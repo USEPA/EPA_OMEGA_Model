@@ -127,7 +127,7 @@ class DriveCycleWeights(OMEGABase):
 
         """
 
-        import numpy as np
+
 
         DriveCycleWeights._data.clear()
 

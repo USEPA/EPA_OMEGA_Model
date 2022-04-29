@@ -281,7 +281,6 @@ class MarketClassBase:
             A copy of the market class dict.
 
         """
-        import copy
         return copy.deepcopy(MarketClassBase._market_class_dict)
 
     @staticmethod
@@ -297,7 +296,6 @@ class MarketClassBase:
             A copy of the appropriate hierarchical market class dict.
 
         """
-        import copy
         if by_reg_class:
             return copy.deepcopy(MarketClassBase._market_class_tree_dict_rc)
         else:

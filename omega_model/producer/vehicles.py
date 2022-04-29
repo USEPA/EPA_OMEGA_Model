@@ -65,7 +65,6 @@ For example, a ``fueling_class:BEV:/:cert_direct_kwh_per_mile->onroad_direct_kwh
 **CODE**
 
 """
-import numpy as np
 
 print('importing %s' % __file__)
 
@@ -81,6 +80,8 @@ from common.omega_functions import weighted_value
 
 from context.fuel_prices import FuelPrice
 from context.onroad_fuels import OnroadFuel
+
+from producer.vehicle_annual_data import VehicleAnnualData
 
 cost_curve_interp_key = 'credits_co2e_Mg_per_vehicle'  # was 'cert_co2e_grams_per_mile'
 
@@ -220,7 +221,7 @@ class VehicleAttributeCalculations(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        import numpy as np
+
 
         if clear_cache:
             VehicleAttributeCalculations._cache = dict()
@@ -384,12 +385,6 @@ class CompositeVehicle(OMEGABase):
             self.cost_curve = self.calc_composite_cost_curve(plot=plot_cost_curve)
 
         self.tech_option_iteration_num = 0
-
-        # self.normalized_target_co2e_Mg = weighted_value(self.vehicle_list, self.weight_by,
-        #                                                 'normalized_target_co2e_Mg')
-        #
-        # self.normalized_cert_co2e_Mg = \
-        #     omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self, co2_gpmi_variants=1, sales_variants=1)
 
     def retail_fuel_price_dollars_per_unit(self, calendar_year=None):
         """
@@ -611,6 +606,14 @@ class CompositeVehicle(OMEGABase):
         return weighted_value(self.vehicle_list, self.weight_by, attribute_name)
 
 
+def calc_vehicle_frontier(vehicle):
+    cost_cloud = omega_globals.options.CostCloud.get_cloud(vehicle)
+    vehicle.cost_curve = vehicle.create_frontier_df(cost_cloud)
+    VehicleAttributeCalculations.perform_attribute_calculations(vehicle)
+
+    return vehicle
+
+
 def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     """
 
@@ -655,22 +658,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
 
     to_vehicle.set_target_co2e_grams_per_mile()  # varies by model year
 
-    if type(from_vehicle) == VehicleFinal:
-        # finish transfer from VehicleFinal to Vehicle
-        if omega_globals.options.flat_context:
-            model_year = to_vehicle.model_year = omega_globals.options.flat_context_year
-            cost_cloud = omega_globals.options.CostCloud.get_cloud(to_vehicle)
-            to_vehicle.model_year = model_year
-        else:
-            cost_cloud = omega_globals.options.CostCloud.get_cloud(to_vehicle)
-
-        to_vehicle.cost_curve = to_vehicle.create_frontier_df(cost_cloud)  # create frontier, inc. generalized cost and policy effects
-
-        # to_vehicle.normalized_target_co2e_Mg = \
-        #     omega_globals.options.VehicleTargets.calc_target_co2e_Mg(to_vehicle, sales_variants=1)
-
-        VehicleAttributeCalculations.perform_attribute_calculations(to_vehicle)
-    else:  # type(from_vehicle == Vehicle)
+    if type(from_vehicle) == Vehicle:
         # finish transfer from Vehicle to VehicleFinal
         to_vehicle.initial_registered_count = from_vehicle.initial_registered_count
 
@@ -1132,7 +1120,6 @@ class VehicleFinal(SQABase, Vehicle):
             Nothing, updates vehicle initial registered count
 
         """
-        from producer.vehicle_annual_data import VehicleAnnualData
         self._initial_registered_count = initial_registered_count
 
         omega_globals.session.add(self)  # update database so vehicle_annual_data foreign key succeeds...

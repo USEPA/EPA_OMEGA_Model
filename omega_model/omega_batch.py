@@ -440,6 +440,7 @@ applied.
 print('importing %s' % __file__)
 
 import os, sys
+import copy
 
 # make sure top-level project folder is on the path (i.e. folder that contains omega_model)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -952,11 +953,9 @@ class OMEGASessionObject(OMEGABase):
             Nothing, updates ``self.settings``
 
         """
-        from copy import copy
-
         self.batch.batch_log.logwrite('Getting User settings...')
 
-        self.settings = copy(self.batch.settings)    # copy batch-level settings to session
+        self.settings = copy.copy(self.batch.settings)    # copy batch-level settings to session
 
         self.settings.session_name = self.name
         self.settings.session_unique_name = self.batch.name + '_' + self.name
@@ -1447,8 +1446,6 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 
         batch.add_sessions(verbose=options.verbose)
 
-        import copy
-
         expanded_batch = copy.deepcopy(batch)
         expanded_batch.name = os.path.splitext(os.path.basename(options.batch_file))[0] + '_expanded' + \
                               os.path.splitext(options.batch_file)[1]
@@ -1620,7 +1617,6 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
             if options.dispy:  # run remote job on cluster, except for first job if generating context vehicle prices
                 dispy_session_list = session_list
 
-                import copy
                 # run reference case to generate vehicle prices then dispy the rest
                 run_bundled_sessions(options, remote_batchfile, [0])
                 dispy_session_list = dispy_session_list[1:]
@@ -1656,14 +1652,14 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                             annual_physical_effects_filename = options.batch_path + '_' \
                                                                + batch.sessions[s_index].settings.output_folder \
                                                                + batch.sessions[s_index].settings.session_unique_name \
-                                                               + '_annual_physical_effects.csv'
+                                                               + '_physical_effects_annual.csv'
                             annual_physical_effects_dfs.append(pd.read_csv(annual_physical_effects_filename))
 
                         if 'Costs' in options.calc_effects:
                             apa_cost_effects_filename = options.batch_path + '_' \
                                                         + batch.sessions[s_index].settings.output_folder \
                                                         + batch.sessions[s_index].settings.session_unique_name \
-                                                        + '_annual_present_and_annualized_cost_effects.csv'
+                                                        + '_cost_effects_annual_present_and_annualized.csv'
                             apa_cost_effects_dfs.append(pd.read_csv(apa_cost_effects_filename))
 
                 batch_summary_df = pd.concat(session_summary_dfs, ignore_index=True, sort=False)
@@ -1672,12 +1668,12 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 
                 if 'Physical' in options.calc_effects:
                     batch_annual_physical_effects_df = pd.concat(annual_physical_effects_dfs, ignore_index=True, sort=False)
-                    batch_annual_physical_effects_filename = batch.name + '_annual_physical_effects.csv'
+                    batch_annual_physical_effects_filename = batch.name + '_physical_effects_annual.csv'
                     batch_annual_physical_effects_df.to_csv(batch_annual_physical_effects_filename, index=False)
 
                 if 'Costs' in options.calc_effects:
                     batch_apa_cost_effects_df = pd.concat(apa_cost_effects_dfs, ignore_index=True, sort=False)
-                    batch_apa_cost_effects_filename = batch.name + '_annual_present_and_annualized_cost_effects.csv'
+                    batch_apa_cost_effects_filename = batch.name + '_cost_effects_annual_present_and_annualized.csv'
                     batch_apa_cost_effects_df.to_csv(batch_apa_cost_effects_filename, index=False)
 
 

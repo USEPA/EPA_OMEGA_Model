@@ -38,6 +38,7 @@ try:
     pd.set_option('chained_assignment', 'raise')
     from pandas.api.types import is_numeric_dtype
     import numpy as np
+    import copy
 
     from common.omega_globals import *
     from common.omega_types import *
@@ -161,7 +162,8 @@ try:
             self.criteria_cost_factors_file = path + 'test_inputs/cost_factors_criteria.csv'
             self.energysecurity_cost_factors_file = path + 'test_inputs/cost_factors_energysecurity.csv'
             self.congestion_noise_cost_factors_file = path + 'test_inputs/cost_factors_congestion_noise.csv'
-            self.emission_factors_vehicles_file = path + 'test_inputs/emission_factors_vehicles.csv'
+            self.emission_factors_vehicles_file = path + 'test_inputs/emission_rates_vehicles-NTR.csv'
+            # self.emission_factors_vehicles_file = path + 'test_inputs/emission_factors_vehicles.csv'
             self.emission_factors_powersector_file = path + 'test_inputs/emission_factors_powersector.csv'
             self.emission_factors_refinery_file = path + 'test_inputs/emission_factors_refinery.csv'
             self.maintenance_cost_inputs_file = path + 'test_inputs/maintenance_cost.csv'

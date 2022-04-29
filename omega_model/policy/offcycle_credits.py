@@ -149,7 +149,7 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
             List of template/input errors, else empty list on success
 
         """
-        import numpy as np
+
 
         OffCycleCredits._data.clear()
 
