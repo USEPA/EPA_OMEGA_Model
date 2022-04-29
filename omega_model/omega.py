@@ -1210,7 +1210,8 @@ def init_omega(session_runtime_options):
     from effects.cost_factors_congestion_noise import CostFactorsCongestionNoise
     from effects.emission_factors_powersector import EmissionFactorsPowersector
     from effects.emission_factors_refinery import EmissionFactorsRefinery
-    from effects.emission_factors_vehicles import EmissionFactorsVehicles
+    # from effects.emission_factors_vehicles import EmissionFactorsVehicles
+    from effects.emission_rates_vehicles import EmissionRatesVehicles
     from effects.cpi_price_deflators import CPIPriceDeflators
     from effects.ip_deflators import ImplictPriceDeflators
 
@@ -1332,8 +1333,11 @@ def init_omega(session_runtime_options):
             init_fail += EmissionFactorsRefinery.init_from_file(omega_globals.options.emission_factors_refinery_file,
                                                                 verbose=verbose_init)
 
-            init_fail += EmissionFactorsVehicles.init_from_file(omega_globals.options.emission_factors_vehicles_file,
-                                                                verbose=verbose_init)
+            # init_fail += EmissionFactorsVehicles.init_from_file(omega_globals.options.emission_factors_vehicles_file,
+            #                                                     verbose=verbose_init)
+
+            init_fail += EmissionRatesVehicles.init_from_file(omega_globals.options.emission_factors_vehicles_file,
+                                                              verbose=verbose_init)
 
             init_fail += CostFactorsCriteria.init_from_file(omega_globals.options.criteria_cost_factors_file,
                                                             verbose=verbose_init)
@@ -1366,8 +1370,11 @@ def init_omega(session_runtime_options):
             init_fail += EmissionFactorsRefinery.init_from_file(omega_globals.options.emission_factors_refinery_file,
                                                                 verbose=verbose_init)
 
-            init_fail += EmissionFactorsVehicles.init_from_file(omega_globals.options.emission_factors_vehicles_file,
-                                                                verbose=verbose_init)
+            # init_fail += EmissionFactorsVehicles.init_from_file(omega_globals.options.emission_factors_vehicles_file,
+            #                                                     verbose=verbose_init)
+
+            init_fail += EmissionRatesVehicles.init_from_file(omega_globals.options.emission_factors_vehicles_file,
+                                                              verbose=verbose_init)
 
         if not init_fail:
             # initial year = initial fleet model year (latest year of data)
