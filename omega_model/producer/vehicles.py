@@ -65,7 +65,6 @@ For example, a ``fueling_class:BEV:/:cert_direct_kwh_per_mile->onroad_direct_kwh
 **CODE**
 
 """
-import ray
 
 print('importing %s' % __file__)
 
