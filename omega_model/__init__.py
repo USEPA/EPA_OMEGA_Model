@@ -177,7 +177,7 @@ try:
             # developer settings
             self.producer_num_market_share_options = 3
             self.producer_num_tech_options_per_ice_vehicle = 3
-            self.producer_num_tech_options_per_bev_vehicle = 1
+            self.producer_num_tech_options_per_bev_vehicle = 3
             self.cost_curve_frontier_affinity_factor = 0.75
             self.slice_tech_combo_cloud_tables = True
             self.verbose = False
@@ -195,11 +195,11 @@ try:
             self.flat_context_year = 2021
 
             # list of modules to allow verbose log files, or empty to disable:
-            self.verbose_log_modules = ['database_', 'producer_compliance_search_', 'cross_subsidy_search_',
+            self.verbose_log_modules = ['database_', 'producer_compliance_search', 'cross_subsidy_search_',
                                         'cv_cost_curves_', 'v_cost_curves_']
 
             # list of modules to allow verbose console output, or empty to disable
-            self.verbose_console_modules = ['producer_compliance_search_',
+            self.verbose_console_modules = ['producer_compliance_search',
                                             'p-c_shares_and_costs_', 'p-c_max_iterations_',
                                             'cross_subsidy_search_', 'cross_subsidy_multipliers_',
                                             'cross_subsidy_convergence_']
