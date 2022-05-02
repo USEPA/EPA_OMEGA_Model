@@ -70,6 +70,8 @@ def validate_template_version_info(filename, input_template_name, input_template
     # read first row of input file as list of values
     version_data = pd.read_csv(filename, header=None, nrows=1).values.tolist()[0]
 
+    omega_globals.options.inputfile_metadata.append([filename] + version_data)
+
     if verbose:
         omega_log.logwrite('Validating Template Version [%s]' % filename)
 
@@ -157,8 +159,6 @@ def _validate_dataframe_column(df, column_name, allowed_values, header_lines=2):
         Empty list on success or list of errors on failure
 
     """
-
-
     error_list = []
 
     valid = np.array([v in allowed_values for v in df[column_name].values])

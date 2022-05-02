@@ -81,6 +81,7 @@ try:
             import time
 
             path = os.path.dirname(os.path.abspath(__file__)) + os.sep
+            self.inputfile_metadata = []
             self.session_name = 'OMEGA Quick Test'
             self.session_unique_name = 'OMEGA Quick Test'
             self.session_is_reference = True
