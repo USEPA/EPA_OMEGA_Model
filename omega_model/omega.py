@@ -1448,8 +1448,6 @@ def run_omega(session_runtime_options, standalone_run=False):
 
                 freeze_support()
 
-                # num_processes = os.cpu_count() - 1
-
                 num_processes = min(len(omega_globals.options.MarketClass.market_classes), os.cpu_count() - 1)
 
                 start_time = time.time()
@@ -1483,8 +1481,6 @@ def run_omega(session_runtime_options, standalone_run=False):
                 omega_log.logwrite('Generating Profiler Dump...')
                 stats.dump_stats('omega_profile.dmp')
 
-            postproc_session.run_postproc(iteration_log, credit_banks)
-
             from context.new_vehicle_market import NewVehicleMarket
 
             if omega_globals.options.session_is_reference and \
@@ -1497,6 +1493,15 @@ def run_omega(session_runtime_options, standalone_run=False):
             NewVehicleMarket.save_session_new_vehicle_generalized_costs(
                 omega_globals.options.output_folder + omega_globals.options.session_unique_name +
                 '_new_vehicle_prices.csv')
+
+            metadata_df = pd.DataFrame(omega_globals.options.inputfile_metadata)
+            metadata_df = metadata_df.drop(columns=[3, 5])
+
+            metadata_df = metadata_df.rename(columns={0: 'filepath', 1: 'filename', 2: 'checksum',
+                                                      4: 'input_template_name', 6: 'version_number', 7: 'notes:'})
+
+            metadata_df.to_csv(
+                omega_globals.options.output_folder + 'inputfile_metadata.csv', index=False, header=True)
 
             omega_log.end_logfile("\nSession Complete")
 
