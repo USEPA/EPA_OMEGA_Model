@@ -101,7 +101,8 @@ def validate_template_version_info(filename, input_template_name, input_template
 
     hash = hashlib.sha1(pd.util.hash_pandas_object(df).values).hexdigest()
 
-    omega_globals.options.inputfile_metadata.append([filename, hash] + version_data)
+    omega_globals.options.inputfile_metadata.append([file_io.get_filepath(filename), file_io.get_basename(filename),
+                                                     hash] + version_data)
 
     if verbose:
         omega_log.logwrite('Validating Template Version [%s]' % filename)
