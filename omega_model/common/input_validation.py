@@ -14,6 +14,7 @@ print('importing %s' % __file__)
 
 from omega_model import *
 from omega_model.input_files import InputFiles
+import hashlib
 
 import pandas as pd
 
@@ -96,7 +97,11 @@ def validate_template_version_info(filename, input_template_name, input_template
     # read first row of input file as list of values
     version_data = pd.read_csv(filename, header=None, nrows=1).values.tolist()[0]
 
-    omega_globals.options.inputfile_metadata.append([filename] + version_data)
+    df = pd.read_csv(filename, skiprows=1)
+
+    hash = hashlib.sha1(pd.util.hash_pandas_object(df).values).hexdigest()
+
+    omega_globals.options.inputfile_metadata.append([filename, hash] + version_data)
 
     if verbose:
         omega_log.logwrite('Validating Template Version [%s]' % filename)
