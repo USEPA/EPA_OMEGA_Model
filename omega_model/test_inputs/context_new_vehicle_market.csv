@@ -1,4 +1,4 @@
-input_template_name:,context_new_vehicle_market,input_template_version:,0.2,20220401-173357_run,,,,,,,,,,,,,,
+input_template_name:,context_new_vehicle_market,input_template_version:,0.2,description:,20220401-173357_run,,,,,,,,,,,,,
 context_id,dollar_basis,case_id,context_size_class,calendar_year,reg_class_id,sales_share_of_regclass,sales_share_of_total,sales,weight_lbs,horsepower,horsepower_to_weight_ratio,mpg_conventional,mpg_conventional_onroad,mpg_alternative,mpg_alternative_onroad,onroad_to_cycle_mpg_ratio,ice_price_dollars,bev_price_dollars
 AEO2020,2019,Reference case,Minicompact,2019,car,0.42,0.19,30958.782039697202,2938.287598,266.538513,0.09071219344948549,32.889961,26.858435502015,57.07032,46.6044793668,0.816615,76875.038,0.0
 AEO2020,2019,Reference case,Subcompact,2019,car,4.52,2.11,331827.2822319624,3315.591309,263.971893,0.07961532903149494,33.923519,27.702454468185,49.373997,40.319546560155004,0.816615,40670.395,0.0
