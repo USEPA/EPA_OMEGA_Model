@@ -278,7 +278,7 @@ def run_producer_consumer():
                                                    producer_decision, strategic_target_offset_Mg)
 
                 converged, share_convergence_error, cross_subsidy_pricing_error = \
-                    detect_convergence(producer_decision_and_response, producer_market_classes)
+                    detect_producer_consumer_convergence(producer_decision_and_response, producer_market_classes)
 
                 # decide whether to continue iterating or not
                 iterate_producer_consumer = omega_globals.options.iterate_producer_consumer \
@@ -456,7 +456,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                     omega_globals.options.producer_compliance_search_tolerance
 
     mcat_converged, share_convergence_error, cross_subsidy_pricing_error = \
-        detect_convergence(producer_decision_and_response, producer_market_classes)
+        detect_producer_consumer_convergence(producer_decision_and_response, producer_market_classes)
 
     if (best_producer_decision_and_response is None) or \
             (producer_decision_and_response['pricing_score']
@@ -988,7 +988,8 @@ def calc_market_category_data(producer_decision):
         producer_decision['average_onroad_mpg_%s' % mcat] /= \
             producer_decision['sales_%s' % mcat]
 
-def detect_convergence(producer_decision_and_response, producer_market_classes):
+
+def detect_producer_consumer_convergence(producer_decision_and_response, producer_market_classes):
     """
     Detect producer-consumer market share convergence.
 
@@ -1482,6 +1483,8 @@ def run_omega(session_runtime_options, standalone_run=False):
                 profiler.enable()
 
             iteration_log, credit_banks = run_producer_consumer()
+
+            postproc_session.run_postproc(iteration_log, credit_banks)
 
             if omega_globals.options.run_profiler:
                 profiler.disable()
