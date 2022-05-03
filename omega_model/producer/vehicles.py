@@ -940,7 +940,7 @@ class Vehicle(OMEGABase):
                 cost_curve = cost_curve.iloc[[0]]
         else:
             cost_curve = calc_frontier(cost_cloud, cost_curve_interp_key,
-                                       'new_vehicle_mfr_cost_dollars', allow_upslope=allow_upslope)
+                                       'new_vehicle_mfr_generalized_cost_dollars', allow_upslope=allow_upslope)
 
         # import common
         # self.cost_curve_class = self.name
@@ -971,29 +971,29 @@ class Vehicle(OMEGABase):
             fig, ax1 = figure()
             label_xyt(ax1, 'CO2e [g/mi]', 'Cost [$]', 'veh %s %s' % (self.vehicle_id, self.name))
 
-            ax1.plot(cost_cloud['cert_co2e_grams_per_mile'],
-                     cost_cloud['new_vehicle_mfr_cost_dollars'], '.',
-                     label='Production Cost')
-
-            ax1.plot(cost_cloud['cert_co2e_grams_per_mile'],
-                     cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], '.',
-                     label='Generalized Cost')
+            # ax1.plot(cost_cloud['cert_co2e_grams_per_mile'],
+            #          cost_cloud['new_vehicle_mfr_cost_dollars'], '.',
+            #          label='Production Cost')
+            #
+            # ax1.plot(cost_cloud['cert_co2e_grams_per_mile'],
+            #          cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], '.',
+            #          label='Generalized Cost')
 
             ax1.plot(cost_cloud[cost_curve_interp_key],
                      cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], 'x',
                      label='Credits g/mi')
 
-            ax1.plot(cost_curve[cost_curve_interp_key],
+            ax1.plot(cost_curve['veh_%s_%s' % (self.vehicle_id, cost_curve_interp_key)],
                      cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_id], 'x-',
                      color='black',
                      label='Credit Cost Curve')
 
-            ax1.plot(cost_curve['veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id],
-                     cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_id], 's-',
-                     color='black',
-                     label='g/mi Cost Curve')
+            # ax1.plot(cost_curve['veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id],
+            #          cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_id], 's-',
+            #          color='black',
+            #          label='g/mi Cost Curve')
 
-            vlineat(ax1, self.target_co2e_grams_per_mile, 'r-', label='target co2e g/mi')
+            # vlineat(ax1, self.target_co2e_grams_per_mile, 'r-', label='target co2e g/mi')
 
             ax1.legend(fontsize='medium', bbox_to_anchor=(0, 1.07), loc="lower left", borderaxespad=0)
 
@@ -1006,7 +1006,7 @@ class Vehicle(OMEGABase):
                      cost_cloud['cert_co2e_grams_per_mile'], '.',
                      label='CO2e g/mi')
 
-            ax1.plot(cost_curve[cost_curve_interp_key],
+            ax1.plot(cost_curve['veh_%s_%s' % (self.vehicle_id, cost_curve_interp_key)],
                      cost_curve['veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id], 's-',
                      color='black',
                      label='Credit CO2e Curve')

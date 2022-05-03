@@ -1,4 +1,4 @@
-input_template_name:,context_fuel_prices,input_template_version:,0.2,20220401-173357_run,,
+input_template_name:,context_fuel_prices,input_template_version:,0.2,description:,20220401-173357_run,
 context_id,dollar_basis,case_id,fuel_id,calendar_year,retail_dollars_per_unit,pretax_dollars_per_unit
 AEO2020,2019,Reference case,pump gasoline,2019,2.665601,2.10838
 AEO2020,2019,Reference case,pump gasoline,2020,2.639979,2.086804

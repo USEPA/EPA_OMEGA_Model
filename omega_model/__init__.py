@@ -81,6 +81,7 @@ try:
             import time
 
             path = os.path.dirname(os.path.abspath(__file__)) + os.sep
+            self.inputfile_metadata = []
             self.session_name = 'OMEGA Quick Test'
             self.session_unique_name = 'OMEGA Quick Test'
             self.session_is_reference = True
@@ -185,7 +186,7 @@ try:
             self.producer_consumer_max_iterations = 20  # recommend 2+
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
-            self.producer_compliance_search_convergence_factor = 0.5
+            self.producer_compliance_search_convergence_factor = 0.9
             self.producer_compliance_search_tolerance = 1e-6
             self.producer_cross_subsidy_price_tolerance = 1e-4
             self.run_profiler = False
@@ -194,7 +195,7 @@ try:
             self.flat_context_year = 2021
 
             # list of modules to allow verbose log files, or empty to disable:
-            self.verbose_log_modules = ['database_', 'producer_compliance_search_', 'cross_subsidy_search_',
+            self.verbose_log_modules = ['database_', 'producer_compliance_search', 'cross_subsidy_search_',
                                         'cv_cost_curves_', 'v_cost_curves_']
 
             # list of modules to allow verbose console output, or empty to disable
@@ -209,7 +210,7 @@ try:
             self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging
 
             # list of vehicles to plot in log_producer_compliance_search_years:
-            self.plot_and_log_vehicles = [] # ['ICE Large Van truck minivan 4WD']
+            self.plot_and_log_vehicles = []  # ['ICE Large Van truck minivan 4WD']
 
             # dynamic modules / classes
             self.RegulatoryClasses = None

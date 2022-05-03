@@ -13,6 +13,8 @@ Used during the initialization process.
 print('importing %s' % __file__)
 
 from omega_model import *
+from omega_model.input_files import InputFiles
+import hashlib
 
 import pandas as pd
 
@@ -53,6 +55,31 @@ def get_template_name(filename):
     return template_name
 
 
+def get_description(template_name, filename):
+    """
+    Get input file template name.  Can be used to identify the type of input file during simulation initialization
+    when more than one type of input file may be provided (e.g. various GHG standards).
+
+    Args:
+        template_name (str): target template name
+        filename (str): name of the file from which to get the input template name
+
+    Returns:
+        Nothing; updates input_files.InputFiles._data
+
+    """
+    # read first row of input file as list of values
+    version_data = pd.read_csv(filename, header=None, nrows=1).values.tolist()[0]
+    if 'description:' not in version_data:
+        description = None
+    else:
+        description_index = version_data.index('description:')
+        description = version_data[description_index + 1]
+    InputFiles.update_input_files_dict(template_name, description)
+
+    return
+
+
 def validate_template_version_info(filename, input_template_name, input_template_version, verbose=False):
     """
     Reads the template version infor from an input file and validates the template name and version number.
@@ -69,6 +96,13 @@ def validate_template_version_info(filename, input_template_name, input_template
     """
     # read first row of input file as list of values
     version_data = pd.read_csv(filename, header=None, nrows=1).values.tolist()[0]
+
+    df = pd.read_csv(filename, skiprows=1)
+
+    hash = hashlib.sha1(pd.util.hash_pandas_object(df).values).hexdigest()
+
+    omega_globals.options.inputfile_metadata.append([file_io.get_filepath(filename), file_io.get_basename(filename),
+                                                     hash] + version_data)
 
     if verbose:
         omega_log.logwrite('Validating Template Version [%s]' % filename)
@@ -103,6 +137,9 @@ def validate_template_version_info(filename, input_template_name, input_template
         omega_log.logwrite(error_list)
     elif verbose:
         omega_log.logwrite('')
+
+    if 'description:' in version_data:
+        get_description(template_name, filename)
 
     return error_list
 
@@ -157,8 +194,6 @@ def _validate_dataframe_column(df, column_name, allowed_values, header_lines=2):
         Empty list on success or list of errors on failure
 
     """
-
-
     error_list = []
 
     valid = np.array([v in allowed_values for v in df[column_name].values])

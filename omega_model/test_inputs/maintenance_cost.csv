@@ -1,4 +1,4 @@
-input_template_name:,maintenance_cost,input_template_version:,0.2,,,
+input_template_name:,maintenance_cost,input_template_version:,0.2,description:,from ANL TCO report,
 item,miles_per_event_ICE,miles_per_event_HEV,miles_per_event_PHEV,miles_per_event_BEV,dollars_per_event,dollar_basis
 Engine Oil,7500,7500,9000,,65,2019
 Oil Filter,7500,7500,9000,,20,2019
