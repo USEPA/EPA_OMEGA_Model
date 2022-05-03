@@ -129,7 +129,7 @@ def logwrite_shares_and_costs(calendar_year, share_convergence_error, cross_subs
 
     for mc in sorted(omega_globals.options.MarketClass.market_classes):
         omega_log.logwrite(('%d producer / consumer_abs_share_frac_%s' % (calendar_year, mc)).ljust(55) +
-                           '= %.4f / %.4f (DELTA:%f)' % (
+                           '= %.6f / %.6f (DELTA:%.6f)' % (
                                producer_decision_and_response['producer_abs_share_frac_%s' % mc],
                                producer_decision_and_response['consumer_abs_share_frac_%s' % mc],
                                abs(producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
@@ -463,14 +463,40 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
              < best_producer_decision_and_response['pricing_score']):
         best_producer_decision_and_response = producer_decision_and_response.copy()
 
+    logwrite_cross_subsidy_results(calendar_year, cross_subsidy_pricing_error, producer_consumer_iteration_num,
+                                   producer_decision_and_response, share_convergence_error)
+
     update_cross_subsidy_log_data(producer_decision_and_response, calendar_year, compliance_id, mcat_converged,
                                   producer_consumer_iteration_num, compliant, share_convergence_error)
-
-    # iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
 
     iteration_log.append(producer_decision_and_response)
 
     return best_producer_decision_and_response, iteration_log, producer_decision_and_response
+
+
+def logwrite_cross_subsidy_results(calendar_year, cross_subsidy_pricing_error, producer_consumer_iteration_num,
+                                   producer_decision_and_response, share_convergence_error):
+    """
+
+    Args:
+        calendar_year:
+        cross_subsidy_pricing_error:
+        producer_consumer_iteration_num:
+        producer_decision_and_response:
+        share_convergence_error:
+
+    """
+    if 'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
+        logwrite_shares_and_costs(calendar_year, share_convergence_error, cross_subsidy_pricing_error,
+                                  producer_decision_and_response, producer_consumer_iteration_num,
+                                  producer_consumer_iteration_num)
+
+    multiplier_columns = ['cost_multiplier_%s' % mc for mc in sorted(omega_globals.options.MarketClass.market_classes)]
+
+    if 'cross_subsidy_multipliers' in omega_globals.options.verbose_console_modules:
+        for mc, cc in zip(sorted(omega_globals.options.MarketClass.market_classes), multiplier_columns):
+            omega_log.logwrite(('FINAL %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc],
+                               echo_console=True)
 
 
 def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pair, producer_decision,
@@ -530,8 +556,6 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pai
             mcat_cross_subsidy_iteration_num
 
         if 'cross_subsidy_search' in omega_globals.options.verbose_log_modules:
-            # iteration_log = iteration_log.append(cross_subsidy_options_and_response, ignore_index=True)
-
             iteration_log.append(cross_subsidy_options_and_response)
 
 
@@ -554,15 +578,12 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pai
                                       producer_consumer_iteration_num, None,
                                       cross_subsidy_options_and_response['abs_share_delta_%s' % mcat])
 
-        # iteration_log = iteration_log.append(cross_subsidy_options_and_response, ignore_index=True)
-
         iteration_log.append(cross_subsidy_options_and_response)
 
         continue_search = continue_search and not mcat_converged
 
-    update_market_classes_console_log(calendar_year, mcat, cross_subsidy_pair, share_convergence_error,
-                                      cross_subsidy_pricing_error, mcat_converged, producer_consumer_iteration_num,
-                                      cross_subsidy_options_and_response)
+    update_cross_subsidy_pair_console_log(cross_subsidy_pair, share_convergence_error, cross_subsidy_pricing_error,
+                                          mcat_converged)
 
     if 'cross_subsidy_search' in omega_globals.options.verbose_console_modules:
         omega_log.logwrite('')
@@ -570,32 +591,19 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pai
     return cross_subsidy_options_and_response, iteration_log
 
 
-def update_market_classes_console_log(calendar_year, mcat, cross_subsidy_pair, share_convergence_error,
-                                      cross_subsidy_pricing_error,
-                                      mcat_converged, producer_consumer_iteration_num, producer_decision_and_response):
+def update_cross_subsidy_pair_console_log(cross_subsidy_pair, share_convergence_error, cross_subsidy_pricing_error,
+                                          mcat_converged):
     """
     Write producer-consumer cross subsidy data to the console and log, if enabled by ``verbose_console_modules``.
 
     Args:
-        calendar_year (int): the year in which the compliance calculations take place
+        cross_subsidy_pair (list): e.g. ['hauling.ICE', 'hauling.BEV']
         share_convergence_error (float): producer-consumer convergence error
         cross_subsidy_pricing_error (float): cross-subsidy pricing error
         mcat_converged (bool): ``True`` if the market class price/cost ratioand the
             producer-consumer shares are within tolerance
-        producer_consumer_iteration_num (int): producer-consumer iteration number
-        producer_decision_and_response (Series): producer decision and cross-subsidy iteration response data
 
     """
-    if 'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
-        logwrite_shares_and_costs(calendar_year, share_convergence_error, cross_subsidy_pricing_error,
-                                  producer_decision_and_response, producer_consumer_iteration_num,
-                                  producer_consumer_iteration_num)
-    multiplier_columns = ['cost_multiplier_%s' % mc for mc in cross_subsidy_pair]
-
-    if 'cross_subsidy_multipliers' in omega_globals.options.verbose_console_modules:
-        for mc, cc in zip(omega_globals.options.MarketClass.market_classes, multiplier_columns):
-            omega_log.logwrite(('FINAL %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc],
-                               echo_console=True)
 
     if 'cross_subsidy_convergence' in omega_globals.options.verbose_console_modules:
         if mcat_converged:
