@@ -1640,6 +1640,9 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 
             # if not running a session inside a dispy batch (i.e. we are the top-level batch):
             if options.session_num is None:
+
+                time.sleep(3)  # wait for summary files to finish writing...
+
                 # post-process sessions (collate summary files)
                 session_summary_dfs = []
                 annual_physical_effects_dfs = []
