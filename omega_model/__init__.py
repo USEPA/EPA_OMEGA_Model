@@ -177,7 +177,7 @@ try:
             # developer settings
             self.producer_num_market_share_options = 3
             self.producer_num_tech_options_per_ice_vehicle = 3
-            self.producer_num_tech_options_per_bev_vehicle = 3
+            self.producer_num_tech_options_per_bev_vehicle = 1
             self.cost_curve_frontier_affinity_factor = 0.75
             self.slice_tech_combo_cloud_tables = True
             self.verbose = False
@@ -186,7 +186,7 @@ try:
             self.producer_consumer_max_iterations = 20  # recommend 2+
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
-            self.producer_compliance_search_convergence_factor = 0.5
+            self.producer_compliance_search_convergence_factor = 0.9
             self.producer_compliance_search_tolerance = 1e-6
             self.producer_cross_subsidy_price_tolerance = 1e-4
             self.run_profiler = False
@@ -199,7 +199,7 @@ try:
                                         'cv_cost_curves_', 'v_cost_curves_']
 
             # list of modules to allow verbose console output, or empty to disable
-            self.verbose_console_modules = ['producer_compliance_search',
+            self.verbose_console_modules = ['producer_compliance_search_',
                                             'p-c_shares_and_costs_', 'p-c_max_iterations_',
                                             'cross_subsidy_search_', 'cross_subsidy_multipliers_',
                                             'cross_subsidy_convergence_']
@@ -210,7 +210,7 @@ try:
             self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging
 
             # list of vehicles to plot in log_producer_compliance_search_years:
-            self.plot_and_log_vehicles = [] # ['ICE Large Van truck minivan 4WD']
+            self.plot_and_log_vehicles = []  # ['ICE Large Van truck minivan 4WD']
 
             # dynamic modules / classes
             self.RegulatoryClasses = None

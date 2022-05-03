@@ -971,13 +971,13 @@ class Vehicle(OMEGABase):
             fig, ax1 = figure()
             label_xyt(ax1, 'CO2e [g/mi]', 'Cost [$]', 'veh %s %s' % (self.vehicle_id, self.name))
 
-            ax1.plot(cost_cloud['cert_co2e_grams_per_mile'],
-                     cost_cloud['new_vehicle_mfr_cost_dollars'], '.',
-                     label='Production Cost')
-
-            ax1.plot(cost_cloud['cert_co2e_grams_per_mile'],
-                     cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], '.',
-                     label='Generalized Cost')
+            # ax1.plot(cost_cloud['cert_co2e_grams_per_mile'],
+            #          cost_cloud['new_vehicle_mfr_cost_dollars'], '.',
+            #          label='Production Cost')
+            #
+            # ax1.plot(cost_cloud['cert_co2e_grams_per_mile'],
+            #          cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], '.',
+            #          label='Generalized Cost')
 
             ax1.plot(cost_cloud[cost_curve_interp_key],
                      cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], 'x',
@@ -988,12 +988,12 @@ class Vehicle(OMEGABase):
                      color='black',
                      label='Credit Cost Curve')
 
-            ax1.plot(cost_curve['veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id],
-                     cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_id], 's-',
-                     color='black',
-                     label='g/mi Cost Curve')
+            # ax1.plot(cost_curve['veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id],
+            #          cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_id], 's-',
+            #          color='black',
+            #          label='g/mi Cost Curve')
 
-            vlineat(ax1, self.target_co2e_grams_per_mile, 'r-', label='target co2e g/mi')
+            # vlineat(ax1, self.target_co2e_grams_per_mile, 'r-', label='target co2e g/mi')
 
             ax1.legend(fontsize='medium', bbox_to_anchor=(0, 1.07), loc="lower left", borderaxespad=0)
 
