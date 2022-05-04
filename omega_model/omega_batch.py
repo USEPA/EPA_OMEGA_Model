@@ -306,6 +306,10 @@ Data Row Name and Description
     The relative or absolute path to the drive cycle weights file,
     loaded by ``policy.drive_cycle_weights.DriveCycleWeights``
 
+:Drive Cycle Ballast File *(str)*:
+    The relative or absolute path to the drive cycle ballast file,
+    loaded by ``policy.drive_cycle_ballast.DriveCycleBallast``
+
 :Drive Cycles File *(str)*:
     The relative or absolute path to the drive cycles file,
     loaded by ``policy.drive_cycles.DriveCycles``
@@ -1006,6 +1010,7 @@ class OMEGASessionObject(OMEGABase):
 
         # read policy settings
         self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')
+        self.settings.drive_cycle_ballast_file = self.read_parameter('Drive Cycle Ballast File')
         self.settings.drive_cycles_file = self.read_parameter('Drive Cycles File')
         self.settings.ghg_credit_params_file = self.read_parameter('GHG Credit Params File')
         self.settings.ghg_credits_file = self.read_parameter('GHG Credits File')
@@ -1635,6 +1640,9 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 
             # if not running a session inside a dispy batch (i.e. we are the top-level batch):
             if options.session_num is None:
+
+                time.sleep(3)  # wait for summary files to finish writing...
+
                 # post-process sessions (collate summary files)
                 session_summary_dfs = []
                 annual_physical_effects_dfs = []

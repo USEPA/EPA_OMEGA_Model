@@ -43,6 +43,7 @@ Session Name,String,NoActionPolicy,NoActionPolicyAgain
 ,,,
 Session Policy Alternatives Settings,,,
 Drive Cycle Weights File,String,drive_cycle_weights.csv,drive_cycle_weights.csv
+Drive Cycle Ballast File,String,drive_cycle_ballast.csv,drive_cycle_ballast.csv
 Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
 GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
 GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-footprint.csv
