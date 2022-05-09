@@ -129,12 +129,14 @@ def calc_present_and_annualized_values(dict_of_values, calendar_years):
     """
     discount_to_year = omega_globals.options.discount_values_to_year
     cost_accrual = omega_globals.options.cost_accrual
+    discount_offset = 1
+    annualized_offset = 0
     if cost_accrual == 'beginning-of-year':
         discount_offset = 0
         annualized_offset = 1
-    elif cost_accrual == 'end-of-year':
-        discount_offset = 1
-        annualized_offset = 0
+    # elif cost_accrual == 'end-of-year':
+    #     discount_offset = 1
+    #     annualized_offset = 0
 
     social_discrates = [0.03, 0.07]
     emission_dr25 = '_2.5'
@@ -164,43 +166,6 @@ def calc_present_and_annualized_values(dict_of_values, calendar_years):
     # first create a dictionary to house data
     calcs_dict = dict()
 
-    # first undiscounted annual values
-    # social_discrate = 0
-    # series = 'AnnualValue'
-    # for calendar_year in calendar_years:
-    #     calcs_dict.update({(calendar_year, social_discrate, series): {'session_name': omega_globals.options.session_name,
-    #                                                                   'calendar_year': calendar_year,
-    #                                                                   'discount_rate': social_discrate,
-    #                                                                   'series': series,
-    #                                                                   'periods': 1,
-    #                                                                   }
-    #                        }
-    #                       )
-
-    # then for discounted values
-    # for series in ['AnnualValue', 'PresentValue', 'AnnualizedValue']:
-    # for series in ['AnnualValue', 'AnnualizedValue']:
-    #     for social_discrate in social_discrates:
-    #         for calendar_year in calendar_years:
-    #             calcs_dict.update({(calendar_year, social_discrate, series): {'session_name': omega_globals.options.session_name,
-    #                                                                           'calendar_year': calendar_year,
-    #                                                                           'discount_rate': social_discrate,
-    #                                                                           'series': series,
-    #                                                                           'periods': 1,
-    #                                                                           }
-    #                                }
-    #                               )
-
-    # now fill in calcs_dict; first sum by year for each cost arg in dict_of_values
-    # series = 'AnnualValue'
-    # for social_discrate in [0, *social_discrates]:
-    #     for calendar_year in calendar_years:
-    #         for arg in all_costs:
-    #             arg_annual_value = sum(v[arg] for k, v in dict_of_values.items()
-    #                                    if v['calendar_year'] == calendar_year
-    #                                    and v['discount_rate'] == social_discrate)
-    #             calcs_dict[(calendar_year, social_discrate, series)][arg] = arg_annual_value
-
     # now do a cumulative sum year-over-year for each cost arg in calcs_dict - these will be present values (note removal of rate=0)
     annual_values_df = pd.DataFrame(annual_values_dict).transpose()
     annual_values_df.reset_index(drop=True, inplace=True)
@@ -209,37 +174,20 @@ def calc_present_and_annualized_values(dict_of_values, calendar_years):
     calcs_dict.update(annual_values_dict)
     calcs_dict.update(present_values_dict)
 
-    # now do a cumulative sum year-over-year for each cost arg in calcs_dict - these will be present values (note removal of rate=0)
-    # series = 'PresentValue'
-    # for social_discrate in social_discrates:
-    #     for arg in all_costs:
-    #         for calendar_year in calendar_years:
-    #             periods = calendar_year - discount_to_year + discount_offset
-    #             if periods < 1:
-    #                 arg_present_value = calcs_dict[(calendar_year, social_discrate, 'AnnualValue')][arg]
-    #             else:
-    #                 arg_present_value = sum(v[arg] for k, v in calcs_dict.items()
-    #                                         if discount_to_year <= v['calendar_year'] <= calendar_year
-    #                                         and v['discount_rate'] == social_discrate
-    #                                         and v['series'] == 'AnnualValue')
-    #             calcs_dict[(calendar_year, social_discrate, series)][arg] = arg_present_value
-    #             calcs_dict[(calendar_year, social_discrate, series)]['periods'] = periods
-
-    # now annualize those present values
-
     # first create an annualized_values_dict in which to store results
     series = 'AnnualizedValue'
     annualized_values_dict = dict()
     for social_discrate in social_discrates:
         for calendar_year in calendar_years:
-            annualized_values_dict.update({(calendar_year, social_discrate, series): {'session_name': omega_globals.options.session_name,
-                                                                                      'calendar_year': calendar_year,
-                                                                                      'discount_rate': social_discrate,
-                                                                                      'series': series,
-                                                                                      'periods': 1,
-                                                                                      }
-                                           }
-                                          )
+            annualized_values_dict.update({
+                (calendar_year, social_discrate, series): {'session_name': omega_globals.options.session_name,
+                                                           'calendar_year': calendar_year,
+                                                           'discount_rate': social_discrate,
+                                                           'series': series,
+                                                           'periods': 1,
+                                                           }
+            }
+            )
 
     for social_discrate in social_discrates:
         for arg in non_emission_costs:

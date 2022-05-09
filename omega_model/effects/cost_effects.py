@@ -166,13 +166,14 @@ def calc_cost_effects(physical_effects_dict):
         if onroad_direct_co2e_grams_per_mile or onroad_direct_kwh_per_mile:
             flag = 1
 
-            tech_cost_dollars = 0
+            vehicle_cost_dollars = 0
             fuel_retail_cost_dollars = 0
             fuel_pretax_cost_dollars = 0
             energy_security_cost_dollars = 0
             congestion_cost_dollars = 0
             noise_cost_dollars = 0
             maintenance_cost_dollars = 0
+            repair_cost_dollars = 0
             refueling_cost_dollars = 0
             driving_cost_dollars = 0
             pm25_tailpipe_3, pm25_upstream_3, nox_tailpipe_3, nox_upstream_3, so2_tailpipe_3, so2_upstream_3, \
@@ -221,7 +222,7 @@ def calc_cost_effects(physical_effects_dict):
 
             # tech costs, only for age=0
             if age == 0:
-                tech_cost_dollars = vehicle_count * new_vehicle_cost
+                vehicle_cost_dollars = vehicle_count * new_vehicle_cost
 
             # fuel costs
             fuel_dict = Eval.eval(in_use_fuel_id, {'__builtins__': None}, {})
@@ -311,11 +312,11 @@ def calc_cost_effects(physical_effects_dict):
             n2o_global_3_cost_dollars = n2o_tons * n2o_global_3
             n2o_global_25_cost_dollars = n2o_tons * n2o_global_25
             n2o_global_395_cost_dollars = n2o_tons * n2o_global_395
-            
+
             ghg_global_5_cost_dollars = co2_global_5_cost_dollars + ch4_global_5_cost_dollars + n2o_global_5_cost_dollars
             ghg_global_3_cost_dollars = co2_global_3_cost_dollars + ch4_global_3_cost_dollars + n2o_global_3_cost_dollars
             ghg_global_25_cost_dollars = co2_global_25_cost_dollars + ch4_global_25_cost_dollars + n2o_global_25_cost_dollars
-            ghg_global_395_cost_dollars = co2_global_395_cost_dollars + ch4_global_395_cost_dollars + n2o_global_395_cost_dollars            
+            ghg_global_395_cost_dollars = co2_global_395_cost_dollars + ch4_global_395_cost_dollars + n2o_global_395_cost_dollars
 
             # criteria effects
 
@@ -371,7 +372,7 @@ def calc_cost_effects(physical_effects_dict):
                                      'vmt': vmt,
                                      'vmt_liquid_fuel': vmt_liquid,
                                      'vmt_electricity': vmt_elec,
-                                     'tech_cost_dollars': tech_cost_dollars,
+                                     'vehicle_cost_dollars': vehicle_cost_dollars,
                                      'fuel_retail_cost_dollars': fuel_retail_cost_dollars,
                                      'fuel_pretax_cost_dollars': fuel_pretax_cost_dollars,
                                      'fuel_taxes_cost_dollars': fuel_retail_cost_dollars - fuel_pretax_cost_dollars,
