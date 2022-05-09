@@ -36,7 +36,6 @@ def run_postproc(iteration_log, credit_banks):
     """
     from producer.vehicles import VehicleFinal
     from effects.omega_effects import run_effects_calcs
-    from omega_model.input_files import InputFiles
     import pandas as pd
     global vehicle_data, vehicle_annual_data
 
@@ -159,11 +158,6 @@ def run_postproc(iteration_log, credit_banks):
     dump_table_to_csv(omega_globals.options.output_folder, 'manufacturer_annual_data',
                       omega_globals.options.session_unique_name + '_manufacturer_annual_data',
                       omega_globals.options.verbose)
-
-    input_files_df = pd.DataFrame.from_dict(InputFiles._data).transpose()
-    input_files_df.to_csv(
-        omega_globals.options.output_folder + omega_globals.options.session_unique_name + '_input_file_log.csv',
-        index=False)
 
 
 def plot_effects(calendar_years, physical_effects_df):
