@@ -42,6 +42,7 @@ from omega_model.effects.general_functions import save_dict_to_csv
 from omega_model.effects.discounting import discount_values
 from omega_model.effects.present_and_annualized_values import calc_present_and_annualized_values
 from omega_model.effects.tech_tracking import TechTracking
+from omega_model.effects.sum_social_costs import calc_social_costs
 
 
 def run_effects_calcs():
@@ -62,7 +63,7 @@ def run_effects_calcs():
     tech_tracking = TechTracking()
     tech_tracking.create_dict(calendar_years)
     tech_tracking_dict = tech_tracking._data
-    # tech_tracking_dict = calc_tech_tracking(calendar_years)
+    tech_tracking_df = pd.DataFrame()
 
     tech_tracking_filename = f'{omega_globals.options.output_folder}' + \
                              f'{omega_globals.options.session_unique_name}_tech_tracking.csv'
@@ -129,8 +130,9 @@ def run_effects_calcs():
             present_and_annualized_filename = f'{omega_globals.options.output_folder}' + \
                                               f'{omega_globals.options.session_unique_name}_cost_effects_annual_present_and_annualized.csv'
 
-            present_and_annualized_cost_df = \
-                save_dict_to_csv(present_and_annualized_dict, present_and_annualized_filename, index=False)
+            present_and_annualized_cost_df = pd.DataFrame(present_and_annualized_dict).transpose()
+            present_and_annualized_cost_df = calc_social_costs(present_and_annualized_cost_df)
+            present_and_annualized_cost_df.to_csv(present_and_annualized_filename, index=False)
 
     if omega_globals.options.multiprocessing:
         if omega_globals.options.calc_effects == 'Physical and Costs':
