@@ -123,11 +123,11 @@ class DecompositionAttributes(OMEGABase):
                        'onroad_direct_kwh_per_mile',
 
                        'cert_direct_oncycle_kwh_per_mile',
-                       'onroad_direct_oncycle_kwh_per_mile',
+                       # 'onroad_direct_oncycle_kwh_per_mile',
                        'cert_direct_offcycle_kwh_per_mile',
 
                        'cert_direct_oncycle_co2e_grams_per_mile',
-                       'onroad_direct_oncycle_co2e_grams_per_mile',
+                       # 'onroad_direct_oncycle_co2e_grams_per_mile',
                        'cert_direct_offcycle_co2e_grams_per_mile',
 
                        'cert_indirect_offcycle_co2e_grams_per_mile',
@@ -355,8 +355,8 @@ class CompositeVehicle(OMEGABase):
                                 'cert_direct_kwh_per_mile',
                                 'onroad_direct_co2e_grams_per_mile',
                                 'onroad_direct_kwh_per_mile',
-                                'onroad_direct_oncycle_co2e_grams_per_mile',
-                                'onroad_direct_oncycle_kwh_per_mile',
+                                # 'onroad_direct_oncycle_co2e_grams_per_mile',
+                                # 'onroad_direct_oncycle_kwh_per_mile',
                                 'new_vehicle_mfr_cost_dollars',
                                 'new_vehicle_mfr_generalized_cost_dollars',
                                 # these are needed for NEMS market share calcs (in addition to g/mi and kWh/hi):
@@ -612,7 +612,7 @@ class CompositeVehicle(OMEGABase):
 def calc_vehicle_frontier(vehicle):
     cost_cloud = omega_globals.options.CostCloud.get_cloud(vehicle)
     vehicle.cost_curve = vehicle.create_frontier_df(cost_cloud)
-    VehicleOnroadCalculations.perform_attribute_calculations(vehicle)
+    # VehicleOnroadCalculations.perform_attribute_calculations(vehicle)
 
     return vehicle
 

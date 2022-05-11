@@ -513,7 +513,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
             for new_veh in manufacturer_vehicles:
                 cost_cloud = omega_globals.options.CostCloud.get_cloud(new_veh)
                 new_veh.cost_curve = new_veh.create_frontier_df(cost_cloud)
-                VehicleOnroadCalculations.perform_attribute_calculations(new_veh)
+                # VehicleOnroadCalculations.perform_attribute_calculations(new_veh)
 
         print('Created manufacturer_vehicles %.20f' % (time.time() - start_time))
 
