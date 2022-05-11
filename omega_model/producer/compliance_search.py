@@ -300,7 +300,7 @@ def apply_production_decision_to_composite_vehicles(composite_vehicles, selected
         # cv.cert_co2e_grams_per_mile = selected_production_decision['veh_%s_co2e_grams_per_mile' % cv.vehicle_id]
         # cv.cert_direct_kwh_per_mile = selected_production_decision['veh_%s_kwh_pmi' % cv.vehicle_id]
         cv.initial_registered_count = selected_production_decision['veh_%s_sales' % cv.vehicle_id]
-        VehicleOnroadCalculations.perform_attribute_calculations(cv)
+        # VehicleOnroadCalculations.perform_attribute_calculations(cv)
         cv.decompose()
         cv.new_vehicle_mfr_cost_dollars = \
             cv.get_weighted_attribute('new_vehicle_mfr_cost_dollars')
