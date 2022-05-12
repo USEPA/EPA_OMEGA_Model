@@ -123,11 +123,9 @@ class DecompositionAttributes(OMEGABase):
                        'onroad_direct_kwh_per_mile',
 
                        'cert_direct_oncycle_kwh_per_mile',
-                       # 'onroad_direct_oncycle_kwh_per_mile',
                        'cert_direct_offcycle_kwh_per_mile',
 
                        'cert_direct_oncycle_co2e_grams_per_mile',
-                       # 'onroad_direct_oncycle_co2e_grams_per_mile',
                        'cert_direct_offcycle_co2e_grams_per_mile',
 
                        'cert_indirect_offcycle_co2e_grams_per_mile',
@@ -259,9 +257,9 @@ class VehicleOnroadCalculations(OMEGABase):
         return template_errors
 
     @staticmethod
-    def perform_attribute_calculations(vehicle, cost_cloud=None):
+    def perform_onroad_calculations(vehicle, cost_cloud=None):
         """
-        Perform attribute calculations as specified by the input file.  Calculations may be applied to the vehicle
+        Perform onroad calculations as specified by the input file.  Calculations may be applied to the vehicle
         directly, or to values in the cost_cloud if provided.
 
         Args:
@@ -355,8 +353,6 @@ class CompositeVehicle(OMEGABase):
                                 'cert_direct_kwh_per_mile',
                                 'onroad_direct_co2e_grams_per_mile',
                                 'onroad_direct_kwh_per_mile',
-                                # 'onroad_direct_oncycle_co2e_grams_per_mile',
-                                # 'onroad_direct_oncycle_kwh_per_mile',
                                 'new_vehicle_mfr_cost_dollars',
                                 'new_vehicle_mfr_generalized_cost_dollars',
                                 # these are needed for NEMS market share calcs (in addition to g/mi and kWh/hi):
@@ -432,8 +428,6 @@ class CompositeVehicle(OMEGABase):
         for v in self.vehicle_list:
             if 'cost_curve' in self.__dict__:
                 for ccv in DecompositionAttributes.values:
-                    # v.__setattr__(ccv, DecompositionAttributes.interp1d(v, self.cost_curve, cost_curve_interp_key,
-                    #                                                     self.cert_co2e_grams_per_mile, ccv))
                     v.__setattr__(ccv, DecompositionAttributes.interp1d(v, self.cost_curve, cost_curve_interp_key,
                                                                         self.__getattribute__(cost_curve_interp_key), ccv))
             v.initial_registered_count = self.initial_registered_count * v.composite_vehicle_share_frac
@@ -612,8 +606,6 @@ class CompositeVehicle(OMEGABase):
 def calc_vehicle_frontier(vehicle):
     cost_cloud = omega_globals.options.CostCloud.get_cloud(vehicle)
     vehicle.cost_curve = vehicle.create_frontier_df(cost_cloud)
-    # VehicleOnroadCalculations.perform_attribute_calculations(vehicle)
-
     return vehicle
 
 
@@ -710,12 +702,10 @@ class Vehicle(OMEGABase):
         self.cost_curve_class = None
         self.reg_class_id = None
         self.context_size_class = None
-        # self.electrification_class = None
         self.target_co2e_grams_per_mile = 0
         self.lifetime_VMT = 0
         self.cert_co2e_Mg = 0
         self.target_co2e_Mg = 0
-        # self.normalized_target_co2e_Mg = 0
         self.in_use_fuel_id = None
         self.cert_fuel_id = None
         self.market_class_id = None
@@ -857,35 +847,55 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
+        # calculate onroad values -------------------------------------------------------------------------------------
+        cloud['onroad_direct_co2e_grams_per_mile'] = 0
+        cloud['onroad_direct_kwh_per_mile'] = 0
+
         if self.fueling_class != 'BEV':
-            cloud['cert_direct_oncycle_co2e_grams_per_mile'] = \
-                DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(self.model_year, self.fueling_class,
-                                                                               cloud)
             cloud['onroad_direct_oncycle_co2e_grams_per_mile'] = \
                 DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(VehicleOnroadCalculations.drive_cycle_weight_year,
                                                                                self.fueling_class,
                                                                                cloud)
         else:
-            cloud['cert_direct_oncycle_co2e_grams_per_mile'] = 0
             cloud['onroad_direct_oncycle_co2e_grams_per_mile'] = 0
 
         if self.fueling_class != 'ICE':
-            cloud['cert_direct_oncycle_kwh_per_mile'] = \
-                DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(self.model_year, self.fueling_class, cloud)
-
             cloud['onroad_direct_oncycle_kwh_per_mile'] = \
                 DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(VehicleOnroadCalculations.drive_cycle_weight_year,
                                                                         self.fueling_class, cloud)
         else:
-            cloud['cert_direct_oncycle_kwh_per_mile'] = 0
             cloud['onroad_direct_oncycle_kwh_per_mile'] = 0
 
-        # initialize onroad values
-        cloud['onroad_direct_co2e_grams_per_mile'] = 0
-        cloud['onroad_direct_kwh_per_mile'] = 0
+        # calculate offcycle values before calculating onroad
+        cloud = OffCycleCredits.calc_off_cycle_credits(VehicleOnroadCalculations.drive_cycle_weight_year, self, cloud)
 
-        # calculate off cycle credits before calculating upstream and onroad
-        cloud = OffCycleCredits.calc_off_cycle_credits(self, cloud)
+        cloud['nominal_onroad_direct_co2e_grams_per_mile'] = \
+            cloud['onroad_direct_oncycle_co2e_grams_per_mile'] - \
+            cloud['cert_direct_offcycle_co2e_grams_per_mile']
+
+        cloud['nominal_onroad_direct_kwh_per_mile'] = \
+            cloud['onroad_direct_oncycle_kwh_per_mile'] - \
+            cloud['cert_direct_offcycle_kwh_per_mile']
+
+        # calc onroad_direct values
+        VehicleOnroadCalculations.perform_onroad_calculations(self, cloud)
+
+        # calculate cert values ---------------------------------------------------------------------------------------
+        if self.fueling_class != 'BEV':
+            cloud['cert_direct_oncycle_co2e_grams_per_mile'] = \
+                DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(self.model_year, self.fueling_class,
+                                                                               cloud)
+        else:
+            cloud['cert_direct_oncycle_co2e_grams_per_mile'] = 0
+
+        if self.fueling_class != 'ICE':
+            cloud['cert_direct_oncycle_kwh_per_mile'] = \
+                DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(self.model_year, self.fueling_class, cloud)
+        else:
+            cloud['cert_direct_oncycle_kwh_per_mile'] = 0
+
+        # re-calculate off cycle credits before calculating upstream
+        cloud = OffCycleCredits.calc_off_cycle_credits(self.model_year, self, cloud)
 
         cloud['cert_direct_co2e_grams_per_mile'] = \
             cloud['cert_direct_oncycle_co2e_grams_per_mile'] - \
@@ -894,9 +904,6 @@ class Vehicle(OMEGABase):
         cloud['cert_direct_kwh_per_mile'] = \
             cloud['cert_direct_oncycle_kwh_per_mile'] - \
             cloud['cert_direct_offcycle_kwh_per_mile']
-
-        # calc onroad gap, etc...
-        VehicleOnroadCalculations.perform_attribute_calculations(self, cloud)
 
         # add upstream calcs
         upstream_method = UpstreamMethods.get_upstream_method(self.model_year)
@@ -1041,13 +1048,11 @@ class VehicleFinal(SQABase, Vehicle):
     manufacturer_id = Column(String, ForeignKey('manufacturers.manufacturer_id'))  #: vehicle manufacturer ID
     compliance_id = Column(String)  #: compliance ID, may be the manufacturer ID or 'consolidated_OEM'
     manufacturer = relationship('Manufacturer', back_populates='vehicles')  #: SQLAlchemy relationship link to manufacturer table
-    # annual_data = relationship('VehicleAnnualData', cascade='delete, delete-orphan')  #: SQLAlchemy relationship link to vehicle annual data table
 
     model_year = Column(Numeric)  #: vehicle model year
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))  #: fueling class, e.g. 'BEV', 'ICE'
     reg_class_id = Column(String)  #: regulatory class assigned according the active policy
     context_size_class = Column(String)  #: context size class, used to project future vehicle sales based on the context
-    # electrification_class = Column(String)  #: electrification class, used to determine ``fueling_class`` at this time
     target_co2e_grams_per_mile = Column(Float)  #: cert target CO2e g/mi, as determined by the active policy
     lifetime_VMT = Column('lifetime_vmt', Float)  #: lifetime VMT, used to calculate CO2e Mg
     cert_co2e_Mg = Column('cert_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
@@ -1290,7 +1295,6 @@ class VehicleFinal(SQABase, Vehicle):
                 cost_curve_class=df.loc[i, 'cost_curve_class'],
                 in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
                 cert_fuel_id=df.loc[i, 'cert_fuel_id'],
-                # initial_registered_count=df.loc[i, 'sales'],
                 unibody_structure=df.loc[i, 'unibody_structure'],
                 drive_system=df.loc[i, 'drive_system'],
                 curbweight_lbs=df.loc[i, 'curbweight_lbs'],
@@ -1409,7 +1413,6 @@ class VehicleFinal(SQABase, Vehicle):
             if v.fueling_class == 'ICE':
                 alt_veh.fueling_class = 'BEV'
                 alt_veh.powertrain_type = 'BEV'
-                # alt_veh.electrification_class = 'EV'
                 alt_veh.name = 'BEV of ' + v.name
                 alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
                 alt_veh.cert_fuel_id = "{'electricity':1.0}"
@@ -1422,7 +1425,6 @@ class VehicleFinal(SQABase, Vehicle):
             else:
                 alt_veh.fueling_class = 'ICE'
                 alt_veh.powertrain_type = 'ICE'
-                # alt_veh.electrification_class = 'N'
                 alt_veh.name = 'ICE of ' + v.name
                 alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
                 alt_veh.cert_fuel_id = "{'gasoline':1.0}"
