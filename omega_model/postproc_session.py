@@ -1217,7 +1217,7 @@ def plot_iteration(iteration_log, compliance_id):
     iteration_log = iteration_log.loc[iteration_log['compliance_id'] == compliance_id]
 
     for iteration in [0, -1]:
-        if iteration == -1:
+        if iteration == 0:
             iteration_label = 'initial'
         else:
             iteration_label = 'final'
