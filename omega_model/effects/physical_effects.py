@@ -243,7 +243,7 @@ def calc_physical_effects(calendar_years):
                         liquid_fuel = fuel
                         vmt_liquid_fuel = vad['vmt'] * fuel_share
                         onroad_gallons_per_mile += onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
-                        fuel_consumption_gallons = vad['vmt'] * onroad_gallons_per_mile / transmission_efficiency
+                        fuel_consumption_gallons = vmt_liquid_fuel * onroad_gallons_per_mile / transmission_efficiency
 
                         # vehicle emission rates
                         rate_names = ['pm25_brakewear_grams_per_mile', 'pm25_tirewear_grams_per_mile']
@@ -431,8 +431,29 @@ def calc_annual_physical_effects(input_df):
         A DataFrame of physical effects by calendar year.
 
     """
+    from context.onroad_fuels import OnroadFuel
+
+
     input_attributes_list = ['grams_per_metric_ton']
     grams_per_metric_ton = get_inputs_for_effects(*input_attributes_list)
+    calendar_years = input_df['calendar_year'].unique()
+    d = dict()
+    num = 0
+    for calendar_year in calendar_years:
+        if ('US electricity', calendar_year) in OnroadFuel._data:
+            d[num] = {
+                'calendar_year': calendar_year,
+                'transmission_efficiency': OnroadFuel.get_fuel_attribute(calendar_year, 'US electricity',
+                                                                         'transmission_efficiency')
+            }
+        else:
+            d[num] = {
+                'calendar_year': calendar_year,
+                'transmission_efficiency': d[num - 1]['transmission_efficiency']
+            }
+        num += 1
+
+    elec_trans_efficiency = pd.DataFrame(d).transpose()
 
     attributes = [col for col in input_df.columns if ('vmt' in col or 'vmt_' in col) and '_vmt' not in col]
     additional_attributes = ['count', 'consumption', 'barrels', 'tons']
@@ -445,6 +466,7 @@ def calc_annual_physical_effects(input_df):
     groupby_cols = ['session_name', 'calendar_year', 'reg_class_id', 'fueling_class']
     return_df = input_df[[*groupby_cols, *attributes]]
     return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+    return_df = return_df.merge(elec_trans_efficiency, on='calendar_year', how='left')
 
     return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
                      'onroad_gallons_per_mile',
@@ -452,7 +474,7 @@ def calc_annual_physical_effects(input_df):
 
     return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
                      'onroad_direct_kwh_per_mile',
-                     return_df['fuel_consumption_kWh'] / return_df['vmt_electricity'])
+                     return_df['fuel_consumption_kWh'] * return_df['transmission_efficiency'] / return_df['vmt_electricity'])
 
     return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
                      'onroad_direct_co2e_grams_per_mile',
@@ -461,6 +483,8 @@ def calc_annual_physical_effects(input_df):
     attributes += ['onroad_gallons_per_mile',
                    'onroad_direct_kwh_per_mile',
                    'onroad_direct_co2e_grams_per_mile']
+
+    return_df.drop(columns='transmission_efficiency', inplace=True)
 
     # groupby calendar year and regclass
     groupby_cols = ['session_name', 'calendar_year', 'reg_class_id']
