@@ -163,15 +163,17 @@ class OffCycleCreditsBase:
     offcycle_credit_names = []  #: list of credit names, populated during init, used to track credits across composition/decomposition and into the database, also used to check simulated vehicles for necessary columns
 
     @staticmethod
-    def calc_off_cycle_credits(vehicle, cost_cloud):
+    def calc_off_cycle_credits(calendar_year, vehicle, cost_cloud):
         """
         Calculate vehicle off-cycle credits for the vehicle's cost cloud
 
         Args:
+            calendar_year (int): the year to calculate credits for, usually the vehicle model year
             vehicle (Vehicle): the vehicle to apply off-cycle credits to
+            cost_cloud (DataFrame): destination data set for off-cycle credits
 
         Returns:
-            vehicle.cost_cloud with off-cycle credits calculated
+            cost_cloud with off-cycle credits calculated
 
         """
         raise Exception('**Attempt to call abstract method OffCycleCreditsBase.%s() without child class override**' %

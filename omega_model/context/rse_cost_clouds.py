@@ -93,7 +93,7 @@ from context.glider_cost import GliderCost
 
 from policy.drive_cycle_ballast import DriveCycleBallast
 
-from producer.vehicles import VehicleAttributeCalculations, Vehicle
+from producer.vehicles import VehicleOnroadCalculations, Vehicle
 
 _cache = dict()
 
