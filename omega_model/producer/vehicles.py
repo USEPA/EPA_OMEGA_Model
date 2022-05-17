@@ -1015,7 +1015,7 @@ class Vehicle(OMEGABase):
             ax1.legend(fontsize='medium', bbox_to_anchor=(0, 1.07), loc="lower left", borderaxespad=0)
 
             figname = '%s%d_%s_cost_curve.png' % (omega_globals.options.output_folder, self.model_year, self.name)
-            fig.savefig(figname.replace(' ', '_'.replace(':', '-')), bbox_inches='tight')
+            fig.savefig(figname.replace(' ', '_').replace(':', '-'), bbox_inches='tight')
 
             fig, ax1 = figure()
             label_xyt(ax1, 'CO2e credits [Mg]', 'CO2e [g/mi]', 'veh %s %s' % (self.vehicle_id, self.name))
