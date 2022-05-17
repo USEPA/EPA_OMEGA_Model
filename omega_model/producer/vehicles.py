@@ -959,11 +959,13 @@ class Vehicle(OMEGABase):
         if ((omega_globals.options.log_producer_compliance_search_years == 'all') or
             (self.model_year in omega_globals.options.log_producer_compliance_search_years)):
 
-            logfile_name = '%s%d_%s_cost_cloud.csv' % (omega_globals.options.output_folder, self.model_year, self.name)
+            logfile_name = '%s%d_%s_cost_cloud.csv' % (omega_globals.options.output_folder, self.model_year,
+                                                       self.name.replace(':', '-'))
             cost_cloud['frontier'] = False
             cost_cloud.loc[cost_curve.index, 'frontier'] = True
             cost_cloud.to_csv(logfile_name)
-            logfile_name = '%s%d_%s_cost_curve.csv' % (omega_globals.options.output_folder, self.model_year, self.name)
+            logfile_name = '%s%d_%s_cost_curve.csv' % (omega_globals.options.output_folder, self.model_year,
+                                                       self.name.replace(':', '-'))
             cost_curve.to_csv(logfile_name)
 
             from common.omega_plot import figure, label_xyt
@@ -998,7 +1000,7 @@ class Vehicle(OMEGABase):
             ax1.legend(fontsize='medium', bbox_to_anchor=(0, 1.07), loc="lower left", borderaxespad=0)
 
             figname = '%s%d_%s_cost_curve.png' % (omega_globals.options.output_folder, self.model_year, self.name)
-            fig.savefig(figname.replace(' ', '_'), bbox_inches='tight')
+            fig.savefig(figname.replace(' ', '_'.replace(':', '-')), bbox_inches='tight')
 
             fig, ax1 = figure()
             label_xyt(ax1, 'CO2e credits [Mg]', 'CO2e [g/mi]', 'veh %s %s' % (self.vehicle_id, self.name))
@@ -1013,7 +1015,7 @@ class Vehicle(OMEGABase):
 
             ax1.legend(fontsize='medium', bbox_to_anchor=(0, 1.07), loc="lower left", borderaxespad=0)
             figname = '%s%d_%s_co2e_curve.png' % (omega_globals.options.output_folder, self.model_year, self.name)
-            fig.savefig(figname.replace(' ', '_'), bbox_inches='tight')
+            fig.savefig(figname.replace(' ', '_').replace(':', '-'), bbox_inches='tight')
 
         return cost_curve
 
