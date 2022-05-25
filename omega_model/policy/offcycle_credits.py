@@ -92,13 +92,14 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
     offcycle_credit_names = []  #: list of credit names, populated during init, used to track credits across composition/decomposition and into the database, also used to check simulated vehicles for necessary columns
 
     @staticmethod
-    def calc_off_cycle_credits(vehicle, cost_cloud):
+    def calc_off_cycle_credits(calendar_year, vehicle, cost_cloud):
         """
         Calculate vehicle off-cycle credits for the vehicle's cost cloud
 
         Args:
+            calendar_year (int): the year to calculate credits for, usually the vehicle model year
             vehicle (Vehicle): the vehicle to apply off-cycle credits to
-            cost_cloud (DataFrame): vehicle cost cloud
+            cost_cloud (DataFrame): destination data set for off-cycle credits
 
         Returns:
             cost_cloud with off-cycle credits calculated
@@ -117,11 +118,11 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
             attribute, value = credit_column.split(':')
             if vehicle.__getattribute__(attribute) == value:
                 for offcycle_credit in OffCycleCredits.offcycle_credit_names:
-                    cache_key = (credit_column, attribute, vehicle.model_year, offcycle_credit)
+                    cache_key = (credit_column, attribute, calendar_year, offcycle_credit)
                     if cache_key not in OffCycleCredits._data:
                         start_years = np.array(OffCycleCredits._data['start_year'][offcycle_credit])
-                        if len(start_years[start_years <= vehicle.model_year]) > 0:
-                            year = max(start_years[start_years <= vehicle.model_year])
+                        if len(start_years[start_years <= calendar_year]) > 0:
+                            year = max(start_years[start_years <= calendar_year])
 
                             credit_value = OffCycleCredits._data[offcycle_credit, year][credit_column]
                             credit_destination = \
@@ -238,7 +239,7 @@ if __name__ == '__main__':
 
             vehicle = dummyVehicle()
 
-            OffCycleCredits.calc_off_cycle_credits(vehicle)
+            OffCycleCredits.calc_off_cycle_credits(vehicle.model_year, vehicle, vehicle.cost_cloud)
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())

@@ -23,27 +23,27 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,vehicle_attribute_calculations,input_template_version:,0.2
+       input_template_name:,onroad_vehicle_calculations,input_template_version:,0.21
 
-The data header consists of a ``start_year`` column followed by zero or more calculation columns.
+The data header consists of a ``drive_cycle_weight_year`` column followed by calculation columns.
 
 Dynamic Data Header
     .. csv-table::
         :widths: auto
 
-        start_year, ``{vehicle_select_attribute}:{vehicle_select_attribute_value}:{operator}:{vehicle_source_attribute}->{vehicle_destination_attribute}``, ...
+        drive_cycle_weight_year, ``{vehicle_select_attribute}:{vehicle_select_attribute_value}:{operator}:{vehicle_source_attribute}->{vehicle_destination_attribute}``, ...
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        start_year,fueling_class:BEV:/:cert_direct_kwh_per_mile->onroad_direct_kwh_per_mile,fueling_class:ICE:/:cert_direct_co2e_grams_per_mile->onroad_direct_co2e_grams_per_mile
+        drive_cycle_weight_year,fueling_class:BEV:/:cert_direct_kwh_per_mile->onroad_direct_kwh_per_mile,fueling_class:ICE:/:cert_direct_co2e_grams_per_mile->onroad_direct_co2e_grams_per_mile
         2020,0.7,0.8
 
 Data Column Name and Description
 
-:start_year:
-    Start year of price modification, modification applies until the next available start year
+:drive_cycle_weight_year:
+    Year to use for cert drive cycle weight calculations
 
 **Optional Columns**
 
@@ -196,7 +196,7 @@ class DecompositionAttributes(OMEGABase):
         return cost_curve.rename(columns=rename_dict)
 
 
-class VehicleAttributeCalculations(OMEGABase):
+class VehicleOnroadCalculations(OMEGABase):
     """
     **Performs vehicle attribute calculations, as outlined in the input file.**
 
@@ -205,6 +205,8 @@ class VehicleAttributeCalculations(OMEGABase):
 
     """
     _cache = dict()
+
+    drive_cycle_weight_year = None
 
     @staticmethod
     def init_vehicle_attribute_calculations_from_file(filename, clear_cache=False, verbose=False):
@@ -224,14 +226,14 @@ class VehicleAttributeCalculations(OMEGABase):
 
 
         if clear_cache:
-            VehicleAttributeCalculations._cache = dict()
+            VehicleOnroadCalculations._cache = dict()
 
         if verbose:
             omega_log.logwrite('\nInitializing from %s...' % filename)
 
-        input_template_name = 'vehicle_attribute_calculations'
-        input_template_version = 0.2
-        input_template_columns = {'start_year'}
+        input_template_name = 'onroad_vehicle_calculations'
+        input_template_version = 0.21
+        input_template_columns = {'drive_cycle_weight_year'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -242,23 +244,22 @@ class VehicleAttributeCalculations(OMEGABase):
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                df = df.set_index('start_year')
+                VehicleOnroadCalculations.drive_cycle_weight_year = int(df['drive_cycle_weight_year'].iloc[0])
+
+                df = df.set_index('drive_cycle_weight_year')
                 df = df.drop([c for c in df.columns if 'Unnamed' in c], axis='columns')
 
-                VehicleAttributeCalculations._cache = df.to_dict(orient='index')
+                VehicleOnroadCalculations._cache = df.to_dict(orient='index')
 
-                # VehicleAttributeCalculations._cache['start_year'] = \
-                #     np.array(list(VehicleAttributeCalculations._cache.keys()))
-
-                VehicleAttributeCalculations._cache['start_year'] = \
-                    np.array([*VehicleAttributeCalculations._cache])
+                VehicleOnroadCalculations._cache['drive_cycle_weight_year'] = \
+                    np.array([*VehicleOnroadCalculations._cache])
 
         return template_errors
 
     @staticmethod
-    def perform_attribute_calculations(vehicle, cost_cloud=None):
+    def perform_onroad_calculations(vehicle, cost_cloud=None):
         """
-        Perform attribute calculations as specified by the input file.  Calculations may be applied to the vehicle
+        Perform onroad calculations as specified by the input file.  Calculations may be applied to the vehicle
         directly, or to values in the cost_cloud if provided.
 
         Args:
@@ -270,25 +271,23 @@ class VehicleAttributeCalculations(OMEGABase):
             else they are performed on the cost cloud data
 
         """
-        start_years = VehicleAttributeCalculations._cache['start_year']
-        if len(start_years[start_years <= vehicle.model_year]) > 0:
-            cache_key = max(start_years[start_years <= vehicle.model_year])
+        cache_key = VehicleOnroadCalculations.drive_cycle_weight_year
 
-            if cache_key in VehicleAttributeCalculations._cache:
-                calcs = VehicleAttributeCalculations._cache[cache_key]
-                for calc, value in calcs.items():
-                    select_attribute, select_value, operator, action = calc.split(':')
-                    if vehicle.__getattribute__(select_attribute) == select_value:
-                        attribute_source, attribute_target = action.split('->')
-                        # print('vehicle.%s = vehicle.%s %s %s' % (attribute_target, attribute_source, operator, value))
-                        if cost_cloud is not None:
-                            cost_cloud[attribute_target] = \
-                                Eval.eval("cost_cloud['%s'] %s %s" % (attribute_source, operator, value),
-                                                                      {}, {'cost_cloud': cost_cloud})
-                        else:
-                            vehicle.__setattr__(attribute_target,
-                                                Eval.eval('vehicle.%s %s %s' % (attribute_source, operator, value),
-                                                          {}, {'vehicle': vehicle}))
+        if cache_key in VehicleOnroadCalculations._cache:
+            calcs = VehicleOnroadCalculations._cache[cache_key]
+            for calc, value in calcs.items():
+                select_attribute, select_value, operator, action = calc.split(':')
+                if vehicle.__getattribute__(select_attribute) == select_value:
+                    attribute_source, attribute_target = action.split('->')
+                    # print('vehicle.%s = vehicle.%s %s %s' % (attribute_target, attribute_source, operator, value))
+                    if cost_cloud is not None:
+                        cost_cloud[attribute_target] = \
+                            Eval.eval("cost_cloud['%s'] %s %s" % (attribute_source, operator, value),
+                                                                  {}, {'cost_cloud': cost_cloud})
+                    else:
+                        vehicle.__setattr__(attribute_target,
+                                            Eval.eval('vehicle.%s %s %s' % (attribute_source, operator, value),
+                                                      {}, {'vehicle': vehicle}))
         else:
             raise Exception('Missing vehicle attribute (vehicle onroad) calculations for %d, or prior'
                             % vehicle.model_year)
@@ -429,8 +428,6 @@ class CompositeVehicle(OMEGABase):
         for v in self.vehicle_list:
             if 'cost_curve' in self.__dict__:
                 for ccv in DecompositionAttributes.values:
-                    # v.__setattr__(ccv, DecompositionAttributes.interp1d(v, self.cost_curve, cost_curve_interp_key,
-                    #                                                     self.cert_co2e_grams_per_mile, ccv))
                     v.__setattr__(ccv, DecompositionAttributes.interp1d(v, self.cost_curve, cost_curve_interp_key,
                                                                         self.__getattribute__(cost_curve_interp_key), ccv))
             v.initial_registered_count = self.initial_registered_count * v.composite_vehicle_share_frac
@@ -609,8 +606,6 @@ class CompositeVehicle(OMEGABase):
 def calc_vehicle_frontier(vehicle):
     cost_cloud = omega_globals.options.CostCloud.get_cloud(vehicle)
     vehicle.cost_curve = vehicle.create_frontier_df(cost_cloud)
-    VehicleAttributeCalculations.perform_attribute_calculations(vehicle)
-
     return vehicle
 
 
@@ -707,12 +702,10 @@ class Vehicle(OMEGABase):
         self.cost_curve_class = None
         self.reg_class_id = None
         self.context_size_class = None
-        # self.electrification_class = None
         self.target_co2e_grams_per_mile = 0
         self.lifetime_VMT = 0
         self.cert_co2e_Mg = 0
         self.target_co2e_Mg = 0
-        # self.normalized_target_co2e_Mg = 0
         self.in_use_fuel_id = None
         self.cert_fuel_id = None
         self.market_class_id = None
@@ -854,6 +847,40 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
+        # calculate onroad values -------------------------------------------------------------------------------------
+        cloud['onroad_direct_co2e_grams_per_mile'] = 0
+        cloud['onroad_direct_kwh_per_mile'] = 0
+
+        if self.fueling_class != 'BEV':
+            cloud['onroad_direct_oncycle_co2e_grams_per_mile'] = \
+                DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(VehicleOnroadCalculations.drive_cycle_weight_year,
+                                                                               self.fueling_class,
+                                                                               cloud)
+        else:
+            cloud['onroad_direct_oncycle_co2e_grams_per_mile'] = 0
+
+        if self.fueling_class != 'ICE':
+            cloud['onroad_direct_oncycle_kwh_per_mile'] = \
+                DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(VehicleOnroadCalculations.drive_cycle_weight_year,
+                                                                        self.fueling_class, cloud)
+        else:
+            cloud['onroad_direct_oncycle_kwh_per_mile'] = 0
+
+        # calculate offcycle values before calculating onroad
+        cloud = OffCycleCredits.calc_off_cycle_credits(VehicleOnroadCalculations.drive_cycle_weight_year, self, cloud)
+
+        cloud['nominal_onroad_direct_co2e_grams_per_mile'] = \
+            cloud['onroad_direct_oncycle_co2e_grams_per_mile'] - \
+            cloud['cert_direct_offcycle_co2e_grams_per_mile']
+
+        cloud['nominal_onroad_direct_kwh_per_mile'] = \
+            cloud['onroad_direct_oncycle_kwh_per_mile'] - \
+            cloud['cert_direct_offcycle_kwh_per_mile']
+
+        # calc onroad_direct values
+        VehicleOnroadCalculations.perform_onroad_calculations(self, cloud)
+
+        # calculate cert values ---------------------------------------------------------------------------------------
         if self.fueling_class != 'BEV':
             cloud['cert_direct_oncycle_co2e_grams_per_mile'] = \
                 DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(self.model_year, self.fueling_class,
@@ -867,12 +894,8 @@ class Vehicle(OMEGABase):
         else:
             cloud['cert_direct_oncycle_kwh_per_mile'] = 0
 
-        # initialize onroad values
-        cloud['onroad_direct_co2e_grams_per_mile'] = 0
-        cloud['onroad_direct_kwh_per_mile'] = 0
-
-        # calculate off cycle credits before calculating upstream and onroad
-        cloud = OffCycleCredits.calc_off_cycle_credits(self, cloud)
+        # re-calculate off cycle credits before calculating upstream
+        cloud = OffCycleCredits.calc_off_cycle_credits(self.model_year, self, cloud)
 
         cloud['cert_direct_co2e_grams_per_mile'] = \
             cloud['cert_direct_oncycle_co2e_grams_per_mile'] - \
@@ -881,9 +904,6 @@ class Vehicle(OMEGABase):
         cloud['cert_direct_kwh_per_mile'] = \
             cloud['cert_direct_oncycle_kwh_per_mile'] - \
             cloud['cert_direct_offcycle_kwh_per_mile']
-
-        # calc onroad gap, etc...
-        VehicleAttributeCalculations.perform_attribute_calculations(self, cloud)
 
         # add upstream calcs
         upstream_method = UpstreamMethods.get_upstream_method(self.model_year)
@@ -919,11 +939,6 @@ class Vehicle(OMEGABase):
             The vehicle frontier / cost curve as a DataFrame.
 
         """
-        if 'cert_direct_co2e_grams_per_mile' not in cost_cloud:
-            cost_cloud = self.calc_cert_values(cost_cloud)
-
-        # drop extraneous columns
-        # cost_cloud = cost_cloud.drop(columns=['cost_curve_class', 'model_year'])
 
         # cull cost_cloud points here, based on producer constraints or whatever #
 
@@ -959,11 +974,13 @@ class Vehicle(OMEGABase):
         if ((omega_globals.options.log_producer_compliance_search_years == 'all') or
             (self.model_year in omega_globals.options.log_producer_compliance_search_years)):
 
-            logfile_name = '%s%d_%s_cost_cloud.csv' % (omega_globals.options.output_folder, self.model_year, self.name)
+            logfile_name = '%s%d_%s_cost_cloud.csv' % (omega_globals.options.output_folder, self.model_year,
+                                                       self.name.replace(':', '-'))
             cost_cloud['frontier'] = False
             cost_cloud.loc[cost_curve.index, 'frontier'] = True
             cost_cloud.to_csv(logfile_name)
-            logfile_name = '%s%d_%s_cost_curve.csv' % (omega_globals.options.output_folder, self.model_year, self.name)
+            logfile_name = '%s%d_%s_cost_curve.csv' % (omega_globals.options.output_folder, self.model_year,
+                                                       self.name.replace(':', '-'))
             cost_curve.to_csv(logfile_name)
 
             from common.omega_plot import figure, label_xyt
@@ -998,7 +1015,7 @@ class Vehicle(OMEGABase):
             ax1.legend(fontsize='medium', bbox_to_anchor=(0, 1.07), loc="lower left", borderaxespad=0)
 
             figname = '%s%d_%s_cost_curve.png' % (omega_globals.options.output_folder, self.model_year, self.name)
-            fig.savefig(figname.replace(' ', '_'), bbox_inches='tight')
+            fig.savefig(figname.replace(' ', '_').replace(':', '-'), bbox_inches='tight')
 
             fig, ax1 = figure()
             label_xyt(ax1, 'CO2e credits [Mg]', 'CO2e [g/mi]', 'veh %s %s' % (self.vehicle_id, self.name))
@@ -1013,7 +1030,7 @@ class Vehicle(OMEGABase):
 
             ax1.legend(fontsize='medium', bbox_to_anchor=(0, 1.07), loc="lower left", borderaxespad=0)
             figname = '%s%d_%s_co2e_curve.png' % (omega_globals.options.output_folder, self.model_year, self.name)
-            fig.savefig(figname.replace(' ', '_'), bbox_inches='tight')
+            fig.savefig(figname.replace(' ', '_').replace(':', '-'), bbox_inches='tight')
 
         return cost_curve
 
@@ -1033,13 +1050,11 @@ class VehicleFinal(SQABase, Vehicle):
     manufacturer_id = Column(String, ForeignKey('manufacturers.manufacturer_id'))  #: vehicle manufacturer ID
     compliance_id = Column(String)  #: compliance ID, may be the manufacturer ID or 'consolidated_OEM'
     manufacturer = relationship('Manufacturer', back_populates='vehicles')  #: SQLAlchemy relationship link to manufacturer table
-    # annual_data = relationship('VehicleAnnualData', cascade='delete, delete-orphan')  #: SQLAlchemy relationship link to vehicle annual data table
 
     model_year = Column(Numeric)  #: vehicle model year
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))  #: fueling class, e.g. 'BEV', 'ICE'
     reg_class_id = Column(String)  #: regulatory class assigned according the active policy
     context_size_class = Column(String)  #: context size class, used to project future vehicle sales based on the context
-    # electrification_class = Column(String)  #: electrification class, used to determine ``fueling_class`` at this time
     target_co2e_grams_per_mile = Column(Float)  #: cert target CO2e g/mi, as determined by the active policy
     lifetime_VMT = Column('lifetime_vmt', Float)  #: lifetime VMT, used to calculate CO2e Mg
     cert_co2e_Mg = Column('cert_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
@@ -1282,7 +1297,6 @@ class VehicleFinal(SQABase, Vehicle):
                 cost_curve_class=df.loc[i, 'cost_curve_class'],
                 in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
                 cert_fuel_id=df.loc[i, 'cert_fuel_id'],
-                # initial_registered_count=df.loc[i, 'sales'],
                 unibody_structure=df.loc[i, 'unibody_structure'],
                 drive_system=df.loc[i, 'drive_system'],
                 curbweight_lbs=df.loc[i, 'curbweight_lbs'],
@@ -1401,7 +1415,6 @@ class VehicleFinal(SQABase, Vehicle):
             if v.fueling_class == 'ICE':
                 alt_veh.fueling_class = 'BEV'
                 alt_veh.powertrain_type = 'BEV'
-                # alt_veh.electrification_class = 'EV'
                 alt_veh.name = 'BEV of ' + v.name
                 alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
                 alt_veh.cert_fuel_id = "{'electricity':1.0}"
@@ -1414,7 +1427,6 @@ class VehicleFinal(SQABase, Vehicle):
             else:
                 alt_veh.fueling_class = 'ICE'
                 alt_veh.powertrain_type = 'ICE'
-                # alt_veh.electrification_class = 'N'
                 alt_veh.name = 'ICE of ' + v.name
                 alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
                 alt_veh.cert_fuel_id = "{'gasoline':1.0}"
@@ -1483,7 +1495,7 @@ class VehicleFinal(SQABase, Vehicle):
 
         VehicleFinal.init_vehicles_from_dataframe(omega_globals.options.vehicles_df, verbose=verbose)
 
-        _init_fail += VehicleAttributeCalculations.init_vehicle_attribute_calculations_from_file(
+        _init_fail += VehicleOnroadCalculations.init_vehicle_attribute_calculations_from_file(
             vehicle_onroad_calculations_file, clear_cache=True, verbose=verbose)
 
         return _init_fail

@@ -204,8 +204,8 @@ try:
                                             'cross_subsidy_search_', 'cross_subsidy_multipliers_',
                                             'cross_subsidy_convergence_']
 
-            self.log_vehicle_cloud_years = []  # = 'all' or list of years to log, empty list to disable logging
-            self.log_producer_compliance_search_years = []  # = 'all' or list of years to log, empty list to disable logging
+            self.log_vehicle_cloud_years = [2020]  # = 'all' or list of years to log, empty list to disable logging
+            self.log_producer_compliance_search_years = [2020]  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging
 

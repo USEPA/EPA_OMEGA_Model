@@ -1217,7 +1217,7 @@ def plot_iteration(iteration_log, compliance_id):
     iteration_log = iteration_log.loc[iteration_log['compliance_id'] == compliance_id]
 
     for iteration in [0, -1]:
-        if iteration == -1:
+        if iteration == 0:
             iteration_label = 'initial'
         else:
             iteration_label = 'final'
@@ -1231,7 +1231,7 @@ def plot_iteration(iteration_log, compliance_id):
             plt.figure()
             plt.plot(year_iter_labels,
                      iteration_log['producer_abs_share_frac_%s' % mc][
-                         iteration_log['cross_subsidy_iteration_num'] == iteration])
+                         iteration_log['cross_subsidy_iteration_num'] == iteration], '--', linewidth=3)
             plt.xticks(rotation=90)
             plt.plot(year_iter_labels,
                      iteration_log['consumer_abs_share_frac_%s' % mc][
@@ -1239,7 +1239,7 @@ def plot_iteration(iteration_log, compliance_id):
             plt.title('%s %s iteration %s' % (compliance_id, mc, iteration_label))
             plt.grid()
             plt.legend(['producer_abs_share_frac_%s' % mc, 'consumer_abs_share_frac_%s' % mc])
-            # plt.ylim([0, 1])
+            plt.ylim([0, 1])
             plt.savefig('%s%s %s Iter %s %s.png' % (
                 omega_globals.options.output_folder, omega_globals.options.session_unique_name, compliance_id,
                 mc, iteration_label))
@@ -1294,7 +1294,17 @@ def plot_iteration(iteration_log, compliance_id):
     plt.title('%s Producer Initial Absolute Market Shares' % compliance_id)
     plt.grid()
     plt.legend(['producer_abs_share_frac_%s' % mc for mc in market_classes])
-    plt.savefig('%s%s %s Producer Initial Abs Shares.png' % (omega_globals.options.output_folder,
+    plt.savefig('%s%s %s Producer Abs Shares Initial.png' % (omega_globals.options.output_folder,
+                                                             omega_globals.options.session_unique_name, compliance_id))
+
+    # plot producer initial share and g/mi decisions
+    plt.figure()
+    for mc in market_classes:
+        plt.plot(last_logged['calendar_year'], last_logged['producer_abs_share_frac_%s' % mc], '.-')
+    plt.title('%s Producer Final Absolute Market Shares' % compliance_id)
+    plt.grid()
+    plt.legend(['producer_abs_share_frac_%s' % mc for mc in market_classes])
+    plt.savefig('%s%s %s Producer Abs Shares Final.png' % (omega_globals.options.output_folder,
                                                              omega_globals.options.session_unique_name, compliance_id))
 
     plt.figure()
@@ -1303,5 +1313,14 @@ def plot_iteration(iteration_log, compliance_id):
     plt.title('%s Producer Initial CO2e g/mi' % compliance_id)
     plt.grid()
     plt.legend(['average_onroad_direct_co2e_gpmi_%s' % mc for mc in market_classes])
-    plt.savefig('%s%s %s Producer Initial CO2e gpmi.png' % (omega_globals.options.output_folder,
+    plt.savefig('%s%s %s Producer CO2e gpmi Initial.png' % (omega_globals.options.output_folder,
+                                                            omega_globals.options.session_unique_name, compliance_id))
+
+    plt.figure()
+    for mc in market_classes:
+        plt.plot(last_logged['calendar_year'], last_logged['average_onroad_direct_co2e_gpmi_%s' % mc], '.-')
+    plt.title('%s Producer Final CO2e g/mi' % compliance_id)
+    plt.grid()
+    plt.legend(['average_onroad_direct_co2e_gpmi_%s' % mc for mc in market_classes])
+    plt.savefig('%s%s %s Producer CO2e gpmi Final.png' % (omega_globals.options.output_folder,
                                                             omega_globals.options.session_unique_name, compliance_id))

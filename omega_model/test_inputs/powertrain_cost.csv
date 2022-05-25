@@ -37,7 +37,7 @@ ALL,pd_dollars_per_oz,(1952.23) * 1,,,ibid
 ALL,rh_dollars_per_oz,(16328.67) * 1,,,ibid
 ALL,ac_efficiency,(40) * MARKUP_ALL,,2010,
 ALL,ac_leakage,(63) * MARKUP_ALL,,2010,
-BEV,battery,((-0.00010551) * (KWH ** 3) + 0.02954283 * (KWH ** 2) - 2.89409681 * KWH + 218.421996) * KWH * MARKUP_BEV,,2019,KWH denotes gross kWh; coefficients denote 125K production volume; source Msa 20210406_1732
+BEV,battery,"max(114.2,(-0.00010551) * (KWH ** 3) + 0.02954283 * (KWH ** 2) - 2.89409681 * KWH + 218.421996) * KWH * MARKUP_BEV",,2019,KWH denotes gross kWh; coefficients denote 125K production volume; source Msa 20210406_1732
 PHEV,battery,((-0.00009965) * (KWH ** 3) + 0.02776430 * (KWH ** 2) - 2.69776661 * KWH + 203.67861255) * KWH * MARKUP_PHEV,,2019,KWH denotes gross kWh; coefficients denote 125K production volume; source Msa 20210406_1732
 HEV,battery,((-250.72) * KWH + 1058.2) * KWH * MARKUP_HEV,,2017,
 BEV,motor_single,((4.29) * KW) * MARKUP_BEV,1,2019,Costing_Guide_BEV_HEV_Draft_04_30_2021.xlsx
