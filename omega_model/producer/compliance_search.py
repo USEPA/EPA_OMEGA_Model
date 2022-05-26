@@ -603,13 +603,6 @@ def create_composite_vehicles(calendar_year, compliance_id):
             omega_globals.options.MarketClass.populate_market_classes(market_class_tree, new_veh.market_class_id,
                                                                       new_veh)
 
-            if calendar_year in omega_globals.options.log_vehicle_cloud_years or \
-                    omega_globals.options.log_vehicle_cloud_years == 'all':
-                with open(omega_globals.options.output_folder + '%d_cost_clouds_%s.csv' %
-                          (calendar_year, new_veh.name), 'a') as f:
-                    new_veh.cost_curve.to_csv(f, mode='a', header=not f.tell(),
-                                              columns=sorted(new_veh.cost_curve.columns), index=False)
-
         _cache[cache_key] = {'composite_vehicles': composite_vehicles,
                             'market_class_tree': market_class_tree,
                             'context_based_total_sales': context_based_total_sales}
@@ -652,16 +645,19 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
     decompose_candidate_vehicles(calendar_year, candidate_mfr_composite_vehicles, producer_decision)
 
     for cv in candidate_mfr_composite_vehicles:
-        if ((omega_globals.options.log_producer_compliance_search_years == 'all') or
-            (calendar_year in omega_globals.options.log_producer_compliance_search_years)) and \
-                'cv_cost_curves' in omega_globals.options.verbose_log_modules:
-            cv.cost_curve.to_csv(omega_globals.options.output_folder +
-                                 '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_id))
+        if (omega_globals.options.log_vehicle_cloud_years == 'all') or \
+                (calendar_year in omega_globals.options.log_vehicle_cloud_years):
+            if 'cv_cost_curves' in omega_globals.options.verbose_log_modules:
+                cv.cost_curve.to_csv(omega_globals.options.output_folder +
+                                 '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_id),
+                                     columns=sorted(cv.cost_curve.columns), index=False)
+            if 'v_cost_curves' in omega_globals.options.verbose_log_modules:
+                for veh in cv.vehicle_list:
+                    veh.cost_curve.to_csv(omega_globals.options.output_folder + '%s_%s_cost_curve.csv' %
+                                          (veh.model_year, veh.vehicle_id),
+                                          columns=sorted(veh.cost_curve.columns), index=False)
 
         for veh in cv.vehicle_list:
-            if 'v_cost_curves' in omega_globals.options.verbose_log_modules:
-                veh.cost_curve.to_csv(omega_globals.options.output_folder + '%s_%s_cost_curve.csv' %
-                                      (veh.model_year, veh.vehicle_id))
             veh_final = VehicleFinal()
             transfer_vehicle_data(veh, veh_final)
             manufacturer_new_vehicles.append(veh_final)
