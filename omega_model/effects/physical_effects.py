@@ -433,24 +433,17 @@ def calc_annual_physical_effects(input_df):
     """
     from context.onroad_fuels import OnroadFuel
 
-
     input_attributes_list = ['grams_per_metric_ton']
     grams_per_metric_ton = get_inputs_for_effects(*input_attributes_list)
     calendar_years = input_df['calendar_year'].unique()
     d = dict()
     num = 0
     for calendar_year in calendar_years:
-        if ('US electricity', calendar_year) in OnroadFuel._data:
-            d[num] = {
-                'calendar_year': calendar_year,
-                'transmission_efficiency': OnroadFuel.get_fuel_attribute(calendar_year, 'US electricity',
-                                                                         'transmission_efficiency')
-            }
-        else:
-            d[num] = {
-                'calendar_year': calendar_year,
-                'transmission_efficiency': d[num - 1]['transmission_efficiency']
-            }
+        d[num] = {
+            'calendar_year': calendar_year,
+            'transmission_efficiency': OnroadFuel.get_fuel_attribute(calendar_year, 'US electricity',
+                                                                     'transmission_efficiency')
+        }
         num += 1
 
     elec_trans_efficiency = pd.DataFrame(d).transpose()
