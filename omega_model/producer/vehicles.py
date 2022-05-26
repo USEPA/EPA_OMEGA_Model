@@ -943,7 +943,7 @@ class Vehicle(OMEGABase):
         # cull cost_cloud points here, based on producer constraints or whatever #
 
         # calculate frontier from updated cloud
-        allow_upslope = True
+        allow_upslope = False
 
         # special handling for the case where all cost_curve_interp_key values are the same value, e.g. 0
         if cost_cloud[cost_curve_interp_key].values.min() == cost_cloud[cost_curve_interp_key].values.max():
