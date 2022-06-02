@@ -969,21 +969,30 @@ class Vehicle(OMEGABase):
         # drop frontier factor
         cost_curve = cost_curve.drop(columns=['frontier_factor'], errors='ignore')
 
+        # save vehicle cost cloud, with indicated frontier points
+        if (omega_globals.options.log_vehicle_cloud_years == 'all') or \
+                (self.model_year in omega_globals.options.log_vehicle_cloud_years):
+            if 'v_cost_clouds' in omega_globals.options.verbose_log_modules:
+                cost_cloud = DecompositionAttributes.rename_decomposition_columns(self, cost_cloud)
+                cost_cloud['frontier'] = False
+                cost_cloud.loc[cost_curve.index, 'frontier'] = True
+
+                filename = '%s%d_%s_%s_cost_cloud.csv' % (omega_globals.options.output_folder, self.model_year,
+                                                          self.name.replace(':', '-'), self.vehicle_id)
+                cost_cloud.to_csv(filename, columns=sorted(cost_cloud.columns), index=False)
+
+            if 'v_cost_curves' in omega_globals.options.verbose_log_modules:
+                filename = '%s%d_%s_%s_cost_curve.csv' % (omega_globals.options.output_folder, self.model_year,
+                                                          self.name.replace(':', '-'), self.vehicle_id)
+                cost_curve.to_csv(filename, columns=sorted(cost_curve.columns), index=False)
+
+
         # if ((omega_globals.options.log_producer_compliance_search_years == 'all') or
         #     (self.model_year in omega_globals.options.log_producer_compliance_search_years)) and \
         #         (self.name in omega_globals.options.plot_and_log_vehicles):
 
         if ((omega_globals.options.log_producer_compliance_search_years == 'all') or
-            (self.model_year in omega_globals.options.log_producer_compliance_search_years)):
-
-            logfile_name = '%s%d_%s_cost_cloud.csv' % (omega_globals.options.output_folder, self.model_year,
-                                                       self.name.replace(':', '-'))
-            cost_cloud['frontier'] = False
-            cost_cloud.loc[cost_curve.index, 'frontier'] = True
-            cost_cloud.to_csv(logfile_name)
-            logfile_name = '%s%d_%s_cost_curve.csv' % (omega_globals.options.output_folder, self.model_year,
-                                                       self.name.replace(':', '-'))
-            cost_curve.to_csv(logfile_name)
+                (self.model_year in omega_globals.options.log_producer_compliance_search_years)):
 
             from common.omega_plot import figure, label_xyt
 

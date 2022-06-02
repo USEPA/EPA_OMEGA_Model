@@ -475,8 +475,14 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         if vehicle.model_year in omega_globals.options.log_vehicle_cloud_years or \
                 omega_globals.options.log_vehicle_cloud_years == 'all':
-            with open(omega_globals.options.output_folder + 'cost_clouds_%s.csv' % vehicle.powertrain_type, 'a') as f:
+            with open(omega_globals.options.output_folder + '%d_cost_clouds_%s.csv' %
+                      (vehicle.model_year, vehicle.powertrain_type), 'a') as f:
                 cost_cloud.to_csv(f, mode='a', header=not f.tell(), columns=sorted(cost_cloud.columns), index=False)
+
+            # TODO: if we want to have one file with everything, we need to deal with the fact that the columns are different otherwise it's no good combining them
+            # with open(omega_globals.options.output_folder + '%d_cost_clouds_all.csv' %
+            #           vehicle.model_year, 'a') as f:
+            #     cost_cloud.to_csv(f, mode='a', header=not f.tell(), columns=sorted(cost_cloud.columns), index=False)
 
         return cost_cloud
 

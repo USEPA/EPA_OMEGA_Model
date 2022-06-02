@@ -650,14 +650,9 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
         if (omega_globals.options.log_vehicle_cloud_years == 'all') or \
                 (calendar_year in omega_globals.options.log_vehicle_cloud_years):
             if 'cv_cost_curves' in omega_globals.options.verbose_log_modules:
-                cv.cost_curve.to_csv(omega_globals.options.output_folder +
-                                 '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_id),
-                                     columns=sorted(cv.cost_curve.columns), index=False)
-            if 'v_cost_curves' in omega_globals.options.verbose_log_modules:
-                for veh in cv.vehicle_list:
-                    veh.cost_curve.to_csv(omega_globals.options.output_folder + '%s_%s_%s_cost_curve.csv' %
-                                          (veh.model_year, veh.name, veh.vehicle_id),
-                                          columns=sorted(veh.cost_curve.columns), index=False)
+                filename = '%s%d_%s_%s_cost_curve.csv' % (omega_globals.options.output_folder, cv.model_year,
+                                                          cv.name.replace(':', '-'), cv.vehicle_id)
+                cv.cost_curve.to_csv(filename, columns=sorted(cv.cost_curve.columns), index=False)
 
         for veh in cv.vehicle_list:
             veh_final = VehicleFinal()
