@@ -655,6 +655,8 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
 
     if type(from_vehicle) == Vehicle:
         # finish transfer from Vehicle to VehicleFinal
+        to_vehicle.from_vehicle_id = from_vehicle.vehicle_id
+
         to_vehicle.initial_registered_count = from_vehicle.initial_registered_count
 
         # set dynamic attributes
@@ -1046,6 +1048,7 @@ class VehicleFinal(SQABase, Vehicle):
     # --- database table properties ---
     __tablename__ = 'vehicles'
     vehicle_id = Column(Integer, primary_key=True)  #: unique vehicle ID, database table primary key
+    from_vehicle_id = Column(String)  #: transferred vehicle ID from Vehicle object
     name = Column(String)  #: vehicle name
     manufacturer_id = Column(String, ForeignKey('manufacturers.manufacturer_id'))  #: vehicle manufacturer ID
     compliance_id = Column(String)  #: compliance ID, may be the manufacturer ID or 'consolidated_OEM'
@@ -1291,6 +1294,7 @@ class VehicleFinal(SQABase, Vehicle):
         for i in df.index:
             veh = VehicleFinal(
                 name=df.loc[i, 'vehicle_name'],
+                vehicle_id = i,
                 manufacturer_id=df.loc[i, 'compliance_id'],  # df.loc[i, 'manufacturer_id'],
                 model_year=df.loc[i, 'model_year'],
                 context_size_class=df.loc[i, 'context_size_class'],

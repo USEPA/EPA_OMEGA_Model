@@ -489,7 +489,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         # pull in last year's vehicles:
         manufacturer_prior_vehicles = VehicleFinal.get_compliance_vehicles(calendar_year - 1, compliance_id)
 
-        Vehicle.reset_vehicle_ids()
+        # Vehicle.reset_vehicle_ids()
 
         manufacturer_vehicles = []
 
