@@ -428,6 +428,8 @@ class CostCloud(OMEGABase, CostCloudBase):
                             # informative data for troubleshooting:
                             if vehicle.model_year in omega_globals.options.log_vehicle_cloud_years or \
                                     omega_globals.options.log_vehicle_cloud_years == 'all':
+                                cloud_point['vehicle_id'] = vehicle.vehicle_id
+                                cloud_point['vehicle_base_year_id'] = vehicle.base_year_vehicle_id
                                 cloud_point['vehicle_name'] = vehicle.name
                                 cloud_point['model_year'] = vehicle.model_year
                                 cloud_point['delta_glider_non_structure_mass_lbs'] = delta_glider_non_structure_mass_lbs
