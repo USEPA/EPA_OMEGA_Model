@@ -107,14 +107,14 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
             if num_tech_options == 1:
                 # cost_curve_options = [veh_min_cost_curve_index]  # was max g/mi -> min credits
                 best_index = (cv.cost_curve.credits_co2e_Mg_per_vehicle / cv.cost_curve.new_vehicle_mfr_generalized_cost_dollars).idxmax()
-                cost_curve_options = cv.cost_curve[cost_curve_interp_key].loc[best_index]
+                cost_curve_options = [cv.cost_curve[cost_curve_interp_key].loc[best_index]]
             else:
                 cost_curve_options = np.unique(cost_curve_options)  # filter out redundant tech options
         else:  # first producer pass, generate full range of options
             if num_tech_options == 1:
                 # cost_curve_options = [veh_min_cost_curve_index]  # was max g/mi -> min credits
                 best_index = (cv.cost_curve.credits_co2e_Mg_per_vehicle / cv.cost_curve.new_vehicle_mfr_generalized_cost_dollars).idxmax()
-                cost_curve_options = cv.cost_curve[cost_curve_interp_key].loc[best_index]
+                cost_curve_options = [cv.cost_curve[cost_curve_interp_key].loc[best_index]]
             else:
                 cost_curve_options = np.linspace(veh_min_cost_curve_index, veh_max_cost_curve_index, num=num_tech_options)
 
