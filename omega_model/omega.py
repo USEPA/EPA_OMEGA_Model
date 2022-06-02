@@ -888,6 +888,9 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
             producer_decision['average_rated_hp_%s' % mc] = \
                 weighted_value(market_class_vehicles, 'initial_registered_count', 'rated_hp')
 
+            producer_decision['average_footprint_ft2_%s' % mc] = \
+                weighted_value(market_class_vehicles, 'initial_registered_count', 'footprint_ft2')
+
             if 'ICE' in mc:
                 # TODO: should get 8887 from PolicyFuel?, but need calendar year (set in omega_globals so we don't have to pass it in??)
                 producer_decision['average_onroad_mpg_%s' % mc] = \
@@ -908,6 +911,7 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
             producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] = 0
             producer_decision['average_curbweight_lbs_%s' % mc] = 0
             producer_decision['average_rated_hp_%s' % mc] = 0
+            producer_decision['average_footprint_ft2_%s' % mc] = 0
             producer_decision['average_onroad_mpg_%s' % mc] = 0
             producer_decision['sales_%s' % mc] = 0
 
