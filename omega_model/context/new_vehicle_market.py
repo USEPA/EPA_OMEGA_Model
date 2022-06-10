@@ -124,6 +124,7 @@ class NewVehicleMarket(OMEGABase):
     _data_by_csc_rc = dict()  # private dict, sales by context size class and legacy reg class
     _data_by_rc = pd.DataFrame()  # private dict, sales by legacy reg class
     _data_by_csc = dict()  # private dict, sales by context size class
+    _data_by_bs = dict()  # private dict, sales by context body style
     _data_by_total = dict()  # private dict, total sales
 
     context_size_class_info_by_nrmc = dict()  #: dict of dicts: information about which context size classes are in which non-responsive market categories as well as what share of the size class is within the non-responsive category.  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
@@ -250,7 +251,7 @@ class NewVehicleMarket(OMEGABase):
         cls._session_new_vehicle_generalized_costs['%s_%s' % (calendar_year, compliance_id)] = generalized_cost
 
     @staticmethod
-    def new_vehicle_data(calendar_year, context_size_class=None, context_reg_class=None, value='sales'):
+    def new_vehicle_data(calendar_year, context_size_class=None, context_reg_class=None, context_body_style=None, value='sales'):
         """
         Get new vehicle sales by session context ID, session context case, calendar year, context size class
         and context reg class.  User can specify total sales (no optional arguments) or sales by context size class or
@@ -293,10 +294,16 @@ class NewVehicleMarket(OMEGABase):
             return sum(NewVehicleMarket._data_by_csc[value][omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
                                                     context_size_class, calendar_year].values)
+
         elif context_reg_class and not context_size_class:
             return NewVehicleMarket._data_by_rc[value].loc[omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
                                                     context_reg_class, calendar_year]
+
+        elif context_body_style:
+            return sum(NewVehicleMarket._data_by_bs[value].loc[omega_globals.options.context_id,
+                                                    omega_globals.options.context_case_id,
+                                                    context_body_style, calendar_year])
         else:
             return sum(NewVehicleMarket._data_by_total[value][omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
@@ -362,6 +369,7 @@ class NewVehicleMarket(OMEGABase):
         NewVehicleMarket._data_by_csc_rc.clear()
         NewVehicleMarket._data_by_rc = pd.DataFrame()
         NewVehicleMarket._data_by_csc.clear()
+        NewVehicleMarket._data_by_bs.clear()
         NewVehicleMarket._data_by_total.clear()
 
         if verbose:
@@ -370,8 +378,8 @@ class NewVehicleMarket(OMEGABase):
         NewVehicleMarket.hauling_context_size_class_info = dict()
 
         input_template_name = 'context_new_vehicle_market'
-        input_template_version = 0.2
-        input_template_columns = {'context_id', 'dollar_basis',	'case_id', 'context_size_class', 'calendar_year', 'reg_class_id',
+        input_template_version = 0.21
+        input_template_columns = {'context_id', 'dollar_basis',	'case_id', 'context_size_class', 'body_style', 'calendar_year', 'reg_class_id',
                                   'sales_share_of_regclass', 'sales_share_of_total', 'sales', 'weight_lbs',
                                   'horsepower', 'horsepower_to_weight_ratio', 'mpg_conventional',
                                   'mpg_conventional_onroad', 'mpg_alternative', 'mpg_alternative_onroad',
@@ -397,6 +405,7 @@ class NewVehicleMarket(OMEGABase):
 
             NewVehicleMarket._data_by_csc_rc = df.set_index(['context_id', 'case_id', 'context_size_class', 'reg_class_id', 'calendar_year']).sort_index().to_dict(orient='index')
             NewVehicleMarket._data_by_csc = df.set_index(['context_id', 'case_id', 'context_size_class', 'calendar_year']).sort_index().to_dict(orient='series')
+            NewVehicleMarket._data_by_bs = df.set_index(['context_id', 'case_id', 'body_style', 'calendar_year']).sort_index().to_dict(orient='series')
             NewVehicleMarket._data_by_total = df.set_index(['context_id', 'case_id', 'calendar_year']).sort_index().to_dict(orient='series')
             NewVehicleMarket.context_size_classes = df['context_size_class'].unique().tolist()
             NewVehicleMarket.context_ids = df['context_id'].unique().tolist()

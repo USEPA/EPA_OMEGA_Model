@@ -71,6 +71,7 @@ Data Column Name and Description
 **CODE**
 
 """
+import numpy as np
 
 print('importing %s' % __file__)
 
@@ -253,7 +254,7 @@ class SalesShare(OMEGABase, SalesShareBase):
         return market_class_data.copy()
 
     @staticmethod
-    def calc_shares_body_style_helper(calendar_year, prev_producer_decision_and_response1, body_style):
+    def calc_shares_body_style_helper(calendar_year, producer_decision, body_style):
         """
 
         Args:
@@ -269,37 +270,53 @@ class SalesShare(OMEGABase, SalesShareBase):
         dfs_coeffs = pd.Series({'sedan_wagon': sedan_wagon_constants, 'cuv_suv_van': cuv_suv_van_constants,
                                 'pickup': pickup_constants}[body_style])
 
+        if 'y_hat_sedan_wagon_%s' % (calendar_year - 1) not in SalesShare._data:
+            # no prior year analysis, use base year, historic value
+            SalesShare._data['y_hat_sedan_wagon_%s' % (calendar_year - 1)] = sedan_wagon_constants['y_hat_historic']
+            SalesShare._data['y_hat_cuv_suv_van_%s' % (calendar_year - 1)] = cuv_suv_van_constants['y_hat_historic']
+            SalesShare._data['y_hat_pickup_%s' % (calendar_year - 1)] = pickup_constants['y_hat_historic']
+
+        y_hat_prior = SalesShare._data['y_hat_%s_%s' % (body_style, calendar_year - 1)]
+        price = producer_decision['average_new_vehicle_mfr_cost_%s' % body_style]
+        footprint = producer_decision['average_footprint_ft2_%s' % body_style]
+        gasoline_dollars_per_gallon = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'pump gasoline')
+        electricity_dollars_per_kwh = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'US electricity')
+        carbon_intensity_gasoline = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline', 'direct_co2e_grams_per_unit')
+        gasoline_cpm = gasoline_dollars_per_gallon * producer_decision['average_onroad_direct_co2e_gpmi_%s' % body_style + '.ICE'] / carbon_intensity_gasoline
+        electricity_cpm = electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_%s' % body_style + '.ICE']
+        cpm = gasoline_cpm + electricity_cpm # only includes ICE vehicle cpm, consistent with original regression
+        hpwt = producer_decision['average_rated_hp_%s' % body_style + '.ICE'] / producer_decision['average_curbweight_lbs_%s' % body_style + '.ICE'] # ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
+
+        gasoline_cpm_sedan_wagon = gasoline_dollars_per_gallon * producer_decision['average_onroad_direct_co2e_gpmi_sedan_wagon.ICE'] / carbon_intensity_gasoline
+        electricity_cpm_sedan_wagon = electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_sedan_wagon.ICE']
+        cpm_sedan_wagon = gasoline_cpm_sedan_wagon + electricity_cpm_sedan_wagon # only includes ICE vehicle cpm, consistent with original regression
+        hpwt_sedan_wagon = producer_decision['average_rated_hp_sedan_wagon.ICE'] / producer_decision['average_curbweight_lbs_sedan_wagon.ICE'] # ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
+        gasoline_cpm_cuv_suv_van = gasoline_dollars_per_gallon * producer_decision['average_onroad_direct_co2e_gpmi_cuv_suv_van.ICE'] / carbon_intensity_gasoline
+        electricity_cpm_cuv_suv_van = electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_cuv_suv_van.ICE']
+        cpm_cuv_suv_van = gasoline_cpm_cuv_suv_van + electricity_cpm_cuv_suv_van # only includes ICE vehicle cpm, consistent with original regression
+        hpwt_cuv_suv_van = producer_decision['average_rated_hp_cuv_suv_van.ICE'] / producer_decision['average_curbweight_lbs_cuv_suv_van.ICE'] # ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
+        gasoline_cpm_pickup = gasoline_dollars_per_gallon * producer_decision['average_onroad_direct_co2e_gpmi_pickup.ICE'] / carbon_intensity_gasoline
+        electricity_cpm_pickup = electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_pickup.ICE']
+        cpm_pickup = gasoline_cpm_pickup + electricity_cpm_pickup # only includes ICE vehicle cpm, consistent with original regression
+        hpwt_pickup = producer_decision['average_rated_hp_pickup.ICE'] / producer_decision['average_curbweight_lbs_pickup.ICE'] # ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
+
+        geometric_mean_price = np.exp(np.average([math.log(producer_decision['average_new_vehicle_mfr_cost_sedan_wagon']), math.log(producer_decision['average_new_vehicle_mfr_cost_cuv_suv_van']), math.log(producer_decision['average_new_vehicle_mfr_cost_pickup'])]))
+        geometric_mean_footprint = np.exp(np.average([math.log(producer_decision['average_footprint_ft2_sedan_wagon']), math.log(producer_decision['average_footprint_ft2_cuv_suv_van']), math.log(producer_decision['average_footprint_ft2_pickup'])]))
+        geometric_mean_cpm = np.exp(np.average([math.log(cpm_sedan_wagon), math.log(cpm_cuv_suv_van), math.log(cpm_pickup)]))
+        geometric_mean_hpwt = np.exp(np.average([math.log(hpwt_sedan_wagon), math.log(hpwt_cuv_suv_van), math.log(hpwt_pickup)]))
+
         y_hat = (dfs_coeffs.Constant +
-                 dfs_coeffs.Xprice * math.log(price / meanprice) +
-                 dfs_coeffs.Xfoot * math.log(footprint / meanfootprint) +
-                 dfs_coeffs.Xcpm * math.log(cpm / meancpm) +
+                 dfs_coeffs.Xprice * math.log(price / geometric_mean_price) +
+                 dfs_coeffs.Xfoot * math.log(footprint / geometric_mean_footprint) +
+                 dfs_coeffs.Xcpm * math.log(cpm / geometric_mean_cpm) +
+                 dfs_coeffs.Xhpwt * math.log(hpwt / geometric_mean_hpwt) +
                  dfs_coeffs.inc_growth * 1.02 +
                  dfs_coeffs.y_lag * y_hat_prior)
 
+        # save y_hat value for the next analysis year's prior value
+        SalesShare._data['y_hat_%s_%s' % (body_style, calendar_year)] = y_hat
 
-
-
-
-
-
-
-
-
-
-
-        # seeds need vehicle_power, curbweight and average_mpg attributes
-        class seed_data(OMEGABase):
-            def __init__(self, vehicle_power, curbweight, average_onroad_mpg, footprint, y_hat_prior=None):
-                if y_hat_prior:
-                    self.share = y_hat_prior
-                self.vehicle_power = vehicle_power
-                self.curbweight = curbweight
-                self.footprint = footprint
-                self.average_onroad_mpg = average_onroad_mpg
-
-        prev_y_hat = producer_decision.copy()
-
-
+        return y_hat
 
     @staticmethod
     def calc_shares_body_style(calendar_year, producer_decision):
@@ -312,91 +329,17 @@ class SalesShare(OMEGABase, SalesShareBase):
         Returns:
 
         """
-        if 'base_year_data' not in SalesShare._data:
-            SalesShare._data['base_year_data'] = omega_globals.options.vehicles_df.groupby('body_style').apply(sales_weight_average_dataframe)
+        y_hat_sedan_wagon = SalesShare.calc_shares_body_style_helper(calendar_year, producer_decision, 'sedan_wagon')
+        y_hat_cuv_suv_van = SalesShare.calc_shares_body_style_helper(calendar_year, producer_decision, 'cuv_suv_van')
+        y_hat_pickup = SalesShare.calc_shares_body_style_helper(calendar_year, producer_decision, 'pickup')
 
-        if len(SalesShare.prev_producer_decisions_and_responses) == 0:
-            # no historical share data, use current decision plus base year data
-            prev_producer_decision_and_response1 = producer_decision.copy()
+        denom = math.exp(y_hat_sedan_wagon) + math.exp(y_hat_cuv_suv_van) + math.exp(y_hat_pickup)
 
-            # need y_hat for prior year
-            # year-1 = base year, use y_hat_historic
-            prev_producer_decision_and_response1['y_hat_historic'] = \
-                SalesShare._data['base_year_data']['rated_hp']['car']
-
-        sedan_wagon_share = SalesShare.calc_shares_body_style_helper(calendar_year, prev_producer_decision_and_response1, 'sedan_wagon')
-
-        cuv_suv_van_share = SalesShare.calc_shares_body_style_helper(calendar_year, prev_producer_decision_and_response1, 'cuv_suv_van')
-
-        pickup_share = SalesShare.calc_shares_body_style_helper(calendar_year, prev_producer_decision_and_response1,'pickup')
+        sedan_wagon_share = math.exp(y_hat_sedan_wagon) / denom
+        cuv_suv_van_share = math.exp(y_hat_cuv_suv_van) / denom
+        pickup_share = math.exp(y_hat_pickup) / denom
 
         return sedan_wagon_share, cuv_suv_van_share, pickup_share
-
-
-
-
-
-
-
-
-
-
-
-
-        if 'base_year_data' not in SalesShare._data:
-            SalesShare._data['base_year_data'] = omega_globals.options.vehicles_df.groupby('body_style').\
-                apply(sales_weight_average_dataframe)
-
-        if len(SalesShare.y_hat_prior1) == 0:
-            # no prior year of modeled shares, use input value of 'y_hat'
-            1==1
-            # y_hat_prior1 = dfs_coeffs[]
-
-            ['y_hat_%s' % market_class]
-
-            gasFP = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'pump gasoline')
-
-            y_hat = (dfs_coeffs.Constant +
-                     dfs_coeffs.Xprice * math.log(price/meanprice) +
-                     dfs_coeffs.Xfoot * math.log(footprint / meanfootprint) +
-                     dfs_coeffs.Xcpm * math.log(cpm / meancpm) +
-                     dfs_coeffs.inc_growth * 1.02 +
-                     dfs_coeffs.y_lag * y_hat_prior)
-
-            return y_hat
-
-        else:
-            # has prior year of data, use prior year for y_hat_prior1
-            prev_producer_decision_and_response1 = SalesShare.prev_producer_decisions_and_responses[-1]
-
-
-
-            # need rated_hp, curbweight_lbs and abs_share_fracs and mpg, for prior two years, if possible
-            # year-1 = base year, use base year data except for mpg, don't have data, implicitly use current year mpg
-            prev_producer_decision_and_response1['average_rated_hp_non_hauling'] = \
-                SalesShare._data['base_year_data']['rated_hp']['car']
-            prev_producer_decision_and_response1['average_rated_hp_hauling'] = \
-                SalesShare._data['base_year_data']['rated_hp']['truck']
-            prev_producer_decision_and_response1['average_curbweight_lbs_non_hauling'] = \
-                SalesShare._data['base_year_data']['curbweight_lbs']['car']
-            prev_producer_decision_and_response1['average_curbweight_lbs_hauling'] = \
-                SalesShare._data['base_year_data']['curbweight_lbs']['truck']
-            prev_producer_decision_and_response1['consumer_abs_share_frac_non_hauling'] = \
-                SalesShare._data['base_year_data']['sales']['car'] / SalesShare._data['base_year_data']['sales'].sum()
-            prev_producer_decision_and_response1['consumer_abs_share_frac_hauling'] = \
-                SalesShare._data['base_year_data']['sales']['truck'] / SalesShare._data['base_year_data']['sales'].sum()
-
-            # has prior year of data, use prior year for y_hat
-            prev_producer_decision_and_response1 = SalesShare.prev_producer_decisions_and_responses[-1]
-
-            sedan_wagon_share = SalesShare.calc_shares_body_style_helper(calendar_year, prev_producer_decision_and_response1, 'sedan_wagon')
-
-            cuv_suv_van_share = SalesShare.calc_shares_body_style_helper(calendar_year, prev_producer_decision_and_response1, 'cuv_suv_van')
-
-            pickup_share = SalesShare.calc_shares_body_style_helper(calendar_year, prev_producer_decision_and_response1,
-                                                                'pickup')
-
-            return sedan_wagon_share, cuv_suv_van_share, pickup_share
 
     @staticmethod
     def calc_shares(calendar_year, producer_decision, market_class_data, mc_parent, mc_pair):
@@ -429,29 +372,38 @@ class SalesShare(OMEGABase, SalesShareBase):
         # If the hauling/non_hauling shares were responsive (endogenous), methods to calculate these values would
         # be called here.
 
-        analysis_non_hauling_share, analysis_hauling_share = \
+        analysis_sedan_wagon_share, analysis_cuv_suv_van_share, analysis_pickup_share = \
             SalesShare.calc_shares_body_style(calendar_year, producer_decision)
-
-        context_non_hauling_share = \
-            NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=None, context_reg_class='car',
-                                              value='sales_share_of_total') / 100
-
-        context_hauling_share = \
-            NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=None, context_reg_class='truck',
-                                              value='sales_share_of_total') / 100
-
         if omega_globals.options.generate_context_calibration_files:
-            SalesShare._data['non_hauling_calibration'][calendar_year] = \
-                context_non_hauling_share / analysis_non_hauling_share
 
-        analysis_non_hauling_share *= SalesShare._data['non_hauling_calibration'][calendar_year]
-        analysis_hauling_share = 1 - analysis_non_hauling_share
+            context_sedan_wagon_share = \
+                NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='sedan_wagon',
+                                            value='sales_share_of_total') / 100
 
-        market_class_data['consumer_abs_share_frac_non_hauling'] = \
-            analysis_non_hauling_share
+            context_cuv_suv_van_share = \
+                NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='cuv_suv_van',
+                                            value='sales_share_of_total') / 100
 
-        market_class_data['consumer_abs_share_frac_hauling'] = \
-            analysis_hauling_share
+            context_pickup_share = \
+                NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='pickup',
+                                            value='sales_share_of_total') / 100
+
+            SalesShare._data['sedan_wagon_calibration'][calendar_year] = \
+                context_sedan_wagon_share / analysis_sedan_wagon_share
+
+            SalesShare._data['cuv_suv_van_calibration'][calendar_year] = \
+                context_cuv_suv_van_share / analysis_cuv_suv_van_share
+
+            SalesShare._data['pickup_calibration'][calendar_year] = \
+                context_pickup_share / analysis_pickup_share
+
+        analysis_sedan_wagon_share *= SalesShare._data['sedan_wagon_calibration'][calendar_year]
+        analysis_cuv_suv_van_share *= SalesShare._data['cuv_suv_van_calibration'][calendar_year]
+        analysis_pickup_share *= SalesShare._data['pickup_calibration'][calendar_year]
+
+        market_class_data['consumer_abs_share_frac_sedan_wagon'] = analysis_sedan_wagon_share
+        market_class_data['consumer_abs_share_frac_cuv_suv_van'] = analysis_cuv_suv_van_share
+        market_class_data['consumer_abs_share_frac_pickup'] = analysis_pickup_share
 
         if all([SalesShare.gcam_supports_market_class(mc) for mc in mc_pair]):
             # calculate desired ICE/BEV shares within hauling/non_hauling using methods based on the GCAM model:
@@ -472,7 +424,9 @@ class SalesShare(OMEGABase, SalesShareBase):
         if omega_globals.options.standalone_run:
             filename = omega_globals.options.output_folder + filename
 
-        calibration = pd.Series(SalesShare._data['non_hauling_calibration'], name='non_hauling_calibration')
+        calibration = pd.DataFrame.from_dict({'sedan_wagon_calibration' : SalesShare._data['sedan_wagon_calibration'],
+                                              'cuv_suv_van_calibration' : SalesShare._data['cuv_suv_van_calibration'],
+                                              'pickup_calibration' : SalesShare._data['pickup_calibration']})
         calibration.to_csv(filename)
 
     @staticmethod
@@ -558,11 +512,19 @@ class SalesShare(OMEGABase, SalesShareBase):
                 SalesShare._data[mc] = {'start_year': np.array(df['start_year'].loc[df['market_class_id'] == mc])}
 
             if omega_globals.options.generate_context_calibration_files:
-                SalesShare._data['non_hauling_calibration'] = dict()
+                SalesShare._data['sedan_wagon_calibration'] = dict()
+                SalesShare._data['cuv_suv_van_calibration'] = dict()
+                SalesShare._data['pickup_calibration'] = dict()
             else:
-                SalesShare._data['non_hauling_calibration'] = \
+                SalesShare._data['sedan_wagon_calibration'] = \
                     pd.read_csv(omega_globals.options.sales_share_calibration_file). \
-                        set_index('Unnamed: 0').to_dict()['non_hauling_calibration']
+                        set_index('Unnamed: 0').to_dict()['sedan_wagon_calibration']
+                SalesShare._data['cuv_suv_van_calibration'] = \
+                    pd.read_csv(omega_globals.options.sales_share_calibration_file). \
+                        set_index('Unnamed: 0').to_dict()['cuv_suv_van_calibration']
+                SalesShare._data['pickup_calibration'] = \
+                    pd.read_csv(omega_globals.options.sales_share_calibration_file). \
+                        set_index('Unnamed: 0').to_dict()['pickup_calibration']
 
         return template_errors
 
