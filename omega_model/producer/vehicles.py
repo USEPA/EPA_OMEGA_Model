@@ -378,9 +378,10 @@ class CompositeVehicle(OMEGABase):
                 v.composite_vehicle_share_frac = 0
 
         if calc_composite_cost_curve:
-            plot_cost_curve = ((omega_globals.options.log_producer_compliance_search_years == 'all') or
-                              (self.model_year in omega_globals.options.log_producer_compliance_search_years)) and \
-                              any([v.name in omega_globals.options.plot_and_log_vehicles for v in self.vehicle_list])
+            plot_cost_curve = ((omega_globals.options.log_vehicle_cloud_years == 'all') or
+                              (self.model_year in omega_globals.options.log_vehicle_cloud_years)) and \
+                              'v_cloud_plots' in omega_globals.options.verbose_log_modules
+            # and any([v.name in omega_globals.options.plot_and_log_vehicles for v in self.vehicle_list])
             self.cost_curve = self.calc_composite_cost_curve(plot=plot_cost_curve)
 
         self.tech_option_iteration_num = 0
@@ -497,7 +498,7 @@ class CompositeVehicle(OMEGABase):
         """
         if plot:
             fig, ax1 = figure()
-            label_xyt(ax1, 'CO2e [g/mi]', 'Generalized Cost [$]', '%s' % self.name)
+            label_xyt(ax1, cost_curve_interp_key, 'Generalized Cost [$]', '%s' % self.name)
 
         composite_frontier_df = pd.DataFrame()
         composite_frontier_df['market_share_frac'] = [0]
@@ -541,12 +542,12 @@ class CompositeVehicle(OMEGABase):
 
             if plot:
                 if v.name in omega_globals.options.plot_and_log_vehicles:
-                    ax1.plot(vehicle_frontier['veh_%s_cert_co2e_grams_per_mile' % v.vehicle_id],
+                    ax1.plot(vehicle_frontier['veh_%s_%s' % (v.vehicle_id, cost_curve_interp_key)],
                              vehicle_frontier['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % v.vehicle_id], 's-',
                              color='black',
                              label='veh %s %s' % (v.vehicle_id, v.name))
                 else:
-                    ax1.plot(vehicle_frontier['veh_%s_cert_co2e_grams_per_mile' % v.vehicle_id],
+                    ax1.plot(vehicle_frontier['veh_%s_%s' % (v.vehicle_id, cost_curve_interp_key)],
                              vehicle_frontier['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % v.vehicle_id], '.--',
                              linewidth=1, label='veh %s %s' % (v.vehicle_id, v.name))
 
