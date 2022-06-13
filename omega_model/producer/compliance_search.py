@@ -106,13 +106,15 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
 
             if num_tech_options == 1:
                 # cost_curve_options = [veh_min_cost_curve_index]  # was max g/mi -> min credits
-                cost_curve_options = [(cv.cost_curve.credits_co2e_Mg_per_vehicle / cv.cost_curve.new_vehicle_mfr_generalized_cost_dollars).idxmax()]
+                best_index = (cv.cost_curve.credits_co2e_Mg_per_vehicle / cv.cost_curve.new_vehicle_mfr_generalized_cost_dollars).idxmax()
+                cost_curve_options = [cv.cost_curve[cost_curve_interp_key].loc[best_index]]
             else:
                 cost_curve_options = np.unique(cost_curve_options)  # filter out redundant tech options
         else:  # first producer pass, generate full range of options
             if num_tech_options == 1:
                 # cost_curve_options = [veh_min_cost_curve_index]  # was max g/mi -> min credits
-                cost_curve_options = [(cv.cost_curve.credits_co2e_Mg_per_vehicle / cv.cost_curve.new_vehicle_mfr_generalized_cost_dollars).idxmax()]
+                best_index = (cv.cost_curve.credits_co2e_Mg_per_vehicle / cv.cost_curve.new_vehicle_mfr_generalized_cost_dollars).idxmax()
+                cost_curve_options = [cv.cost_curve[cost_curve_interp_key].loc[best_index]]
             else:
                 cost_curve_options = np.linspace(veh_min_cost_curve_index, veh_max_cost_curve_index, num=num_tech_options)
 
@@ -487,7 +489,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         # pull in last year's vehicles:
         manufacturer_prior_vehicles = VehicleFinal.get_compliance_vehicles(calendar_year - 1, compliance_id)
 
-        Vehicle.reset_vehicle_ids()
+        # Vehicle.reset_vehicle_ids()
 
         manufacturer_vehicles = []
 
@@ -648,14 +650,9 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
         if (omega_globals.options.log_vehicle_cloud_years == 'all') or \
                 (calendar_year in omega_globals.options.log_vehicle_cloud_years):
             if 'cv_cost_curves' in omega_globals.options.verbose_log_modules:
-                cv.cost_curve.to_csv(omega_globals.options.output_folder +
-                                 '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_id),
-                                     columns=sorted(cv.cost_curve.columns), index=False)
-            if 'v_cost_curves' in omega_globals.options.verbose_log_modules:
-                for veh in cv.vehicle_list:
-                    veh.cost_curve.to_csv(omega_globals.options.output_folder + '%s_%s_cost_curve.csv' %
-                                          (veh.model_year, veh.vehicle_id),
-                                          columns=sorted(veh.cost_curve.columns), index=False)
+                filename = '%s%d_%s_%s_cost_curve.csv' % (omega_globals.options.output_folder, cv.model_year,
+                                                          cv.name.replace(':', '-'), cv.vehicle_id)
+                cv.cost_curve.to_csv(filename, columns=sorted(cv.cost_curve.columns), index=False)
 
         for veh in cv.vehicle_list:
             veh_final = VehicleFinal()

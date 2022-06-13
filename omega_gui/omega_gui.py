@@ -151,7 +151,7 @@ class Form(QObject):
         self.window.output_batch_directory_1_result.setReadOnly(1)
         # Set wizard window options
         # self.window.wizard_result.setReadOnly(1)
-        # Disable run model button graphic
+        # Disable run model button graphics
         # self.enable_run_button(False)
         self.window.select_input_batch_file_button.setIcon(QIcon(input_batch_file_button_image))
         self.window.select_output_batch_directory_button.setIcon(QIcon(output_batch_directory_button_image))

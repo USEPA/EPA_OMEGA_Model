@@ -196,7 +196,8 @@ def calc_physical_effects(calendar_years):
                 electric_fuel = None
 
                 vmt_liquid_fuel = vmt_electricity \
-                    = onroad_gallons_per_mile = fuel_consumption_gallons = fuel_consumption_kWh = 0
+                    = onroad_gallons_per_mile = fuel_consumption_gallons \
+                    = fuel_generation_kWh = fuel_consumption_kWh = 0
 
                 voc_tailpipe_ustons = co_tailpipe_ustons = nox_tailpipe_ustons = pm25_tailpipe_ustons \
                     = so2_tailpipe_ustons = benzene_tailpipe_ustons = butadiene13_tailpipe_ustons \
@@ -228,7 +229,8 @@ def calc_physical_effects(calendar_years):
                     if fuel == 'US electricity' and onroad_direct_kwh_per_mile:
                         electric_fuel = fuel
                         vmt_electricity = vad['vmt'] * fuel_share
-                        fuel_consumption_kWh += vmt_electricity * onroad_direct_kwh_per_mile / transmission_efficiency
+                        fuel_consumption_kWh += vmt_electricity * onroad_direct_kwh_per_mile
+                        fuel_generation_kWh += fuel_consumption_kWh / transmission_efficiency
 
                         # vehicle emission rates:
                         rate_names = ['pm25_brakewear_grams_per_mile', 'pm25_tirewear_grams_per_mile']
@@ -292,7 +294,7 @@ def calc_physical_effects(calendar_years):
                                         / grams_per_us_ton
 
                 # calc upstream emissions for both liquid and electric fuel operation
-                kwhs, gallons = fuel_consumption_kWh, fuel_consumption_gallons
+                kwhs, gallons = fuel_generation_kWh, fuel_consumption_gallons
                 voc_upstream_ustons = (kwhs * voc_ps + gallons * voc_ref) / grams_per_us_ton
                 co_upstream_ustons = (kwhs * co_ps + gallons * co_ref) / grams_per_us_ton
                 nox_upstream_ustons = (kwhs * nox_ps + gallons * nox_ref) / grams_per_us_ton
@@ -331,7 +333,7 @@ def calc_physical_effects(calendar_years):
                 share_of_us_annual_oil = oil_bbl / bbl_oil_us_annual
 
                 # calc kwh and comparisons to year_for_compares
-                share_of_us_annual_kwh = fuel_consumption_kWh / kwh_us_annual
+                share_of_us_annual_kwh = fuel_generation_kWh / kwh_us_annual
 
                 if vmt_liquid_fuel > 0 or vmt_electricity > 0:
                     flag = 1
@@ -359,6 +361,7 @@ def calc_physical_effects(calendar_years):
                                              'onroad_gallons_per_mile': onroad_gallons_per_mile,
                                              'fuel_consumption_gallons': fuel_consumption_gallons,
                                              'fuel_consumption_kWh': fuel_consumption_kWh,
+                                             'fuel_generation_kWh': fuel_generation_kWh,
 
                                              f'share_of_{year_for_compares}_US_gasoline': share_of_us_annual_gasoline,
                                              f'share_of_{year_for_compares}_US_kWh': share_of_us_annual_kwh,
@@ -449,7 +452,7 @@ def calc_annual_physical_effects(input_df):
     elec_trans_efficiency = pd.DataFrame(d).transpose()
 
     attributes = [col for col in input_df.columns if ('vmt' in col or 'vmt_' in col) and '_vmt' not in col]
-    additional_attributes = ['count', 'consumption', 'barrels', 'tons']
+    additional_attributes = ['count', 'consumption', 'generation', 'barrels', 'tons']
     for additional_attribute in additional_attributes:
         for col in input_df:
             if col.__contains__(additional_attribute):
@@ -461,15 +464,15 @@ def calc_annual_physical_effects(input_df):
     return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
     return_df = return_df.merge(elec_trans_efficiency, on='calendar_year', how='left')
 
-    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
+    return_df.insert(return_df.columns.get_loc('fuel_generation_kWh') + 1,
                      'onroad_gallons_per_mile',
                      return_df['fuel_consumption_gallons'] / return_df['vmt_liquid_fuel'])
 
-    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
+    return_df.insert(return_df.columns.get_loc('fuel_generation_kWh') + 1,
                      'onroad_direct_kwh_per_mile',
                      return_df['fuel_consumption_kWh'] * return_df['transmission_efficiency'] / return_df['vmt_electricity'])
 
-    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
+    return_df.insert(return_df.columns.get_loc('fuel_generation_kWh') + 1,
                      'onroad_direct_co2e_grams_per_mile',
                      return_df['co2_tailpipe_metrictons'] * grams_per_metric_ton / return_df['vmt_liquid_fuel'])
 
@@ -513,10 +516,10 @@ def calc_annual_physical_effects(input_df):
 
     share_of_us_annual_gasoline = return_df['fuel_consumption_gallons'] / gallons_of_gasoline_us_annual
     share_of_us_annual_oil = return_df['barrels_of_oil'] / bbl_oil_us_annual
-    share_of_us_annual_kwh = return_df['fuel_consumption_kWh'] / kwh_us_annual
+    share_of_us_annual_kwh = return_df['fuel_generation_kWh'] / kwh_us_annual
 
-    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1, f'share_of_{year_for_compares}_US_kWh', share_of_us_annual_kwh)
-    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1, f'share_of_{year_for_compares}_US_gasoline', share_of_us_annual_gasoline)
+    return_df.insert(return_df.columns.get_loc('fuel_generation_kWh') + 1, f'share_of_{year_for_compares}_US_kWh', share_of_us_annual_kwh)
+    return_df.insert(return_df.columns.get_loc('fuel_generation_kWh') + 1, f'share_of_{year_for_compares}_US_gasoline', share_of_us_annual_gasoline)
     return_df.insert(return_df.columns.get_loc('barrels_of_oil') + 1, f'share_of_{year_for_compares}_US_oil', share_of_us_annual_oil)
 
     return return_df
