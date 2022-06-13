@@ -81,7 +81,7 @@ def plot_frontier(cost_cloud, cost_curve_name, frontier_df, x_key, y_key):
     plt.savefig(omega_globals.options.output_folder + '%s versus %s %s.png' % (y_key, x_key, cost_curve_name))
 
 
-def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=True):
+def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=False):
     """
     Calculate the frontier of a cloud.
 
