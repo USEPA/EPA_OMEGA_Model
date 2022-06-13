@@ -81,7 +81,7 @@ def plot_frontier(cost_cloud, cost_curve_name, frontier_df, x_key, y_key):
     plt.savefig(omega_globals.options.output_folder + '%s versus %s %s.png' % (y_key, x_key, cost_curve_name))
 
 
-def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
+def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=True):
     """
     Calculate the frontier of a cloud.
 
@@ -124,9 +124,14 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
         # drop non-numeric columns so dtypes don't become "object"
         cloud = cloud.drop(columns=cloud_non_numeric_columns, errors='ignore')
 
+        if invert_x_axis:
+            x_sign = -1
+        else:
+            x_sign = 1
+
         # normalize data (helps with up-slope frontier)
         cloud['y_norm'] = (cloud[y_key].values - cloud[y_key].values.min()) / (cloud[y_key].values.max() - cloud[y_key].values.min())
-        cloud['x_norm'] = (cloud[x_key].values - cloud[x_key].values.min()) / (cloud[x_key].values.max() - cloud[x_key].values.min())
+        cloud['x_norm'] = x_sign * (cloud[x_key].values - cloud[x_key].values.min()) / (cloud[x_key].values.max() - cloud[x_key].values.min())
 
         x_key = 'x_norm'
         y_key = 'y_norm'
@@ -160,6 +165,9 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
 
                     if pd.notna(idxmin) and (allow_upslope or min_frontier_factor <= 0):
                         frontier_pts.append(cloud.loc[idxmin])
+
+        if invert_x_axis:
+            frontier_pts.reverse()
 
         frontier_df = pd.concat(frontier_pts, axis=1).transpose()
     else:

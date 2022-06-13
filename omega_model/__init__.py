@@ -196,7 +196,7 @@ try:
 
             # list of modules to allow verbose log files, or empty to disable:
             self.verbose_log_modules = ['database_', 'producer_compliance_search', 'cross_subsidy_search_',
-                                        'cv_cost_curves_', 'v_cost_curves_', 'v_cost_clouds_']
+                                        'cv_cost_curves_', 'v_cost_curves_', 'v_cost_clouds_', 'v_cloud_plots_']
 
             # list of modules to allow verbose console output, or empty to disable
             self.verbose_console_modules = ['producer_compliance_search_',
