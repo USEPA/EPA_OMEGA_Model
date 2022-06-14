@@ -108,7 +108,7 @@ try:
             self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
             self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights.csv'
             self.drive_cycle_ballast_file = path + 'test_inputs/drive_cycle_ballast.csv'
-            self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market.csv'
+            self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market-body_style.csv'
 
             # self.ice_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_ice.csv'
             # self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_bev.csv'
