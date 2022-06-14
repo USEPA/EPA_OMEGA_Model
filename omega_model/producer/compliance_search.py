@@ -956,10 +956,11 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         # grab best compliant option (least over-compliant OR lowest cost?)
         compliance_possible = True
         # least over-compliant:
+        # candidate_production_decisions = \
+        #     production_options.loc[[mini_df['total_credits_with_offset_co2e_megagrams'].idxmin()]]
+        # grab lowest-cost compliant option
         candidate_production_decisions = \
-            production_options.loc[[mini_df['total_credits_with_offset_co2e_megagrams'].idxmin()]]
-        # lowest cost:
-        # candidate_production_decisions = tech_share_combos_total.loc[[[cost_name].idxmin()]]
+            production_options.loc[[compliant_tech_share_options[cost_name].idxmin()]]
 
     candidate_production_decisions['selected_production_option'] = candidate_production_decisions.index
 

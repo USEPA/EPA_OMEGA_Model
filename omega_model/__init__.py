@@ -85,7 +85,7 @@ try:
             self.session_name = 'OMEGA Quick Test'
             self.session_unique_name = 'OMEGA Quick Test'
             self.session_is_reference = True
-            self.auto_close_figures = False
+            self.auto_close_figures = True
             self.output_folder = 'out' + os.sep
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
             self.omega_model_path = path
