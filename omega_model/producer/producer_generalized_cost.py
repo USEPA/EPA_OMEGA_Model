@@ -131,8 +131,9 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
                                               producer_generalized_cost_fuel_years)
 
         # TODO: if we keep this, the 1300 should be an input somewhere
+        # WLTP updated to 400 per footprint-equilibrium searching runs - BDE 06/14/22
         delta_footprint_ft2 = cost_cloud['footprint_ft2'] - vehicle.base_year_footprint_ft2
-        footprint_wltp = delta_footprint_ft2 * 1300
+        footprint_wltp = delta_footprint_ft2 * 400
 
         generalized_fuel_cost = liquid_generalized_fuel_cost + electric_generalized_fuel_cost
 
