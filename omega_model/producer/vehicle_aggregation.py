@@ -356,6 +356,7 @@ class VehicleAggregation(OMEGABase):
                 veh = Vehicle()
                 veh.model_year = row['model_year']
                 veh.powertrain_type = row['powertrain_type']
+                veh.body_style = row['body_style']
 
                 if veh.powertrain_type == 'FCV':
                     veh.powertrain_type = 'BEV'  # TODO: for costing purposes, for now

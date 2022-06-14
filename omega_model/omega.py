@@ -888,6 +888,9 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
             producer_decision['average_rated_hp_%s' % mc] = \
                 weighted_value(market_class_vehicles, 'initial_registered_count', 'rated_hp')
 
+            producer_decision['average_footprint_ft2_%s' % mc] = \
+                weighted_value(market_class_vehicles, 'initial_registered_count', 'footprint_ft2')
+
             if 'ICE' in mc:
                 # TODO: should get 8887 from PolicyFuel?, but need calendar year (set in omega_globals so we don't have to pass it in??)
                 producer_decision['average_onroad_mpg_%s' % mc] = \
@@ -908,6 +911,7 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
             producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] = 0
             producer_decision['average_curbweight_lbs_%s' % mc] = 0
             producer_decision['average_rated_hp_%s' % mc] = 0
+            producer_decision['average_footprint_ft2_%s' % mc] = 0
             producer_decision['average_onroad_mpg_%s' % mc] = 0
             producer_decision['sales_%s' % mc] = 0
 
@@ -928,17 +932,28 @@ def calc_market_category_data(producer_decision):
 
 
     for mcat in omega_globals.options.MarketClass.market_categories:
+        producer_decision['average_onroad_direct_co2e_gpmi_%s' % mcat] = 0
+        producer_decision['average_onroad_direct_kwh_pmi_%s' % mcat] = 0
         producer_decision['average_new_vehicle_mfr_cost_%s' % mcat] = 0
         producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mcat] = 0
         producer_decision['average_cross_subsidized_price_%s' % mcat] = 0
         producer_decision['average_curbweight_lbs_%s' % mcat] = 0
         producer_decision['average_rated_hp_%s' % mcat] = 0
+        producer_decision['average_footprint_ft2_%s' % mcat] = 0
         producer_decision['average_onroad_mpg_%s' % mcat] = 0
         producer_decision['sales_%s' % mcat] = 0
         producer_decision['producer_abs_share_frac_%s' % mcat] = 0
 
         for mc in omega_globals.options.MarketClass.market_classes:
             if mcat in mc.split('.'):
+                producer_decision['average_onroad_direct_co2e_gpmi_%s' % mcat] += \
+                    producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc] * \
+                    np.maximum(1, producer_decision['sales_%s' % mc])
+
+                producer_decision['average_onroad_direct_kwh_pmi_%s' % mcat] += \
+                    producer_decision['average_onroad_direct_kwh_pmi_%s' % mc] * \
+                    np.maximum(1, producer_decision['sales_%s' % mc])
+
                 producer_decision['average_new_vehicle_mfr_cost_%s' % mcat] += \
                     producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * \
                     np.maximum(1, producer_decision['sales_%s' % mc])
@@ -960,6 +975,10 @@ def calc_market_category_data(producer_decision):
                     producer_decision['average_rated_hp_%s' % mc] * \
                     np.maximum(1, producer_decision['sales_%s' % mc])
 
+                producer_decision['average_footprint_ft2_%s' % mcat] += \
+                    producer_decision['average_footprint_ft2_%s' % mc] * \
+                    np.maximum(1, producer_decision['sales_%s' % mc])
+
                 producer_decision['average_onroad_mpg_%s' % mcat] += \
                     producer_decision['average_onroad_mpg_%s' % mc] * \
                     np.maximum(1, producer_decision['sales_%s' % mc])
@@ -969,6 +988,12 @@ def calc_market_category_data(producer_decision):
 
                 producer_decision['producer_abs_share_frac_%s' % mcat] += \
                     producer_decision['producer_abs_share_frac_%s' % mc]
+
+        producer_decision['average_onroad_direct_co2e_gpmi_%s' % mcat] /= \
+            producer_decision['sales_%s' % mcat]
+
+        producer_decision['average_onroad_direct_kwh_pmi_%s' % mcat] /= \
+            producer_decision['sales_%s' % mcat]
 
         producer_decision['average_new_vehicle_mfr_cost_%s' % mcat] /= \
             producer_decision['sales_%s' % mcat]
@@ -983,6 +1008,9 @@ def calc_market_category_data(producer_decision):
             producer_decision['sales_%s' % mcat]
 
         producer_decision['average_rated_hp_%s' % mcat] /= \
+            producer_decision['sales_%s' % mcat]
+
+        producer_decision['average_footprint_ft2_%s' % mcat] /= \
             producer_decision['sales_%s' % mcat]
 
         producer_decision['average_onroad_mpg_%s' % mcat] /= \

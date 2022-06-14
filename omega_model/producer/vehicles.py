@@ -358,6 +358,7 @@ class CompositeVehicle(OMEGABase):
                                 # these are needed for NEMS market share calcs (in addition to g/mi and kWh/hi):
                                 'curbweight_lbs',
                                 'rated_hp',
+                                'footprint_ft2'
                                 ]
 
         # calc weighted values
