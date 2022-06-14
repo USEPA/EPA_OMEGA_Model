@@ -979,12 +979,12 @@ class Vehicle(OMEGABase):
                 cost_cloud.loc[cost_curve.index, 'frontier'] = True
 
                 filename = '%s%d_%s_%s_cost_cloud.csv' % (omega_globals.options.output_folder, self.model_year,
-                                                          self.name.replace(':', '-'), self.vehicle_id)
+                                                          self.name.replace(' ', '_').replace(':', '-'), self.vehicle_id)
                 cost_cloud.to_csv(filename, columns=sorted(cost_cloud.columns), index=False)
 
             if 'v_cost_curves' in omega_globals.options.verbose_log_modules:
                 filename = '%s%d_%s_%s_cost_curve.csv' % (omega_globals.options.output_folder, self.model_year,
-                                                          self.name.replace(':', '-'), self.vehicle_id)
+                                                          self.name.replace(' ', '_').replace(':', '-'), self.vehicle_id)
                 cost_curve.to_csv(filename, columns=sorted(cost_curve.columns), index=False)
 
 
@@ -997,8 +997,8 @@ class Vehicle(OMEGABase):
                 fig, ax1 = figure()
                 label_xyt(ax1, cost_curve_interp_key, 'Cost [$]', 'veh %s %s' % (self.vehicle_id, self.name))
 
-                ax1.plot(cost_cloud[cost_curve_interp_key],
-                         cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], 'x',
+                ax1.plot(cost_cloud['veh_%s_%s' % (self.vehicle_id, cost_curve_interp_key)],
+                         cost_cloud['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_id], 'x',
                          label='Cloud Points')
 
                 ax1.plot(cost_curve['veh_%s_%s' % (self.vehicle_id, cost_curve_interp_key)],
@@ -1007,13 +1007,14 @@ class Vehicle(OMEGABase):
                          label='Cost Curve')
 
                 ax1.legend(fontsize='medium', bbox_to_anchor=(0, 1.07), loc="lower left", borderaxespad=0)
-                figname = '%s%d_%s_cost_curve.png' % (omega_globals.options.output_folder, self.model_year, self.name)
+                figname = '%s%d_%s_%s_cost_curve.png' % \
+                          (omega_globals.options.output_folder, self.model_year, self.name, self.vehicle_id,)
                 fig.savefig(figname.replace(' ', '_').replace(':', '-'), bbox_inches='tight')
 
                 fig, ax1 = figure()
                 label_xyt(ax1, cost_curve_interp_key, 'CO2e [g/mi]', 'veh %s %s' % (self.vehicle_id, self.name))
-                ax1.plot(cost_cloud[cost_curve_interp_key],
-                         cost_cloud['cert_co2e_grams_per_mile'], '.',
+                ax1.plot(cost_cloud['veh_%s_%s' % (self.vehicle_id, cost_curve_interp_key)],
+                         cost_cloud['veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id], '.',
                          label='CO2e g/mi')
 
                 ax1.plot(cost_curve['veh_%s_%s' % (self.vehicle_id, cost_curve_interp_key)],
@@ -1022,7 +1023,8 @@ class Vehicle(OMEGABase):
                          label='CO2e Curve')
 
                 ax1.legend(fontsize='medium', bbox_to_anchor=(0, 1.07), loc="lower left", borderaxespad=0)
-                figname = '%s%d_%s_co2e_curve.png' % (omega_globals.options.output_folder, self.model_year, self.name)
+                figname = '%s%d_%s_%s_co2e_curve.png' % \
+                          (omega_globals.options.output_folder, self.model_year, self.name, self.vehicle_id,)
                 fig.savefig(figname.replace(' ', '_').replace(':', '-'), bbox_inches='tight')
 
         return cost_curve
