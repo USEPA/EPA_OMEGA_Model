@@ -73,6 +73,10 @@ def validate_template_version_info(filename, input_template_name, input_template
 
     df = pd.read_csv(filename, skiprows=1)
 
+    cols = [col for col in df if 'Unnamed' not in col]
+
+    df = df[cols]
+
     hash = hashlib.sha1(pd.util.hash_pandas_object(df).values).hexdigest()
 
     omega_globals.options.inputfile_metadata.append([file_io.get_filepath(filename), file_io.get_basename(filename),

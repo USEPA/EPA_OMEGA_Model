@@ -1537,7 +1537,7 @@ def run_omega(session_runtime_options, standalone_run=False):
                                                       4: 'input_template_name', 6: 'version_number', 7: 'notes:'})
 
             metadata_df.to_csv(
-                omega_globals.options.output_folder + 'inputfile_metadata.csv', index=False, header=True)
+                omega_globals.options.output_folder + f'{omega_globals.options.session_unique_name}_inputfile_metadata.csv', index=False, header=True)
 
             omega_log.end_logfile("\nSession Complete")
 

@@ -261,7 +261,6 @@ class PowertrainCost(OMEGABase):
             dcdc_converter_kw = eval(_cache[powertrain_type, 'DCDC_converter_kW']['value'], {'np': np}, locals_dict)
 
             OBC_AND_DCDC_CONVERTER_KW = dcdc_converter_kw + obc_kw
-            # VEHICLE_SIZE_CLASS = weight_bins.index(min([v for v in weight_bins if CURBWT < v])) # TODO where is this coming from, if we keep this?
 
             VEHICLE_SIZE_CLASS = np.array([weight_bins.index(min([v for v in weight_bins if cw < v])) for cw in CURBWT])
 
@@ -409,7 +408,7 @@ class PowertrainCost(OMEGABase):
             df = pd.read_csv(filename, skiprows=1)
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
-                                                        verbose=verbose)
+                                                             verbose=verbose)
 
             if not template_errors:
 
