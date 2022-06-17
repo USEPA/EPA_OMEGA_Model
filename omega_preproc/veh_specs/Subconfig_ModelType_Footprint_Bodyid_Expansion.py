@@ -8,8 +8,12 @@ DEBUGGING_CAFE_MFR_CD_MODE = False
 DEBUGGING_CAFE_MFR_CD = 'FMX'
 ESTIMATE_NV_RATIO_SET_COEF_ABC_BY_ROAD_LOAD_HP = False
 ESTIMATE_TARGET_COEF_BEST_MTH_3_4 = True
+global total_volumes_footprint_file;
 
-def file_errta_update(footprintSubconfigMY_file, errta_table, Column_Name, Old_Value, New_Value, MODEL_YEAR, MFR_DIVISION_NM, MFR_DIVISION_CD, MFR_CARLINE_CD, CAFE_ID, footprintSubconfig_INDEX):
+def file_errta_update(footprintSubconfigMY_file, errta_table, year, Column_Name, Old_Value, New_Value, MODEL_YEAR, MFR_DIVISION_NM, MFR_DIVISION_CD, MFR_CARLINE_CD, CAFE_ID, footprintSubconfig_INDEX):
+    errta_table = errta_table.loc[errta_table[MODEL_YEAR] == year, :].reset_index(drop=True)
+    errta_table['Correction Index'] = errta_table.index;
+
     errta_table.loc[pd.isnull(errta_table[Old_Value]), Old_Value] = ''
     errta_table.loc[pd.isnull(errta_table[New_Value]), New_Value] = ''
     for error_check_count in range(0, len(errta_table)):
@@ -53,6 +57,8 @@ def file_errta_update(footprintSubconfigMY_file, errta_table, Column_Name, Old_V
                     (footprintSubconfigMY_file[MFR_DIVISION_CD] == errta_table[MFR_DIVISION_CD][error_check_count]) & \
                     (footprintSubconfigMY_file[MFR_CARLINE_CD] == errta_table[MFR_CARLINE_CD][error_check_count]) & \
                     (footprintSubconfigMY_file[footprintSubconfig_INDEX] == errta_table[footprintSubconfig_INDEX][error_check_count])
+                # if len(errta_checks[errta_checks == True]) == 0:
+                #     print(i, _column_name)
                 if pd.isnull(errta_table[MFR_CARLINE_CD][error_check_count]):
                     errta_checks = (footprintSubconfigMY_file[MODEL_YEAR] == errta_table[MODEL_YEAR][error_check_count]) & \
                                    (footprintSubconfigMY_file[CAFE_ID] == errta_table[CAFE_ID][error_check_count]) & \
@@ -90,14 +96,64 @@ def check_final_model_yr_ghg_prod_units(data_chk_filename, vehghg_file_full_merg
     grp_vehghg_file_full_merged_data_chk = vehghg_file_full_merged_data_chk.groupby(['FOOTPRINT_MFR_CD']).sum().reset_index(drop=True)
     grp_volumes_vehghg_file_full_merged_data_chk = grp_vehghg_file_full_merged_data_chk[distributed_volumes_column_name]
 
-    print('total volumes = ', grp_volumes_footprint_file_with_lineage['PROD_VOL_GHG_STD_50_STATE'].sum(),
+    # grp_vehghg_file_full_merged_data_chk1 = vehghg_file_full_merged_data_chk.groupby(['FOOTPRINT_MFR_CD'])['PROD_VOL_GHG_STD_50_STATE'].sum().reset_index(drop=True)
+    # grp_volumes_vehghg_file_full_merged_data_chk1 = grp_vehghg_file_full_merged_data_chk1[distributed_volumes_column_name]
+
+    print('total_volumes_footprint_file = ', total_volumes_footprint_file, ' total volumes_footprint_file_with_lineage = ', grp_volumes_footprint_file_with_lineage['PROD_VOL_GHG_STD_50_STATE'].sum(),
           ' grp_volumes_' + data_chk_filename + ' @ merging = ', grp_volumes_vehghg_file_full_merged_data_chk.sum().round(0).astype(int))
 
-    for i in range(min(len(grp_volumes_footprint_file_with_lineage), len(grp_vehghg_file_full_merged_data_chk))):
-        if abs(grp_volumes_footprint_file_with_lineage['PROD_VOL_GHG_STD_50_STATE'][i] - grp_volumes_vehghg_file_full_merged_data_chk[i].round(0).astype(int)) != 0:
-            print(grp_volumes_footprint_file_with_lineage.index[i], grp_volumes_footprint_file_with_lineage[i], grp_volumes_vehghg_file_full_merged_data_chk[i].round(0).astype(int))
+    if total_volumes_footprint_file == grp_volumes_vehghg_file_full_merged_data_chk.sum().round(0).astype(int):
+        delta_final_model_yr_ghg_prod_units = 0
+    else:
+        for i in range(min(len(grp_volumes_footprint_file_with_lineage), len(grp_vehghg_file_full_merged_data_chk))):
+            if abs(grp_volumes_footprint_file_with_lineage['PROD_VOL_GHG_STD_50_STATE'][i] - grp_volumes_vehghg_file_full_merged_data_chk[i].round(0).astype(int)) != 0:
+                print(grp_volumes_footprint_file_with_lineage.index[i], grp_volumes_footprint_file_with_lineage.loc[grp_volumes_footprint_file_with_lineage.index[i], 'PROD_VOL_GHG_STD_50_STATE'], \
+                      grp_volumes_vehghg_file_full_merged_data_chk[i].round(0).astype(int))
 
-    delta_final_model_yr_ghg_prod_units = grp_volumes_footprint_file_with_lineage['PROD_VOL_GHG_STD_50_STATE'].sum() - grp_volumes_vehghg_file_full_merged_data_chk.sum().round(0).astype(int)
+        delta_final_model_yr_ghg_prod_units = grp_volumes_footprint_file_with_lineage['PROD_VOL_GHG_STD_50_STATE'].sum() - grp_volumes_vehghg_file_full_merged_data_chk.sum().round(0).astype(int)
+
+    # if footprint_file['PROD_VOL_GHG_STD_50_STATE'].sum() != full_expanded_footprint_file['PROD_VOL_GHG_STD_50_STATE'].sum():
+    #
+    #     _footprint_mfr_CDs = full_expanded_footprint_file['FOOTPRINT_MFR_CD'].unique();
+    #     for i in range(len(_footprint_mfr_CDs)):
+    #         _footprint_mfr_CD = _footprint_mfr_CDs[i];
+    #         # _matching_checks = df.drop(df.index[[1,3]])
+    #         grp_volumes_full_expanded_footprint_file = full_expanded_footprint_file.loc[(full_expanded_footprint_file['FOOTPRINT_MFR_CD'] == _footprint_mfr_CD), 'PROD_VOL_GHG_STD_50_STATE'].sum();
+    #         grp_volumes_footprint_file = footprint_file.loc[(footprint_file['FOOTPRINT_MFR_CD'] == _footprint_mfr_CD), 'PROD_VOL_GHG_STD_50_STATE'].sum();
+    #         if grp_volumes_footprint_file != grp_volumes_full_expanded_footprint_file:
+    #             _carline_NMs = full_expanded_footprint_file.loc[(full_expanded_footprint_file['FOOTPRINT_MFR_CD'] == _footprint_mfr_CD), 'FOOTPRINT_CARLINE_NM'].unique();
+    #             for j in range(len(_carline_NMs)):
+    #                 _carline_NM = _carline_NMs[j]
+    #                 carline_NM_volumes_full_expanded_footprint_file = full_expanded_footprint_file.loc[(full_expanded_footprint_file['FOOTPRINT_MFR_CD'] == _footprint_mfr_CD) &
+    #                                                                                                    (full_expanded_footprint_file['FOOTPRINT_CARLINE_NM'] == _carline_NM), 'PROD_VOL_GHG_STD_50_STATE'];
+    #                 carline_NM_volumes_footprint_file = footprint_file.loc[(footprint_file['FOOTPRINT_MFR_CD'] == _footprint_mfr_CD) &
+    #                                                                         (footprint_file['FOOTPRINT_CARLINE_NM'] == _carline_NM), 'PROD_VOL_GHG_STD_50_STATE'];
+    #                 if (carline_NM_volumes_full_expanded_footprint_file.sum() != carline_NM_volumes_footprint_file.sum()) and \
+    #                         (carline_NM_volumes_full_expanded_footprint_file.unique()[0] == carline_NM_volumes_footprint_file.unique()[0]) and \
+    #                         (len(carline_NM_volumes_full_expanded_footprint_file.unique()) == 1):
+    #                     print(_footprint_mfr_CD, _carline_NM, carline_NM_volumes_full_expanded_footprint_file, carline_NM_volumes_footprint_file)
+    #                     if len(carline_NM_volumes_full_expanded_footprint_file) > len(carline_NM_volumes_footprint_file):
+    #                         print(carline_NM_volumes_full_expanded_footprint_file.index)
+    #                         print(carline_NM_volumes_footprint_file.index)
+    #                         non_duplicated_rows = [];
+    #                         for k in range(len(carline_NM_volumes_footprint_file)):
+    #                             _index = carline_NM_volumes_footprint_file.index[k]
+    #                             _row_found = min(carline_NM_volumes_full_expanded_footprint_file.index, key=lambda x: abs(x - _index));
+    #                             non_duplicated_rows.append(_row_found);
+    #                             print(carline_NM_volumes_full_expanded_footprint_file[carline_NM_volumes_full_expanded_footprint_file.index[k]], \
+    #                                   carline_NM_volumes_footprint_file[carline_NM_volumes_footprint_file.index[k]])
+    #
+    #                         _index_duplicated = carline_NM_volumes_full_expanded_footprint_file.index.to_list();
+    #                         for kk in range(len(_index_duplicated)):
+    #                             if _index_duplicated[kk] not in non_duplicated_rows:
+    #                                 full_expanded_footprint_file = full_expanded_footprint_file.drop(full_expanded_footprint_file.index[_index_duplicated[kk] ])
+    #
+    #     full_expanded_footprint_file = full_expanded_footprint_file[full_expanded_footprint_file['MODEL_YEAR'] == year].reset_index(drop=True)
+    #
+    #     print('total previous_filter_table volumes = ', previous_filter_table['PROD_VOL_GHG_STD_50_STATE'].sum())
+    #     # print('total full_expanded_footprint_file1 volumes = ', full_expanded_footprint_file1['PROD_VOL_GHG_STD_50_STATE'].sum())
+    #     print('total full_expanded_footprint_file volumes = ', full_expanded_footprint_file['PROD_VOL_GHG_STD_50_STATE'].sum())
+    #     df_null = full_expanded_footprint_file[full_expanded_footprint_file['POSSIBLE_BODYID'] != 'y'];
 
     return delta_final_model_yr_ghg_prod_units
 
@@ -205,12 +261,226 @@ def tstcar_target_coef_cafe_mfr_cd_carline_name(set_roadload_coefficient_table, 
 
     return df_tstcar_table
 
+def manual_filtering(year, footprint_filter_table, footprint_id_categories, footprint_file, lineage_file, body_id_table, input_path, footprint_lineage_filename, output_path, date_and_time):
+
+    if len(lineage_file) == 0:
+        lineage_file = pd.read_csv(input_path + '\\' + footprint_lineage_filename, encoding="ISO-8859-1");
+        _year = lineage_file['MODEL_YEAR'].iloc[(lineage_file['MODEL_YEAR'] - year).abs().argsort()[:2]].reset_index(drop=True)[0];
+        lineage_file = lineage_file[lineage_file['MODEL_YEAR'] == _year].reset_index(drop=True)
+        lineage_file['MODEL_YEAR'] = year;
+        # lineage_file.append(lineage_file_MY, ignore_index=True)
+        # lineage_file = lineage_file_MY;
+        # lineage_file_save_name = footprint_lineage_filename.replace('.csv', '') + ' ' + date_and_time + '.csv'
+        # lineage_file.to_csv(input_path + '\\' + lineage_file_save_name, index=False)
+        # lineage_file = lineage_file[lineage_file['MODEL_YEAR'] == year].reset_index(drop=True)
+
+        footprint_lineageid_categories = ['MODEL_YEAR', 'FOOTPRINT_INDEX', 'FOOTPRINT_CARLINE_NM', 'FOOTPRINT_CARLINE_CD', 'FOOTPRINT_MFR_CD', 'FOOTPRINT_MFR_NM', 'FOOTPRINT_DIVISION_CD', 'FOOTPRINT_DIVISION_NM'];
+        # footprint_lineageid_categories = ['MODEL_YEAR', 'FOOTPRINT_CARLINE_NM', 'FOOTPRINT_MFR_CD', 'FOOTPRINT_MFR_NM', 'FOOTPRINT_DIVISION_NM'];
+        footprint_filter_table = footprint_file[list(footprint_id_categories) + ['WHEEL_BASE_INCHES'] + ['FOOTPRINT_DESC'] + ['PROD_VOL_GHG_STD_50_STATE'] + ['CAFE_MFR_CD'] + ['CAFE_MFR_NM']].merge(
+            lineage_file[list(footprint_lineageid_categories) + ['LineageID']], how='left', on=footprint_lineageid_categories)
+    else:
+        footprint_lineageid_categories = ['MODEL_YEAR', 'FOOTPRINT_INDEX', 'FOOTPRINT_CARLINE_CD', 'FOOTPRINT_MFR_CD', 'FOOTPRINT_MFR_NM', 'FOOTPRINT_DIVISION_CD', 'FOOTPRINT_DIVISION_NM'];
+        footprint_filter_table = footprint_file[list(footprint_id_categories) + ['WHEEL_BASE_INCHES'] + ['FOOTPRINT_DESC'] + ['PROD_VOL_GHG_STD_50_STATE'] + ['CAFE_MFR_CD'] + ['CAFE_MFR_NM']].merge(
+            lineage_file[list(footprint_id_categories) + ['LineageID']], how='left', on=footprint_lineageid_categories)
+
+
+    footprint_filter_table.insert(14, 'Matching Method', np.nan);
+    footprint_filter_table.loc[footprint_filter_table['LineageID'].astype(str) != 'nan', 'Matching Method'] = 0;
+    footprint_filter_table = footprint_filter_table.rename({'CAFE_ID_x':'CAFE_ID', 'FOOTPRINT_CARLINE_NM_x':'FOOTPRINT_CARLINE_NM'}, axis=1)
+    # print('Direct matching footprint_file volumes = ', footprint_filter_table.loc[footprint_filter_table['LineageID'].astype(str) != 'nan', 'PROD_VOL_GHG_STD_50_STATE'].sum())
+    # df = footprint_filter_table.loc[footprint_filter_table['LineageID'].astype(str) != 'nan']
+
+    # footprint_filter_table1 = footprint_filter_table.loc[~pd.isnull(footprint_filter_table['LineageID']), :].reset_index(drop=True)
+    # footprint_filter_table0 = footprint_filter_table.loc[pd.isnull(footprint_filter_table['LineageID']), :].reset_index(drop=True)
+
+    for i in range (len(footprint_filter_table)):
+        if (footprint_filter_table['LineageID'][i].astype(str) == 'nan') or (footprint_filter_table['LineageID'][i].astype(int) == 0):
+            _carline_nm = footprint_filter_table['FOOTPRINT_CARLINE_NM'][i].split(' ');
+            _num_carline_nm = len(_carline_nm);
+            for j in range(len(lineage_file)):
+                if (footprint_filter_table['MODEL_YEAR'][i] == lineage_file['MODEL_YEAR'][j]) and (footprint_filter_table['FOOTPRINT_CARLINE_CD'][i] == lineage_file['FOOTPRINT_CARLINE_CD'][j]) and \
+                    (footprint_filter_table['FOOTPRINT_MFR_CD'][i] == lineage_file['FOOTPRINT_MFR_CD'][j]) and (footprint_filter_table['FOOTPRINT_DIVISION_CD'][i] == lineage_file['FOOTPRINT_DIVISION_CD'][j]):
+                    if (footprint_filter_table['FOOTPRINT_CARLINE_NM'][i] == lineage_file['FOOTPRINT_CARLINE_NM'][j])  or (lineage_file['FOOTPRINT_CARLINE_NM'][j] == footprint_filter_table['FOOTPRINT_CARLINE_NM'][i]):
+                        footprint_filter_table.loc[i, 'LineageID'] = lineage_file['LineageID'][j].astype(int);
+                        footprint_filter_table.loc[i, 'Matching Method'] = 1;
+                        break;
+                elif (footprint_filter_table['MODEL_YEAR'][i] == lineage_file['MODEL_YEAR'][j]) and \
+                    (footprint_filter_table['FOOTPRINT_MFR_CD'][i] == lineage_file['FOOTPRINT_MFR_CD'][j]) and (footprint_filter_table['FOOTPRINT_DIVISION_CD'][i] == lineage_file['FOOTPRINT_DIVISION_CD'][j]):
+                    _carline_nm = footprint_filter_table['FOOTPRINT_CARLINE_NM'][i].split(' ');
+                    for k in range(_num_carline_nm-1, 0, -1):
+                        _carline_nm.remove(_carline_nm[k])
+                        _carline_nm_k = ' '.join([str(n) for n in _carline_nm])
+                        if  ((k == _num_carline_nm-1) or (k >= 2)) and (_carline_nm_k in lineage_file['FOOTPRINT_CARLINE_NM'][j])  or (lineage_file['FOOTPRINT_CARLINE_NM'][j] in footprint_filter_table['FOOTPRINT_CARLINE_NM'][i]):
+                            footprint_filter_table.loc[i, 'LineageID'] = lineage_file['LineageID'][j].astype(int);
+                            footprint_filter_table.loc[i, 'Matching Method'] = 2;
+                            break;
+                        elif (k == 1) and (_carline_nm_k in lineage_file['FOOTPRINT_CARLINE_NM'][j])  or (lineage_file['FOOTPRINT_CARLINE_NM'][j] in footprint_filter_table['FOOTPRINT_CARLINE_NM'][i]):
+                            footprint_filter_table.loc[i, 'LineageID'] = lineage_file['LineageID'][j].astype(int);
+                            footprint_filter_table.loc[i, 'Matching Method'] = 3;
+                            break;
+
+    footprint_filter_table.loc[footprint_filter_table['LineageID'].astype(str) == 'nan', 'Matching Method'] = np.nan
+
+    print('total footprint_file volumes = ', footprint_file['PROD_VOL_GHG_STD_50_STATE'].sum())
+    print('total footprint_filter_table volumes = ', footprint_filter_table['PROD_VOL_GHG_STD_50_STATE'].sum())
+    # footprint_file_max = footprint_file.loc[footprint_file['FOOTPRINT_MFR_CD'] == 'MAX', :].sort_values(by=['FOOTPRINT_CARLINE_CD'])
+    # footprint_filter_table1 = footprint_filter_table.loc[footprint_filter_table['FOOTPRINT_MFR_CD'] == 'MAX', :].sort_values(by=['FOOTPRINT_CARLINE_CD'])
+    # print('total footprint_file_max volumes = ', footprint_file_max['PROD_VOL_GHG_STD_50_STATE'].sum())
+    # print('total footprint_filter_table1 volumes = ', footprint_filter_table1['PROD_VOL_GHG_STD_50_STATE'].sum())
+
+    grp_volumes_footprint_file = footprint_file.groupby(['FOOTPRINT_MFR_CD']).sum()
+    grp_volumes_footprint_filter_table = footprint_filter_table.groupby(['FOOTPRINT_MFR_CD']).sum()
+    # grp_volumes_footprint_file1 = footprint_file.groupby(['FOOTPRINT_MFR_CD'])['PROD_VOL_GHG_STD_50_STATE'].sum()
+    # grp_volumes_footprint_file_with_lineage1 = footprint_file_with_lineage.groupby(['FOOTPRINT_MFR_CD'])['PROD_VOL_GHG_STD_50_STATE'].sum()
+
+    for i in range(min(len(grp_volumes_footprint_file), len(grp_volumes_footprint_filter_table))):
+        if grp_volumes_footprint_file['PROD_VOL_GHG_STD_50_STATE'][i].round(0) != grp_volumes_footprint_filter_table['PROD_VOL_GHG_STD_50_STATE'][i].round(0):
+            #### Update CAFE_ID in the footprint errta and footprint-lineageID files
+            print(grp_volumes_footprint_file.index[i], grp_volumes_footprint_file['PROD_VOL_GHG_STD_50_STATE'][i], grp_volumes_footprint_filter_table['PROD_VOL_GHG_STD_50_STATE'][i])
+            df_footprint = footprint_file.loc[footprint_file['FOOTPRINT_MFR_CD'] == grp_volumes_footprint_file.index[i], :];
+            df_footprint_filter = footprint_filter_table.loc[footprint_filter_table['FOOTPRINT_MFR_CD'] == grp_volumes_footprint_file.index[i], :].sort_values(by=['FOOTPRINT_CARLINE_CD']);
+            df_footprint_filter = df_footprint_filter.drop_duplicates(subset=df_footprint_filter.columns).reset_index(drop=True);
+            _carline_nm = df_footprint['FOOTPRINT_CARLINE_NM'].unique();
+            for j in range(len(_carline_nm)):
+                df_footprint = df_footprint.loc[(df_footprint['FOOTPRINT_CARLINE_NM'] == _carline_nm[j]), :]
+                df_footprint_filter = df_footprint_filter.loc[(df_footprint_filter['FOOTPRINT_CARLINE_NM'] == _carline_nm[j]), :]
+                if df_footprint['PROD_VOL_GHG_STD_50_STATE'].sum() != df_footprint_filter['PROD_VOL_GHG_STD_50_STATE'].sum():
+                    print(_carline_nm[j], df_footprint['PROD_VOL_GHG_STD_50_STATE'].sum(), df_footprint_filter['PROD_VOL_GHG_STD_50_STATE'].sum())
+
+    manual_filter_table = footprint_filter_table.merge(body_id_table, how='left', on='LineageID')
+    manual_filter_table['POSSIBLE_BODYID'] = 'y';
+    manual_filter_table.loc[manual_filter_table['LineageID'].astype(str) == 'nan', 'POSSIBLE_BODYID'] = np.nan
+    manual_filter_table['LineageID'] = pd.to_numeric(manual_filter_table['LineageID'], errors='coerce')
+    manual_filter_table = manual_filter_table.sort_values(by=['LineageID'])
+    # manual_filter_table = manual_filter_table.drop_duplicates(subset=footprint_id_categories+['PROD_VOL_GHG_STD_50_STATE']).reset_index(drop=True);
+    manual_filter_table.loc[manual_filter_table['LineageID'] == 99999, ['LineageID', 'BodyID']] = np.nan;
+    # manual_filter_table.loc[manual_filter_table['BodyID'] == 99999, 'BodyID'] = np.nan;
+    manual_filter_table.sort_values(by=['FOOTPRINT_MFR_NM'], ascending=True, inplace=True);
+    manual_filter_table.reset_index(drop=True, inplace=True);
+    manual_filter_table_null = manual_filter_table.loc[pd.isnull(manual_filter_table['LineageID']), :].reset_index(drop=True)
+    manual_filter_table_null_carline_nm = manual_filter_table_null['FOOTPRINT_CARLINE_NM'].unique();
+    #
+    _lineageID = manual_filter_table['LineageID'].max()+1;
+    _bodyID_MY_start = _lineageID;
+
+    _carline_nm_unique = [];
+    for i in range(len(manual_filter_table_null_carline_nm)):
+        _carline_nm_i = manual_filter_table_null_carline_nm[i].split(' ');
+        if len(_carline_nm_i) == 1:
+            _carline_nm_unique.append(_carline_nm_i[0]);
+        elif (len(_carline_nm_i) > 1) and (_carline_nm_i[0] not in _carline_nm_unique):
+            if (_carline_nm_i[0] in manual_filter_table_null_carline_nm[i]) and (_carline_nm_i[0] not in _carline_nm_unique):
+                if (_carline_nm_i[0] == 'GLB') or (_carline_nm_i[0] == 'Continental'):
+                    _carline_nm_unique.append(_carline_nm_i[0] + ' ' + _carline_nm_i[1]);
+                else:
+                    _carline_nm_unique.append(_carline_nm_i[0]);
+
+    _carline_nm_unique_base = []
+    for i in _carline_nm_unique:
+        if i not in _carline_nm_unique_base:
+            _carline_nm_unique_base.append(i)
+
+    for i in range(len(manual_filter_table_null)):
+        manual_filter_table_null_carline_nm_i = manual_filter_table_null['FOOTPRINT_CARLINE_NM'][i].split(' ')[0]
+        if (manual_filter_table_null_carline_nm_i == 'GLB') or (manual_filter_table_null_carline_nm_i == 'Continental'):
+            manual_filter_table_null_carline_nm_i = manual_filter_table_null['FOOTPRINT_CARLINE_NM'][i].split(' ')[0] + ' ' + manual_filter_table_null['FOOTPRINT_CARLINE_NM'][i].split(' ')[1]
+
+        if manual_filter_table_null_carline_nm_i in _carline_nm_unique_base:
+            index = _carline_nm_unique_base.index(manual_filter_table_null_carline_nm_i);
+            manual_filter_table_null.loc[i, 'LineageID'] = manual_filter_table['LineageID'].max() + index + 1;
+
+    for i in range(len(manual_filter_table_null)):
+        _carline_nm_i = manual_filter_table_null['FOOTPRINT_CARLINE_NM'][i];
+        _mfr_nm_i = manual_filter_table_null['FOOTPRINT_MFR_NM'][i];
+        manual_filter_table.loc[(manual_filter_table['FOOTPRINT_CARLINE_NM'] == _carline_nm_i) & (manual_filter_table['FOOTPRINT_MFR_NM'] == _mfr_nm_i), 'LineageID'] = manual_filter_table_null['LineageID'][i]
+        manual_filter_table.loc[(manual_filter_table['FOOTPRINT_CARLINE_NM'] == _carline_nm_i) & (manual_filter_table['FOOTPRINT_MFR_NM'] == _mfr_nm_i), ['CabinID', 'BedID', 'ref_Make', 'ref_Model', 'ref_BedDescription']] = 9999;
+        manual_filter_table.loc[(manual_filter_table['FOOTPRINT_CARLINE_NM'] == _carline_nm_i) & (manual_filter_table['FOOTPRINT_MFR_NM'] == _mfr_nm_i), ['BodyID StartYear', 'CabinID StartYear']] = 9;
+        manual_filter_table.loc[(manual_filter_table['FOOTPRINT_CARLINE_NM'] == _carline_nm_i) & (manual_filter_table['FOOTPRINT_MFR_NM'] == _mfr_nm_i), \
+                                ['BodyDescription', 'BodyID EndYear',	'Last Observed Year_BodyID', 'CabinID EndYear', 'Last Observed Year_CabinID']] = 'null';
+
+    manual_filter_table.loc[manual_filter_table['BodyID'].astype(str) == 'nan', 'BodyID'] = manual_filter_table['LineageID'];
+
+    # manual_filter_table1 = manual_filter_table[~(manual_filter_table[footprint_id_categories+['PROD_VOL_GHG_STD_50_STATE']].duplicated() & manual_filter_table.index.duplicated()) | \
+    #                                            manual_filter_table['LineageID'].astype(str).ne('nan')];
+    footprint_mfr = manual_filter_table['FOOTPRINT_MFR_NM'].unique();
+    footprint_mfr_cd = manual_filter_table['FOOTPRINT_MFR_CD'].unique();
+    cafe_mfr_cd = manual_filter_table['CAFE_MFR_CD'].unique();
+
+    list_with_keys = footprint_mfr_cd;
+    list_footprint_div_nm = [];
+    for i in range(len(footprint_mfr_cd)):
+        list_footprint_div_nm.append(list(manual_filter_table.loc[
+                                              manual_filter_table['FOOTPRINT_MFR_CD'] == footprint_mfr_cd[i], 'FOOTPRINT_DIVISION_NM'].unique()));
+
+    dict_mfr_cd = dict(zip(list_with_keys, list_footprint_div_nm))
+    dict_mfr_cd.update(BMX=['BMW', 'Mini'])
+    # dict_mfr_cd.pop('CRX', 'MASERATI')
+
+    _cafe_mfr_cd = footprint_filter_table['CAFE_MFR_CD'].unique();
+    _cafe_mfr_nm = footprint_filter_table['CAFE_MFR_NM'].unique();
+    _footprint_mfr_cd = footprint_filter_table['FOOTPRINT_MFR_CD'].unique();
+
+    footprint_cafe_mfr_cd = [];
+    for i in range(len(_cafe_mfr_cd)):
+        footprint_cafe_mfr_cd.append(list(manual_filter_table.loc[
+                                              manual_filter_table['CAFE_MFR_CD'] == _cafe_mfr_cd[i], 'FOOTPRINT_MFR_CD'].unique()));
+    dict_footprint_cafe_mfr_cd = dict(zip(_cafe_mfr_cd, footprint_cafe_mfr_cd))
+    dict_footprint_cafe_mfr_cd.update(CRX=['CRX'])
+    dict_footprint_cafe_mfr_cd.update(TYX=['TYX'])
+
+    # footprint_cafe_mfr_cd_errta = pd.DataFrame()
+    # df_footprint_cafe_mfr_cd = manual_filter_table.loc[(manual_filter_table['CAFE_MFR_CD']!= manual_filter_table['FOOTPRINT_MFR_CD']), :].reset_index(drop=True)
+    #
+    # for i in range(len(df_footprint_cafe_mfr_cd)):
+    #     _key = df_footprint_cafe_mfr_cd['CAFE_MFR_CD'][i];
+    #     _footprint_mfr_cd = df_footprint_cafe_mfr_cd['FOOTPRINT_MFR_CD'][i];
+    #     if _footprint_mfr_cd not in dict_footprint_cafe_mfr_cd[_key]:
+    #         df_tmp = pd.DataFrame(df_footprint_cafe_mfr_cd.loc[i, :])
+    #         footprint_cafe_mfr_cd_errta = pd.concat([footprint_cafe_mfr_cd_errta, df_tmp]);
+
+    footprint_cafe_mfr_cd_errta = pd.DataFrame()
+    for i in range(len(_cafe_mfr_cd)):
+        _footprint_mfr_cd = list(footprint_filter_table.loc[footprint_filter_table['CAFE_MFR_CD'] == _cafe_mfr_cd[i], 'FOOTPRINT_MFR_CD'].unique());
+        if len(_footprint_mfr_cd) > 1:
+            for j in range (len(_footprint_mfr_cd)):
+                if _footprint_mfr_cd[j] not in dict_footprint_cafe_mfr_cd[_cafe_mfr_cd[i]]:
+                    df_tmp = pd.DataFrame(manual_filter_table.loc[(manual_filter_table['FOOTPRINT_MFR_CD'] == _footprint_mfr_cd[j]) & (manual_filter_table['CAFE_MFR_CD'] == _cafe_mfr_cd[i]), :])
+                    footprint_cafe_mfr_cd_errta = pd.concat([footprint_cafe_mfr_cd_errta, df_tmp]);
+    #
+    # footprint_mfr_div_errta = pd.DataFrame(footprint_mfr_div_errta)
+    if len(footprint_cafe_mfr_cd_errta) > 0:
+        footprint_cafe_mfr_cd_errta_name = 'footprint_cafe_mfr_cd_errta_' + date_and_time + '.csv'
+        footprint_cafe_mfr_cd_errta.to_csv(output_path + '\\' + footprint_cafe_mfr_cd_errta_name, index=False)
+
+    footprint_lineageid_MY = manual_filter_table[['MODEL_YEAR','CAFE_ID', 'FOOTPRINT_MFR_NM', 'FOOTPRINT_MFR_CD', 'FOOTPRINT_DIVISION_NM', 'FOOTPRINT_DIVISION_CD', 'FOOTPRINT_CARLINE_NM', \
+                                                 'FOOTPRINT_CARLINE_CD', 'FOOTPRINT_INDEX',	'FOOTPRINT_DESC', 'LineageID', 'PROD_VOL_GHG_STD_50_STATE']];
+    footprint_lineageid_MY_fname = 'footprint_lineageid_MY_' + date_and_time + '.csv'
+    footprint_lineageid_MY.to_csv(output_path + '\\' + footprint_lineageid_MY_fname, index=False);
+
+    bodyID_MY = manual_filter_table[['BodyID', 'BodyDescription', 'LineageID', 'CabinID', 'BodyID StartYear', 'BodyID EndYear', 'Last Observed Year_BodyID',	'CabinID StartYear', 'CabinID EndYear',	\
+                                    'Last Observed Year_CabinID', 'BedID', 'ref_Make', 'ref_Model',	'ref_BedDescription',	\
+                                    'Wards Projected BodyID StartYear',	'Wards Projected BodyID EndYear', 'Wards Projected Last Observed Year_BodyID', 'Wards Projected CabinID StartYear', \
+                                    'Wards Projected CabinID EndYear', 'Wards Projected Last Observed Year_CabinID', 'WARDS_PROJECTION_YN',	'Notes',	\
+                                    'Weblink', 'piclink_3/4FR-1', 'piclink_3/4FR-2', 'piclink_3/4RR-1', 'piclink_3/4RR-2', 'piclink_RR-1']];
+
+    bodyID_MY.sort_values(by=['BodyID'], ascending=True,  inplace=True)
+    # bodyID_MY = bodyID_MY.loc[bodyID_MY['BodyID'].astype(int) >= _bodyID_MY_start, :];
+    bodyID_MY = bodyID_MY.drop_duplicates(subset=['BodyID']).reset_index(drop=True);
+    bodyID_MY_fname = 'bodyID_MY_' + date_and_time + '.csv'
+    bodyID_MY.to_csv(output_path + '\\' + bodyID_MY_fname, index=False);
+
+    print('total manual_filter_table volumes = ', manual_filter_table['PROD_VOL_GHG_STD_50_STATE'].sum())
+
+    return manual_filter_table
+
 def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filename, footprint_lineage_filename, bodyid_filename, \
                                                    bool_run_new_manual_filter, manual_filter_name, expanded_footprint_filename, subconfig_filename, model_type_filename, vehghg_filename, output_path, \
                                                    footprint_exceptions_table, modeltype_exceptions_table, subconfig_MY_exceptions_table, subconfig_sales_exceptions_table, \
                                                    tstcar_MY_exceptions_table, year, roadload_coefficient_table_filename, set_bodyid_to_lineageid, \
                                                    drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, set_roadload_coefficient_table_filename, \
                                                    tstcar_MY_carline_name_mapping_filename):
+    global total_volumes_footprint_file;
+
     footprint_file = pd.read_csv(input_path + '\\' + footprint_filename, encoding="ISO-8859-1", na_values=['-'])  # EVCIS Qlik Sense query results contain hyphens for nan
     lineage_file = pd.read_csv(input_path + '\\' + footprint_lineage_filename, encoding="ISO-8859-1")
     # body_id_table_readin = pd.read_excel(input_path + '\\' + bodyid_filename, converters={'LineageID': int, 'BodyID': int})
@@ -254,24 +524,31 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
         if CSV_OUTPUT_DEBUG_MODE: df_CAFE_ID_not_matched.to_csv(output_path + '\\' + 'CAFE_ID_lineageid_neq_Footprint_MY' + '_' + date_and_time + '.csv', index=False)
 
     if len(footprint_exceptions_table) > 0:
-        footprint_file = file_errta_update(footprint_file, footprint_exceptions_table, 'Column Name', 'Old Value', 'New Value', 'MODEL_YEAR', 'FOOTPRINT_DIVISION_NM', \
+        footprint_file = file_errta_update(footprint_file, footprint_exceptions_table, year, 'Column Name', 'Old Value', 'New Value', 'MODEL_YEAR', 'FOOTPRINT_DIVISION_NM', \
                                            'FOOTPRINT_DIVISION_CD', 'FOOTPRINT_CARLINE_CD', 'CAFE_ID', 'FOOTPRINT_INDEX')
         if CSV_OUTPUT_DEBUG_MODE: footprint_file.to_csv(output_path+'\\'+'Corrected_Footprint_MY_file' + '_' + date_and_time + '.csv', index=False)
-        print('footprint_file volumes = ', footprint_file['PROD_VOL_GHG_STD_50_STATE'].sum())
+        # print('footprint_file volumes = ', footprint_file['PROD_VOL_GHG_STD_50_STATE'].sum(), 'in the', footprint_filename)
 
     footprint_filter_table = footprint_file[
         list(footprint_id_categories) + ['WHEEL_BASE_INCHES'] + ['FOOTPRINT_DESC'] + ['PROD_VOL_GHG_STD_50_STATE']].merge(
         lineage_file[list(footprint_id_categories) + ['LineageID']], how='left', on=footprint_id_categories)
+    if len(footprint_filter_table.loc[pd.isnull(footprint_filter_table['LineageID']), :]) > 0:
+        df_null = footprint_filter_table.loc[pd.isnull(footprint_filter_table['LineageID']), :]
     footprint_filter_table = footprint_filter_table.loc[~pd.isnull(footprint_filter_table['LineageID']), :].reset_index(drop=True)
 
     footprint_file_with_lineage = footprint_file.merge(lineage_file[list(footprint_id_categories) + ['LineageID']], how='left', on=footprint_id_categories)
     footprint_file_with_lineage = footprint_file_with_lineage.loc[~pd.isnull(footprint_file_with_lineage['LineageID']), :].reset_index(drop=True)
+    total_volumes_footprint_file = footprint_file['PROD_VOL_GHG_STD_50_STATE'].sum();
 
     print('total footprint_file volumes = ', footprint_file['PROD_VOL_GHG_STD_50_STATE'].sum())
     print('total footprint_filter_table volumes = ', footprint_filter_table['PROD_VOL_GHG_STD_50_STATE'].sum())
     print('total footprint_file_with_lineage volumes = ', footprint_file_with_lineage['PROD_VOL_GHG_STD_50_STATE'].sum())
     grp_volumes_footprint_file = footprint_file.groupby(['FOOTPRINT_MFR_CD']).sum()
     grp_volumes_footprint_file_with_lineage = footprint_file_with_lineage.groupby(['FOOTPRINT_MFR_CD']).sum()
+
+    # grp_volumes_footprint_file1 = footprint_file.groupby(['FOOTPRINT_MFR_CD'])['PROD_VOL_GHG_STD_50_STATE'].sum()
+    # grp_volumes_footprint_file_with_lineage1 = footprint_file_with_lineage.groupby(['FOOTPRINT_MFR_CD'])['PROD_VOL_GHG_STD_50_STATE'].sum()
+
     for i in range(min(len(grp_volumes_footprint_file), len(grp_volumes_footprint_file_with_lineage))):
         if grp_volumes_footprint_file['PROD_VOL_GHG_STD_50_STATE'][i].round(0) != grp_volumes_footprint_file_with_lineage['PROD_VOL_GHG_STD_50_STATE'][i].round(0):
             print(grp_volumes_footprint_file.index[i], grp_volumes_footprint_file['PROD_VOL_GHG_STD_50_STATE'][i], grp_volumes_footprint_file_with_lineage['PROD_VOL_GHG_STD_50_STATE'][i])
@@ -284,20 +561,27 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
         previous_filter_table = previous_filter_table[previous_filter_table['MODEL_YEAR'] == year].reset_index(drop=True)
     except OSError:
         # New BodyID table to be made, no previous data
-        full_filter_table_save_name = manual_filter_name.replace('.csv', '') + ' ' + date_and_time + '.csv'
-        if CSV_OUTPUT_DEBUG_MODE: full_expanded_footprint_filter_table.to_csv(output_path.replace('\VehghgID', '\intermediate files') + '\\' + full_filter_table_save_name, index=False)
+        manual_filter_table = manual_filtering(year, footprint_filter_table, footprint_id_categories, footprint_file, lineage_file, body_id_table, input_path, footprint_lineage_filename, output_path, date_and_time);
+        manual_filter_table_save_name = manual_filter_name.replace('.csv', '') + ' ' + date_and_time + '.csv'
+        manual_filter_table.to_csv(output_path + '\\' + manual_filter_table_save_name, index=False)
+        # full_expanded_footprint_filter_table.to_csv(output_path.replace('\VehghgID', '\intermediate files') + '\\' + full_filter_table_save_name, index=False)
     else:
         if bool_run_new_manual_filter == 'n':
             import math
             from Unit_Conversion import hp2lbfmph, kgpm32slugpft3, mph2ftps, in2m, n2lbf, mph2mps, btu2mj, kg2lbm, \
                 ftps2mph, lbfmph2hp, in2mm
-
+            # full_expanded_footprint_file1 = full_expanded_footprint_file;
             full_expanded_footprint_file = full_expanded_footprint_file.merge(previous_filter_table[list(footprint_id_categories) + ['BodyID'] + ['POSSIBLE_BODYID']], \
                 how='left', on=list(footprint_id_categories) + ['BodyID'])
+
             full_expanded_footprint_file = full_expanded_footprint_file[full_expanded_footprint_file['POSSIBLE_BODYID'] == 'y'].reset_index(drop=True)
 
             grp_volumes_footprint_file = footprint_file.groupby(['FOOTPRINT_MFR_CD']).sum()
             grp_volumes_full_expanded_footprint_file = full_expanded_footprint_file.groupby(['FOOTPRINT_MFR_CD']).sum()
+
+            grp_volumes_footprint_file1 = footprint_file.groupby(['FOOTPRINT_MFR_CD'])['PROD_VOL_GHG_STD_50_STATE'].sum()
+            grp_volumes_full_expanded_footprint_file1 = full_expanded_footprint_file.groupby(['FOOTPRINT_MFR_CD'])['PROD_VOL_GHG_STD_50_STATE'].sum()
+
             print('full_expanded_footprint_file volumes = ', grp_volumes_full_expanded_footprint_file['PROD_VOL_GHG_STD_50_STATE'].sum())
             for i in range(min(len(grp_volumes_footprint_file), len(grp_volumes_full_expanded_footprint_file))):
                 if (grp_volumes_footprint_file['PROD_VOL_GHG_STD_50_STATE'][i].round(0) != grp_volumes_full_expanded_footprint_file['PROD_VOL_GHG_STD_50_STATE'][i].round(0)):
@@ -343,14 +627,14 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
 
             if len(modeltype_exceptions_table) > 0:
                 if DEBUGGING_CAFE_MFR_CD_MODE: model_type_file = model_type_file.loc[model_type_file['CAFE_MFR_CODE'] == DEBUGGING_CAFE_MFR_CD, :]
-                model_type_file = file_errta_update(model_type_file, modeltype_exceptions_table, 'Column Name', 'Old Value', 'New Value', 'CAFE_MODEL_YEAR',  \
+                model_type_file = file_errta_update(model_type_file, modeltype_exceptions_table, year, 'Column Name', 'Old Value', 'New Value', 'CAFE_MODEL_YEAR',  \
                                                     'MFR_DIVISION_NM', 'CAFE_MFR_CODE', 'CARLINE_NAME', 'CAFE_ID', 'MODEL_TYPE_INDEX')
                 model_type_file['CALC_ID'] = model_type_file['CALC_ID'].astype(int)
                 if CSV_OUTPUT_DEBUG_MODE: model_type_file.to_csv(output_path+'\\'+'Corrected_CAFE_Model_Type_MY_file'+ '_' + date_and_time + '.csv', index=False)
                 # print('FUEL_USAGE', len(model_type_file[model_type_file['FUEL_USAGE'] == 'n']))
             if len(subconfig_sales_exceptions_table) > 0:
                 if DEBUGGING_CAFE_MFR_CD_MODE: subconfig_file = subconfig_file.loc[subconfig_file['CAFE_MFR_CD'] == DEBUGGING_CAFE_MFR_CD, :]
-                subconfig_file = file_errta_update(subconfig_file, subconfig_sales_exceptions_table, 'Column Name', 'Old Value', 'New Value', 'MODEL_YEAR',  \
+                subconfig_file = file_errta_update(subconfig_file, subconfig_sales_exceptions_table, year, 'Column Name', 'Old Value', 'New Value', 'MODEL_YEAR',  \
                                                    'MFR_DIVISION_SHORT_NM', 'CAFE_MFR_CD', 'CARLINE_NAME', 'LDFE_CAFE_ID', 'MODEL_TYPE_INDEX')
                 subconfig_file['LDFE_CAFE_MODEL_TYPE_CALC_ID'] = subconfig_file['LDFE_CAFE_MODEL_TYPE_CALC_ID'].astype(int)
                 if CSV_OUTPUT_DEBUG_MODE: subconfig_file.to_csv(output_path+'\\'+'Corrected_CAFE_Subconfig_Sales_MY_file'+ '_' + date_and_time + '.csv', index=False)
@@ -451,7 +735,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             # roadload_coefficient_table_tmp = roadload_coefficient_table.loc[pd.isnull(roadload_coefficient_table['DRIVE_SYSTEM']), :]
             if len(subconfig_MY_exceptions_table) > 0:
                 if DEBUGGING_CAFE_MFR_CD_MODE: roadload_coefficient_table = roadload_coefficient_table.loc[roadload_coefficient_table['CAFE_MFR_CD'] == DEBUGGING_CAFE_MFR_CD, :]
-                roadload_coefficient_table = file_errta_update(roadload_coefficient_table, subconfig_MY_exceptions_table, 'Column Name', 'Old Value', 'New Value', 'MODEL_YEAR',  \
+                roadload_coefficient_table = file_errta_update(roadload_coefficient_table, subconfig_MY_exceptions_table, year, 'Column Name', 'Old Value', 'New Value', 'MODEL_YEAR',  \
                                                                'MFR_DIVISION_SHORT_NM', 'CAFE_MFR_CD', 'CARLINE_NAME', 'LDFE_CAFE_ID', 'MODEL_TYPE_INDEX')
                 roadload_coefficient_table['LDFE_CAFE_MODEL_TYPE_CALC_ID'] = roadload_coefficient_table['LDFE_CAFE_MODEL_TYPE_CALC_ID'].astype(int)
                 if CSV_OUTPUT_DEBUG_MODE: roadload_coefficient_table.to_csv(output_path+'\\'+'Corrected_CAFE_Subconfig_MY_file' + '_' + date_and_time + '.csv', index=False)
@@ -504,7 +788,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                         set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Vehicle ID'] == _test_veh_ID) & (set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE Bag 2'].values[0];
 
             if len(tstcar_MY_exceptions_table) > 0:
-                set_roadload_coefficient_table = file_errta_update(set_roadload_coefficient_table, tstcar_MY_exceptions_table, 'Column Name', 'Old Value', 'New Value', 'Model Year', \
+                set_roadload_coefficient_table = file_errta_update(set_roadload_coefficient_table, tstcar_MY_exceptions_table, year, 'Column Name', 'Old Value', 'New Value', 'Model Year', \
                                                                'Represented Test Veh Make', 'Veh Mfr Code', 'Represented Test Veh Model', np.nan, np.nan)
                 if DEBUGGING_CAFE_MFR_CD_MODE: set_roadload_coefficient_table = set_roadload_coefficient_table.loc[set_roadload_coefficient_table['Veh Mfr Code'] == DEBUGGING_CAFE_MFR_CD, :]
                 if CSV_OUTPUT_DEBUG_MODE: set_roadload_coefficient_table.to_csv(output_path+'\\'+'Corrected_set_roadload_coefficient_table' + '_' + date_and_time + '.csv', index=False)

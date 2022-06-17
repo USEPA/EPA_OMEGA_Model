@@ -8,8 +8,10 @@ import matplotlib.pyplot as plt
 home = str(Path.home())
 
 root_drive_letter = 'I:'
-
 main_path = root_drive_letter + '/Project/Midterm Review/Trends/Original Trends Team Data Gathering and Analysis/Tech Specifications/techspecconsolidator/VehGHG Runs'
+main_path = 'C:\\Users\\slee02\\Documents\\Python\\VehGHG Runs';
+# C:\Users\slee02\Documents\Python\VehGHG Runs
+
 run_folder = str(input('Enter Run Folder Name: '))
 run_folder_path = os.path.join(main_path, run_folder)
 run_controller_file = os.path.join(run_folder_path, 'VehghgID Run Controller.csv')
@@ -63,14 +65,14 @@ for run_count in range (0,len(run_controller)):
         if 'HWY' in drivecycle_output_filenames[i]: drivecycle_output_filenames[i] = 'HWY'
         if 'US06' in drivecycle_output_filenames[i]: drivecycle_output_filenames[i] = 'US06'
 
-    footprint_exceptions_table = pd.read_csv(input_path+'\\'+ footprint_exceptions_table_filename) #, converters={'Column Name': eval, 'Old Value': eval, 'New Value': eval})
+    footprint_exceptions_table = pd.read_csv(input_path+'\\'+ footprint_exceptions_table_filename, encoding="ISO-8859-1") # encoding='utf-8' encoding='utf-8-sig'  #, converters={'Column Name': eval, 'Old Value': eval, 'New Value': eval})
     # footprint_exceptions_table = footprint_exceptions_table.applymap(lambda s: s.upper() if type(s) == str else s)
     print(model_year)
     if (bool_run_new_manual_filter == 'n')and model_type_exceptions_table_filename != 'N':
-        modeltype_exceptions_table = pd.read_csv(input_path+'\\'+ model_type_exceptions_table_filename)
-        subconfig_MY_exceptions_table = pd.read_csv(input_path+'\\'+ subconfig_MY_exceptions_table_filename)
-        subconfig_sales_exceptions_table = pd.read_csv(input_path+'\\'+ subconfig_sales_exceptions_table_filename)
-        tstcar_MY_exceptions_table = pd.read_csv(input_path +'\\'+ tstcar_MY_errta_filename)
+        modeltype_exceptions_table = pd.read_csv(input_path+'\\'+ model_type_exceptions_table_filename, encoding="ISO-8859-1")
+        subconfig_MY_exceptions_table = pd.read_csv(input_path+'\\'+ subconfig_MY_exceptions_table_filename, encoding="ISO-8859-1")
+        subconfig_sales_exceptions_table = pd.read_csv(input_path+'\\'+ subconfig_sales_exceptions_table_filename, encoding="ISO-8859-1")
+        tstcar_MY_exceptions_table = pd.read_csv(input_path +'\\'+ tstcar_MY_errta_filename, encoding="ISO-8859-1")
         # modeltype_exceptions_table = modeltype_exceptions_table.applymap(lambda s: s.upper() if type(s) == str else s)
         # subconfig_MY_exceptions_table = subconfig_MY_exceptions_table.applymap(lambda s: s.upper() if type(s) == str else s)
         # subconfig_sales_exceptions_table = subconfig_sales_exceptions_table.applymap(lambda s: s.upper() if type(s) == str else s)
