@@ -215,14 +215,14 @@ class PowertrainCost(OMEGABase):
             adj_factor_can = _cache['ALL', 'twc_canning']['dollar_adjustment']
             TWC_SWEPT_VOLUME = eval(_cache['ALL', 'twc_swept_volume']['value'], {'np': np}, locals_dict)
             locals_dict = locals()
-            substrate = eval(_cache['ALL', 'twc_substrate']['value'], {'np': np}, locals_dict) \
-                        * adj_factor_sub * learn
-            washcoat = eval(_cache['ALL', 'twc_washcoat']['value'], {'np': np}, locals_dict) \
-                       * adj_factor_wash * learn
-            canning = eval(_cache['ALL', 'twc_canning']['value'], {'np': np}, locals_dict) \
-                      * adj_factor_can * learn
-            pgm = eval(_cache['ALL', 'twc_pgm']['value'], {'np': np}, locals_dict)
-            twc_cost = (substrate + washcoat + canning + pgm) * gasoline_flag
+            twc_substrate = eval(_cache['ALL', 'twc_substrate']['value'], {'np': np}, locals_dict) \
+                            * adj_factor_sub * learn
+            twc_washcoat = eval(_cache['ALL', 'twc_washcoat']['value'], {'np': np}, locals_dict) \
+                           * adj_factor_wash * learn
+            twc_canning = eval(_cache['ALL', 'twc_canning']['value'], {'np': np}, locals_dict) \
+                          * adj_factor_can * learn
+            twc_pgm = eval(_cache['ALL', 'twc_pgm']['value'], {'np': np}, locals_dict)
+            twc_cost = (twc_substrate + twc_washcoat + twc_canning + twc_pgm) * gasoline_flag
 
             # gpf cost
             adj_factor_sub = _cache['ALL', 'gpf_substrate']['dollar_adjustment']
@@ -230,14 +230,14 @@ class PowertrainCost(OMEGABase):
             adj_factor_can = _cache['ALL', 'gpf_canning']['dollar_adjustment']
             GPF_SWEPT_VOLUME = eval(_cache['ALL', 'gpf_swept_volume']['value'], {'np': np}, locals_dict)
             locals_dict = locals()
-            substrate = eval(_cache['ALL', 'gpf_substrate']['value'], {'np': np}, locals_dict) \
-                        * adj_factor_sub * learn
-            washcoat = eval(_cache['ALL', 'gpf_washcoat']['value'], {'np': np}, locals_dict) \
-                       * adj_factor_wash * learn
-            canning = eval(_cache['ALL', 'gpf_canning']['value'], {'np': np}, locals_dict) \
-                      * adj_factor_can * learn
-            pgm = eval(_cache['ALL', 'gpf_pgm']['value'], {'np': np}, locals_dict)
-            gpf_cost = (substrate + washcoat + canning + pgm) * gasoline_flag
+            gpf_substrate = eval(_cache['ALL', 'gpf_substrate']['value'], {'np': np}, locals_dict) \
+                            * adj_factor_sub * learn
+            gpf_washcoat = eval(_cache['ALL', 'gpf_washcoat']['value'], {'np': np}, locals_dict) \
+                           * adj_factor_wash * learn
+            gpf_canning = eval(_cache['ALL', 'gpf_canning']['value'], {'np': np}, locals_dict) \
+                          * adj_factor_can * learn
+            gpf_pgm = eval(_cache['ALL', 'gpf_pgm']['value'], {'np': np}, locals_dict)
+            gpf_cost = (gpf_substrate + gpf_washcoat + gpf_canning + gpf_pgm) * gasoline_flag
 
         if powertrain_type in ['HEV', 'PHEV', 'BEV']:
 
