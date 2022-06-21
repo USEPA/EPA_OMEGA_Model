@@ -1,4 +1,4 @@
-input_template_name:,powertrain_cost,input_template_version:,0.1,description:,proof-of-concept;pre-fev;20220404
+input_template_name:,powertrain_cost,input_template_version:,0.1,description:,proof-of-concept;pre-fev;20220617 update gpf and add ICE lv_battery and hvac
 powertrain_type,item,value,quantity,dollar_basis,notes
 ALL,dollars_per_cylinder,((-28.814) * CYL + 726.27) * CYL * MARKUP_ICE,,2019,
 ALL,dollars_per_liter,((400) * LITERS) * MARKUP_ICE,,2019,
@@ -22,11 +22,11 @@ ALL,twc_swept_volume,(1.2) * 1,,,Tier3
 ALL,twc_pt_grams_per_liter,(0) * 1,,,
 ALL,twc_pd_grams_per_liter,(2) * 1,,,
 ALL,twc_rh_grams_per_liter,(0.11) * 1,,,
-ALL,gpf_substrate,((1) * LITERS * GPF_SWEPT_VOLUME) * MARKUP_ICE,,2019,placeholder
-ALL,gpf_washcoat,((1) * LITERS * GPF_SWEPT_VOLUME) * MARKUP_ICE,,2019,ibid
-ALL,gpf_canning,((1) * LITERS * GPF_SWEPT_VOLUME) * MARKUP_ICE,,2019,ibid
-ALL,gpf_swept_volume,(1) * 1,,,ibid
-ALL,gpf_pt_grams_per_liter,(1) * 1,,,ibid
+ALL,gpf_substrate,((6.108) * LITERS * TWC_SWEPT_VOLUME + 1.95456) * 2 * MARKUP_ICE,,2012,set equal to twice the twc value
+ALL,gpf_washcoat,((0) * LITERS * GPF_SWEPT_VOLUME) * MARKUP_ICE,,2012,set to 0
+ALL,gpf_canning,((2.4432) * LITERS * TWC_SWEPT_VOLUME) * MARKUP_ICE,,2012,set equal to twc
+ALL,gpf_swept_volume,(1.2) * 1,,,ibid
+ALL,gpf_pt_grams_per_liter,(0) * 1,,,ibid
 ALL,gpf_pd_grams_per_liter,(0) * 1,,,ibid
 ALL,gpf_rh_grams_per_liter,(0) * 1,,,ibid
 ALL,twc_pgm,(PT_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * PT_USD_PER_OZ * OZ_PER_GRAM + PD_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * PD_USD_PER_OZ * OZ_PER_GRAM  + RH_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * RH_USD_PER_OZ * OZ_PER_GRAM) * MARKUP_ICE,,,
@@ -37,6 +37,8 @@ ALL,pd_dollars_per_oz,(1952.23) * 1,,,ibid
 ALL,rh_dollars_per_oz,(16328.67) * 1,,,ibid
 ALL,ac_efficiency,(40) * MARKUP_ALL,,2010,
 ALL,ac_leakage,(63) * MARKUP_ALL,,2010,
+ICE,LV_battery,((3) * VEHICLE_SIZE_CLASS + 51) * MARKUP_ICE,1,2019,set equal to electrified vehicle values
+ICE,HVAC,((11.5) * VEHICLE_SIZE_CLASS + 195.5) * MARKUP_ICE,1,2019,set equal to electrified vehicle values
 BEV,battery,"max(114.2,(-0.00010551) * (KWH ** 3) + 0.02954283 * (KWH ** 2) - 2.89409681 * KWH + 218.421996) * KWH * MARKUP_BEV",,2019,KWH denotes gross kWh; coefficients denote 125K production volume; source Msa 20210406_1732
 PHEV,battery,((-0.00009965) * (KWH ** 3) + 0.02776430 * (KWH ** 2) - 2.69776661 * KWH + 203.67861255) * KWH * MARKUP_PHEV,,2019,KWH denotes gross kWh; coefficients denote 125K production volume; source Msa 20210406_1732
 HEV,battery,((-250.72) * KWH + 1058.2) * KWH * MARKUP_HEV,,2017,
