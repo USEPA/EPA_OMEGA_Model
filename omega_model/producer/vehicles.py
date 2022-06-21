@@ -68,6 +68,8 @@ For example, a ``fueling_class:BEV:/:cert_direct_kwh_per_mile->onroad_direct_kwh
 
 print('importing %s' % __file__)
 
+import math
+
 from omega_model import *
 
 from policy.drive_cycle_weights import DriveCycleWeights
@@ -432,6 +434,29 @@ class CompositeVehicle(OMEGABase):
                 for ccv in DecompositionAttributes.values:
                     v.__setattr__(ccv, DecompositionAttributes.interp1d(v, self.cost_curve, cost_curve_interp_key,
                                                                         self.__getattribute__(cost_curve_interp_key), ccv))
+
+            # vvv interpolate non-numeric data...
+            if cost_curve_interp_key not in v.cost_curve_non_numeric_data:
+                v.cost_curve_non_numeric_data[cost_curve_interp_key] = v.cost_curve['veh_%s_%s' % (v.vehicle_id, cost_curve_interp_key)]
+                v.cost_curve_non_numeric_data = v.cost_curve_non_numeric_data.reset_index()
+            str_index = np.interp(self.__getattribute__(cost_curve_interp_key),
+                      v.cost_curve_non_numeric_data[cost_curve_interp_key], v.cost_curve_non_numeric_data.index)
+
+            for cn in v.non_numeric_columns:
+                if str_index <= 0:
+                    v.__setattr__(cn, v.cost_curve_non_numeric_data[cn].iloc[0])
+                elif str_index >= max(v.cost_curve_non_numeric_data.index):
+                    v.__setattr__(cn, v.cost_curve_non_numeric_data[cn].iloc[-1])
+                else:
+                    if v.cost_curve_non_numeric_data[cn].iloc[math.trunc(str_index)] != v.cost_curve_non_numeric_data[cn].iloc[math.trunc(str_index) + 1]:
+                        offset = str_index - math.trunc(str_index)
+                        v.__setattr__(cn, '%s (%.3f):%s (%.3f)' % \
+                            (v.cost_curve_non_numeric_data[cn].iloc[math.trunc(str_index)], 1-offset,
+                             v.cost_curve_non_numeric_data[cn].iloc[math.trunc(str_index)+1], offset))
+                    else:
+                        v.__setattr__(cn, v.cost_curve_non_numeric_data[cn].iloc[math.trunc(str_index)])
+            # ^^^ interpolate non-numeric data...
+
             v.initial_registered_count = self.initial_registered_count * v.composite_vehicle_share_frac
             v.set_target_co2e_Mg()  # varies by model year and initial_registered_count
             v.set_cert_co2e_Mg()  # varies by model year and initial_registered_count
