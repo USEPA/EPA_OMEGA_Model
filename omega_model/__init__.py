@@ -179,7 +179,7 @@ try:
             self.producer_num_tech_options_per_ice_vehicle = 3
             self.producer_num_tech_options_per_bev_vehicle = 1
             self.cost_curve_frontier_affinity_factor = 0.75
-            self.slice_tech_combo_cloud_tables = True
+            self.slice_tech_combo_cloud_tables = False
             self.verbose = False
             self.iterate_producer_consumer = True
 
@@ -195,8 +195,8 @@ try:
             self.flat_context_year = 2021
 
             # list of modules to allow verbose log files, or empty to disable:
-            self.verbose_log_modules = ['database_', 'producer_compliance_search', 'cross_subsidy_search_',
-                                        'cv_cost_curves_', 'v_cost_curves_', 'v_cost_clouds_', 'v_cloud_plots_']
+            self.verbose_log_modules = ['database_', 'producer_compliance_search_', 'cross_subsidy_search_',
+                                        'cv_cost_curves', 'v_cost_curves_', 'v_cost_clouds', 'v_cloud_plots_']
 
             # list of modules to allow verbose console output, or empty to disable
             self.verbose_console_modules = ['producer_compliance_search_',
@@ -204,7 +204,7 @@ try:
                                             'cross_subsidy_search_', 'cross_subsidy_multipliers_',
                                             'cross_subsidy_convergence_']
 
-            self.log_vehicle_cloud_years = []  # = 'all' or list of years to log, empty list to disable logging
+            self.log_vehicle_cloud_years = [2030]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_compliance_search_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging

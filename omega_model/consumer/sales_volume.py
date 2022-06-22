@@ -95,9 +95,10 @@ def new_vehicle_sales_response(calendar_year, compliance_id, P, update_context_n
 
     E = omega_globals.options.new_vehicle_price_elasticity_of_demand
 
-    M = -(Q0*E - Q0) / (P0/E - P0)  # slope of linear response
+    # M = -(Q0*E - Q0) / (P0/E - P0)  # slope of linear response
+    # Q = Q0 + M * (P-P0)  # point-slope equation of a line
 
-    Q = Q0 + M * (P-P0)  # point-slope equation of a line
+    Q = 1 - (P - P0)/P * E
 
     return Q/Q0
 
