@@ -633,6 +633,8 @@ class CompositeVehicle(OMEGABase):
 def calc_vehicle_frontier(vehicle):
     cost_cloud = omega_globals.options.CostCloud.get_cloud(vehicle)
     vehicle.cost_curve = vehicle.create_frontier_df(cost_cloud)
+    vehicle.non_numeric_columns = ['cost_curve_class', 'structure_material']  # TODO: decide where to pull these from
+    vehicle.cost_curve_non_numeric_data = cost_cloud[vehicle.non_numeric_columns].iloc[vehicle.cost_curve.index]
     return vehicle
 
 
