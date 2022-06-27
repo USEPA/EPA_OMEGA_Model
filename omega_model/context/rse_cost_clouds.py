@@ -377,10 +377,10 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                                 # battery sizing -------------------------------------------------------------------- #
                                 if vehicle.powertrain_type == 'BEV':  # TODO: or 'PHEV'
-                                    cloud_point = vehicle.calc_cert_values(cloud_point)
+                                    cloud_point = vehicle.calc_battery_sizing_onroad_direct_kWh_per_mile(cloud_point)
 
                                     battery_kwh = vehicle.charge_depleting_range_mi * \
-                                              cloud_point['onroad_direct_kwh_per_mile'] / \
+                                              cloud_point['battery_sizing_onroad_direct_kwh_per_mile'] / \
                                               usable_battery_capacity_norm
 
                                 # determine convergence ------------------------------------------------------------- #
@@ -401,8 +401,8 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                                 # ------------------------------------------------------------------------------------#
 
-                            if vehicle.powertrain_type != 'BEV':
-                                cloud_point = vehicle.calc_cert_values(cloud_point)
+                            # if vehicle.powertrain_type != 'BEV':
+                            cloud_point = vehicle.calc_cert_values(cloud_point)
 
                             v = copy.copy(vehicle)
                             v.footprint_ft2 = footprint_ft2

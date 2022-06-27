@@ -250,7 +250,8 @@ class VehicleOnroadCalculations(OMEGABase):
     """
     _cache = dict()
 
-    drive_cycle_weight_year = None
+    onroad_drive_cycle_weight_year = None
+    battery_sizing_drive_cycle_weight_year = None
 
     @staticmethod
     def init_vehicle_attribute_calculations_from_file(filename, clear_cache=False, verbose=False):
@@ -276,8 +277,8 @@ class VehicleOnroadCalculations(OMEGABase):
             omega_log.logwrite('\nInitializing from %s...' % filename)
 
         input_template_name = 'onroad_vehicle_calculations'
-        input_template_version = 0.21
-        input_template_columns = {'drive_cycle_weight_year'}
+        input_template_version = 0.22
+        input_template_columns = {'onroad_drive_cycle_weight_year', 'battery_sizing_drive_cycle_weight_year'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -288,14 +289,18 @@ class VehicleOnroadCalculations(OMEGABase):
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                VehicleOnroadCalculations.drive_cycle_weight_year = int(df['drive_cycle_weight_year'].iloc[0])
+                VehicleOnroadCalculations.onroad_drive_cycle_weight_year = \
+                    int(df['onroad_drive_cycle_weight_year'].iloc[0])
+                VehicleOnroadCalculations.battery_sizing_drive_cycle_weight_year = \
+                    int(df['battery_sizing_drive_cycle_weight_year'].iloc[0])
 
-                df = df.set_index('drive_cycle_weight_year')
+                df = df.set_index('onroad_drive_cycle_weight_year')
                 df = df.drop([c for c in df.columns if 'Unnamed' in c], axis='columns')
+                df = df.drop('battery_sizing_drive_cycle_weight_year', axis='columns')
 
                 VehicleOnroadCalculations._cache = df.to_dict(orient='index')
 
-                VehicleOnroadCalculations._cache['drive_cycle_weight_year'] = \
+                VehicleOnroadCalculations._cache['onroad_drive_cycle_weight_year'] = \
                     np.array([*VehicleOnroadCalculations._cache])
 
         return template_errors
@@ -315,7 +320,7 @@ class VehicleOnroadCalculations(OMEGABase):
             else they are performed on the cost cloud data
 
         """
-        cache_key = VehicleOnroadCalculations.drive_cycle_weight_year
+        cache_key = VehicleOnroadCalculations.onroad_drive_cycle_weight_year
 
         if cache_key in VehicleOnroadCalculations._cache:
             calcs = VehicleOnroadCalculations._cache[cache_key]
@@ -898,6 +903,29 @@ class Vehicle(OMEGABase):
         """
         self.cert_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self)
 
+    def calc_battery_sizing_onroad_direct_kWh_per_mile(self, cloud):
+        """
+
+        Args:
+            cloud:
+
+        Returns:
+
+        """
+        drive_cycle_weight_year = VehicleOnroadCalculations.battery_sizing_drive_cycle_weight_year
+
+        cloud['onroad_direct_kwh_per_mile'] = 0
+        cloud['nominal_onroad_direct_kwh_per_mile'] = \
+            DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(drive_cycle_weight_year,
+                                                                    self.fueling_class, cloud)
+
+        # calc onroad_direct values
+        VehicleOnroadCalculations.perform_onroad_calculations(self, cloud)
+
+        cloud['battery_sizing_onroad_direct_kwh_per_mile'] = cloud['onroad_direct_kwh_per_mile']
+
+        return cloud
+
     def calc_cert_values(self, cloud):
         """
 
@@ -908,12 +936,15 @@ class Vehicle(OMEGABase):
 
         """
         # calculate onroad values -------------------------------------------------------------------------------------
+
+        drive_cycle_weight_year = VehicleOnroadCalculations.onroad_drive_cycle_weight_year
+
         cloud['onroad_direct_co2e_grams_per_mile'] = 0
         cloud['onroad_direct_kwh_per_mile'] = 0
 
         if self.fueling_class != 'BEV':
             cloud['onroad_direct_oncycle_co2e_grams_per_mile'] = \
-                DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(VehicleOnroadCalculations.drive_cycle_weight_year,
+                DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(drive_cycle_weight_year,
                                                                                self.fueling_class,
                                                                                cloud)
         else:
@@ -921,13 +952,13 @@ class Vehicle(OMEGABase):
 
         if self.fueling_class != 'ICE':
             cloud['onroad_direct_oncycle_kwh_per_mile'] = \
-                DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(VehicleOnroadCalculations.drive_cycle_weight_year,
+                DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(drive_cycle_weight_year,
                                                                         self.fueling_class, cloud)
         else:
             cloud['onroad_direct_oncycle_kwh_per_mile'] = 0
 
         # calculate offcycle values before calculating onroad
-        cloud = OffCycleCredits.calc_off_cycle_credits(VehicleOnroadCalculations.drive_cycle_weight_year, self, cloud)
+        cloud = OffCycleCredits.calc_off_cycle_credits(drive_cycle_weight_year, self, cloud)
 
         cloud['nominal_onroad_direct_co2e_grams_per_mile'] = \
             cloud['onroad_direct_oncycle_co2e_grams_per_mile'] - \
