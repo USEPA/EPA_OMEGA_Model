@@ -664,8 +664,6 @@ class CompositeVehicle(OMEGABase):
 def calc_vehicle_frontier(vehicle):
     cost_cloud = omega_globals.options.CostCloud.get_cloud(vehicle)
     vehicle.cost_curve = vehicle.create_frontier_df(cost_cloud)
-    vehicle.cost_curve_non_numeric_data = \
-        cost_cloud[omega_globals.options.CostCloud.cloud_non_numeric_data_columns].iloc[vehicle.cost_curve.index]
     return vehicle
 
 
@@ -1029,6 +1027,9 @@ class Vehicle(OMEGABase):
         # drop frontier factor
         cost_curve = cost_curve.drop(columns=['frontier_factor'], errors='ignore')
 
+        self.cost_curve_non_numeric_data = \
+            cost_cloud[omega_globals.options.CostCloud.cloud_non_numeric_data_columns].iloc[cost_curve.index]
+
         # save vehicle cost cloud, with indicated frontier points
         if (omega_globals.options.log_vehicle_cloud_years == 'all') or \
                 (self.model_year in omega_globals.options.log_vehicle_cloud_years):
@@ -1082,7 +1083,8 @@ class Vehicle(OMEGABase):
             if 'v_cost_curves' in omega_globals.options.verbose_log_modules:
                 filename = '%s%d_%s_%s_cost_curve.csv' % (omega_globals.options.output_folder, self.model_year,
                                                           self.name.replace(' ', '_').replace(':', '-'), self.vehicle_id)
-                cost_curve.to_csv(filename, columns=sorted(cost_curve.columns), index=False)
+                cc = pd.merge(cost_curve, self.cost_curve_non_numeric_data, left_index=True, right_index=True)
+                cc.to_csv(filename, columns=sorted(cc.columns), index=False)
 
         return cost_curve
 
