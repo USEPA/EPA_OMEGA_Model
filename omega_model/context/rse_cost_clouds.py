@@ -120,6 +120,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                                'electrified_driveline_cost', 'structure_cost', 'glider_non_structure_cost']
 
     cloud_non_numeric_columns = ['cost_curve_class', 'structure_material', 'vehicle_name']
+    cloud_non_numeric_data_columns = ['cost_curve_class', 'structure_material']
 
     @staticmethod
     def init_from_ice_file(filename, powertrain_type='ICE', verbose=False):

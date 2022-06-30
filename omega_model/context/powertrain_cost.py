@@ -115,7 +115,7 @@ class PowertrainCost(OMEGABase):
         VEHICLE_SIZE_CLASS = np.array([weight_bins.index(min([v for v in weight_bins if cw < v])) for cw in CURBWT])
 
         # powertrain costs for anything with a liquid fueled engine
-        if powertrain_type in ['ICE', 'HEV', 'PHEV']:
+        if powertrain_type in ['ICE', 'HEV', 'PHEV', 'MHEV']:
 
             # pkg_df['trx_idx'] = pkg_df['cost_curve_class'].apply(lambda x: x.find('TRX'))
             pkg_df['trx_idx'] = pkg_df['cost_curve_class'].apply(find_TRX)
@@ -239,15 +239,17 @@ class PowertrainCost(OMEGABase):
             gpf_pgm = eval(_cache['ALL', 'gpf_pgm']['value'], {'np': np}, locals_dict)
             gpf_cost = (gpf_substrate + gpf_washcoat + gpf_canning + gpf_pgm) * gasoline_flag
 
-        if powertrain_type in ['HEV', 'PHEV', 'BEV']:
+        if powertrain_type in ['MHEV', 'HEV', 'PHEV', 'BEV']:
 
-            if powertrain_type != 'HEV':
+            if powertrain_type == 'PHEV' or powertrain_type == 'BEV':
                 learn = learning_factor_pev
 
             KWH = pkg_df['battery_kwh'].values
             KW = pkg_df['motor_kw'].values
 
             if powertrain_type == 'HEV':
+                obc_kw = 0
+            elif powertrain_type == 'MHEV':
                 obc_kw = 0
             elif powertrain_type == 'PHEV':
                 obc_kw = 1.9 * np.ones_like(KWH)

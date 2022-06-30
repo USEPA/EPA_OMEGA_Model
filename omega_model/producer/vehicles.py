@@ -154,7 +154,7 @@ class DecompositionAttributes(OMEGABase):
         Interpolate the given cost curve using the given index column name, index value(s), vehicle and attribute name.
 
         Args:
-            vehicle (Vehicle or CompositeVehicle):
+            vehicle (Vehicle or CompositeVehicle): the vehicle object
             cost_curve (DataFrame): the cost curve to interpolate
             index_column (str): the name of the x-axis / index column
             index_value (numeric): the x-axis / index value(s) at which to interpolate
@@ -174,6 +174,48 @@ class DecompositionAttributes(OMEGABase):
                       cost_curve['%s%s' % (prefix, attribute_name)].values)
         else:
             return cost_curve['%s%s' % (prefix, attribute_name)].item()
+
+    @staticmethod
+    def interp1d_non_numeric(vehicle, cost_curve_non_numeric_data, index_column, index_value, attribute_name):
+        """
+        Interpolate non-numeric data
+
+        Args:
+            vehicle (Vehicle or CompositeVehicle): the vehicle object
+            cost_curve_non_numeric_data (DataFrame): the cost curve non-numeric data to interpolate
+            index_column (str): the name of the x-axis / index column
+            index_value (numeric): the x-axis / index value(s) at which to interpolate
+            attribute_name (str): name of the attribute to interpolate
+
+        Returns:
+            None, updates vehicle attributes based on interpolation
+
+        """
+        if index_column not in cost_curve_non_numeric_data:
+            cost_curve_non_numeric_data[index_column] = vehicle.cost_curve[
+                'veh_%s_%s' % (vehicle.vehicle_id, index_column)]
+
+            # cost_curve_non_numeric_data = cost_curve_non_numeric_data.reset_index()
+            cost_curve_non_numeric_data.reset_index(inplace=True)
+
+        interp_index = np.interp(index_value,
+                              cost_curve_non_numeric_data[index_column],
+                              cost_curve_non_numeric_data.index)
+
+        if interp_index <= 0:
+            value = cost_curve_non_numeric_data[attribute_name].iloc[0]
+        elif interp_index >= max(cost_curve_non_numeric_data.index):
+            value = cost_curve_non_numeric_data[attribute_name].iloc[-1]
+        elif cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index)] != \
+                cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index) + 1]:
+            offset = interp_index - math.trunc(interp_index)
+            value = '%s (%.3f):%s (%.3f)' % (
+                cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index)], 1 - offset,
+                cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index) + 1], offset)
+        else:
+            value = cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index)]
+
+        return value
 
     @classmethod
     def rename_decomposition_columns(cls, vehicle, cost_curve):
@@ -432,30 +474,17 @@ class CompositeVehicle(OMEGABase):
         for v in self.vehicle_list:
             if 'cost_curve' in self.__dict__:
                 for ccv in DecompositionAttributes.values:
-                    v.__setattr__(ccv, DecompositionAttributes.interp1d(v, self.cost_curve, cost_curve_interp_key,
-                                                                        self.__getattribute__(cost_curve_interp_key), ccv))
+                    v.__setattr__(ccv,
+                                  DecompositionAttributes.interp1d(v, self.cost_curve, cost_curve_interp_key,
+                                                                   self.__getattribute__(cost_curve_interp_key),
+                                                                   ccv))
 
-            # vvv interpolate non-numeric data...
-            if cost_curve_interp_key not in v.cost_curve_non_numeric_data:
-                v.cost_curve_non_numeric_data[cost_curve_interp_key] = v.cost_curve['veh_%s_%s' % (v.vehicle_id, cost_curve_interp_key)]
-                v.cost_curve_non_numeric_data = v.cost_curve_non_numeric_data.reset_index()
-            str_index = np.interp(self.__getattribute__(cost_curve_interp_key),
-                      v.cost_curve_non_numeric_data[cost_curve_interp_key], v.cost_curve_non_numeric_data.index)
-
-            for cn in v.non_numeric_columns:
-                if str_index <= 0:
-                    v.__setattr__(cn, v.cost_curve_non_numeric_data[cn].iloc[0])
-                elif str_index >= max(v.cost_curve_non_numeric_data.index):
-                    v.__setattr__(cn, v.cost_curve_non_numeric_data[cn].iloc[-1])
-                else:
-                    if v.cost_curve_non_numeric_data[cn].iloc[math.trunc(str_index)] != v.cost_curve_non_numeric_data[cn].iloc[math.trunc(str_index) + 1]:
-                        offset = str_index - math.trunc(str_index)
-                        v.__setattr__(cn, '%s (%.3f):%s (%.3f)' % \
-                            (v.cost_curve_non_numeric_data[cn].iloc[math.trunc(str_index)], 1-offset,
-                             v.cost_curve_non_numeric_data[cn].iloc[math.trunc(str_index)+1], offset))
-                    else:
-                        v.__setattr__(cn, v.cost_curve_non_numeric_data[cn].iloc[math.trunc(str_index)])
-            # ^^^ interpolate non-numeric data...
+                for ccv in omega_globals.options.CostCloud.cloud_non_numeric_data_columns:
+                    v.__setattr__(ccv,
+                                  DecompositionAttributes.interp1d_non_numeric(v, v.cost_curve_non_numeric_data,
+                                                                               cost_curve_interp_key,
+                                                                               self.__getattribute__(cost_curve_interp_key),
+                                                                               ccv))
 
             v.initial_registered_count = self.initial_registered_count * v.composite_vehicle_share_frac
             v.set_target_co2e_Mg()  # varies by model year and initial_registered_count
@@ -633,8 +662,8 @@ class CompositeVehicle(OMEGABase):
 def calc_vehicle_frontier(vehicle):
     cost_cloud = omega_globals.options.CostCloud.get_cloud(vehicle)
     vehicle.cost_curve = vehicle.create_frontier_df(cost_cloud)
-    vehicle.non_numeric_columns = ['cost_curve_class', 'structure_material']  # TODO: decide where to pull these from
-    vehicle.cost_curve_non_numeric_data = cost_cloud[vehicle.non_numeric_columns].iloc[vehicle.cost_curve.index]
+    vehicle.cost_curve_non_numeric_data = \
+        cost_cloud[omega_globals.options.CostCloud.cloud_non_numeric_data_columns].iloc[vehicle.cost_curve.index]
     return vehicle
 
 
