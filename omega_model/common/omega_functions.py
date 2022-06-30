@@ -62,7 +62,7 @@ def plot_frontier(cost_cloud, cost_curve_name, frontier_df, x_key, y_key):
 
         ::
 
-            # from create_frontier_df() in vehicles.py
+            # from calc_cost_curve() in vehicles.py
             plot_frontier(self.cost_cloud, '', cost_curve, 'cert_co2e_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
 
     """
