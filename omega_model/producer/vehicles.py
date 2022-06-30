@@ -663,9 +663,7 @@ class CompositeVehicle(OMEGABase):
 
 def calc_vehicle_frontier(vehicle):
     cost_cloud = omega_globals.options.CostCloud.get_cloud(vehicle)
-    vehicle.cost_curve = vehicle.create_frontier_df(cost_cloud)
-    vehicle.cost_curve_non_numeric_data = \
-        cost_cloud[omega_globals.options.CostCloud.cloud_non_numeric_data_columns].iloc[vehicle.cost_curve.index]
+    vehicle.calc_cost_curve(cost_cloud)
     return vehicle
 
 
@@ -981,7 +979,7 @@ class Vehicle(OMEGABase):
 
         return cloud
 
-    def create_frontier_df(self, cost_cloud):
+    def calc_cost_curve(self, cost_cloud):
         """
         Create a frontier ("cost curve") from a vehicle's cloud of simulated vehicle points ("cost cloud") based
         on the current policy and vehicle attributes.  The cost values are a function of the producer generalized cost
@@ -998,7 +996,7 @@ class Vehicle(OMEGABase):
             cost_cloud (DataFrame): vehicle cost cloud
 
         Returns:
-            The vehicle frontier / cost curve as a DataFrame.
+            None, updates vehicle.cust_curve with vehicle tecnhology frontier / cost curve as a DataFrame.
 
         """
 
@@ -1028,6 +1026,9 @@ class Vehicle(OMEGABase):
 
         # drop frontier factor
         cost_curve = cost_curve.drop(columns=['frontier_factor'], errors='ignore')
+
+        self.cost_curve_non_numeric_data = \
+            cost_cloud[omega_globals.options.CostCloud.cloud_non_numeric_data_columns].iloc[cost_curve.index]
 
         # save vehicle cost cloud, with indicated frontier points
         if (omega_globals.options.log_vehicle_cloud_years == 'all') or \
@@ -1082,9 +1083,10 @@ class Vehicle(OMEGABase):
             if 'v_cost_curves' in omega_globals.options.verbose_log_modules:
                 filename = '%s%d_%s_%s_cost_curve.csv' % (omega_globals.options.output_folder, self.model_year,
                                                           self.name.replace(' ', '_').replace(':', '-'), self.vehicle_id)
-                cost_curve.to_csv(filename, columns=sorted(cost_curve.columns), index=False)
+                cc = pd.merge(cost_curve, self.cost_curve_non_numeric_data, left_index=True, right_index=True)
+                cc.to_csv(filename, columns=sorted(cc.columns), index=False)
 
-        return cost_curve
+        self.cost_curve = cost_curve
 
 
 class VehicleFinal(SQABase, Vehicle):
