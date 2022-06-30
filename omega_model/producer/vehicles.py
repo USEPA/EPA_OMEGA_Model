@@ -474,13 +474,15 @@ class CompositeVehicle(OMEGABase):
         for v in self.vehicle_list:
             if 'cost_curve' in self.__dict__:
                 for ccv in DecompositionAttributes.values:
-                    v.__setattr__(ccv,
+                    if ccv in self.cost_curve:
+                        v.__setattr__(ccv,
                                   DecompositionAttributes.interp1d(v, self.cost_curve, cost_curve_interp_key,
                                                                    self.__getattribute__(cost_curve_interp_key),
                                                                    ccv))
 
                 for ccv in omega_globals.options.CostCloud.cloud_non_numeric_data_columns:
-                    v.__setattr__(ccv,
+                    if ccv in v.cost_curve_non_numeric_data:
+                        v.__setattr__(ccv,
                                   DecompositionAttributes.interp1d_non_numeric(v, v.cost_curve_non_numeric_data,
                                                                                cost_curve_interp_key,
                                                                                self.__getattribute__(cost_curve_interp_key),
