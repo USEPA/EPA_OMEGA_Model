@@ -350,6 +350,7 @@ def calc_cross_subsidy_metrics(mcat, cross_subsidy_pair, producer_decision, cros
 
     if mcat == '':
         _cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat] = 1.0
+        cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat] = 1.0
 
     for mc in cross_subsidy_pair:
         _cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat] += \
