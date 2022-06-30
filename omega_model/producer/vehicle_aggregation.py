@@ -346,6 +346,8 @@ class VehicleAggregation(OMEGABase):
 
             df['base_year_footprint_ft2'] = df['footprint_ft2']
 
+            df['base_year_curbweight_lbs'] = df['curbweight_lbs']
+
             df['structure_mass_lbs'], df['battery_mass_lbs'], df['powertrain_mass_lbs'], \
             df['delta_glider_non_structure_mass_lbs'], df['usable_battery_capacity_norm'] = \
                 MassScaling.calc_mass_terms(df, df['structure_material'], df['eng_rated_hp'],
@@ -385,6 +387,8 @@ class VehicleAggregation(OMEGABase):
                     GliderCost.get_base_year_glider_non_structure_cost(veh, row['structure_mass_lbs'], powertrain_cost)
 
                 veh.base_year_footprint_ft2 = row['footprint_ft2']
+
+                veh.base_year_curbweight_lbs = row['curbweight_lbs']
 
                 df.loc[idx, 'glider_non_structure_cost_dollars'] = \
                     float(GliderCost.calc_cost(veh, pd.DataFrame([row]))[1])
