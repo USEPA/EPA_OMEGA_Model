@@ -190,9 +190,7 @@ class CostCloud(OMEGABase, CostCloudBase):
         input_template_name = __name__
         input_template_version = 0.11
         input_template_columns = {'cost_curve_class',
-                                  'high_eff_alternator', 'start_stop', 'hev', 'hev_truck', 'deac_pd',
-                                  'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11', 'gas_fuel',
-                                  'diesel_fuel'}
+                                  }
 
         powertrain_type = 'BEV'
 
