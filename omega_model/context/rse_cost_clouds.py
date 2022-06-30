@@ -128,10 +128,10 @@ class CostCloud(OMEGABase, CostCloudBase):
             omega_log.logwrite('\nInitializing CostCloud from %s...' % filename)
         input_template_name = __name__
         input_template_version = 0.2
-        input_template_columns = {'cost_curve_class', 'engine_displacement_L', 'engine_cylinders', 'unibody',
-                                  'high_eff_alternator', 'start_stop', 'mhev', 'hev', 'hev_truck', 'deac_pd',
-                                  'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11', 'gas_fuel',
-                                  'diesel_fuel', 'awd', 'fwd', 'trx10', 'trx11', 'trx12', 'trx21', 'trx22'}
+        input_template_columns = {'cost_curve_class', 'engine_displacement_L', 'engine_cylinders', 'hev_motor_kw',
+                                  'hev_batt_kwh', 'unibody', 'high_eff_alternator', 'start_stop', 'mhev', 'hev',
+                                  'hev_truck', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11', 'gas_fuel',
+                                  'diesel_fuel', 'awd', 'fwd', 'trx10', 'trx11', 'trx12', 'trx21', 'trx22','ecvt'}
 
         # input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -188,11 +188,11 @@ class CostCloud(OMEGABase, CostCloudBase):
         if verbose:
             omega_log.logwrite('\nInitializing CostCloud from %s...' % filename)
         input_template_name = __name__
-        input_template_version = 0.2
-        input_template_columns = {'cost_curve_class', 'unibody',
-                                  'high_eff_alternator', 'start_stop', 'mhev', 'hev', 'hev_truck', 'deac_pd',
+        input_template_version = 0.11
+        input_template_columns = {'cost_curve_class',
+                                  'high_eff_alternator', 'start_stop', 'hev', 'hev_truck', 'deac_pd',
                                   'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11', 'gas_fuel',
-                                  'diesel_fuel', 'awd', 'fwd', 'trx10', 'trx11', 'trx12', 'trx21', 'trx22'}
+                                  'diesel_fuel'}
 
         powertrain_type = 'BEV'
 
