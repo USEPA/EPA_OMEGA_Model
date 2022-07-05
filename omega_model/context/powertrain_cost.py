@@ -40,12 +40,36 @@ from effects.general_functions import dollar_adjustment_factor
 _cache = dict()
 
 
-def find_TRX(x):
-    return x.find('TRX')
-
-
 def get_trans(x):
-    return x['cost_curve_class'][x['trx_idx']:x['trx_idx_end']]
+    trans = ''
+    flags = 0
+
+    if x['trx10']:
+        trans = 'TRX10'
+        flags += 1
+    elif x['trx11']:
+        trans = 'TRX11'
+        flags += 1
+    elif x['trx12']:
+        trans = 'TRX12'
+        flags += 1
+    elif x['trx21']:
+        trans = 'TRX21'
+        flags += 1
+    elif x['trx22']:
+        trans = 'TRX22'
+        flags += 1
+    elif x['ecvt']:
+        trans = 'TRXCV'
+        flags += 1
+
+    if trans == '':
+        raise Exception('%s has no transmission tech flag' % x.vehicle_name)
+
+    if flags > 1:
+        raise Exception('%s has multiple transmission tech flags' % x.vehicle_name)
+
+    return trans
 
 
 class PowertrainCost(OMEGABase):
@@ -117,11 +141,6 @@ class PowertrainCost(OMEGABase):
         # powertrain costs for anything with a liquid fueled engine
         if powertrain_type in ['ICE', 'HEV', 'PHEV', 'MHEV']:
 
-            # pkg_df['trx_idx'] = pkg_df['cost_curve_class'].apply(lambda x: x.find('TRX'))
-            pkg_df['trx_idx'] = pkg_df['cost_curve_class'].apply(find_TRX)
-            pkg_df['trx_idx_end'] = pkg_df['trx_idx'].values + 5
-
-            # trans = pkg_df.apply(lambda x: x['cost_curve_class'][x['trx_idx']:x['trx_idx_end']], axis=1).values
             trans = pkg_df.apply(get_trans, axis=1).values
 
             gasoline_flag = pkg_df['gas_fuel'].values

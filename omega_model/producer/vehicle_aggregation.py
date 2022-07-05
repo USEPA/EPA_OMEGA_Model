@@ -336,7 +336,6 @@ class VehicleAggregation(OMEGABase):
                 replace({'powertrain_type': {'HEV': 0, 'PHEV': 50, 'BEV': 300, 'FCV': 300, 'ICE': 0}})
 
             # need to determine vehicle trans / techs
-            df['cost_curve_class'] = 'TRX12'  # FOR NOW, NEED TO ADD TRX FLAGS TO THE VEHICLES.CSV
             df['engine_cylinders'] = df['eng_cyls_num']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
             df['engine_displacement_L'] = df['eng_disp_liters']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
 
