@@ -1,4 +1,4 @@
-input_template_name:,powertrain_cost,input_template_version:,0.1,description:,proof-of-concept;pre-fev;20220617 update gpf and add ICE lv_battery and hvac; 20220629 add MHEV entries
+input_template_name:,powertrain_cost,input_template_version:,0.1,description:,proof-of-concept;pre-fev;20220617 update gpf and add ICE lv_battery and hvac; 20220629 add MHEV entries; 20220705 update trans entries
 powertrain_type,item,value,quantity,dollar_basis,notes
 ALL,dollars_per_cylinder,((-28.814) * CYL + 726.27) * CYL * MARKUP_ICE,,2019,
 ALL,dollars_per_liter,((400) * LITERS) * MARKUP_ICE,,2019,
@@ -9,11 +9,11 @@ ALL,cegr,(114) * MARKUP_ICE,,2012,
 ALL,deac_pd,((-1.0603) * CYL ** 2 + 28.92 * CYL - 8.6935) * MARKUP_ICE,,2006,
 ALL,deac_fc,(154) * MARKUP_ICE,,2017,
 ALL,atk2,(4.907 * CYL ** 2 - 29.957 * CYL + 130.18) * MARKUP_ICE,,2010,
-ALL,TRX10,(800) * MARKUP_ICE,,2012,
-ALL,TRX11,(841) * MARKUP_ICE,,2012,
-ALL,TRX12,(1063) * MARKUP_ICE,,2012,
-ALL,TRX21,(978) * MARKUP_ICE,,2012,
-ALL,TRX22,(1201) * MARKUP_ICE,,2012,
+ALL,TRX10,(1390.2) * MARKUP_ICE,,2018,from NTR-FRM AT5 cost of 2085.30/1.5=1390.20 in 2018 dollars for MY2020
+ALL,TRX11,(1431.20) * MARKUP_ICE,,2018,
+ALL,TRX12,(1653.20) * MARKUP_ICE,,2018,
+ALL,TRX21,(1568.20) * MARKUP_ICE,,2018,
+ALL,TRX22,(1791.20) * MARKUP_ICE,,2018,
 ALL,TRXCV,(1000) * MARKUP_ICE,,2019,this is for power split transmission ECVT
 ALL,high_eff_alternator,(150) * MARKUP_ICE,,2015,
 ALL,start_stop,((0.0149) * CURBWT + 276.82) * MARKUP_ICE,,2015,
