@@ -63,7 +63,7 @@ def get_trans(x):
         trans = 'TRXCV'
         flags += 1
 
-    if trans == '':
+    if flags == 0:
         raise Exception('%s has no transmission tech flag' % x.vehicle_name)
 
     if flags > 1:
