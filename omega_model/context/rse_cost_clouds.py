@@ -154,9 +154,9 @@ class CostCloud(OMEGABase, CostCloudBase):
                 template_errors.append('Invalid drive cycle column in %s' % filename)
 
             if not template_errors:
-                # RSE columns are the drive cycle columns + the displacement and cylinder columns
+                # RSE columns are the drive cycle columns + the displacement, cylinder count, hev motor kW and hev battery kWh columns
                 rse_columns = drive_cycle_columns
-                rse_columns.update(['engine_displacement_L', 'engine_cylinders'])
+                rse_columns.update(['engine_displacement_L', 'engine_cylinders', 'hev_motor_kw', 'hev_batt_kwh'])
 
                 non_data_columns = list(rse_columns) + ['cost_curve_class']
                 CostCloud.cost_cloud_data_columns = list(df.columns.drop(non_data_columns))
@@ -416,13 +416,19 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                             # required cloud data for powertrain costing, etc:
                             cloud_point['cost_curve_class'] = ccc
-                            cloud_point['battery_kwh'] = battery_kwh
                             cloud_point['structure_mass_lbs'] = structure_mass_lbs
                             cloud_point['footprint_ft2'] = footprint_ft2
                             cloud_point['structure_material'] = structure_material
-                            cloud_point['motor_kw'] = motor_kw
                             cloud_point['curbweight_lbs'] = vehicle_curbweight_lbs
                             cloud_point['rated_hp'] = rated_hp
+                            if vehicle.powertrain_type != 'BEV':
+                                # battery size and total motor/generator power come from RSEs for ICE/HEV
+                                cloud_point['battery_kwh'] = cloud_point['hev_batt_kwh']
+                                cloud_point['motor_kw'] = cloud_point['hev_motor_kw']
+                            else:
+                                # battery size and motor power determined by vehicle and iterative range calculation
+                                cloud_point['battery_kwh'] = battery_kwh
+                                cloud_point['motor_kw'] = motor_kw
 
                             # informative data for troubleshooting:
                             if vehicle.model_year in omega_globals.options.log_vehicle_cloud_years or \
