@@ -129,10 +129,12 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
                                 OffCycleCredits._data[offcycle_credit, year]['credit_destination']
 
                             OffCycleCredits._data[cache_key] = (credit_destination, credit_value)
+                        else:
+                            OffCycleCredits._data[cache_key] = (None, 0)
 
                     (credit_destination, credit_value) = OffCycleCredits._data[cache_key]
 
-                    if offcycle_credit in cost_cloud:
+                    if offcycle_credit in cost_cloud and credit_destination is not None:
                         cost_cloud[credit_destination] += credit_value * cost_cloud[offcycle_credit]
 
         return cost_cloud
