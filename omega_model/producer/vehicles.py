@@ -169,11 +169,16 @@ class DecompositionAttributes(OMEGABase):
         else:
             prefix = ''
 
-        if len(cost_curve) > 1:
-            return np.interp(index_value, cost_curve[index_column].values,
-                      cost_curve['%s%s' % (prefix, attribute_name)].values)
+        cn = '%s%s' % (prefix, attribute_name)
+
+        if cn in cost_curve:
+            if len(cost_curve) > 1:
+                return np.interp(index_value, cost_curve[index_column].values,
+                          cost_curve[cn].values)
+            else:
+                return cost_curve[cn].item()
         else:
-            return cost_curve['%s%s' % (prefix, attribute_name)].item()
+            return None
 
     @staticmethod
     def interp1d_non_numeric(vehicle, cost_curve_non_numeric_data, index_column, index_value, attribute_name):
@@ -191,29 +196,33 @@ class DecompositionAttributes(OMEGABase):
             None, updates vehicle attributes based on interpolation
 
         """
-        if index_column not in cost_curve_non_numeric_data:
-            cost_curve_non_numeric_data[index_column] = vehicle.cost_curve[
-                'veh_%s_%s' % (vehicle.vehicle_id, index_column)]
 
-            # cost_curve_non_numeric_data = cost_curve_non_numeric_data.reset_index()
-            cost_curve_non_numeric_data.reset_index(inplace=True)
+        if attribute_name in cost_curve_non_numeric_data:
+            if index_column not in cost_curve_non_numeric_data:
+                cost_curve_non_numeric_data[index_column] = vehicle.cost_curve[
+                    'veh_%s_%s' % (vehicle.vehicle_id, index_column)]
 
-        interp_index = np.interp(index_value,
-                              cost_curve_non_numeric_data[index_column],
-                              cost_curve_non_numeric_data.index)
+                # cost_curve_non_numeric_data = cost_curve_non_numeric_data.reset_index()
+                cost_curve_non_numeric_data.reset_index(inplace=True)
 
-        if interp_index <= 0:
-            value = cost_curve_non_numeric_data[attribute_name].iloc[0]
-        elif interp_index >= max(cost_curve_non_numeric_data.index):
-            value = cost_curve_non_numeric_data[attribute_name].iloc[-1]
-        elif cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index)] != \
-                cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index) + 1]:
-            offset = interp_index - math.trunc(interp_index)
-            value = '%s (%.3f):%s (%.3f)' % (
-                cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index)], 1 - offset,
-                cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index) + 1], offset)
+            interp_index = np.interp(index_value,
+                                  cost_curve_non_numeric_data[index_column],
+                                  cost_curve_non_numeric_data.index)
+
+            if interp_index <= 0:
+                value = cost_curve_non_numeric_data[attribute_name].iloc[0]
+            elif interp_index >= max(cost_curve_non_numeric_data.index):
+                value = cost_curve_non_numeric_data[attribute_name].iloc[-1]
+            elif cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index)] != \
+                    cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index) + 1]:
+                offset = interp_index - math.trunc(interp_index)
+                value = '%s (%.3f):%s (%.3f)' % (
+                    cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index)], 1 - offset,
+                    cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index) + 1], offset)
+            else:
+                value = cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index)]
         else:
-            value = cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index)]
+            value = None
 
         return value
 
@@ -479,19 +488,17 @@ class CompositeVehicle(OMEGABase):
         for v in self.vehicle_list:
             if 'cost_curve' in self.__dict__:
                 for ccv in DecompositionAttributes.values:
-                    if ccv in self.cost_curve:
-                        v.__setattr__(ccv,
-                                  DecompositionAttributes.interp1d(v, self.cost_curve, cost_curve_interp_key,
-                                                                   self.__getattribute__(cost_curve_interp_key),
-                                                                   ccv))
+                    v.__setattr__(ccv,
+                              DecompositionAttributes.interp1d(v, self.cost_curve, cost_curve_interp_key,
+                                                               self.__getattribute__(cost_curve_interp_key),
+                                                               ccv))
 
                 for ccv in omega_globals.options.CostCloud.cloud_non_numeric_data_columns:
-                    if ccv in v.cost_curve_non_numeric_data:
-                        v.__setattr__(ccv,
-                                  DecompositionAttributes.interp1d_non_numeric(v, v.cost_curve_non_numeric_data,
-                                                                               cost_curve_interp_key,
-                                                                               self.__getattribute__(cost_curve_interp_key),
-                                                                               ccv))
+                    v.__setattr__(ccv,
+                          DecompositionAttributes.interp1d_non_numeric(v, v.cost_curve_non_numeric_data,
+                                                                       cost_curve_interp_key,
+                                                                       self.__getattribute__(cost_curve_interp_key),
+                                                                       ccv))
 
             v.initial_registered_count = self.initial_registered_count * v.composite_vehicle_share_frac
             v.set_target_co2e_Mg()  # varies by model year and initial_registered_count
