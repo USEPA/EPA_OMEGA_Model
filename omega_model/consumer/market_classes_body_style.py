@@ -78,17 +78,17 @@ class MarketClass(OMEGABase, MarketClassBase):
         """
 
         if vehicle.body_style == 'sedan':
-            if vehicle.powertrain_type in ['BEV', 'FCV']:
+            if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
                 market_class_id = 'sedan_wagon.BEV'
             else:
                 market_class_id = 'sedan_wagon.ICE'
         elif vehicle.body_style == 'cuv_suv':
-            if vehicle.powertrain_type in ['BEV', 'FCV']:
+            if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
                 market_class_id = 'cuv_suv_van.BEV'
             else:
                 market_class_id = 'cuv_suv_van.ICE'
         elif vehicle.body_style == 'pickup':
-            if vehicle.powertrain_type in ['BEV', 'FCV']:
+            if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
                 market_class_id = 'pickup.BEV'
             else:
                 market_class_id = 'pickup.ICE'

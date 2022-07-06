@@ -217,7 +217,7 @@ print('importing %s' % __file__)
 from omega_model import *
 
 # for now, eventually need to be inputs somewhere:
-aggregation_columns = ['context_size_class', 'body_style', 'powertrain_type', 'unibody_structure',
+aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
                        'cert_fuel_id', 'reg_class_id', 'drive_system']  #, 'manufacturer_id']
 
 
@@ -317,23 +317,23 @@ class VehicleAggregation(OMEGABase):
 
             df['height_in'] = df['height_in'].fillna(62.4)  # dummy value, sales-weighted
 
-            df['powertrain_type'] = df['electrification_class'].\
+            df['base_year_powertrain_type'] = df['electrification_class'].\
                 replace({'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'FCV'})
 
             # TODO: FCV battery size = 2?? Mirai=1.8
-            df['battery_kwh'] = df[['powertrain_type']].\
-                replace({'powertrain_type': {'HEV': 1, 'PHEV': 18, 'BEV': 60, 'FCV': 60, 'ICE': 0}})
+            df['battery_kwh'] = df[['base_year_powertrain_type']].\
+                replace({'base_year_powertrain_type': {'HEV': 1, 'PHEV': 18, 'BEV': 60, 'FCV': 60, 'ICE': 0}})
 
-            df['motor_kw'] = df[['powertrain_type']].\
-                replace({'powertrain_type': {'HEV': 20,
+            df['motor_kw'] = df[['base_year_powertrain_type']].\
+                replace({'base_year_powertrain_type': {'HEV': 20,
                                              'PHEV': 50,
                                              'BEV': 150 + (100 * (df['drive_system'] == 4)),
                                              'FCV': 150 + (100 * (df['drive_system'] == 4)),
                                              'ICE': 0}})
 
             # TODO: FCV range = 0??
-            df['charge_depleting_range_mi'] = df[['powertrain_type']].\
-                replace({'powertrain_type': {'HEV': 0, 'PHEV': 50, 'BEV': 300, 'FCV': 300, 'ICE': 0}})
+            df['charge_depleting_range_mi'] = df[['base_year_powertrain_type']].\
+                replace({'base_year_powertrain_type': {'HEV': 0, 'PHEV': 50, 'BEV': 300, 'FCV': 300, 'ICE': 0}})
 
             # need to determine vehicle trans / techs
             df['engine_cylinders'] = df['eng_cyls_num']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
@@ -356,11 +356,11 @@ class VehicleAggregation(OMEGABase):
                 # calc powertrain cost
                 veh = Vehicle()
                 veh.model_year = row['model_year']
-                veh.powertrain_type = row['powertrain_type']
+                veh.base_year_powertrain_type = row['base_year_powertrain_type']
                 veh.body_style = row['body_style']
 
-                if veh.powertrain_type == 'FCV':
-                    veh.powertrain_type = 'BEV'  # TODO: for costing purposes, for now
+                if veh.base_year_powertrain_type == 'FCV':
+                    veh.base_year_powertrain_type = 'BEV'  # TODO: for costing purposes, for now
 
                 veh.base_year_reg_class_id = row['reg_class_id']
                 veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)

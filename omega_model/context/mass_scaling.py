@@ -28,8 +28,8 @@ Sample Data Columns
         mass_term,condition,equation,
         null_structure_mass_lbs,vehicle.body_style == 'sedan' and vehicle.unibody_structure==1,18.5 * vehicle.footprint_ft2 + 180,
         structure_mass_lbs,vehicle.structure_material == 'steel',1 * null_structure_mass,
-        battery_mass_lbs,vehicle.powertrain_type == 'BEV',(2.2 * battery_kwh) / (0.0000000847 * battery_kwh ** 3 + 0.0000249011 * battery_kwh ** 2 + 0.0023686408 * battery_kwh + 0.1245668155),
-        powertrain_mass_lbs,vehicle.powertrain_type == 'ICE' and vehicle.drive_system==2,0.6 * vehicle.eng_rated_hp + 200,
+        battery_mass_lbs,vehicle.base_year_powertrain_type == 'BEV',(2.2 * battery_kwh) / (0.0000000847 * battery_kwh ** 3 + 0.0000249011 * battery_kwh ** 2 + 0.0023686408 * battery_kwh + 0.1245668155),
+        powertrain_mass_lbs,vehicle.base_year_powertrain_type == 'ICE' and vehicle.drive_system==2,0.6 * vehicle.eng_rated_hp + 200,
 
 Data Column Name and Description
 
@@ -213,7 +213,7 @@ if __name__ == '__main__':
                 MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp,
                                             veh.battery_kwh, veh.footprint_ft2)
             print(structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs)
-            veh.powertrain_type = 'BEV'
+            veh.base_year_powertrain_type = 'BEV'
             structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs,\
                 usable_battery_capacity_norm = \
                 MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp,

@@ -701,7 +701,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'context_size_class',
                        'unibody_structure', 'drive_system', 'curbweight_lbs', 'eng_rated_hp', 'footprint_ft2',
                        'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c', 'body_style',
-                       'structure_material', 'powertrain_type', 'base_year_reg_class_id', 'base_year_market_share',
+                       'structure_material', 'base_year_powertrain_type', 'base_year_reg_class_id', 'base_year_market_share',
                        'base_year_vehicle_id', 'base_year_glider_non_structure_mass_lbs',
                        'base_year_glider_non_structure_cost_dollars',
                        'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'base_year_curbweight_lbs_to_hp',
@@ -793,7 +793,7 @@ class Vehicle(OMEGABase):
         self.base_year_target_coef_c = 0
         self.body_style = ''
         self.structure_material = ''
-        self.powertrain_type = ''
+        self.base_year_powertrain_type = ''
         self.base_year_reg_class_id = None
         self.base_year_vehicle_id = 0
         self.base_year_market_share = 0
@@ -1159,7 +1159,7 @@ class VehicleFinal(SQABase, Vehicle):
     unibody_structure = Column(Float)  #: unibody structure flag, e.g. 0,1
     drive_system = Column(Float)  #: drive system, 1=FWD, 2=RWD, 4=AWD
     body_style = Column(String)  #: vehicle body style, e.g. 'sedan'
-    powertrain_type = Column(String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
+    base_year_powertrain_type = Column(String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
     charge_depleting_range_mi = Column(Float)  #: vehicle charge-depleting range, miles
 
     # "base year properties" - things that may change over time but we want to retain the original values
@@ -1413,7 +1413,7 @@ class VehicleFinal(SQABase, Vehicle):
                 battery_kwh=df.loc[i, 'battery_kwh'],
                 motor_kw=df.loc[i, 'motor_kw'],
                 charge_depleting_range_mi=df.loc[i, 'charge_depleting_range_mi'],
-                powertrain_type=df.loc[i, 'powertrain_type'],
+                base_year_powertrain_type=df.loc[i, 'base_year_powertrain_type'],
             )
 
             electrification_class = df.loc[i, 'electrification_class']
@@ -1432,12 +1432,12 @@ class VehicleFinal(SQABase, Vehicle):
             veh.initial_registered_count = df.loc[i, 'sales']
 
             # TODO: what are we doing about fuel cell vehicles...?
-            if veh.powertrain_type in ['BEV', 'FCV']:
-                if veh.powertrain_type == 'FCV':
+            if veh.base_year_powertrain_type in ['BEV', 'FCV']:
+                if veh.base_year_powertrain_type == 'FCV':
                     # TODO: MAP FCV to BEV for now
                     veh.in_use_fuel_id = "{'US electricity':1.0}"
                     veh.cert_fuel_id = "{'electricity':1.0}"
-                    veh.powertrain_type = 'BEV'
+                    veh.base_year_powertrain_type = 'BEV'
                 veh.fueling_class = 'BEV'
             else:
                 veh.fueling_class = 'ICE'
@@ -1451,7 +1451,7 @@ class VehicleFinal(SQABase, Vehicle):
             veh.onroad_direct_kwh_per_mile = 0
 
             # TODO: we need to figure out how we want to do this for real
-            if veh.powertrain_type in ['BEV', 'FCV']:
+            if veh.base_year_powertrain_type in ['BEV', 'FCV']:
                 rated_hp = veh.motor_kw * 1.34102
             elif electrification_class in ['HEV', 'PHEV']:
                 rated_hp = veh.eng_rated_hp + veh.motor_kw * 1.34102
@@ -1511,7 +1511,7 @@ class VehicleFinal(SQABase, Vehicle):
 
             if v.fueling_class == 'ICE':
                 alt_veh.fueling_class = 'BEV'
-                alt_veh.powertrain_type = 'BEV'
+                alt_veh.base_year_powertrain_type = 'BEV'
                 alt_veh.name = 'BEV of ' + v.name
                 alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
                 alt_veh.cert_fuel_id = "{'electricity':1.0}"
@@ -1523,7 +1523,7 @@ class VehicleFinal(SQABase, Vehicle):
                 alt_veh.eng_disp_liters = 0
             else:
                 alt_veh.fueling_class = 'ICE'
-                alt_veh.powertrain_type = 'ICE'
+                alt_veh.base_year_powertrain_type = 'ICE'
                 alt_veh.name = 'ICE of ' + v.name
                 alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
                 alt_veh.cert_fuel_id = "{'gasoline':1.0}"
