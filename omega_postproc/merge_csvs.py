@@ -104,16 +104,20 @@ for sessionname in sessionnames:
     dfvehtmp = dfvehtmp[dfvehtmp['model_year'] == model_year]
     dfvehtmp = dfvehtmp[['name', 'model_year', 'base_year_vehicle_id', 'cost_curve_class', 'structure_material', '_initial_registered_count']]
 
-    dfvehtmp[['cost_curve_class_1', 'cost_curve_class_2']] = dfvehtmp['cost_curve_class'].str.split(':', expand=True)
+    if dfvehtmp['cost_curve_class'].str.split(':', expand=True).shape[1] == 2:
+        dfvehtmp[['cost_curve_class_1', 'cost_curve_class_2']] = dfvehtmp['cost_curve_class'].str.split(':', expand=True)
+    else:
+        dfvehtmp[['cost_curve_class_1', 'cost_curve_class_2']] = pd.concat([dfvehtmp['cost_curve_class'], pd.DataFrame(columns=['empty'], index=dfvehtmp.index)], axis=1)
+
     dfvehtmp[['cost_curve_class_1', 'cost_curve_class_1_share']] = dfvehtmp['cost_curve_class_1'].str.replace(')', '').\
         str.split('\s\(', expand=True).fillna(1) # first package, default share of 1 unless otherwise specified
     dfvehtmp[['cost_curve_class_2', 'cost_curve_class_2_share']] = dfvehtmp['cost_curve_class_2'].str.replace(')', '').\
         str.split('\s\(', expand=True).fillna(0) # second package, default share of 0 unless otherwise specified
 
-    try:
+    if dfvehtmp['structure_material'].str.split(':', expand=True).shape[1] == 2:
         dfvehtmp[['structure_material_1', 'structure_material_2']] = dfvehtmp['structure_material'].str.split(':', expand=True)
-    except:
-        dfvehtmp[['structure_material_1', 'structure_material_2']] = pd.concat([dfvehtmp['structure_material'],dfvehtmp['structure_material']], axis=1)
+    else:
+        dfvehtmp[['structure_material_1', 'structure_material_2']] = pd.concat([dfvehtmp['structure_material'], pd.DataFrame(columns=['empty'], index=dfvehtmp.index)], axis=1)
 
     dfvehtmp[['structure_material_1', 'structure_material_1_share']] = dfvehtmp['structure_material_1'].str.replace(')', ''). \
         str.split('\s\(', expand=True).fillna(1)  # first package, default share of 1 unless otherwise specified
