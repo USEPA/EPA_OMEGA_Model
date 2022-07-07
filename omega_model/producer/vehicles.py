@@ -497,7 +497,7 @@ class CompositeVehicle(OMEGABase):
                     v.__setattr__(ccv,
                           DecompositionAttributes.interp1d_non_numeric(v, v.cost_curve_non_numeric_data,
                                                                        cost_curve_interp_key,
-                                                                       self.__getattribute__(cost_curve_interp_key),
+                                                                       v.__getattribute__(cost_curve_interp_key),
                                                                        ccv))
 
             v.initial_registered_count = self.initial_registered_count * v.composite_vehicle_share_frac
