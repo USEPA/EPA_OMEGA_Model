@@ -1513,6 +1513,9 @@ class VehicleFinal(SQABase, Vehicle):
                 alt_veh.fueling_class = 'BEV'
                 alt_veh.base_year_powertrain_type = 'BEV'
                 alt_veh.name = 'BEV of ' + v.name
+                for tf in omega_globals.options.CostCloud.tech_flags:
+                    alt_veh.__setattr__(tf, None)
+                alt_veh.bev = 1
                 alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
                 alt_veh.cert_fuel_id = "{'electricity':1.0}"
                 alt_veh.battery_kwh = 60  # TODO: do we need this?  it gets set in the cloud search
@@ -1525,6 +1528,9 @@ class VehicleFinal(SQABase, Vehicle):
                 alt_veh.fueling_class = 'ICE'
                 alt_veh.base_year_powertrain_type = 'ICE'
                 alt_veh.name = 'ICE of ' + v.name
+                for tf in omega_globals.options.CostCloud.tech_flags:
+                    alt_veh.__setattr__(tf, None)
+                alt_veh.ice = 1
                 alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
                 alt_veh.cert_fuel_id = "{'gasoline':1.0}"
                 alt_veh.eng_rated_hp = v.motor_kw * 1.34102  # TODO: where does power come from?

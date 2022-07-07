@@ -259,7 +259,7 @@ class VehicleAggregation(OMEGABase):
         omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.46
+        input_template_version = 0.47
         input_template_columns = VehicleFinal.mandatory_input_template_columns
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -347,6 +347,8 @@ class VehicleAggregation(OMEGABase):
 
             df['base_year_curbweight_lbs'] = df['curbweight_lbs']
 
+            df['powertrain_type'] = df['base_year_powertrain_type']  # required for mass_scaling calcs
+
             df['structure_mass_lbs'], df['battery_mass_lbs'], df['powertrain_mass_lbs'], \
             df['delta_glider_non_structure_mass_lbs'], df['usable_battery_capacity_norm'] = \
                 MassScaling.calc_mass_terms(df, df['structure_material'], df['eng_rated_hp'],
@@ -364,9 +366,10 @@ class VehicleAggregation(OMEGABase):
 
                 veh.base_year_reg_class_id = row['reg_class_id']
                 veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
+                row['market_class_id'] = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
                 veh.drive_system = row['drive_system']
 
-                powertrain_cost = sum(PowertrainCost.calc_cost(veh, pd.DataFrame([row])))
+                powertrain_cost = sum(PowertrainCost.calc_cost(veh, row, veh.base_year_powertrain_type))
 
                 # powertrain_costs = PowertrainCost.calc_cost(veh, pd.DataFrame([row]))  # includes battery cost
                 # powertrain_cost_terms = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
@@ -379,6 +382,8 @@ class VehicleAggregation(OMEGABase):
                 veh.height_in = row['height_in']
                 veh.ground_clearance_in = row['ground_clearance_in']
                 veh.base_year_msrp_dollars = row['msrp_dollars']
+                row['base_year_msrp_dollars'] = row['msrp_dollars']
+
                 veh.unibody_structure = row['unibody_structure']
                 veh.body_style = row['body_style']
 
