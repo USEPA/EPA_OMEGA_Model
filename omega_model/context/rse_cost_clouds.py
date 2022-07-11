@@ -134,7 +134,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                                   'hev_batt_kwh', 'unibody', 'high_eff_alternator', 'start_stop', 'mhev', 'hev',
                                   'hev_truck', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11', 'gas_fuel',
                                   'diesel_fuel', 'awd', 'fwd', 'trx10', 'trx11', 'trx12', 'trx21', 'trx22', 'ecvt',
-                                  'ice', 'fcv'}
+                                  'ice', 'fcv', 'phev'}  # TODO: move phev flag to phev rse only when it gets its own init
 
         # input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
