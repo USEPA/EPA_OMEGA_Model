@@ -312,9 +312,22 @@ class DispyCluster(object):
 
         """
         import socket
-        # socket.gethostbyname(socket.gethostname())
-        # return socket.gethostbyname_ex(socket.gethostname())[2][-1]
-        return socket.gethostbyname_ex(socket.gethostname())[2]
+
+        my_ip = []
+
+        retries = 0
+        ip_found = False
+        while not ip_found and retries < 10:
+            try:
+                my_ip = socket.gethostbyname_ex(socket.gethostname())[2]
+                ip_found = True
+            except Exception as e:
+                retries += 1
+
+        if not my_ip.count('127.0.0.1'):
+            my_ip.append('127.0.0.1')  # Add support for local loopback interface
+
+        return my_ip
 
     def find_nodes(self):
         """

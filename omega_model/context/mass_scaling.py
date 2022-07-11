@@ -213,7 +213,7 @@ if __name__ == '__main__':
                 MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp,
                                             veh.battery_kwh, veh.footprint_ft2)
             print(structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs)
-            veh.powertrain_type = 'BEV'
+            veh.base_year_powertrain_type = 'BEV'
             structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs,\
                 usable_battery_capacity_norm = \
                 MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp,

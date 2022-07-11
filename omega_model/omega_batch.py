@@ -1615,6 +1615,8 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 
         if options.session_num is None:
             session_list = list({0}.union([s.num for s in batch.sessions if s.enabled]))
+        elif no_bundle and no_validate:  # running remotely
+            session_list = list({options.session_num})
         else:
             session_list = list({0, options.session_num})
 
