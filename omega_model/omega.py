@@ -1246,7 +1246,8 @@ def init_omega(session_runtime_options):
     from effects.cost_factors_scc import CostFactorsSCC
     from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
     from effects.cost_factors_congestion_noise import CostFactorsCongestionNoise
-    from effects.emission_factors_powersector import EmissionFactorsPowersector
+    from effects.emission_rates_egu import EmissionRatesEGU
+    # from effects.emission_factors_powersector import EmissionFactorsPowersector
     from effects.emission_factors_refinery import EmissionFactorsRefinery
     # from effects.emission_factors_vehicles import EmissionFactorsVehicles
     from effects.emission_rates_vehicles import EmissionRatesVehicles
@@ -1365,8 +1366,11 @@ def init_omega(session_runtime_options):
             init_fail += GeneralInputsForEffects.init_from_file(omega_globals.options.general_inputs_for_effects_file,
                                                           verbose=verbose_init)
 
-            init_fail += EmissionFactorsPowersector.init_from_file(omega_globals.options.emission_factors_powersector_file,
-                                                                   verbose=verbose_init)
+            init_fail += EmissionRatesEGU.init_from_file(omega_globals.options.emission_factors_powersector_file,
+                                                           verbose=verbose_init)
+
+            # init_fail += EmissionFactorsPowersector.init_from_file(omega_globals.options.emission_factors_powersector_file,
+            #                                                        verbose=verbose_init)
 
             init_fail += EmissionFactorsRefinery.init_from_file(omega_globals.options.emission_factors_refinery_file,
                                                                 verbose=verbose_init)
@@ -1402,8 +1406,11 @@ def init_omega(session_runtime_options):
             init_fail += GeneralInputsForEffects.init_from_file(omega_globals.options.general_inputs_for_effects_file,
                                                                 verbose=verbose_init)
 
-            init_fail += EmissionFactorsPowersector.init_from_file(omega_globals.options.emission_factors_powersector_file,
-                                                                   verbose=verbose_init)
+            init_fail += EmissionRatesEGU.init_from_file(omega_globals.options.emission_factors_powersector_file,
+                                                           verbose=verbose_init)
+
+            # init_fail += EmissionFactorsPowersector.init_from_file(omega_globals.options.emission_factors_powersector_file,
+            #                                                        verbose=verbose_init)
 
             init_fail += EmissionFactorsRefinery.init_from_file(omega_globals.options.emission_factors_refinery_file,
                                                                 verbose=verbose_init)

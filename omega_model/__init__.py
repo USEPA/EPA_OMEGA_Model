@@ -92,7 +92,7 @@ try:
             self.consolidate_manufacturers = True
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
             self.market_classes_file = path + 'test_inputs/market_classes.csv'
-            self.vehicles_file = path + 'test_inputs/vehicles.csv'
+            self.vehicles_file = path + 'test_inputs/vehicles_ford.csv'
             self.vehicles_df = pd.DataFrame()
             self.onroad_vehicle_calculations_file = path + 'test_inputs/onroad_vehicle_calculations.csv'
             self.sales_share_file = path + 'test_inputs/sales_share_params.csv'
@@ -125,7 +125,7 @@ try:
             self.mass_scaling_file = path + 'test_inputs/mass_scaling.csv'
 
             self.analysis_initial_year = None
-            self.analysis_final_year = 2021
+            self.analysis_final_year = 2040
             self.logfile_prefix = 'o2log_'
             self.logfilename = ''
             self.consumer_calc_generalized_cost = None
@@ -163,9 +163,8 @@ try:
             self.criteria_cost_factors_file = path + 'test_inputs/cost_factors_criteria.csv'
             self.energysecurity_cost_factors_file = path + 'test_inputs/cost_factors_energysecurity.csv'
             self.congestion_noise_cost_factors_file = path + 'test_inputs/cost_factors_congestion_noise.csv'
-            self.emission_factors_vehicles_file = path + 'test_inputs/emission_rates_vehicles-NTR.csv'
-            # self.emission_factors_vehicles_file = path + 'test_inputs/emission_factors_vehicles.csv'
-            self.emission_factors_powersector_file = path + 'test_inputs/emission_factors_powersector.csv'
+            self.emission_factors_vehicles_file = path + 'test_inputs/emission_rates_vehicles-no_gpf.csv'
+            self.emission_factors_powersector_file = path + 'test_inputs/emission_rates_egu.csv'
             self.emission_factors_refinery_file = path + 'test_inputs/emission_factors_refinery.csv'
             self.maintenance_cost_inputs_file = path + 'test_inputs/maintenance_cost.csv'
             self.repair_cost_inputs_file = path + 'test_inputs/repair_cost.csv'
@@ -183,7 +182,7 @@ try:
             self.verbose = False
             self.iterate_producer_consumer = True
 
-            self.producer_consumer_max_iterations = 20  # recommend 2+
+            self.producer_consumer_max_iterations = 2  # recommend 2+
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
             self.producer_compliance_search_convergence_factor = 0.9

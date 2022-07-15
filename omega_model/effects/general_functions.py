@@ -88,11 +88,13 @@ def round_sig(df, divisor=1, sig=0, *args):
 
     """
     for arg in args:
-        try:
-            df[arg] = df[arg].apply(lambda x: round(x/divisor, sig-int(floor(log10(abs(x/divisor))))-1))
-        except:
-            df[arg].replace(to_replace=0, value=1, inplace=True)
-            df[arg] = df[arg].apply(lambda x: round(x / divisor, sig - int(floor(log10(abs(x / divisor)))) - 1))
+        df[arg] = df.loc[(df[arg] != np.nan) & (df[arg] != 0), arg].apply(
+            lambda x: round(x / divisor, sig - (1 + int(log10(abs(x / divisor))))))
+        # try:
+        #     df[arg] = df[arg].apply(lambda x: round(x/divisor, sig-int(floor(log10(abs(x/divisor))))-1))
+        # except:
+        #     df[arg].replace(to_replace=0, value=1, inplace=True)
+        #     df[arg] = df.loc[(df[arg] != np.nan) & (df[arg] != 0), arg].apply(lambda x: round(x / divisor, sig-(1+int(log10(abs(x / divisor))))))
     return df
 
 

@@ -1,5 +1,5 @@
-input_template_name:,cost_factors_criteria,input_template_version:,0.3,description:,ntr frm,,,,,,,,
-calendar_year,dollar_basis,pm25_tailpipe_3.0_USD_per_uston,pm25_upstream_3.0_USD_per_uston,nox_tailpipe_3.0_USD_per_uston,nox_upstream_3.0_USD_per_uston,so2_tailpipe_3.0_USD_per_uston,so2_upstream_3.0_USD_per_uston,pm25_tailpipe_7.0_USD_per_uston,pm25_upstream_7.0_USD_per_uston,nox_tailpipe_7.0_USD_per_uston,nox_upstream_7.0_USD_per_uston,so2_tailpipe_7.0_USD_per_uston,so2_upstream_7.0_USD_per_uston
+input_template_name:,cost_factors_criteria,input_template_version:,0.31,description:,ntr frm,,,,,,,,
+calendar_year,dollar_basis,pm25_tailpipe_3.0_USD_per_uston,pm25_upstream_3.0_USD_per_uston,nox_tailpipe_3.0_USD_per_uston,nox_upstream_3.0_USD_per_uston,sox_tailpipe_3.0_USD_per_uston,sox_upstream_3.0_USD_per_uston,pm25_tailpipe_7.0_USD_per_uston,pm25_upstream_7.0_USD_per_uston,nox_tailpipe_7.0_USD_per_uston,nox_upstream_7.0_USD_per_uston,sox_tailpipe_7.0_USD_per_uston,sox_upstream_7.0_USD_per_uston
 2016,2018,420000,370000,8700,7700,22000,77000,380000,330000,7900,7000,20000,70000
 2020,2018,602362.7901,380000,6394.459424,8100,153440.3911,81000,543698.0811,350000,5770.584738,7300,138496.0826,74000
 2025,2018,662886.8303,420000,6919.989335,8800,168685.8807,90000,598246.6516,380000,6243.868985,7900,152236.6921,80000
