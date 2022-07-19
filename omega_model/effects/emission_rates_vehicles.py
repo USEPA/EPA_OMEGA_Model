@@ -83,7 +83,7 @@ class EmissionRatesVehicles(OMEGABase):
 
         for rate_name in rate_names:
 
-            cache_key = (model_year, sourcetype_name, reg_class_id, in_use_fuel_id, rate_name)
+            cache_key = (model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age, rate_name)
             if cache_key in _cache:
                 rate = _cache[cache_key]
             else:
