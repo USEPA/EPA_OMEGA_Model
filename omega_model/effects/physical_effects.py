@@ -234,7 +234,10 @@ def calc_physical_effects(calendar_years):
                         fuel_generation_kWh += fuel_consumption_kWh / transmission_efficiency
 
                         # vehicle emission rates:
-                        rate_names = ['pm25_brakewear_grams_per_mile', 'pm25_tirewear_grams_per_mile']
+                        rate_names = [
+                            'pm25_brakewear_grams_per_mile',
+                            'pm25_tirewear_grams_per_mile'
+                        ]
                         pm25_brakewear_e, pm25_tirewear_e \
                             = get_vehicle_emission_rate(model_year, sourcetype_name, base_year_reg_class_id, fuel,
                                                         ind_var_value, *rate_names)
@@ -255,29 +258,53 @@ def calc_physical_effects(calendar_years):
                             = get_vehicle_emission_rate(model_year, sourcetype_name, base_year_reg_class_id, fuel,
                                                         ind_var_value, *rate_names)
 
-                        rate_names = [
-                            'pm25_exhaust_grams_per_mile',
-                            'nmog_exhaust_grams_per_mile',
-                            'co_exhaust_grams_per_mile',
-                            'nox_exhaust_grams_per_mile',
-                            'sox_exhaust_grams_per_gallon',
-                            # 'benzene_exhaust_grams_per_mile',
-                            # 'butadiene13_exhaust_grams_per_mile',
-                            # 'formaldehyde_exhaust_grams_per_mile',
-                            # 'acetaldehyde_exhaust_grams_per_mile',
-                            # 'acrolein_exhaust_grams_per_mile',
-                            'ch4_exhaust_grams_per_mile',
-                            'n2o_exhaust_grams_per_mile',
-                            'nmog_evap_permeation_grams_per_gallon',
-                            'nmog_evap_fuel_vapor_venting_grams_per_gallon',
-                            'nmog_evap_fuel_leaks_grams_per_gallon',
-                            'nmog_refueling_displacement_grams_per_gallon',
-                            'nmog_refueling_spillage_grams_per_gallon',
-                        ]
-
-                        pm25_exhaust, nmog, co, nox, sox, ch4, n2o, nmog_permeation, nmog_venting, nmog_leaks, nmog_refuel_disp, nmog_refuel_spill \
-                            = get_vehicle_emission_rate(model_year, sourcetype_name, base_year_reg_class_id, fuel,
-                                                        ind_var_value, *rate_names)
+                        if fuel == 'pump gasoline':
+                            rate_names = [
+                                'pm25_brakewear_grams_per_mile',
+                                'pm25_tirewear_grams_per_mile',
+                                'pm25_exhaust_grams_per_mile',
+                                'nmog_exhaust_grams_per_mile',
+                                'nmog_evap_permeation_grams_per_gallon',
+                                'nmog_evap_fuel_vapor_venting_grams_per_gallon',
+                                'nmog_evap_fuel_leaks_grams_per_gallon',
+                                'nmog_refueling_displacement_grams_per_gallon',
+                                'nmog_refueling_spillage_grams_per_gallon',
+                                'co_exhaust_grams_per_mile',
+                                'nox_exhaust_grams_per_mile',
+                                'sox_exhaust_grams_per_gallon',
+                                # 'benzene_exhaust_grams_per_mile',
+                                # 'butadiene13_exhaust_grams_per_mile',
+                                # 'formaldehyde_exhaust_grams_per_mile',
+                                # 'acetaldehyde_exhaust_grams_per_mile',
+                                # 'acrolein_exhaust_grams_per_mile',
+                                'ch4_exhaust_grams_per_mile',
+                                'n2o_exhaust_grams_per_mile',
+                            ]
+                            pm25_brakewear_l, pm25_tirewear_l, pm25_exhaust, \
+                            nmog, nmog_permeation, nmog_venting, nmog_leaks, nmog_refuel_disp, nmog_refuel_spill, \
+                            co, nox, sox, ch4, n2o \
+                                = get_vehicle_emission_rate(model_year, sourcetype_name, base_year_reg_class_id, fuel,
+                                                            ind_var_value, *rate_names)
+                        elif fuel == 'pump diesel':
+                            rate_names = [
+                                'pm25_brakewear_grams_per_mile',
+                                'pm25_tirewear_grams_per_mile',
+                                'pm25_exhaust_grams_per_mile',
+                                'nmog_exhaust_grams_per_mile',
+                                'nmog_refueling_spillage_grams_per_gallon',
+                                'co_exhaust_grams_per_mile',
+                                'nox_exhaust_grams_per_mile',
+                                'sox_exhaust_grams_per_gallon',
+                                'ch4_exhaust_grams_per_mile',
+                                'n2o_exhaust_grams_per_mile',
+                            ]
+                            pm25_brakewear_l, pm25_tirewear_l, pm25_exhaust, \
+                            nmog, nmog_refuel_spill, \
+                            co, nox, sox, ch4, n2o \
+                                = get_vehicle_emission_rate(model_year, sourcetype_name, base_year_reg_class_id, fuel,
+                                                            ind_var_value, *rate_names)
+                        else:
+                            pass # add additional liquid fuels (E85) if necessary
 
                         # upstream refinery emission factors for liquid fuel operation
                         # voc_ref, co_ref, nox_ref, pm25_ref, sox_ref, benzene_ref, butadiene13_ref, formaldehyde_ref, \
