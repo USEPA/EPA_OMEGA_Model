@@ -33,21 +33,21 @@ def get_safety_values(body_style):
 
 
 def get_fatality_rate(model_year, age):
-        """
+    """
 
-        Get fatality rate for the given age of vehicle in the given model year.
+    Get fatality rate for the given age of vehicle in the given model year.
 
-        Args:
-            model_year (int): the model year for which a fatality rate is needed.
+    Args:
+        model_year (int): the model year for which a fatality rate is needed.
 
-        Returns:
-            The curb weight threshold and percentage changes in fatality rates for weight changes above and below
-            that threshold.
+    Returns:
+        The curb weight threshold and percentage changes in fatality rates for weight changes above and below
+        that threshold.
 
-        """
-        from effects.fatality_rates import FatalityRates
+    """
+    from effects.fatality_rates import FatalityRates
 
-        return FatalityRates.get_fatality_rate(model_year, age)
+    return FatalityRates.get_fatality_rate(model_year, age)
 
 
 def calc_lbs_changed(base_weight, final_weight):
