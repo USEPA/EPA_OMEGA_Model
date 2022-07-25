@@ -401,6 +401,12 @@ class SalesShare(OMEGABase, SalesShareBase):
         analysis_cuv_suv_van_share *= SalesShare._data['cuv_suv_van_calibration'][calendar_year]
         analysis_pickup_share *= SalesShare._data['pickup_calibration'][calendar_year]
 
+        total_corrected_share = analysis_sedan_wagon_share + analysis_cuv_suv_van_share + analysis_pickup_share
+
+        analysis_sedan_wagon_share /= total_corrected_share
+        analysis_cuv_suv_van_share /= total_corrected_share
+        analysis_pickup_share /= total_corrected_share
+
         market_class_data['consumer_abs_share_frac_sedan_wagon'] = analysis_sedan_wagon_share
         market_class_data['consumer_abs_share_frac_cuv_suv_van'] = analysis_cuv_suv_van_share
         market_class_data['consumer_abs_share_frac_pickup'] = analysis_pickup_share
