@@ -226,17 +226,46 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
     physical_effects_dict = dict()
     vehicle_info_dict = dict()
     for calendar_year in calendar_years:
+
         vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year)
 
         # UPDATE physical effects data
         calendar_year_effects_dict = dict()
-        # calendar_year_safety_dict = dict()
+
+        # first a loop to determine kwh demand for this calendar year
+        fuel_consumption_kWh_annual = fuel_generation_kWh_annual = 0
         for vad in vads:
 
             # need vehicle info once for each vehicle, not every calendar year for each vehicle
             if vad['vehicle_id'] not in vehicle_info_dict:
                 vehicle_info_dict[vad['vehicle_id']] \
                     = VehicleFinal.get_vehicle_attributes(vad['vehicle_id'], vehicle_attribute_list)
+
+            mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, \
+            base_year_powertrain_type, target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, \
+            onroad_direct_kwh_per_mile, body_style, base_year_curbweight_lbs, curbweight_lbs \
+                = vehicle_info_dict[vad['vehicle_id']]
+
+            fuel_dict = Eval.eval(in_use_fuel_id, {'__builtins__': None}, {})
+            for fuel, fuel_share in fuel_dict.items():
+                if fuel == 'US electricity' and onroad_direct_kwh_per_mile:
+                    # refuel_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
+                    transmission_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'transmission_efficiency')
+
+                    vmt_electricity = vad['vmt'] * fuel_share
+                    fuel_consumption_kWh_annual += vmt_electricity * onroad_direct_kwh_per_mile
+                    fuel_generation_kWh_annual += fuel_consumption_kWh_annual / transmission_efficiency
+
+        # upstream EGU emission factors for electric fuel operation
+        co_egu, nox_egu, pm25_egu, sox_egu, co2_egu, ch4_egu, n2o_egu \
+            = get_egu_emission_rate(calendar_year, fuel_generation_kWh_annual)
+
+        for vad in vads:
+
+            # need vehicle info once for each vehicle, not every calendar year for each vehicle
+            # if vad['vehicle_id'] not in vehicle_info_dict:
+            #     vehicle_info_dict[vad['vehicle_id']] \
+            #         = VehicleFinal.get_vehicle_attributes(vad['vehicle_id'], vehicle_attribute_list)
 
             mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, \
             base_year_powertrain_type, target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, \
@@ -272,7 +301,7 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                 pm25_exhaust = nmog = co = nox = sox = ch4 = n2o = 0
                 nmog_permeation = nmog_venting = nmog_leaks = nmog_refuel_disp = nmog_refuel_spill = 0
 
-                co_egu = nox_egu = pm25_egu = sox_egu = co2_egu = ch4_egu = n2o_egu = 0
+                # co_egu = nox_egu = pm25_egu = sox_egu = co2_egu = ch4_egu = n2o_egu = 0
                 voc_ref = co_ref = nox_ref = pm25_ref = sox_ref = co2_ref = ch4_ref = n2o_ref = 0
                 # benzene_ref = butadiene13_ref = formaldehyde_ref = acetaldehyde_ref = acrolein_ref = 0
 
@@ -299,10 +328,10 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                             pm25_brakewear_e, pm25_tirewear_e \
                                 = get_vehicle_emission_rate(model_year, sourcetype_name, base_year_reg_class_id, fuel,
                                                             ind_var_value, *bev_veh_rate_names)
-
-                        # upstream EGU emission factors for electric fuel operation
-                        co_egu, nox_egu, pm25_egu, sox_egu, co2_egu, ch4_egu, n2o_egu \
-                            = get_egu_emission_rate(calendar_year, fuel_generation_kWh)
+                        #
+                        # # upstream EGU emission factors for electric fuel operation
+                        # co_egu, nox_egu, pm25_egu, sox_egu, co2_egu, ch4_egu, n2o_egu \
+                        #     = get_egu_emission_rate(calendar_year, fuel_generation_kWh)
 
                     elif fuel != 'US electricity' and onroad_direct_co2e_grams_per_mile:
                         liquid_fuel = fuel
@@ -509,7 +538,9 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
             if flag:
                 key = (int(vad['vehicle_id']), int(calendar_year), int(vad['age']))
                 calendar_year_effects_dict[key] = vehicle_effects_dict
+
         physical_effects_dict.update(calendar_year_effects_dict)
+
     return physical_effects_dict
 
 
