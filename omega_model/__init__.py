@@ -125,7 +125,7 @@ try:
             self.mass_scaling_file = path + 'test_inputs/mass_scaling.csv'
 
             self.analysis_initial_year = None
-            self.analysis_final_year = 2040
+            self.analysis_final_year = 2021
             self.logfile_prefix = 'o2log_'
             self.logfilename = ''
             self.consumer_calc_generalized_cost = None
@@ -169,6 +169,8 @@ try:
             self.maintenance_cost_inputs_file = path + 'test_inputs/maintenance_cost.csv'
             self.repair_cost_inputs_file = path + 'test_inputs/repair_cost.csv'
             self.refueling_cost_inputs_file = path + 'test_inputs/refueling_cost.csv'
+            self.safety_values_file = path + 'test_inputs/safety_values.csv'
+            self.fatality_rates_file = path + 'test_inputs/fatality_rates.csv'
 
             self.start_time = 0
             self.end_time = 0

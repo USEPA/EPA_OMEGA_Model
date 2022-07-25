@@ -98,6 +98,8 @@ Sample Data Columns
         Context Vehicle Emission Factors File,String,emission_factors_vehicles.csv
         Context Implicit Price Deflators File,String,implicit_price_deflators.csv
         Context Consumer Price Index File,String,cpi_price_deflators.csv
+        Context Safety Values File,String,safety_values.csv
+        Context Fatality Rates File,String,fatality_rates.csv
 
 
 The first column defines the parameter name, the second column is a type-hint and does not get evaluated.  Subsequent
@@ -285,6 +287,14 @@ Data Row Name and Description
 :Context Consumer Price Index File *(str)*:
     The relative or absolute path to the consumer price index file,
     loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
+
+:Context Safety Values File *(str)*:
+    The relative or absolute path to the safety values file,
+    loaded by ``effects.safety_values.SafetyValue``
+
+:Context Fatality Rates File *(str)*:
+    The relative or absolute path to the safety values file,
+    loaded by ``effects.fatality_rates.FatalityRates``
 
 ----
 
@@ -851,6 +861,8 @@ class OMEGABatchObject(OMEGABase):
         self.settings.emission_factors_vehicles_file = self.read_parameter('Context Vehicle Emission Factors File')
         self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
         self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
+        self.settings.safety_values_file = self.read_parameter('Context Safety Values File')
+        self.settings.fatality_rates_file = self.read_parameter('Context Fatality Rates File')
 
     def num_sessions(self):
         """
@@ -1007,6 +1019,8 @@ class OMEGASessionObject(OMEGABase):
         self.settings.emission_factors_vehicles_file = self.read_parameter('Context Vehicle Emission Factors File')
         self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
         self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
+        self.settings.safety_values_file = self.read_parameter('Context Safety Values File')
+        self.settings.fatality_rates_file = self.read_parameter('Context Fatality Rates File')
 
         # read policy settings
         self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')

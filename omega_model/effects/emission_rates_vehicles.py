@@ -13,35 +13,45 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,emission_factors_vehicles,input_template_version:,0.1
+       input_template_name:,emission_rates_vehicles,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        model_year,age,reg_class_id,in_use_fuel_id,voc_grams_per_mile,co_grams_per_mile,nox_grams_per_mile,pm25_grams_per_mile,sox_grams_per_gallon,benzene_grams_per_mile,butadiene13_grams_per_mile,formaldehyde_grams_per_mile,acetaldehyde_grams_per_mile,acrolein_grams_per_mile,co2_grams_per_mile,n2o_grams_per_mile,ch4_grams_per_mile
-        2020,0,car,pump gasoline,0.038838978,0.934237929,0.041727278,0.001925829,0.001648851,0.001641638,0.0003004,0.000441563,0.000767683,4.91E-05,,0.004052681,0.005520596
-        2020,0,truck,pump gasoline,0.035665375,1.068022441,0.054597497,0.002444363,0.002240974,0.001499163,0.000262733,0.000411881,0.000764069,4.45E-05,,0.005146965,0.007103921
+        start_year,sourcetype_name,reg_class_id,market_class_id,in_use_fuel_id,rate_name,independent_variable,equation
+        2017,passenger car,car,non_hauling.ICE,pump gasoline,pm25_exhaust_grams_per_mile,age,((0.00020321 * age) + 0.0017372)
+        2017,passenger car,car,non_hauling.ICE,pump gasoline,nmog_exhaust_grams_per_mile,age,((0.00039006 * age) + 0.05267)
 
 
 Data Column Name and Description
-    :model_year:
-        The model year of vehicles, e.g. 2020
+    :start_year:
+        The model year to which the rate applies; model years not shown will apply the start_year rate less than or equal
+        to the model year.
 
-    :age:
-        The age of vehicles
+    :sourcetype_name:
+        The MOVES sourcetype name (e.g., passenger car, passenger truck, light-commercial truck, etc.).
 
     :reg_class_id:
         Vehicle regulatory class at the time of certification, e.g. 'car','truck'.  Reg class definitions may differ
         across years within the simulation based on policy changes. ``reg_class_id`` can be considered a 'historical'
         or 'legacy' reg class.
 
+    :market_class_id:
+        The OMEGA market class (e.g., non-hauling.ICE, hauling.BEV, etc.).
+
     :in_use_fuel_id:
         In-use fuel id, for use with context fuel prices, must be consistent with the context data read by
         ``class context_fuel_prices.ContextFuelPrices``
 
-    :voc_grams_per_mile:
-        The vehicle emission factors follow the structure pollutant_units where units are grams per mile.
+    :rate_name:
+        The emission rate providing the pollutant and units.
+
+    :independent_variable:
+        The independent variable used in calculating the emission rate (e.g., age).
+
+    :equation:
+        The emission rate equation used to calculate an emission rate at the given age (or other independent variable).
 
 ----
 
@@ -74,7 +84,7 @@ class EmissionRatesVehicles(OMEGABase):
             rate_names: name of emission rate(s) to get
 
         Returns:
-            A list of emission rates
+            A list of emission rates for the given type of vehicle of the given model_year and age.
 
         """
         locals_dict = locals()

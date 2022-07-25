@@ -21,22 +21,28 @@ Sample Data Columns
 
         case,rate_name,independent_variable,initial_year,equation_rate_id,equation_kwh
         low_bound,pm25_grams_per_kwh,(calendar_year - 2020),2020,((-0.00024125 * (calendar_year - 2020)) + 0.024254),((8215370000.0 * (calendar_year - 2020)) + 1420520000.0)
+        low_bound,nox_grams_per_kwh,(calendar_year - 2020),2020,((-0.0027646 * (calendar_year - 2020)) + 0.28546),((8215370000.0 * (calendar_year - 2020)) + 1420520000.0)
 
 Data Column Name and Description
     :case:
         The Integrated Planning Model electricity demand case.
 
     :rate_name:
-        The pollutant emission rate.
+        The emission rate providing the pollutant and units.
 
     :independent_variable:
-        The
+        The independent variable used in calculating the emission rate.
 
     :initial_year:
+        The calendar year from which the rate regression curves were generated.
 
     :equation_rate_id:
+        The emission rate equation used to calculate an emission rate at the given independent variable.
 
     :equation_kwh:
+        The kilowatt-hour demand equation used to calculate kwh demand in the specified case; the demands calculated using
+        the kwh equations are used, along with the OMEGA kwh demand value to interpolate appropriate emission rates for
+        the given OMEGA session.
 
 
 ----
@@ -70,7 +76,7 @@ class EmissionRatesEGU(OMEGABase):
             rate_names (str, [strs]): name of emission rate(s) to get
 
         Returns:
-            A list of emission rates
+            A list of emission rates for the given kwh_demand in the given calendar_year.
 
         """
         locals_dict = locals()

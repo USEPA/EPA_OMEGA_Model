@@ -1247,12 +1247,12 @@ def init_omega(session_runtime_options):
     from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
     from effects.cost_factors_congestion_noise import CostFactorsCongestionNoise
     from effects.emission_rates_egu import EmissionRatesEGU
-    # from effects.emission_factors_powersector import EmissionFactorsPowersector
     from effects.emission_factors_refinery import EmissionFactorsRefinery
-    # from effects.emission_factors_vehicles import EmissionFactorsVehicles
     from effects.emission_rates_vehicles import EmissionRatesVehicles
     from effects.cpi_price_deflators import CPIPriceDeflators
     from effects.ip_deflators import ImplictPriceDeflators
+    from effects.safety_values import SafetyValues
+    from effects.fatality_rates import FatalityRates
 
     from consumer.sales_volume import init_sales_volume
 
@@ -1402,6 +1402,12 @@ def init_omega(session_runtime_options):
             init_fail += RefuelingCost.init_from_file(omega_globals.options.refueling_cost_inputs_file,
                                                       verbose=verbose_init)
 
+            init_fail += SafetyValues.init_from_file(omega_globals.options.safety_values_file,
+                                                     verbose=verbose_init)
+
+            init_fail += FatalityRates.init_from_file(omega_globals.options.fatality_rates_file,
+                                                      verbose=verbose_init)
+
         if omega_globals.options.calc_effects == 'Physical':
             init_fail += GeneralInputsForEffects.init_from_file(omega_globals.options.general_inputs_for_effects_file,
                                                                 verbose=verbose_init)
@@ -1420,6 +1426,12 @@ def init_omega(session_runtime_options):
 
             init_fail += EmissionRatesVehicles.init_from_file(omega_globals.options.emission_factors_vehicles_file,
                                                               verbose=verbose_init)
+
+            init_fail += SafetyValues.init_from_file(omega_globals.options.safety_values_file,
+                                                     verbose=verbose_init)
+
+            init_fail += FatalityRates.init_from_file(omega_globals.options.fatality_rates_file,
+                                                      verbose=verbose_init)
 
         if not init_fail:
             # initial year = initial fleet model year (latest year of data)

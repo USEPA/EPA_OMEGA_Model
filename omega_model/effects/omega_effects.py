@@ -36,6 +36,7 @@ Note:
 """
 
 from omega_model import *
+from omega_model.effects.safety_effects import calc_safety_effects
 from omega_model.effects.physical_effects import calc_physical_effects, calc_annual_physical_effects
 from omega_model.effects.cost_effects import calc_cost_effects
 from omega_model.effects.general_functions import save_dict_to_csv
@@ -53,7 +54,7 @@ def run_effects_calcs():
     """
     from producer.vehicle_annual_data import VehicleAnnualData
 
-    physical_effects_df = cost_effects_df = present_and_annualized_cost_df = pd.DataFrame()
+    safety_effects_df = physical_effects_df = cost_effects_df = present_and_annualized_cost_df = pd.DataFrame()
 
     calendar_years = pd.Series(VehicleAnnualData.get_calendar_years()).unique()
     # calendar_years = np.unique(np.array(VehicleAnnualData.get_calendar_years()))
@@ -79,19 +80,31 @@ def run_effects_calcs():
 
     if 'Physical' in omega_globals.options.calc_effects:
         omega_log.logwrite('\nCalculating physical effects')
-        physical_effects_dict = calc_physical_effects(calendar_years)
+
+        safety_effects_dict = calc_safety_effects(calendar_years)
+
+        safety_effects_filename = f'{omega_globals.options.output_folder}' + \
+                                  f'{omega_globals.options.session_unique_name}_safety_effects.csv'
+
+        physical_effects_dict = calc_physical_effects(calendar_years, safety_effects_dict)
 
         physical_effects_filename = f'{omega_globals.options.output_folder}' + \
                                     f'{omega_globals.options.session_unique_name}_physical_effects.csv'
 
         if omega_globals.options.multiprocessing:
             print('Starting multiprocess save_dict_to_csv...')
+            safety_effects_result = omega_globals.pool.apply_async(func=save_dict_to_csv,
+                                                                   args=[safety_effects_dict, safety_effects_filename,
+                                                                         False],
+                                                                   callback=None,
+                                                                   error_callback=None)
             physical_effects_result = omega_globals.pool.apply_async(func=save_dict_to_csv,
                                                                      args=[physical_effects_dict, physical_effects_filename,
                                                                            False],
                                                                      callback=None,
                                                                      error_callback=None)
         else:
+            safety_effects_df = save_dict_to_csv(safety_effects_dict, safety_effects_filename, index=False)
             physical_effects_df = save_dict_to_csv(physical_effects_dict, physical_effects_filename, index=False)
 
         if not omega_globals.options.multiprocessing:
@@ -136,18 +149,27 @@ def run_effects_calcs():
 
     if omega_globals.options.multiprocessing:
         if omega_globals.options.calc_effects == 'Physical and Costs':
-            while not all([tech_tracking_result.ready(), physical_effects_result.ready(), cost_effects_result.ready()]):
+            while not all([tech_tracking_result.ready(),
+                           safety_effects_result.ready(),
+                           physical_effects_result.ready(),
+                           cost_effects_result.ready()]):
                 pass
 
             tech_tracking_df = tech_tracking_result.get()
+            safety_effects_df = safety_effects_result.get()
             physical_effects_df = physical_effects_result.get()
             cost_effects_df = cost_effects_result.get()
+
         elif omega_globals.options.calc_effects == 'Physical':
-            while not all([tech_tracking_result.ready(), physical_effects_result.ready()]):
+            while not all([tech_tracking_result.ready(),
+                           safety_effects_result.ready(),
+                           physical_effects_result.ready()]):
                 pass
 
             tech_tracking_df = tech_tracking_result.get()
+            safety_effects_df = safety_effects_result.get()
             physical_effects_df = physical_effects_result.get()
+
         else:
             while not all([tech_tracking_result.ready()]):
                 pass
@@ -164,4 +186,4 @@ def run_effects_calcs():
 
     print('OMEGA Effects Complete')
 
-    return tech_tracking_df, physical_effects_df, cost_effects_df, present_and_annualized_cost_df
+    return tech_tracking_df, safety_effects_df, physical_effects_df, cost_effects_df, present_and_annualized_cost_df

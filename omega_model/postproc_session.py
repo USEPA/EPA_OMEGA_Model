@@ -44,7 +44,8 @@ def run_postproc(iteration_log, credit_banks):
     market_categories = omega_globals.options.MarketClass.market_categories
 
     # this runs tech_tracking always and physical/cost effects based on globals.options:
-    tech_tracking_df, physical_effects_df, cost_effects_df, present_and_annualized_cost_df = run_effects_calcs()
+    tech_tracking_df, safety_effects_df, physical_effects_df, cost_effects_df, present_and_annualized_cost_df \
+        = run_effects_calcs()
 
     if not omega_globals.options.standalone_run:
         omega_log.logwrite('%s: Post Processing ...' % omega_globals.options.session_name)
