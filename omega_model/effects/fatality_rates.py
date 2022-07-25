@@ -1,3 +1,48 @@
+"""
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represent fatality rates (fatalities per billion miles) for the fleet.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,fatality_rates,input_template_version:,0.1
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        model_year,calendar_year,age,average_fatality_rate,
+        1996,1996,0,8.487042,
+        1996,1997,1,8.364596,
+        1996,1998,2,8.342017,
+
+Data Column Name and Description
+    :model_year:
+        The model year of a given vehicle
+
+    :calendar_year:
+        The calendar year
+
+    :age:
+        The vehicle age
+
+    :average_fatality_rate:
+        The fatality rate in fatalities per billions miles travelled where "average" denotes the average effectiveness
+        of passenger safety technology on vehicles.
+
+----
+
+**CODE**
+
+"""
 from omega_model import *
 
 
