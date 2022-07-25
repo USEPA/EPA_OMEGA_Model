@@ -1173,7 +1173,12 @@ class OMEGASessionObject(OMEGABase):
         self.init()
 
         self.batch.batch_log.logwrite("Starting Compliance Run %s ..." % self.name)
-        result = run_omega(self.settings)
+
+        if self.num == 0 and self.settings.use_prerun_context_outputs:
+            result = None
+        else:
+            result = run_omega(self.settings)
+
         return result
 
 
@@ -1672,26 +1677,27 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                 apa_cost_effects_dfs = [] # this is short for annual_present_and_annualized_cost_effects
                 for idx, s_index in enumerate(session_list):
                     if not batch.sessions[s_index].result or options.dispy:
-                        batch.batch_log.logwrite("\nPost-Processing Session %d (%s):" % (s_index, batch.sessions[s_index].name))
-                        session_summary_filename = options.batch_path + '_' \
-                                                   + batch.sessions[s_index].settings.output_folder \
-                                                   + batch.sessions[s_index].settings.session_unique_name \
-                                                   + '_summary_results.csv'
-                        session_summary_dfs.append(pd.read_csv(session_summary_filename))
+                        if not (s_index == 0 and batch.sessions[s_index].settings.use_prerun_context_outputs):
+                            batch.batch_log.logwrite("\nPost-Processing Session %d (%s):" % (s_index, batch.sessions[s_index].name))
+                            session_summary_filename = options.batch_path + '_' \
+                                                       + batch.sessions[s_index].settings.output_folder \
+                                                       + batch.sessions[s_index].settings.session_unique_name \
+                                                       + '_summary_results.csv'
+                            session_summary_dfs.append(pd.read_csv(session_summary_filename))
 
-                        if 'Physical' in options.calc_effects:
-                            annual_physical_effects_filename = options.batch_path + '_' \
-                                                               + batch.sessions[s_index].settings.output_folder \
-                                                               + batch.sessions[s_index].settings.session_unique_name \
-                                                               + '_physical_effects_annual.csv'
-                            annual_physical_effects_dfs.append(pd.read_csv(annual_physical_effects_filename))
+                            if 'Physical' in options.calc_effects:
+                                annual_physical_effects_filename = options.batch_path + '_' \
+                                                                   + batch.sessions[s_index].settings.output_folder \
+                                                                   + batch.sessions[s_index].settings.session_unique_name \
+                                                                   + '_physical_effects_annual.csv'
+                                annual_physical_effects_dfs.append(pd.read_csv(annual_physical_effects_filename))
 
-                        if 'Costs' in options.calc_effects:
-                            apa_cost_effects_filename = options.batch_path + '_' \
-                                                        + batch.sessions[s_index].settings.output_folder \
-                                                        + batch.sessions[s_index].settings.session_unique_name \
-                                                        + '_cost_effects_annual_present_and_annualized.csv'
-                            apa_cost_effects_dfs.append(pd.read_csv(apa_cost_effects_filename))
+                            if 'Costs' in options.calc_effects:
+                                apa_cost_effects_filename = options.batch_path + '_' \
+                                                            + batch.sessions[s_index].settings.output_folder \
+                                                            + batch.sessions[s_index].settings.session_unique_name \
+                                                            + '_cost_effects_annual_present_and_annualized.csv'
+                                apa_cost_effects_dfs.append(pd.read_csv(apa_cost_effects_filename))
 
                 batch_summary_df = pd.concat(session_summary_dfs, ignore_index=True, sort=False)
                 batch_summary_filename = batch.name + '_summary_results.csv'

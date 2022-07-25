@@ -89,6 +89,7 @@ try:
             self.output_folder = 'out' + os.sep
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
             self.omega_model_path = path
+            self.use_prerun_context_outputs = False
             self.consolidate_manufacturers = True
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
             self.market_classes_file = path + 'test_inputs/market_classes.csv'
