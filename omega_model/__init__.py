@@ -92,7 +92,7 @@ try:
             self.consolidate_manufacturers = True
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
             self.market_classes_file = path + 'test_inputs/market_classes.csv'
-            self.vehicles_file = path + 'test_inputs/vehicles_ford.csv'
+            self.vehicles_file = path + 'test_inputs/vehicles.csv'
             self.vehicles_df = pd.DataFrame()
             self.onroad_vehicle_calculations_file = path + 'test_inputs/onroad_vehicle_calculations.csv'
             self.sales_share_file = path + 'test_inputs/sales_share_params.csv'
