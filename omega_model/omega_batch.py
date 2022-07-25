@@ -1134,6 +1134,13 @@ class OMEGASessionObject(OMEGABase):
             self.read_parameter('Verbose Output', self.settings.verbose),
             true_false_dict)
 
+        # read arbitrary backdoor setttings...
+        backdoor_settings = [i.replace('settings.', '') for i in self.batch.dataframe.index
+                             if type(i) == str and 'settings.' in i]
+
+        for bo in backdoor_settings:
+            self.settings.__setattr__(bo, self.read_parameter('settings.%s' % bo))
+
     def init(self, verbose=False):
         """
         Get user and developer settings for the session
@@ -1588,7 +1595,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                         #                                          session.num]))
                         #     batch.dataframe.loc[i][session.num] = \
                         #         session.name + os.sep + batch.dataframe.loc[i][session.num]
-                        if str(i).endswith(' File'):
+                        if str(i).endswith(' File') or (str(i).startswith('settings.') and str(i).endswith('_file')):
                             source_file_path = batch.dataframe.loc[i][session.num]
 
                             if s > 0 and type(source_file_path) is float:
