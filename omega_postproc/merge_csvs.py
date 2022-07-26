@@ -3,9 +3,11 @@ import glob
 import os
 
 maindir = 'C:/Users/KBolon/Documents/OMEGA_runs/2022July/'
-runname = '2022_07_10_22_19_33_testcycles_20220710c'
-sessionnames = ['_Flatter-5545', '_Flatter-plus40pct-ftpus06'] # , '_NTR+OCC', '_Negative', '_Flat', , '_NTR+OCC', '_Steep', , 'SAFE', '_Steep']
+runname = '2022_07_21_manual_merge_bevactng_x_cycles_20220713f'
+sessionnames = ['_0gpm_5545_C79T103', '_0gpm_ftpus06_C116T152', '_non0gpm_5545_C162T212', '_non0gpm_ftpus06_C237T309'] # , '_NTR+OCC', '_Negative', '_Flat', , '_NTR+OCC', '_Steep', , 'SAFE', '_Steep']
 model_year = 2030
+
+#drop_columns_pre_run = []
 
 drop_columns_pre_run = ['cd_ftp_1:cert_direct_oncycle_kwh_per_mile', 'cd_ftp_2:cert_direct_oncycle_kwh_per_mile',
     'cd_ftp_3:cert_direct_oncycle_kwh_per_mile', 'cd_ftp_4:cert_direct_oncycle_kwh_per_mile',
@@ -25,7 +27,8 @@ keep_fields_small_output_version = ['cost_curve_class', 'etw_lbs', 'onroad_direc
     'new_vehicle_mfr_generalized_cost_dollars', 'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile',
     'target_co2e_Mg_per_vehicle', 'base_year_vehicle_id', 'run_name', 'session_name', 'rlhp20_level', 'rlhp60_level',
     'footprint_level', 'credits_co2e_Mg_per_vehicle_per_new_vehicle_mfr_generalized_cost_dollars', 'unibody',
-    'context_size_class', 'body_style', 'base_year_reg_class', 'drive_system', 'apportioned_initial_registered_count']
+    'context_size_class', 'body_style', 'base_year_reg_class', 'drive_system', 'apportioned_initial_registered_count',
+    'powertrain_type', 'battery_kwh', 'battery_mass_lbs']
 
 keep_fields_very_small_output_version = ['cost_curve_class', 'credits_co2e_Mg_per_vehicle', 'footprint_ft2',
     'new_vehicle_mfr_cost_dollars', 'new_vehicle_mfr_generalized_cost_dollars', 'base_year_vehicle_id', 'run_name',
@@ -172,6 +175,6 @@ df_all[['context_size_class', 'body_style', 'base_year_electrification_class', '
 df_all = df_all.drop(columns=['vehicle_name'])
 df_all = df_all.drop(columns=drop_columns_post_run) # reduce output file size, drop intermediate calculation fields
 
-#df_all.to_csv(os.path.join(maindir, runname, 'combined_cost_cloud.csv'))
-df_all[keep_fields_small_output_version].to_csv(os.path.join(maindir, runname, 'combined_cost_cloud_small.csv'))
+df_all.to_csv(os.path.join(maindir, runname, 'combined_cost_cloud.csv'))
+#df_all[keep_fields_small_output_version].to_csv(os.path.join(maindir, runname, 'combined_cost_cloud_small.csv'))
 #df_all[keep_fields_very_small_output_version].to_csv(os.path.join(maindir, runname, 'combined_cost_cloud_very_small.csv'))
