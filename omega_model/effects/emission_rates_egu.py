@@ -63,6 +63,7 @@ class EmissionRatesEGU(OMEGABase):
     _data = dict()  # private dict, emissions factors power sector by calendar year
     _cases = None
     _cache = dict()
+    calendar_year_max = 2050
 
     @staticmethod
     def get_emission_rate(calendar_year, kwh_demand, rate_names):
@@ -80,49 +81,22 @@ class EmissionRatesEGU(OMEGABase):
 
         """
         locals_dict = locals()
-        kwh_dict = dict()
         return_rates = list()
 
-        case_low = case_high = None
         kwh_low = kwh_high = 0
 
-        if calendar_year in EmissionRatesEGU._cache:
-            case_low = EmissionRatesEGU._cache[calendar_year]['case_low']
-            case_high = EmissionRatesEGU._cache[calendar_year]['case_high']
-            kwh_low = EmissionRatesEGU._cache[calendar_year]['kwh_low']
-            kwh_high = EmissionRatesEGU._cache[calendar_year]['kwh_high']
-        else:
-            for idx, case in enumerate(EmissionRatesEGU._cases):
-                # note that rate_name is not important here since there's only one kwh equation per case
-                kwh_dict[idx] = eval(EmissionRatesEGU._data[case, rate_names[0]]['equation_kwh'], {}, locals_dict)
-            if len(kwh_dict) == 1:
-                kwh_low = kwh_dict[0]
-                case_low = EmissionRatesEGU._cases[0]
-                kwh_high = case_high = 0
-            else:
-                kwh_list = [kwh_demand]
-                for k, kwh in kwh_dict.items():
-                    kwh_list.append(kwh)
-                kwh_list.sort()
-                idx_demand = kwh_list.index(kwh_demand)
-                kwh_low = kwh_list[idx_demand - 1]
-                kwh_high = kwh_list[idx_demand + 1]
-                for k, v in kwh_dict.items():
-                    if v == kwh_low:
-                        case_low = EmissionRatesEGU._cases[k]
-                    elif v == kwh_high:
-                        case_high = EmissionRatesEGU._cases[k]
-                    else:
-                        pass
+        if calendar_year > EmissionRatesEGU.calendar_year_max:
+            calendar_year = EmissionRatesEGU.calendar_year_max
 
-                EmissionRatesEGU._cache[calendar_year] = {'case_low': case_low,
-                                                          'case_high': case_high,
-                                                          'kwh_low': kwh_low,
-                                                          'kwh_high': kwh_high,
-                                                          }
+        kwh_low = eval(EmissionRatesEGU._data['low_bound', rate_names[0]]['equation_kwh'], {}, locals_dict)
+        kwh_high = eval(EmissionRatesEGU._data['high_bev', rate_names[0]]['equation_kwh'], {}, locals_dict)
+
+        if kwh_high < kwh_demand:
+            kwh_high = kwh_demand
+
         for rate_name in rate_names:
-            rate_low = eval(EmissionRatesEGU._data[case_low, rate_name]['equation_rate_id'], {}, locals_dict)
-            rate_high = eval(EmissionRatesEGU._data[case_high, rate_name]['equation_rate_id'], {}, locals_dict)
+            rate_low = eval(EmissionRatesEGU._data['low_bound', rate_name]['equation_rate_id'], {}, locals_dict)
+            rate_high = eval(EmissionRatesEGU._data['high_bev', rate_name]['equation_rate_id'], {}, locals_dict)
 
             # interpolate the rate for kwh_demand
             rate = rate_low - (kwh_low - kwh_demand) * (rate_low - rate_high) / (kwh_low - kwh_high)
