@@ -13,15 +13,15 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,emission_rates_egu,input_template_version:,0.1
+       input_template_name:,emission_rates_egu,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        case,rate_name,independent_variable,initial_year,equation_rate_id,equation_kwh
-        low_bound,pm25_grams_per_kwh,(calendar_year - 2020),2020,((-0.00024125 * (calendar_year - 2020)) + 0.024254),((8215370000.0 * (calendar_year - 2020)) + 1420520000.0)
-        low_bound,nox_grams_per_kwh,(calendar_year - 2020),2020,((-0.0027646 * (calendar_year - 2020)) + 0.28546),((8215370000.0 * (calendar_year - 2020)) + 1420520000.0)
+        case,rate_name,independent_variable,initial_year,last_year,equation_rate_id,kwh_demand_metric,equation_kwh
+        low_bound,pm25_grams_per_kwh,(calendar_year - 2020),2020,2050,((-0.00024125 * (calendar_year - 2020)) + 0.024254),kWh_consumption,((8086100000.0 * (calendar_year - 2020)) + 4221420000.0)
+        high_bev,pm25_grams_per_kwh,(calendar_year - 2020),2020,2050,((-0.00050552 * (calendar_year - 2020)) + 0.02351),kWh_consumption,((30020900000.0 * (calendar_year - 2020)) + 0)
 
 Data Column Name and Description
     :case:
@@ -34,10 +34,16 @@ Data Column Name and Description
         The independent variable used in calculating the emission rate.
 
     :initial_year:
-        The calendar year from which the rate regression curves were generated.
+        The initial calendar year from which the rate regression curves were generated.
+
+    :last_year:
+        The last calendar year from which the rate regression curves were generated.
 
     :equation_rate_id:
         The emission rate equation used to calculate an emission rate at the given independent variable.
+
+    :kwh_demand_metric:
+        The kwh demand metric used in generating regressions (e.g., consumption or generation).
 
     :equation_kwh:
         The kilowatt-hour demand equation used to calculate kwh demand in the specified case; the demands calculated using
@@ -63,7 +69,8 @@ class EmissionRatesEGU(OMEGABase):
     _data = dict()  # private dict, emissions factors power sector by calendar year
     _cases = None
     _cache = dict()
-    calendar_year_max = 2050
+    calendar_year_max = None
+    kwh_demand_metric = None
 
     @staticmethod
     def get_emission_rate(calendar_year, kwh_demand, rate_names):
@@ -88,20 +95,26 @@ class EmissionRatesEGU(OMEGABase):
         if calendar_year > EmissionRatesEGU.calendar_year_max:
             calendar_year = EmissionRatesEGU.calendar_year_max
 
-        kwh_low = eval(EmissionRatesEGU._data['low_bound', rate_names[0]]['equation_kwh'], {}, locals_dict)
-        kwh_high = eval(EmissionRatesEGU._data['high_bev', rate_names[0]]['equation_kwh'], {}, locals_dict)
+        if calendar_year in EmissionRatesEGU._cache:
+            return_rates = EmissionRatesEGU._cache[calendar_year]
 
-        if kwh_high < kwh_demand:
-            kwh_high = kwh_demand
+        else:
+            kwh_low = eval(EmissionRatesEGU._data['low_bound', rate_names[0]]['equation_kwh'], {}, locals_dict)
+            kwh_high = eval(EmissionRatesEGU._data['high_bev', rate_names[0]]['equation_kwh'], {}, locals_dict)
 
-        for rate_name in rate_names:
-            rate_low = eval(EmissionRatesEGU._data['low_bound', rate_name]['equation_rate_id'], {}, locals_dict)
-            rate_high = eval(EmissionRatesEGU._data['high_bev', rate_name]['equation_rate_id'], {}, locals_dict)
+            if kwh_high < kwh_demand:
+                kwh_high = kwh_demand
 
-            # interpolate the rate for kwh_demand
-            rate = rate_low - (kwh_low - kwh_demand) * (rate_low - rate_high) / (kwh_low - kwh_high)
+            for rate_name in rate_names:
+                rate_low = eval(EmissionRatesEGU._data['low_bound', rate_name]['equation_rate_id'], {}, locals_dict)
+                rate_high = eval(EmissionRatesEGU._data['high_bev', rate_name]['equation_rate_id'], {}, locals_dict)
 
-            return_rates.append(rate)
+                # interpolate the rate for kwh_demand
+                rate = rate_low - (kwh_low - kwh_demand) * (rate_low - rate_high) / (kwh_low - kwh_high)
+
+                return_rates.append(rate)
+
+            EmissionRatesEGU._cache[calendar_year] = return_rates
 
         return return_rates
 
@@ -120,15 +133,19 @@ class EmissionRatesEGU(OMEGABase):
 
         """
         EmissionRatesEGU._data.clear()
+        EmissionRatesEGU._cache.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
         input_template_name = 'emission_rates_egu'
-        input_template_version = 0.1
+        input_template_version = 0.2
         input_template_columns = {
             'case',
             'rate_name',
+            'independent_variable',
+            'last_year',
+            'kwh_demand_metric',
             'equation_rate_id',
             'equation_kwh'
         }
@@ -151,6 +168,8 @@ class EmissionRatesEGU(OMEGABase):
                 df.set_index(rate_keys, inplace=True)
 
                 EmissionRatesEGU._cases = df['case'].unique()
+                EmissionRatesEGU.kwh_demand_metric = df['kwh_demand_metric'][0]
+                EmissionRatesEGU.calendar_year_max = df['last_year'][0]
 
                 EmissionRatesEGU._data = df.to_dict('index')
                 # EmissionRatesEGU._data = df.set_index('calendar_year').to_dict(orient='index')
