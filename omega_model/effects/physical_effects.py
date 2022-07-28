@@ -40,7 +40,7 @@ def get_vehicle_emission_rate(model_year, sourcetype_name, reg_class_id, fuel, i
     return rates
 
 
-def get_egu_emission_rate(calendar_year, kwh_demand):
+def get_egu_emission_rate(calendar_year, kwh_consumption, kwh_generation):
     """
 
     Args:
@@ -51,6 +51,10 @@ def get_egu_emission_rate(calendar_year, kwh_demand):
 
     """
     from effects.emission_rates_egu import EmissionRatesEGU
+
+    kwh_demand = kwh_consumption
+    if EmissionRatesEGU.kwh_demand_metric == 'kWh_generation':
+        kwh_demand = kwh_generation
 
     rate_names = ('co_grams_per_kwh',
                   'nox_grams_per_kwh',
@@ -254,18 +258,13 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
 
                     vmt_electricity = vad['vmt'] * fuel_share
                     fuel_consumption_kWh_annual += vmt_electricity * onroad_direct_kwh_per_mile
-                    fuel_generation_kWh_annual += fuel_consumption_kWh_annual / transmission_efficiency
+                    fuel_generation_kWh_annual = fuel_consumption_kWh_annual / transmission_efficiency
 
         # upstream EGU emission factors for electric fuel operation
         co_egu, nox_egu, pm25_egu, sox_egu, co2_egu, ch4_egu, n2o_egu \
-            = get_egu_emission_rate(calendar_year, fuel_generation_kWh_annual)
+            = get_egu_emission_rate(calendar_year, fuel_consumption_kWh_annual, fuel_generation_kWh_annual)
 
         for vad in vads:
-
-            # need vehicle info once for each vehicle, not every calendar year for each vehicle
-            # if vad['vehicle_id'] not in vehicle_info_dict:
-            #     vehicle_info_dict[vad['vehicle_id']] \
-            #         = VehicleFinal.get_vehicle_attributes(vad['vehicle_id'], vehicle_attribute_list)
 
             mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, \
             base_year_powertrain_type, target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, \
@@ -321,7 +320,7 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                         electric_fuel = fuel
                         vmt_electricity = vad['vmt'] * fuel_share
                         fuel_consumption_kWh += vmt_electricity * onroad_direct_kwh_per_mile
-                        fuel_generation_kWh += fuel_consumption_kWh / transmission_efficiency
+                        fuel_generation_kWh = fuel_consumption_kWh / transmission_efficiency
 
                         # vehicle emission rates; PHEVs use the ICE vehicle rates
                         if fueling_class == 'BEV':
