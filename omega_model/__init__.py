@@ -197,7 +197,7 @@ try:
 
             # list of modules to allow verbose log files, or empty to disable:
             self.verbose_log_modules = ['database_', 'producer_compliance_search_', 'cross_subsidy_search_',
-                                        'cv_cost_curves_', 'v_cost_curves_', 'v_cost_clouds_', 'v_cloud_plots_']
+                                        'cv_cost_curves_', 'v_cost_curves_', 'v_cost_clouds', 'v_cloud_plots_']
 
             # list of modules to allow verbose console output, or empty to disable
             self.verbose_console_modules = ['producer_compliance_search_',
@@ -205,7 +205,7 @@ try:
                                             'cross_subsidy_search_', 'cross_subsidy_multipliers_',
                                             'cross_subsidy_convergence_']
 
-            self.log_vehicle_cloud_years = []  # = 'all' or list of years to log, empty list to disable logging
+            self.log_vehicle_cloud_years = [2030]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_compliance_search_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging
