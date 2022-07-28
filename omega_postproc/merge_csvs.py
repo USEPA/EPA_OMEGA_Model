@@ -3,8 +3,8 @@ import glob
 import os
 
 maindir = 'C:/Users/KBolon/Documents/OMEGA_runs/2022July/'
-runname = '2022_07_21_manual_merge_bevactng_x_cycles_20220713f'
-sessionnames = ['_0gpm_5545_C79T103', '_0gpm_ftpus06_C116T152', '_non0gpm_5545_C162T212', '_non0gpm_ftpus06_C237T309'] # , '_NTR+OCC', '_Negative', '_Flat', , '_NTR+OCC', '_Steep', , 'SAFE', '_Steep']
+runname = '2022_07_27_23_34_38_CT_sweep_20offst_20220727a'
+sessionnames = ['_CT20offst_b50_163_m1p68', '_CT20offst_b50_140_m1p44', '_CT20offst_b50_116_m1p2', '_CT20offst_b50_93_m0p96', '_CT20offst_b50_70_m0p72', '_CT20offst_b50_47_m0p48'] # , '_NTR+OCC', '_Negative', '_Flat', , '_NTR+OCC', '_Steep', , 'SAFE', '_Steep']
 model_year = 2030
 
 #drop_columns_pre_run = []
