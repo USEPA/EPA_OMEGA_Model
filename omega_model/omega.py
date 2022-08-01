@@ -63,10 +63,35 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
         if verbose:
             print('responsive: %s' % cross_subsidy_pair)
 
-        # search cross subsidy options at this level of the tree
-        cross_subsidy_options_and_response, iteration_log = \
-            search_cross_subsidies(calendar_year, compliance_id, node_name, cross_subsidy_pair, producer_decision,
-                                   cross_subsidy_options_and_response, producer_consumer_iteration_num, iteration_log)
+        if omega_globals.options.producer_shares_mode:
+            # consumer shares from producer desired shares, no cross-subsidy search and convergence
+            for c in cross_subsidy_pair:
+                # grab producer decision, all fields:
+                cross_subsidy_options_and_response = producer_decision
+
+                # assign consumer shares:
+                cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % c] = \
+                    producer_decision['producer_abs_share_frac_%s' % c]
+
+                # for iteration_log:
+                cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % c] = \
+                    producer_decision['average_new_vehicle_mfr_cost_%s' % c]
+
+                cross_subsidy_options_and_response['average_modified_cross_subsidized_price_%s' % c] = \
+                    producer_decision['average_new_vehicle_mfr_cost_%s' % c]
+
+                cross_subsidy_options_and_response['pricing_score'] = 0
+
+                # for postproc plots:
+                cross_subsidy_options_and_response['consumer_generalized_cost_dollars_%s' % c] = 0
+
+                cross_subsidy_options_and_response['cost_multiplier_%s' % c] = 1
+
+        else:
+            # search cross subsidy options at this level of the tree
+            cross_subsidy_options_and_response, iteration_log = \
+                search_cross_subsidies(calendar_year, compliance_id, node_name, cross_subsidy_pair, producer_decision,
+                                       cross_subsidy_options_and_response, producer_consumer_iteration_num, iteration_log)
 
     else:
         if verbose:

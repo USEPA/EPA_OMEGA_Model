@@ -119,7 +119,6 @@ try:
             self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_bev.csv'
             self.phev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_phev.csv'
 
-            # TODO: add these to the batch process
             self.powertrain_cost_input_file = path + 'test_inputs/powertrain_cost.csv'
             self.glider_cost_input_file = path + 'test_inputs/glider_cost.csv'
             self.body_styles_file = path + 'test_inputs/body_styles.csv'
@@ -177,6 +176,7 @@ try:
             self.end_time = 0
 
             # developer settings
+            self.producer_shares_mode = False
             self.producer_num_market_share_options = 3
             self.producer_num_tech_options_per_ice_vehicle = 3
             self.producer_num_tech_options_per_bev_vehicle = 1
