@@ -1136,7 +1136,7 @@ class OMEGASessionObject(OMEGABase):
 
         # read arbitrary backdoor setttings...
         backdoor_settings = [i.replace('settings.', '') for i in self.batch.dataframe.index
-                             if type(i) == str and 'settings.' in i]
+                             if type(i) == str and i.startswith('settings.')]
 
         for bo in backdoor_settings:
             self.settings.__setattr__(bo, self.read_parameter('settings.%s' % bo))
