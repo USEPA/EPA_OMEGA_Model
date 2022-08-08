@@ -65,7 +65,8 @@ def run_postproc(iteration_log, credit_banks):
                                                VehicleFinal.lifetime_VMT, VehicleFinal.compliance_id).all()
 
     # index vehicle annual data by vehicle id and age for quick access
-    vehicle_annual_data_df = pd.DataFrame(VehicleAnnualData._data).set_index(['vehicle_id', 'age'])
+    vehicle_annual_data_df = pd.DataFrame(VehicleAnnualData._data).set_index(['compliance_id', 'vehicle_id', 'age'])
+    vehicle_annual_data_df = vehicle_annual_data_df.drop_duplicates()  # TODO: figure out why, when non-consolidated...
     vehicle_annual_data = vehicle_annual_data_df.to_dict(orient='index')
 
     analysis_years = vehicle_years[1:]
@@ -997,7 +998,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
 
             market_category_abs_share_frac.append(float(count) / total_sales[idx])
 
-        market_share_results['abs_share_frac_%s' % mcat] = market_category_abs_share_frac
+        market_share_results['abs_share_frac_%s_%s' % (compliance_id, mcat)] = market_category_abs_share_frac
 
     # tally up market class sales
     for mc in market_classes:
@@ -1010,7 +1011,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
                 count += vehicle_annual_data[vehicle_id, 0]['registered_count']
 
             market_category_abs_share_frac.append(float(count) / total_sales[idx])
-        market_share_results['abs_share_frac_%s' % (compliance_id, mc)] = market_category_abs_share_frac
+        market_share_results['abs_share_frac_%s_%s' % (compliance_id, mc)] = market_category_abs_share_frac
 
     # tally up context size class sales
     for csc in NewVehicleMarket.base_year_context_size_class_sales:
@@ -1024,7 +1025,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
                 count += vehicle_annual_data[vehicle_id, 0]['registered_count']
 
             market_category_abs_share_frac.append(float(count) / total_sales[idx])
-        market_share_results['abs_share_frac_%s' % (compliance_id, csc)] = market_category_abs_share_frac
+        market_share_results['abs_share_frac_%s_%s' % (compliance_id, csc)] = market_category_abs_share_frac
 
     # tally up reg class sales
     for rc in omega_globals.options.RegulatoryClasses.reg_classes:
@@ -1038,12 +1039,12 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
                 count += vehicle_annual_data[vehicle_id, 0]['registered_count']
 
             market_category_abs_share_frac.append(float(count) / total_sales[idx])
-        market_share_results['abs_share_frac_%s' % (compliance_id, rc)] = market_category_abs_share_frac
+        market_share_results['abs_share_frac_%s_%s' % (compliance_id, rc)] = market_category_abs_share_frac
 
     # plot market category results
     fig, ax1 = figure()
     for mcat in market_categories:
-        ax1.plot(calendar_years, market_share_results['%s_abs_share_frac_%s' % (compliance_id, mcat)], '.--')
+        ax1.plot(calendar_years, market_share_results['abs_share_frac_%s_%s' % (compliance_id, mcat)], '.--')
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s %s\nMarket Category Absolute Market Shares'
               % (compliance_id, omega_globals.options.session_unique_name))
@@ -1054,7 +1055,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
     # plot market class results
     fig, ax1 = figure()
     for mc in market_classes:
-        ax1.plot(calendar_years, market_share_results['%s_abs_share_frac_%s' % (compliance_id, mc)], '.--')
+        ax1.plot(calendar_years, market_share_results['abs_share_frac_%s_%s' % (compliance_id, mc)], '.--')
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s %s\nMarket Class Absolute Market Shares'
               % (compliance_id, omega_globals.options.session_unique_name))
@@ -1065,7 +1066,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
     # plot context size class results
     fig, ax1 = figure()
     for csc in NewVehicleMarket.base_year_context_size_class_sales:
-        ax1.plot(calendar_years, market_share_results['%s_abs_share_frac_%s' % (compliance_id, csc)], '.--')
+        ax1.plot(calendar_years, market_share_results['abs_share_frac_%s_%s' % (compliance_id, csc)], '.--')
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s %s\nContext Size Class Absolute Market Shares'
               % (compliance_id, omega_globals.options.session_unique_name))
@@ -1076,7 +1077,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
     # plot reg class results
     fig, ax1 = figure()
     for rc in omega_globals.options.RegulatoryClasses.reg_classes:
-        ax1.plot(calendar_years, market_share_results['%s_abs_share_frac_%s' % (compliance_id, rc)], '.--')
+        ax1.plot(calendar_years, market_share_results['abs_share_frac_%s_%s' % (compliance_id, rc)], '.--')
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s %s\nReg Class Absolute Market Shares'
               % (compliance_id, omega_globals.options.session_unique_name))
@@ -1103,9 +1104,10 @@ def plot_total_sales(calendar_years, compliance_ids):
     total_sales = []
     for cy in calendar_years:
         count = 0
-        vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy]
-        for vehicle_id in vehicle_ids:
-            count += vehicle_annual_data[vehicle_id, 0]['registered_count']
+        vad_ids = [(v.compliance_id, v.vehicle_id, 0) for v in vehicle_data if v.model_year == cy]
+        for vad_id in vad_ids:
+            print(vad_id)
+            count += vehicle_annual_data[vad_id]['registered_count']
         total_sales.append(count)
 
     total_sales = np.array(total_sales)
@@ -1115,9 +1117,9 @@ def plot_total_sales(calendar_years, compliance_ids):
         manufacturer_sales[compliance_id] = []
         for cy in calendar_years:
             count = 0
-            vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy and v.compliance_id == compliance_id]
-            for vehicle_id in vehicle_ids:
-                count += vehicle_annual_data[vehicle_id, 0]['registered_count']
+            vad_ids = [(v.compliance_id, v.vehicle_id, 0) for v in vehicle_data if v.model_year == cy and v.compliance_id == compliance_id]
+            for vad_id in vad_ids:
+                count += vehicle_annual_data[vad_id]['registered_count']
             manufacturer_sales[compliance_id].append(count)
 
     context_sales = np.array(

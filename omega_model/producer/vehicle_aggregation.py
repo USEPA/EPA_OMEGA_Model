@@ -220,6 +220,8 @@ from omega_model import *
 aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
                        'cert_fuel_id', 'reg_class_id', 'drive_system']  #, 'manufacturer_id']
 
+aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
+                       'cert_fuel_id', 'reg_class_id', 'drive_system', 'manufacturer_id']
 
 class VehicleAggregation(OMEGABase):
     """
@@ -412,7 +414,12 @@ class VehicleAggregation(OMEGABase):
             # calculate weighted numeric values within the groups, and combined string values
             agg_df = df.groupby(aggregation_columns, as_index=False).apply(sales_weight_average_dataframe)
             agg_df['vehicle_name'] = agg_df[aggregation_columns].apply(lambda x: ':'.join(x.values.astype(str)), axis=1)
-            agg_df['compliance_id'] = 'consolidated_OEM'
+
+            if omega_globals.options.consolidate_manufacturers:
+                agg_df['compliance_id'] = 'consolidated_OEM'
+            else:
+                agg_df['compliance_id'] = agg_df['manufacturer_id']
+
             agg_df['model_year'] = df['model_year'].iloc[0]
 
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')

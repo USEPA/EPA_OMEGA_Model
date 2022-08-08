@@ -906,10 +906,12 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
             for v in market_class_vehicles:
                 producer_decision['sales_%s' % mc] += producer_decision['veh_%s_sales' % v.vehicle_id]
         else:
+            producer_decision['producer_abs_share_frac_%s' % mc] = 0
             producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc] = 0
             producer_decision['average_onroad_direct_kwh_pmi_%s' % mc] = 0
             producer_decision['average_new_vehicle_mfr_cost_%s' % mc] = 0
             producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] = 0
+            producer_decision['average_retail_fuel_price_dollars_per_unit_%s' % mc] = 0
             producer_decision['average_curbweight_lbs_%s' % mc] = 0
             producer_decision['average_rated_hp_%s' % mc] = 0
             producer_decision['average_footprint_ft2_%s' % mc] = 0
@@ -930,7 +932,6 @@ def calc_market_category_data(producer_decision):
         Nothing, updates ``producer_decsion`` with calculated market data
 
     """
-
 
     for mcat in omega_globals.options.MarketClass.market_categories:
         producer_decision['average_onroad_direct_co2e_gpmi_%s' % mcat] = 0
