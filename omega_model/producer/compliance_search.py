@@ -220,31 +220,35 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
         else:
             share_column_names = [producer_prefix + c for c in children]
 
-        if all(s in omega_globals.options.MarketClass.responsive_market_categories for s in children):
+        responsive_children = [s in omega_globals.options.MarketClass.responsive_market_categories for s in children if market_class_dict[s]]
 
-            min_constraints = dict()
-            max_constraints = dict()
-            for c in share_column_names:
-                production_min = ProductionConstraints.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
-                production_max = ProductionConstraints.get_maximum_share(calendar_year, c.replace(producer_prefix, ''))
-                required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
+        if all(responsive_children):
+            if responsive_children:
+                min_constraints = dict()
+                max_constraints = dict()
+                for c in share_column_names:
+                    production_min = ProductionConstraints.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
+                    production_max = ProductionConstraints.get_maximum_share(calendar_year, c.replace(producer_prefix, ''))
+                    required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
 
-                max_constraints[c] = production_max
-                min_constraints[c] = min(production_max, max(required_zev_share, production_min))
+                    max_constraints[c] = production_max
+                    min_constraints[c] = min(production_max, max(required_zev_share, production_min))
 
-            if share_range == 1.0:
-                # span the whole space of shares
-                sales_share_df = partition(share_column_names,
-                                           num_levels=omega_globals.options.producer_num_market_share_options,
-                                           min_constraints=min_constraints, max_constraints=max_constraints)
+                if share_range == 1.0:
+                    # span the whole space of shares
+                    sales_share_df = partition(share_column_names,
+                                               num_levels=omega_globals.options.producer_num_market_share_options,
+                                               min_constraints=min_constraints, max_constraints=max_constraints)
+                else:
+                    # narrow search span to a range of shares around the winners
+                    sales_share_df = \
+                        generate_constrained_nearby_shares(share_column_names, candidate_production_decisions,
+                                                           share_range,
+                                                           omega_globals.options.producer_num_market_share_options,
+                                                           min_constraints=min_constraints,
+                                                           max_constraints=max_constraints)
             else:
-                # narrow search span to a range of shares around the winners
-                sales_share_df = \
-                    generate_constrained_nearby_shares(share_column_names, candidate_production_decisions,
-                                                       share_range,
-                                                       omega_globals.options.producer_num_market_share_options,
-                                                       min_constraints=min_constraints,
-                                                       max_constraints=max_constraints)
+                sales_share_df = pd.DataFrame()
         else:
             sales_share_dict = pd.DataFrame()
             for c, cn in zip(children, share_column_names):
@@ -274,7 +278,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
         print('combining ' + str(children))
     share_combos_df = pd.DataFrame()
     for df in child_df_list:
-        share_combos_df = cartesian_prod(share_combos_df, df)
+        if not df.empty:
+            share_combos_df = cartesian_prod(share_combos_df, df)
 
     # print('generate share options time = %f' % (time.time() - start_time))
 
@@ -740,8 +745,11 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
 
             market_class_sales = total_sales
 
-            for c in chain:
-                market_class_sales = market_class_sales * production_options[c].values
+            try:
+                for c in chain:
+                    market_class_sales = market_class_sales * production_options[c].values
+            except:
+                print('wtf?')
 
             if ('producer_abs_share_frac_%s' % market_class) not in production_options:
                 production_options['producer_abs_share_frac_%s' % market_class] = market_class_sales / total_sales

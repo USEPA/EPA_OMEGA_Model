@@ -223,6 +223,7 @@ aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain
 aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
                        'cert_fuel_id', 'reg_class_id', 'drive_system', 'manufacturer_id']
 
+
 class VehicleAggregation(OMEGABase):
     """
     **Implements aggregation of detailed vehicle data into compliance vehicles.**

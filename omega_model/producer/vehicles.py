@@ -1471,6 +1471,7 @@ class VehicleFinal(SQABase, Vehicle):
 
             # assign user-definable market class
             veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
+            veh.manufacturer.update_market_class_data(veh.manufacturer_id, veh.market_class_id)
 
             non_responsive_market_category = \
                 omega_globals.options.MarketClass.get_non_responsive_market_category(veh.market_class_id)
@@ -1541,6 +1542,8 @@ class VehicleFinal(SQABase, Vehicle):
                 alt_veh.eng_disp_liters = None
 
             alt_veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(alt_veh)
+            v.manufacturer.update_market_class_data(v.manufacturer_id, alt_veh.market_class_id)
+
             alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
             alt_veh.cert_direct_co2e_grams_per_mile = 0
             alt_veh.cert_direct_kwh_per_mile = 0

@@ -48,6 +48,9 @@ from omega_model import *
 # _cache = dict()
 
 
+market_class_data = dict()
+
+
 class Manufacturer(SQABase, OMEGABase):
     """
     **Stores information regarding manufacturers, such as manufacturer ID.**
@@ -60,7 +63,12 @@ class Manufacturer(SQABase, OMEGABase):
 
     manufacturers = []  #: stores a list of manufacturer names after init
 
-    # --- static properties ---
+    @staticmethod
+    def update_market_class_data(manufacturer_id, market_class_id):
+        if manufacturer_id not in market_class_data:
+            market_class_data[manufacturer_id] = set()
+
+        market_class_data[manufacturer_id].add(market_class_id)
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -77,6 +85,8 @@ class Manufacturer(SQABase, OMEGABase):
 
         """
         # _cache.clear()
+        global market_class_data
+        market_class_data = dict()
 
         from policy.credit_banking import CreditBank
         if verbose:
