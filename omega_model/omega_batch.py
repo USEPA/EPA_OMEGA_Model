@@ -525,7 +525,7 @@ class OMEGABatchObject(OMEGABase):
             name (str): the name of the batch
             analysis_final_year (int): optional externally-provided analysis final year, otherwise the analysis final
                 year is determined by the batch file
-            calc_effects (str): 'None', 'Physical' or 'Physical and Costs', determines which effects calcs to run
+            calc_effects (str): 'No', 'Physical' or 'Physical and Costs', determines which effects calcs to run
                 post-compliance modeling
 
         """
@@ -1254,7 +1254,7 @@ class OMEGABatchCLIOptions(OMEGABase):
         self.local = True
         self.network = False
         self.analysis_final_year = None
-        self.calc_effects = 'None'
+        self.calc_effects = 'No'
 
 
 def run_bundled_sessions(options, remote_batchfile, session_list):
@@ -1347,7 +1347,7 @@ def run_bundled_sessions(options, remote_batchfile, session_list):
 def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle=False,
                     batch_file='', session_num=None, verbose=False, timestamp=None, show_figures=False, dispy=False,
                     dispy_ping=False, dispy_debug=False, dispy_exclusive=False, dispy_scheduler=None, local=False,
-                    network=False, analysis_final_year=None, calc_effects='None'):
+                    network=False, analysis_final_year=None, calc_effects='No'):
     """
     The top-level entry point for running a batch with the given settings, called from the GUI with a dictionary
     of arguments.  Reads the source batch file, expanding factorially where there are multi-valued parameters, bundles
@@ -1374,7 +1374,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
         local (bool): if ``True`` then run ``dispy`` parallel processing on the local machine only, no network nodes
         network (bool): if ``True`` then allow ``dispy`` parallel processing on networked nodes
         analysis_final_year (int): optional override for the analysis final year batch parameter
-        calc_effects (str): 'None', 'Physical' or 'Physical and Costs', determines what kind of effects post-processing
+        calc_effects (str): 'No', 'Physical' or 'Physical and Costs', determines what kind of effects post-processing
             to run
 
     Returns:
@@ -1730,7 +1730,7 @@ if __name__ == '__main__':
     parser.add_argument('--analysis_final_year', type=int, help='Override analysis final year')
     parser.add_argument('--calc_effects', type=str,
                         help='Type of effects calcs to run: "None", "Physical", or "Physical and Costs"',
-                        default='None')
+                        default='No')
     parser.add_argument('--verbose', action='store_true', help='Enable verbose omega_batch messages)')
     parser.add_argument('--timestamp', type=str,
                         help='Timestamp string, overrides creating timestamp from system clock', default=None)

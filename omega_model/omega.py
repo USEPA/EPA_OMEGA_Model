@@ -627,9 +627,10 @@ def calc_new_vehicle_mfr_generalized_cost(producer_decision, producer_market_cla
     """
     average_new_vehicle_mfr_generalized_cost = 0
     for mc in producer_market_classes:
-        average_new_vehicle_mfr_generalized_cost += \
-            producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] * \
-            producer_decision['producer_abs_share_frac_%s' % mc]
+        if producer_decision['producer_abs_share_frac_%s' % mc] is not None:
+            average_new_vehicle_mfr_generalized_cost += \
+                producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] * \
+                producer_decision['producer_abs_share_frac_%s' % mc]
 
     return average_new_vehicle_mfr_generalized_cost
 
@@ -906,7 +907,7 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
             for v in market_class_vehicles:
                 producer_decision['sales_%s' % mc] += producer_decision['veh_%s_sales' % v.vehicle_id]
         else:
-            producer_decision['producer_abs_share_frac_%s' % mc] = 0
+            producer_decision['producer_abs_share_frac_%s' % mc] = None
             producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc] = 0
             producer_decision['average_onroad_direct_kwh_pmi_%s' % mc] = 0
             producer_decision['average_new_vehicle_mfr_cost_%s' % mc] = 0
@@ -988,8 +989,9 @@ def calc_market_category_data(producer_decision):
                 producer_decision['sales_%s' % mcat] += \
                     np.maximum(1, producer_decision['sales_%s' % mc])
 
-                producer_decision['producer_abs_share_frac_%s' % mcat] += \
-                    producer_decision['producer_abs_share_frac_%s' % mc]
+                if producer_decision['producer_abs_share_frac_%s' % mc] is not None:
+                    producer_decision['producer_abs_share_frac_%s' % mcat] += \
+                        producer_decision['producer_abs_share_frac_%s' % mc]
 
         producer_decision['average_onroad_direct_co2e_gpmi_%s' % mcat] /= \
             producer_decision['sales_%s' % mcat]
