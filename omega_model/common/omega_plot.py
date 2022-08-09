@@ -100,7 +100,7 @@ def figure(reuse_figure=False):
     return fig, ax1
 
 
-def fplothg(x, y, reuse_figure=False, *args, **kwargs):
+def fplothg(x, y, *args, reuse_figure=False, **kwargs):
     """
     Shortcut for figure, plot, hold on, grid on (based on Matlab plotting terminology)
     Creates a single axis plot, with grid.

@@ -1135,7 +1135,8 @@ def plot_total_sales(calendar_years, compliance_ids):
 
     context_sales = np.array(
         [consumer.sales_volume.context_new_vehicle_sales(cy)['total'] for cy in calendar_years[1:]])
-    fig, ax1 = fplothg(calendar_years[1:], context_sales / 1e6, '.-', omega_globals.options.auto_close_figures)
+    fig, ax1 = fplothg(calendar_years[1:], context_sales / 1e6, '.-',
+                       reuse_figure=omega_globals.options.auto_close_figures)
     ax1.plot(calendar_years, total_sales / 1e6)
 
     for manufacturer in manufacturer_sales:
@@ -1183,7 +1184,7 @@ def plot_manufacturer_compliance(calendar_years, compliance_id, credit_history):
     model_year_cert_co2e_Mg = ManufacturerAnnualData.get_model_year_cert_co2e_Mg(compliance_id)
     total_cost_billions = ManufacturerAnnualData.get_total_cost_billions(compliance_id)
     # compliance chart
-    fig, ax1 = fplothg(calendar_years, target_co2e_Mg, 'o-', omega_globals.options.auto_close_figures)
+    fig, ax1 = fplothg(calendar_years, target_co2e_Mg, 'o-', reuse_figure=omega_globals.options.auto_close_figures)
     ax1.plot(calendar_years, calendar_year_cert_co2e_Mg, 'r.-')
     ax1.plot(calendar_years, model_year_cert_co2e_Mg, '-')
     ax1.legend(['target_co2e_Mg', 'calendar_year_cert_co2e_Mg', 'model_year_cert_co2e_Mg'])
@@ -1296,7 +1297,7 @@ def plot_iteration(iteration_log, compliance_id):
             iteration_label))
 
     fig, ax1 = fplothg(last_logged['calendar_year'], last_logged['producer_consumer_iteration_num'], '.-',
-                       omega_globals.options.auto_close_figures)
+                       reuse_figure=omega_globals.options.auto_close_figures)
     label_xyt(ax1, '', 'Iteration [#]', '%s Iteration mean = %.2f' % (compliance_id, last_logged['producer_consumer_iteration_num'].mean()))
 
     fig.savefig('%s%s %s Iter Counts.png' % (omega_globals.options.output_folder,
