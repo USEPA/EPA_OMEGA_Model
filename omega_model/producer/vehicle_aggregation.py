@@ -218,10 +218,7 @@ from omega_model import *
 
 # for now, eventually need to be inputs somewhere:
 aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
-                       'cert_fuel_id', 'reg_class_id', 'drive_system']  #, 'manufacturer_id']
-
-aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
-                       'cert_fuel_id', 'reg_class_id', 'drive_system', 'manufacturer_id']
+                       'cert_fuel_id', 'reg_class_id', 'drive_system']  #  'manufacturer_id' added if not consolidating manufacturers
 
 
 class VehicleAggregation(OMEGABase):
@@ -311,6 +308,11 @@ class VehicleAggregation(OMEGABase):
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
+
+            global aggregation_columns
+            if not omega_globals.options.consolidate_manufacturers:
+                aggregation_columns += ['manufacturer_id']
+
             # new columns calculated here for every vehicle in vehicles.csv:
             df['glider_non_structure_cost_dollars'] = 0
             df['glider_non_structure_mass_lbs'] = 0
