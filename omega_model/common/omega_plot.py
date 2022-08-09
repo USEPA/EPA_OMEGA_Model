@@ -82,7 +82,7 @@ def vlineat(ax, x, *args, **kwargs):
     ax.set_ylim(ylim)
 
 
-def figure():
+def figure(reuse_figure=False):
     """
     Create a figure window with a single plot axis.
 
@@ -90,13 +90,17 @@ def figure():
         2-tuple of figure and axis objects, respectively.
 
     """
-    fig, ax1 = plt.subplots()
+    if reuse_figure:
+        fig, ax1 = plt.subplots()
+    else:
+        fig, ax1 = plt.subplots(num=1, clear=True)
+
     ax1.grid(True, which='both')
     # fig.show()
     return fig, ax1
 
 
-def fplothg(x, y, *args, **kwargs):
+def fplothg(x, y, reuse_figure=False, *args, **kwargs):
     """
     Shortcut for figure, plot, hold on, grid on (based on Matlab plotting terminology)
     Creates a single axis plot, with grid.
@@ -111,7 +115,11 @@ def fplothg(x, y, *args, **kwargs):
         2-tuple of figure and axis objects, respectively.
 
     """
-    fig, ax1 = plt.subplots()
+    if reuse_figure:
+        fig, ax1 = plt.subplots()
+    else:
+        fig, ax1 = plt.subplots(num=1, clear=True)
+
     ax1.plot(x, y, *args, **kwargs)
     ax1.grid(True, which='both')
     # fig.show()

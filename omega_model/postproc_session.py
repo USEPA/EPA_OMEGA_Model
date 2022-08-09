@@ -195,35 +195,35 @@ def plot_effects(calendar_years, physical_effects_df):
             physical_effects['registered_count'].append(
                 physical_effects_df['registered_count'].loc[physical_effects_df['calendar_year'] == cy].sum())
 
-        fig, ax1 = figure()
+        fig, ax1 = figure(omega_globals.options.auto_close_figures)
         ax1.plot(calendar_years, physical_effects['vehicle_stock_CO2_megagrams'], '.-')
         ax1.legend(['Vehicle Stock CO2 Mg'])
         label_xyt(ax1, 'Year', 'CO2 [Mg]', '%s\nVehicle Stock CO2 Mg' % omega_globals.options.session_unique_name)
         fig.savefig(omega_globals.options.output_folder + '%s Stock CO2 Mg.png'
                     % omega_globals.options.session_unique_name)
 
-        fig, ax1 = figure()
+        fig, ax1 = figure(omega_globals.options.auto_close_figures)
         ax1.plot(calendar_years, physical_effects['vehicle_stock_consumption_gasoline_gallons'], '.-')
         ax1.legend(['Vehicle Stock Fuel Consumption Gallons'])
         label_xyt(ax1, 'Year', 'Fuel Consumption [Gasoline gallons]', '%s\nVehicle Stock Fuel Consumption Gasoline Gallons' % omega_globals.options.session_unique_name)
         fig.savefig(omega_globals.options.output_folder + '%s Stock Gas Gallons.png'
                     % omega_globals.options.session_unique_name)
 
-        fig, ax1 = figure()
+        fig, ax1 = figure(omega_globals.options.auto_close_figures)
         ax1.plot(calendar_years, physical_effects['vehicle_stock_consumption_kwh'], '.-')
         ax1.legend(['Vehicle Stock Fuel Consumption kWh'])
         label_xyt(ax1, 'Year', 'Consumption [kWh]', '%s\nVehicle Stock Fuel Consumption kWh' % omega_globals.options.session_unique_name)
         fig.savefig(omega_globals.options.output_folder + '%s Stock kWh.png'
                     % omega_globals.options.session_unique_name)
 
-        fig, ax1 = figure()
+        fig, ax1 = figure(omega_globals.options.auto_close_figures)
         ax1.plot(calendar_years, physical_effects['vehicle_stock_vmt'], '.-')
         ax1.legend(['Vehicle Stock Miles Travelled'])
         label_xyt(ax1, 'Year', 'Distance Travelled [miles]', '%s\nVehicle Stock Miles Travelled' % omega_globals.options.session_unique_name)
         fig.savefig(omega_globals.options.output_folder + '%s Stock VMT.png'
                     % omega_globals.options.session_unique_name)
 
-        fig, ax1 = figure()
+        fig, ax1 = figure(omega_globals.options.auto_close_figures)
         ax1.plot(calendar_years, np.array(physical_effects['registered_count']) / 1e6, '.-')
         ax1.legend(['Vehicle Stock Registered Count'])
         label_xyt(ax1, 'Year', 'Registered Count [millions]', '%s\nVehicle Stock Registered Count' % omega_globals.options.session_unique_name)
@@ -297,7 +297,7 @@ def plot_cert_co2e_gpmi(calendar_years):
         co2e_data[mc] = market_class_co2e
 
     # market category chart
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
         ax1.plot(calendar_years, co2e_data[mcat], '.--')
     ax1.plot(calendar_years, co2e_data['vehicle'], '.-')
@@ -308,7 +308,7 @@ def plot_cert_co2e_gpmi(calendar_years):
         omega_globals.options.output_folder + '%s V Cert CO2e gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # market class chart
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
         if 'ICE' in mc:
             ax1.plot(calendar_years, co2e_data[mc], '.-')
@@ -388,7 +388,7 @@ def plot_cert_direct_kwh_pmi(calendar_years):
         average_cert_direct_kwh_data[mc] = market_class_cost
 
     # market category chart
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
         ax1.plot(calendar_years, average_cert_direct_kwh_data[mcat], '.--')
     ax1.plot(calendar_years, average_cert_direct_kwh_data['vehicle'], '.-')
@@ -399,7 +399,7 @@ def plot_cert_direct_kwh_pmi(calendar_years):
         omega_globals.options.output_folder + '%s V Cert kWh pmi Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # market class chart
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
         if 'ICE' in mc:
             ax1.plot(calendar_years, average_cert_direct_kwh_data[mc], '.-')
@@ -479,7 +479,7 @@ def plot_target_co2e_gpmi(calendar_years):
         co2e_data[mc] = market_class_co2e
 
     # market category chart
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
         ax1.plot(calendar_years, co2e_data[mcat], '.--')
     ax1.plot(calendar_years, co2e_data['vehicle'], '.-')
@@ -490,7 +490,7 @@ def plot_target_co2e_gpmi(calendar_years):
         omega_globals.options.output_folder + '%s V Target CO2e gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # market class chart
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
         if 'ICE' in mc:
             ax1.plot(calendar_years, co2e_data[mc], '.-')
@@ -567,7 +567,7 @@ def plot_vehicle_cost(calendar_years):
         average_cost_data[mc] = market_class_cost
 
     # market category chart
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
         ax1.plot(calendar_years, average_cost_data[mcat], '.--')
     ax1.plot(calendar_years, average_cost_data['vehicle'], '.-')
@@ -578,7 +578,7 @@ def plot_vehicle_cost(calendar_years):
         omega_globals.options.output_folder + '%s V Cost Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # market class chart
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
         if 'ICE' in mc:
             ax1.plot(calendar_years, average_cost_data[mc], '.-')
@@ -663,7 +663,7 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
         cost_data['%s_%s' % (compliance_id, mc)] = market_class_cost
 
     # market category chart
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
         ax1.plot(calendar_years, cost_data['%s_%s' % (compliance_id, mcat)], '.--')
     ax1.plot(calendar_years, cost_data['%s_total' % compliance_id], '.-')
@@ -675,7 +675,7 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
                 % (omega_globals.options.session_unique_name, compliance_id))
 
     # market class chart
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
         if 'ICE' in mc:
             ax1.plot(calendar_years, cost_data['%s_%s' % (compliance_id, mc)], '.-')
@@ -758,7 +758,7 @@ def plot_vehicle_generalized_cost(calendar_years):
         cost_data[mc] = market_class_cost
 
     # market category chart
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
         ax1.plot(calendar_years, cost_data[mcat], '.--')
     ax1.plot(calendar_years, cost_data['vehicle'], '.-')
@@ -769,7 +769,7 @@ def plot_vehicle_generalized_cost(calendar_years):
         omega_globals.options.output_folder + '%s V GenCost Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # market class chart
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
         if 'ICE' in mc:
             ax1.plot(calendar_years, cost_data[mc], '.-')
@@ -826,7 +826,7 @@ def plot_vehicle_megagrams(calendar_years):
         Mg_data[mc] = market_class_Mg
 
     # market category chart
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
         ax1.plot(calendar_years, Mg_data[mcat], '.--')
     ax1.plot(calendar_years, Mg_data['vehicle'], '.-')
@@ -836,7 +836,7 @@ def plot_vehicle_megagrams(calendar_years):
     fig.savefig(omega_globals.options.output_folder + '%s V Mg Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # market class chart
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
         if 'ICE' in mc:
             ax1.plot(calendar_years, Mg_data[mc], '.-')
@@ -920,7 +920,7 @@ def plot_market_shares(calendar_years, total_sales):
         market_share_results['abs_share_frac_%s' % rc] = market_category_abs_share_frac
 
     # plot market category results
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
         ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % mcat], '.--')
     ax1.set_ylim(-0.05, 1.05)
@@ -931,7 +931,7 @@ def plot_market_shares(calendar_years, total_sales):
         omega_globals.options.output_folder + '%s Mkt Cat Shares.png' % omega_globals.options.session_unique_name)
 
     # plot market class results
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
         ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % mc], '.--')
     ax1.set_ylim(-0.05, 1.05)
@@ -942,7 +942,7 @@ def plot_market_shares(calendar_years, total_sales):
         omega_globals.options.output_folder + '%s Mkt Cls Shares.png' % omega_globals.options.session_unique_name)
 
     # plot context size class results
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for csc in NewVehicleMarket.base_year_context_size_class_sales:
         ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % csc], '.--')
     ax1.set_ylim(-0.05, 1.05)
@@ -952,7 +952,7 @@ def plot_market_shares(calendar_years, total_sales):
     fig.savefig(omega_globals.options.output_folder + '%s CSC Shares.png' % omega_globals.options.session_unique_name)
 
     # plot reg class results
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for rc in omega_globals.options.RegulatoryClasses.reg_classes:
         ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % rc], '.--')
     ax1.set_ylim(-0.05, 1.05)
@@ -1040,46 +1040,60 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
         market_share_results['abs_share_frac_%s_%s' % (compliance_id, rc)] = market_category_abs_share_frac
 
     # plot market category results
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
+    labels = []
     for mcat in market_categories:
-        ax1.plot(calendar_years, market_share_results['abs_share_frac_%s_%s' % (compliance_id, mcat)], '.--')
+        if max(market_share_results['abs_share_frac_%s_%s' % (compliance_id, mcat)]) > 0:
+            ax1.plot(calendar_years, market_share_results['abs_share_frac_%s_%s' % (compliance_id, mcat)], '.--')
+            labels += [mcat]
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s %s\nMarket Category Absolute Market Shares'
               % (compliance_id, omega_globals.options.session_unique_name))
-    ax1.legend(market_categories)
+    ax1.legend(labels)
     fig.savefig(omega_globals.options.output_folder + '%s Mkt Cat Shares %s.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
 
     # plot market class results
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
+    labels = []
     for mc in market_classes:
-        ax1.plot(calendar_years, market_share_results['abs_share_frac_%s_%s' % (compliance_id, mc)], '.--')
+        if max(market_share_results['abs_share_frac_%s_%s' % (compliance_id, mc)]) > 0:
+            ax1.plot(calendar_years, market_share_results['abs_share_frac_%s_%s' % (compliance_id, mc)], '.--')
+            labels += [mc]
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s %s\nMarket Class Absolute Market Shares'
               % (compliance_id, omega_globals.options.session_unique_name))
-    ax1.legend(market_classes)
+    ax1.legend(labels)
     fig.savefig(omega_globals.options.output_folder + '%s Mkt Cls Shares %s.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
 
     # plot context size class results
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
+    labels = []
     for csc in NewVehicleMarket.base_year_context_size_class_sales:
-        ax1.plot(calendar_years, market_share_results['abs_share_frac_%s_%s' % (compliance_id, csc)], '.--')
+        if max(market_share_results['abs_share_frac_%s_%s' % (compliance_id, csc)]) > 0:
+            ax1.plot(calendar_years, market_share_results['abs_share_frac_%s_%s' % (compliance_id, csc)], '.--')
+            labels += [csc]
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s %s\nContext Size Class Absolute Market Shares'
               % (compliance_id, omega_globals.options.session_unique_name))
-    ax1.legend(NewVehicleMarket.base_year_context_size_class_sales.keys(), ncol=2, loc='upper center')
+    # ax1.legend(NewVehicleMarket.base_year_context_size_class_sales.keys(), ncol=2, loc='upper center')
+    ax1.legend(labels, ncol=2, loc='upper center')
     fig.savefig(omega_globals.options.output_folder + '%s CSC Shares %s.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
 
     # plot reg class results
-    fig, ax1 = figure()
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
+    labels = []
     for rc in omega_globals.options.RegulatoryClasses.reg_classes:
-        ax1.plot(calendar_years, market_share_results['abs_share_frac_%s_%s' % (compliance_id, rc)], '.--')
+        if max(market_share_results['abs_share_frac_%s_%s' % (compliance_id, rc)]) > 0:
+            ax1.plot(calendar_years, market_share_results['abs_share_frac_%s_%s' % (compliance_id, rc)], '.--')
+            labels += [rc]
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s %s\nReg Class Absolute Market Shares'
               % (compliance_id, omega_globals.options.session_unique_name))
-    ax1.legend(omega_globals.options.RegulatoryClasses.reg_classes, ncol=2, loc='upper center')
+    # ax1.legend(omega_globals.options.RegulatoryClasses.reg_classes, ncol=2, loc='upper center')
+    ax1.legend(labels, ncol=2, loc='upper center')
     fig.savefig(omega_globals.options.output_folder + '%s RC Shares %s.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
 
@@ -1121,7 +1135,7 @@ def plot_total_sales(calendar_years, compliance_ids):
 
     context_sales = np.array(
         [consumer.sales_volume.context_new_vehicle_sales(cy)['total'] for cy in calendar_years[1:]])
-    fig, ax1 = fplothg(calendar_years[1:], context_sales / 1e6, '.-')
+    fig, ax1 = fplothg(calendar_years[1:], context_sales / 1e6, '.-', omega_globals.options.auto_close_figures)
     ax1.plot(calendar_years, total_sales / 1e6)
 
     for manufacturer in manufacturer_sales:
@@ -1169,7 +1183,7 @@ def plot_manufacturer_compliance(calendar_years, compliance_id, credit_history):
     model_year_cert_co2e_Mg = ManufacturerAnnualData.get_model_year_cert_co2e_Mg(compliance_id)
     total_cost_billions = ManufacturerAnnualData.get_total_cost_billions(compliance_id)
     # compliance chart
-    fig, ax1 = fplothg(calendar_years, target_co2e_Mg, 'o-')
+    fig, ax1 = fplothg(calendar_years, target_co2e_Mg, 'o-', omega_globals.options.auto_close_figures)
     ax1.plot(calendar_years, calendar_year_cert_co2e_Mg, 'r.-')
     ax1.plot(calendar_years, model_year_cert_co2e_Mg, '-')
     ax1.legend(['target_co2e_Mg', 'calendar_year_cert_co2e_Mg', 'model_year_cert_co2e_Mg'])
@@ -1228,7 +1242,7 @@ def plot_iteration(iteration_log, compliance_id):
                                 iteration_log['producer_consumer_iteration_num'][iteration_log['cross_subsidy_iteration_num'] == iteration])]
 
         for mc in market_classes:
-            plt.figure()
+            plt.figure(omega_globals.options.auto_close_figures)
             plt.plot(year_iter_labels,
                      iteration_log['producer_abs_share_frac_%s' % mc][
                          iteration_log['cross_subsidy_iteration_num'] == iteration], '--', linewidth=3)
@@ -1247,7 +1261,7 @@ def plot_iteration(iteration_log, compliance_id):
         first_logged = iteration_log.loc[iteration_log['cross_subsidy_iteration_num'] == 0]
         last_logged = iteration_log.loc[iteration_log['cross_subsidy_iteration_num'] == -1]
 
-        plt.figure()
+        plt.figure(omega_globals.options.auto_close_figures)
         if iteration == -1:
             for mc in market_classes:
                 plt.plot(last_logged['calendar_year'],
@@ -1264,7 +1278,7 @@ def plot_iteration(iteration_log, compliance_id):
                                                    omega_globals.options.session_unique_name, compliance_id,
                                                    iteration_label))
 
-        plt.figure()
+        plt.figure(omega_globals.options.auto_close_figures)
         if iteration == -1:
             for mc in market_classes:
                 plt.plot(last_logged['calendar_year'],
@@ -1281,14 +1295,15 @@ def plot_iteration(iteration_log, compliance_id):
             omega_globals.options.output_folder, omega_globals.options.session_unique_name, compliance_id,
             iteration_label))
 
-    fig, ax1 = fplothg(last_logged['calendar_year'], last_logged['producer_consumer_iteration_num'], '.-')
+    fig, ax1 = fplothg(last_logged['calendar_year'], last_logged['producer_consumer_iteration_num'], '.-',
+                       omega_globals.options.auto_close_figures)
     label_xyt(ax1, '', 'Iteration [#]', '%s Iteration mean = %.2f' % (compliance_id, last_logged['producer_consumer_iteration_num'].mean()))
 
     fig.savefig('%s%s %s Iter Counts.png' % (omega_globals.options.output_folder,
                                              omega_globals.options.session_unique_name, compliance_id))
 
     # plot producer initial share and g/mi decisions
-    plt.figure()
+    plt.figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
         plt.plot(first_logged['calendar_year'], first_logged['producer_abs_share_frac_%s' % mc], '.-')
     plt.title('%s Producer Initial Absolute Market Shares' % compliance_id)
@@ -1298,7 +1313,7 @@ def plot_iteration(iteration_log, compliance_id):
                                                              omega_globals.options.session_unique_name, compliance_id))
 
     # plot producer initial share and g/mi decisions
-    plt.figure()
+    plt.figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
         plt.plot(last_logged['calendar_year'], last_logged['producer_abs_share_frac_%s' % mc], '.-')
     plt.title('%s Producer Final Absolute Market Shares' % compliance_id)
@@ -1307,7 +1322,7 @@ def plot_iteration(iteration_log, compliance_id):
     plt.savefig('%s%s %s Producer Abs Shares Final.png' % (omega_globals.options.output_folder,
                                                              omega_globals.options.session_unique_name, compliance_id))
 
-    plt.figure()
+    plt.figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
         plt.plot(first_logged['calendar_year'], first_logged['average_onroad_direct_co2e_gpmi_%s' % mc], '.-')
     plt.title('%s Producer Initial CO2e g/mi' % compliance_id)
@@ -1316,7 +1331,7 @@ def plot_iteration(iteration_log, compliance_id):
     plt.savefig('%s%s %s Producer CO2e gpmi Initial.png' % (omega_globals.options.output_folder,
                                                             omega_globals.options.session_unique_name, compliance_id))
 
-    plt.figure()
+    plt.figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
         plt.plot(last_logged['calendar_year'], last_logged['average_onroad_direct_co2e_gpmi_%s' % mc], '.-')
     plt.title('%s Producer Final CO2e g/mi' % compliance_id)
