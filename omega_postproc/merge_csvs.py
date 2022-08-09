@@ -2,9 +2,9 @@ import pandas as pd
 import glob
 import os
 
-maindir = 'C:/Users/KBolon/Documents/OMEGA_runs/2022July/'
-runname = '2022_07_27_23_34_38_CT_sweep_20offst_20220727a'
-sessionnames = ['_CT20offst_b50_163_m1p68', '_CT20offst_b50_140_m1p44', '_CT20offst_b50_116_m1p2', '_CT20offst_b50_93_m0p96', '_CT20offst_b50_70_m0p72', '_CT20offst_b50_47_m0p48'] # , '_NTR+OCC', '_Negative', '_Flat', , '_NTR+OCC', '_Steep', , 'SAFE', '_Steep']
+maindir = 'C:/Users/KBolon/Documents/OMEGA_runs/2022Aug/'
+runname = '2022_08_08_18_27_07_fp_tendency_20220808a'
+sessionnames = ['_SAFE']
 model_year = 2030
 
 #drop_columns_pre_run = []
@@ -30,11 +30,10 @@ keep_fields_small_output_version = ['cost_curve_class', 'etw_lbs', 'onroad_direc
     'context_size_class', 'body_style', 'base_year_reg_class', 'drive_system', 'apportioned_initial_registered_count',
     'powertrain_type', 'battery_kwh', 'battery_mass_lbs']
 
-keep_fields_very_small_output_version = ['cost_curve_class', 'credits_co2e_Mg_per_vehicle', 'footprint_ft2',
-    'new_vehicle_mfr_cost_dollars', 'new_vehicle_mfr_generalized_cost_dollars', 'base_year_vehicle_id', 'run_name',
-    'session_name', 'rlhp20_level', 'rlhp60_level', 'footprint_level',
-    'credits_co2e_Mg_per_vehicle_per_new_vehicle_mfr_generalized_cost_dollars', 'body_style', 'base_year_reg_class',
-    'apportioned_initial_registered_count']
+keep_fields_fpsize_change_tendency_version = ['run_name', 'session_name', 'base_year_vehicle_id',
+    'context_size_class', 'body_style', 'unibody', 'drive_system', 'cost_curve_class', 'structure_material', 'rlhp20_level', 'rlhp60_level',
+    'footprint_level', 'credits_co2e_Mg_per_vehicle', 'footprint_ft2', 'new_vehicle_mfr_cost_dollars',
+    'new_vehicle_mfr_generalized_cost_dollars', 'apportioned_initial_registered_count']
 
 df_all = pd.DataFrame()
 
@@ -45,7 +44,7 @@ for sessionname in sessionnames:
     cloud_files = glob.glob(cloud_files)
     for cloud_file in cloud_files:
         df_vehcloud = pd.read_csv(cloud_file)
-        df_vehcloud = df_vehcloud.drop(columns=drop_columns_pre_run, errors='ignore') # reduce script memory requirements, and output file size, drop unnecessary fields
+        df_vehcloud.drop(columns=drop_columns_pre_run, errors='ignore', inplace=True) # reduce script memory requirements, and output file size, drop unnecessary fields
         df_vehcloud.columns = df_vehcloud.columns.str.replace('veh_....._', '', regex=True)
         df_vehcloud.columns = df_vehcloud.columns.str.replace('veh_...._', '', regex=True)
         df_vehcloud['run_name'] = runname
@@ -127,7 +126,7 @@ for sessionname in sessionnames:
         emptydf = pd.DataFrame(columns=['empty1','empty2','empty3'], index=dfvehtmp.index)
         dfvehtmp[['structure_material_1', 'structure_material_1_share', 'structure_material_2', 'structure_material_2_share']] = pd.concat([dfvehtmp['structure_material'], emptydf.empty1.fillna(1), emptydf.empty2, emptydf.empty3], axis=1)
 
-    dfvehtmp = dfvehtmp.drop(columns=['name', 'cost_curve_class', 'structure_material'], errors='ignore')
+    dfvehtmp.drop(columns=['name', 'cost_curve_class', 'structure_material'], errors='ignore', inplace=True)
 
     # merge in sub share fields one at a time
     df_session = df_session.merge(dfvehtmp[['model_year', 'base_year_vehicle_id', '_initial_registered_count']].
@@ -140,28 +139,28 @@ for sessionname in sessionnames:
                                   how='left', left_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class', 'structure_material'],
                                   right_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class_1', 'structure_material_1'])
     df_session['apportioned_share'] = df_session['apportioned_share'] + df_session['cost_curve_class_1_share'].fillna(0).astype(float) * df_session['structure_material_1_share'].fillna(0).astype(float)
-    df_session = df_session.drop(columns=['cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_1', 'structure_material_1_share'], errors='ignore')
+    df_session.drop(columns=['cost_curve_class_1', 'cost_cshoe urve_class_1_share', 'structure_material_1', 'structure_material_1_share'], errors='ignore', inplace=True)
 
     df_session = df_session.merge(dfvehtmp[['model_year', 'base_year_vehicle_id', 'cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_2', 'structure_material_2_share']].
                                   drop_duplicates(['model_year', 'base_year_vehicle_id', 'cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_2', 'structure_material_2_share']),
                                   how='left', left_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class', 'structure_material'],
                                   right_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class_2', 'structure_material_2'])
     df_session['apportioned_share'] = df_session['apportioned_share'] + df_session['cost_curve_class_2_share'].fillna(0).astype(float) * df_session['structure_material_2_share'].fillna(0).astype(float)
-    df_session = df_session.drop(columns=['cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_2', 'structure_material_2_share'], errors='ignore')
+    df_session.drop(columns=['cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_2', 'structure_material_2_share'], errors='ignore', inplace=True)
 
     df_session = df_session.merge(dfvehtmp[['model_year', 'base_year_vehicle_id', 'cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_2', 'structure_material_2_share']].
                                   drop_duplicates(['model_year', 'base_year_vehicle_id', 'cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_2', 'structure_material_2_share']),
                                   how='left', left_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class', 'structure_material'],
                                   right_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class_1', 'structure_material_2'])
     df_session['apportioned_share'] = df_session['apportioned_share'] + df_session['cost_curve_class_1_share'].fillna(0).astype(float) * df_session['structure_material_2_share'].fillna(0).astype(float)
-    df_session = df_session.drop(columns=['cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_2', 'structure_material_2_share'], errors='ignore')
+    df_session.drop(columns=['cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_2', 'structure_material_2_share'], errors='ignore', inplace=True)
 
     df_session = df_session.merge(dfvehtmp[['model_year', 'base_year_vehicle_id', 'cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_1', 'structure_material_1_share']].
                                   drop_duplicates(['model_year', 'base_year_vehicle_id', 'cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_1', 'structure_material_1_share']),
                                   how='left', left_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class', 'structure_material'],
                                   right_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class_2', 'structure_material_1'])
     df_session['apportioned_share'] = df_session['apportioned_share'] + df_session['cost_curve_class_2_share'].fillna(0).astype(float) * df_session['structure_material_1_share'].fillna(0).astype(float)
-    df_session = df_session.drop(columns=['cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_1', 'structure_material_1_share'], errors='ignore')
+    df_session.drop(columns=['cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_1', 'structure_material_1_share'], errors='ignore', inplace=True)
 
     df_session['apportioned_initial_registered_count'] = df_session['apportioned_share'] * df_session['_initial_registered_count']
 
@@ -170,11 +169,15 @@ for sessionname in sessionnames:
     else:
         df_all = pd.concat([df_all, df_session], ignore_index=True)
 
-df_all['vehicle_name'] = df_all['vehicle_name'].str.replace('BEV of ', '').str.replace('\'', '').str.replace('ICE of ', '').str.replace('{', '').str.replace('}', '') # prepare vehicle_name field for delimited split
-df_all[['context_size_class', 'body_style', 'base_year_electrification_class', 'unibody', 'base_year_fuel', 'base_year_fuel_share', 'base_year_reg_class', 'drive_system']] = df_all['vehicle_name'].str.split(':', expand=True)
-df_all = df_all.drop(columns=['vehicle_name'])
-df_all = df_all.drop(columns=drop_columns_post_run) # reduce output file size, drop intermediate calculation fields
+del df_session # save memory
+df_all.drop(columns=drop_columns_post_run, inplace=True) # reduce output file size, drop intermediate calculation fields
 
-df_all.to_csv(os.path.join(maindir, runname, 'combined_cost_cloud.csv'))
+df_all['vehicle_name'] = df_all['vehicle_name'].str.replace('BEV of ', '').str.replace('\'', '').str.replace('ICE of ', '').str.replace('{', '').str.replace('}', '') # prepare vehicle_name field for delimited split
+df_all[['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
+                       'cert_fuel_id', 'cert_fuel_share', 'reg_class_id', 'drive_system', 'manufacturer_id']] = df_all['vehicle_name'].str.split(':', expand=True)
+df_all.drop(columns=['vehicle_name'], inplace=True)
+
+
+#df_all.to_csv(os.path.join(maindir, runname, 'combined_cost_cloud.csv'))
 #df_all[keep_fields_small_output_version].to_csv(os.path.join(maindir, runname, 'combined_cost_cloud_small.csv'))
-#df_all[keep_fields_very_small_output_version].to_csv(os.path.join(maindir, runname, 'combined_cost_cloud_very_small.csv'))
+df_all[keep_fields_fpsize_change_tendency_version].loc[df_all['apportioned_initial_registered_count'] != 0].to_csv(os.path.join(maindir, runname, 'combined_cost_cloud_fpsize_change_tendency.csv'))
