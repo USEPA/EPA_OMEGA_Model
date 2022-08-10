@@ -31,7 +31,7 @@ keep_fields_small_output_version = ['cost_curve_class', 'etw_lbs', 'onroad_direc
     'powertrain_type', 'battery_kwh', 'battery_mass_lbs']
 
 keep_fields_fpsize_change_tendency_version = ['run_name', 'session_name', 'base_year_vehicle_id',
-    'context_size_class', 'body_style', 'unibody', 'drive_system', 'cost_curve_class', 'structure_material', 'rlhp20_level', 'rlhp60_level',
+    'context_size_class', 'body_style', 'reg_class_id', 'unibody', 'drive_system', 'cost_curve_class', 'structure_material', 'rlhp20_level', 'rlhp60_level',
     'footprint_level', 'credits_co2e_Mg_per_vehicle', 'footprint_ft2', 'new_vehicle_mfr_cost_dollars',
     'new_vehicle_mfr_generalized_cost_dollars', 'apportioned_initial_registered_count']
 
@@ -139,7 +139,7 @@ for sessionname in sessionnames:
                                   how='left', left_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class', 'structure_material'],
                                   right_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class_1', 'structure_material_1'])
     df_session['apportioned_share'] = df_session['apportioned_share'] + df_session['cost_curve_class_1_share'].fillna(0).astype(float) * df_session['structure_material_1_share'].fillna(0).astype(float)
-    df_session.drop(columns=['cost_curve_class_1', 'cost_cshoe urve_class_1_share', 'structure_material_1', 'structure_material_1_share'], errors='ignore', inplace=True)
+    df_session.drop(columns=['cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_1', 'structure_material_1_share'], errors='ignore', inplace=True)
 
     df_session = df_session.merge(dfvehtmp[['model_year', 'base_year_vehicle_id', 'cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_2', 'structure_material_2_share']].
                                   drop_duplicates(['model_year', 'base_year_vehicle_id', 'cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_2', 'structure_material_2_share']),
