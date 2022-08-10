@@ -50,6 +50,9 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
         tuple of ``cross_subsidy_options_and_response``, updated ``iteration_log``
 
     """
+
+    from producer.manufacturers import market_class_data
+
     children = list(market_class_tree)
     if verbose:
         print('children: %s' % children)
@@ -63,7 +66,7 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
         if verbose:
             print('responsive: %s' % cross_subsidy_pair)
 
-        if all(mc in producer.manufacturers.market_class_data[compliance_id] for mc in cross_subsidy_pair):
+        if all(mc in market_class_data[compliance_id] for mc in cross_subsidy_pair):
             # search cross subsidy options at this level of the tree
             cross_subsidy_options_and_response, iteration_log = \
                 search_cross_subsidies(calendar_year, compliance_id, node_name, cross_subsidy_pair, producer_decision,
