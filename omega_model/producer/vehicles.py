@@ -1626,7 +1626,7 @@ class VehicleFinal(SQABase, Vehicle):
                     NewVehicleMarket.manufacturer_base_year_sales_data[key] / \
                     NewVehicleMarket.base_year_other_sales[other]
 
-        if True:
+        if verbose:
             print_dict(NewVehicleMarket.base_year_context_size_class_sales)
             print_dict(NewVehicleMarket.base_year_other_sales)
             print_dict(VehicleFinal.mfr_base_year_share_data)
