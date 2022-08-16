@@ -3,8 +3,8 @@ import glob
 import os
 
 maindir = 'C:/Users/KBolon/Documents/OMEGA_runs/2022Aug/'
-runname = '2022_08_08_18_27_07_fp_tendency_20220808a'
-sessionnames = ['_SAFE']
+runname = '2022_08_13_22_52_16_OS_strngncy_A_fpload_20220813a'
+sessionnames = ['_NTR_wupstrm', '_C65m0p7Tutiloffst', '_C75m0p7Tutiloffst', '_C85m0p7Tutiloffst', '_C105m0p7Tutiloffst', '_C125m0p7Tutiloffst']
 model_year = 2030
 
 #drop_columns_pre_run = []
@@ -25,15 +25,15 @@ keep_fields_small_output_version = ['cost_curve_class', 'etw_lbs', 'onroad_direc
     'onroad_direct_oncycle_kwh_per_mile', 'rlhp20', 'rlhp60', 'battery_cost', 'cert_co2e_grams_per_mile',
     'credits_co2e_Mg_per_vehicle', 'curbweight_lbs', 'footprint_ft2', 'new_vehicle_mfr_cost_dollars',
     'new_vehicle_mfr_generalized_cost_dollars', 'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile',
-    'target_co2e_Mg_per_vehicle', 'base_year_vehicle_id', 'run_name', 'session_name', 'rlhp20_level', 'rlhp60_level',
+    'target_co2e_Mg_per_vehicle', 'base_year_vehicle_id', 'vehicle_id', 'run_name', 'session_name', 'rlhp20_level', 'rlhp60_level',
     'footprint_level', 'credits_co2e_Mg_per_vehicle_per_new_vehicle_mfr_generalized_cost_dollars', 'unibody',
     'context_size_class', 'body_style', 'base_year_reg_class', 'drive_system', 'apportioned_initial_registered_count',
     'powertrain_type', 'battery_kwh', 'battery_mass_lbs']
 
-keep_fields_fpsize_change_tendency_version = ['run_name', 'session_name', 'base_year_vehicle_id',
+keep_fields_fpsize_change_tendency_version = ['run_name', 'session_name', 'base_year_vehicle_id', 'vehicle_id',
     'context_size_class', 'body_style', 'reg_class_id', 'unibody', 'drive_system', 'cost_curve_class', 'structure_material', 'rlhp20_level', 'rlhp60_level',
     'footprint_level', 'credits_co2e_Mg_per_vehicle', 'footprint_ft2', 'new_vehicle_mfr_cost_dollars',
-    'new_vehicle_mfr_generalized_cost_dollars', 'apportioned_initial_registered_count']
+    'new_vehicle_mfr_generalized_cost_dollars', 'apportioned_initial_registered_count'] # 'manufacturer_id',
 
 df_all = pd.DataFrame()
 
@@ -104,7 +104,7 @@ for sessionname in sessionnames:
     vehicles_file = os.path.join(maindir, runname, sessionname, 'out', runname + sessionname + '_vehicles.csv')
     dfvehtmp = pd.read_csv(vehicles_file)
     dfvehtmp = dfvehtmp[dfvehtmp['model_year'] == model_year]
-    dfvehtmp = dfvehtmp[['name', 'model_year', 'base_year_vehicle_id', 'cost_curve_class', 'structure_material', '_initial_registered_count']]
+    dfvehtmp = dfvehtmp[['name', 'model_year', 'base_year_vehicle_id', 'vehicle_id', 'from_vehicle_id', 'cost_curve_class', 'structure_material', '_initial_registered_count']]
 
     if dfvehtmp['cost_curve_class'].str.split(':', expand=True).shape[1] == 2:
         dfvehtmp[['cost_curve_class_1', 'cost_curve_class_2']] = dfvehtmp['cost_curve_class'].str.split(':', expand=True)
@@ -129,40 +129,40 @@ for sessionname in sessionnames:
     dfvehtmp.drop(columns=['name', 'cost_curve_class', 'structure_material'], errors='ignore', inplace=True)
 
     # merge in sub share fields one at a time
-    df_session = df_session.merge(dfvehtmp[['model_year', 'base_year_vehicle_id', '_initial_registered_count']].
-                                  drop_duplicates(['model_year', 'base_year_vehicle_id']),
-                                  how='left', on=['model_year', 'base_year_vehicle_id'])
+    df_session = df_session.merge(dfvehtmp[['model_year', 'from_vehicle_id', '_initial_registered_count']].
+                                  drop_duplicates(['model_year', 'from_vehicle_id']),
+                                  how='left', left_on=['model_year', 'vehicle_id'], right_on=['model_year', 'from_vehicle_id'])
 
     # each combination of cost_curve_class_1 and 2, and structure_material_1 and 2
-    df_session = df_session.merge(dfvehtmp[['model_year', 'base_year_vehicle_id', 'cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_1', 'structure_material_1_share']].
-                                  drop_duplicates(['model_year', 'base_year_vehicle_id', 'cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_1', 'structure_material_1_share']),
-                                  how='left', left_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class', 'structure_material'],
-                                  right_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class_1', 'structure_material_1'])
+    df_session = df_session.merge(dfvehtmp[['model_year', 'from_vehicle_id', 'cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_1', 'structure_material_1_share']].
+                                  drop_duplicates(['model_year', 'from_vehicle_id', 'cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_1', 'structure_material_1_share']),
+                                  how='left', left_on=['model_year', 'vehicle_id', 'cost_curve_class', 'structure_material'],
+                                  right_on=['model_year', 'from_vehicle_id', 'cost_curve_class_1', 'structure_material_1'])
     df_session['apportioned_share'] = df_session['apportioned_share'] + df_session['cost_curve_class_1_share'].fillna(0).astype(float) * df_session['structure_material_1_share'].fillna(0).astype(float)
     df_session.drop(columns=['cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_1', 'structure_material_1_share'], errors='ignore', inplace=True)
 
-    df_session = df_session.merge(dfvehtmp[['model_year', 'base_year_vehicle_id', 'cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_2', 'structure_material_2_share']].
-                                  drop_duplicates(['model_year', 'base_year_vehicle_id', 'cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_2', 'structure_material_2_share']),
-                                  how='left', left_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class', 'structure_material'],
-                                  right_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class_2', 'structure_material_2'])
+    df_session = df_session.merge(dfvehtmp[['model_year', 'from_vehicle_id', 'cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_2', 'structure_material_2_share']].
+                                  drop_duplicates(['model_year', 'from_vehicle_id', 'cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_2', 'structure_material_2_share']),
+                                  how='left', left_on=['model_year', 'vehicle_id', 'cost_curve_class', 'structure_material'],
+                                  right_on=['model_year', 'from_vehicle_id', 'cost_curve_class_2', 'structure_material_2'])
     df_session['apportioned_share'] = df_session['apportioned_share'] + df_session['cost_curve_class_2_share'].fillna(0).astype(float) * df_session['structure_material_2_share'].fillna(0).astype(float)
     df_session.drop(columns=['cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_2', 'structure_material_2_share'], errors='ignore', inplace=True)
 
-    df_session = df_session.merge(dfvehtmp[['model_year', 'base_year_vehicle_id', 'cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_2', 'structure_material_2_share']].
-                                  drop_duplicates(['model_year', 'base_year_vehicle_id', 'cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_2', 'structure_material_2_share']),
-                                  how='left', left_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class', 'structure_material'],
-                                  right_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class_1', 'structure_material_2'])
+    df_session = df_session.merge(dfvehtmp[['model_year', 'from_vehicle_id', 'cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_2', 'structure_material_2_share']].
+                                  drop_duplicates(['model_year', 'from_vehicle_id', 'cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_2', 'structure_material_2_share']),
+                                  how='left', left_on=['model_year', 'vehicle_id', 'cost_curve_class', 'structure_material'],
+                                  right_on=['model_year', 'from_vehicle_id', 'cost_curve_class_1', 'structure_material_2'])
     df_session['apportioned_share'] = df_session['apportioned_share'] + df_session['cost_curve_class_1_share'].fillna(0).astype(float) * df_session['structure_material_2_share'].fillna(0).astype(float)
     df_session.drop(columns=['cost_curve_class_1', 'cost_curve_class_1_share', 'structure_material_2', 'structure_material_2_share'], errors='ignore', inplace=True)
 
-    df_session = df_session.merge(dfvehtmp[['model_year', 'base_year_vehicle_id', 'cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_1', 'structure_material_1_share']].
-                                  drop_duplicates(['model_year', 'base_year_vehicle_id', 'cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_1', 'structure_material_1_share']),
-                                  how='left', left_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class', 'structure_material'],
-                                  right_on=['model_year', 'base_year_vehicle_id', 'cost_curve_class_2', 'structure_material_1'])
+    df_session = df_session.merge(dfvehtmp[['model_year', 'from_vehicle_id', 'cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_1', 'structure_material_1_share']].
+                                  drop_duplicates(['model_year', 'from_vehicle_id', 'cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_1', 'structure_material_1_share']),
+                                  how='left', left_on=['model_year', 'vehicle_id', 'cost_curve_class', 'structure_material'],
+                                  right_on=['model_year', 'from_vehicle_id', 'cost_curve_class_2', 'structure_material_1'])
     df_session['apportioned_share'] = df_session['apportioned_share'] + df_session['cost_curve_class_2_share'].fillna(0).astype(float) * df_session['structure_material_1_share'].fillna(0).astype(float)
     df_session.drop(columns=['cost_curve_class_2', 'cost_curve_class_2_share', 'structure_material_1', 'structure_material_1_share'], errors='ignore', inplace=True)
 
-    df_session['apportioned_initial_registered_count'] = df_session['apportioned_share'] * df_session['_initial_registered_count']
+    df_session['apportioned_initial_registered_count'] = (df_session['apportioned_share'] * df_session['_initial_registered_count']) / 3**3  # divide by 3x3x3 to account for RLHP20 x RLHP60 x FT combinations
 
     if df_all.empty:
         df_all = df_session
@@ -174,7 +174,7 @@ df_all.drop(columns=drop_columns_post_run, inplace=True) # reduce output file si
 
 df_all['vehicle_name'] = df_all['vehicle_name'].str.replace('BEV of ', '').str.replace('\'', '').str.replace('ICE of ', '').str.replace('{', '').str.replace('}', '') # prepare vehicle_name field for delimited split
 df_all[['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
-                       'cert_fuel_id', 'cert_fuel_share', 'reg_class_id', 'drive_system', 'manufacturer_id']] = df_all['vehicle_name'].str.split(':', expand=True)
+                       'cert_fuel_id', 'cert_fuel_share', 'reg_class_id', 'drive_system']] = df_all['vehicle_name'].str.split(':', expand=True) # add 'manufacturer_id' when OMEGA is run in non-consolidated mode
 df_all.drop(columns=['vehicle_name'], inplace=True)
 
 
