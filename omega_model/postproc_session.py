@@ -671,7 +671,7 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s %s\nAverage Vehicle Cost by Market Category v Year' %
               (compliance_id, omega_globals.options.session_unique_name))
-    fig.savefig(omega_globals.options.output_folder + '%s V Cost Mkt Cat %s.png'
+    fig.savefig(omega_globals.options.output_folder + '%s %s V Cost Mkt Cat.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
 
     # market class chart
@@ -687,7 +687,7 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
               % (compliance_id, omega_globals.options.session_unique_name))
     # ax1.set_ylim(15e3, 80e3)
     ax1.legend(market_classes)
-    fig.savefig(omega_globals.options.output_folder + '%s V Cost Mkt Cls %s.png'
+    fig.savefig(omega_globals.options.output_folder + '%s %s V Cost Mkt Cls.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
 
     return cost_data
@@ -1050,7 +1050,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s %s\nMarket Category Absolute Market Shares'
               % (compliance_id, omega_globals.options.session_unique_name))
     ax1.legend(labels)
-    fig.savefig(omega_globals.options.output_folder + '%s Mkt Cat Shares %s.png'
+    fig.savefig(omega_globals.options.output_folder + '%s %s Mkt Cat Shares.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
 
     # plot market class results
@@ -1064,7 +1064,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s %s\nMarket Class Absolute Market Shares'
               % (compliance_id, omega_globals.options.session_unique_name))
     ax1.legend(labels)
-    fig.savefig(omega_globals.options.output_folder + '%s Mkt Cls Shares %s.png'
+    fig.savefig(omega_globals.options.output_folder + '%s %s Mkt Cls Shares.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
 
     # plot context size class results
@@ -1079,7 +1079,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
               % (compliance_id, omega_globals.options.session_unique_name))
     # ax1.legend(NewVehicleMarket.base_year_context_size_class_sales.keys(), ncol=2, loc='upper center')
     ax1.legend(labels, ncol=2, loc='upper center')
-    fig.savefig(omega_globals.options.output_folder + '%s CSC Shares %s.png'
+    fig.savefig(omega_globals.options.output_folder + '%s %s CSC Shares.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
 
     # plot reg class results
@@ -1094,7 +1094,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
               % (compliance_id, omega_globals.options.session_unique_name))
     # ax1.legend(omega_globals.options.RegulatoryClasses.reg_classes, ncol=2, loc='upper center')
     ax1.legend(labels, ncol=2, loc='upper center')
-    fig.savefig(omega_globals.options.output_folder + '%s RC Shares %s.png'
+    fig.savefig(omega_globals.options.output_folder + '%s %s RC Shares.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
 
     return market_share_results
@@ -1214,7 +1214,7 @@ def plot_manufacturer_compliance(calendar_years, compliance_id, credit_history):
             plt.scatter(t.model_year, calendar_year_cert_co2e_Mg_dict[t.model_year], s=80, facecolors='none',
                         edgecolors='r')
 
-    fig.savefig(omega_globals.options.output_folder + '%s Cert Mg v Year %s.png' %
+    fig.savefig(omega_globals.options.output_folder + '%s %s Cert Mg v Year.png' %
                 (omega_globals.options.session_unique_name, compliance_id))
 
     return calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg, target_co2e_Mg

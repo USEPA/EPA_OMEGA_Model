@@ -529,13 +529,13 @@ def create_composite_vehicles(calendar_year, compliance_id):
         for csc in NewVehicleMarket.base_year_context_size_class_sales: # for each context size class
             context_based_total_sales += \
                 NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=csc) \
-                * VehicleFinal.mfr_base_year_size_class_share[compliance_id][csc]
+                * VehicleFinal.mfr_base_year_share_data[compliance_id][csc]
 
         # calculate new vehicle absolute market share based on vehicle size mix from context
         for new_veh in manufacturer_vehicles:
             new_veh.base_year_market_share = \
                 new_veh.initial_registered_count * \
-                VehicleFinal.mfr_base_year_size_class_share[compliance_id][new_veh.context_size_class] / \
+                VehicleFinal.mfr_base_year_share_data[compliance_id][new_veh.context_size_class] / \
                 context_based_total_sales
 
         # group by context size class
@@ -549,7 +549,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         for csc in csc_dict: # for each context size class
             projection_initial_registered_count = \
                 NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=csc) \
-                * VehicleFinal.mfr_base_year_size_class_share[compliance_id][csc]
+                * VehicleFinal.mfr_base_year_share_data[compliance_id][csc]
 
             distribute_by_attribute(csc_dict[csc], projection_initial_registered_count,
                                     weight_by='base_year_market_share',

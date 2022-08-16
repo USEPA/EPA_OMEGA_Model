@@ -119,6 +119,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
     """
     _data = dict()
+    _calibration_data = dict()
 
     prev_producer_decisions_and_responses = []
 
@@ -344,12 +345,13 @@ class SalesShare(OMEGABase, SalesShareBase):
         return sedan_wagon_share, cuv_suv_van_share, pickup_share
 
     @staticmethod
-    def calc_shares(calendar_year, producer_decision, market_class_data, mc_parent, mc_pair):
+    def calc_shares(calendar_year, compliance_id, producer_decision, market_class_data, mc_parent, mc_pair):
         """
         Determine consumer desired market shares for the given vehicles, their costs, etc.
 
         Args:
             calendar_year (int): calendar year to calculate market shares in
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
             producer_decision (Series): selected producer compliance option with
                 'average_retail_fuel_price_dollars_per_unit_MC',
                 'average_onroad_direct_co2e_gpmi_MC', 'average_onroad_direct_kwh_pmi_MC' attributes,
@@ -374,35 +376,55 @@ class SalesShare(OMEGABase, SalesShareBase):
         # If the hauling/non_hauling shares were responsive (endogenous), methods to calculate these values would
         # be called here.
 
+        from producer.vehicles import VehicleFinal
+
         analysis_sedan_wagon_share, analysis_cuv_suv_van_share, analysis_pickup_share = \
             SalesShare.calc_shares_body_style(calendar_year, producer_decision)
 
         if omega_globals.options.generate_context_calibration_files:
-
             context_sedan_wagon_share = \
                 NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='sedan_wagon',
-                                            value='sales_share_of_total') / 100
+                                            value='sales_share_of_total') / 100 * \
+                VehicleFinal.mfr_base_year_share_data[compliance_id]['sedan_wagon']
 
             context_cuv_suv_van_share = \
                 NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='cuv_suv_van',
-                                            value='sales_share_of_total') / 100
+                                            value='sales_share_of_total') / 100 * \
+                VehicleFinal.mfr_base_year_share_data[compliance_id]['cuv_suv_van']
 
             context_pickup_share = \
                 NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='pickup',
-                                            value='sales_share_of_total') / 100
+                                            value='sales_share_of_total') / 100 * \
+                VehicleFinal.mfr_base_year_share_data[compliance_id]['pickup']
 
-            SalesShare._data['sedan_wagon_calibration'][calendar_year] = \
+            # renormalize shares
+            denom = context_sedan_wagon_share + context_cuv_suv_van_share + context_pickup_share
+
+            context_sedan_wagon_share /= denom
+            context_cuv_suv_van_share /= denom
+            context_pickup_share /= denom
+
+            calibration_key = '%s_sedan_wagon_calibration' % compliance_id
+            if calibration_key not in SalesShare._calibration_data:
+                SalesShare._calibration_data[calibration_key] = dict()
+            SalesShare._calibration_data[calibration_key][calendar_year] = \
                 context_sedan_wagon_share / analysis_sedan_wagon_share
 
-            SalesShare._data['cuv_suv_van_calibration'][calendar_year] = \
+            calibration_key = '%s_cuv_suv_van_calibration' % compliance_id
+            if calibration_key not in SalesShare._calibration_data:
+                SalesShare._calibration_data[calibration_key] = dict()
+            SalesShare._calibration_data[calibration_key][calendar_year] = \
                 context_cuv_suv_van_share / analysis_cuv_suv_van_share
 
-            SalesShare._data['pickup_calibration'][calendar_year] = \
+            calibration_key = '%s_pickup_calibration' % compliance_id
+            if calibration_key not in SalesShare._calibration_data:
+                SalesShare._calibration_data[calibration_key] = dict()
+            SalesShare._calibration_data[calibration_key][calendar_year] = \
                 context_pickup_share / analysis_pickup_share
 
-        analysis_sedan_wagon_share *= SalesShare._data['sedan_wagon_calibration'][calendar_year]
-        analysis_cuv_suv_van_share *= SalesShare._data['cuv_suv_van_calibration'][calendar_year]
-        analysis_pickup_share *= SalesShare._data['pickup_calibration'][calendar_year]
+        analysis_sedan_wagon_share *= SalesShare._calibration_data['%s_sedan_wagon_calibration' % compliance_id][calendar_year]
+        analysis_cuv_suv_van_share *= SalesShare._calibration_data['%s_cuv_suv_van_calibration' % compliance_id][calendar_year]
+        analysis_pickup_share *= SalesShare._calibration_data['%s_pickup_calibration' % compliance_id][calendar_year]
 
         total_corrected_share = analysis_sedan_wagon_share + analysis_cuv_suv_van_share + analysis_pickup_share
 
@@ -433,9 +455,8 @@ class SalesShare(OMEGABase, SalesShareBase):
         if omega_globals.options.standalone_run:
             filename = omega_globals.options.output_folder + filename
 
-        calibration = pd.DataFrame.from_dict({'sedan_wagon_calibration' : SalesShare._data['sedan_wagon_calibration'],
-                                              'cuv_suv_van_calibration' : SalesShare._data['cuv_suv_van_calibration'],
-                                              'pickup_calibration' : SalesShare._data['pickup_calibration']})
+        calibration = pd.DataFrame.from_dict(SalesShare._calibration_data)
+
         calibration.to_csv(filename)
 
     @staticmethod
@@ -485,8 +506,10 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         """
 
+        from producer.vehicles import VehicleFinal
 
         SalesShare._data.clear()
+        SalesShare._calibration_data.clear()
 
         SalesShare.prev_producer_decisions_and_responses = []
 
@@ -521,19 +544,11 @@ class SalesShare(OMEGABase, SalesShareBase):
                 SalesShare._data[mc] = {'start_year': np.array(df['start_year'].loc[df['market_class_id'] == mc])}
 
             if omega_globals.options.generate_context_calibration_files:
-                SalesShare._data['sedan_wagon_calibration'] = dict()
-                SalesShare._data['cuv_suv_van_calibration'] = dict()
-                SalesShare._data['pickup_calibration'] = dict()
+                SalesShare._calibration_data = dict()
+
             else:
-                SalesShare._data['sedan_wagon_calibration'] = \
-                    pd.read_csv(omega_globals.options.sales_share_calibration_file). \
-                        set_index('Unnamed: 0').to_dict()['sedan_wagon_calibration']
-                SalesShare._data['cuv_suv_van_calibration'] = \
-                    pd.read_csv(omega_globals.options.sales_share_calibration_file). \
-                        set_index('Unnamed: 0').to_dict()['cuv_suv_van_calibration']
-                SalesShare._data['pickup_calibration'] = \
-                    pd.read_csv(omega_globals.options.sales_share_calibration_file). \
-                        set_index('Unnamed: 0').to_dict()['pickup_calibration']
+                SalesShare._calibration_data = \
+                    pd.read_csv(omega_globals.options.sales_share_calibration_file).set_index('Unnamed: 0').to_dict()
 
         return template_errors
 
@@ -587,7 +602,7 @@ if __name__ == '__main__':
                 mcd['producer_abs_share_frac_non_hauling'] = [0.8, 0.85]
                 mcd['producer_abs_share_frac_hauling'] = [0.2, 0.15]
 
-            share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, mcd, 'hauling',
+            share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'consolidated_OEM', mcd, 'hauling',
                                                   ['hauling.ICE', 'hauling.BEV'])
 
         else:

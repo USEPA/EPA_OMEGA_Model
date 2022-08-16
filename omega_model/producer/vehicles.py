@@ -1191,7 +1191,7 @@ class VehicleFinal(SQABase, Vehicle):
 
     # --- static properties ---
     compliance_ids = set()  #: the set of compliance IDs (manufacturer IDs or 'consolidated_OEM')
-    mfr_base_year_size_class_share = dict()  #: dict of base year context size class market share by compliance ID and size class, used to project future vehicle sales based on the context
+    mfr_base_year_share_data = dict()  #: dict of base year market shares by compliance ID and various categories, used to project future vehicle sales based on the context
 
     # these are used to validate vehicles.csv:
     mandatory_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id',
@@ -1487,16 +1487,43 @@ class VehicleFinal(SQABase, Vehicle):
                 NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category][veh.context_size_class]['total'] += \
                     veh.initial_registered_count
 
+            # update base year sales data by context size class (used for specifically for sales projections)
             if veh.context_size_class not in NewVehicleMarket.base_year_context_size_class_sales:
                 NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] = veh.initial_registered_count
             else:
                 NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] += veh.initial_registered_count
 
-            size_key = veh.compliance_id + '_' + veh.context_size_class
-            if size_key not in NewVehicleMarket.manufacturer_base_year_context_size_class_sales:
-                NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] = veh.initial_registered_count
+            key = veh.compliance_id + '_' + veh.context_size_class
+            if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
+                NewVehicleMarket.manufacturer_base_year_sales_data[key] = veh.initial_registered_count
             else:
-                NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] += veh.initial_registered_count
+                NewVehicleMarket.manufacturer_base_year_sales_data[key] += veh.initial_registered_count
+
+            # update base year sales data by market class id
+            if veh.market_class_id not in NewVehicleMarket.base_year_other_sales:
+                NewVehicleMarket.base_year_other_sales[veh.market_class_id] = veh.initial_registered_count
+            else:
+                NewVehicleMarket.base_year_other_sales[veh.market_class_id] += veh.initial_registered_count
+
+            key = veh.compliance_id + '_' + veh.market_class_id
+            if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
+                NewVehicleMarket.manufacturer_base_year_sales_data[key] = veh.initial_registered_count
+            else:
+                NewVehicleMarket.manufacturer_base_year_sales_data[key] += veh.initial_registered_count
+
+            # update base year sales data by market category
+            for market_category in veh.market_class_id.split('.'):
+                if market_category not in NewVehicleMarket.base_year_other_sales:
+                    NewVehicleMarket.base_year_other_sales[market_category] = veh.initial_registered_count
+                else:
+                    NewVehicleMarket.base_year_other_sales[market_category] += veh.initial_registered_count
+
+            for market_category in veh.market_class_id.split('.'):
+                key = veh.compliance_id + '_' + market_category
+                if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
+                    NewVehicleMarket.manufacturer_base_year_sales_data[key] = veh.initial_registered_count
+                else:
+                    NewVehicleMarket.manufacturer_base_year_sales_data[key] += veh.initial_registered_count
 
             if verbose:
                 print(veh)
@@ -1556,27 +1583,53 @@ class VehicleFinal(SQABase, Vehicle):
         # calculate manufacturer base year context size class shares
         VehicleFinal.compliance_ids = sorted(list(VehicleFinal.compliance_ids))
 
-        VehicleFinal.mfr_base_year_size_class_share = dict()
+        VehicleFinal.mfr_base_year_share_data = dict()
         for compliance_id in VehicleFinal.compliance_ids:
             for size_class in NewVehicleMarket.base_year_context_size_class_sales:
-                if compliance_id not in VehicleFinal.mfr_base_year_size_class_share:
-                    VehicleFinal.mfr_base_year_size_class_share[compliance_id] = dict()
+                if compliance_id not in VehicleFinal.mfr_base_year_share_data:
+                    VehicleFinal.mfr_base_year_share_data[compliance_id] = dict()
 
-                size_key = compliance_id + '_' + size_class
+                key = compliance_id + '_' + size_class
 
-                if size_key not in NewVehicleMarket.manufacturer_base_year_context_size_class_sales:
-                    NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] = 0
+                if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
+                    NewVehicleMarket.manufacturer_base_year_sales_data[key] = 0
 
                 if verbose:
-                    print('%s: %s / %s: %.2f' % (size_key,
-                                                 NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key],
+                    print('%s: %s / %s: %.2f' % (key,
+                                                 NewVehicleMarket.manufacturer_base_year_sales_data[key],
                                                  NewVehicleMarket.base_year_context_size_class_sales[size_class],
-                                                 NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] /
+                                                 NewVehicleMarket.manufacturer_base_year_sales_data[key] /
                                                  NewVehicleMarket.base_year_context_size_class_sales[size_class]))
 
-                VehicleFinal.mfr_base_year_size_class_share[compliance_id][size_class] = \
-                    NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] / \
+                VehicleFinal.mfr_base_year_share_data[compliance_id][size_class] = \
+                    NewVehicleMarket.manufacturer_base_year_sales_data[key] / \
                     NewVehicleMarket.base_year_context_size_class_sales[size_class]
+
+        for compliance_id in VehicleFinal.compliance_ids:
+            for other in NewVehicleMarket.base_year_other_sales:
+                if compliance_id not in VehicleFinal.mfr_base_year_share_data:
+                    VehicleFinal.mfr_base_year_share_data[compliance_id] = dict()
+
+                key = compliance_id + '_' + other
+
+                if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
+                    NewVehicleMarket.manufacturer_base_year_sales_data[key] = 0
+
+                if verbose:
+                    print('%s: %s / %s: %.2f' % (key,
+                                                 NewVehicleMarket.manufacturer_base_year_sales_data[key],
+                                                 NewVehicleMarket.base_year_other_sales[other],
+                                                 NewVehicleMarket.manufacturer_base_year_sales_data[key] /
+                                                 NewVehicleMarket.base_year_other_sales[other]))
+
+                VehicleFinal.mfr_base_year_share_data[compliance_id][other] = \
+                    NewVehicleMarket.manufacturer_base_year_sales_data[key] / \
+                    NewVehicleMarket.base_year_other_sales[other]
+
+        if True:
+            print_dict(NewVehicleMarket.base_year_context_size_class_sales)
+            print_dict(NewVehicleMarket.base_year_other_sales)
+            print_dict(VehicleFinal.mfr_base_year_share_data)
 
     @staticmethod
     def init_from_file(vehicle_onroad_calculations_file, verbose=False):

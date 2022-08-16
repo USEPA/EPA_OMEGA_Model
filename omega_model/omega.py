@@ -323,11 +323,11 @@ def run_producer_consumer():
 
         credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
                                                        omega_globals.options.session_unique_name +
-                                                       '_GHG_credit_balances %s.csv' % compliance_id, index=False)
+                                                       '%s_GHG_credit_balances.csv' % compliance_id, index=False)
 
         credit_banks[compliance_id].transaction_log.to_csv(
             omega_globals.options.output_folder + omega_globals.options.session_unique_name +
-            '_GHG_credit_transactions %s.csv' % compliance_id, index=False)
+            '%s_GHG_credit_transactions.csv' % compliance_id, index=False)
 
     iteration_log_df = pd.DataFrame(iteration_log)
 
@@ -546,8 +546,8 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pai
                                          prev_multiplier_range, producer_decision, cross_subsidy_options_and_response)
 
         cross_subsidy_options_and_response = \
-            omega_globals.options.SalesShare.calc_shares(calendar_year, producer_decision, cross_subsidy_options, mcat,
-                                                         cross_subsidy_pair)
+            omega_globals.options.SalesShare.calc_shares(calendar_year, compliance_id, producer_decision,
+                                                         cross_subsidy_options, mcat, cross_subsidy_pair)
 
         calc_cross_subsidy_metrics(mcat, cross_subsidy_pair, producer_decision, cross_subsidy_options_and_response)
 
