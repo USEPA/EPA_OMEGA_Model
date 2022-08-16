@@ -378,8 +378,32 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         from producer.vehicles import VehicleFinal
 
-        analysis_sedan_wagon_share, analysis_cuv_suv_van_share, analysis_pickup_share = \
-            SalesShare.calc_shares_body_style(calendar_year, producer_decision)
+        body_styles = ['sedan_wagon', 'cuv_suv_van', 'pickup']
+        body_style_available = \
+            [VehicleFinal.mfr_base_year_share_data[compliance_id][bs] > 0 for bs in body_styles]
+
+        if all(body_style_available):
+            analysis_sedan_wagon_share, analysis_cuv_suv_van_share, analysis_pickup_share = \
+                SalesShare.calc_shares_body_style(calendar_year, producer_decision)
+        else:
+            analysis_sedan_wagon_share = 0
+            analysis_cuv_suv_van_share = 0
+            analysis_pickup_share = 0
+
+            denom = 0
+            for bs in body_styles:
+                bs_share = VehicleFinal.mfr_base_year_share_data[compliance_id][bs]
+                denom +=  bs_share
+                if bs == 'sedan_wagon':
+                    analysis_sedan_wagon_share = bs_share
+                elif bs == 'cuv_suv_van':
+                    analysis_cuv_suv_van_share = bs_share
+                elif bs == 'pickup':
+                    analysis_pickup_share = bs_share
+
+            analysis_sedan_wagon_share /= denom
+            analysis_cuv_suv_van_share /= denom
+            analysis_pickup_share /= denom
 
         if omega_globals.options.generate_context_calibration_files:
             context_sedan_wagon_share = \
@@ -407,20 +431,29 @@ class SalesShare(OMEGABase, SalesShareBase):
             calibration_key = '%s_sedan_wagon_calibration' % compliance_id
             if calibration_key not in SalesShare._calibration_data:
                 SalesShare._calibration_data[calibration_key] = dict()
-            SalesShare._calibration_data[calibration_key][calendar_year] = \
-                context_sedan_wagon_share / analysis_sedan_wagon_share
+            if analysis_sedan_wagon_share > 0:
+                SalesShare._calibration_data[calibration_key][calendar_year] = \
+                    context_sedan_wagon_share / analysis_sedan_wagon_share
+            else:
+                SalesShare._calibration_data[calibration_key][calendar_year] = 0
 
             calibration_key = '%s_cuv_suv_van_calibration' % compliance_id
             if calibration_key not in SalesShare._calibration_data:
                 SalesShare._calibration_data[calibration_key] = dict()
-            SalesShare._calibration_data[calibration_key][calendar_year] = \
-                context_cuv_suv_van_share / analysis_cuv_suv_van_share
+            if analysis_cuv_suv_van_share > 0:
+                SalesShare._calibration_data[calibration_key][calendar_year] = \
+                    context_cuv_suv_van_share / analysis_cuv_suv_van_share
+            else:
+                SalesShare._calibration_data[calibration_key][calendar_year] = 0
 
             calibration_key = '%s_pickup_calibration' % compliance_id
             if calibration_key not in SalesShare._calibration_data:
                 SalesShare._calibration_data[calibration_key] = dict()
-            SalesShare._calibration_data[calibration_key][calendar_year] = \
-                context_pickup_share / analysis_pickup_share
+            if analysis_pickup_share > 0:
+                SalesShare._calibration_data[calibration_key][calendar_year] = \
+                    context_pickup_share / analysis_pickup_share
+            else:
+                SalesShare._calibration_data[calibration_key][calendar_year] = 0
 
         analysis_sedan_wagon_share *= SalesShare._calibration_data['%s_sedan_wagon_calibration' % compliance_id][calendar_year]
         analysis_cuv_suv_van_share *= SalesShare._calibration_data['%s_cuv_suv_van_calibration' % compliance_id][calendar_year]
