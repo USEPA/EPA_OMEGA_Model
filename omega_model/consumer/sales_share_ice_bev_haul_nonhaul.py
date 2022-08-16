@@ -106,6 +106,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
     """
     _data = dict()
+    _calibration_data = dict()
 
     prev_producer_decisions_and_responses = []
 
@@ -362,12 +363,13 @@ class SalesShare(OMEGABase, SalesShareBase):
         return non_hauling_share, hauling_share
 
     @staticmethod
-    def calc_shares(calendar_year, producer_decision, market_class_data, mc_parent, mc_pair):
+    def calc_shares(calendar_year, compliance_id, producer_decision, market_class_data, mc_parent, mc_pair):
         """
         Determine consumer desired market shares for the given vehicles, their costs, etc.
 
         Args:
             calendar_year (int): calendar year to calculate market shares in
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
             producer_decision (Series): selected producer compliance option with
                 'average_retail_fuel_price_dollars_per_unit_MC',
                 'average_onroad_direct_co2e_gpmi_MC', 'average_onroad_direct_kwh_pmi_MC' attributes,
@@ -392,22 +394,36 @@ class SalesShare(OMEGABase, SalesShareBase):
         # If the hauling/non_hauling shares were responsive (endogenous), methods to calculate these values would
         # be called here.
 
+        from producer.vehicles import VehicleFinal
+
         analysis_non_hauling_share, analysis_hauling_share = \
             SalesShare.calc_shares_NEMS(calendar_year, producer_decision)
 
         context_non_hauling_share = \
             NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=None, context_reg_class='car',
-                                              value='sales_share_of_total') / 100
+                                              value='sales_share_of_total') / 100 * \
+            VehicleFinal.mfr_base_year_share_data[compliance_id]['non_hauling']
 
         context_hauling_share = \
             NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=None, context_reg_class='truck',
-                                              value='sales_share_of_total') / 100
+                                              value='sales_share_of_total') / 100 * \
+            VehicleFinal.mfr_base_year_share_data[compliance_id]['hauling']
+
+        # renormalize shares
+        denom = context_non_hauling_share + context_hauling_share
+
+        context_non_hauling_share /= denom
+        context_hauling_share /= denom
 
         if omega_globals.options.generate_context_calibration_files:
-            SalesShare._data['non_hauling_calibration'][calendar_year] = \
+            calibration_key = '%s_non_hauling_calibration' % compliance_id
+            if calibration_key not in SalesShare._calibration_data:
+                SalesShare._calibration_data[calibration_key] = dict()
+
+            SalesShare._calibration_data[calibration_key][calendar_year] = \
                 context_non_hauling_share / analysis_non_hauling_share
 
-        analysis_non_hauling_share *= SalesShare._data['non_hauling_calibration'][calendar_year]
+        analysis_non_hauling_share *= SalesShare._calibration_data['%s_non_hauling_calibration' % compliance_id][calendar_year]
         analysis_hauling_share = 1 - analysis_non_hauling_share
 
         market_class_data['consumer_abs_share_frac_non_hauling'] = \
@@ -435,8 +451,9 @@ class SalesShare(OMEGABase, SalesShareBase):
         if omega_globals.options.standalone_run:
             filename = omega_globals.options.output_folder + filename
 
-        calibration = pd.Series(SalesShare._data['non_hauling_calibration'], name='non_hauling_calibration')
+        calibration = pd.DataFrame.from_dict(SalesShare._calibration_data)
         calibration.to_csv(filename)
+
 
     @staticmethod
     def store_producer_decision_and_response(producer_decision_and_response):
@@ -487,6 +504,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
 
         SalesShare._data.clear()
+        SalesShare._calibration_data.clear()
 
         SalesShare.prev_producer_decisions_and_responses = []
 
@@ -521,11 +539,11 @@ class SalesShare(OMEGABase, SalesShareBase):
                 SalesShare._data[mc] = {'start_year': np.array(df['start_year'].loc[df['market_class_id'] == mc])}
 
             if omega_globals.options.generate_context_calibration_files:
-                SalesShare._data['non_hauling_calibration'] = dict()
+                SalesShare._calibration_data = dict()
             else:
-                SalesShare._data['non_hauling_calibration'] = \
+                SalesShare._calibration_data = \
                     pd.read_csv(omega_globals.options.sales_share_calibration_file). \
-                        set_index('Unnamed: 0').to_dict()['non_hauling_calibration']
+                        set_index('Unnamed: 0').to_dict()
 
         return template_errors
 
@@ -579,7 +597,7 @@ if __name__ == '__main__':
                 mcd['producer_abs_share_frac_non_hauling'] = [0.8, 0.85]
                 mcd['producer_abs_share_frac_hauling'] = [0.2, 0.15]
 
-            share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, mcd, 'hauling',
+            share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'consolidate_OEM', mcd, 'hauling',
                                                   ['hauling.ICE', 'hauling.BEV'])
 
         else:
