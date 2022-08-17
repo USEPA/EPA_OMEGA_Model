@@ -83,6 +83,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
     """
     _data = dict()
+    _calibration_data = dict()
 
     @staticmethod
     def gcam_supports_market_class(market_class_id):
@@ -214,12 +215,13 @@ class SalesShare(OMEGABase, SalesShareBase):
         return market_class_data.copy()
 
     @staticmethod
-    def calc_shares(calendar_year, producer_decision, market_class_data, mc_parent, mc_pair):
+    def calc_shares(calendar_year, compliance_id, producer_decision, market_class_data, mc_parent, mc_pair):
         """
         Determine consumer desired market shares for the given vehicles, their costs, etc.
 
         Args:
             calendar_year (int): calendar year to calculate market shares in
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
             producer_decision (Series): selected producer compliance option
             market_class_data (DataFrame): DataFrame with 'average_fuel_price_MC',
                 'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'
@@ -306,6 +308,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
 
         SalesShare._data.clear()
+        SalesShare._calibration_data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)

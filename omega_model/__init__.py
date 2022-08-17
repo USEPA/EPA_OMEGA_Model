@@ -31,7 +31,6 @@ if 'darwin' in sys.platform:
 
 import traceback
 
-
 try:
     import time
     import pandas as pd
@@ -92,12 +91,10 @@ try:
             self.use_prerun_context_outputs = False
             self.consolidate_manufacturers = True
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
-            self.market_classes_file = path + 'test_inputs/market_classes.csv'
             self.vehicles_file = path + 'test_inputs/vehicles.csv'
             self.vehicles_file_base_year = None
             self.vehicles_df = pd.DataFrame()
             self.onroad_vehicle_calculations_file = path + 'test_inputs/onroad_vehicle_calculations.csv'
-            self.sales_share_file = path + 'test_inputs/sales_share_params.csv'
             self.onroad_fuels_file = path + 'test_inputs/onroad_fuels.csv'
             self.context_id = 'AEO2021'
             self.context_case_id = 'Reference case'
@@ -106,15 +103,9 @@ try:
             self.generate_context_calibration_files = True
             self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
             self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods.csv'
-            self.vehicle_price_modifications_file = path + 'test_inputs/vehicle_price_modifications.csv'
             self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
             self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights.csv'
             self.drive_cycle_ballast_file = path + 'test_inputs/drive_cycle_ballast.csv'
-            self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market-body_style.csv'
-
-            # self.ice_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_ice.csv'
-            # self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_bev.csv'
-            # self.phev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_phev.csv'
 
             self.ice_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_ice.csv'
             self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_bev.csv'
@@ -137,11 +128,17 @@ try:
             self.policy_fuels_file = path + 'test_inputs/policy_fuels.csv'
             self.ghg_credit_params_file = path + 'test_inputs/ghg_credit_params.csv'
             self.ghg_credits_file = path + 'test_inputs/ghg_credits.csv'
-            self.required_sales_share_file = path + 'test_inputs/required_sales_share.csv'
-            self.producer_generalized_cost_file = path + 'test_inputs/producer_generalized_cost.csv'
-            self.production_constraints_file = path + 'test_inputs/production_constraints.csv'
-            self.vehicle_reregistration_file = path + 'test_inputs/reregistration_fixed_by_age.csv'
-            self.onroad_vmt_file = path + 'test_inputs/annual_vmt_fixed_by_age.csv'
+
+            self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market-body_style.csv'
+            self.market_classes_file = path + 'test_inputs/market_classes-body_style.csv'
+            self.producer_generalized_cost_file = path + 'test_inputs/producer_generalized_cost-body_style.csv'
+            self.production_constraints_file = path + 'test_inputs/production_constraints-body_style.csv'
+            self.vehicle_reregistration_file = path + 'test_inputs/reregistration_fixed_by_age-body_style.csv'
+            self.sales_share_file = path + 'test_inputs/sales_share_params_ice_bev_body_style.csv'
+            self.required_sales_share_file = path + 'test_inputs/required_sales_share-body_style.csv'
+            self.onroad_vmt_file = path + 'test_inputs/annual_vmt_fixed_by_age-body_style.csv'
+            self.vehicle_price_modifications_file = path + 'test_inputs/vehicle_price_modifications-body_style.csv'
+
             self.offcycle_credits_file = path + 'test_inputs/offcycle_credits.csv'
 
             self.consumer_pricing_num_options = 4

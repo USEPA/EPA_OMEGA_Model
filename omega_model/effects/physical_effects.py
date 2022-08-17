@@ -52,9 +52,7 @@ def get_egu_emission_rate(calendar_year, kwh_consumption, kwh_generation):
     """
     from effects.emission_rates_egu import EmissionRatesEGU
 
-    kwh_demand = kwh_consumption
-    if EmissionRatesEGU.kwh_demand_metric == 'kWh_generation':
-        kwh_demand = kwh_generation
+    kwh_session = kwh_consumption
 
     rate_names = ('co_grams_per_kwh',
                   'nox_grams_per_kwh',
@@ -65,7 +63,7 @@ def get_egu_emission_rate(calendar_year, kwh_consumption, kwh_generation):
                   'n2o_grams_per_kwh',
                   )
 
-    return EmissionRatesEGU.get_emission_rate(calendar_year, kwh_demand, rate_names)
+    return EmissionRatesEGU.get_emission_rate(calendar_year, kwh_session, rate_names)
 
 
 def get_refinery_ef(calendar_year, fuel):

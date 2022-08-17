@@ -71,16 +71,17 @@ class EmissionRatesEGU(OMEGABase):
     _cache = dict()
     calendar_year_max = None
     kwh_demand_metric = None
+    kwh_consumption_metric = None
 
     @staticmethod
-    def get_emission_rate(calendar_year, kwh_demand, rate_names):
+    def get_emission_rate(calendar_year, kwh_session, rate_names):
         """
 
         Get emission rates by calendar year
 
         Args:
             calendar_year (int): calendar year for which to get emission rates
-            kwh_demand (numeric): the kWh demand to use (e.g., kwh_consumption or kwh_generation)
+            kwh_session (numeric): the session kWh to use (e.g., kwh_consumption or kwh_generation; this is omega-only)
             rate_names (str, [strs]): name of emission rate(s) to get
 
         Returns:
@@ -90,7 +91,7 @@ class EmissionRatesEGU(OMEGABase):
         locals_dict = locals()
         return_rates = list()
 
-        kwh_low = kwh_high = 0
+        kwh_demand_low = kwh_demand_high = kwh_low_bound = 0
 
         if calendar_year > EmissionRatesEGU.calendar_year_max:
             calendar_year = EmissionRatesEGU.calendar_year_max
@@ -99,18 +100,27 @@ class EmissionRatesEGU(OMEGABase):
             return_rates = EmissionRatesEGU._cache[calendar_year]
 
         else:
-            kwh_low = eval(EmissionRatesEGU._data['low_bound', rate_names[0]]['equation_kwh'], {}, locals_dict)
-            kwh_high = eval(EmissionRatesEGU._data['high_bev', rate_names[0]]['equation_kwh'], {}, locals_dict)
+            kwh_demand_low \
+                = eval(EmissionRatesEGU._data['low_bound', rate_names[0]]['equation_kwh_demand_metric'], {}, locals_dict)
 
-            if kwh_high < kwh_demand:
-                kwh_high = kwh_demand
+            kwh_demand_high \
+                = eval(EmissionRatesEGU._data['high_bev', rate_names[0]]['equation_kwh_demand_metric'], {}, locals_dict)
+
+            kwh_low_bound \
+                = eval(EmissionRatesEGU._data['low_bound', rate_names[0]]['equation_kwh_consumption_metric'], {}, locals_dict)
+
+            # back out the low-bound consumption provided to IPM to establish a base without the low bound omega demand
+            kwh_base = kwh_demand_low - kwh_low_bound
+
+            # add the kwh_session to the new kwh base value to determine the US demand for the session
+            kwh_session += kwh_base
 
             for rate_name in rate_names:
                 rate_low = eval(EmissionRatesEGU._data['low_bound', rate_name]['equation_rate_id'], {}, locals_dict)
                 rate_high = eval(EmissionRatesEGU._data['high_bev', rate_name]['equation_rate_id'], {}, locals_dict)
 
                 # interpolate the rate for kwh_demand
-                rate = rate_low - (kwh_low - kwh_demand) * (rate_low - rate_high) / (kwh_low - kwh_high)
+                rate = rate_low - (kwh_demand_low - kwh_session) * (rate_low - rate_high) / (kwh_demand_low - kwh_demand_high)
 
                 return_rates.append(rate)
 
@@ -139,15 +149,17 @@ class EmissionRatesEGU(OMEGABase):
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
         input_template_name = 'emission_rates_egu'
-        input_template_version = 0.2
+        input_template_version = 0.3
         input_template_columns = {
             'case',
             'rate_name',
             'independent_variable',
             'last_year',
             'kwh_demand_metric',
+            'kwh_consumption_metric',
             'equation_rate_id',
-            'equation_kwh'
+            'equation_kwh_demand_metric',
+            'equation_kwh_consumption_metric',
         }
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -169,6 +181,7 @@ class EmissionRatesEGU(OMEGABase):
 
                 EmissionRatesEGU._cases = df['case'].unique()
                 EmissionRatesEGU.kwh_demand_metric = df['kwh_demand_metric'][0]
+                EmissionRatesEGU.kwh_consumption_metric = df['kwh_consumption_metric'][0]
                 EmissionRatesEGU.calendar_year_max = df['last_year'][0]
 
                 EmissionRatesEGU._data = df.to_dict('index')
@@ -177,10 +190,14 @@ class EmissionRatesEGU(OMEGABase):
                 for rate_key in rate_keys:
 
                     rate_eq = EmissionRatesEGU._data[rate_key]['equation_rate_id']
-                    kwh_eq = EmissionRatesEGU._data[rate_key]['equation_kwh']
+                    kwh_demand_eq = EmissionRatesEGU._data[rate_key]['equation_kwh_demand_metric']
+                    kwh_consumption_eq = EmissionRatesEGU._data[rate_key]['equation_kwh_consumption_metric']
 
-                    EmissionRatesEGU._data[rate_key].update({'equation_rate_id': compile(rate_eq, '<string>', 'eval'),
-                                                             'equation_kwh': compile(kwh_eq, '<string>', 'eval')})
+                    EmissionRatesEGU._data[rate_key].update({
+                        'equation_rate_id': compile(rate_eq, '<string>', 'eval'),
+                        'equation_kwh_demand_metric': compile(kwh_demand_eq, '<string>', 'eval'),
+                        'equation_kwh_consumption_metric': compile(kwh_consumption_eq, '<string>', 'eval'),
+                    })
 
         return template_errors
 

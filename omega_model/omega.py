@@ -50,6 +50,9 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
         tuple of ``cross_subsidy_options_and_response``, updated ``iteration_log``
 
     """
+
+    from producer.manufacturers import market_class_data
+
     children = list(market_class_tree)
     if verbose:
         print('children: %s' % children)
@@ -63,10 +66,13 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
         if verbose:
             print('responsive: %s' % cross_subsidy_pair)
 
-        # search cross subsidy options at this level of the tree
-        cross_subsidy_options_and_response, iteration_log = \
-            search_cross_subsidies(calendar_year, compliance_id, node_name, cross_subsidy_pair, producer_decision,
-                                   cross_subsidy_options_and_response, producer_consumer_iteration_num, iteration_log)
+        if all(mc in market_class_data[compliance_id] for mc in cross_subsidy_pair):
+            # search cross subsidy options at this level of the tree
+            cross_subsidy_options_and_response, iteration_log = \
+                search_cross_subsidies(calendar_year, compliance_id, node_name, cross_subsidy_pair, producer_decision,
+                                       cross_subsidy_options_and_response, producer_consumer_iteration_num, iteration_log)
+        else:
+            pass
 
     else:
         if verbose:
@@ -87,9 +93,9 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
     return cross_subsidy_options_and_response, iteration_log
 
 
-def logwrite_shares_and_costs(calendar_year, share_convergence_error, cross_subsidy_pricing_error,
-                              producer_decision_and_response, producer_consumer_iteration_num,
-                              cross_subsidy_iteration_num):
+def logwrite_shares_and_costs(calendar_year, producer_market_classes, share_convergence_error,
+                              cross_subsidy_pricing_error, producer_decision_and_response,
+                              producer_consumer_iteration_num, cross_subsidy_iteration_num):
     """
     Write detailed producer-consumer cross-subsidy iteration data to the log and console.  For investigation of
     cross-subsidy search behavior.  Optionally called from ``iterate_producer_cross_subsidy()``
@@ -127,7 +133,7 @@ def logwrite_shares_and_costs(calendar_year, share_convergence_error, cross_subs
     """
     omega_log.logwrite('')
 
-    for mc in sorted(omega_globals.options.MarketClass.market_classes):
+    for mc in sorted(producer_market_classes):
         omega_log.logwrite(('%d producer / consumer_abs_share_frac_%s' % (calendar_year, mc)).ljust(55) +
                            '= %.6f / %.6f (DELTA:%.6f)' % (
                                producer_decision_and_response['producer_abs_share_frac_%s' % mc],
@@ -138,7 +144,7 @@ def logwrite_shares_and_costs(calendar_year, share_convergence_error, cross_subs
 
     omega_log.logwrite('')
 
-    for mc in sorted(omega_globals.options.MarketClass.market_classes):
+    for mc in sorted(producer_market_classes):
         omega_log.logwrite(
             ('cross subsidized price / cost %s' % mc).ljust(50) + '$%d / $%d R:%f' % (
                 producer_decision_and_response['average_cross_subsidized_price_%s' % mc],
@@ -150,13 +156,17 @@ def logwrite_shares_and_costs(calendar_year, share_convergence_error, cross_subs
     omega_log.logwrite('')
 
     for mcat in sorted(omega_globals.options.MarketClass.market_categories):
-        omega_log.logwrite(
-            ('cross subsidized price / cost %s' % mcat).ljust(50) + '$%d / $%d R:%f' % (
-                producer_decision_and_response['average_cross_subsidized_price_%s' % mcat],
-                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat],
-                producer_decision_and_response['average_cross_subsidized_price_%s' % mcat] /
-                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat]
-            ))
+        try:
+            if producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat] > 0:
+                omega_log.logwrite(
+                    ('cross subsidized price / cost %s' % mcat).ljust(50) + '$%d / $%d R:%f' % (
+                        producer_decision_and_response['average_cross_subsidized_price_%s' % mcat],
+                        producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat],
+                        producer_decision_and_response['average_cross_subsidized_price_%s' % mcat] /
+                        producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat]
+                    ))
+        except:
+            pass
 
     omega_log.logwrite(
         'cross subsidized price / cost TOTAL'.ljust(50) + '$%d / $%d R:%f' % (
@@ -313,11 +323,11 @@ def run_producer_consumer():
 
         credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
                                                        omega_globals.options.session_unique_name +
-                                                       '_GHG_credit_balances %s.csv' % compliance_id, index=False)
+                                                       ' %s_GHG_credit_balances.csv' % compliance_id, index=False)
 
         credit_banks[compliance_id].transaction_log.to_csv(
             omega_globals.options.output_folder + omega_globals.options.session_unique_name +
-            '_GHG_credit_transactions %s.csv' % compliance_id, index=False)
+            ' %s_GHG_credit_transactions.csv' % compliance_id, index=False)
 
     iteration_log_df = pd.DataFrame(iteration_log)
 
@@ -464,8 +474,9 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
              < best_producer_decision_and_response['pricing_score']):
         best_producer_decision_and_response = producer_decision_and_response.copy()
 
-    logwrite_cross_subsidy_results(calendar_year, cross_subsidy_pricing_error, producer_consumer_iteration_num,
-                                   producer_decision_and_response, share_convergence_error)
+    logwrite_cross_subsidy_results(calendar_year, producer_market_classes, cross_subsidy_pricing_error,
+                                   producer_consumer_iteration_num, producer_decision_and_response,
+                                   share_convergence_error)
 
     update_cross_subsidy_log_data(producer_decision_and_response, calendar_year, compliance_id, mcat_converged,
                                   producer_consumer_iteration_num, compliant, share_convergence_error)
@@ -475,8 +486,9 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     return best_producer_decision_and_response, iteration_log, producer_decision_and_response
 
 
-def logwrite_cross_subsidy_results(calendar_year, cross_subsidy_pricing_error, producer_consumer_iteration_num,
-                                   producer_decision_and_response, share_convergence_error):
+def logwrite_cross_subsidy_results(calendar_year, producer_market_classes, cross_subsidy_pricing_error,
+                                   producer_consumer_iteration_num, producer_decision_and_response,
+                                   share_convergence_error):
     """
 
     Args:
@@ -488,14 +500,14 @@ def logwrite_cross_subsidy_results(calendar_year, cross_subsidy_pricing_error, p
 
     """
     if 'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
-        logwrite_shares_and_costs(calendar_year, share_convergence_error, cross_subsidy_pricing_error,
-                                  producer_decision_and_response, producer_consumer_iteration_num,
-                                  producer_consumer_iteration_num)
+        logwrite_shares_and_costs(calendar_year, producer_market_classes, share_convergence_error,
+                                  cross_subsidy_pricing_error, producer_decision_and_response,
+                                  producer_consumer_iteration_num, producer_consumer_iteration_num)
 
-    multiplier_columns = ['cost_multiplier_%s' % mc for mc in sorted(omega_globals.options.MarketClass.market_classes)]
+    multiplier_columns = ['cost_multiplier_%s' % mc for mc in sorted(producer_market_classes)]
 
     if 'cross_subsidy_multipliers' in omega_globals.options.verbose_console_modules:
-        for mc, cc in zip(sorted(omega_globals.options.MarketClass.market_classes), multiplier_columns):
+        for mc, cc in zip(sorted(producer_market_classes), multiplier_columns):
             omega_log.logwrite(('FINAL %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc],
                                echo_console=True)
 
@@ -534,8 +546,8 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pai
                                          prev_multiplier_range, producer_decision, cross_subsidy_options_and_response)
 
         cross_subsidy_options_and_response = \
-            omega_globals.options.SalesShare.calc_shares(calendar_year, producer_decision, cross_subsidy_options, mcat,
-                                                         cross_subsidy_pair)
+            omega_globals.options.SalesShare.calc_shares(calendar_year, compliance_id, producer_decision,
+                                                         cross_subsidy_options, mcat, cross_subsidy_pair)
 
         calc_cross_subsidy_metrics(mcat, cross_subsidy_pair, producer_decision, cross_subsidy_options_and_response)
 
@@ -558,7 +570,6 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pai
 
         if 'cross_subsidy_search' in omega_globals.options.verbose_log_modules:
             iteration_log.append(cross_subsidy_options_and_response)
-
 
         # select best cross subsidy option
         cross_subsidy_options_and_response = \
@@ -845,7 +856,7 @@ def calc_market_data(candidate_mfr_composite_vehicles, producer_decision):
 
     calc_market_category_data(producer_decision)
 
-    return list(market_class_vehicle_dict.keys())
+    return [k for k in market_class_vehicle_dict.keys() if market_class_vehicle_dict[k]] # list(market_class_vehicle_dict.keys())
 
 
 def calc_market_class_data(market_class_vehicle_dict, producer_decision):
