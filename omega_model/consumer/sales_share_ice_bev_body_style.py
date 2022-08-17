@@ -380,7 +380,8 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         body_styles = ['sedan_wagon', 'cuv_suv_van', 'pickup']
         body_style_available = \
-            [VehicleFinal.mfr_base_year_share_data[compliance_id][bs] > 0 for bs in body_styles]
+            [bs in VehicleFinal.mfr_base_year_share_data[compliance_id] and
+             VehicleFinal.mfr_base_year_share_data[compliance_id][bs] > 0 for bs in body_styles]
 
         if all(body_style_available):
             analysis_sedan_wagon_share, analysis_cuv_suv_van_share, analysis_pickup_share = \
@@ -392,34 +393,44 @@ class SalesShare(OMEGABase, SalesShareBase):
 
             denom = 0
             for bs in body_styles:
-                bs_share = VehicleFinal.mfr_base_year_share_data[compliance_id][bs]
-                denom +=  bs_share
-                if bs == 'sedan_wagon':
-                    analysis_sedan_wagon_share = bs_share
-                elif bs == 'cuv_suv_van':
-                    analysis_cuv_suv_van_share = bs_share
-                elif bs == 'pickup':
-                    analysis_pickup_share = bs_share
+                if bs in VehicleFinal.mfr_base_year_share_data[compliance_id]:
+                    bs_share = VehicleFinal.mfr_base_year_share_data[compliance_id][bs]
+                    denom +=  bs_share
+                    if bs == 'sedan_wagon':
+                        analysis_sedan_wagon_share = bs_share
+                    elif bs == 'cuv_suv_van':
+                        analysis_cuv_suv_van_share = bs_share
+                    elif bs == 'pickup':
+                        analysis_pickup_share = bs_share
 
             analysis_sedan_wagon_share /= denom
             analysis_cuv_suv_van_share /= denom
             analysis_pickup_share /= denom
 
         if omega_globals.options.generate_context_calibration_files:
-            context_sedan_wagon_share = \
-                NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='sedan_wagon',
-                                            value='sales_share_of_total') / 100 * \
-                VehicleFinal.mfr_base_year_share_data[compliance_id]['sedan_wagon']
+            if 'sedan_wagon' in VehicleFinal.mfr_base_year_share_data[compliance_id]:
+                context_sedan_wagon_share = \
+                    NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='sedan_wagon',
+                                                value='sales_share_of_total') / 100 * \
+                    VehicleFinal.mfr_base_year_share_data[compliance_id]['sedan_wagon']
+            else:
+                context_sedan_wagon_share = 0
 
-            context_cuv_suv_van_share = \
-                NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='cuv_suv_van',
-                                            value='sales_share_of_total') / 100 * \
-                VehicleFinal.mfr_base_year_share_data[compliance_id]['cuv_suv_van']
+            if 'cuv_suv_van' in VehicleFinal.mfr_base_year_share_data[compliance_id]:
+                context_cuv_suv_van_share = \
+                    NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='cuv_suv_van',
+                                                value='sales_share_of_total') / 100 * \
+                    VehicleFinal.mfr_base_year_share_data[compliance_id]['cuv_suv_van']
+            else:
+                context_cuv_suv_van_share = 0
 
-            context_pickup_share = \
-                NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='pickup',
-                                            value='sales_share_of_total') / 100 * \
-                VehicleFinal.mfr_base_year_share_data[compliance_id]['pickup']
+            if 'pickup' in VehicleFinal.mfr_base_year_share_data[compliance_id]:
+                context_pickup_share = \
+                    NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='pickup',
+                                                value='sales_share_of_total') / 100 * \
+                    VehicleFinal.mfr_base_year_share_data[compliance_id]['pickup']
+            else:
+                context_pickup_share = 0
 
             # renormalize shares
             denom = context_sedan_wagon_share + context_cuv_suv_van_share + context_pickup_share
@@ -519,7 +530,8 @@ class SalesShare(OMEGABase, SalesShareBase):
         base_year_reg_class_data = \
             base_year_vehicles_df.groupby(['reg_class_id']).apply(sales_weight_average_dataframe)
 
-        for rc in legacy_reg_classes:
+        # for rc in legacy_reg_classes:
+        for rc in base_year_vehicles_df.reg_class_id.unique():
             for c in ['curbweight_lbs', 'rated_hp']:  # TODO: add 'onroad_mpg' ...
                 SalesShare._data['share_seed_data', base_year, rc, c] = base_year_reg_class_data[c][rc]
 

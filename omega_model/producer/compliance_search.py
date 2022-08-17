@@ -252,7 +252,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
         else:
             sales_share_dict = pd.DataFrame()
             for c, cn in zip(children, share_column_names):
-                sales_share_dict[cn] = [context_new_vehicle_sales(calendar_year)[c] /
+                if c in context_new_vehicle_sales(calendar_year):
+                    sales_share_dict[cn] = [context_new_vehicle_sales(calendar_year)[c] /
                                         context_new_vehicle_sales(calendar_year)['total']]
             sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
     else:

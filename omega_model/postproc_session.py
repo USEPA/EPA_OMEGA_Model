@@ -1243,21 +1243,22 @@ def plot_iteration(iteration_log, compliance_id):
                                 iteration_log['producer_consumer_iteration_num'][iteration_log['cross_subsidy_iteration_num'] == iteration])]
 
         for mc in market_classes:
-            plt.figure()
-            plt.plot(year_iter_labels,
-                     iteration_log['producer_abs_share_frac_%s' % mc][
-                         iteration_log['cross_subsidy_iteration_num'] == iteration], '--', linewidth=3)
-            plt.xticks(rotation=90)
-            plt.plot(year_iter_labels,
-                     iteration_log['consumer_abs_share_frac_%s' % mc][
-                         iteration_log['cross_subsidy_iteration_num'] == iteration])
-            plt.title('%s %s iteration %s' % (compliance_id, mc, iteration_label))
-            plt.grid()
-            plt.legend(['producer_abs_share_frac_%s' % mc, 'consumer_abs_share_frac_%s' % mc])
-            plt.ylim([0, 1])
-            plt.savefig('%s%s %s Iter %s %s.png' % (
-                omega_globals.options.output_folder, omega_globals.options.session_unique_name, compliance_id,
-                mc, iteration_label))
+            if 'consumer_abs_share_frac_%s' % mc in iteration_log:
+                plt.figure()
+                plt.plot(year_iter_labels,
+                         iteration_log['producer_abs_share_frac_%s' % mc][
+                             iteration_log['cross_subsidy_iteration_num'] == iteration], '--', linewidth=3)
+                plt.xticks(rotation=90)
+                plt.plot(year_iter_labels,
+                         iteration_log['consumer_abs_share_frac_%s' % mc][
+                             iteration_log['cross_subsidy_iteration_num'] == iteration])
+                plt.title('%s %s iteration %s' % (compliance_id, mc, iteration_label))
+                plt.grid()
+                plt.legend(['producer_abs_share_frac_%s' % mc, 'consumer_abs_share_frac_%s' % mc])
+                plt.ylim([0, 1])
+                plt.savefig('%s%s %s Iter %s %s.png' % (
+                    omega_globals.options.output_folder, omega_globals.options.session_unique_name, compliance_id,
+                    mc, iteration_label))
 
         first_logged = iteration_log.loc[iteration_log['cross_subsidy_iteration_num'] == 0]
         last_logged = iteration_log.loc[iteration_log['cross_subsidy_iteration_num'] == -1]
@@ -1265,12 +1266,14 @@ def plot_iteration(iteration_log, compliance_id):
         plt.figure()
         if iteration == -1:
             for mc in market_classes:
-                plt.plot(last_logged['calendar_year'],
-                         last_logged['consumer_generalized_cost_dollars_%s' % mc], '.-')
+                if 'consumer_generalized_cost_dollars_%s' % mc in last_logged:
+                    plt.plot(last_logged['calendar_year'],
+                             last_logged['consumer_generalized_cost_dollars_%s' % mc], '.-')
         else:
             for mc in market_classes:
-                plt.plot(first_logged['calendar_year'],
-                         first_logged['consumer_generalized_cost_dollars_%s' % mc], '.-')
+                if 'consumer_generalized_cost_dollars_%s' % mc in first_logged:
+                    plt.plot(first_logged['calendar_year'],
+                             first_logged['consumer_generalized_cost_dollars_%s' % mc], '.-')
         plt.legend(['consumer_generalized_cost_dollars_%s' % mc for mc in market_classes])
         plt.ylabel('Cost $ / mi')
         plt.title('%s Consumer Generalized Cost %s' % (compliance_id, iteration_label))
@@ -1282,12 +1285,14 @@ def plot_iteration(iteration_log, compliance_id):
         plt.figure()
         if iteration == -1:
             for mc in market_classes:
-                plt.plot(last_logged['calendar_year'],
+                if 'cost_multiplier_%s' % mc in last_logged:
+                    plt.plot(last_logged['calendar_year'],
                          last_logged['cost_multiplier_%s' % mc], '.-')
         else:
             for mc in market_classes:
-                plt.plot(first_logged['calendar_year'],
-                         first_logged['cost_multiplier_%s' % mc], '.-')
+                if 'cost_multiplier_%s' % mc in first_logged:
+                    plt.plot(first_logged['calendar_year'],
+                             first_logged['cost_multiplier_%s' % mc], '.-')
         plt.legend(['cost_multiplier_%s' % mc for mc in market_classes])
         plt.ylabel('Cost Multiplier')
         plt.title('%s Producer Cost Multipliers %s' % (compliance_id, iteration_label))
