@@ -417,11 +417,16 @@ class VehicleAggregation(OMEGABase):
             else:
                 agg_df['compliance_id'] = agg_df['manufacturer_id']
 
-            agg_df['model_year'] = df['model_year'].iloc[0]
+            if omega_globals.options.vehicles_file_base_year is not None:
+                agg_df['model_year'] = omega_globals.options.vehicles_file_base_year
+            else:
+                agg_df['model_year'] = df['model_year'].iloc[0]
 
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
 
             agg_df['rated_hp'] = agg_df['eng_rated_hp']  # TODO: we need to figure out this 'engine' rated hp biz
+
+            # TODO: process manufacturers include/exclude list (drop agg_df rows)
 
             omega_globals.options.vehicles_df = agg_df
 
