@@ -90,6 +90,8 @@ try:
             self.omega_model_path = path
             self.use_prerun_context_outputs = False
             self.consolidate_manufacturers = True
+            self.include_manufacturers_list = 'all'
+            self.exclude_manufacturers_list = 'none'
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
             self.vehicles_file = path + 'test_inputs/vehicles.csv'
             self.vehicles_file_base_year = None

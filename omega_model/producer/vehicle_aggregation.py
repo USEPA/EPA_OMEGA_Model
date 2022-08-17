@@ -432,7 +432,14 @@ class VehicleAggregation(OMEGABase):
 
             agg_df['rated_hp'] = agg_df['eng_rated_hp']  # TODO: we need to figure out this 'engine' rated hp biz
 
-            # TODO: process manufacturers include/exclude list (drop agg_df rows)
+            # process manufacturer include/exclude lists
+            if omega_globals.options.include_manufacturers_list != 'all':
+                agg_df = agg_df[[mid in omega_globals.options.include_manufacturers_list
+                                 for mid in agg_df['manufacturer_id']]]
+
+            if omega_globals.options.exclude_manufacturers_list != 'none':
+                agg_df = agg_df[[mid not in omega_globals.options.exclude_manufacturers_list
+                                 for mid in agg_df['manufacturer_id']]]
 
             omega_globals.options.vehicles_df = agg_df
 
