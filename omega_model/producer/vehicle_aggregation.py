@@ -313,6 +313,15 @@ class VehicleAggregation(OMEGABase):
             if not omega_globals.options.consolidate_manufacturers:
                 aggregation_columns += ['manufacturer_id']
 
+            # process manufacturer include/exclude lists
+            if omega_globals.options.include_manufacturers_list != 'all':
+                df = df[[mid in omega_globals.options.include_manufacturers_list
+                                 for mid in df['manufacturer_id']]]
+
+            if omega_globals.options.exclude_manufacturers_list != 'none':
+                df = df[[mid not in omega_globals.options.exclude_manufacturers_list
+                                 for mid in df['manufacturer_id']]]
+
             # new columns calculated here for every vehicle in vehicles.csv:
             df['glider_non_structure_cost_dollars'] = 0
             df['glider_non_structure_mass_lbs'] = 0
@@ -431,15 +440,6 @@ class VehicleAggregation(OMEGABase):
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
 
             agg_df['rated_hp'] = agg_df['eng_rated_hp']  # TODO: we need to figure out this 'engine' rated hp biz
-
-            # process manufacturer include/exclude lists
-            if omega_globals.options.include_manufacturers_list != 'all':
-                agg_df = agg_df[[mid in omega_globals.options.include_manufacturers_list
-                                 for mid in agg_df['manufacturer_id']]]
-
-            if omega_globals.options.exclude_manufacturers_list != 'none':
-                agg_df = agg_df[[mid not in omega_globals.options.exclude_manufacturers_list
-                                 for mid in agg_df['manufacturer_id']]]
 
             omega_globals.options.vehicles_df = agg_df
 
