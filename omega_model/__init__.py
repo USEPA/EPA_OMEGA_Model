@@ -150,12 +150,12 @@ try:
             self.new_vehicle_price_elasticity_of_demand = -0.4
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
-            # self.calc_effects = True
             self.calc_effects = 'Physical and Costs' # options are 'No', 'Physical' and 'Physical and Costs' as strings
             self.analysis_dollar_basis = 2020 # Note that the implicit_price_deflator.csv input file must contain data for this entry.
             self.discount_values_to_year = 2021
             self.cost_accrual = 'end-of-year'  # end-of-year means costs accrue at year's end; beginning-of-year means cost accrue at year's beginning
-            # self.calc_criteria_emission_costs = False # no longer functional in omega.py
+            self.allow_ice_of_bev = True
+
             # effects modeling files
             self.general_inputs_for_effects_file = path + 'test_inputs/general_inputs_for_effects.csv'
             self.ip_deflators_file = path + 'test_inputs/implicit_price_deflators.csv'

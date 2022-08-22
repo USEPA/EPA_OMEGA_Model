@@ -1535,45 +1535,46 @@ class VehicleFinal(SQABase, Vehicle):
         for v in vehicles_list:
             v.base_year_market_share = v.initial_registered_count / vehicle_shares_dict['total']
 
-            alt_veh = v.clone_vehicle(v)  # create alternative powertrain clone of vehicle
+            if v.fueling_class != 'BEV' or omega_globals.options.allow_ice_of_bev:
+                alt_veh = v.clone_vehicle(v)  # create alternative powertrain clone of vehicle
 
-            if v.fueling_class == 'ICE':
-                alt_veh.fueling_class = 'BEV'
-                alt_veh.base_year_powertrain_type = 'BEV'
-                alt_veh.name = 'BEV of ' + v.name
-                for tf in omega_globals.options.CostCloud.tech_flags:
-                    alt_veh.__setattr__(tf, None)
-                alt_veh.bev = 1
-                alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
-                alt_veh.cert_fuel_id = "{'electricity':1.0}"
-                alt_veh.battery_kwh = 60  # TODO: do we need this?  it gets set in the cloud search
-                alt_veh.motor_kw = 150 + 100 * (v.drive_system == 4)  # TODO: where does power come from?
-                alt_veh.charge_depleting_range_mi = 300  # TODO: where does 300 come from?
-                alt_veh.eng_rated_hp = 0
-                alt_veh.eng_cyls_num = 0
-                alt_veh.eng_disp_liters = 0
-            else:
-                alt_veh.fueling_class = 'ICE'
-                alt_veh.base_year_powertrain_type = 'ICE'
-                alt_veh.name = 'ICE of ' + v.name
-                for tf in omega_globals.options.CostCloud.tech_flags:
-                    alt_veh.__setattr__(tf, None)
-                alt_veh.ice = 1
-                alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
-                alt_veh.cert_fuel_id = "{'gasoline':1.0}"
-                alt_veh.eng_rated_hp = v.motor_kw * 1.34102  # TODO: where does power come from?
-                alt_veh.motor_kw = 0
-                alt_veh.charge_depleting_range_mi = 0
-                alt_veh.battery_kwh = 0
-                alt_veh.eng_cyls_num = None
-                alt_veh.eng_disp_liters = None
+                if v.fueling_class == 'ICE':
+                    alt_veh.fueling_class = 'BEV'
+                    alt_veh.base_year_powertrain_type = 'BEV'
+                    alt_veh.name = 'BEV of ' + v.name
+                    for tf in omega_globals.options.CostCloud.tech_flags:
+                        alt_veh.__setattr__(tf, None)
+                    alt_veh.bev = 1
+                    alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
+                    alt_veh.cert_fuel_id = "{'electricity':1.0}"
+                    alt_veh.battery_kwh = 60  # TODO: do we need this?  it gets set in the cloud search
+                    alt_veh.motor_kw = 150 + 100 * (v.drive_system == 4)  # TODO: where does power come from?
+                    alt_veh.charge_depleting_range_mi = 300  # TODO: where does 300 come from?
+                    alt_veh.eng_rated_hp = 0
+                    alt_veh.eng_cyls_num = 0
+                    alt_veh.eng_disp_liters = 0
+                else:
+                    alt_veh.fueling_class = 'ICE'
+                    alt_veh.base_year_powertrain_type = 'ICE'
+                    alt_veh.name = 'ICE of ' + v.name
+                    for tf in omega_globals.options.CostCloud.tech_flags:
+                        alt_veh.__setattr__(tf, None)
+                    alt_veh.ice = 1
+                    alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
+                    alt_veh.cert_fuel_id = "{'gasoline':1.0}"
+                    alt_veh.eng_rated_hp = v.motor_kw * 1.34102  # TODO: where does power come from?
+                    alt_veh.motor_kw = 0
+                    alt_veh.charge_depleting_range_mi = 0
+                    alt_veh.battery_kwh = 0
+                    alt_veh.eng_cyls_num = None
+                    alt_veh.eng_disp_liters = None
 
-            alt_veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(alt_veh)
-            v.manufacturer.update_market_class_data(v.manufacturer_id, alt_veh.market_class_id)
+                alt_veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(alt_veh)
+                v.manufacturer.update_market_class_data(v.manufacturer_id, alt_veh.market_class_id)
 
-            alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
-            alt_veh.cert_direct_co2e_grams_per_mile = 0
-            alt_veh.cert_direct_kwh_per_mile = 0
+                alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
+                alt_veh.cert_direct_co2e_grams_per_mile = 0
+                alt_veh.cert_direct_kwh_per_mile = 0
 
         for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
             for csc in NewVehicleMarket.context_size_class_info_by_nrmc[nrmc]:
