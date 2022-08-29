@@ -71,6 +71,14 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
             cross_subsidy_options_and_response, iteration_log = \
                 search_cross_subsidies(calendar_year, compliance_id, node_name, cross_subsidy_pair, producer_decision,
                                        cross_subsidy_options_and_response, producer_consumer_iteration_num, iteration_log)
+        elif any(mc in market_class_data[compliance_id] for mc in cross_subsidy_pair):
+            # only one child available from the manufacturer for this market class (e.g. ICE or BEV-only)
+            only_child = [mc for mc in cross_subsidy_pair if mc in market_class_data[compliance_id]]
+            cross_subsidy_options_and_response = \
+                omega_globals.options.SalesShare.calc_shares(calendar_year, compliance_id, producer_decision,
+                                                             cross_subsidy_options_and_response, node_name, only_child)
+            if type(cross_subsidy_options_and_response) is pd.DataFrame:
+                cross_subsidy_options_and_response = cross_subsidy_options_and_response.loc[0].copy()
         else:
             pass
 
