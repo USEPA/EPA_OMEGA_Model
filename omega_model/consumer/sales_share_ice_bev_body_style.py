@@ -164,6 +164,59 @@ class SalesShare(OMEGABase, SalesShareBase):
         return SalesShare._data[cache_key]
 
     @staticmethod
+    def calc_consumer_generalized_cost(calendar_year, market_class_data, market_class_id, producer_decision):
+        """
+
+        Args:
+            calendar_year (int): calendar year to calculate market shares in
+            market_class_data (DataFrame): DataFrame with 'average_modified_cross_subsidized_price_MC' columns,
+                where MC = market class ID
+            market_class_id (str}: e.g. 'hauling.ICE'
+            producer_decision (Series): selected producer compliance option with
+                'average_retail_fuel_price_dollars_per_unit_MC',
+                'average_onroad_direct_co2e_gpmi_MC', 'average_onroad_direct_kwh_pmi_MC' attributes,
+                where MC = market class ID
+
+        Returns:
+            Consumer cost in $/mi
+
+        """
+        fuel_cost = producer_decision['average_retail_fuel_price_dollars_per_unit_%s' % market_class_id]
+        gcam_data_cy = SalesShare.get_gcam_params(calendar_year, market_class_id)
+        price_amortization_period = float(gcam_data_cy['price_amortization_period'])
+        discount_rate = gcam_data_cy['discount_rate']
+        annualization_factor = discount_rate + discount_rate / (
+                ((1 + discount_rate) ** price_amortization_period) - 1)
+
+        if type(market_class_data) is pd.DataFrame:
+            total_capital_costs = market_class_data[
+                'average_modified_cross_subsidized_price_%s' % market_class_id].values
+        else:
+            total_capital_costs = market_class_data[
+                'average_modified_cross_subsidized_price_%s' % market_class_id]
+
+        average_co2e_gpmi = producer_decision['average_onroad_direct_co2e_gpmi_%s' % market_class_id]
+        average_kwh_pmi = producer_decision['average_onroad_direct_kwh_pmi_%s' % market_class_id]
+        carbon_intensity_gasoline = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
+                                                                  'direct_co2e_grams_per_unit')
+        refuel_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
+                                                          'refuel_efficiency')
+        recharge_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, 'US electricity',
+                                                            'refuel_efficiency')
+        annual_o_m_costs = gcam_data_cy['o_m_costs']
+        # TODO: will eventually need utility factor for PHEVs here
+        fuel_cost_per_VMT = fuel_cost * average_kwh_pmi / recharge_efficiency
+        fuel_cost_per_VMT += fuel_cost * average_co2e_gpmi / carbon_intensity_gasoline / refuel_efficiency
+        # consumer_generalized_cost_dollars = total_capital_costs
+        annualized_capital_costs = annualization_factor * total_capital_costs
+        annual_VMT = float(gcam_data_cy['annual_vmt'])
+        total_non_fuel_costs_per_VMT = (annualized_capital_costs + annual_o_m_costs) / 1.383 / annual_VMT
+        total_cost_w_fuel_per_VMT = total_non_fuel_costs_per_VMT + fuel_cost_per_VMT
+        total_cost_w_fuel_per_PMT = total_cost_w_fuel_per_VMT / gcam_data_cy['average_occupancy']
+
+        return total_cost_w_fuel_per_PMT
+
+    @staticmethod
     def calc_shares_gcam(producer_decision, market_class_data, calendar_year,
                          parent_market_class, child_market_classes):
         """
@@ -198,49 +251,18 @@ class SalesShare(OMEGABase, SalesShareBase):
         for pass_num in [0, 1]:
             for market_class_id in child_market_classes:
                 if pass_num == 0:
-                    fuel_cost = producer_decision['average_retail_fuel_price_dollars_per_unit_%s' % market_class_id]
+                    total_cost_w_fuel_per_PMT = SalesShare.calc_consumer_generalized_cost(calendar_year,
+                                                                                          market_class_data,
+                                                                                          market_class_id,
+                                                                                          producer_decision)
+
+                    market_class_data['consumer_generalized_cost_dollars_%s' % market_class_id] = \
+                        total_cost_w_fuel_per_PMT
 
                     gcam_data_cy = SalesShare.get_gcam_params(calendar_year, market_class_id)
-
                     logit_exponent_mu = gcam_data_cy['logit_exponent_mu']
-
-                    price_amortization_period = float(gcam_data_cy['price_amortization_period'])
-                    discount_rate = gcam_data_cy['discount_rate']
-                    annualization_factor = discount_rate + discount_rate / (
-                            ((1 + discount_rate) ** price_amortization_period) - 1)
-
-                    total_capital_costs = market_class_data[
-                        'average_modified_cross_subsidized_price_%s' % market_class_id].values
-                    average_co2e_gpmi = producer_decision['average_onroad_direct_co2e_gpmi_%s' % market_class_id]
-                    average_kwh_pmi = producer_decision['average_onroad_direct_kwh_pmi_%s' % market_class_id]
-
-                    carbon_intensity_gasoline = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
-                                                                              'direct_co2e_grams_per_unit')
-
-                    refuel_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
-                                                                      'refuel_efficiency')
-
-                    recharge_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, 'US electricity',
-                                                                        'refuel_efficiency')
-
-                    annual_o_m_costs = gcam_data_cy['o_m_costs']
-
-                    # TODO: will eventually need utility factor for PHEVs here
-                    fuel_cost_per_VMT = fuel_cost * average_kwh_pmi / recharge_efficiency
-                    fuel_cost_per_VMT += fuel_cost * average_co2e_gpmi / carbon_intensity_gasoline / refuel_efficiency
-
-                    # consumer_generalized_cost_dollars = total_capital_costs
-                    annualized_capital_costs = annualization_factor * total_capital_costs
-                    annual_VMT = float(gcam_data_cy['annual_vmt'])
-
-                    total_non_fuel_costs_per_VMT = (annualized_capital_costs + annual_o_m_costs) / 1.383 / annual_VMT
-                    total_cost_w_fuel_per_VMT = total_non_fuel_costs_per_VMT + fuel_cost_per_VMT
-                    total_cost_w_fuel_per_PMT = total_cost_w_fuel_per_VMT / gcam_data_cy['average_occupancy']
                     sales_share_numerator[market_class_id] = gcam_data_cy['share_weight'] * (
                             total_cost_w_fuel_per_PMT ** logit_exponent_mu)
-
-                    market_class_data[
-                        'consumer_generalized_cost_dollars_%s' % market_class_id] = total_cost_w_fuel_per_PMT
 
                     sales_share_denominator += sales_share_numerator[market_class_id]
 
@@ -476,14 +498,43 @@ class SalesShare(OMEGABase, SalesShareBase):
         analysis_cuv_suv_van_share /= total_corrected_share
         analysis_pickup_share /= total_corrected_share
 
-        market_class_data['consumer_abs_share_frac_sedan_wagon'] = analysis_sedan_wagon_share
+        if len(market_class_data):
+            market_class_data['consumer_abs_share_frac_sedan_wagon'] = analysis_sedan_wagon_share
+        else:  # populate Series with at least one row
+            market_class_data['consumer_abs_share_frac_sedan_wagon'] = [analysis_sedan_wagon_share]
+
         market_class_data['consumer_abs_share_frac_cuv_suv_van'] = analysis_cuv_suv_van_share
         market_class_data['consumer_abs_share_frac_pickup'] = analysis_pickup_share
 
         if all([SalesShare.gcam_supports_market_class(mc) for mc in mc_pair]):
-            # calculate desired ICE/BEV shares within hauling/non_hauling using methods based on the GCAM model:
-            market_class_data = SalesShare.calc_shares_gcam(producer_decision, market_class_data, calendar_year,
-                                                        mc_parent, mc_pair)
+            if len(mc_pair) > 1:
+                # calculate desired ICE/BEV shares within hauling/non_hauling using methods based on the GCAM model:
+                market_class_data = SalesShare.calc_shares_gcam(producer_decision, market_class_data, calendar_year,
+                                                            mc_parent, mc_pair)
+            else:
+                # can't calculate ICE/BEV shares since there is only ICE or only BEV
+                only_child = mc_pair[0]
+
+                # populate fields that normally come from cross subsidy iteration
+                market_class_data['average_cross_subsidized_price_%s' % only_child] = \
+                    producer_decision['average_new_vehicle_mfr_cost_%s' % only_child]
+
+                market_class_data['average_modified_cross_subsidized_price_%s' % only_child] = \
+                    producer_decision['average_new_vehicle_mfr_cost_%s' % only_child]
+
+                market_class_data['pricing_score'] = 0
+
+                total_cost_w_fuel_per_PMT = SalesShare.calc_consumer_generalized_cost(calendar_year,
+                                                                                      market_class_data,
+                                                                                      only_child,
+                                                                                      producer_decision)
+
+                market_class_data['consumer_generalized_cost_dollars_%s' % only_child] = \
+                    total_cost_w_fuel_per_PMT
+
+                market_class_data['consumer_share_frac_%s' % only_child] = 1.0
+                market_class_data['consumer_abs_share_frac_%s' % only_child] = \
+                    producer_decision['producer_abs_share_frac_%s' % only_child]
 
         return market_class_data
 
