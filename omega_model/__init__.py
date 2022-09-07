@@ -154,7 +154,7 @@ try:
             self.analysis_dollar_basis = 2020 # Note that the implicit_price_deflator.csv input file must contain data for this entry.
             self.discount_values_to_year = 2021
             self.cost_accrual = 'end-of-year'  # end-of-year means costs accrue at year's end; beginning-of-year means cost accrue at year's beginning
-            self.allow_ice_of_bev = True
+            self.allow_ice_of_bev = False
 
             # effects modeling files
             self.general_inputs_for_effects_file = path + 'test_inputs/general_inputs_for_effects.csv'
