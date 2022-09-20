@@ -1,120 +1,140 @@
-input_template_name:,powertrain_cost,input_template_version:,0.1,description:,proof-of-concept;pre-fev;20220617 update gpf and add ICE lv_battery and hvac
-powertrain_type,item,value,quantity,dollar_basis,notes
-ALL,dollars_per_cylinder,((-28.814) * CYL + 726.27) * CYL * MARKUP_ICE,,2019,
-ALL,dollars_per_liter,((400) * LITERS) * MARKUP_ICE,,2019,
-ALL,gdi,((43.237) * CYL + 97.35) * MARKUP_ICE,,2019,
-ALL,turb11,((-13.149) * CYL ** 2 + 220.34 * CYL - 124.73) * MARKUP_ICE,,2012,
-ALL,turb12,((-13.149) * CYL ** 2 + 220.34 * CYL - 124.73) * MARKUP_ICE,,2012,
-ALL,cegr,(114) * MARKUP_ICE,,2012,
-ALL,deac_pd,((-1.0603) * CYL ** 2 + 28.92 * CYL - 8.6935) * MARKUP_ICE,,2006,
-ALL,deac_fc,(154) * MARKUP_ICE,,2017,
-ALL,atk2,(4.907 * CYL ** 2 - 29.957 * CYL + 130.18) * MARKUP_ICE,,2010,
-ALL,TRX11,(841) * MARKUP_ICE,,2012,
-ALL,TRX12,(1063) * MARKUP_ICE,,2012,
-ALL,TRX21,(978) * MARKUP_ICE,,2012,
-ALL,TRX22,(1201) * MARKUP_ICE,,2012,
-ALL,high_eff_alternator,(150) * MARKUP_ICE,,2015,
-ALL,start_stop,((0.0149) * CURBWT + 276.82) * MARKUP_ICE,,2015,
-ALL,twc_substrate,((6.108) * LITERS * TWC_SWEPT_VOLUME + 1.95456) * MARKUP_ICE,,2012,SAE 2013-01-0534
-ALL,twc_washcoat,((5.09) * LITERS * TWC_SWEPT_VOLUME) * MARKUP_ICE,,2012,ibid
-ALL,twc_canning,((2.4432) * LITERS * TWC_SWEPT_VOLUME) * MARKUP_ICE,,2012,ibid
-ALL,twc_swept_volume,(1.2) * 1,,,Tier3
-ALL,twc_pt_grams_per_liter,(0) * 1,,,
-ALL,twc_pd_grams_per_liter,(2) * 1,,,
-ALL,twc_rh_grams_per_liter,(0.11) * 1,,,
-ALL,gpf_substrate,((6.108) * LITERS * TWC_SWEPT_VOLUME + 1.95456) * 2 * MARKUP_ICE,,2012,set equal to twice the twc value
-ALL,gpf_washcoat,((0) * LITERS * GPF_SWEPT_VOLUME) * MARKUP_ICE,,2012,set to 0
-ALL,gpf_canning,((2.4432) * LITERS * TWC_SWEPT_VOLUME) * MARKUP_ICE,,2012,set equal to twc
-ALL,gpf_swept_volume,(1.2) * 1,,,ibid
-ALL,gpf_pt_grams_per_liter,(0) * 1,,,ibid
-ALL,gpf_pd_grams_per_liter,(0) * 1,,,ibid
-ALL,gpf_rh_grams_per_liter,(0) * 1,,,ibid
-ALL,twc_pgm,(PT_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * PT_USD_PER_OZ * OZ_PER_GRAM + PD_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * PD_USD_PER_OZ * OZ_PER_GRAM  + RH_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * RH_USD_PER_OZ * OZ_PER_GRAM) * MARKUP_ICE,,,
-ALL,gpf_pgm,(PT_GRAMS_PER_LITER_GPF * LITERS * GPF_SWEPT_VOLUME * PT_USD_PER_OZ * OZ_PER_GRAM + PD_GRAMS_PER_LITER_GPF * LITERS * GPF_SWEPT_VOLUME * PD_USD_PER_OZ * OZ_PER_GRAM  + RH_GRAMS_PER_LITER_GPF * LITERS * GPF_SWEPT_VOLUME * RH_USD_PER_OZ * OZ_PER_GRAM) * MARKUP_ICE,,,
-ALL,troy_oz_per_gram,(0.0322) * 1,,,
-ALL,pt_dollars_per_oz,(990.58) * 1,,,http://www.platinum.matthey.com/prices/price-tables; Month Average for all time zones (20220125)
-ALL,pd_dollars_per_oz,(1952.23) * 1,,,ibid
-ALL,rh_dollars_per_oz,(16328.67) * 1,,,ibid
-ALL,ac_efficiency,(40) * MARKUP_ALL,,2010,
-ALL,ac_leakage,(63) * MARKUP_ALL,,2010,
-ICE,LV_battery,((3) * VEHICLE_SIZE_CLASS + 51) * MARKUP_ICE,1,2019,set equal to electrified vehicle values
-ICE,HVAC,((11.5) * VEHICLE_SIZE_CLASS + 195.5) * MARKUP_ICE,1,2019,set equal to electrified vehicle values
-BEV,battery,"max(114.2,(-0.00010551) * (KWH ** 3) + 0.02954283 * (KWH ** 2) - 2.89409681 * KWH + 218.421996) * KWH * MARKUP_BEV",,2019,KWH denotes gross kWh; coefficients denote 125K production volume; source Msa 20210406_1732
-PHEV,battery,((-0.00009965) * (KWH ** 3) + 0.02776430 * (KWH ** 2) - 2.69776661 * KWH + 203.67861255) * KWH * MARKUP_PHEV,,2019,KWH denotes gross kWh; coefficients denote 125K production volume; source Msa 20210406_1732
-HEV,battery,((-250.72) * KWH + 1058.2) * KWH * MARKUP_HEV,,2017,
-BEV,motor_single,((4.29) * KW) * MARKUP_BEV,1,2019,Costing_Guide_BEV_HEV_Draft_04_30_2021.xlsx
-BEV,inverter_single,((2.5) * KW) * MARKUP_BEV,1,2019,ibid
-BEV,induction_motor_single,(0) * 1,0,2019,ibid
-BEV,induction_inverter_single,(0) * 1,0,2019,ibid
-BEV,motor_dual,((4.29) * KW / 2) * MARKUP_BEV,1,2019,Costing_Guide_BEV_HEV_Draft_04_30_2021.xlsx
-BEV,inverter_dual,((2.5) * KW / 2) * MARKUP_BEV,1,2019,ibid
-BEV,induction_motor_dual,((3.12) * KW / 2) * MARKUP_BEV,1,2019,ibid
-BEV,induction_inverter_dual,((4) * KW / 2) * MARKUP_BEV,1,2019,ibid
-BEV,DCDC_converter_kW,(3.5) * 1,1,2019,ibid; this is a kW value to be added to the onboard charger kW value
-BEV,OBC_and_DCDC_converter,(39.7537931034483) * OBC_AND_DCDC_CONVERTER_KW * MARKUP_BEV,1,2019,ibid; 1st determine onboard charger kW then add DCDC_converter kW then multiply sum by this curve
-BEV,HV_orange_cables,((9.5) * VEHICLE_SIZE_CLASS + 161.5) * MARKUP_BEV,1,2019,Costing_Guide_BEV_HEV_Draft_04_30_2021.xlsx
-BEV,LV_battery,((3) * VEHICLE_SIZE_CLASS + 51) * MARKUP_BEV,1,2019,ibid
-BEV,HVAC,((11.5) * VEHICLE_SIZE_CLASS + 195.5) * MARKUP_BEV,1,2019,ibid
-BEV,single_speed_gearbox_single,(410) * MARKUP_BEV,1,2019,ibid
-BEV,powertrain_cooling_loop_single,(300) * MARKUP_BEV,1,2019,ibid
-BEV,single_speed_gearbox_dual,(410) * MARKUP_BEV,2,2019,ibid
-BEV,powertrain_cooling_loop_dual,(300) * MARKUP_BEV,2,2019,ibid
-BEV,charging_cord_kit,(200) * MARKUP_BEV,1,2019,ibid
-BEV,DC_fast_charge_circuitry,(160) * MARKUP_BEV,1,2019,ibid
-BEV,power_management_and_distribution,(720) * MARKUP_BEV,1,2019,ibid
-BEV,brake_sensors_actuators,(0) * 1,0,2019,ibid
-BEV,additional_pair_of_half_shafts_single,(0) * 1,0,2019,ibid
-BEV,additional_pair_of_half_shafts_dual,(190) * MARKUP_BEV,1,2019,ibid
-PHEV,motor_single,((4.29) * KW) * MARKUP_PHEV,1,2019,Costing_Guide_PHEV_HEV_Draft_04_30_2021.xlsx
-PHEV,inverter_single,((2.5) * KW) * MARKUP_PHEV,1,2019,ibid
-PHEV,induction_motor_single,(0) * 1,0,2019,ibid
-PHEV,induction_inverter_single,(0) * 1,0,2019,ibid
-PHEV,motor_dual,((4.29) * KW / 2) * MARKUP_PHEV,1,2019,Costing_Guide_PHEV_HEV_Draft_04_30_2021.xlsx
-PHEV,inverter_dual,((2.5) * KW / 2) * MARKUP_PHEV,1,2019,ibid
-PHEV,induction_motor_dual,((3.12) * KW / 2) * MARKUP_PHEV,1,2019,ibid
-PHEV,induction_inverter_dual,((4) * KW / 2) * MARKUP_PHEV,1,2019,ibid
-PHEV,DCDC_converter_kW,(3.5) * 1,1,2019,ibid; this is a kW value to be added to the onboard charger kW value
-PHEV,OBC_and_DCDC_converter,(39.7537931034483) * OBC_AND_DCDC_CONVERTER_KW * MARKUP_PHEV,1,2019,ibid; 1st determine onboard charger kW then add DCDC_converter kW then multiply sum by this curve
-PHEV,HV_orange_cables,((9.5) * VEHICLE_SIZE_CLASS + 161.5) * MARKUP_PHEV,1,2019,Costing_Guide_PHEV_HEV_Draft_04_30_2021.xlsx
-PHEV,LV_battery,((3) * VEHICLE_SIZE_CLASS + 51) * MARKUP_PHEV,1,2019,ibid
-PHEV,HVAC,((11.5) * VEHICLE_SIZE_CLASS + 195.5) * MARKUP_PHEV,1,2019,ibid
-PHEV,single_speed_gearbox_single,(410) * MARKUP_PHEV,1,2019,ibid
-PHEV,powertrain_cooling_loop_single,(300) * MARKUP_PHEV,1,2019,ibid
-PHEV,single_speed_gearbox_dual,(410) * MARKUP_PHEV,2,2019,ibid
-PHEV,powertrain_cooling_loop_dual,(300) * MARKUP_PHEV,2,2019,ibid
-PHEV,charging_cord_kit,(200) * MARKUP_PHEV,1,2019,ibid
-PHEV,DC_fast_charge_circuitry,(160) * MARKUP_PHEV,1,2019,ibid
-PHEV,power_management_and_distribution,(720) * MARKUP_PHEV,1,2019,ibid
-PHEV,brake_sensors_actuators,(0) * 1,0,2019,ibid
-PHEV,additional_pair_of_half_shafts_single,(0) * 1,0,2019,ibid
-PHEV,additional_pair_of_half_shafts_dual,(190) * MARKUP_PHEV,1,2019,ibid
-HEV,motor_single,((6.91) * KW - 8.64) * MARKUP_HEV,1,2019,Costing_Guide_BEV_HEV_Draft_04_30_2021.xlsx
-HEV,inverter_single,((2.4) * KW + 231) * MARKUP_HEV,1,2019,ibid
-HEV,induction_motor_single,(0) * 1,0,2019,ibid
-HEV,induction_inverter_single,(0) * 1,0,2019,ibid
-HEV,DCDC_converter_kW,(3.5) * 1,1,2019,ibid; this is a kW value to be added to the onboard charger kW value
-HEV,OBC_and_DCDC_converter,(39.7537931034483) * OBC_AND_DCDC_CONVERTER_KW * MARKUP_HEV,1,2019,ibid; 1st determine onboard charger kW then add DCDC_converter kW then multiply sum by this curve
-HEV,HV_orange_cables,((9.5) * VEHICLE_SIZE_CLASS + 161.5) * MARKUP_HEV,1,2019,Costing_Guide_BEV_HEV_Draft_04_30_2021.xlsx
-HEV,LV_battery,((3) * VEHICLE_SIZE_CLASS + 51) * MARKUP_HEV,1,2019,ibid
-HEV,HVAC,((11.5) * VEHICLE_SIZE_CLASS + 195.5) * MARKUP_HEV,1,2019,ibid
-HEV,single_speed_gearbox_single,(0) * 1,0,2019,ibid
-HEV,powertrain_cooling_loop_single,(0) * 1,0,2019,ibid
-HEV,charging_cord_kit,(0) * 1,0,2019,ibid
-HEV,DC_fast_charge_circuitry,(0) * 1,0,2019,ibid
-HEV,power_management_and_distribution,(0) * 1,0,2019,ibid
-HEV,brake_sensors_actuators,(200) * MARKUP_HEV,1,2019,ibid
-HEV,additional_pair_of_half_shafts_single,(0) * 1,0,,ibid
-BEV,markup,(1.5) * 1,,,
-HEV,markup,(1.5) * 1,,,
-PHEV,markup,(1.5) * 1,,,
-ICE,markup,(1.5) * 1,,,
-ALL,markup,(1.5) * 1,,,
-ALL,learning_rate,(-0.245) * 1,,,
-ALL,learning_start,(2020) * 1,,,
-ROADLOAD,legacy_sales_learning_scaler,(100) * 1,,,
-ICE,legacy_sales_learning_scaler,(100) * 1,,,
-PEV,legacy_sales_learning_scaler,(8) * 1,,,
-ROADLOAD,sales_scaler,(10) * 1,,,
-ICE,sales_scaler,(8) * 1,,,
-PEV,sales_scaler,(2) * 1,,,
-ALL,turb_scaler,(1.2) * 1,,,
+input_template_name:,powertrain_cost,input_template_version:,0.1,description:,proof-of-concept;pre-fev;20220617 update gpf and add ICE lv_battery and hvac; 20220629 add MHEV entries; 20220705 update trans entries,,,,,,,
+powertrain_type,item,value,quantity,dollar_basis,notes,,,,,,,
+ALL,dollars_per_cylinder,((-28.814) * CYL + 726.27) * CYL * MARKUP_ICE,,2019,,,,,,,,
+ALL,dollars_per_liter,((400) * LITERS) * MARKUP_ICE,,2019,,,,,,,,
+ALL,gdi,((43.237) * CYL + 97.35) * MARKUP_ICE,,2019,,,,,,,,
+ALL,turb11,((-13.149) * CYL ** 2 + 220.34 * CYL - 124.73) * MARKUP_ICE,,2012,,,,,,,,
+ALL,turb12,((-13.149) * CYL ** 2 + 220.34 * CYL - 124.73) * MARKUP_ICE,,2012,,,,,,,,
+ALL,cegr,(114) * MARKUP_ICE,,2012,,,,,,,,
+ALL,deac_pd,((-1.0603) * CYL ** 2 + 28.92 * CYL - 8.6935) * MARKUP_ICE,,2006,,,,,,,,
+ALL,deac_fc,(154) * MARKUP_ICE,,2017,,,,,,,,
+ALL,atk2,(4.907 * CYL ** 2 - 29.957 * CYL + 130.18) * MARKUP_ICE,,2010,,,,,,,,
+ALL,TRX10,(1390.2) * MARKUP_ICE,,2018,from NTR-FRM AT5 cost of 2085.30/1.5=1390.20 in 2018 dollars for MY2020,,,,,,,
+ALL,TRX11,(1431.20) * MARKUP_ICE,,2018,,,,,,,,
+ALL,TRX12,(1653.20) * MARKUP_ICE,,2018,,,,,,,,
+ALL,TRX21,(1568.20) * MARKUP_ICE,,2018,,,,,,,,
+ALL,TRX22,(1791.20) * MARKUP_ICE,,2018,,,,,,,,
+ALL,TRXCV,(1000) * MARKUP_ICE,,2019,this is for power split transmission ECVT,,,,,,,
+ALL,high_eff_alternator,(150) * MARKUP_ICE,,2015,,,,,,,,
+ALL,start_stop,((0.0149) * CURBWT + 276.82) * MARKUP_ICE,,2015,,,,,,,,
+ALL,twc_substrate,((6.108) * LITERS * TWC_SWEPT_VOLUME + 1.95456) * MARKUP_ICE,,2012,SAE 2013-01-0534,,,,,,,
+ALL,twc_washcoat,((5.09) * LITERS * TWC_SWEPT_VOLUME) * MARKUP_ICE,,2012,ibid,,,,,,,
+ALL,twc_canning,((2.4432) * LITERS * TWC_SWEPT_VOLUME) * MARKUP_ICE,,2012,ibid,,,,,,,
+ALL,twc_swept_volume,(1.2) * 1,,,Tier3,,,,,,,
+ALL,twc_pt_grams_per_liter,(0) * 1,,,,,,,,,,
+ALL,twc_pd_grams_per_liter,(2) * 1,,,,,,,,,,
+ALL,twc_rh_grams_per_liter,(0.11) * 1,,,,,,,,,,
+ALL,gpf_substrate,((6.108) * LITERS * TWC_SWEPT_VOLUME + 1.95456) * 2 * MARKUP_ICE,,2012,set equal to twice the twc value,,,,,,,
+ALL,gpf_washcoat,((0) * LITERS * GPF_SWEPT_VOLUME) * MARKUP_ICE,,2012,set to 0,,,,,,,
+ALL,gpf_canning,((2.4432) * LITERS * TWC_SWEPT_VOLUME) * MARKUP_ICE,,2012,set equal to twc,,,,,,,
+ALL,gpf_swept_volume,(1.2) * 1,,,ibid,,,,,,,
+ALL,gpf_pt_grams_per_liter,(0) * 1,,,ibid,,,,,,,
+ALL,gpf_pd_grams_per_liter,(0) * 1,,,ibid,,,,,,,
+ALL,gpf_rh_grams_per_liter,(0) * 1,,,ibid,,,,,,,
+ALL,twc_pgm,(PT_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * PT_USD_PER_OZ * OZ_PER_GRAM + PD_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * PD_USD_PER_OZ * OZ_PER_GRAM  + RH_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * RH_USD_PER_OZ * OZ_PER_GRAM) * MARKUP_ICE,,,,,,,,,,
+ALL,gpf_pgm,(PT_GRAMS_PER_LITER_GPF * LITERS * GPF_SWEPT_VOLUME * PT_USD_PER_OZ * OZ_PER_GRAM + PD_GRAMS_PER_LITER_GPF * LITERS * GPF_SWEPT_VOLUME * PD_USD_PER_OZ * OZ_PER_GRAM  + RH_GRAMS_PER_LITER_GPF * LITERS * GPF_SWEPT_VOLUME * RH_USD_PER_OZ * OZ_PER_GRAM) * MARKUP_ICE,,,,,,,,,,
+ALL,troy_oz_per_gram,(0.0322) * 1,,,,,,,,,,
+ALL,pt_dollars_per_oz,(990.58) * 1,,,http://www.platinum.matthey.com/prices/price-tables; Month Average for all time zones (20220125),,,,,,,
+ALL,pd_dollars_per_oz,(1952.23) * 1,,,ibid,,,,,,,
+ALL,rh_dollars_per_oz,(16328.67) * 1,,,ibid,,,,,,,
+ALL,ac_efficiency,(40) * MARKUP_ALL,,2010,,,,,,,,
+ALL,ac_leakage,(63) * MARKUP_ALL,,2010,,,,,,,,
+ICE,LV_battery,((3) * VEHICLE_SIZE_CLASS + 51) * MARKUP_ICE,1,2019,set equal to electrified vehicle values,,,,,,,
+ICE,HVAC,((11.5) * VEHICLE_SIZE_CLASS + 195.5) * MARKUP_ICE,1,2019,set equal to electrified vehicle values,,,,,,,
+BEV,battery,"max(114.2,(-0.00010551) * (KWH ** 3) + 0.02954283 * (KWH ** 2) - 2.89409681 * KWH + 218.421996) * KWH * MARKUP_BEV",,2019,KWH denotes gross kWh; coefficients denote 125K production volume; source Msa 20210406_1732,,,,,,,
+BEV,battery_offset,"{""dollars_per_kwh"": {2023: -45, 2024: -45, 2025: -45, 2026: -45, 2027: -45, 2028: -45, 2029: -45, 2030: -33.75, 2031: -22.50, 2032: -11.25}}",,,,,,,,,,
+PHEV,battery,((-0.00009965) * (KWH ** 3) + 0.02776430 * (KWH ** 2) - 2.69776661 * KWH + 203.67861255) * KWH * MARKUP_PHEV,,2019,KWH denotes gross kWh; coefficients denote 125K production volume; source Msa 20210406_1732,,,,,,,
+HEV,battery,((-250.72) * KWH + 1058.2) * KWH * MARKUP_HEV,,2017,,,,,,,,
+MHEV,battery,((-250.72) * KWH + 1058.2) * KWH * MARKUP_HEV,,2017,,,,,,,,
+BEV,motor_single,((4.29) * KW) * MARKUP_BEV,1,2019,Costing_Guide_BEV_HEV_Draft_04_30_2021.xlsx,,,,,,,
+BEV,inverter_single,((2.5) * KW) * MARKUP_BEV,1,2019,ibid,,,,,,,
+BEV,induction_motor_single,(0) * 1,0,2019,ibid,,,,,,,
+BEV,induction_inverter_single,(0) * 1,0,2019,ibid,,,,,,,
+BEV,motor_dual,((4.29) * KW / 2) * MARKUP_BEV,1,2019,Costing_Guide_BEV_HEV_Draft_04_30_2021.xlsx,,,,,,,
+BEV,inverter_dual,((2.5) * KW / 2) * MARKUP_BEV,1,2019,ibid,,,,,,,
+BEV,induction_motor_dual,((3.12) * KW / 2) * MARKUP_BEV,1,2019,ibid,,,,,,,
+BEV,induction_inverter_dual,((4) * KW / 2) * MARKUP_BEV,1,2019,ibid,,,,,,,
+BEV,DCDC_converter_kW,(3.5) * 1,1,2019,ibid; this is a kW value to be added to the onboard charger kW value,,,,,,,
+BEV,OBC_and_DCDC_converter,(39.7537931034483) * OBC_AND_DCDC_CONVERTER_KW * MARKUP_BEV,1,2019,ibid; 1st determine onboard charger kW then add DCDC_converter kW then multiply sum by this curve,,,,,,,
+BEV,HV_orange_cables,((9.5) * VEHICLE_SIZE_CLASS + 161.5) * MARKUP_BEV,1,2019,Costing_Guide_BEV_HEV_Draft_04_30_2021.xlsx,,,,,,,
+BEV,LV_battery,((3) * VEHICLE_SIZE_CLASS + 51) * MARKUP_BEV,1,2019,ibid,,,,,,,
+BEV,HVAC,((11.5) * VEHICLE_SIZE_CLASS + 195.5) * MARKUP_BEV,1,2019,ibid,,,,,,,
+BEV,single_speed_gearbox_single,(410) * MARKUP_BEV,1,2019,ibid,,,,,,,
+BEV,powertrain_cooling_loop_single,(300) * MARKUP_BEV,1,2019,ibid,,,,,,,
+BEV,single_speed_gearbox_dual,(410) * MARKUP_BEV,2,2019,ibid,,,,,,,
+BEV,powertrain_cooling_loop_dual,(300) * MARKUP_BEV,2,2019,ibid,,,,,,,
+BEV,charging_cord_kit,(200) * MARKUP_BEV,1,2019,ibid,,,,,,,
+BEV,DC_fast_charge_circuitry,(160) * MARKUP_BEV,1,2019,ibid,,,,,,,
+BEV,power_management_and_distribution,(720) * MARKUP_BEV,1,2019,ibid,,,,,,,
+BEV,brake_sensors_actuators,(0) * 1,0,2019,ibid,,,,,,,
+BEV,additional_pair_of_half_shafts_single,(0) * 1,0,2019,ibid,,,,,,,
+BEV,additional_pair_of_half_shafts_dual,(190) * MARKUP_BEV,1,2019,ibid,,,,,,,
+PHEV,motor_single,((4.29) * KW) * MARKUP_PHEV,1,2019,Costing_Guide_PHEV_HEV_Draft_04_30_2021.xlsx,,,,,,,
+PHEV,inverter_single,((2.5) * KW) * MARKUP_PHEV,1,2019,ibid,,,,,,,
+PHEV,induction_motor_single,(0) * 1,0,2019,ibid,,,,,,,
+PHEV,induction_inverter_single,(0) * 1,0,2019,ibid,,,,,,,
+PHEV,motor_dual,((4.29) * KW / 2) * MARKUP_PHEV,1,2019,Costing_Guide_PHEV_HEV_Draft_04_30_2021.xlsx,,,,,,,
+PHEV,inverter_dual,((2.5) * KW / 2) * MARKUP_PHEV,1,2019,ibid,,,,,,,
+PHEV,induction_motor_dual,((3.12) * KW / 2) * MARKUP_PHEV,1,2019,ibid,,,,,,,
+PHEV,induction_inverter_dual,((4) * KW / 2) * MARKUP_PHEV,1,2019,ibid,,,,,,,
+PHEV,DCDC_converter_kW,(3.5) * 1,1,2019,ibid; this is a kW value to be added to the onboard charger kW value,,,,,,,
+PHEV,OBC_and_DCDC_converter,(39.7537931034483) * OBC_AND_DCDC_CONVERTER_KW * MARKUP_PHEV,1,2019,ibid; 1st determine onboard charger kW then add DCDC_converter kW then multiply sum by this curve,,,,,,,
+PHEV,HV_orange_cables,((9.5) * VEHICLE_SIZE_CLASS + 161.5) * MARKUP_PHEV,1,2019,Costing_Guide_PHEV_HEV_Draft_04_30_2021.xlsx,,,,,,,
+PHEV,LV_battery,((3) * VEHICLE_SIZE_CLASS + 51) * MARKUP_PHEV,1,2019,ibid,,,,,,,
+PHEV,HVAC,((11.5) * VEHICLE_SIZE_CLASS + 195.5) * MARKUP_PHEV,1,2019,ibid,,,,,,,
+PHEV,single_speed_gearbox_single,(410) * MARKUP_PHEV,1,2019,ibid,,,,,,,
+PHEV,powertrain_cooling_loop_single,(300) * MARKUP_PHEV,1,2019,ibid,,,,,,,
+PHEV,single_speed_gearbox_dual,(410) * MARKUP_PHEV,2,2019,ibid,,,,,,,
+PHEV,powertrain_cooling_loop_dual,(300) * MARKUP_PHEV,2,2019,ibid,,,,,,,
+PHEV,charging_cord_kit,(200) * MARKUP_PHEV,1,2019,ibid,,,,,,,
+PHEV,DC_fast_charge_circuitry,(160) * MARKUP_PHEV,1,2019,ibid,,,,,,,
+PHEV,power_management_and_distribution,(720) * MARKUP_PHEV,1,2019,ibid,,,,,,,
+PHEV,brake_sensors_actuators,(0) * 1,0,2019,ibid,,,,,,,
+PHEV,additional_pair_of_half_shafts_single,(0) * 1,0,2019,ibid,,,,,,,
+PHEV,additional_pair_of_half_shafts_dual,(190) * MARKUP_PHEV,1,2019,ibid,,,,,,,
+HEV,motor_single,((6.91) * KW - 8.64) * MARKUP_HEV,1,2019,Costing_Guide_BEV_HEV_Draft_04_30_2021.xlsx,,,,,,,
+HEV,inverter_single,((2.4) * KW + 231) * MARKUP_HEV,1,2019,ibid,,,,,,,
+HEV,induction_motor_single,(0) * 1,0,2019,ibid,,,,,,,
+HEV,induction_inverter_single,(0) * 1,0,2019,ibid,,,,,,,
+HEV,DCDC_converter_kW,(3.5) * 1,1,2019,ibid; this is a kW value to be added to the onboard charger kW value,,,,,,,
+HEV,OBC_and_DCDC_converter,(39.7537931034483) * OBC_AND_DCDC_CONVERTER_KW * MARKUP_HEV,1,2019,ibid; 1st determine onboard charger kW then add DCDC_converter kW then multiply sum by this curve,,,,,,,
+HEV,HV_orange_cables,((9.5) * VEHICLE_SIZE_CLASS + 161.5) * MARKUP_HEV,1,2019,Costing_Guide_BEV_HEV_Draft_04_30_2021.xlsx,,,,,,,
+HEV,LV_battery,((3) * VEHICLE_SIZE_CLASS + 51) * MARKUP_HEV,1,2019,ibid,,,,,,,
+HEV,HVAC,((11.5) * VEHICLE_SIZE_CLASS + 195.5) * MARKUP_HEV,1,2019,ibid,,,,,,,
+HEV,single_speed_gearbox_single,(0) * 1,0,2019,ibid,,,,,,,
+HEV,powertrain_cooling_loop_single,(0) * 1,0,2019,ibid,,,,,,,
+HEV,charging_cord_kit,(0) * 1,0,2019,ibid,,,,,,,
+HEV,DC_fast_charge_circuitry,(0) * 1,0,2019,ibid,,,,,,,
+HEV,power_management_and_distribution,(0) * 1,0,2019,ibid,,,,,,,
+HEV,brake_sensors_actuators,(200) * MARKUP_HEV,1,2019,ibid,,,,,,,
+HEV,additional_pair_of_half_shafts_single,(0) * 1,0,,ibid,,,,,,,
+MHEV,motor_single,((6.91) * KW - 8.64) * MARKUP_HEV,1,2019,copy/paste of HEV,,,,,,,
+MHEV,inverter_single,((2.4) * KW + 231) * MARKUP_HEV,1,2019,ibid,,,,,,,
+MHEV,induction_motor_single,(0) * 1,0,2019,ibid,,,,,,,
+MHEV,induction_inverter_single,(0) * 1,0,2019,ibid,,,,,,,
+MHEV,DCDC_converter_kW,(3.5) * 1,1,2019,ibid; this is a kW value to be added to the onboard charger kW value,,,,,,,
+MHEV,OBC_and_DCDC_converter,(39.7537931034483) * OBC_AND_DCDC_CONVERTER_KW * MARKUP_HEV,1,2019,ibid; 1st determine onboard charger kW then add DCDC_converter kW then multiply sum by this curve,,,,,,,
+MHEV,HV_orange_cables,((9.5) * VEHICLE_SIZE_CLASS + 161.5) * MARKUP_HEV,1,2019,copy/paste of HEV,,,,,,,
+MHEV,LV_battery,((3) * VEHICLE_SIZE_CLASS + 51) * MARKUP_HEV,1,2019,ibid,,,,,,,
+MHEV,HVAC,((11.5) * VEHICLE_SIZE_CLASS + 195.5) * MARKUP_HEV,1,2019,ibid,,,,,,,
+MHEV,single_speed_gearbox_single,(0) * 1,0,2019,ibid,,,,,,,
+MHEV,powertrain_cooling_loop_single,(0) * 1,0,2019,ibid,,,,,,,
+MHEV,charging_cord_kit,(0) * 1,0,2019,ibid,,,,,,,
+MHEV,DC_fast_charge_circuitry,(0) * 1,0,2019,ibid,,,,,,,
+MHEV,power_management_and_distribution,(0) * 1,0,2019,ibid,,,,,,,
+MHEV,brake_sensors_actuators,(200) * MARKUP_HEV,1,2019,ibid,,,,,,,
+MHEV,additional_pair_of_half_shafts_single,(0) * 1,0,,ibid,,,,,,,
+BEV,markup,(1.5) * 1,,,,,,,,,,
+HEV,markup,(1.5) * 1,,,,,,,,,,
+PHEV,markup,(1.5) * 1,,,,,,,,,,
+ICE,markup,(1.5) * 1,,,,,,,,,,
+ALL,markup,(1.5) * 1,,,,,,,,,,
+ALL,learning_rate,(-0.245) * 1,,,,,,,,,,
+ALL,learning_start,(2020) * 1,,,,,,,,,,
+ROADLOAD,legacy_sales_learning_scaler,(100) * 1,,,,,,,,,,
+ICE,legacy_sales_learning_scaler,(100) * 1,,,,,,,,,,
+PEV,legacy_sales_learning_scaler,(8) * 1,,,,,,,,,,
+ROADLOAD,sales_scaler,(10) * 1,,,,,,,,,,
+ICE,sales_scaler,(8) * 1,,,,,,,,,,
+PEV,sales_scaler,(2) * 1,,,,,,,,,,
+ALL,turb_scaler,(1.2) * 1,,,,,,,,,,

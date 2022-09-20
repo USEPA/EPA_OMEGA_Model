@@ -217,8 +217,8 @@ print('importing %s' % __file__)
 from omega_model import *
 
 # for now, eventually need to be inputs somewhere:
-aggregation_columns = ['context_size_class', 'body_style', 'powertrain_type', 'unibody_structure',
-                       'cert_fuel_id', 'reg_class_id', 'drive_system']  #, 'manufacturer_id']
+aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
+                       'cert_fuel_id', 'reg_class_id', 'drive_system']  #  'manufacturer_id' added if not consolidating manufacturers
 
 
 class VehicleAggregation(OMEGABase):
@@ -259,7 +259,7 @@ class VehicleAggregation(OMEGABase):
         omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.46
+        input_template_version = 0.48
         input_template_columns = VehicleFinal.mandatory_input_template_columns
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -308,6 +308,20 @@ class VehicleAggregation(OMEGABase):
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
+
+            global aggregation_columns
+            if not omega_globals.options.consolidate_manufacturers:
+                aggregation_columns += ['manufacturer_id']
+
+            # process manufacturer include/exclude lists
+            if omega_globals.options.include_manufacturers_list != 'all':
+                df = df[[mid in omega_globals.options.include_manufacturers_list
+                                 for mid in df['manufacturer_id']]]
+
+            if omega_globals.options.exclude_manufacturers_list != 'none':
+                df = df[[mid not in omega_globals.options.exclude_manufacturers_list
+                                 for mid in df['manufacturer_id']]]
+
             # new columns calculated here for every vehicle in vehicles.csv:
             df['glider_non_structure_cost_dollars'] = 0
             df['glider_non_structure_mass_lbs'] = 0
@@ -317,26 +331,25 @@ class VehicleAggregation(OMEGABase):
 
             df['height_in'] = df['height_in'].fillna(62.4)  # dummy value, sales-weighted
 
-            df['powertrain_type'] = df['electrification_class'].\
+            df['base_year_powertrain_type'] = df['electrification_class'].\
                 replace({'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'FCV'})
 
             # TODO: FCV battery size = 2?? Mirai=1.8
-            df['battery_kwh'] = df[['powertrain_type']].\
-                replace({'powertrain_type': {'HEV': 1, 'PHEV': 18, 'BEV': 60, 'FCV': 60, 'ICE': 0}})
+            df['battery_kwh'] = df[['base_year_powertrain_type']].\
+                replace({'base_year_powertrain_type': {'HEV': 1, 'PHEV': 18, 'BEV': 60, 'FCV': 60, 'ICE': 0}})
 
-            df['motor_kw'] = df[['powertrain_type']].\
-                replace({'powertrain_type': {'HEV': 20,
+            df['motor_kw'] = df[['base_year_powertrain_type']].\
+                replace({'base_year_powertrain_type': {'HEV': 20,
                                              'PHEV': 50,
                                              'BEV': 150 + (100 * (df['drive_system'] == 4)),
                                              'FCV': 150 + (100 * (df['drive_system'] == 4)),
                                              'ICE': 0}})
 
             # TODO: FCV range = 0??
-            df['charge_depleting_range_mi'] = df[['powertrain_type']].\
-                replace({'powertrain_type': {'HEV': 0, 'PHEV': 50, 'BEV': 300, 'FCV': 300, 'ICE': 0}})
+            df['charge_depleting_range_mi'] = df[['base_year_powertrain_type']].\
+                replace({'base_year_powertrain_type': {'HEV': 0, 'PHEV': 50, 'BEV': 300, 'FCV': 300, 'ICE': 0}})
 
             # need to determine vehicle trans / techs
-            df['cost_curve_class'] = 'TRX12'  # FOR NOW, NEED TO ADD TRX FLAGS TO THE VEHICLES.CSV
             df['engine_cylinders'] = df['eng_cyls_num']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
             df['engine_displacement_L'] = df['eng_disp_liters']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
 
@@ -345,6 +358,10 @@ class VehicleAggregation(OMEGABase):
             print('starting iterrows')
 
             df['base_year_footprint_ft2'] = df['footprint_ft2']
+
+            df['base_year_curbweight_lbs'] = df['curbweight_lbs']
+
+            df['powertrain_type'] = df['base_year_powertrain_type']  # required for mass_scaling calcs
 
             df['structure_mass_lbs'], df['battery_mass_lbs'], df['powertrain_mass_lbs'], \
             df['delta_glider_non_structure_mass_lbs'], df['usable_battery_capacity_norm'] = \
@@ -355,17 +372,18 @@ class VehicleAggregation(OMEGABase):
                 # calc powertrain cost
                 veh = Vehicle()
                 veh.model_year = row['model_year']
-                veh.powertrain_type = row['powertrain_type']
+                veh.base_year_powertrain_type = row['base_year_powertrain_type']
                 veh.body_style = row['body_style']
 
-                if veh.powertrain_type == 'FCV':
-                    veh.powertrain_type = 'BEV'  # TODO: for costing purposes, for now
+                if veh.base_year_powertrain_type == 'FCV':
+                    veh.base_year_powertrain_type = 'BEV'  # TODO: for costing purposes, for now
 
                 veh.base_year_reg_class_id = row['reg_class_id']
                 veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
+                row['market_class_id'] = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
                 veh.drive_system = row['drive_system']
 
-                powertrain_cost = sum(PowertrainCost.calc_cost(veh, pd.DataFrame([row])))
+                powertrain_cost = sum(PowertrainCost.calc_cost(veh, row, veh.base_year_powertrain_type))
 
                 # powertrain_costs = PowertrainCost.calc_cost(veh, pd.DataFrame([row]))  # includes battery cost
                 # powertrain_cost_terms = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
@@ -378,6 +396,8 @@ class VehicleAggregation(OMEGABase):
                 veh.height_in = row['height_in']
                 veh.ground_clearance_in = row['ground_clearance_in']
                 veh.base_year_msrp_dollars = row['msrp_dollars']
+                row['base_year_msrp_dollars'] = row['msrp_dollars']
+
                 veh.unibody_structure = row['unibody_structure']
                 veh.body_style = row['body_style']
 
@@ -385,6 +405,8 @@ class VehicleAggregation(OMEGABase):
                     GliderCost.get_base_year_glider_non_structure_cost(veh, row['structure_mass_lbs'], powertrain_cost)
 
                 veh.base_year_footprint_ft2 = row['footprint_ft2']
+
+                veh.base_year_curbweight_lbs = row['curbweight_lbs']
 
                 df.loc[idx, 'glider_non_structure_cost_dollars'] = \
                     float(GliderCost.calc_cost(veh, pd.DataFrame([row]))[1])
@@ -404,8 +426,16 @@ class VehicleAggregation(OMEGABase):
             # calculate weighted numeric values within the groups, and combined string values
             agg_df = df.groupby(aggregation_columns, as_index=False).apply(sales_weight_average_dataframe)
             agg_df['vehicle_name'] = agg_df[aggregation_columns].apply(lambda x: ':'.join(x.values.astype(str)), axis=1)
-            agg_df['compliance_id'] = 'consolidated_OEM'
-            agg_df['model_year'] = df['model_year'].iloc[0]
+
+            if omega_globals.options.consolidate_manufacturers:
+                agg_df['compliance_id'] = 'consolidated_OEM'
+            else:
+                agg_df['compliance_id'] = agg_df['manufacturer_id']
+
+            if omega_globals.options.vehicles_file_base_year is not None:
+                agg_df['model_year'] = omega_globals.options.vehicles_file_base_year
+            else:
+                agg_df['model_year'] = df['model_year'].iloc[0]
 
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
 

@@ -99,13 +99,14 @@ class SalesShareBase:
     """
 
     @staticmethod
-    def calc_shares(calendar_year, producer_decision, market_class_data, mc_parent, mc_pair):
+    def calc_shares(calendar_year, compliance_id, producer_decision, market_class_data, mc_parent, mc_pair):
         """
         Determine consumer desired market shares for the given vehicles, their costs, etc.  Relative shares are first
         calculated within non-responsive market categories then converted to absolute shares.
 
         Args:
             calendar_year (int): calendar year to calculate market shares in
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
             producer_decision (Series): selected producer compliance option
             market_class_data (DataFrame): DataFrame with 'average_fuel_price_MC',
                 'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'

@@ -54,7 +54,7 @@ def update_stock(calendar_year, compliance_id=None):
     # pull in this year's vehicle ids:
     this_years_vehicle_annual_data = VehicleAnnualData.get_vehicle_annual_data(calendar_year, compliance_id)
 
-    last_years_vehicle_annual_data = VehicleAnnualData.get_vehicle_annual_data(calendar_year-1)
+    last_years_vehicle_annual_data = VehicleAnnualData.get_vehicle_annual_data(calendar_year-1, compliance_id)
 
     # omega_globals.session.add_all(this_years_vehicle_annual_data)
     # UPDATE vehicle annual data for this year's stock
@@ -90,7 +90,7 @@ def update_stock(calendar_year, compliance_id=None):
     if prior_year_vehicle_data:
         for vehicle_id, prior_odometer in prior_year_vehicle_data:
             market_class_id, model_year, initial_registered_count = get_vehicle_info(vehicle_id)
-            age = calendar_year - model_year
+            age = int(calendar_year - model_year)
 
             reregistration_factor = omega_globals.options.Reregistration.\
                 get_reregistered_proportion(model_year, market_class_id, age)
@@ -106,7 +106,7 @@ def update_stock(calendar_year, compliance_id=None):
                 vad_list.append(VehicleAnnualData.create(calendar_year=calendar_year,
                                   vehicle_id=int(vehicle_id),
                                   compliance_id=compliance_id,
-                                  age=calendar_year - model_year,
+                                  age=age,
                                   registered_count=registered_count,
                                   annual_vmt=annual_vmt,
                                   odometer=odometer,

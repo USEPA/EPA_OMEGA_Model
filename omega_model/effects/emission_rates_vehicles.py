@@ -13,35 +13,45 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,emission_factors_vehicles,input_template_version:,0.1
+       input_template_name:,emission_rates_vehicles,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        model_year,age,reg_class_id,in_use_fuel_id,voc_grams_per_mile,co_grams_per_mile,nox_grams_per_mile,pm25_grams_per_mile,sox_grams_per_gallon,benzene_grams_per_mile,butadiene13_grams_per_mile,formaldehyde_grams_per_mile,acetaldehyde_grams_per_mile,acrolein_grams_per_mile,co2_grams_per_mile,n2o_grams_per_mile,ch4_grams_per_mile
-        2020,0,car,pump gasoline,0.038838978,0.934237929,0.041727278,0.001925829,0.001648851,0.001641638,0.0003004,0.000441563,0.000767683,4.91E-05,,0.004052681,0.005520596
-        2020,0,truck,pump gasoline,0.035665375,1.068022441,0.054597497,0.002444363,0.002240974,0.001499163,0.000262733,0.000411881,0.000764069,4.45E-05,,0.005146965,0.007103921
+        start_year,sourcetype_name,reg_class_id,market_class_id,in_use_fuel_id,rate_name,independent_variable,equation
+        2017,passenger car,car,non_hauling.ICE,pump gasoline,pm25_exhaust_grams_per_mile,age,((0.00020321 * age) + 0.0017372)
+        2017,passenger car,car,non_hauling.ICE,pump gasoline,nmog_exhaust_grams_per_mile,age,((0.00039006 * age) + 0.05267)
 
 
 Data Column Name and Description
-    :model_year:
-        The model year of vehicles, e.g. 2020
+    :start_year:
+        The model year to which the rate applies; model years not shown will apply the start_year rate less than or equal
+        to the model year.
 
-    :age:
-        The age of vehicles
+    :sourcetype_name:
+        The MOVES sourcetype name (e.g., passenger car, passenger truck, light-commercial truck, etc.).
 
     :reg_class_id:
         Vehicle regulatory class at the time of certification, e.g. 'car','truck'.  Reg class definitions may differ
         across years within the simulation based on policy changes. ``reg_class_id`` can be considered a 'historical'
         or 'legacy' reg class.
 
+    :market_class_id:
+        The OMEGA market class (e.g., non-hauling.ICE, hauling.BEV, etc.).
+
     :in_use_fuel_id:
         In-use fuel id, for use with context fuel prices, must be consistent with the context data read by
         ``class context_fuel_prices.ContextFuelPrices``
 
-    :voc_grams_per_mile:
-        The vehicle emission factors follow the structure pollutant_units where units are grams per mile.
+    :rate_name:
+        The emission rate providing the pollutant and units.
+
+    :independent_variable:
+        The independent variable used in calculating the emission rate (e.g., age).
+
+    :equation:
+        The emission rate equation used to calculate an emission rate at the given age (or other independent variable).
 
 ----
 
@@ -51,49 +61,58 @@ Data Column Name and Description
 
 from omega_model import *
 
+_cache = dict()
+
 
 class EmissionRatesVehicles(OMEGABase):
     """
     Loads and provides access to vehicle emission factors by model year, age, legacy reg class ID and in-use fuel ID.
 
     """
-
     _data = dict()  # private dict, emission factors vehicles by model year, age, legacy reg class ID and in-use fuel ID
-    _cache = dict()
 
     @staticmethod
-    def get_emission_rate(model_year, reg_class_id, in_use_fuel_id, ind_var_name, independent_variable, *rate_names):
+    def get_emission_rate(model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age, *rate_names):
         """
 
         Args:
             model_year (int): vehicle model year for which to get emission factors
+            sourcetype_name (str): the MOVES sourcetype name (e.g., 'passenger car', 'light commercial truck')
             reg_class_id (str): the regulatory class, e.g., 'car' or 'truck'
             in_use_fuel_id (str): the liquid fuel ID, e.g., 'pump gasoline'
-            ind_var_dict (dictionary): the independent_variable and value e.g., {'age': 10} or {'odometer': 75000}).
-            rate_names: name of emission rate to get
+            age (int): the vehicle age
+            rate_names: name of emission rate(s) to get
 
         Returns:
-            The emission rate or list of emission rates
+            A list of emission rates for the given type of vehicle of the given model_year and age.
 
         """
         locals_dict = locals()
         rate = 0
         return_rates = list()
+
         for rate_name in rate_names:
-            cache_key = (model_year, reg_class_id, in_use_fuel_id, rate_name, ind_var_name)
-            if cache_key not in EmissionRatesVehicles._cache:
-                rate_name_keys = [k for k in EmissionRatesVehicles._data.keys()
-                                  if k[1] == reg_class_id
-                                  and k[2] == in_use_fuel_id
-                                  and k[3] == rate_name
-                                  and k[4] == ind_var_name]
-                max_start_year = max([k[0] for k in rate_name_keys])
-                year = min(model_year, max_start_year)
-                rate = eval(EmissionRatesVehicles._data[year, reg_class_id, in_use_fuel_id, rate_name, ind_var_name]['equation'], {},
-                            locals_dict)
-                EmissionRatesVehicles._cache[cache_key] = rate
+
+            cache_key = (model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age, rate_name)
+            if cache_key in _cache:
+                rate = _cache[cache_key]
             else:
-                rate = EmissionRatesVehicles._cache[cache_key]
+                rate_keys = [
+                    k for k in EmissionRatesVehicles._data
+                    if k[0] <= model_year
+                       and k[1] == sourcetype_name
+                       and k[2] == reg_class_id
+                       and k[3] == in_use_fuel_id
+                       and k[4] == rate_name
+                ]
+                max_start_year = max([k[0] for k in rate_keys])
+                start_year = min(model_year, max_start_year)
+                rate_key = start_year, sourcetype_name, reg_class_id, in_use_fuel_id, rate_name
+
+                rate = eval(EmissionRatesVehicles._data[rate_key]['equation'], {}, locals_dict)
+
+                _cache[cache_key] = rate
+
             return_rates.append(rate)
 
         return return_rates
@@ -113,20 +132,22 @@ class EmissionRatesVehicles(OMEGABase):
 
         """
         EmissionRatesVehicles._data.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
         input_template_name = 'emission_rates_vehicles'
-        input_template_version = 0.1
-        input_template_columns = {'start_year',
-                                  'reg_class_id',
-                                  'market_class_id',
-                                  'in_use_fuel_id',
-                                  'rate_name',
-                                  'independent_variable',
-                                  'equation',
-                                  }
+        input_template_version = 0.2
+        input_template_columns = {
+            'start_year',
+            'sourcetype_name',
+            'reg_class_id',
+            'market_class_id',
+            'in_use_fuel_id',
+            'rate_name',
+            'equation',
+        }
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -141,32 +162,31 @@ class EmissionRatesVehicles(OMEGABase):
             from context.onroad_fuels import OnroadFuel
 
             # validate columns
-            validation_dict = {'in_use_fuel_id': OnroadFuel.fuel_ids,
-                               'reg_class_id': list(legacy_reg_classes)}
+            # TODO: add sourcetype_name to validation_dict if we add that attribute
+            validation_dict = {
+                'in_use_fuel_id': OnroadFuel.fuel_ids,
+                'reg_class_id': list(legacy_reg_classes)
+            }
 
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
 
-            rate_keys = zip(df['start_year'],
-                            df['reg_class_id'],
-                            df['in_use_fuel_id'],
-                            df['rate_name'],
-                            df['independent_variable'])
+            rate_keys = zip(
+                df['start_year'],
+                df['sourcetype_name'],
+                df['reg_class_id'],
+                df['in_use_fuel_id'],
+                df['rate_name']
+            )
+            df.set_index(rate_keys, inplace=True)
+
+            EmissionRatesVehicles._data = df.to_dict('index')
 
             for rate_key in rate_keys:
 
-                EmissionRatesVehicles._data[rate_key] = dict()
-                start_year, reg_class_id, fuel_id, rate_name, ind_var_name = rate_key
+                rate_eq = EmissionRatesVehicles._data[rate_key]['equation']
 
-                rate_info = df[(df['start_year'] == start_year)
-                               & (df['reg_class_id'] == reg_class_id)
-                               & (df['in_use_fuel_id'] == fuel_id)
-                               & (df['rate_name'] == rate_name)
-                               & (df['independent_variable'] == ind_var_name)].iloc[0]
-
-                EmissionRatesVehicles._data[rate_key] = {'equation': None}
-
-                EmissionRatesVehicles._data[rate_key]['equation'] = compile(rate_info['equation'], '<string>', 'eval')
+                EmissionRatesVehicles._data[rate_key].update({'equation': compile(rate_eq, '<string>', 'eval')})
 
         return template_errors

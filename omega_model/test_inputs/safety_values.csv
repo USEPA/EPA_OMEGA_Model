@@ -1,0 +1,5 @@
+input_template_name:,safety_values,input_template_version:,0.1,NHTSA 2024-2026 FRM paramaters file values
+body_style,nhtsa_safety_class,threshold_lbs,change_per_100_lbs_below_threshold,change_per_100_lbs_at_or_above_threshold
+sedan,PC,3201,0.012,0.0042
+pickup,LT/SUV,5014,0.0031,-0.0061
+cuv_suv,CUV/Minivan,3872,-0.0025,-0.0025

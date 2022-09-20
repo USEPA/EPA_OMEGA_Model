@@ -110,20 +110,23 @@ class CostFactorsCriteria(OMEGABase):
             omega_log.logwrite(f'\nInitializing database from {filename} ...')
 
         input_template_name = 'cost_factors_criteria'
-        input_template_version = 0.3
-        cost_factors_input_template_columns = {'calendar_year', 'dollar_basis',
-                                               'pm25_tailpipe_3.0_USD_per_uston',
-                                               'pm25_upstream_3.0_USD_per_uston',
-                                               'nox_tailpipe_3.0_USD_per_uston',
-                                               'nox_upstream_3.0_USD_per_uston',
-                                               'so2_tailpipe_3.0_USD_per_uston',
-                                               'so2_upstream_3.0_USD_per_uston',
-                                               'pm25_tailpipe_7.0_USD_per_uston',
-                                               'pm25_upstream_7.0_USD_per_uston',
-                                               'nox_tailpipe_7.0_USD_per_uston',
-                                               'nox_upstream_7.0_USD_per_uston',
-                                               'so2_tailpipe_7.0_USD_per_uston',
-                                               'so2_upstream_7.0_USD_per_uston'}
+        input_template_version = 0.31
+        cost_factors_input_template_columns = {
+            'calendar_year',
+            'dollar_basis',
+            'pm25_tailpipe_3.0_USD_per_uston',
+            'pm25_upstream_3.0_USD_per_uston',
+            'nox_tailpipe_3.0_USD_per_uston',
+            'nox_upstream_3.0_USD_per_uston',
+            'sox_tailpipe_3.0_USD_per_uston',
+            'sox_upstream_3.0_USD_per_uston',
+            'pm25_tailpipe_7.0_USD_per_uston',
+            'pm25_upstream_7.0_USD_per_uston',
+            'nox_tailpipe_7.0_USD_per_uston',
+            'nox_upstream_7.0_USD_per_uston',
+            'sox_tailpipe_7.0_USD_per_uston',
+            'sox_upstream_7.0_USD_per_uston'
+        }
 
         template_errors = validate_template_version_info(filename, input_template_name,
                                                          input_template_version, verbose=verbose)

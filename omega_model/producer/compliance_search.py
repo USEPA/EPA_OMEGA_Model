@@ -220,35 +220,40 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
         else:
             share_column_names = [producer_prefix + c for c in children]
 
-        if all(s in omega_globals.options.MarketClass.responsive_market_categories for s in children):
+        responsive_children = [s in omega_globals.options.MarketClass.responsive_market_categories for s in children if market_class_dict[s]]
 
-            min_constraints = dict()
-            max_constraints = dict()
-            for c in share_column_names:
-                production_min = ProductionConstraints.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
-                production_max = ProductionConstraints.get_maximum_share(calendar_year, c.replace(producer_prefix, ''))
-                required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
+        if all(responsive_children):
+            if responsive_children:
+                min_constraints = dict()
+                max_constraints = dict()
+                for c in share_column_names:
+                    production_min = ProductionConstraints.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
+                    production_max = ProductionConstraints.get_maximum_share(calendar_year, c.replace(producer_prefix, ''))
+                    required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
 
-                max_constraints[c] = production_max
-                min_constraints[c] = min(production_max, max(required_zev_share, production_min))
+                    max_constraints[c] = production_max
+                    min_constraints[c] = min(production_max, max(required_zev_share, production_min))
 
-            if share_range == 1.0:
-                # span the whole space of shares
-                sales_share_df = partition(share_column_names,
-                                           num_levels=omega_globals.options.producer_num_market_share_options,
-                                           min_constraints=min_constraints, max_constraints=max_constraints)
+                if share_range == 1.0:
+                    # span the whole space of shares
+                    sales_share_df = partition(share_column_names,
+                                               num_levels=omega_globals.options.producer_num_market_share_options,
+                                               min_constraints=min_constraints, max_constraints=max_constraints)
+                else:
+                    # narrow search span to a range of shares around the winners
+                    sales_share_df = \
+                        generate_constrained_nearby_shares(share_column_names, candidate_production_decisions,
+                                                           share_range,
+                                                           omega_globals.options.producer_num_market_share_options,
+                                                           min_constraints=min_constraints,
+                                                           max_constraints=max_constraints)
             else:
-                # narrow search span to a range of shares around the winners
-                sales_share_df = \
-                    generate_constrained_nearby_shares(share_column_names, candidate_production_decisions,
-                                                       share_range,
-                                                       omega_globals.options.producer_num_market_share_options,
-                                                       min_constraints=min_constraints,
-                                                       max_constraints=max_constraints)
+                sales_share_df = pd.DataFrame()
         else:
             sales_share_dict = pd.DataFrame()
             for c, cn in zip(children, share_column_names):
-                sales_share_dict[cn] = [context_new_vehicle_sales(calendar_year)[c] /
+                if c in context_new_vehicle_sales(calendar_year):
+                    sales_share_dict[cn] = [context_new_vehicle_sales(calendar_year)[c] /
                                         context_new_vehicle_sales(calendar_year)['total']]
             sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
     else:
@@ -274,7 +279,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
         print('combining ' + str(children))
     share_combos_df = pd.DataFrame()
     for df in child_df_list:
-        share_combos_df = cartesian_prod(share_combos_df, df)
+        if not df.empty:
+            share_combos_df = cartesian_prod(share_combos_df, df)
 
     # print('generate share options time = %f' % (time.time() - start_time))
 
@@ -509,13 +515,10 @@ def create_composite_vehicles(calendar_year, compliance_id):
                                                               args=[new_veh],
                                                               callback=None,
                                                               error_callback=error_callback))
-
             manufacturer_vehicles = [r.get() for r in results]
         else:
             for new_veh in manufacturer_vehicles:
-                cost_cloud = omega_globals.options.CostCloud.get_cloud(new_veh)
-                new_veh.cost_curve = new_veh.create_frontier_df(cost_cloud)
-                # VehicleOnroadCalculations.perform_onroad_calculations(new_veh)
+                calc_vehicle_frontier(new_veh)
 
         print('Created manufacturer_vehicles %.20f' % (time.time() - start_time))
 
@@ -527,13 +530,13 @@ def create_composite_vehicles(calendar_year, compliance_id):
         for csc in NewVehicleMarket.base_year_context_size_class_sales: # for each context size class
             context_based_total_sales += \
                 NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=csc) \
-                * VehicleFinal.mfr_base_year_size_class_share[compliance_id][csc]
+                * VehicleFinal.mfr_base_year_share_data[compliance_id][csc]
 
         # calculate new vehicle absolute market share based on vehicle size mix from context
         for new_veh in manufacturer_vehicles:
             new_veh.base_year_market_share = \
                 new_veh.initial_registered_count * \
-                VehicleFinal.mfr_base_year_size_class_share[compliance_id][new_veh.context_size_class] / \
+                VehicleFinal.mfr_base_year_share_data[compliance_id][new_veh.context_size_class] / \
                 context_based_total_sales
 
         # group by context size class
@@ -547,7 +550,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         for csc in csc_dict: # for each context size class
             projection_initial_registered_count = \
                 NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=csc) \
-                * VehicleFinal.mfr_base_year_size_class_share[compliance_id][csc]
+                * VehicleFinal.mfr_base_year_share_data[compliance_id][csc]
 
             distribute_by_attribute(csc_dict[csc], projection_initial_registered_count,
                                     weight_by='base_year_market_share',
@@ -743,8 +746,11 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
 
             market_class_sales = total_sales
 
-            for c in chain:
-                market_class_sales = market_class_sales * production_options[c].values
+            try:
+                for c in chain:
+                    market_class_sales = market_class_sales * production_options[c].values
+            except:
+                print('wtf?')
 
             if ('producer_abs_share_frac_%s' % market_class) not in production_options:
                 production_options['producer_abs_share_frac_%s' % market_class] = market_class_sales / total_sales
