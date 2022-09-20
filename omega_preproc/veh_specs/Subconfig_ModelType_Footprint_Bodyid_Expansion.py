@@ -1018,7 +1018,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                     _carline_name = vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_carline_name_only, 'CARLINE_NAME'].unique()
                     _engine_displacement = vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_carline_name_only, 'ENG_DISPL'].unique()
                     _etw = vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_carline_name_only, 'ETW'].unique()
-                    _rated_hp = pd.to_numeric(vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_only, 'ENG_RATED_HP'].unique(), errors='coerce')
+                    _rated_hp = pd.to_numeric(vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_carline_name_only, 'ENG_RATED_HP'].unique(), errors='coerce')
                     for j in range (len(_carline_name)):
                         _carline_name_j = _carline_name[j]
                         _etw_j = _etw[j]
