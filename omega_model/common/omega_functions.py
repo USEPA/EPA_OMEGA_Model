@@ -18,6 +18,23 @@ import common.omega_globals as omega_globals
 # np.seterr(all='raise')  # for troubleshooting runtime warnings
 
 
+def dataframe_to_numeric(df):
+    """
+    Convert dataframe columns to numeric (i.e. non-object dtypes) if possible.
+
+    Args:
+        df (DataFrame): the dataframe to convert to numeric
+
+    Returns:
+        df with numeric columns where possible
+
+    """
+    for c in df.columns:
+        df[c] = pd.to_numeric(df[c], errors='ignore')
+
+    return df
+
+
 def sales_weight_average_dataframe(df):
     """
         Numeric columns are sales-weighted-averaged except for 'model_year' and columns containing

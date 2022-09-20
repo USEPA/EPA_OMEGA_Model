@@ -81,8 +81,7 @@ def run_postproc(iteration_log, credit_banks):
         from producer.manufacturer_annual_data import ManufacturerAnnualData
         from producer.vehicle_aggregation import aggregation_columns
 
-        for c in vehicles_table.columns:
-            vehicles_table[c] = pd.to_numeric(vehicles_table[c], errors='ignore')
+        vehicles_table = dataframe_to_numeric(vehicles_table)
 
         # generate after-the-fact manufacturer annual data for individual producers
         for manufacturer_id in vehicles_table['manufacturer_id'].unique():
@@ -104,9 +103,11 @@ def run_postproc(iteration_log, credit_banks):
 
         omega_globals.session.flush()
 
-    dump_table_to_csv(omega_globals.options.output_folder, 'manufacturer_annual_data',
+    manufacturer_annual_data_table = dump_table_to_csv(omega_globals.options.output_folder, 'manufacturer_annual_data',
                       omega_globals.options.session_unique_name + '_manufacturer_annual_data',
                       omega_globals.options.verbose)
+
+    manufacturer_annual_data_table = dataframe_to_numeric(manufacturer_annual_data_table)
 
     session_results = pd.DataFrame()
     session_results['calendar_year'] = analysis_years
@@ -194,6 +195,7 @@ def run_postproc(iteration_log, credit_banks):
 
     session_results.to_csv(summary_filename, index=False)
 
+    return manufacturer_annual_data_table
 
 def plot_effects(calendar_years, physical_effects_df):
     """
