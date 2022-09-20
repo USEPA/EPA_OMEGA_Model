@@ -865,13 +865,14 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                                                     'TARGET_COEF_A', 'TARGET_COEF_B', 'TARGET_COEF_C', 'NV_RATIO', 'TARGET_COEF_BEST_MTH', 'TARGET_COEF_A_SURRO', 'TARGET_COEF_B_SURRO', 'TARGET_COEF_C_SURRO', \
                                                     'SET_COEF_A', 'SET_COEF_B', 'SET_COEF_C', 'SET_COEF_A_SURRO', 'SET_COEF_B_SURRO', 'SET_COEF_C_SURRO', 'TEST_PROC_CATEGORY', 'TARGET_COEF_MERGING_MTH', 'ENG_RATED_HP', \
                                                     'FUEL_NET_HEATING_VALUE', 'FUEL_GRAVITY', 'Boost Type Category']
-            df_Cafe_MFR_CD_Mode_Type_Index = vehghg_file_nonflexfuel[pd.isnull(vehghg_file_nonflexfuel['SET_COEF_A'])].groupby(['CAFE_MFR_CD', 'MODEL_TYPE_INDEX']).mean()
+            df_Cafe_MFR_CD_Mode_Type_Index = vehghg_file_nonflexfuel[pd.isnull(vehghg_file_nonflexfuel['SET_COEF_A'])].groupby(['CAFE_MFR_CD', 'MODEL_TYPE_INDEX', 'CARLINE_NAME']).mean()
             for i in range(len(df_Cafe_MFR_CD_Mode_Type_Index)):
                 try:
                     _cafe_mfr_cd = df_Cafe_MFR_CD_Mode_Type_Index.index[i][0]
                     _model_type_index = df_Cafe_MFR_CD_Mode_Type_Index.index[i][1]
-                    df_vehghg_file_nonflexfuel_target_coef = vehghg_file_nonflexfuel.loc[(vehghg_file_nonflexfuel['CAFE_MFR_CD'] == _cafe_mfr_cd) & \
-                                                                                         (vehghg_file_nonflexfuel['MODEL_TYPE_INDEX'] == _model_type_index), _target_coef_indexing_category]
+                    _carline_name = df_Cafe_MFR_CD_Mode_Type_Index.index[i][2]
+                    _cafe_mfr_cd_model_type_index_carline_name_only = (vehghg_file_nonflexfuel['CAFE_MFR_CD'] == _cafe_mfr_cd) & (vehghg_file_nonflexfuel['MODEL_TYPE_INDEX'] == _model_type_index) & (vehghg_file_nonflexfuel['CARLINE_NAME'] == _carline_name)
+                    df_vehghg_file_nonflexfuel_target_coef = vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_carline_name_only, _target_coef_indexing_category]
                     df_vehghg_file_nonflexfuel_target_coef_index = list(df_vehghg_file_nonflexfuel_target_coef.index)
                     df_vehghg_file_nonflexfuel_target_coef.reset_index(drop=True, inplace=True)
                     _boost_types = df_vehghg_file_nonflexfuel_target_coef['Boost Type Category'].unique();
@@ -928,13 +929,15 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             print('# of TARGET_COEF_A_SURRO', (~pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A_SURRO'])).sum())
             print('')
 
-            df_Cafe_MFR_CD_Mode_Type_Index = vehghg_file_nonflexfuel[(pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A']))].groupby(['CAFE_MFR_CD', 'MODEL_TYPE_INDEX']).mean()
+            df_Cafe_MFR_CD_Mode_Type_Index = vehghg_file_nonflexfuel[(pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A']))].groupby(['CAFE_MFR_CD', 'MODEL_TYPE_INDEX', 'CARLINE_NAME']).mean()
             for i in range(len(df_Cafe_MFR_CD_Mode_Type_Index)):
                 _cafe_mfr_cd = df_Cafe_MFR_CD_Mode_Type_Index.index[i][0]
                 _model_type_index = df_Cafe_MFR_CD_Mode_Type_Index.index[i][1]
-                _bodyid = vehghg_file_nonflexfuel.loc[(vehghg_file_nonflexfuel['CAFE_MFR_CD'] == _cafe_mfr_cd) & (vehghg_file_nonflexfuel['MODEL_TYPE_INDEX'] == _model_type_index), 'BodyID'].unique()
-                _engine_family = vehghg_file_nonflexfuel.loc[(vehghg_file_nonflexfuel['CAFE_MFR_CD'] == _cafe_mfr_cd) & (vehghg_file_nonflexfuel['MODEL_TYPE_INDEX'] == _model_type_index), 'SS_ENGINE_FAMILY'].unique()
-                _etw = vehghg_file_nonflexfuel.loc[(vehghg_file_nonflexfuel['CAFE_MFR_CD'] == _cafe_mfr_cd) & (vehghg_file_nonflexfuel['MODEL_TYPE_INDEX'] == _model_type_index), 'ETW'].unique()
+                _carline_name = df_Cafe_MFR_CD_Mode_Type_Index.index[i][2]
+                _cafe_mfr_cd_model_type_index_carline_name_only = (vehghg_file_nonflexfuel['CAFE_MFR_CD'] == _cafe_mfr_cd) & (vehghg_file_nonflexfuel['MODEL_TYPE_INDEX'] == _model_type_index) & (vehghg_file_nonflexfuel['CARLINE_NAME'] == _carline_name)
+                _bodyid = vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_carline_name_only, 'BodyID'].unique()
+                _engine_family = vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_carline_name_only, 'SS_ENGINE_FAMILY'].unique()
+                _etw = vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_carline_name_only, 'ETW'].unique()
                 if len(_engine_family) == 0: continue
                 for j in range (len(_bodyid)):
                     _bodyid_j = _bodyid[j]
@@ -1006,15 +1009,15 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                 df_target_coef_null.reset_index(drop=True, inplace=True)
                 _engine_displacement_check = 'strict'
 
-                df_Cafe_MFR_CD_Mode_Type_Index = vehghg_file_nonflexfuel[pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A_SURRO'])].groupby(['CAFE_MFR_CD', 'LABEL_MFR_CD', 'MODEL_TYPE_INDEX']).mean()
+                df_Cafe_MFR_CD_Mode_Type_Index = vehghg_file_nonflexfuel[pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A_SURRO'])].groupby(['CAFE_MFR_CD', 'MODEL_TYPE_INDEX', 'CARLINE_NAME']).mean()
                 for i in range(len(df_Cafe_MFR_CD_Mode_Type_Index)):
                     _cafe_mfr_cd = df_Cafe_MFR_CD_Mode_Type_Index.index[i][0]
-                    _label_mfr_cd = df_Cafe_MFR_CD_Mode_Type_Index[i].index[i][1]
-                    _model_type_index = df_Cafe_MFR_CD_Mode_Type_Index.index[i][2]
-                    _cafe_mfr_cd_model_type_index_only = (vehghg_file_nonflexfuel['CAFE_MFR_CD'] == _cafe_mfr_cd) & (vehghg_file_nonflexfuel['LABEL_MFR_CD'] == _label_mfr_cd) & (vehghg_file_nonflexfuel['MODEL_TYPE_INDEX'] == _model_type_index)
-                    _carline_name = vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_only, 'CARLINE_NAME'].unique()
-                    _engine_displacement = vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_only, 'ENG_DISPL'].unique()
-                    _etw = vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_only, 'ETW'].unique()
+                    _model_type_index = df_Cafe_MFR_CD_Mode_Type_Index.index[i][1]
+                    _carline_name_i = df_Cafe_MFR_CD_Mode_Type_Index.index[i][2]
+                    _cafe_mfr_cd_model_type_index_carline_name_only = (vehghg_file_nonflexfuel['CAFE_MFR_CD'] == _cafe_mfr_cd) & (vehghg_file_nonflexfuel['MODEL_TYPE_INDEX'] == _model_type_index) & (vehghg_file_nonflexfuel['CARLINE_NAME'] == _carline_name_i)
+                    _carline_name = vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_carline_name_only, 'CARLINE_NAME'].unique()
+                    _engine_displacement = vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_carline_name_only, 'ENG_DISPL'].unique()
+                    _etw = vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_carline_name_only, 'ETW'].unique()
                     _rated_hp = pd.to_numeric(vehghg_file_nonflexfuel.loc[_cafe_mfr_cd_model_type_index_only, 'ENG_RATED_HP'].unique(), errors='coerce')
                     for j in range (len(_carline_name)):
                         _carline_name_j = _carline_name[j]
