@@ -35,7 +35,6 @@ def run_postproc(iteration_log, credit_banks):
 
     """
     from producer.vehicles import VehicleFinal
-    from producer.manufacturer_annual_data import ManufacturerAnnualData
     from effects.omega_effects import run_effects_calcs
     import pandas as pd
     global vehicle_data, vehicle_annual_data
@@ -78,16 +77,16 @@ def run_postproc(iteration_log, credit_banks):
     vehicle_annual_data_df.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name
                                   + '_vehicle_annual_data.csv')
 
-    from producer.vehicle_aggregation import aggregation_columns
-    if 'manufacturer_id' in aggregation_columns:
+    if 0.0 < omega_globals.options.credit_market_efficiency < 1.0 and omega_globals.options.consolidate_manufacturers:
+        from producer.manufacturer_annual_data import ManufacturerAnnualData
+        from producer.vehicle_aggregation import aggregation_columns
+
         for c in vehicles_table.columns:
             vehicles_table[c] = pd.to_numeric(vehicles_table[c], errors='ignore')
 
         # generate after-the-fact manufacturer annual data for individual producers
         for manufacturer_id in vehicles_table['manufacturer_id'].unique():
-            print(manufacturer_id)
             for calendar_year in vehicle_years[1:]:
-                print(calendar_year)
                 mfr_data = vehicles_table[(vehicles_table['manufacturer_id'] == manufacturer_id) &
                                           (vehicles_table['model_year'] == calendar_year)]
 
@@ -100,6 +99,7 @@ def run_postproc(iteration_log, credit_banks):
                                                                     sum(mfr_data['new_vehicle_mfr_cost_dollars'] *
                                                                         mfr_data['_initial_registered_count']),
                                                     )
+
                 credit_banks[manufacturer_id] = None
 
         omega_globals.session.flush()
@@ -120,7 +120,7 @@ def run_postproc(iteration_log, credit_banks):
         session_results['%s_sales_total' % manufacturer] = manufacturer_sales[manufacturer][1:]
 
     # generate manufacturer-specific plots and data if not consolidating
-    if 'manufacturer_id' in aggregation_columns:
+    if 0.0 < omega_globals.options.credit_market_efficiency < 1.0 and omega_globals.options.consolidate_manufacturers:
         compliance_ids = vehicles_table['manufacturer_id'].unique()
         compliance_ids = np.unique(np.append(compliance_ids, vehicles_table['compliance_id'].unique()))
     else:

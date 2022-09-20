@@ -310,10 +310,8 @@ class VehicleAggregation(OMEGABase):
         if not template_errors:
 
             global aggregation_columns
-            # if not omega_globals.options.consolidate_manufacturers:
-            #     aggregation_columns += ['manufacturer_id']
-
-            aggregation_columns += ['manufacturer_id']
+            if omega_globals.options.credit_market_efficiency < 1.0:
+                aggregation_columns += ['manufacturer_id']
 
             # process manufacturer include/exclude lists
             if omega_globals.options.include_manufacturers_list != 'all':

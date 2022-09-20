@@ -1426,6 +1426,9 @@ class VehicleFinal(SQABase, Vehicle):
             else:
                 veh.compliance_id = veh.manufacturer_id
 
+            if omega_globals.options.credit_market_efficiency == 1.0:
+                veh.manufacturer_id = 'consolidated_OEM'
+
             VehicleFinal.compliance_ids.add(veh.compliance_id)
 
             # update initial registered count >after< setting compliance id, it's required for vehicle annual data

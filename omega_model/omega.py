@@ -1507,7 +1507,20 @@ def run_omega(session_runtime_options, standalone_run=False):
 
     session_runtime_options.start_time = time.time()
     session_runtime_options.standalone_run = standalone_run
-    session_runtime_options.multiprocessing = session_runtime_options.multiprocessing and not standalone_run
+    session_runtime_options.multiprocessing = True or session_runtime_options.multiprocessing and not standalone_run
+
+    if session_runtime_options.credit_market_efficiency == 1.0:
+        # perfect trading
+        session_runtime_options.consolidate_manufacturers = True
+        num_passes = 1
+    elif session_runtime_options.credit_market_efficiency == 0.0:
+        # no trading
+        session_runtime_options.consolidate_manufacturers = False
+        num_passes = 1
+    else:
+        # imperfect trading
+        session_runtime_options.consolidate_manufacturers = True
+        num_passes = 2
 
     init_fail = None
 
