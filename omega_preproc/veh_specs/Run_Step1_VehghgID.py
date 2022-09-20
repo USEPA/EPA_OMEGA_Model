@@ -90,6 +90,8 @@ for run_count in range (0,len(run_controller)):
              bool_run_new_manual_filter, manual_filter_filename, expanded_footprint_filename, subconfig_filename, model_type_filename, vehghg_filename, output_path_vehghgid, footprint_exceptions_table, \
              modeltype_exceptions_table, subconfig_MY_exceptions_table, subconfig_sales_exceptions_table, tstcar_MY_exceptions_table, model_year, roadload_coefficient_table_filename, set_bodyid_to_lineageid, \
              drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, set_roadload_coefficient_table_filename, tstcar_MY_carline_name_mapping_filename)
+
+    print('VehGHG Run Completed !!!')
         # import Subconfig_Expansion
         # Subconfig_Expansion.Subconfig_Expansion(input_path, subconfig_filename, output_path_intermediate, \
         #                                         expanded_footprint_filename, output_path_vehghgid, vehghg_filename, 2016)
