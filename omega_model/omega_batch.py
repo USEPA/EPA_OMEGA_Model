@@ -35,7 +35,7 @@ Sample Data Columns
         Batch Settings,,
         Batch Name,String,test_batch
         Analysis Final Year,#,2030
-        Consolidate Manufacturers,TRUE / FALSE,TRUE
+        Credit Market Efficiency,#,1.0
         Cost Accrual,end-of-year / beginning-of-year,end-of-year
         Discount Values to Year,#,2021
         Analysis Dollar Basis,#,2020
@@ -119,8 +119,8 @@ Data Row Name and Description
 :Analysis Final Year *(int)*:
     Analysis Final Year, e.g. ``2050``
 
-:Consolidate Manufacturers *(TRUE or FALSE)*:
-    If ``TRUE`` then manufacturers will be conslidated into a "consolidated_OEM", otherwise manufacturers will be run independently
+:Credit Market Efficiency *(float)*:
+    0.0 = no trading between manufacturers, 1.0 = perfect trading, 0..1 = variable trading
 
 :Cost Accrual:
     The time of year when costs are assumed to accrue, ``end-of-year`` or ``beginning-of-year``
@@ -806,7 +806,7 @@ class OMEGABatchObject(OMEGABase):
             self.dataframe.loc['Analysis Final Year'][0] = self.settings.analysis_final_year
         self.settings.analysis_final_year = int(self.read_parameter('Analysis Final Year'))
         self.dataframe.loc['Calc Effects'] = self.settings.calc_effects
-        self.settings.consolidate_manufacturers = self.read_parameter('Consolidate Manufacturers')
+        self.settings.credit_market_efficiency = self.read_parameter('Credit Market Efficiency')
         self.settings.cost_accrual = validate_predefined_input(self.read_parameter('Cost Accrual'),
                                                       {'end-of-year', 'beginning-of-year'})
         self.settings.discount_values_to_year = int(self.read_parameter('Discount Values to Year'))
