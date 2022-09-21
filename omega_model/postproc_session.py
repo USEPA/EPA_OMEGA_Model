@@ -137,7 +137,8 @@ def run_postproc(iteration_log, credit_banks):
 
     for compliance_id in VehicleFinal.compliance_ids:
 
-        plot_iteration(iteration_log, compliance_id)
+        if 'iteration' in omega_globals.options.verbose_postproc:
+            plot_iteration(iteration_log, compliance_id)
 
         if not omega_globals.options.consolidate_manufacturers:
 
@@ -235,35 +236,35 @@ def plot_effects(calendar_years, physical_effects_df):
         ax1.plot(calendar_years, physical_effects['vehicle_stock_CO2_megagrams'], '.-')
         ax1.legend(['Vehicle Stock CO2 Mg'])
         label_xyt(ax1, 'Year', 'CO2 [Mg]', '%s\nVehicle Stock CO2 Mg' % omega_globals.options.session_unique_name)
-        fig.savefig(omega_globals.options.output_folder + '%s Stock CO2 Mg.png'
+        fig.savefig(omega_globals.options.output_folder + '%s ALL Stock CO2 Mg.png'
                     % omega_globals.options.session_unique_name)
 
         fig, ax1 = figure(omega_globals.options.auto_close_figures)
         ax1.plot(calendar_years, physical_effects['vehicle_stock_consumption_gasoline_gallons'], '.-')
         ax1.legend(['Vehicle Stock Fuel Consumption Gallons'])
         label_xyt(ax1, 'Year', 'Fuel Consumption [Gasoline gallons]', '%s\nVehicle Stock Fuel Consumption Gasoline Gallons' % omega_globals.options.session_unique_name)
-        fig.savefig(omega_globals.options.output_folder + '%s Stock Gas Gallons.png'
+        fig.savefig(omega_globals.options.output_folder + '%s ALL Stock Gas Gallons.png'
                     % omega_globals.options.session_unique_name)
 
         fig, ax1 = figure(omega_globals.options.auto_close_figures)
         ax1.plot(calendar_years, physical_effects['vehicle_stock_consumption_kwh'], '.-')
         ax1.legend(['Vehicle Stock Fuel Consumption kWh'])
         label_xyt(ax1, 'Year', 'Consumption [kWh]', '%s\nVehicle Stock Fuel Consumption kWh' % omega_globals.options.session_unique_name)
-        fig.savefig(omega_globals.options.output_folder + '%s Stock kWh.png'
+        fig.savefig(omega_globals.options.output_folder + '%s ALL Stock kWh.png'
                     % omega_globals.options.session_unique_name)
 
         fig, ax1 = figure(omega_globals.options.auto_close_figures)
         ax1.plot(calendar_years, physical_effects['vehicle_stock_vmt'], '.-')
         ax1.legend(['Vehicle Stock Miles Travelled'])
         label_xyt(ax1, 'Year', 'Distance Travelled [miles]', '%s\nVehicle Stock Miles Travelled' % omega_globals.options.session_unique_name)
-        fig.savefig(omega_globals.options.output_folder + '%s Stock VMT.png'
+        fig.savefig(omega_globals.options.output_folder + '%s ALL Stock VMT.png'
                     % omega_globals.options.session_unique_name)
 
         fig, ax1 = figure(omega_globals.options.auto_close_figures)
         ax1.plot(calendar_years, np.array(physical_effects['registered_count']) / 1e6, '.-')
         ax1.legend(['Vehicle Stock Registered Count'])
         label_xyt(ax1, 'Year', 'Registered Count [millions]', '%s\nVehicle Stock Registered Count' % omega_globals.options.session_unique_name)
-        fig.savefig(omega_globals.options.output_folder + '%s Stock Count.png'
+        fig.savefig(omega_globals.options.output_folder + '%s ALL Stock Count.png'
                     % omega_globals.options.session_unique_name)
 
     return physical_effects
@@ -341,7 +342,7 @@ def plot_cert_co2e_gpmi(calendar_years):
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
               '%s\nAverage Vehicle Cert CO2e g/mi by Market Category v Year' % omega_globals.options.session_unique_name)
     fig.savefig(
-        omega_globals.options.output_folder + '%s V Cert CO2e gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
+        omega_globals.options.output_folder + '%s ALL V Cert CO2e gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # market class chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
@@ -355,7 +356,7 @@ def plot_cert_co2e_gpmi(calendar_years):
               '%s\nAverage Vehicle Cert CO2e g/mi  by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(market_classes)
     fig.savefig(
-        omega_globals.options.output_folder + '%s V Cert CO2e gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
+        omega_globals.options.output_folder + '%s ALL V Cert CO2e gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
 
     return co2e_data
 
@@ -432,7 +433,7 @@ def plot_cert_direct_kwh_pmi(calendar_years):
     label_xyt(ax1, 'Year', 'Energy Consumption [kWh/mi]',
               '%s\nAverage Vehicle Cert kWh/mi by Market Category v Year' % omega_globals.options.session_unique_name)
     fig.savefig(
-        omega_globals.options.output_folder + '%s V Cert kWh pmi Mkt Cat.png' % omega_globals.options.session_unique_name)
+        omega_globals.options.output_folder + '%s ALL V Cert kWh pmi Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # market class chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
@@ -446,7 +447,7 @@ def plot_cert_direct_kwh_pmi(calendar_years):
               '%s\nAverage Vehicle Cert kWh/mi  by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(market_classes)
     fig.savefig(
-        omega_globals.options.output_folder + '%s V Cert kWh pmi Mkt Cls.png' % omega_globals.options.session_unique_name)
+        omega_globals.options.output_folder + '%s ALL V Cert kWh pmi Mkt Cls.png' % omega_globals.options.session_unique_name)
     return average_cert_direct_kwh_data
 
 
@@ -523,7 +524,7 @@ def plot_target_co2e_gpmi(calendar_years):
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
               '%s\nAverage Vehicle Target CO2e g/mi by Market Category v Year' % omega_globals.options.session_unique_name)
     fig.savefig(
-        omega_globals.options.output_folder + '%s V Target CO2e gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
+        omega_globals.options.output_folder + '%s ALL V Target CO2e gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # market class chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
@@ -537,7 +538,7 @@ def plot_target_co2e_gpmi(calendar_years):
               '%s\nAverage Vehicle Target CO2e g/mi  by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(market_classes)
     fig.savefig(
-        omega_globals.options.output_folder + '%s V Target CO2e gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
+        omega_globals.options.output_folder + '%s ALL V Target CO2e gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
 
     return co2e_data
 
@@ -611,7 +612,7 @@ def plot_vehicle_cost(calendar_years):
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s\nAverage Vehicle Cost by Market Category v Year' % omega_globals.options.session_unique_name)
     fig.savefig(
-        omega_globals.options.output_folder + '%s V Cost Mkt Cat.png' % omega_globals.options.session_unique_name)
+        omega_globals.options.output_folder + '%s ALL V Cost Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # market class chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
@@ -626,7 +627,7 @@ def plot_vehicle_cost(calendar_years):
     # ax1.set_ylim(15e3, 80e3)
     ax1.legend(market_classes)
     fig.savefig(
-        omega_globals.options.output_folder + '%s V Cost Mkt Cls.png' % omega_globals.options.session_unique_name)
+        omega_globals.options.output_folder + '%s ALL V Cost Mkt Cls.png' % omega_globals.options.session_unique_name)
 
     return average_cost_data
 
@@ -802,7 +803,7 @@ def plot_vehicle_generalized_cost(calendar_years):
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s\nAverage Vehicle Generalized Cost by Market Category v Year' % omega_globals.options.session_unique_name)
     fig.savefig(
-        omega_globals.options.output_folder + '%s V GenCost Mkt Cat.png' % omega_globals.options.session_unique_name)
+        omega_globals.options.output_folder + '%s ALL V GenCost Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # market class chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
@@ -817,7 +818,7 @@ def plot_vehicle_generalized_cost(calendar_years):
     # ax1.set_ylim(15e3, 80e3)
     ax1.legend(market_classes)
     fig.savefig(
-        omega_globals.options.output_folder + '%s V GenCost Mkt Cls.png' % omega_globals.options.session_unique_name)
+        omega_globals.options.output_folder + '%s ALL V GenCost Mkt Cls.png' % omega_globals.options.session_unique_name)
 
     return cost_data
 
@@ -869,7 +870,7 @@ def plot_vehicle_megagrams(calendar_years):
     ax1.legend(market_categories + ['vehicle'])
     label_xyt(ax1, 'Year', 'CO2e [Mg]',
               '%s\nVehicle CO2e Mg by Market Category v Year' % omega_globals.options.session_unique_name)
-    fig.savefig(omega_globals.options.output_folder + '%s V Mg Mkt Cat.png' % omega_globals.options.session_unique_name)
+    fig.savefig(omega_globals.options.output_folder + '%s ALL V Mg Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # market class chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
@@ -882,7 +883,7 @@ def plot_vehicle_megagrams(calendar_years):
     label_xyt(ax1, 'Year', 'CO2e [Mg]',
               '%s\nVehicle CO2e Mg  by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(market_classes + ['vehicle'])
-    fig.savefig(omega_globals.options.output_folder + '%s V Mg Mkt Cls.png' % omega_globals.options.session_unique_name)
+    fig.savefig(omega_globals.options.output_folder + '%s ALL V Mg Mkt Cls.png' % omega_globals.options.session_unique_name)
 
     return Mg_data
 
@@ -964,7 +965,7 @@ def plot_market_shares(calendar_years, total_sales):
               '%s\nMarket Category Absolute Market Shares' % omega_globals.options.session_unique_name)
     ax1.legend(market_categories)
     fig.savefig(
-        omega_globals.options.output_folder + '%s Mkt Cat Shares.png' % omega_globals.options.session_unique_name)
+        omega_globals.options.output_folder + '%s ALL Mkt Cat Shares.png' % omega_globals.options.session_unique_name)
 
     # plot market class results
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
@@ -975,7 +976,7 @@ def plot_market_shares(calendar_years, total_sales):
               '%s\nMarket Class Absolute Market Shares' % omega_globals.options.session_unique_name)
     ax1.legend(market_classes)
     fig.savefig(
-        omega_globals.options.output_folder + '%s Mkt Cls Shares.png' % omega_globals.options.session_unique_name)
+        omega_globals.options.output_folder + '%s ALL Mkt Cls Shares.png' % omega_globals.options.session_unique_name)
 
     # plot context size class results
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
@@ -985,7 +986,7 @@ def plot_market_shares(calendar_years, total_sales):
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]',
               '%s\nContext Size Class Absolute Market Shares' % omega_globals.options.session_unique_name)
     ax1.legend(NewVehicleMarket.base_year_context_size_class_sales.keys(), ncol=2, loc='upper center')
-    fig.savefig(omega_globals.options.output_folder + '%s CSC Shares.png' % omega_globals.options.session_unique_name)
+    fig.savefig(omega_globals.options.output_folder + '%s ALL CSC Shares.png' % omega_globals.options.session_unique_name)
 
     # plot reg class results
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
@@ -995,7 +996,7 @@ def plot_market_shares(calendar_years, total_sales):
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]',
               '%s\nReg Class Absolute Market Shares' % omega_globals.options.session_unique_name)
     ax1.legend(omega_globals.options.RegulatoryClasses.reg_classes, ncol=2, loc='upper center')
-    fig.savefig(omega_globals.options.output_folder + '%s RC Shares.png' % omega_globals.options.session_unique_name)
+    fig.savefig(omega_globals.options.output_folder + '%s ALL RC Shares.png' % omega_globals.options.session_unique_name)
 
     return market_share_results
 
@@ -1182,7 +1183,7 @@ def plot_total_sales(calendar_years, compliance_ids):
     label_xyt(ax1, 'Year', 'Sales [millions]', '%s\nTotal Sales Versus Calendar Year\n Total Sales %.2f Million' % (
         omega_globals.options.session_unique_name, total_sales.sum() / 1e6))
 
-    fig.savefig(omega_globals.options.output_folder + '%s Sales v Year.png' % omega_globals.options.session_unique_name)
+    fig.savefig(omega_globals.options.output_folder + '%s ALL Sales v Year.png' % omega_globals.options.session_unique_name)
 
     return context_sales, total_sales, manufacturer_sales
 
