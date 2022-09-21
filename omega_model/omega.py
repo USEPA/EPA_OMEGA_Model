@@ -337,11 +337,11 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
         credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
                                                        omega_globals.options.session_unique_name +
-                                                       ' %s_GHG_credit_balances.csv' % compliance_id, index=False)
+                                                       ' %s GHG_credit_balances.csv' % compliance_id, index=False)
 
         credit_banks[compliance_id].transaction_log.to_csv(
             omega_globals.options.output_folder + omega_globals.options.session_unique_name +
-            ' %s_GHG_credit_transactions.csv' % compliance_id, index=False)
+            ' %s GHG_credit_transactions.csv' % compliance_id, index=False)
 
     iteration_log_df = pd.DataFrame(iteration_log)
 
