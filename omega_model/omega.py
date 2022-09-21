@@ -1537,7 +1537,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
         for pass_num in range(num_passes):
 
-            if pass_num == num_passes-1:
+            if pass_num == num_passes-1 and 0.0 < session_runtime_options.credit_market_efficiency < 1.0:
                 # second / last pass, don't consolidate
                 session_runtime_options.consolidate_manufacturers = False
 
