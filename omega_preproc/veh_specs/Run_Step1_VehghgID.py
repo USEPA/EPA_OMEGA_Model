@@ -9,7 +9,7 @@ home = str(Path.home())
 
 root_drive_letter = 'I:'
 main_path = root_drive_letter + '/Project/Midterm Review/Trends/Original Trends Team Data Gathering and Analysis/Tech Specifications/techspecconsolidator/VehGHG Runs'
-# main_path = 'C:\\Users\\slee02\\Documents\\Python\\VehGHG Runs';
+main_path = 'C:\\Users\\slee02\\Documents\\Python\\VehGHG Runs';
 # C:\Users\slee02\Documents\Python\VehGHG Runs
 
 run_folder = str(input('Enter Run Folder Name: '))
