@@ -1133,12 +1133,12 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             if pd.isnull(vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'G', 'FUEL_NET_HEATING_VALUE_BEST']).sum() > 0:
                 vehghg_file_nonflexfuel.loc[pd.isnull(vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_BEST']) & (vehghg_file_nonflexfuel['Fuel Type Category'] == 'G'), 'FUEL_NET_HEATING_VALUE_BEST'] = \
                     vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'G', 'FUEL_NET_HEATING_VALUE'].mean()
-                vehghg_file_nonflexfuel.loc[pd.isnull(vehghg_file_nonflexfuel['FUEL_GRAVITY_BEST']) & vehghg_file_nonflexfuel['Fuel Type Category'] == 'G', 'FUEL_GRAVITY_BEST'] = \
+                vehghg_file_nonflexfuel.loc[(pd.isnull(vehghg_file_nonflexfuel['FUEL_GRAVITY_BEST'])) & (vehghg_file_nonflexfuel['Fuel Type Category'] == 'G'), 'FUEL_GRAVITY_BEST'] = \
                     vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'G', 'FUEL_GRAVITY'].mean()
             if pd.isnull(vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'D', 'FUEL_NET_HEATING_VALUE_BEST']).sum() > 0:
                 vehghg_file_nonflexfuel.loc[pd.isnull(vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_BEST']) & (vehghg_file_nonflexfuel['Fuel Type Category'] == 'D'), 'FUEL_NET_HEATING_VALUE_BEST'] = \
                     vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'D', 'FUEL_NET_HEATING_VALUE'].mean()
-                vehghg_file_nonflexfuel.loc[pd.isnull(vehghg_file_nonflexfuel['FUEL_GRAVITY_BEST']) & vehghg_file_nonflexfuel['Fuel Type Category'] == 'D', 'FUEL_GRAVITY_BEST'] = \
+                vehghg_file_nonflexfuel.loc[(pd.isnull(vehghg_file_nonflexfuel['FUEL_GRAVITY_BEST'])) & (vehghg_file_nonflexfuel['Fuel Type Category'] == 'D'), 'FUEL_GRAVITY_BEST'] = \
                     vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'D', 'FUEL_GRAVITY'].mean()
             vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'E', 'FUEL_NET_HEATING_VALUE_BEST'] = np.nan
             vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'E', 'FUEL_GRAVITY_BEST'] = np.nan
@@ -1285,7 +1285,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             # vehghg_file_output.loc[vehghg_file_output['Drive System Code'] == '4'  & (~pd.isnull(vehghg_file_output['Drive System Code'])), 'DRIVE TYPE'] = 'Four wheel drive'
 
             vehghg_file_output.to_csv(output_path + '\\' + vehghg_filename + '_' + date_and_time + '.csv', index=False)
-            print('Finish writing the ', vehghg_filename)
+            print('\nFinish writing the', vehghg_filename, 'in the', output_path, 'directory')
         else:
             # New BodyID table sought, previous data included
             full_expanded_footprint_filter_table = full_expanded_footprint_filter_table.merge \
