@@ -1547,6 +1547,9 @@ def run_omega(session_runtime_options, standalone_run=False):
                 # initial pass(es), save preliminary outputs (for now)
                 omega_globals.options.output_folder = session_runtime_options.output_folder\
                     .replace('out', 'out%sout%d' % (os.sep, pass_num))
+                file_io.validate_folder(omega_globals.options.output_folder)
+
+                omega_globals.options.database_dump_folder = omega_globals.options.output_folder + '__dump' + os.sep
 
             if not init_fail:
                 if omega_globals.options.multiprocessing:
@@ -1593,6 +1596,16 @@ def run_omega(session_runtime_options, standalone_run=False):
                     omega_globals.pool.close()
                     omega_globals.pool.join()
 
+                if 'database' in omega_globals.options.verbose_log_modules:
+                    dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+
+                # shut down the db
+                omega_globals.session.close()
+                omega_globals.engine.dispose()
+                omega_globals.engine = None
+                omega_globals.session = None
+                omega_globals.options = None
+
             else:
                 omega_log.logwrite(init_fail)
                 omega_log.end_logfile("\nSession Fail")
@@ -1629,18 +1642,8 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             omega_log.end_logfile("\nSession Complete")
 
-            if 'database' in omega_globals.options.verbose_log_modules:
-                dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
-
             if omega_globals.options.run_profiler:
                 os.system('snakeviz omega_profile.dmp')
-
-            # shut down the db
-            omega_globals.session.close()
-            omega_globals.engine.dispose()
-            omega_globals.engine = None
-            omega_globals.session = None
-            omega_globals.options = None
 
     except:
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
