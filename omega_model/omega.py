@@ -216,7 +216,7 @@ def update_cross_subsidy_log_data(producer_decision_and_response, calendar_year,
     producer_decision_and_response['share_convergence_error'] = share_convergence_error
 
 
-def run_producer_consumer():
+def run_producer_consumer(pass_num, manufacturer_annual_data_table):
     """
     Create producer cost-minimizing technology and market share options, in consideration of market response from
     the consumer, possibly with iteration between the two. Iterates across years for each compliance ID.  When
@@ -238,7 +238,8 @@ def run_producer_consumer():
     credit_banks = dict()
 
     for compliance_id in VehicleFinal.compliance_ids:
-        omega_log.logwrite("\nRunning %s: Manufacturer=%s" % (omega_globals.options.session_unique_name, compliance_id),
+        omega_log.logwrite("\nRunning %s Pass %d: Manufacturer=%s" % (omega_globals.options.session_unique_name,
+                                                                      pass_num, compliance_id),
                            echo_console=True)
 
         analysis_end_year = omega_globals.options.analysis_final_year + 1
@@ -251,23 +252,28 @@ def run_producer_consumer():
 
             credit_banks[compliance_id].update_credit_age(calendar_year)
 
-            # TODO: make credit strategy modular, like upstream methods?
-            # strategy: use expiring credits, pay any expiring debits in one shot:
-            # expiring_credits_Mg = credit_banks[compliance_id].get_expiring_credits_Mg(calendar_year)
-            # expiring_debits_Mg = credit_banks[compliance_id].get_expiring_debits_Mg(calendar_year)
-            # strategic_target_offset_Mg = expiring_credits_Mg + expiring_debits_Mg
+            if manufacturer_annual_data_table is None:
+                # TODO: make credit strategy modular, like upstream methods?
+                # strategy: use expiring credits, pay any expiring debits in one shot:
+                # expiring_credits_Mg = credit_banks[compliance_id].get_expiring_credits_Mg(calendar_year)
+                # expiring_debits_Mg = credit_banks[compliance_id].get_expiring_debits_Mg(calendar_year)
+                # strategic_target_offset_Mg = expiring_credits_Mg + expiring_debits_Mg
 
-            # strategy: use credits and pay debits over their remaining lifetime, instead of all at once:
-            # current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
-            # for c in current_credits + current_debits:
-            #     strategic_target_offset_Mg += (c.remaining_balance_Mg / c.remaining_years)
+                # strategy: use credits and pay debits over their remaining lifetime, instead of all at once:
+                # current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
+                # for c in current_credits + current_debits:
+                #     strategic_target_offset_Mg += (c.remaining_balance_Mg / c.remaining_years)
 
-            # strategy: try to hit the target and make up for minor previous compliance discrepancies
-            #           (ignoring base year banked credits):
-            strategic_target_offset_Mg = 0
-            current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
-            for c in current_debits:
-                strategic_target_offset_Mg += c.remaining_balance_Mg
+                # strategy: try to hit the target and make up for minor previous compliance discrepancies
+                #           (ignoring base year banked credits):
+                strategic_target_offset_Mg = 0
+                current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
+                for c in current_debits:
+                    strategic_target_offset_Mg += c.remaining_balance_Mg
+            else:
+                strategic_target_offset_Mg = \
+                    manufacturer_annual_data_table[(manufacturer_annual_data_table['compliance_id'] == compliance_id) &
+                                                   (manufacturer_annual_data_table['model_year'] == calendar_year)]['strategic_offset'].item()
 
             producer_decision_and_response = None
             best_winning_combo_with_sales_response = None
@@ -1504,55 +1510,107 @@ def run_omega(session_runtime_options, standalone_run=False):
     """
     import traceback
     import time
+    import copy
 
     session_runtime_options.start_time = time.time()
     session_runtime_options.standalone_run = standalone_run
-    session_runtime_options.multiprocessing = session_runtime_options.multiprocessing and not standalone_run
+    session_runtime_options.multiprocessing = True or session_runtime_options.multiprocessing and not standalone_run
+
+    if session_runtime_options.credit_market_efficiency == 1.0:
+        # perfect trading
+        session_runtime_options.consolidate_manufacturers = True
+        num_passes = 1
+    elif session_runtime_options.credit_market_efficiency == 0.0:
+        # no trading
+        session_runtime_options.consolidate_manufacturers = False
+        num_passes = 1
+    else:
+        # imperfect trading
+        session_runtime_options.consolidate_manufacturers = True
+        num_passes = 2
 
     init_fail = None
 
     try:
 
-        init_fail = init_omega(session_runtime_options)
+        manufacturer_annual_data_table = None
+
+        for pass_num in range(num_passes):
+
+            if pass_num == num_passes-1 and 0.0 < session_runtime_options.credit_market_efficiency < 1.0:
+                # second / last pass, don't consolidate
+                session_runtime_options.consolidate_manufacturers = False
+
+            init_fail = init_omega(copy.copy(session_runtime_options))
+
+            if pass_num < num_passes-1:
+                # initial pass(es), save preliminary outputs (for now)
+                omega_globals.options.output_folder = session_runtime_options.output_folder\
+                    .replace('out', 'out%sout%d' % (os.sep, pass_num))
+                file_io.validate_folder(omega_globals.options.output_folder)
+
+                omega_globals.options.database_dump_folder = omega_globals.options.output_folder + '__dump' + os.sep
+
+            if not init_fail:
+                if omega_globals.options.multiprocessing:
+                    from omega_model import omega
+
+                    from multiprocessing import Pool, freeze_support
+
+                    freeze_support()
+
+                    num_processes = min(len(omega_globals.options.MarketClass.market_classes), os.cpu_count() - 1)
+
+                    start_time = time.time()
+                    omega_globals.pool = Pool(processes=num_processes,
+                                              initializer=omega.init_omega, initargs=[omega_globals.options])
+
+                    results = []
+                    for i in range(num_processes):
+                        results.append(omega_globals.pool.apply_async(func=omega.poolwait,
+                                                         callback=None,
+                                                         error_callback=omega.error_callback))
+
+                    [r.get() for r in results]
+
+                    print('Elapsed init time = %f' % (time.time() - start_time))
+
+                omega_log.logwrite("Running %s:" % omega_globals.options.session_unique_name)
+
+                if omega_globals.options.run_profiler:
+                    # run with profiler
+                    omega_log.logwrite('Enabling Profiler...')
+                    import cProfile, pstats
+                    profiler = cProfile.Profile()
+                    profiler.enable()
+
+                iteration_log, credit_banks = run_producer_consumer(pass_num, manufacturer_annual_data_table)
+
+                manufacturer_annual_data_table = postproc_session.run_postproc(iteration_log, credit_banks)
+                manufacturer_annual_data_table['strategic_offset'] = \
+                    omega_globals.options.credit_market_efficiency * \
+                    (manufacturer_annual_data_table['calendar_year_cert_co2e_megagrams'] - \
+                    manufacturer_annual_data_table['target_co2e_megagrams'])
+
+                if omega_globals.options.multiprocessing:
+                    omega_globals.pool.close()
+                    omega_globals.pool.join()
+
+                if 'database' in omega_globals.options.verbose_log_modules:
+                    dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+
+                # shut down the db
+                omega_globals.session.close()
+                omega_globals.engine.dispose()
+                omega_globals.engine = None
+                omega_globals.session = None
+
+            else:
+                omega_log.logwrite(init_fail)
+                omega_log.end_logfile("\nSession Fail")
+                dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
         if not init_fail:
-
-            if session_runtime_options.multiprocessing:
-                from omega_model import omega
-
-                from multiprocessing import Pool, freeze_support
-
-                freeze_support()
-
-                num_processes = min(len(omega_globals.options.MarketClass.market_classes), os.cpu_count() - 1)
-
-                start_time = time.time()
-                omega_globals.pool = Pool(processes=num_processes,
-                                          initializer=omega.init_omega, initargs=[session_runtime_options])
-
-                results = []
-                for i in range(num_processes):
-                    results.append(omega_globals.pool.apply_async(func=omega.poolwait,
-                                                     callback=None,
-                                                     error_callback=omega.error_callback))
-
-                [r.get() for r in results]
-
-                print('Elapsed init time = %f' % (time.time() - start_time))
-
-            omega_log.logwrite("Running %s:" % omega_globals.options.session_unique_name)
-
-            if omega_globals.options.run_profiler:
-                # run with profiler
-                omega_log.logwrite('Enabling Profiler...')
-                import cProfile, pstats
-                profiler = cProfile.Profile()
-                profiler.enable()
-
-            iteration_log, credit_banks = run_producer_consumer()
-
-            postproc_session.run_postproc(iteration_log, credit_banks)
-
             if omega_globals.options.run_profiler:
                 profiler.disable()
                 stats = pstats.Stats(profiler)
@@ -1583,27 +1641,8 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             omega_log.end_logfile("\nSession Complete")
 
-            if 'database' in omega_globals.options.verbose_log_modules:
-                dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
-
             if omega_globals.options.run_profiler:
                 os.system('snakeviz omega_profile.dmp')
-
-            # shut down the db
-            omega_globals.session.close()
-            omega_globals.engine.dispose()
-            omega_globals.engine = None
-            omega_globals.session = None
-            omega_globals.options = None
-
-            if session_runtime_options.multiprocessing:
-                omega_globals.pool.close()
-                omega_globals.pool.join()
-
-        else:
-            omega_log.logwrite(init_fail)
-            omega_log.end_logfile("\nSession Fail")
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
     except:
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

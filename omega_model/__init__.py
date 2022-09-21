@@ -89,11 +89,12 @@ try:
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
             self.omega_model_path = path
             self.use_prerun_context_outputs = False
+            self.credit_market_efficiency = 1.0
             self.consolidate_manufacturers = True
             self.include_manufacturers_list = 'all'
             self.exclude_manufacturers_list = 'none'
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
-            self.vehicles_file = path + 'test_inputs/vehicles.csv'
+            self.vehicles_file = path + 'test_inputs/vehicles_big_three.csv'
             self.vehicles_file_base_year = None
             self.vehicles_df = pd.DataFrame()
             self.onroad_vehicle_calculations_file = path + 'test_inputs/onroad_vehicle_calculations.csv'
