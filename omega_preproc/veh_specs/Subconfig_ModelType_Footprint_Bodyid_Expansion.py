@@ -1129,24 +1129,24 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             vehghg_file_nonflexfuel.drop(['Model Year', 'Veh Mfr Code', 'Represented Test Veh Make', 'Represented Test Veh Model', 'Test Number', 'Test Category', 'Equivalent Test Weight (lbs.)', 'Test Veh Displacement (L)', 'N/V Ratio'], axis=1, inplace=True)
             if DEBUGGING_CAFE_MFR_CD_MODE != True: check_final_model_yr_ghg_prod_units('vehghg_file_nonflexfuel_rr', vehghg_file_nonflexfuel, footprint_indexing_categories, subconfig_indexing_categories, grp_volumes_footprint_file_with_lineage)
 
-            print('# of Null FUEL_NET_HEATING_VALUE_BEST = ', len(vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_BEST'].astype(str) == 'nan']))
+            print('# of Null FUEL_NET_HEATING_VALUE_BEST = ', len(pd.isnull(vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_BEST'])))
             if pd.isnull(vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'G', 'FUEL_NET_HEATING_VALUE_BEST']).sum() > 0:
-                vehghg_file_nonflexfuel.loc[pd.isnull(vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_BEST']) & (vehghg_file_nonflexfuel['Fuel Type Category'] == 'G'), 'FUEL_NET_HEATING_VALUE_BEST'] = \
+                vehghg_file_nonflexfuel.loc[(pd.isnull(vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_BEST'])) & (vehghg_file_nonflexfuel['Fuel Type Category'] == 'G'), 'FUEL_NET_HEATING_VALUE_BEST'] = \
                     vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'G', 'FUEL_NET_HEATING_VALUE'].mean()
                 vehghg_file_nonflexfuel.loc[(pd.isnull(vehghg_file_nonflexfuel['FUEL_GRAVITY_BEST'])) & (vehghg_file_nonflexfuel['Fuel Type Category'] == 'G'), 'FUEL_GRAVITY_BEST'] = \
                     vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'G', 'FUEL_GRAVITY'].mean()
             if pd.isnull(vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'D', 'FUEL_NET_HEATING_VALUE_BEST']).sum() > 0:
-                vehghg_file_nonflexfuel.loc[pd.isnull(vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_BEST']) & (vehghg_file_nonflexfuel['Fuel Type Category'] == 'D'), 'FUEL_NET_HEATING_VALUE_BEST'] = \
+                vehghg_file_nonflexfuel.loc[(pd.isnull(vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_BEST'])) & (vehghg_file_nonflexfuel['Fuel Type Category'] == 'D'), 'FUEL_NET_HEATING_VALUE_BEST'] = \
                     vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'D', 'FUEL_NET_HEATING_VALUE'].mean()
                 vehghg_file_nonflexfuel.loc[(pd.isnull(vehghg_file_nonflexfuel['FUEL_GRAVITY_BEST'])) & (vehghg_file_nonflexfuel['Fuel Type Category'] == 'D'), 'FUEL_GRAVITY_BEST'] = \
                     vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'D', 'FUEL_GRAVITY'].mean()
             vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'E', 'FUEL_NET_HEATING_VALUE_BEST'] = np.nan
             vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['Fuel Type Category'] == 'E', 'FUEL_GRAVITY_BEST'] = np.nan
 
-            print('# of Null FUEL_NET_HEATING_VALUE_BEST2 = ', len(vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_BEST'].astype(str) == 'nan']))
+            print('# of Null FUEL_NET_HEATING_VALUE_BEST Updated = ', len(pd.isnull(vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_BEST'])))
 
             vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_MJPL'] = pd.Series(
-                vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_BEST'].astype(float) * vehghg_file_nonflexfuel['FUEL_GRAVITY_BEST'].astype(float) * btu2mj * kg2lbm)
+                vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_BEST'] * vehghg_file_nonflexfuel['FUEL_GRAVITY_BEST'] * btu2mj * kg2lbm)
 
             import Calculate_Powertrain_Efficiency
             vehghg_file_nonflexfuel = pd.concat([pd.Series(range(len(vehghg_file_nonflexfuel)), name='TEMP_ID') + 1, vehghg_file_nonflexfuel], axis=1)
