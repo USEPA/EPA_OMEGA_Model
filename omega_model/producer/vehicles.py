@@ -1423,7 +1423,6 @@ class VehicleFinal(SQABase, Vehicle):
 
             if omega_globals.options.consolidate_manufacturers:
                 veh.compliance_id = 'consolidated_OEM'
-                veh.manufacturer_id = 'consolidated_OEM'
             else:
                 veh.compliance_id = veh.manufacturer_id
 
