@@ -651,13 +651,15 @@ def calc_new_vehicle_mfr_generalized_cost(producer_decision, producer_market_cla
 
     """
     average_new_vehicle_mfr_generalized_cost = 0
+    share_total = 0
     for mc in producer_market_classes:
         if producer_decision['producer_abs_share_frac_%s' % mc] is not None:
             average_new_vehicle_mfr_generalized_cost += \
                 producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] * \
                 producer_decision['producer_abs_share_frac_%s' % mc]
+            share_total += producer_decision['producer_abs_share_frac_%s' % mc]
 
-    return average_new_vehicle_mfr_generalized_cost
+    return average_new_vehicle_mfr_generalized_cost / share_total
 
 
 def calc_sales_and_cost_data_from_shares(calendar_year, compliance_id, producer_market_classes,
@@ -1586,20 +1588,35 @@ def run_omega(session_runtime_options, standalone_run=False):
 
                 iteration_log, credit_banks = run_producer_consumer(pass_num, manufacturer_annual_data_table)
 
+                # postproc session
                 manufacturer_annual_data_table = postproc_session.run_postproc(iteration_log, credit_banks)
                 manufacturer_annual_data_table['strategic_offset'] = \
                     omega_globals.options.credit_market_efficiency * \
                     (manufacturer_annual_data_table['calendar_year_cert_co2e_megagrams'] - \
                     manufacturer_annual_data_table['target_co2e_megagrams'])
 
+                # everybody out of the pool
                 if omega_globals.options.multiprocessing:
                     omega_globals.pool.close()
                     omega_globals.pool.join()
 
+                # save context calibration files
+                from context.new_vehicle_market import NewVehicleMarket
+                if omega_globals.options.session_is_reference and \
+                        omega_globals.options.generate_context_calibration_files:
+                    NewVehicleMarket.save_context_new_vehicle_generalized_costs(
+                        omega_globals.options.context_new_vehicle_generalized_costs_file)
+                    omega_globals.options.SalesShare.save_calibration(
+                        omega_globals.options.sales_share_calibration_file)
+
+                NewVehicleMarket.save_session_new_vehicle_generalized_costs(
+                    omega_globals.options.output_folder + omega_globals.options.session_unique_name +
+                    '_new_vehicle_prices.csv')
+
+                # shut down the db
                 if 'database' in omega_globals.options.verbose_log_modules:
                     dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
-                # shut down the db
                 omega_globals.session.close()
                 omega_globals.engine.dispose()
                 omega_globals.engine = None
@@ -1616,19 +1633,6 @@ def run_omega(session_runtime_options, standalone_run=False):
                 stats = pstats.Stats(profiler)
                 omega_log.logwrite('Generating Profiler Dump...')
                 stats.dump_stats('omega_profile.dmp')
-
-            from context.new_vehicle_market import NewVehicleMarket
-
-            if omega_globals.options.session_is_reference and \
-                    omega_globals.options.generate_context_calibration_files:
-                NewVehicleMarket.save_context_new_vehicle_generalized_costs(
-                    omega_globals.options.context_new_vehicle_generalized_costs_file)
-                omega_globals.options.SalesShare.save_calibration(
-                    omega_globals.options.sales_share_calibration_file)
-
-            NewVehicleMarket.save_session_new_vehicle_generalized_costs(
-                omega_globals.options.output_folder + omega_globals.options.session_unique_name +
-                '_new_vehicle_prices.csv')
 
             metadata_df = pd.DataFrame(omega_globals.options.inputfile_metadata)
             metadata_df = metadata_df.drop(columns=[3, 5])
