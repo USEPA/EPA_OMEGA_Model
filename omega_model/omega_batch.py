@@ -806,7 +806,6 @@ class OMEGABatchObject(OMEGABase):
             self.dataframe.loc['Analysis Final Year'][0] = self.settings.analysis_final_year
         self.settings.analysis_final_year = int(self.read_parameter('Analysis Final Year'))
         self.dataframe.loc['Calc Effects'] = self.settings.calc_effects
-        self.settings.credit_market_efficiency = self.read_parameter('Credit Market Efficiency')
         self.settings.cost_accrual = validate_predefined_input(self.read_parameter('Cost Accrual'),
                                                       {'end-of-year', 'beginning-of-year'})
         self.settings.discount_values_to_year = int(self.read_parameter('Discount Values to Year'))
@@ -823,6 +822,7 @@ class OMEGABatchObject(OMEGABase):
             self.read_parameter('Producer Cross Subsidy Multiplier Min')
 
         # read context file settings
+        self.settings.credit_market_efficiency = self.read_parameter('Credit Market Efficiency')
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
         self.settings.maintenance_cost_inputs_file = self.read_parameter('Maintenance Costs File')
@@ -981,6 +981,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.generate_context_calibration_files = (self.num == 0)
 
         # read context settings
+        self.settings.credit_market_efficiency = self.read_parameter('Credit Market Efficiency')
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
         self.settings.maintenance_cost_inputs_file = self.read_parameter('Maintenance Costs File')
