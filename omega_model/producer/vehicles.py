@@ -413,6 +413,7 @@ class CompositeVehicle(OMEGABase):
                                 'onroad_direct_kwh_per_mile',
                                 'new_vehicle_mfr_cost_dollars',
                                 'new_vehicle_mfr_generalized_cost_dollars',
+                                'battery_kwh',
                                 # these are needed for NEMS market share calcs (in addition to g/mi and kWh/hi):
                                 'curbweight_lbs',
                                 'rated_hp',

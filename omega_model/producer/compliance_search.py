@@ -118,19 +118,18 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
             else:
                 cost_curve_options = np.linspace(veh_min_cost_curve_index, veh_max_cost_curve_index, num=num_tech_options)
 
-        # tech_cost_options = cv.get_new_vehicle_mfr_cost_from_cost_curve(cost_curve_options)
-        # tech_generalized_cost_options = cv.get_new_vehicle_mfr_generalized_cost_from_cost_curve(cost_curve_options)
-        # tech_kwh_options = cv.get_cert_direct_kwh_pmi_from_cost_curve(cost_curve_options)
-
         tech_cost_options = \
             cv.get_from_cost_curve('new_vehicle_mfr_cost_dollars', cost_curve_options)
         tech_generalized_cost_options = \
             cv.get_from_cost_curve('new_vehicle_mfr_generalized_cost_dollars', cost_curve_options)
-        # tech_kwh_options = \
+        tech_kwh_options = \
+            cv.get_from_cost_curve('battery_kwh', cost_curve_options)
+        # tech_kwh_per_mile_options = \
         #     cv.get_from_cost_curve('cert_direct_kwh_per_mile', cost_curve_options)
 
         d = {'veh_%s_cost_curve_indices' % cv.vehicle_id: cost_curve_options,
-             # 'veh_%s_kwh_pmi' % cv.vehicle_id: tech_kwh_options,
+             'veh_%s_battery_kwh' % cv.vehicle_id: tech_kwh_options,
+             # 'veh_%s_kwh_pmi' % cv.vehicle_id: tech_kwh_per_mile_options,
              'veh_%s_cost_dollars' % cv.vehicle_id: tech_cost_options,
              'veh_%s_generalized_cost_dollars' % cv.vehicle_id: tech_generalized_cost_options}
         df = pd.DataFrame.from_dict(d)
@@ -392,6 +391,10 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                                                                    context_based_total_sales)
 
         # insert code to cull production options based on policy here #
+        GWh_limit = np.interp(calendar_year, omega_globals.options.battery_GWh_limit_years,
+                              omega_globals.options.battery_GWh_limit)
+
+        production_options = production_options[production_options['total_battery_GWh'] <= GWh_limit].copy()
 
         production_options['share_range'] = share_range
 
@@ -709,6 +712,7 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
 
     is_series = type(production_options) == pd.Series
 
+    total_battery_GWh = 0
     total_target_co2e_Mg = 0
     total_cert_co2e_Mg = 0
     total_cost_dollars = 0
@@ -770,6 +774,10 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
                 composite_veh_sales * production_options[
                     'veh_%s_generalized_cost_dollars' % composite_veh.vehicle_id]
 
+            composite_veh_total_GWh = \
+                composite_veh_sales * production_options[
+                    'veh_%s_battery_kwh' % composite_veh.vehicle_id] / 1e6
+
             composite_veh_cost_curve_options = production_options[
                 'veh_%s_cost_curve_indices' % composite_veh.vehicle_id]
 
@@ -781,6 +789,10 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
             composite_veh_total_generalized_cost_dollars = \
                 composite_veh_sales * production_options[
                     'veh_%s_generalized_cost_dollars' % composite_veh.vehicle_id].values
+
+            composite_veh_total_GWh = \
+                composite_veh_sales * production_options[
+                    'veh_%s_battery_kwh' % composite_veh.vehicle_id].values / 1e6
 
             composite_veh_cost_curve_options = production_options[
                 'veh_%s_cost_curve_indices' % composite_veh.vehicle_id].values
@@ -805,12 +817,14 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
         production_options['veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_target_co2e_Mg
 
         # update totals
+        total_battery_GWh += composite_veh_total_GWh
         total_target_co2e_Mg += composite_veh_target_co2e_Mg
         total_cert_co2e_Mg += composite_veh_cert_co2e_Mg
         total_cost_dollars += composite_veh_total_cost_dollars
         total_generalized_cost_dollars += composite_veh_total_generalized_cost_dollars
 
     # TODO: looks like we'll need to calculate these, too?  Or use credits directly to select production decisions, not target/cert/strategic_offset...
+    production_options['total_battery_GWh'] = total_battery_GWh
     production_options['total_target_co2e_megagrams'] = total_target_co2e_Mg
     production_options['total_cert_co2e_megagrams'] = total_cert_co2e_Mg
     production_options['total_cost_dollars'] = total_cost_dollars
@@ -905,7 +919,7 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
 
     mini_df = pd.DataFrame()
     mini_df['total_credits_with_offset_co2e_megagrams'] = \
-        production_options['total_credits_co2e_megagrams'].values + strategic_target_offset_Mg
+        production_options['total_credits_co2e_megagrams'] + strategic_target_offset_Mg
     mini_df['total_cost_dollars'] = production_options['total_cost_dollars']
     mini_df['total_generalized_cost_dollars'] = production_options['total_generalized_cost_dollars']
     mini_df['strategic_compliance_ratio'] = production_options['strategic_compliance_ratio']
@@ -930,7 +944,7 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
             non_compliant_tech_share_options['strategic_compliance_ratio'].values * \
             ((non_compliant_tech_share_options[cost_name].values - lowest_cost_compliant_tech_share_option[cost_name].item()) /
             (non_compliant_tech_share_options['strategic_compliance_ratio'].values -
-             lowest_cost_compliant_tech_share_option['strategic_compliance_ratio'].item()))
+            lowest_cost_compliant_tech_share_option['strategic_compliance_ratio'].item()))
 
         best_non_compliant_tech_share_option = \
             production_options.loc[[non_compliant_tech_share_options['weighted_slope'].idxmin()]]
@@ -953,10 +967,13 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
             pd.concat([best_compliant_tech_share_option, best_non_compliant_tech_share_option])
 
     elif compliant_tech_share_options.empty:
-        # grab best non-compliant option (least under-compliance)
-        compliance_possible = False
-        candidate_production_decisions = \
-            production_options.loc[[mini_df['total_credits_with_offset_co2e_megagrams'].idxmax()]]
+        try:
+            # grab best non-compliant option (least under-compliance)
+            compliance_possible = False
+            candidate_production_decisions = \
+                production_options.loc[[mini_df['total_credits_with_offset_co2e_megagrams'].idxmax()]]
+        except:
+            print('wtf??')
 
     else: # non_compliant_tech_share_options.empty:
         # grab best compliant option (least over-compliant OR lowest cost?)
