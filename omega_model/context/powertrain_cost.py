@@ -110,10 +110,13 @@ class PowertrainCost(OMEGABase):
         legacy_sales_scaler_pev = eval(_cache['PEV', 'legacy_sales_learning_scaler']['value'], {'np': np}, locals_dict)
         sales_scaler_ice = eval(_cache['ICE', 'sales_scaler']['value'], {'np': np}, locals_dict)
         sales_scaler_pev = eval(_cache['PEV', 'sales_scaler']['value'], {'np': np}, locals_dict)
-        cumulative_sales_ice = sales_scaler_ice * max(0, model_year - learning_start)
-        cumulative_sales_pev = sales_scaler_pev * max(0, model_year - learning_start)
+        cumulative_sales_ice = abs(sales_scaler_ice * (model_year - learning_start))
+        cumulative_sales_pev = abs(sales_scaler_pev * (model_year - learning_start))
         learning_factor_ice = ((cumulative_sales_ice + legacy_sales_scaler_ice) / legacy_sales_scaler_ice) ** learning_rate
         learning_factor_pev = ((cumulative_sales_pev + legacy_sales_scaler_pev) / legacy_sales_scaler_pev) ** learning_rate
+        if model_year < learning_start:
+            learning_factor_ice = 1 / learning_factor_ice
+            learning_factor_pev = 1 / learning_factor_pev
 
         weight_bins = (0, 3200, 3800, 4400, 5000, 5600, 6200, 14000)
         tractive_motor = 'dual'
