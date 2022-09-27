@@ -73,7 +73,7 @@ class GliderCost(OMEGABase):
                                    locals_dict)
         sales_scaler = eval(_cache['ALL', 'sales_scaler', 'not applicable']['value'], {}, locals_dict)
 
-        cumulative_sales = sales_scaler * (vehicle.model_year - learning_start)
+        cumulative_sales = sales_scaler * max(0, vehicle.model_year - learning_start)
         learning_factor = ((cumulative_sales + legacy_sales_scaler) / legacy_sales_scaler) ** learning_rate
 
         return body_structure, learning_factor, markup
