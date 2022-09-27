@@ -2,7 +2,7 @@ Parameter,Type,Value,
 Batch Settings,,,
 Batch Name,String,test_batch,
 Analysis Final Year,#,2050,
-Consolidate Manufacturers,TRUE / FALSE,TRUE,
+Credit Market Efficiency,#,1.0,
 Cost Accrual,end-of-year / beginning-of-year,end-of-year,
 Discount Values to Year,#,2021,
 Analysis Dollar Basis,#,2020,
@@ -16,18 +16,18 @@ Maintenance Costs File,String,maintenance_cost.csv,
 Repair Costs File,String,repair_cost.csv,
 Refueling Costs File,String,refueling_cost.csv,
 Manufacturers File,String,manufacturers.csv,
-Market Classes File,String,market_classes.csv,
+Market Classes File,String,market_classes-body_style.csv,
 New Vehicle Price Elasticity of Demand,#,-0.4,
 Onroad Fuels File,String,onroad_fuels.csv,
 Onroad Vehicle Calculations File,String,onroad_vehicle_calculations.csv,
-Onroad VMT File,String,annual_vmt_fixed_by_age.csv,
+Onroad VMT File,String,annual_vmt_fixed_by_age-body_style.csv,
 Producer Cross Subsidy Multiplier Max,#,1.1,
 Producer Cross Subsidy Multiplier Min,#,0.9,
-Producer Generalized Cost File,String,producer_generalized_cost.csv,
-Production Constraints File,String,production_constraints.csv,
-Sales Share File,String,sales_share_params.csv,
-Vehicle Price Modifications File,String,vehicle_price_modifications.csv,
-Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,
+Producer Generalized Cost File,String,producer_generalized_cost-body_style.csv,
+Production Constraints File,String,production_constraints-body_style.csv,
+Sales Share File,String,sales_share_params_ice_bev_body_style.csv,
+Vehicle Price Modifications File,String,vehicle_price_modifications-body_style.csv,
+Vehicle Reregistration File,String,reregistration_fixed_by_age-body_style.csv,
 ICE Vehicle Simulation Results File,String,simulated_vehicles_rse_ice.csv,
 BEV Vehicle Simulation Results File,String,simulated_vehicles_rse_bev.csv,
 PHEV Vehicle Simulation Results File,String,simulated_vehicles_rse_phev.csv,
@@ -53,7 +53,7 @@ Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv,policy
 Policy Fuels File,String,policy_fuels.csv,policy_fuels.csv
 Production Multipliers File,String,production_multipliers.csv,production_multipliers.csv
 Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
-Required Sales Share File,String,required_sales_share.csv,required_sales_share.csv
+Required Sales Share File,String,required_sales_share-body_style.csv,required_sales_share-body_style.csv
 ,,,
 Session Postproc Settings,,,
 General Inputs for Effects File,String,general_inputs_for_effects.csv,general_inputs_for_effects.csv
@@ -68,3 +68,11 @@ Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implic
 Context Consumer Price Index File,String,cpi_price_deflators.csv,cpi_price_deflators.csv
 Context Safety Values File,String,safety_values.csv,safety_values.csv
 Context Fatality Rates File,String,fatality_rates.csv,fatality_rates.csv
+,,,
+Developer Settings,,,
+Num Market Share Options,#,5,3
+Num Tech Options per ICE Vehicle,#,5,3
+Num Tech Options per BEV Vehicle,#,1,1
+Verbose Console Modules,"['producer', 'consumer'] or subset or []",['producer'],['producer']
+Producer Compliance Search Min Share Range,#,1.00E-04,1.00E-04
+Producer Compliance Search Convergence Factor,#,0.33,0.66

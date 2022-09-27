@@ -218,7 +218,7 @@ from omega_model import *
 
 # for now, eventually need to be inputs somewhere:
 aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
-                       'cert_fuel_id', 'reg_class_id', 'drive_system']  #, 'manufacturer_id']
+                       'cert_fuel_id', 'reg_class_id', 'drive_system']  #  'manufacturer_id' added if not consolidating manufacturers
 
 
 class VehicleAggregation(OMEGABase):
@@ -259,7 +259,7 @@ class VehicleAggregation(OMEGABase):
         omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.47
+        input_template_version = 0.48
         input_template_columns = VehicleFinal.mandatory_input_template_columns
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -308,6 +308,20 @@ class VehicleAggregation(OMEGABase):
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
+
+            global aggregation_columns
+            if omega_globals.options.credit_market_efficiency < 1.0:
+                aggregation_columns += ['manufacturer_id']
+
+            # process manufacturer include/exclude lists
+            if omega_globals.options.include_manufacturers_list != 'all':
+                df = df[[mid in omega_globals.options.include_manufacturers_list
+                                 for mid in df['manufacturer_id']]]
+
+            if omega_globals.options.exclude_manufacturers_list != 'none':
+                df = df[[mid not in omega_globals.options.exclude_manufacturers_list
+                                 for mid in df['manufacturer_id']]]
+
             # new columns calculated here for every vehicle in vehicles.csv:
             df['glider_non_structure_cost_dollars'] = 0
             df['glider_non_structure_mass_lbs'] = 0
@@ -412,8 +426,16 @@ class VehicleAggregation(OMEGABase):
             # calculate weighted numeric values within the groups, and combined string values
             agg_df = df.groupby(aggregation_columns, as_index=False).apply(sales_weight_average_dataframe)
             agg_df['vehicle_name'] = agg_df[aggregation_columns].apply(lambda x: ':'.join(x.values.astype(str)), axis=1)
-            agg_df['compliance_id'] = 'consolidated_OEM'
-            agg_df['model_year'] = df['model_year'].iloc[0]
+
+            if omega_globals.options.consolidate_manufacturers:
+                agg_df['compliance_id'] = 'consolidated_OEM'
+            else:
+                agg_df['compliance_id'] = agg_df['manufacturer_id']
+
+            if omega_globals.options.vehicles_file_base_year is not None:
+                agg_df['model_year'] = omega_globals.options.vehicles_file_base_year
+            else:
+                agg_df['model_year'] = df['model_year'].iloc[0]
 
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
 

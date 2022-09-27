@@ -31,7 +31,6 @@ if 'darwin' in sys.platform:
 
 import traceback
 
-
 try:
     import time
     import pandas as pd
@@ -90,13 +89,15 @@ try:
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
             self.omega_model_path = path
             self.use_prerun_context_outputs = False
-            self.consolidate_manufacturers = True
+            self.credit_market_efficiency = 1.0
+            self.consolidate_manufacturers = None
+            self.include_manufacturers_list = 'all'
+            self.exclude_manufacturers_list = 'none'
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
-            self.market_classes_file = path + 'test_inputs/market_classes.csv'
             self.vehicles_file = path + 'test_inputs/vehicles.csv'
+            self.vehicles_file_base_year = None
             self.vehicles_df = pd.DataFrame()
             self.onroad_vehicle_calculations_file = path + 'test_inputs/onroad_vehicle_calculations.csv'
-            self.sales_share_file = path + 'test_inputs/sales_share_params.csv'
             self.onroad_fuels_file = path + 'test_inputs/onroad_fuels.csv'
             self.context_id = 'AEO2021'
             self.context_case_id = 'Reference case'
@@ -105,15 +106,9 @@ try:
             self.generate_context_calibration_files = True
             self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
             self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods.csv'
-            self.vehicle_price_modifications_file = path + 'test_inputs/vehicle_price_modifications.csv'
             self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
             self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights.csv'
             self.drive_cycle_ballast_file = path + 'test_inputs/drive_cycle_ballast.csv'
-            self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market-body_style.csv'
-
-            # self.ice_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_ice.csv'
-            # self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_bev.csv'
-            # self.phev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_phev.csv'
 
             self.ice_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_ice.csv'
             self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_bev.csv'
@@ -135,11 +130,17 @@ try:
             self.policy_fuels_file = path + 'test_inputs/policy_fuels.csv'
             self.ghg_credit_params_file = path + 'test_inputs/ghg_credit_params.csv'
             self.ghg_credits_file = path + 'test_inputs/ghg_credits.csv'
-            self.required_sales_share_file = path + 'test_inputs/required_sales_share.csv'
-            self.producer_generalized_cost_file = path + 'test_inputs/producer_generalized_cost.csv'
-            self.production_constraints_file = path + 'test_inputs/production_constraints.csv'
-            self.vehicle_reregistration_file = path + 'test_inputs/reregistration_fixed_by_age.csv'
-            self.onroad_vmt_file = path + 'test_inputs/annual_vmt_fixed_by_age.csv'
+
+            self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market-body_style.csv'
+            self.market_classes_file = path + 'test_inputs/market_classes-body_style.csv'
+            self.producer_generalized_cost_file = path + 'test_inputs/producer_generalized_cost-body_style.csv'
+            self.production_constraints_file = path + 'test_inputs/production_constraints-body_style.csv'
+            self.vehicle_reregistration_file = path + 'test_inputs/reregistration_fixed_by_age-body_style.csv'
+            self.sales_share_file = path + 'test_inputs/sales_share_params_ice_bev_body_style.csv'
+            self.required_sales_share_file = path + 'test_inputs/required_sales_share-body_style.csv'
+            self.onroad_vmt_file = path + 'test_inputs/annual_vmt_fixed_by_age-body_style.csv'
+            self.vehicle_price_modifications_file = path + 'test_inputs/vehicle_price_modifications-body_style.csv'
+
             self.offcycle_credits_file = path + 'test_inputs/offcycle_credits.csv'
 
             self.consumer_pricing_num_options = 4
@@ -149,12 +150,12 @@ try:
             self.new_vehicle_price_elasticity_of_demand = -0.4
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
-            # self.calc_effects = True
-            self.calc_effects = 'Physical and Costs' # options are 'None', 'Physical' and 'Physical and Costs' as strings
+            self.calc_effects = 'Physical and Costs' # options are 'No', 'Physical' and 'Physical and Costs' as strings
             self.analysis_dollar_basis = 2020 # Note that the implicit_price_deflator.csv input file must contain data for this entry.
             self.discount_values_to_year = 2021
             self.cost_accrual = 'end-of-year'  # end-of-year means costs accrue at year's end; beginning-of-year means cost accrue at year's beginning
-            # self.calc_criteria_emission_costs = False # no longer functional in omega.py
+            self.allow_ice_of_bev = False
+
             # effects modeling files
             self.general_inputs_for_effects_file = path + 'test_inputs/general_inputs_for_effects.csv'
             self.ip_deflators_file = path + 'test_inputs/implicit_price_deflators.csv'
@@ -205,6 +206,8 @@ try:
                                             'p-c_shares_and_costs', 'p-c_max_iterations_',
                                             'cross_subsidy_search_', 'cross_subsidy_multipliers_',
                                             'cross_subsidy_convergence_']
+
+            self.verbose_postproc = ['iteration_']
 
             self.log_vehicle_cloud_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_compliance_search_years = []  # = 'all' or list of years to log, empty list to disable logging

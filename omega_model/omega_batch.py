@@ -35,7 +35,7 @@ Sample Data Columns
         Batch Settings,,
         Batch Name,String,test_batch
         Analysis Final Year,#,2030
-        Consolidate Manufacturers,TRUE / FALSE,TRUE
+        Credit Market Efficiency,#,1.0
         Cost Accrual,end-of-year / beginning-of-year,end-of-year
         Discount Values to Year,#,2021
         Analysis Dollar Basis,#,2020
@@ -119,8 +119,8 @@ Data Row Name and Description
 :Analysis Final Year *(int)*:
     Analysis Final Year, e.g. ``2050``
 
-:Consolidate Manufacturers *(TRUE or FALSE)*:
-    If ``TRUE`` then manufacturers will be conslidated into a "consolidated_OEM", otherwise manufacturers will be run independently
+:Credit Market Efficiency *(float)*:
+    0.0 = no trading between manufacturers, 1.0 = perfect trading, 0..1 = variable trading
 
 :Cost Accrual:
     The time of year when costs are assumed to accrue, ``end-of-year`` or ``beginning-of-year``
@@ -525,7 +525,7 @@ class OMEGABatchObject(OMEGABase):
             name (str): the name of the batch
             analysis_final_year (int): optional externally-provided analysis final year, otherwise the analysis final
                 year is determined by the batch file
-            calc_effects (str): 'None', 'Physical' or 'Physical and Costs', determines which effects calcs to run
+            calc_effects (str): 'No', 'Physical' or 'Physical and Costs', determines which effects calcs to run
                 post-compliance modeling
 
         """
@@ -806,7 +806,6 @@ class OMEGABatchObject(OMEGABase):
             self.dataframe.loc['Analysis Final Year'][0] = self.settings.analysis_final_year
         self.settings.analysis_final_year = int(self.read_parameter('Analysis Final Year'))
         self.dataframe.loc['Calc Effects'] = self.settings.calc_effects
-        self.settings.consolidate_manufacturers = self.read_parameter('Consolidate Manufacturers')
         self.settings.cost_accrual = validate_predefined_input(self.read_parameter('Cost Accrual'),
                                                       {'end-of-year', 'beginning-of-year'})
         self.settings.discount_values_to_year = int(self.read_parameter('Discount Values to Year'))
@@ -823,6 +822,7 @@ class OMEGABatchObject(OMEGABase):
             self.read_parameter('Producer Cross Subsidy Multiplier Min')
 
         # read context file settings
+        self.settings.credit_market_efficiency = self.read_parameter('Credit Market Efficiency')
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
         self.settings.maintenance_cost_inputs_file = self.read_parameter('Maintenance Costs File')
@@ -981,6 +981,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.generate_context_calibration_files = (self.num == 0)
 
         # read context settings
+        self.settings.credit_market_efficiency = self.read_parameter('Credit Market Efficiency')
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
         self.settings.maintenance_cost_inputs_file = self.read_parameter('Maintenance Costs File')
@@ -1254,7 +1255,7 @@ class OMEGABatchCLIOptions(OMEGABase):
         self.local = True
         self.network = False
         self.analysis_final_year = None
-        self.calc_effects = 'None'
+        self.calc_effects = 'No'
 
 
 def run_bundled_sessions(options, remote_batchfile, session_list):
@@ -1347,7 +1348,7 @@ def run_bundled_sessions(options, remote_batchfile, session_list):
 def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle=False,
                     batch_file='', session_num=None, verbose=False, timestamp=None, show_figures=False, dispy=False,
                     dispy_ping=False, dispy_debug=False, dispy_exclusive=False, dispy_scheduler=None, local=False,
-                    network=False, analysis_final_year=None, calc_effects='None'):
+                    network=False, analysis_final_year=None, calc_effects='No'):
     """
     The top-level entry point for running a batch with the given settings, called from the GUI with a dictionary
     of arguments.  Reads the source batch file, expanding factorially where there are multi-valued parameters, bundles
@@ -1374,7 +1375,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
         local (bool): if ``True`` then run ``dispy`` parallel processing on the local machine only, no network nodes
         network (bool): if ``True`` then allow ``dispy`` parallel processing on networked nodes
         analysis_final_year (int): optional override for the analysis final year batch parameter
-        calc_effects (str): 'None', 'Physical' or 'Physical and Costs', determines what kind of effects post-processing
+        calc_effects (str): 'No', 'Physical' or 'Physical and Costs', determines what kind of effects post-processing
             to run
 
     Returns:
@@ -1685,14 +1686,14 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                                                        + '_summary_results.csv'
                             session_summary_dfs.append(pd.read_csv(session_summary_filename))
 
-                            if 'Physical' in options.calc_effects:
+                            if 'Physical' in batch.sessions[s_index].settings.calc_effects:
                                 annual_physical_effects_filename = options.batch_path + '_' \
                                                                    + batch.sessions[s_index].settings.output_folder \
                                                                    + batch.sessions[s_index].settings.session_unique_name \
                                                                    + '_physical_effects_annual.csv'
                                 annual_physical_effects_dfs.append(pd.read_csv(annual_physical_effects_filename))
 
-                            if 'Costs' in options.calc_effects:
+                            if 'Costs' in batch.sessions[s_index].settings.calc_effects:
                                 apa_cost_effects_filename = options.batch_path + '_' \
                                                             + batch.sessions[s_index].settings.output_folder \
                                                             + batch.sessions[s_index].settings.session_unique_name \
@@ -1703,12 +1704,12 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                 batch_summary_filename = batch.name + '_summary_results.csv'
                 batch_summary_df.to_csv(batch_summary_filename, index=False)
 
-                if 'Physical' in options.calc_effects:
+                if 'Physical' in batch.sessions[s_index].settings.calc_effects:
                     batch_annual_physical_effects_df = pd.concat(annual_physical_effects_dfs, ignore_index=True, sort=False)
                     batch_annual_physical_effects_filename = batch.name + '_physical_effects_annual.csv'
                     batch_annual_physical_effects_df.to_csv(batch_annual_physical_effects_filename, index=False)
 
-                if 'Costs' in options.calc_effects:
+                if 'Costs' in batch.sessions[s_index].settings.calc_effects:
                     batch_apa_cost_effects_df = pd.concat(apa_cost_effects_dfs, ignore_index=True, sort=False)
                     batch_apa_cost_effects_filename = batch.name + '_cost_effects_annual_present_and_annualized.csv'
                     batch_apa_cost_effects_df.to_csv(batch_apa_cost_effects_filename, index=False)
@@ -1730,7 +1731,7 @@ if __name__ == '__main__':
     parser.add_argument('--analysis_final_year', type=int, help='Override analysis final year')
     parser.add_argument('--calc_effects', type=str,
                         help='Type of effects calcs to run: "None", "Physical", or "Physical and Costs"',
-                        default='None')
+                        default='No')
     parser.add_argument('--verbose', action='store_true', help='Enable verbose omega_batch messages)')
     parser.add_argument('--timestamp', type=str,
                         help='Timestamp string, overrides creating timestamp from system clock', default=None)

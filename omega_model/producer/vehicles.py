@@ -1191,7 +1191,7 @@ class VehicleFinal(SQABase, Vehicle):
 
     # --- static properties ---
     compliance_ids = set()  #: the set of compliance IDs (manufacturer IDs or 'consolidated_OEM')
-    mfr_base_year_size_class_share = dict()  #: dict of base year context size class market share by compliance ID and size class, used to project future vehicle sales based on the context
+    mfr_base_year_share_data = dict()  #: dict of base year market shares by compliance ID and various categories, used to project future vehicle sales based on the context
 
     # these are used to validate vehicles.csv:
     mandatory_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id',
@@ -1387,7 +1387,7 @@ class VehicleFinal(SQABase, Vehicle):
             veh = VehicleFinal(
                 name=df.loc[i, 'vehicle_name'],
                 vehicle_id = i,
-                manufacturer_id=df.loc[i, 'compliance_id'],  # df.loc[i, 'manufacturer_id'],
+                manufacturer_id=df.loc[i, 'manufacturer_id'],
                 model_year=df.loc[i, 'model_year'],
                 context_size_class=df.loc[i, 'context_size_class'],
                 cost_curve_class=df.loc[i, 'cost_curve_class'],
@@ -1425,6 +1425,9 @@ class VehicleFinal(SQABase, Vehicle):
                 veh.compliance_id = 'consolidated_OEM'
             else:
                 veh.compliance_id = veh.manufacturer_id
+
+            if omega_globals.options.credit_market_efficiency == 1.0:
+                veh.manufacturer_id = 'consolidated_OEM'
 
             VehicleFinal.compliance_ids.add(veh.compliance_id)
 
@@ -1471,6 +1474,7 @@ class VehicleFinal(SQABase, Vehicle):
 
             # assign user-definable market class
             veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
+            veh.manufacturer.update_market_class_data(veh.compliance_id, veh.market_class_id)
 
             non_responsive_market_category = \
                 omega_globals.options.MarketClass.get_non_responsive_market_category(veh.market_class_id)
@@ -1486,16 +1490,43 @@ class VehicleFinal(SQABase, Vehicle):
                 NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category][veh.context_size_class]['total'] += \
                     veh.initial_registered_count
 
+            # update base year sales data by context size class (used for specifically for sales projections)
             if veh.context_size_class not in NewVehicleMarket.base_year_context_size_class_sales:
                 NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] = veh.initial_registered_count
             else:
                 NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] += veh.initial_registered_count
 
-            size_key = veh.compliance_id + '_' + veh.context_size_class
-            if size_key not in NewVehicleMarket.manufacturer_base_year_context_size_class_sales:
-                NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] = veh.initial_registered_count
+            key = veh.compliance_id + '_' + veh.context_size_class
+            if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
+                NewVehicleMarket.manufacturer_base_year_sales_data[key] = veh.initial_registered_count
             else:
-                NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] += veh.initial_registered_count
+                NewVehicleMarket.manufacturer_base_year_sales_data[key] += veh.initial_registered_count
+
+            # update base year sales data by market class id
+            if veh.market_class_id not in NewVehicleMarket.base_year_other_sales:
+                NewVehicleMarket.base_year_other_sales[veh.market_class_id] = veh.initial_registered_count
+            else:
+                NewVehicleMarket.base_year_other_sales[veh.market_class_id] += veh.initial_registered_count
+
+            key = veh.compliance_id + '_' + veh.market_class_id
+            if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
+                NewVehicleMarket.manufacturer_base_year_sales_data[key] = veh.initial_registered_count
+            else:
+                NewVehicleMarket.manufacturer_base_year_sales_data[key] += veh.initial_registered_count
+
+            # update base year sales data by market category
+            for market_category in veh.market_class_id.split('.'):
+                if market_category not in NewVehicleMarket.base_year_other_sales:
+                    NewVehicleMarket.base_year_other_sales[market_category] = veh.initial_registered_count
+                else:
+                    NewVehicleMarket.base_year_other_sales[market_category] += veh.initial_registered_count
+
+            for market_category in veh.market_class_id.split('.'):
+                key = veh.compliance_id + '_' + market_category
+                if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
+                    NewVehicleMarket.manufacturer_base_year_sales_data[key] = veh.initial_registered_count
+                else:
+                    NewVehicleMarket.manufacturer_base_year_sales_data[key] += veh.initial_registered_count
 
             if verbose:
                 print(veh)
@@ -1507,43 +1538,46 @@ class VehicleFinal(SQABase, Vehicle):
         for v in vehicles_list:
             v.base_year_market_share = v.initial_registered_count / vehicle_shares_dict['total']
 
-            alt_veh = v.clone_vehicle(v)  # create alternative powertrain clone of vehicle
+            if v.fueling_class != 'BEV' or omega_globals.options.allow_ice_of_bev:
+                alt_veh = v.clone_vehicle(v)  # create alternative powertrain clone of vehicle
 
-            if v.fueling_class == 'ICE':
-                alt_veh.fueling_class = 'BEV'
-                alt_veh.base_year_powertrain_type = 'BEV'
-                alt_veh.name = 'BEV of ' + v.name
-                for tf in omega_globals.options.CostCloud.tech_flags:
-                    alt_veh.__setattr__(tf, None)
-                alt_veh.bev = 1
-                alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
-                alt_veh.cert_fuel_id = "{'electricity':1.0}"
-                alt_veh.battery_kwh = 60  # TODO: do we need this?  it gets set in the cloud search
-                alt_veh.motor_kw = 150 + 100 * (v.drive_system == 4)  # TODO: where does power come from?
-                alt_veh.charge_depleting_range_mi = 300  # TODO: where does 300 come from?
-                alt_veh.eng_rated_hp = 0
-                alt_veh.eng_cyls_num = 0
-                alt_veh.eng_disp_liters = 0
-            else:
-                alt_veh.fueling_class = 'ICE'
-                alt_veh.base_year_powertrain_type = 'ICE'
-                alt_veh.name = 'ICE of ' + v.name
-                for tf in omega_globals.options.CostCloud.tech_flags:
-                    alt_veh.__setattr__(tf, None)
-                alt_veh.ice = 1
-                alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
-                alt_veh.cert_fuel_id = "{'gasoline':1.0}"
-                alt_veh.eng_rated_hp = v.motor_kw * 1.34102  # TODO: where does power come from?
-                alt_veh.motor_kw = 0
-                alt_veh.charge_depleting_range_mi = 0
-                alt_veh.battery_kwh = 0
-                alt_veh.eng_cyls_num = None
-                alt_veh.eng_disp_liters = None
+                if v.fueling_class == 'ICE':
+                    alt_veh.fueling_class = 'BEV'
+                    alt_veh.base_year_powertrain_type = 'BEV'
+                    alt_veh.name = 'BEV of ' + v.name
+                    for tf in omega_globals.options.CostCloud.tech_flags:
+                        alt_veh.__setattr__(tf, None)
+                    alt_veh.bev = 1
+                    alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
+                    alt_veh.cert_fuel_id = "{'electricity':1.0}"
+                    alt_veh.battery_kwh = 60  # TODO: do we need this?  it gets set in the cloud search
+                    alt_veh.motor_kw = 150 + 100 * (v.drive_system == 4)  # TODO: where does power come from?
+                    alt_veh.charge_depleting_range_mi = 300  # TODO: where does 300 come from?
+                    alt_veh.eng_rated_hp = 0
+                    alt_veh.eng_cyls_num = 0
+                    alt_veh.eng_disp_liters = 0
+                else:
+                    alt_veh.fueling_class = 'ICE'
+                    alt_veh.base_year_powertrain_type = 'ICE'
+                    alt_veh.name = 'ICE of ' + v.name
+                    for tf in omega_globals.options.CostCloud.tech_flags:
+                        alt_veh.__setattr__(tf, None)
+                    alt_veh.ice = 1
+                    alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
+                    alt_veh.cert_fuel_id = "{'gasoline':1.0}"
+                    alt_veh.eng_rated_hp = v.motor_kw * 1.34102  # TODO: where does power come from?
+                    alt_veh.motor_kw = 0
+                    alt_veh.charge_depleting_range_mi = 0
+                    alt_veh.battery_kwh = 0
+                    alt_veh.eng_cyls_num = None
+                    alt_veh.eng_disp_liters = None
 
-            alt_veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(alt_veh)
-            alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
-            alt_veh.cert_direct_co2e_grams_per_mile = 0
-            alt_veh.cert_direct_kwh_per_mile = 0
+                alt_veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(alt_veh)
+                v.manufacturer.update_market_class_data(v.compliance_id, alt_veh.market_class_id)
+
+                alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
+                alt_veh.cert_direct_co2e_grams_per_mile = 0
+                alt_veh.cert_direct_kwh_per_mile = 0
 
         for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
             for csc in NewVehicleMarket.context_size_class_info_by_nrmc[nrmc]:
@@ -1553,27 +1587,53 @@ class VehicleFinal(SQABase, Vehicle):
         # calculate manufacturer base year context size class shares
         VehicleFinal.compliance_ids = sorted(list(VehicleFinal.compliance_ids))
 
-        VehicleFinal.mfr_base_year_size_class_share = dict()
+        VehicleFinal.mfr_base_year_share_data = dict()
         for compliance_id in VehicleFinal.compliance_ids:
             for size_class in NewVehicleMarket.base_year_context_size_class_sales:
-                if compliance_id not in VehicleFinal.mfr_base_year_size_class_share:
-                    VehicleFinal.mfr_base_year_size_class_share[compliance_id] = dict()
+                if compliance_id not in VehicleFinal.mfr_base_year_share_data:
+                    VehicleFinal.mfr_base_year_share_data[compliance_id] = dict()
 
-                size_key = compliance_id + '_' + size_class
+                key = compliance_id + '_' + size_class
 
-                if size_key not in NewVehicleMarket.manufacturer_base_year_context_size_class_sales:
-                    NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] = 0
+                if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
+                    NewVehicleMarket.manufacturer_base_year_sales_data[key] = 0
 
                 if verbose:
-                    print('%s: %s / %s: %.2f' % (size_key,
-                                                 NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key],
+                    print('%s: %s / %s: %.2f' % (key,
+                                                 NewVehicleMarket.manufacturer_base_year_sales_data[key],
                                                  NewVehicleMarket.base_year_context_size_class_sales[size_class],
-                                                 NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] /
+                                                 NewVehicleMarket.manufacturer_base_year_sales_data[key] /
                                                  NewVehicleMarket.base_year_context_size_class_sales[size_class]))
 
-                VehicleFinal.mfr_base_year_size_class_share[compliance_id][size_class] = \
-                    NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] / \
+                VehicleFinal.mfr_base_year_share_data[compliance_id][size_class] = \
+                    NewVehicleMarket.manufacturer_base_year_sales_data[key] / \
                     NewVehicleMarket.base_year_context_size_class_sales[size_class]
+
+        for compliance_id in VehicleFinal.compliance_ids:
+            for other in NewVehicleMarket.base_year_other_sales:
+                if compliance_id not in VehicleFinal.mfr_base_year_share_data:
+                    VehicleFinal.mfr_base_year_share_data[compliance_id] = dict()
+
+                key = compliance_id + '_' + other
+
+                if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
+                    NewVehicleMarket.manufacturer_base_year_sales_data[key] = 0
+
+                if verbose:
+                    print('%s: %s / %s: %.2f' % (key,
+                                                 NewVehicleMarket.manufacturer_base_year_sales_data[key],
+                                                 NewVehicleMarket.base_year_other_sales[other],
+                                                 NewVehicleMarket.manufacturer_base_year_sales_data[key] /
+                                                 NewVehicleMarket.base_year_other_sales[other]))
+
+                VehicleFinal.mfr_base_year_share_data[compliance_id][other] = \
+                    NewVehicleMarket.manufacturer_base_year_sales_data[key] / \
+                    NewVehicleMarket.base_year_other_sales[other]
+
+        if verbose:
+            print_dict(NewVehicleMarket.base_year_context_size_class_sales)
+            print_dict(NewVehicleMarket.base_year_other_sales)
+            print_dict(VehicleFinal.mfr_base_year_share_data)
 
     @staticmethod
     def init_from_file(vehicle_onroad_calculations_file, verbose=False):
