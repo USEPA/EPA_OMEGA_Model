@@ -554,6 +554,7 @@ class OMEGABatchObject(OMEGABase):
         import pandas as pd
 
         numeric_params = {
+            'Credit Market Efficiency',
             'Analysis Final Year',
             'Discount Values to Year',
             'Analysis Dollar Basis',
@@ -820,9 +821,10 @@ class OMEGABatchObject(OMEGABase):
             self.read_parameter('Producer Cross Subsidy Multiplier Max')
         self.settings.consumer_pricing_multiplier_min = \
             self.read_parameter('Producer Cross Subsidy Multiplier Min')
+        self.settings.credit_market_efficiency = \
+            self.read_parameter('Credit Market Efficiency')
 
         # read context file settings
-        self.settings.credit_market_efficiency = self.read_parameter('Credit Market Efficiency')
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
         self.settings.maintenance_cost_inputs_file = self.read_parameter('Maintenance Costs File')
@@ -981,7 +983,6 @@ class OMEGASessionObject(OMEGABase):
         self.settings.generate_context_calibration_files = (self.num == 0)
 
         # read context settings
-        self.settings.credit_market_efficiency = self.read_parameter('Credit Market Efficiency')
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
         self.settings.maintenance_cost_inputs_file = self.read_parameter('Maintenance Costs File')
