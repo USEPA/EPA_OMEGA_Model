@@ -750,11 +750,8 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
 
             market_class_sales = total_sales
 
-            try:
-                for c in chain:
-                    market_class_sales = market_class_sales * production_options[c].values
-            except:
-                print('wtf?')
+            for c in chain:
+                market_class_sales = market_class_sales * production_options[c].values
 
             if ('producer_abs_share_frac_%s' % market_class) not in production_options:
                 production_options['producer_abs_share_frac_%s' % market_class] = market_class_sales / total_sales
