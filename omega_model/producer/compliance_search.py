@@ -198,6 +198,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
     children = list(market_class_dict)
 
+    children = [c for c in children if market_class_dict[c]]
+
     start_time = time.time()
     for k in market_class_dict:
         if verbose:
@@ -223,37 +225,48 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
         if all(responsive_children):
             if responsive_children:
-                min_constraints = dict()
-                max_constraints = dict()
-                for c in share_column_names:
-                    production_min = ProductionConstraints.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
-                    production_max = ProductionConstraints.get_maximum_share(calendar_year, c.replace(producer_prefix, ''))
-                    required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
+                if len(responsive_children) > 1:
+                    min_constraints = dict()
+                    max_constraints = dict()
+                    for c in share_column_names:
+                        production_min = ProductionConstraints.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
+                        production_max = ProductionConstraints.get_maximum_share(calendar_year, c.replace(producer_prefix, ''))
+                        required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
 
-                    max_constraints[c] = production_max
-                    min_constraints[c] = min(production_max, max(required_zev_share, production_min))
+                        max_constraints[c] = production_max
+                        min_constraints[c] = min(production_max, max(required_zev_share, production_min))
 
-                if share_range == 1.0:
-                    # span the whole space of shares
-                    sales_share_df = partition(share_column_names,
-                                               num_levels=omega_globals.options.producer_num_market_share_options,
-                                               min_constraints=min_constraints, max_constraints=max_constraints)
+                    if share_range == 1.0:
+                        # span the whole space of shares
+                        sales_share_df = partition(share_column_names,
+                                                   num_levels=omega_globals.options.producer_num_market_share_options,
+                                                   min_constraints=min_constraints, max_constraints=max_constraints)
+                    else:
+                        # narrow search span to a range of shares around the winners
+                        sales_share_df = \
+                            generate_constrained_nearby_shares(share_column_names, candidate_production_decisions,
+                                                               share_range,
+                                                               omega_globals.options.producer_num_market_share_options,
+                                                               min_constraints=min_constraints,
+                                                               max_constraints=max_constraints)
                 else:
-                    # narrow search span to a range of shares around the winners
-                    sales_share_df = \
-                        generate_constrained_nearby_shares(share_column_names, candidate_production_decisions,
-                                                           share_range,
-                                                           omega_globals.options.producer_num_market_share_options,
-                                                           min_constraints=min_constraints,
-                                                           max_constraints=max_constraints)
+                    sales_share_df = pd.DataFrame()
+                    for c in share_column_names:
+                        sales_share_df[c] = [1.0]
             else:
                 sales_share_df = pd.DataFrame()
         else:
-            sales_share_dict = pd.DataFrame()
+            # partition based on context projection sales share ratios
+            sales_total = 0
             for c, cn in zip(children, share_column_names):
                 if c in context_new_vehicle_sales(calendar_year):
-                    sales_share_dict[cn] = [context_new_vehicle_sales(calendar_year)[c] /
-                                        context_new_vehicle_sales(calendar_year)['total']]
+                    sales_total += context_new_vehicle_sales(calendar_year)[c]
+
+            sales_share_dict = dict()
+            for c, cn in zip(children, share_column_names):
+                if c in context_new_vehicle_sales(calendar_year):
+                    sales_share_dict[cn] = [context_new_vehicle_sales(calendar_year)[c] / sales_total]
+
             sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
     else:
         # inherit absolute market shares from consumer response
@@ -611,6 +624,12 @@ def create_composite_vehicles(calendar_year, compliance_id):
         for new_veh in composite_vehicles:
             omega_globals.options.MarketClass.populate_market_classes(market_class_tree, new_veh.market_class_id,
                                                                       new_veh)
+
+        # cull leaves that don't contain vehicles
+        keys = list(market_class_tree.keys())
+        for k in keys:
+            if k not in VehicleFinal.mfr_base_year_share_data[compliance_id] or VehicleFinal.mfr_base_year_share_data[compliance_id][k] == 0.0:
+                market_class_tree.pop(k)
 
         _cache[cache_key] = {'composite_vehicles': composite_vehicles,
                             'market_class_tree': market_class_tree,
