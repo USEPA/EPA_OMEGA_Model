@@ -27,7 +27,7 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        vehicle_name,manufacturer_id,model_year,reg_class_id,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs,unibody_structure,body_style,structure_material,prior_redesign_year,redesign_interval,drive_system,gvwr_lbs,gcwr_lbs,curbweight_lbs,eng_cyls_num,eng_disp_liters,high_eff_alternator,start_stop,hev,phev,bev,deac_pd,deac_fc,cegr,atk2,gdi,turb12,turb11,gas_fuel,diesel_fuel,target_coef_a,target_coef_b,target_coef_c
+        vehicle_name,manufacturer_id,model_year,reg_class_id,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs,unibody_structure,body_style,structure_material,drive_system,gvwr_lbs,gcwr_lbs,curbweight_lbs,eng_cyls_num,eng_disp_liters,high_eff_alternator,start_stop,hev,phev,bev,deac_pd,deac_fc,cegr,atk2,gdi,turb12,turb11,gas_fuel,diesel_fuel,target_coef_a,target_coef_b,target_coef_c
         COOPER HARDTOP 2 DOOR,BMX,2019,car,Subcompact,N,,{'pump gasoline':1.0},{'gasoline':1.0},4459,,,40,134,10.7,3000,153.5,,55.8,5.1,99.2,,23900,4.3,775,,0,sedan,steel,2,3680,,2743,3,1.5,0,0,0,0,0,0,0,0,0,1,1,0,1,0,27.6,0.156,0.01806
         Panamera 4 e-Hybrid,VGA,2019,car,Large,PHEV,,{'pump gasoline':1.0},{'gasoline':1.0},458,,,52.7,330,15.8,5500,200.8,,56.1,,118.1,,107783,4.3,,,0,sedan,steel,4,5860,,4547,6,2.9,0,1,0,1,0,0,0,0,0,1,1,0,1,0,51.706,0.39797,0.01863
 
@@ -259,7 +259,7 @@ class VehicleAggregation(OMEGABase):
         omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.49
+        input_template_version = 0.48
         input_template_columns = VehicleFinal.mandatory_input_template_columns
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
