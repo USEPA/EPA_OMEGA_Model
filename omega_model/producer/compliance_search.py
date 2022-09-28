@@ -984,13 +984,10 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
             pd.concat([best_compliant_tech_share_option, best_non_compliant_tech_share_option])
 
     elif compliant_tech_share_options.empty:
-        try:
-            # grab best non-compliant option (least under-compliance)
-            compliance_possible = False
-            candidate_production_decisions = \
-                production_options.loc[[mini_df['total_credits_with_offset_co2e_megagrams'].idxmax()]]
-        except:
-            print('wtf??')
+        # grab best non-compliant option (least under-compliance)
+        compliance_possible = False
+        candidate_production_decisions = \
+            production_options.loc[[mini_df['total_credits_with_offset_co2e_megagrams'].idxmax()]]
 
     else: # non_compliant_tech_share_options.empty:
         # grab best compliant option (least over-compliant OR lowest cost?)
