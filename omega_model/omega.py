@@ -550,7 +550,8 @@ def logwrite_cross_subsidy_results(calendar_year, producer_market_classes, cross
 
     if 'cross_subsidy_multipliers' in omega_globals.options.verbose_console_modules:
         for mc, cc in zip(sorted(producer_market_classes), multiplier_columns):
-            omega_log.logwrite(('FINAL %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc],
+            if cc in producer_decision_and_response:
+                omega_log.logwrite(('FINAL %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc],
                                echo_console=True)
 
 
@@ -714,22 +715,33 @@ def calc_sales_and_cost_data_from_shares(calendar_year, compliance_id, producer_
     producer_decision_and_response['average_new_vehicle_mfr_cost'] = 0
     producer_decision_and_response['average_new_vehicle_mfr_generalized_cost'] = 0
 
+    consumer_share_total = 0
+
     for mc in producer_market_classes:
+        consumer_abs_share_frac = producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
+        consumer_share_total += consumer_abs_share_frac
+
         producer_decision_and_response['average_cross_subsidized_price_total'] += \
             producer_decision_and_response['average_cross_subsidized_price_%s' % mc] * \
-            producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
+            consumer_abs_share_frac
 
         producer_decision_and_response['average_modified_cross_subsidized_price_total'] += \
             producer_decision_and_response['average_modified_cross_subsidized_price_%s' % mc] * \
-            producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
+            consumer_abs_share_frac
 
         producer_decision_and_response['average_new_vehicle_mfr_cost'] += \
             producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc] * \
-            producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
+            consumer_abs_share_frac
 
         producer_decision_and_response['average_new_vehicle_mfr_generalized_cost'] += \
             producer_decision_and_response['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] * \
-            producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
+            consumer_abs_share_frac
+
+    # normalize values
+    producer_decision_and_response['average_cross_subsidized_price_total'] /= consumer_share_total
+    producer_decision_and_response['average_modified_cross_subsidized_price_total'] /= consumer_share_total
+    producer_decision_and_response['average_new_vehicle_mfr_cost'] /= consumer_share_total
+    producer_decision_and_response['average_new_vehicle_mfr_generalized_cost'] /= consumer_share_total
 
     producer_decision_and_response['new_vehicle_sales'] = \
         producer_decision_and_response['context_new_vehicle_sales'] * \
