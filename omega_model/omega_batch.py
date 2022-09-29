@@ -978,7 +978,8 @@ class OMEGASessionObject(OMEGABase):
         self.settings.session_name = self.name
         self.settings.session_unique_name = self.batch.name + '_' + self.name
         self.settings.session_is_reference = self.num == 0
-        self.settings.output_folder = self.name + os.sep + self.settings.output_folder
+        self.settings.output_folder_base = self.name + os.sep + self.settings.output_folder
+        self.settings.output_folder = self.settings.output_folder_base
         self.settings.database_dump_folder = self.name + os.sep + self.settings.database_dump_folder
         self.settings.generate_context_calibration_files = (self.num == 0)
 
@@ -1682,21 +1683,21 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                         if not (s_index == 0 and batch.sessions[s_index].settings.use_prerun_context_outputs):
                             batch.batch_log.logwrite("\nPost-Processing Session %d (%s):" % (s_index, batch.sessions[s_index].name))
                             session_summary_filename = options.batch_path + '_' \
-                                                       + batch.sessions[s_index].settings.output_folder \
+                                                       + batch.sessions[s_index].settings.output_folder_base \
                                                        + batch.sessions[s_index].settings.session_unique_name \
                                                        + '_summary_results.csv'
                             session_summary_dfs.append(pd.read_csv(session_summary_filename))
 
                             if 'Physical' in batch.sessions[s_index].settings.calc_effects:
                                 annual_physical_effects_filename = options.batch_path + '_' \
-                                                                   + batch.sessions[s_index].settings.output_folder \
+                                                                   + batch.sessions[s_index].settings.output_folder_base \
                                                                    + batch.sessions[s_index].settings.session_unique_name \
                                                                    + '_physical_effects_annual.csv'
                                 annual_physical_effects_dfs.append(pd.read_csv(annual_physical_effects_filename))
 
                             if 'Costs' in batch.sessions[s_index].settings.calc_effects:
                                 apa_cost_effects_filename = options.batch_path + '_' \
-                                                            + batch.sessions[s_index].settings.output_folder \
+                                                            + batch.sessions[s_index].settings.output_folder_base \
                                                             + batch.sessions[s_index].settings.session_unique_name \
                                                             + '_cost_effects_annual_present_and_annualized.csv'
                                 apa_cost_effects_dfs.append(pd.read_csv(apa_cost_effects_filename))

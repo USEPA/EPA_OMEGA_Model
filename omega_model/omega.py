@@ -1556,20 +1556,21 @@ def run_omega(session_runtime_options, standalone_run=False):
 
     session_runtime_options.start_time = time.time()
     session_runtime_options.standalone_run = standalone_run
-    session_runtime_options.multiprocessing = True or session_runtime_options.multiprocessing and not standalone_run
+    session_runtime_options.multiprocessing = False or session_runtime_options.multiprocessing and not standalone_run
 
-    if session_runtime_options.credit_market_efficiency == 1.0:
+    if session_runtime_options.session_is_reference or 0.0 < session_runtime_options.credit_market_efficiency < 1.0:
+        # imperfect trading and/or reference session
+        consolidate = [True, False]
+    elif session_runtime_options.credit_market_efficiency == 1.0:
         # perfect trading
-        session_runtime_options.consolidate_manufacturers = True
-        num_passes = 1
-    elif session_runtime_options.credit_market_efficiency == 0.0:
+        consolidate = [True]
+    else:  # session_runtime_options.credit_market_efficiency == 0.0:
         # no trading
-        session_runtime_options.consolidate_manufacturers = False
-        num_passes = 1
-    else:
-        # imperfect trading
-        session_runtime_options.consolidate_manufacturers = True
-        num_passes = 2
+        consolidate = [False]
+
+    last_pass = len(consolidate)-1
+
+    output_folders = []
 
     init_fail = None
 
@@ -1577,21 +1578,23 @@ def run_omega(session_runtime_options, standalone_run=False):
 
         manufacturer_annual_data_table = None
 
-        for pass_num in range(num_passes):
+        for omega_globals.pass_num in range(len(consolidate)):
 
-            if pass_num == num_passes-1 and 0.0 < session_runtime_options.credit_market_efficiency < 1.0:
-                # second / last pass, don't consolidate
-                session_runtime_options.consolidate_manufacturers = False
+            session_runtime_options.consolidate_manufacturers = consolidate[omega_globals.pass_num]
+
+            session_runtime_options.context_new_vehicle_generalized_costs_file = \
+                'context_new_vehicle_prices_%d.csv' % session_runtime_options.consolidate_manufacturers
+            session_runtime_options.sales_share_calibration_file = \
+                'context_sales_share_calibration_%d.csv' % session_runtime_options.consolidate_manufacturers
+
+            session_runtime_options.output_folder = session_runtime_options.output_folder_base\
+                .replace('out', 'out%sconsolidate_%d' % (os.sep, session_runtime_options.consolidate_manufacturers))
 
             init_fail = init_omega(copy.copy(session_runtime_options))
 
-            if pass_num < num_passes-1:
-                # initial pass(es), save preliminary outputs (for now)
-                omega_globals.options.output_folder = session_runtime_options.output_folder\
-                    .replace('out', 'out%sout%d' % (os.sep, pass_num))
-                file_io.validate_folder(omega_globals.options.output_folder)
+            output_folders.append(omega_globals.options.output_folder)
 
-                omega_globals.options.database_dump_folder = omega_globals.options.output_folder + '__dump' + os.sep
+            omega_globals.options.database_dump_folder = omega_globals.options.output_folder + '__dump' + os.sep
 
             if not init_fail:
                 if omega_globals.options.multiprocessing:
@@ -1626,7 +1629,8 @@ def run_omega(session_runtime_options, standalone_run=False):
                     profiler = cProfile.Profile()
                     profiler.enable()
 
-                iteration_log, credit_banks = run_producer_consumer(pass_num, manufacturer_annual_data_table)
+                iteration_log, credit_banks = \
+                    run_producer_consumer(omega_globals.pass_num, manufacturer_annual_data_table)
 
                 # postproc session
                 manufacturer_annual_data_table = postproc_session.run_postproc(iteration_log, credit_banks)
@@ -1634,6 +1638,10 @@ def run_omega(session_runtime_options, standalone_run=False):
                     omega_globals.options.credit_market_efficiency * \
                     (manufacturer_annual_data_table['calendar_year_cert_co2e_megagrams'] - \
                     manufacturer_annual_data_table['target_co2e_megagrams'])
+
+                manufacturer_annual_data_table.to_csv('%s/manufacturer_annual_data_table_%d.csv' %
+                                                      (omega_globals.options.output_folder_base,
+                                                       omega_globals.options.consolidate_manufacturers), index=False)
 
                 # everybody out of the pool
                 if omega_globals.options.multiprocessing:
@@ -1667,7 +1675,6 @@ def run_omega(session_runtime_options, standalone_run=False):
                 omega_log.end_logfile("\nSession Fail")
                 dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
-        if not init_fail:
             if omega_globals.options.run_profiler:
                 profiler.disable()
                 stats = pstats.Stats(profiler)
@@ -1687,6 +1694,16 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             if omega_globals.options.run_profiler:
                 os.system('snakeviz omega_profile.dmp')
+
+        # move appropriate outputs to base output folder
+        file_io.move_folder_contents('%s%sconsolidate_%d' % (omega_globals.options.output_folder_base, os.sep,
+                                                             omega_globals.options.credit_market_efficiency == 1.0),
+                                     omega_globals.options.output_folder_base)
+
+        # delete preliminary outputs if not preserving them
+        if not omega_globals.options.save_preliminary_outputs:
+            for f in output_folders:
+                file_io.delete_folder(f)
 
     except:
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

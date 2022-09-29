@@ -548,7 +548,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         """
         if omega_globals.options.standalone_run:
-            filename = omega_globals.options.output_folder + filename
+            filename = omega_globals.options.output_folder_base + filename
 
         calibration = pd.DataFrame.from_dict(SalesShare._calibration_data)
 

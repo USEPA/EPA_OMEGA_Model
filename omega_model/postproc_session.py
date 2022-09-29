@@ -77,7 +77,8 @@ def run_postproc(iteration_log, credit_banks):
     vehicle_annual_data_df.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name
                                   + '_vehicle_annual_data.csv')
 
-    if 0.0 < omega_globals.options.credit_market_efficiency < 1.0 and omega_globals.options.consolidate_manufacturers:
+    if (omega_globals.options.session_is_reference or 0.0 < omega_globals.options.credit_market_efficiency < 1.0) \
+            and omega_globals.options.consolidate_manufacturers:
         from producer.manufacturer_annual_data import ManufacturerAnnualData
         from producer.vehicle_aggregation import aggregation_columns
 

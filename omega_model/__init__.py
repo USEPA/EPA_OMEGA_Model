@@ -85,11 +85,13 @@ try:
             self.session_unique_name = 'OMEGA Quick Test'
             self.session_is_reference = True
             self.auto_close_figures = True
-            self.output_folder = 'out' + os.sep
+            self.save_preliminary_outputs = False
+            self.output_folder_base = 'out' + os.sep
+            self.output_folder = self.output_folder_base
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
             self.omega_model_path = path
             self.use_prerun_context_outputs = False
-            self.credit_market_efficiency = 1.0
+            self.credit_market_efficiency = 0.5
             self.consolidate_manufacturers = None
             self.include_manufacturers_list = 'all'
             self.exclude_manufacturers_list = 'none'
@@ -120,7 +122,7 @@ try:
             self.mass_scaling_file = path + 'test_inputs/mass_scaling.csv'
 
             self.analysis_initial_year = None
-            self.analysis_final_year = 2021
+            self.analysis_final_year = 2020
             self.logfile_prefix = 'o2log_'
             self.logfilename = ''
             self.consumer_calc_generalized_cost = None

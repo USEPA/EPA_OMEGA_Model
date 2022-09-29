@@ -27,6 +27,33 @@ def get_user_home():
     return os.path.expanduser('~')
 
 
+def move_folder_contents(srcfolder, dstfolder):
+    """
+    Move files from the srcfolder to the dstfolder and delete the srcfolder
+
+    Args:
+        srcfolder (str): source folder path
+        dstfolder (str): destination folder path
+
+    """
+    shutil.copytree(srcfolder, dstfolder, dirs_exist_ok=True)
+    delete_folder(srcfolder)
+
+
+def delete_folder(dstfolder):
+    """
+    Delete the dstfolder
+
+    .. code-block:: python
+
+        delete_folder('C:\\Users\\Temp')
+
+    :param dstfolder: Path the folder to delete
+
+    """
+    shutil.rmtree(dstfolder, ignore_errors=True)
+
+
 def validate_folder(dstfolder):
     """
     Verify the existence of dstfolder and try to create it if doesn't exist

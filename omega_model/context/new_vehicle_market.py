@@ -175,7 +175,7 @@ class NewVehicleMarket(OMEGABase):
 
         """
         if omega_globals.options.standalone_run:
-            filename = omega_globals.options.output_folder + filename
+            filename = omega_globals.options.output_folder_base + filename
 
         # wanted to do: pd.DataFrame.from_dict(cls._new_vehicle_generalized_costs, orient='index',
         #       columns=['new_vehicle_price_dollars']).to_csv(filename, index=True)

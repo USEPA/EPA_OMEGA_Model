@@ -17,3 +17,4 @@ print('importing %s' % __file__)
 options = None  #: simulation options
 engine = None  #: connection to database engine
 session = None  #: database session
+pass_num = 0  #: multi-pass pass number
