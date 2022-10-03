@@ -66,49 +66,73 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
         if verbose:
             print('responsive: %s' % cross_subsidy_pair)
 
-        if omega_globals.options.producer_shares_mode:
+        # if omega_globals.producer_shares_mode:
+        #     # consumer shares from producer desired shares, no cross-subsidy search and convergence
+        #     for c in cross_subsidy_pair:
+        #         # grab producer decision, all fields:
+        #         cross_subsidy_options_and_response = producer_decision
+        #
+        #         # assign consumer shares:
+        #         cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % c] = \
+        #             producer_decision['producer_abs_share_frac_%s' % c]
+        #
+        #         # for iteration_log:
+        #         cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % c] = \
+        #             producer_decision['average_new_vehicle_mfr_cost_%s' % c]
+        #
+        #         cross_subsidy_options_and_response['average_modified_cross_subsidized_price_%s' % c] = \
+        #             producer_decision['average_new_vehicle_mfr_cost_%s' % c]
+        #
+        #         cross_subsidy_options_and_response['pricing_score'] = 0
+        #
+        #         # for postproc plots:
+        #         cross_subsidy_options_and_response['consumer_generalized_cost_dollars_%s' % c] = 0
+        #
+        #         cross_subsidy_options_and_response['cost_multiplier_%s' % c] = 1
+        #
+        # else:
+        if all(mc in market_class_data[compliance_id] for mc in cross_subsidy_pair):
+            # search cross subsidy options at this level of the tree
+            cross_subsidy_options_and_response, iteration_log = \
+                search_cross_subsidies(calendar_year, compliance_id, node_name, cross_subsidy_pair,
+                                       producer_decision,
+                                       cross_subsidy_options_and_response, producer_consumer_iteration_num,
+                                       iteration_log)
+        elif any(mc in market_class_data[compliance_id] for mc in cross_subsidy_pair):
+            # only one child available from the manufacturer for this market class (e.g. ICE or BEV-only)
+            only_child = [mc for mc in cross_subsidy_pair if mc in market_class_data[compliance_id]]
+            cross_subsidy_options_and_response = \
+                omega_globals.options.SalesShare.calc_shares(calendar_year, compliance_id, producer_decision,
+                                                             cross_subsidy_options_and_response, node_name,
+                                                             only_child)
+            if type(cross_subsidy_options_and_response) is pd.DataFrame:
+                cross_subsidy_options_and_response = cross_subsidy_options_and_response.loc[0].copy()
+        else:
+            pass
+
+        if omega_globals.producer_shares_mode:
             # consumer shares from producer desired shares, no cross-subsidy search and convergence
             for c in cross_subsidy_pair:
                 # grab producer decision, all fields:
-                cross_subsidy_options_and_response = producer_decision
+                # cross_subsidy_options_and_response = producer_decision
 
-                # assign consumer shares:
+                # assign consumer shares from producer shares:
                 cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % c] = \
                     producer_decision['producer_abs_share_frac_%s' % c]
 
-                # for iteration_log:
-                cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % c] = \
-                    producer_decision['average_new_vehicle_mfr_cost_%s' % c]
-
-                cross_subsidy_options_and_response['average_modified_cross_subsidized_price_%s' % c] = \
-                    producer_decision['average_new_vehicle_mfr_cost_%s' % c]
-
-                cross_subsidy_options_and_response['pricing_score'] = 0
-
-                # for postproc plots:
-                cross_subsidy_options_and_response['consumer_generalized_cost_dollars_%s' % c] = 0
-
-                cross_subsidy_options_and_response['cost_multiplier_%s' % c] = 1
-
-        else:
-            if all(mc in market_class_data[compliance_id] for mc in cross_subsidy_pair):
-                # search cross subsidy options at this level of the tree
-                cross_subsidy_options_and_response, iteration_log = \
-                    search_cross_subsidies(calendar_year, compliance_id, node_name, cross_subsidy_pair,
-                                           producer_decision,
-                                           cross_subsidy_options_and_response, producer_consumer_iteration_num,
-                                           iteration_log)
-            elif any(mc in market_class_data[compliance_id] for mc in cross_subsidy_pair):
-                # only one child available from the manufacturer for this market class (e.g. ICE or BEV-only)
-                only_child = [mc for mc in cross_subsidy_pair if mc in market_class_data[compliance_id]]
-                cross_subsidy_options_and_response = \
-                    omega_globals.options.SalesShare.calc_shares(calendar_year, compliance_id, producer_decision,
-                                                                 cross_subsidy_options_and_response, node_name,
-                                                                 only_child)
-                if type(cross_subsidy_options_and_response) is pd.DataFrame:
-                    cross_subsidy_options_and_response = cross_subsidy_options_and_response.loc[0].copy()
-            else:
-                pass
+                # # for iteration_log:
+                # cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % c] = \
+                #     producer_decision['average_new_vehicle_mfr_cost_%s' % c]
+                #
+                # cross_subsidy_options_and_response['average_modified_cross_subsidized_price_%s' % c] = \
+                #     producer_decision['average_new_vehicle_mfr_cost_%s' % c]
+                #
+                # cross_subsidy_options_and_response['pricing_score'] = 0
+                #
+                # # for postproc plots:
+                # cross_subsidy_options_and_response['consumer_generalized_cost_dollars_%s' % c] = 0
+                #
+                # cross_subsidy_options_and_response['cost_multiplier_%s' % c] = 1
 
     else:
         if verbose:
@@ -309,6 +333,11 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
             producer_consumer_iteration_num = 0
             iterate_producer_consumer = True
 
+            if omega_globals.options.producer_shares_mode == 'auto':
+                omega_globals.producer_shares_mode = False
+            elif omega_globals.options.producer_shares_mode == True:
+                omega_globals.producer_shares_mode = True
+
             while iterate_producer_consumer:
                 omega_log.logwrite("Running %s:  Year=%s  Iteration=%s" %
                                    (omega_globals.options.session_unique_name, calendar_year,
@@ -317,6 +346,19 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
                 candidate_mfr_composite_vehicles, producer_decision, market_class_tree, producer_compliant = \
                     compliance_search.search_production_options(compliance_id, calendar_year,
+                                                                producer_decision_and_response,
+                                                                producer_consumer_iteration_num,
+                                                                strategic_target_offset_Mg)
+
+                if producer_compliant is None:
+                    # no viable production options, try again in producer shares mode
+                    omega_log.logwrite('### Production Constraints Violated, Enabling Producer Shares Mode ###')
+                    producer_consumer_iteration_num += 1
+                    omega_globals.producer_shares_mode = True
+                    producer_decision_and_response = None
+                    best_winning_combo_with_sales_response = None
+                    candidate_mfr_composite_vehicles, producer_decision, market_class_tree, producer_compliant = \
+                        compliance_search.search_production_options(compliance_id, calendar_year,
                                                                 producer_decision_and_response,
                                                                 producer_consumer_iteration_num,
                                                                 strategic_target_offset_Mg)
@@ -1106,7 +1148,8 @@ def detect_producer_consumer_convergence(producer_decision_and_response, produce
          producer_decision_and_response['average_new_vehicle_mfr_cost'])
 
     cross_subsidy_pricing_error = abs(1-producer_decision_and_response['price_cost_ratio_total'])
-    converged = cross_subsidy_pricing_error <= omega_globals.options.producer_cross_subsidy_price_tolerance
+    converged = cross_subsidy_pricing_error <= omega_globals.options.producer_cross_subsidy_price_tolerance or \
+                omega_globals.producer_shares_mode
 
     share_convergence_error = 0
     for mc in producer_market_classes:
@@ -1556,7 +1599,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
     session_runtime_options.start_time = time.time()
     session_runtime_options.standalone_run = standalone_run
-    session_runtime_options.multiprocessing = False or session_runtime_options.multiprocessing and not standalone_run
+    session_runtime_options.multiprocessing = True or session_runtime_options.multiprocessing and not standalone_run
 
     if session_runtime_options.session_is_reference or 0.0 < session_runtime_options.credit_market_efficiency < 1.0:
         # imperfect trading and/or reference session

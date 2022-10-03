@@ -409,67 +409,74 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
         production_options = production_options[production_options['total_battery_GWh'] <= GWh_limit].copy()
 
-        production_options['share_range'] = share_range
+        if production_options.empty:
+            producer_compliance_possible = None
+            selected_production_decision = None
 
-        production_options['strategic_compliance_ratio'] = \
-            (production_options['total_cert_co2e_megagrams'] - strategic_target_offset_Mg) / \
-            np.maximum(1, production_options['total_target_co2e_megagrams'])
+        if producer_compliance_possible is not None:
+            production_options['share_range'] = share_range
 
-        production_options['strategic_target_offset_Mg'] = strategic_target_offset_Mg
+            production_options['strategic_compliance_ratio'] = \
+                (production_options['total_cert_co2e_megagrams'] - strategic_target_offset_Mg) / \
+                np.maximum(1, production_options['total_target_co2e_megagrams'])
 
-        candidate_production_decisions, compliance_possible = \
-            select_candidate_manufacturing_decisions(production_options, calendar_year, search_iteration,
-                                                     producer_iteration_log, strategic_target_offset_Mg)
+            production_options['strategic_target_offset_Mg'] = strategic_target_offset_Mg
 
-        producer_compliance_possible |= compliance_possible
+            candidate_production_decisions, compliance_possible = \
+                select_candidate_manufacturing_decisions(production_options, calendar_year, search_iteration,
+                                                         producer_iteration_log, strategic_target_offset_Mg)
 
-        if (best_candidate_production_decision is None) or \
-                (candidate_production_decisions['strategic_compliance_error'].min() <
-                 best_candidate_production_decision['strategic_compliance_error'].min()):
-            best_candidate_production_decision = \
-                candidate_production_decisions.loc[candidate_production_decisions['strategic_compliance_error'].idxmin()]
+            producer_compliance_possible |= compliance_possible
 
-        if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
-            omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,
-                                              search_iteration)).ljust(12) + 'SR:%f CR:%.10f' % (share_range,
-                                    best_candidate_production_decision['strategic_compliance_ratio']))
+            if (best_candidate_production_decision is None) or \
+                    (candidate_production_decisions['strategic_compliance_error'].min() <
+                     best_candidate_production_decision['strategic_compliance_error'].min()):
+                best_candidate_production_decision = \
+                    candidate_production_decisions.loc[candidate_production_decisions['strategic_compliance_error'].idxmin()]
 
-        search_iteration += 1
+            if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
+                omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,
+                                                  search_iteration)).ljust(12) + 'SR:%f CR:%.10f' % (share_range,
+                                        best_candidate_production_decision['strategic_compliance_ratio']))
 
-        continue_search = (abs(1 - best_candidate_production_decision['strategic_compliance_ratio']) > \
-                           omega_globals.options.producer_compliance_search_tolerance) and \
+            search_iteration += 1
+
+        continue_search = producer_compliance_possible is not None and \
+                        (abs(1 - best_candidate_production_decision['strategic_compliance_ratio']) >
+                         omega_globals.options.producer_compliance_search_tolerance) and \
                           (share_range > omega_globals.options.producer_compliance_search_min_share_range)
 
-    if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
-        omega_log.logwrite('PRODUCER FINAL COMPLIANCE DELTA %f' % abs(1 - best_candidate_production_decision['strategic_compliance_ratio']),
-                           echo_console=True)
+    if producer_compliance_possible is not None:
+        if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
+            omega_log.logwrite('PRODUCER FINAL COMPLIANCE DELTA %f' % abs(1 - best_candidate_production_decision['strategic_compliance_ratio']),
+                               echo_console=True)
 
-        omega_log.logwrite('Target GHG Offset Mg %.0f, Actual GHG Offset Mg %.0f' % (-best_candidate_production_decision['strategic_target_offset_Mg'], best_candidate_production_decision['total_credits_co2e_megagrams']),
-                           echo_console=True)
+            omega_log.logwrite('Target GHG Offset Mg %.0f, Actual GHG Offset Mg %.0f' % (-best_candidate_production_decision['strategic_target_offset_Mg'], best_candidate_production_decision['total_credits_co2e_megagrams']),
+                               echo_console=True)
 
-        omega_log.logwrite('Target Compliance Ratio %3.3f, Actual Compliance Ratio %3.3f' %
-                           ((best_candidate_production_decision['total_cert_co2e_megagrams']-best_candidate_production_decision['strategic_target_offset_Mg'])/max(1, best_candidate_production_decision['total_target_co2e_megagrams']),
-                            best_candidate_production_decision['strategic_compliance_ratio']),
-                           echo_console=True)
+            omega_log.logwrite('Target Compliance Ratio %3.3f, Actual Compliance Ratio %3.3f' %
+                               ((best_candidate_production_decision['total_cert_co2e_megagrams']-best_candidate_production_decision['strategic_target_offset_Mg'])/max(1, best_candidate_production_decision['total_target_co2e_megagrams']),
+                                best_candidate_production_decision['strategic_compliance_ratio']),
+                               echo_console=True)
 
-    selected_production_decision = pd.to_numeric(best_candidate_production_decision)
+        selected_production_decision = pd.to_numeric(best_candidate_production_decision)
 
-    selected_production_decision = \
-        selected_production_decision.rename({'strategic_compliance_ratio': 'strategic_compliance_ratio_initial',
-                                             'strategic_compliance_error': 'strategic_compliance_error_initial'})
+        selected_production_decision = \
+            selected_production_decision.rename({'strategic_compliance_ratio': 'strategic_compliance_ratio_initial',
+                                                 'strategic_compliance_error': 'strategic_compliance_error_initial'})
 
-    # log the final iteration, as opposed to the winning iteration:
-    selected_production_decision['producer_search_iteration'] = search_iteration - 1
+        # log the final iteration, as opposed to the winning iteration:
+        selected_production_decision['producer_search_iteration'] = search_iteration - 1
 
-    if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
-        for mc in sorted(omega_globals.options.MarketClass.market_classes):
-            if 'producer_abs_share_frac_%s' % mc in selected_production_decision:
-                omega_log.logwrite(('%d producer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %.6f' %
-                               (selected_production_decision['producer_abs_share_frac_%s' % mc]))
-        omega_log.logwrite('')
+        if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
+            for mc in sorted(omega_globals.options.MarketClass.market_classes):
+                if 'producer_abs_share_frac_%s' % mc in selected_production_decision:
+                    omega_log.logwrite(('%d producer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %.6f' %
+                                   (selected_production_decision['producer_abs_share_frac_%s' % mc]))
+            omega_log.logwrite('')
 
-    composite_vehicles = apply_production_decision_to_composite_vehicles(composite_vehicles,
-                                                                         selected_production_decision)
+        composite_vehicles = apply_production_decision_to_composite_vehicles(composite_vehicles,
+                                                                             selected_production_decision)
 
     return composite_vehicles, selected_production_decision, market_class_tree, \
            producer_compliance_possible
