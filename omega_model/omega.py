@@ -113,27 +113,9 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
         if omega_globals.producer_shares_mode:
             # consumer shares from producer desired shares, no cross-subsidy search and convergence
             for c in cross_subsidy_pair:
-                # grab producer decision, all fields:
-                # cross_subsidy_options_and_response = producer_decision
-
                 # assign consumer shares from producer shares:
                 cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % c] = \
                     producer_decision['producer_abs_share_frac_%s' % c]
-
-                # # for iteration_log:
-                # cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % c] = \
-                #     producer_decision['average_new_vehicle_mfr_cost_%s' % c]
-                #
-                # cross_subsidy_options_and_response['average_modified_cross_subsidized_price_%s' % c] = \
-                #     producer_decision['average_new_vehicle_mfr_cost_%s' % c]
-                #
-                # cross_subsidy_options_and_response['pricing_score'] = 0
-                #
-                # # for postproc plots:
-                # cross_subsidy_options_and_response['consumer_generalized_cost_dollars_%s' % c] = 0
-                #
-                # cross_subsidy_options_and_response['cost_multiplier_%s' % c] = 1
-
     else:
         if verbose:
             print('non-responsive: %s' % cross_subsidy_pair)
