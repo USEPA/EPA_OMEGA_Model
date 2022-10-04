@@ -334,7 +334,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
             iterate_producer_consumer = True
 
             if omega_globals.options.producer_shares_mode == 'auto':
-                omega_globals.producer_shares_mode = False
+                omega_globals.producer_shares_mode = omega_globals.pass_num == 1
             elif omega_globals.options.producer_shares_mode == True:
                 omega_globals.producer_shares_mode = True
 
