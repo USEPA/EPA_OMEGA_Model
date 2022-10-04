@@ -85,7 +85,7 @@ try:
             self.session_unique_name = 'OMEGA Quick Test'
             self.session_is_reference = True
             self.auto_close_figures = True
-            self.save_preliminary_outputs = False
+            self.save_preliminary_outputs = True
             self.output_folder_base = 'out' + os.sep
             self.output_folder = self.output_folder_base
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
@@ -198,10 +198,6 @@ try:
             self.multiprocessing = True and not self.run_profiler and not getattr(sys, 'frozen', False)
             self.flat_context = False
             self.flat_context_year = 2021
-
-            # self.battery_GWh_limit_years = [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031,
-            #                                 2032, 2033, 2034, 2035]
-            # self.battery_GWh_limit = [30, 48, 79, 134, 159, 190, 250, 356, 502, 651, 792, 936, 1080, 1224, 1364, 1500]
 
             self.battery_GWh_limit_years = [2020]
             self.battery_GWh_limit = [1e9]
