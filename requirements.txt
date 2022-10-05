@@ -36,3 +36,4 @@ PySide2
 multitimer
 playsound
 PyYAML
+
