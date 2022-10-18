@@ -482,17 +482,9 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
            producer_compliance_possible
 
 
-def update_vehicles(calendar_year, prior_veh, vehicle_id=None):
-    new_veh = Vehicle(vehicle_id=vehicle_id)
-    transfer_vehicle_data(prior_veh, new_veh, model_year=calendar_year)
-    new_veh.initial_registered_count = new_veh.base_year_market_share
-
-    return new_veh
-
-
 def calc_composite_vehicles(mc, rc, mctrc):
-    cv = CompositeVehicle(mctrc[mc][rc], vehicle_id='%s.%s' % (mc, rc), weight_by='base_year_market_share')
-    cv.composite_vehicle_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
+    cv = CompositeVehicle(mctrc[mc][rc], vehicle_id='%s.%s' % (mc, rc), weight_by='model_year_prevalence')
+    cv.market_class_share_frac = sum([v.projected_sales for v in cv.vehicle_list]) / mctrc[mc]['sales']
 
     return cv
 
@@ -519,8 +511,6 @@ def create_composite_vehicles(calendar_year, compliance_id):
         # pull in last year's vehicles:
         manufacturer_prior_vehicles = VehicleFinal.get_compliance_vehicles(calendar_year - 1, compliance_id)
 
-        # Vehicle.reset_vehicle_ids()
-
         manufacturer_vehicles = []
 
         start_time = time.time()
@@ -530,7 +520,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
             new_veh = Vehicle()
             transfer_vehicle_data(prior_veh, new_veh, model_year=calendar_year)
             manufacturer_vehicles.append(new_veh)
-            new_veh.initial_registered_count = new_veh.base_year_market_share
+            new_veh.model_year_prevalence = new_veh.base_year_market_share
 
         if omega_globals.options.multiprocessing:
             results = []
@@ -546,7 +536,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
 
         print('Created manufacturer_vehicles %.20f' % (time.time() - start_time))
 
-        # sum([new_veh.base_year_market_share for new_veh in manufacturer_vehicles]) == 2.0 at this point due to
+        # sum([new_veh.base_year_market_share for new_veh in manufacturer_vehicles]) ~= 2.0 at this point due to
         # intentional duplicate entries for "alternative" powertrain vehicles, but "market_share" is used for relative
         # proportions
 
@@ -556,12 +546,11 @@ def create_composite_vehicles(calendar_year, compliance_id):
                 NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=csc) \
                 * VehicleFinal.mfr_base_year_share_data[compliance_id][csc]
 
-        # calculate new vehicle absolute market share based on vehicle size mix from context
+        # update new vehicle prevalence based on vehicle size mix from context (base year data)
         for new_veh in manufacturer_vehicles:
-            new_veh.base_year_market_share = \
-                new_veh.initial_registered_count * \
-                VehicleFinal.mfr_base_year_share_data[compliance_id][new_veh.context_size_class] / \
-                context_based_total_sales
+            new_veh.model_year_prevalence = \
+                new_veh.model_year_prevalence * \
+                VehicleFinal.mfr_base_year_share_data[compliance_id][new_veh.context_size_class]
 
         # group by context size class
         csc_dict = dict()
@@ -577,12 +566,12 @@ def create_composite_vehicles(calendar_year, compliance_id):
                 * VehicleFinal.mfr_base_year_share_data[compliance_id][csc]
 
             distribute_by_attribute(csc_dict[csc], projection_initial_registered_count,
-                                    weight_by='base_year_market_share',
-                                    distribute_to='initial_registered_count')
+                                    weight_by='model_year_prevalence',
+                                    distribute_to='projected_sales')
 
-        # calculate new vehicle market share based on vehicle size mix from context
+        # calculate new prevalence based on vehicle size mix from context
         for new_veh in manufacturer_vehicles:
-            new_veh.base_year_market_share = new_veh.initial_registered_count / context_based_total_sales
+            new_veh.model_year_prevalence = new_veh.projected_sales / context_based_total_sales
 
         # sum([new_veh.base_year_market_share for new_veh in manufacturer_vehicles]) == 1.0 at this point,
         # sum([new_veh.initial_registered_count for new_veh in manufacturer_vehicles]) = context_based_total_sales
@@ -595,7 +584,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
                 mctrc[mc][rc] = []
         for new_veh in manufacturer_vehicles:
             mctrc[new_veh.market_class_id][new_veh.reg_class_id].append(new_veh)
-            mctrc[new_veh.market_class_id]['sales'] += new_veh.initial_registered_count
+            mctrc[new_veh.market_class_id]['sales'] += new_veh.projected_sales
 
         mcrc_priority_list = []
         for mc in omega_globals.options.MarketClass.market_classes:
@@ -648,13 +637,6 @@ def create_composite_vehicles(calendar_year, compliance_id):
         context_based_total_sales = _cache[cache_key]['context_based_total_sales']
 
     return composite_vehicles, market_class_tree, context_based_total_sales
-
-
-def create_manufacturer_vehicles(calendar_year, manufacturer_vehicles, prior_veh):
-    new_veh = Vehicle()
-    transfer_vehicle_data(prior_veh, new_veh, model_year=calendar_year)
-    manufacturer_vehicles.append(new_veh)
-    new_veh.initial_registered_count = new_veh.base_year_market_share
 
 
 def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_vehicles, producer_decision):
@@ -785,7 +767,7 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
             else:
                 production_options['producer_abs_share_frac_%s' % market_class] += market_class_sales / total_sales
 
-        composite_veh_sales = market_class_sales * composite_veh.composite_vehicle_share_frac
+        composite_veh_sales = market_class_sales * composite_veh.market_class_share_frac
         production_options['veh_%s_sales' % composite_veh.vehicle_id] = composite_veh_sales
 
         # calculate vehicle total cost
