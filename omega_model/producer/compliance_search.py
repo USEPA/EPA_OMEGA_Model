@@ -520,7 +520,6 @@ def create_composite_vehicles(calendar_year, compliance_id):
             new_veh = Vehicle()
             transfer_vehicle_data(prior_veh, new_veh, model_year=calendar_year)
             manufacturer_vehicles.append(new_veh)
-            new_veh.model_year_prevalence = new_veh.base_year_market_share
 
         if omega_globals.options.multiprocessing:
             results = []
@@ -549,7 +548,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         # update new vehicle prevalence based on vehicle size mix from context (base year data)
         for new_veh in manufacturer_vehicles:
             new_veh.model_year_prevalence = \
-                new_veh.model_year_prevalence * \
+                new_veh.base_year_market_share * \
                 VehicleFinal.mfr_base_year_share_data[compliance_id][new_veh.context_size_class]
 
         # group by context size class
