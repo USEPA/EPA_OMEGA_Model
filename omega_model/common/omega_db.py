@@ -27,7 +27,7 @@ from sqlalchemy import create_engine
 # noinspection PyUnresolvedReferences
 import sqlalchemy
 # noinspection PyUnresolvedReferences
-from sqlalchemy import MetaData, Table, Column, String, ForeignKey, Enum, Float, Numeric, Integer, func
+from sqlalchemy import MetaData, Table, Column, String, ForeignKey, Enum, Float, Numeric, Integer, func, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 # noinspection PyUnresolvedReferences
 from sqlalchemy.orm import relationship, Session
