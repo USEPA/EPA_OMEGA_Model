@@ -246,11 +246,11 @@ def print_dict(dict_in, num_tabs=0):
         for k in dict_in.keys():
             if type(dict_in[k]) == list:
                 if dict_in[k]:
-                    print('\t' * num_tabs + k + ':' + str(dict_in[k]))
+                    print('\t' * num_tabs + str(k) + ':' + str(dict_in[k]))
                 else:
-                    print('\t' * num_tabs + k)
+                    print('\t' * num_tabs + str(k))
             else:
-                print('\t' * num_tabs + k)
+                print('\t' * num_tabs + str(k))
                 print_dict(dict_in[k], num_tabs + 1)
 
     if num_tabs == 0:
