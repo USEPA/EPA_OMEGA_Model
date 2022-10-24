@@ -1,4 +1,4 @@
-input_template_name:,powertrain_cost,input_template_version:,0.1,description:,proof-of-concept;pre-fev;20220617 update gpf and add ICE lv_battery and hvac; 20220629 add MHEV entries; 20220705 update trans entries
+input_template_name:,powertrain_cost,input_template_version:,0.1,description:,proof-of-concept;pre-fev;20220617 update gpf and add ICE lv_battery and hvac; 20220629 add MHEV entries; 20220705 update trans entries; 20221024 updated PGM prices & new gpf_cost
 powertrain_type,item,value,quantity,dollar_basis,notes
 ALL,dollars_per_cylinder,((-28.814) * CYL + 726.27) * CYL * MARKUP_ICE,,2019,
 ALL,dollars_per_liter,((400) * LITERS) * MARKUP_ICE,,2019,
@@ -24,15 +24,8 @@ ALL,twc_swept_volume,(1.2) * 1,,,Tier3
 ALL,twc_pt_grams_per_liter,(0) * 1,,,
 ALL,twc_pd_grams_per_liter,(2) * 1,,,
 ALL,twc_rh_grams_per_liter,(0.11) * 1,,,
-ALL,gpf_substrate,((6.108) * LITERS * TWC_SWEPT_VOLUME + 1.95456) * 2 * MARKUP_ICE,,2012,set equal to twice the twc value
-ALL,gpf_washcoat,((0) * LITERS * GPF_SWEPT_VOLUME) * MARKUP_ICE,,2012,set to 0
-ALL,gpf_canning,((2.4432) * LITERS * TWC_SWEPT_VOLUME) * MARKUP_ICE,,2012,set equal to twc
-ALL,gpf_swept_volume,(1.2) * 1,,,ibid
-ALL,gpf_pt_grams_per_liter,(0) * 1,,,ibid
-ALL,gpf_pd_grams_per_liter,(0) * 1,,,ibid
-ALL,gpf_rh_grams_per_liter,(0) * 1,,,ibid
+ALL,gpf_cost,((14.1940) * LITERS + 39.2867) * MARKUP_ICE,,2021,from SB on 20221013
 ALL,twc_pgm,(PT_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * PT_USD_PER_OZ * OZ_PER_GRAM + PD_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * PD_USD_PER_OZ * OZ_PER_GRAM  + RH_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * RH_USD_PER_OZ * OZ_PER_GRAM) * MARKUP_ICE,,,
-ALL,gpf_pgm,(PT_GRAMS_PER_LITER_GPF * LITERS * GPF_SWEPT_VOLUME * PT_USD_PER_OZ * OZ_PER_GRAM + PD_GRAMS_PER_LITER_GPF * LITERS * GPF_SWEPT_VOLUME * PD_USD_PER_OZ * OZ_PER_GRAM  + RH_GRAMS_PER_LITER_GPF * LITERS * GPF_SWEPT_VOLUME * RH_USD_PER_OZ * OZ_PER_GRAM) * MARKUP_ICE,,,
 ALL,troy_oz_per_gram,(0.0322) * 1,,,
 ALL,pt_dollars_per_oz,(1030) * 1,,,C:\Users\TSHERWOO\OneDrive - Environmental Protection Agency (EPA)\Documents\LMDV\CostAnalysis\Copy of PGM 5-year 08-31-2022.xlsx from JMc
 ALL,pd_dollars_per_oz,(2331) * 1,,,ibid
