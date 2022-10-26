@@ -640,3 +640,6 @@ def calc_annual_physical_effects(input_df):
     return_df.insert(return_df.columns.get_loc('barrels_of_oil') + 1, f'share_of_{year_for_compares}_US_oil', share_of_us_annual_oil)
 
     return return_df
+
+def legacy_fleet_physical_effects(calendar_year, safety_effects_dict):
+    pass

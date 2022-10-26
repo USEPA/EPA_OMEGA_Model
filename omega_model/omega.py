@@ -1348,6 +1348,7 @@ def init_omega(session_runtime_options):
     from effects.ip_deflators import ImplictPriceDeflators
     from effects.safety_values import SafetyValues
     from effects.fatality_rates import FatalityRates
+    from effects.legacy_fleet import LegacyFleet
 
     from consumer.sales_volume import init_sales_volume
 
@@ -1503,6 +1504,9 @@ def init_omega(session_runtime_options):
             init_fail += FatalityRates.init_from_file(omega_globals.options.fatality_rates_file,
                                                       verbose=verbose_init)
 
+            init_fail += LegacyFleet.init_from_file(omega_globals.options.legacy_fleet_file,
+                                                    verbose=verbose_init)
+
         if omega_globals.options.calc_effects == 'Physical':
             init_fail += GeneralInputsForEffects.init_from_file(omega_globals.options.general_inputs_for_effects_file,
                                                                 verbose=verbose_init)
@@ -1527,6 +1531,9 @@ def init_omega(session_runtime_options):
 
             init_fail += FatalityRates.init_from_file(omega_globals.options.fatality_rates_file,
                                                       verbose=verbose_init)
+
+            init_fail += LegacyFleet.init_from_file(omega_globals.options.legacy_fleet_file,
+                                                    verbose=verbose_init)
 
         if not init_fail:
             # initial year = initial fleet model year (latest year of data)
