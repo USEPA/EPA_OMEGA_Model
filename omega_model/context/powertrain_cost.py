@@ -164,9 +164,6 @@ class PowertrainCost(OMEGABase):
             PT_GRAMS_PER_LITER_TWC = eval(_cache['ALL', 'twc_pt_grams_per_liter']['value'], {'np': np}, locals_dict)
             PD_GRAMS_PER_LITER_TWC = eval(_cache['ALL', 'twc_pd_grams_per_liter']['value'], {'np': np}, locals_dict)
             RH_GRAMS_PER_LITER_TWC = eval(_cache['ALL', 'twc_rh_grams_per_liter']['value'], {'np': np}, locals_dict)
-            PT_GRAMS_PER_LITER_GPF = eval(_cache['ALL', 'gpf_pt_grams_per_liter']['value'], {'np': np}, locals_dict)
-            PD_GRAMS_PER_LITER_GPF = eval(_cache['ALL', 'gpf_pd_grams_per_liter']['value'], {'np': np}, locals_dict)
-            RH_GRAMS_PER_LITER_GPF = eval(_cache['ALL', 'gpf_rh_grams_per_liter']['value'], {'np': np}, locals_dict)
             OZ_PER_GRAM = eval(_cache['ALL', 'troy_oz_per_gram']['value'], {'np': np}, locals_dict)  # note that these are Troy ounces
 
             turb_input_scaler = eval(_cache['ALL', 'turb_scaler']['value'], {'np': np}, locals_dict)
