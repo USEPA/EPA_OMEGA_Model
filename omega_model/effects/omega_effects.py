@@ -38,7 +38,7 @@ Note:
 from omega_model import *
 from omega_model.effects.legacy_fleet import LegacyFleet
 from omega_model.effects.safety_effects import calc_safety_effects, calc_legacy_fleet_safety_effects
-from omega_model.effects.physical_effects import calc_physical_effects, calc_annual_physical_effects
+from omega_model.effects.physical_effects import calc_physical_effects, calc_legacy_fleet_physical_effects, calc_annual_physical_effects
 from omega_model.effects.cost_effects import calc_cost_effects
 from omega_model.effects.general_functions import save_dict_to_csv
 from omega_model.effects.discounting import discount_values
@@ -92,9 +92,13 @@ def run_effects_calcs():
                                   f'{omega_globals.options.session_unique_name}_safety_effects.csv'
 
         physical_effects_dict = calc_physical_effects(calendar_years, safety_effects_dict)
+        legacy_fleet_physical_effects_dict = calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict)
 
         physical_effects_filename = f'{omega_globals.options.output_folder}' + \
                                     f'{omega_globals.options.session_unique_name}_physical_effects.csv'
+
+        safety_effects_dict = {**safety_effects_dict, **legacy_fleet_safety_effects_dict}
+        physical_effects_dict = {**physical_effects_dict, **legacy_fleet_physical_effects_dict}
 
         if omega_globals.options.multiprocessing:
             print('Starting multiprocess save_dict_to_csv...')

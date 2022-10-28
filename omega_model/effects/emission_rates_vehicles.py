@@ -70,6 +70,7 @@ class EmissionRatesVehicles(OMEGABase):
 
     """
     _data = dict()  # private dict, emission factors vehicles by model year, age, legacy reg class ID and in-use fuel ID
+    startyear_min = 0
 
     @staticmethod
     def get_emission_rate(model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age, *rate_names):
@@ -90,6 +91,9 @@ class EmissionRatesVehicles(OMEGABase):
         locals_dict = locals()
         rate = 0
         return_rates = list()
+
+        if model_year < EmissionRatesVehicles.startyear_min:
+            model_year = EmissionRatesVehicles.startyear_min
 
         for rate_name in rate_names:
 
@@ -180,6 +184,8 @@ class EmissionRatesVehicles(OMEGABase):
                 df['rate_name']
             )
             df.set_index(rate_keys, inplace=True)
+
+            EmissionRatesVehicles.startyear_min = min(df['start_year'])
 
             EmissionRatesVehicles._data = df.to_dict('index')
 

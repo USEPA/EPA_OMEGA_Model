@@ -147,6 +147,7 @@ def calc_safety_effects(calendar_years):
         'base_year_reg_class_id',
         'reg_class_id',
         'in_use_fuel_id',
+        'market_class_id',
         'fueling_class',
         'base_year_powertrain_type',
         'body_style',
@@ -169,7 +170,7 @@ def calc_safety_effects(calendar_years):
                 vehicle_info_dict[vad['vehicle_id']] \
                     = VehicleFinal.get_vehicle_attributes(vad['vehicle_id'], vehicle_attribute_list)
 
-            mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, \
+            mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_class_id, fueling_class, \
             base_year_powertrain_type, body_style, base_year_curbweight_lbs, curbweight_lbs \
                 = vehicle_info_dict[vad['vehicle_id']]
 
@@ -207,6 +208,7 @@ def calc_safety_effects(calendar_years):
                 'base_year_reg_class_id': base_year_reg_class_id,
                 'reg_class_id': reg_class_id,
                 'in_use_fuel_id': in_use_fuel_id,
+                'market_class_id': market_class_id,
                 'fueling_class': fueling_class,
                 'base_year_powertrain_type': base_year_powertrain_type,
                 'registered_count': vad['registered_count'],
@@ -253,21 +255,17 @@ def calc_legacy_fleet_safety_effects():
     from effects.legacy_fleet import LegacyFleet
 
     mfr_id = name = 'legacy_fleet'
-    vehicle_id = pow(10, 6)
+    # vehicle_id = pow(10, 6)
 
     legacy_fleet_safety_effects_dict = dict()
-    # for calendar_year in calendar_years:
-
-        # calendar_year_safety_dict = dict()
-    for key, value in LegacyFleet._data.items():
+    for key, nested_dict in LegacyFleet._legacy_fleet.items():
 
         age, calendar_year, reg_class_id, market_class_id, fuel_id = key
 
-        model_year = value['model_year']
-        annual_vmt = value['annual_vmt']
-        registered_count = value['registered_count']
+        model_year = nested_dict['model_year']
+        annual_vmt = nested_dict['annual_vmt']
+        registered_count = nested_dict['registered_count']
         vmt = annual_vmt * registered_count
-        # odometer = value['odometer']
         fueling_class = base_year_powertrain_type = threshold_lbs = 'ICE'
         if 'BEV' in market_class_id:
             fueling_class = base_year_powertrain_type = 'BEV'
@@ -280,7 +278,7 @@ def calc_legacy_fleet_safety_effects():
 
         vehicle_safety_dict.update({
             'session_name': omega_globals.options.session_name,
-            'vehicle_id': vehicle_id,
+            'vehicle_id': nested_dict['vehicle_id'],
             'manufacturer_id': mfr_id,
             'name': name,
             'calendar_year': int(calendar_year),
@@ -289,18 +287,19 @@ def calc_legacy_fleet_safety_effects():
             'base_year_reg_class_id': reg_class_id,
             'reg_class_id': reg_class_id,
             'in_use_fuel_id': fuel_id,
+            'market_class_id': market_class_id,
             'fueling_class': fueling_class,
             'base_year_powertrain_type': base_year_powertrain_type,
             'registered_count': registered_count,
             'annual_vmt': annual_vmt,
-            'odometer': value['odometer'],
+            'odometer': nested_dict['odometer'],
             'vmt': vmt,
-            'body_style': value['body_style'],
+            'body_style': nested_dict['body_style'],
             'change_per_100lbs_below': 0,
             'change_per_100lbs_above': 0,
             'threshold_lbs': threshold_lbs,
-            'base_year_curbweight_lbs': value['curbweight_lbs'],
-            'curbweight_lbs': value['curbweight_lbs'],
+            'base_year_curbweight_lbs': nested_dict['curbweight_lbs'],
+            'curbweight_lbs': nested_dict['curbweight_lbs'],
             'lbs_changed': 0,
             'lbs_changed_below_threshold': 0,
             'lbs_changed_above_threshold': 0,
@@ -314,10 +313,9 @@ def calc_legacy_fleet_safety_effects():
         }
         )
 
-        key = (vehicle_id, int(calendar_year), age)
-        # calendar_year_safety_dict[key] = vehicle_safety_dict
+        key = (nested_dict['vehicle_id'], int(calendar_year), age)
 
         legacy_fleet_safety_effects_dict[key] = vehicle_safety_dict
-        vehicle_id += 1
+        # vehicle_id += 1
 
     return legacy_fleet_safety_effects_dict

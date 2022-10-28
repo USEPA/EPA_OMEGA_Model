@@ -8,14 +8,15 @@ class LegacyFleet(OMEGABase):
 
     """
 
-    _data = dict()  # private dict, cost factors social cost of carbon by calendar year
+    _data = dict()  # private dict, the legacy_fleet_file data
+    _legacy_fleet = dict() # the built legacy fleet for the analysis
 
     @staticmethod
     def get_legacy_fleet_data(key, *args):
         """
 
         Args:
-            key (tuple): the LegacyFleet._data key
+            key (tuple): the LegacyFleet._legacy_fleet key
             args (str, strs): name of attributes for which attribute values are sought
 
         Returns:
@@ -24,7 +25,7 @@ class LegacyFleet(OMEGABase):
         """
         return_values = list()
         for arg in args:
-            return_values.append(LegacyFleet._data[key][arg])
+            return_values.append(LegacyFleet._legacy_fleet[key][arg])
 
         return return_values
 
@@ -33,21 +34,21 @@ class LegacyFleet(OMEGABase):
         """
 
         Parameters:
-            key: tuple; the LegacyFleet._data dict key
+            key: tuple; the LegacyFleet._legacy_fleet dict key
             update_dict: Dictionary; represents the attribute-value pairs to be updated
 
         Returns:
             Nothing, but updates the object dictionary with update_dict
 
         """
-        if key in LegacyFleet._data:
+        if key in LegacyFleet._legacy_fleet:
             for attribute_name, attribute_value in update_dict.items():
-                LegacyFleet._data[key][attribute_name] = attribute_value
+                LegacyFleet._legacy_fleet[key][attribute_name] = attribute_value
 
         else:
-            LegacyFleet._data.update({key: {}})
+            LegacyFleet._legacy_fleet.update({key: {}})
             for attribute_name, attribute_value in update_dict.items():
-                LegacyFleet._data[key].update({attribute_name: attribute_value})
+                LegacyFleet._legacy_fleet[key].update({attribute_name: attribute_value})
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -93,13 +94,10 @@ class LegacyFleet(OMEGABase):
         if not template_errors:
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
-            # df = df.loc[df['dollar_basis'] != 0, :]
+
+            df.fillna(0, inplace=True)
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
-
-            # cols_to_convert = [col for col in df.columns if 'USD_per_metricton' in col]
-
-            # df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
 
             if not template_errors:
                 key = pd.Series(zip(
@@ -109,6 +107,10 @@ class LegacyFleet(OMEGABase):
                     df['market_class_id'],
                     df['in_use_fuel_id'],
                 ))
+                # add attributes that are populated in build_legacy_fleet_for_analysis
+                df.insert(0, 'vehicle_id', pow(10, 6))
+                df.insert(len(df.columns), 'annual_vmt', 0)
+                df.insert(len(df.columns), 'odometer', 0)
                 LegacyFleet._data = df.set_index(key).to_dict(orient='index')
 
         return template_errors
@@ -119,31 +121,32 @@ class LegacyFleet(OMEGABase):
         from consumer.reregistration_fixed_by_age import Reregistration
         from consumer.annual_vmt_fixed_by_age import OnroadVMT
 
-        _dict = LegacyFleet._data.copy()
+        vehicle_id_increment = 0
         for calendar_year in calendar_years:
 
-            # _dict = LegacyFleet._data.copy()
-            for key, value in _dict.items():
+            for key, nested_dict in LegacyFleet._data.items():
 
                 last_age, last_calendar_year, reg_class_id, market_class_id, fuel_id = key
-                model_year = value['model_year']
+                model_year = nested_dict['model_year']
                 new_age = calendar_year - model_year
 
                 reregistered_proportion = Reregistration.get_reregistered_proportion(model_year, market_class_id, new_age)
-                new_registered_count = value['registered_count'] * reregistered_proportion
+                new_registered_count = nested_dict['registered_count'] * reregistered_proportion
                 if new_registered_count == 0:
                     pass
 
                 else:
-                    update_dict = dict()
+                    vehicle_id_increment += 1
                     annual_vmt = OnroadVMT.get_vmt(calendar_year, market_class_id, new_age)
                     new_key = new_age, calendar_year, reg_class_id, market_class_id, fuel_id
-                    # update_dict.update({new_key: value})
-                    update_dict[new_key]['age'] = new_age
-                    update_dict[new_key]['calendar_year'] = calendar_year
-                    update_dict[new_key]['registered_count'] = new_registered_count
-                    update_dict[new_key]['annual_vmt'] = annual_vmt
-                    update_dict[new_key]['odometer'] = OnroadVMT.get_cumulative_vmt(market_class_id, new_age)
+                    update_dict = nested_dict.copy()
+                    update_dict['age'] = new_age
+                    update_dict['calendar_year'] = calendar_year
+                    update_dict['registered_count'] = new_registered_count
+                    update_dict['annual_vmt'] = annual_vmt
+                    update_dict['odometer'] = OnroadVMT.get_cumulative_vmt(market_class_id, new_age)
+                    if nested_dict['vehicle_id'] == pow(10, 6):
+                        update_dict['vehicle_id'] += vehicle_id_increment
                     LegacyFleet.update_legacy_fleet(new_key, update_dict)
 
-        return LegacyFleet._data
+        return LegacyFleet._legacy_fleet
