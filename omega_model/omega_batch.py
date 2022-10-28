@@ -100,6 +100,7 @@ Sample Data Columns
         Context Consumer Price Index File,String,cpi_price_deflators.csv
         Context Safety Values File,String,safety_values.csv
         Context Fatality Rates File,String,fatality_rates.csv
+        Context Legacy Fleet File,String,legacy_fleet.csv
 
 
 The first column defines the parameter name, the second column is a type-hint and does not get evaluated.  Subsequent
@@ -296,6 +297,9 @@ Data Row Name and Description
     The relative or absolute path to the safety values file,
     loaded by ``effects.fatality_rates.FatalityRates``
 
+:Context Legacy Fleet File *(str)*:
+    The relative or absolute path to the legacy fleet file,
+    loaded by ``effects.legacy_fleet.LegacyFleet``
 ----
 
 :Session Settings:
@@ -865,6 +869,7 @@ class OMEGABatchObject(OMEGABase):
         self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
         self.settings.safety_values_file = self.read_parameter('Context Safety Values File')
         self.settings.fatality_rates_file = self.read_parameter('Context Fatality Rates File')
+        self.settings.legacy_fleet_file = self.read_parameter('Context Legacy Fleet File')
 
     def num_sessions(self):
         """
@@ -1024,6 +1029,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
         self.settings.safety_values_file = self.read_parameter('Context Safety Values File')
         self.settings.fatality_rates_file = self.read_parameter('Context Fatality Rates File')
+        self.settings.legacy_fleet_file = self.read_parameter('Context Legacy Fleet File')
 
         # read policy settings
         self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')

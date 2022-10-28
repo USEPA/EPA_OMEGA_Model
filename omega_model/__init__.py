@@ -96,7 +96,7 @@ try:
             self.include_manufacturers_list = 'all'
             self.exclude_manufacturers_list = 'none'
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
-            self.vehicles_file = path + 'test_inputs/vehicles.csv'
+            self.vehicles_file = path + 'test_inputs/vehicles_ford.csv'
             self.vehicles_file_base_year = None
             self.vehicles_df = pd.DataFrame()
             self.onroad_vehicle_calculations_file = path + 'test_inputs/onroad_vehicle_calculations.csv'
@@ -174,6 +174,7 @@ try:
             self.refueling_cost_inputs_file = path + 'test_inputs/refueling_cost.csv'
             self.safety_values_file = path + 'test_inputs/safety_values.csv'
             self.fatality_rates_file = path + 'test_inputs/fatality_rates.csv'
+            self.legacy_fleet_file = path + 'test_inputs/legacy_fleet.csv'
 
             self.start_time = 0
             self.end_time = 0
