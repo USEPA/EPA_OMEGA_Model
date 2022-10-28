@@ -210,18 +210,7 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
     from producer.vehicles import VehicleFinal
     from context.onroad_fuels import OnroadFuel
     from common.omega_eval import Eval
-    #
-    # input_attributes_list = [
-    #     'grams_per_us_ton',
-    #     'grams_per_metric_ton',
-    #     'gal_per_bbl',
-    #     'e0_in_retail_gasoline',
-    #     'e0_energy_density_ratio',
-    #     'gallons_of_gasoline_us_annual',
-    #     'bbl_oil_us_annual',
-    #     'kwh_us_annual',
-    #     'year_for_compares',
-    # ]
+
     vehicle_attribute_list = [
         'manufacturer_id',
         'name',
@@ -239,43 +228,6 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
         'base_year_curbweight_lbs',
         'curbweight_lbs',
     ]
-    # bev_veh_rate_names = [
-    #     'pm25_brakewear_grams_per_mile',
-    #     'pm25_tirewear_grams_per_mile'
-    # ]
-    # gasoline_veh_rate_names = [
-    #     'pm25_brakewear_grams_per_mile',
-    #     'pm25_tirewear_grams_per_mile',
-    #     'pm25_exhaust_grams_per_mile',
-    #     'nmog_exhaust_grams_per_mile',
-    #     'nmog_evap_permeation_grams_per_gallon',
-    #     'nmog_evap_fuel_vapor_venting_grams_per_gallon',
-    #     'nmog_evap_fuel_leaks_grams_per_gallon',
-    #     'nmog_refueling_displacement_grams_per_gallon',
-    #     'nmog_refueling_spillage_grams_per_gallon',
-    #     'co_exhaust_grams_per_mile',
-    #     'nox_exhaust_grams_per_mile',
-    #     'sox_exhaust_grams_per_gallon',
-    #     # 'benzene_exhaust_grams_per_mile',
-    #     # 'butadiene13_exhaust_grams_per_mile',
-    #     # 'formaldehyde_exhaust_grams_per_mile',
-    #     # 'acetaldehyde_exhaust_grams_per_mile',
-    #     # 'acrolein_exhaust_grams_per_mile',
-    #     'ch4_exhaust_grams_per_mile',
-    #     'n2o_exhaust_grams_per_mile',
-    # ]
-    # diesel_veh_rate_names = [
-    #     'pm25_brakewear_grams_per_mile',
-    #     'pm25_tirewear_grams_per_mile',
-    #     'pm25_exhaust_grams_per_mile',
-    #     'nmog_exhaust_grams_per_mile',
-    #     'nmog_refueling_spillage_grams_per_gallon',
-    #     'co_exhaust_grams_per_mile',
-    #     'nox_exhaust_grams_per_mile',
-    #     'sox_exhaust_grams_per_gallon',
-    #     'ch4_exhaust_grams_per_mile',
-    #     'n2o_exhaust_grams_per_mile',
-    # ]
 
     grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio = get_inputs_for_effects()
     # gallons_of_gasoline_us_annual, bbl_oil_us_annual, kwh_us_annual, year_for_compares = get_inputs_for_effects(*input_attributes_list)

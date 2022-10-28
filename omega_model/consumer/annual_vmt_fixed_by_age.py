@@ -155,7 +155,6 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
                 OnroadVMT._data.update(
                     df[['market_class_id', 'age', 'start_year']].set_index('market_class_id').to_dict(orient='dict'))
 
-
         return template_errors
 
 

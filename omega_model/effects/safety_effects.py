@@ -255,7 +255,6 @@ def calc_legacy_fleet_safety_effects():
     from effects.legacy_fleet import LegacyFleet
 
     mfr_id = name = 'legacy_fleet'
-    # vehicle_id = pow(10, 6)
 
     legacy_fleet_safety_effects_dict = dict()
     for key, nested_dict in LegacyFleet._legacy_fleet.items():
@@ -316,6 +315,5 @@ def calc_legacy_fleet_safety_effects():
         key = (nested_dict['vehicle_id'], int(calendar_year), age)
 
         legacy_fleet_safety_effects_dict[key] = vehicle_safety_dict
-        # vehicle_id += 1
 
     return legacy_fleet_safety_effects_dict
