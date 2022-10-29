@@ -925,7 +925,7 @@ class Vehicle(OMEGABase):
         """
         drive_cycle_weight_year = VehicleOnroadCalculations.battery_sizing_drive_cycle_weight_year
 
-        cloud['onroad_direct_kwh_per_mile'] = 0
+        cloud['battery_sizing_onroad_direct_kwh_per_mile'] = 0
         cloud['nominal_onroad_direct_kwh_per_mile'] = \
             DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(drive_cycle_weight_year,
                                                                     self.fueling_class, cloud)
@@ -933,7 +933,7 @@ class Vehicle(OMEGABase):
         # calc onroad_direct values
         VehicleOnroadCalculations.perform_onroad_calculations(self, cloud)
 
-        cloud['battery_sizing_onroad_direct_kwh_per_mile'] = cloud['onroad_direct_kwh_per_mile']
+        cloud['battery_sizing_onroad_direct_kwh_per_mile'] = cloud['battery_sizing_onroad_direct_kwh_per_mile']
 
         return cloud
 
