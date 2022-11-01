@@ -316,8 +316,8 @@ class CostCloud(OMEGABase, CostCloudBase):
         # sweep vehicle params (for now, final ranges TBD)
 #       rlhp20s = (vehicle_rlhp20 * 0.95, vehicle_rlhp20, vehicle_rlhp20 * 1.05)
 #       rlhp60s = (vehicle_rlhp60 * 0.95, vehicle_rlhp60, vehicle_rlhp60 * 1.05)
-        rlhp20s = (vehicle_rlhp20)
-        rlhp60s = (vehicle_rlhp60)
+        rlhp20s = [vehicle_rlhp20]
+        rlhp60s = [vehicle_rlhp60]
 
         # vehicle_footprints = [vehicle.base_year_footprint_ft2]
         vehicle_footprints = (vehicle.base_year_footprint_ft2 * 0.95,
