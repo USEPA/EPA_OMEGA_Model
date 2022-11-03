@@ -37,6 +37,7 @@ Note:
 
 from omega_model import *
 from omega_model.effects.legacy_fleet import LegacyFleet
+from omega_model.effects.vmt_adjustments import AdjustmentsVMT
 from omega_model.effects.safety_effects import calc_safety_effects, calc_legacy_fleet_safety_effects
 from omega_model.effects.physical_effects import calc_physical_effects, calc_legacy_fleet_physical_effects, calc_annual_physical_effects
 from omega_model.effects.cost_effects import calc_cost_effects
@@ -71,6 +72,12 @@ def run_effects_calcs():
     tech_tracking_filename = f'{omega_globals.options.output_folder}' + \
                              f'{omega_globals.options.session_unique_name}_tech_tracking.csv'
 
+    LegacyFleet.build_legacy_fleet_for_analysis(calendar_years)
+
+    # with legacy fleet built, adjust VMTs throughout
+    vmt_adjustments = AdjustmentsVMT()
+    vmt_adjustments.calc_vmt_adjustments(calendar_years)
+
     if omega_globals.options.multiprocessing:
         print('Starting multiprocess save_dict_to_csv...')
         tech_tracking_result = omega_globals.pool.apply_async(func=save_dict_to_csv,
@@ -83,16 +90,16 @@ def run_effects_calcs():
     if 'Physical' in omega_globals.options.calc_effects:
         omega_log.logwrite('\nCalculating physical effects')
 
-        LegacyFleet.build_legacy_fleet_for_analysis(calendar_years)
-        legacy_fleet_safety_effects_dict = calc_legacy_fleet_safety_effects()
+        legacy_fleet_safety_effects_dict = calc_legacy_fleet_safety_effects(calendar_years, vmt_adjustments)
 
-        safety_effects_dict = calc_safety_effects(calendar_years)
+        safety_effects_dict = calc_safety_effects(calendar_years, vmt_adjustments)
 
         safety_effects_filename = f'{omega_globals.options.output_folder}' + \
                                   f'{omega_globals.options.session_unique_name}_safety_effects.csv'
 
         physical_effects_dict = calc_physical_effects(calendar_years, safety_effects_dict)
-        legacy_fleet_physical_effects_dict = calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict)
+        legacy_fleet_physical_effects_dict \
+            = calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict)
 
         physical_effects_filename = f'{omega_globals.options.output_folder}' + \
                                     f'{omega_globals.options.session_unique_name}_physical_effects.csv'
