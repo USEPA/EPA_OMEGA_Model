@@ -96,7 +96,7 @@ try:
             self.include_manufacturers_list = 'all'
             self.exclude_manufacturers_list = 'none'
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
-            self.vehicles_file = path + 'test_inputs/vehicles_ford.csv'
+            self.vehicles_file = path + 'test_inputs/vehicles.csv'
             self.vehicles_file_base_year = None
             self.vehicles_df = pd.DataFrame()
             self.onroad_vehicle_calculations_file = path + 'test_inputs/onroad_vehicle_calculations.csv'
@@ -109,8 +109,9 @@ try:
             self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
             self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods.csv'
             self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
-            self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights.csv'
+            self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights_5545.csv'
             self.drive_cycle_ballast_file = path + 'test_inputs/drive_cycle_ballast.csv'
+            self.context_stock_vmt_file = path + 'test_inputs/context_stock_vmt.csv'
 
             self.ice_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_ice.csv'
             self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_bev.csv'
