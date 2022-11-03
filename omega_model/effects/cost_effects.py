@@ -146,6 +146,7 @@ def calc_cost_effects(physical_effects_dict):
     from context.repair_cost import RepairCost
     from context.refueling_cost import RefuelingCost
     from common.omega_eval import Eval
+    from effects.legacy_fleet import LegacyFleet
 
     # UPDATE cost effects data
     costs_dict = dict()
@@ -154,10 +155,12 @@ def calc_cost_effects(physical_effects_dict):
     refueling_liquid_dict = dict()
     fuel = None
     
-    for key in physical_effects_dict.keys():
-
+    for key in physical_effects_dict:
         vehicle_id, calendar_year, age = key
         physical = physical_effects_dict[key]
+        # reg_class_id = physical['reg_class_id']
+        # market_class_id = physical['market_class_id']
+        # fuel_id = physical['in_use_fuel_id']
         onroad_direct_co2e_grams_per_mile = physical['onroad_direct_co2e_grams_per_mile']
         onroad_direct_kwh_per_mile = physical['onroad_direct_kwh_per_mile']
 
@@ -178,19 +181,24 @@ def calc_cost_effects(physical_effects_dict):
             driving_cost_dollars = 0
             pm25_tailpipe_3 = pm25_upstream_3 = nox_tailpipe_3 = nox_upstream_3 = sox_tailpipe_3 = sox_upstream_3 = 0
             pm25_tailpipe_7 = pm25_upstream_7 = nox_tailpipe_7 = nox_upstream_7 = sox_tailpipe_7 = sox_upstream_7 = 0
+            #
+            # if vehicle_id not in vehicle_info_dict:
+            #     if vehicle_id < pow(10, 6):
+            #         attribute_list = ['new_vehicle_mfr_cost_dollars']
+            #         vehicle_info_dict[vehicle_id] = VehicleFinal.get_vehicle_attributes(vehicle_id, attribute_list)[0]
+            #     else:
+            #         legacy_fleet_key = (age, calendar_year, reg_class_id, market_class_id, fuel_id)
+            #         vehicle_info_dict[vehicle_id] = LegacyFleet._legacy_fleet[legacy_fleet_key]['transaction_price_dollars']
+            #
+            # new_vehicle_cost = vehicle_info_dict[vehicle_id]
 
-            attribute_list = ['new_vehicle_mfr_cost_dollars']
-            if vehicle_id not in vehicle_info_dict:
-                vehicle_info_dict[vehicle_id] = VehicleFinal.get_vehicle_attributes(vehicle_id, attribute_list)[0]
-
-            new_vehicle_cost = vehicle_info_dict[vehicle_id]
-
-            mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, base_year_powertrain_type \
+            mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type \
                 = physical['manufacturer_id'], \
                   physical['name'], \
                   physical['base_year_reg_class_id'], \
                   physical['reg_class_id'], \
                   physical['in_use_fuel_id'], \
+                  physical['market_class_id'], \
                   physical['fueling_class'], \
                   physical['base_year_powertrain_type']
 
@@ -220,6 +228,15 @@ def calc_cost_effects(physical_effects_dict):
                   physical['sox_vehicle_ustons'], \
                   physical['sox_upstream_ustons']
 
+            if vehicle_id not in vehicle_info_dict:
+                if vehicle_id < pow(10, 6):
+                    attribute_list = ['new_vehicle_mfr_cost_dollars']
+                    vehicle_info_dict[vehicle_id] = VehicleFinal.get_vehicle_attributes(vehicle_id, attribute_list)[0]
+                else:
+                    legacy_fleet_key = (age, calendar_year, reg_class_id, market_class_id, in_use_fuel_id)
+                    vehicle_info_dict[vehicle_id] = LegacyFleet._legacy_fleet[legacy_fleet_key]['transaction_price_dollars']
+
+            new_vehicle_cost = vehicle_info_dict[vehicle_id]
             # tech costs, only for age=0
             if age == 0:
                 vehicle_cost_dollars = vehicle_count * new_vehicle_cost
@@ -249,7 +266,8 @@ def calc_cost_effects(physical_effects_dict):
             else:
                 operating_veh_type = 'suv'
 
-            repair_cost_per_mile = RepairCost.calc_repair_cost_per_mile(new_vehicle_cost, base_year_powertrain_type, operating_veh_type, age)
+            repair_cost_per_mile \
+                = RepairCost.calc_repair_cost_per_mile(new_vehicle_cost, base_year_powertrain_type, operating_veh_type, age)
             repair_cost_dollars = repair_cost_per_mile * vmt
 
             # refueling costs

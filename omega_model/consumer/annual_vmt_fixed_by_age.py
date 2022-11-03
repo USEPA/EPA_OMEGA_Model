@@ -64,6 +64,7 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
     """
 
     _data = dict()  # private dict, on-road VMT by market class ID and age
+    cumulative_vmt = dict()
 
     @staticmethod
     def get_vmt(calendar_year, market_class_id, age):
@@ -92,6 +93,20 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
                                 (market_class_id, calendar_year))
 
         return OnroadVMT._data[cache_key]
+
+    @staticmethod
+    def get_cumulative_vmt(market_class_id, age):
+
+        if (market_class_id, age) in OnroadVMT.cumulative_vmt:
+            return OnroadVMT.cumulative_vmt[market_class_id, age]
+        else:
+            cumulative_vmt = sum([v['annual_vmt'] for k, v in OnroadVMT._data.items()
+                                  if k[0] == market_class_id
+                                  and k[1] <= age]
+                                 )
+            OnroadVMT.cumulative_vmt[market_class_id, age] = cumulative_vmt
+
+            return cumulative_vmt
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -139,7 +154,6 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
                 # add 'start_year' key which returns start years by market class ID
                 OnroadVMT._data.update(
                     df[['market_class_id', 'age', 'start_year']].set_index('market_class_id').to_dict(orient='dict'))
-
 
         return template_errors
 
