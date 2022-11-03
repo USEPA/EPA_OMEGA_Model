@@ -1319,6 +1319,7 @@ def init_omega(session_runtime_options):
     from context.refueling_cost import RefuelingCost
     from context.powertrain_cost import PowertrainCost
     from context.glider_cost import GliderCost
+    from context.context_stock_vmt import ContextStockVMT
 
     from policy.upstream_methods import UpstreamMethods
     from policy.required_sales_share import RequiredSalesShare
@@ -1448,6 +1449,9 @@ def init_omega(session_runtime_options):
 
         init_fail += GliderCost.init_from_file(omega_globals.options.glider_cost_input_file,
                                                verbose=verbose_init)
+
+        init_fail += ContextStockVMT.init_from_file(omega_globals.options.context_stock_vmt_file,
+                                                    verbose=verbose_init)
 
         init_fail += VehicleAnnualData.init_vehicle_annual_data()
 

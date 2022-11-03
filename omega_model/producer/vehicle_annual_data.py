@@ -98,6 +98,25 @@ class VehicleAnnualData(OMEGABase):
         return result
 
     @staticmethod
+    def get_vehicle_annual_data_by_vehicle_id(calendar_year, vehicle_id, attribute_name):
+        """
+        Get vehicle annual data for the given calendar year.
+
+        Args:
+            calendar_year (int): calendar to get data for
+            vehicle_id (int): the vehicle_id
+            attribute_name (str): the attribute_name for which a value is sought
+
+        Returns:
+            The attribute_value for the given attribute_name
+
+        """
+        result = [v[attribute_name] for v in VehicleAnnualData._data
+                  if v['calendar_year'] == calendar_year and v['vehicle_id'] == vehicle_id]
+
+        return result[0]
+
+    @staticmethod
     def init_vehicle_annual_data():
 
         _cache.clear()

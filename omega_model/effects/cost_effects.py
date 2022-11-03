@@ -233,7 +233,7 @@ def calc_cost_effects(physical_effects_dict):
                     attribute_list = ['new_vehicle_mfr_cost_dollars']
                     vehicle_info_dict[vehicle_id] = VehicleFinal.get_vehicle_attributes(vehicle_id, attribute_list)[0]
                 else:
-                    legacy_fleet_key = (age, calendar_year, reg_class_id, market_class_id, in_use_fuel_id)
+                    legacy_fleet_key = (vehicle_id, calendar_year, age)
                     vehicle_info_dict[vehicle_id] = LegacyFleet._legacy_fleet[legacy_fleet_key]['transaction_price_dollars']
 
             new_vehicle_cost = vehicle_info_dict[vehicle_id]
