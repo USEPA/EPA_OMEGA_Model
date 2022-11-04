@@ -138,8 +138,8 @@ def run_effects_calcs():
             cost_effects_dict.update(calc_cost_effects(physical_effects_dict,
                                                        calc_health_effects=CostFactorsCriteria.calc_health_effects))
 
-            omega_log.logwrite('\nDiscounting costs')
-            cost_effects_dict = discount_values(cost_effects_dict)
+            # omega_log.logwrite('\nDiscounting costs')
+            # cost_effects_dict = discount_values(cost_effects_dict)
 
             cost_effects_filename = f'{omega_globals.options.output_folder}' + \
                                     f'{omega_globals.options.session_unique_name}_cost_effects.csv'
@@ -154,7 +154,7 @@ def run_effects_calcs():
             else:
                 cost_effects_df = save_dict_to_csv(cost_effects_dict, cost_effects_filename, index=False)
 
-            omega_log.logwrite('\nCalculating annual, present and annualized values')
+            omega_log.logwrite('\nCalculating annual, discounted, present and annualized values')
             present_and_annualized_dict = calc_present_and_annualized_values(cost_effects_dict, calendar_years)
 
             present_and_annualized_filename = f'{omega_globals.options.output_folder}' + \
