@@ -36,7 +36,6 @@ Note:
 """
 
 from omega_model import *
-from omega_model.effects.legacy_fleet import LegacyFleet
 from omega_model.effects.vmt_adjustments import AdjustmentsVMT
 from omega_model.effects.safety_effects import calc_safety_effects, calc_legacy_fleet_safety_effects
 from omega_model.effects.physical_effects import calc_physical_effects, calc_legacy_fleet_physical_effects, calc_annual_physical_effects
@@ -56,6 +55,7 @@ def run_effects_calcs():
     """
     from producer.vehicle_annual_data import VehicleAnnualData
     from effects.legacy_fleet import LegacyFleet
+    from effects.cost_factors_criteria import CostFactorsCriteria
 
     safety_effects_df = physical_effects_df = cost_effects_df = present_and_annualized_cost_df = pd.DataFrame()
 
@@ -135,7 +135,8 @@ def run_effects_calcs():
             cost_effects_dict = dict()
 
             omega_log.logwrite('\nCalculating cost effects')
-            cost_effects_dict.update(calc_cost_effects(physical_effects_dict))
+            cost_effects_dict.update(calc_cost_effects(physical_effects_dict,
+                                                       calc_health_effects=CostFactorsCriteria.calc_health_effects))
 
             omega_log.logwrite('\nDiscounting costs')
             cost_effects_dict = discount_values(cost_effects_dict)

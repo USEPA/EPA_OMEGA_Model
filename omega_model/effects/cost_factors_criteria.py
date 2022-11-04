@@ -56,6 +56,8 @@ class CostFactorsCriteria(OMEGABase):
 
     _cache = dict()
 
+    calc_health_effects = True
+
     @staticmethod
     def get_cost_factors(calendar_year, cost_factors):
         """
@@ -134,17 +136,23 @@ class CostFactorsCriteria(OMEGABase):
         if not template_errors:
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
-            df = df.loc[df['dollar_basis'] != 0, :]
 
             template_errors = validate_template_column_names(filename, cost_factors_input_template_columns,
                                                              df.columns, verbose=verbose)
 
-            cols_to_convert = [col for col in df.columns if 'USD_per_uston' in col]
+            if not sum(df['calendar_year']) == 0:
 
-            if not template_errors:
-                df = gen_fxns.adjust_dollars(df, 'cpi_price_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
+                df = df.loc[df['dollar_basis'] != 0, :]
 
-                CostFactorsCriteria._data = df.set_index('calendar_year').to_dict(orient='index')
+                cols_to_convert = [col for col in df.columns if 'USD_per_uston' in col]
+
+                if not template_errors:
+                    df = gen_fxns.adjust_dollars(df, 'cpi_price_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
+
+                    CostFactorsCriteria._data = df.set_index('calendar_year').to_dict(orient='index')
+
+            else:
+                CostFactorsCriteria.calc_health_effects = False
 
         return template_errors
 
