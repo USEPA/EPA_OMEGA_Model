@@ -765,7 +765,7 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict): #, adj
 
             elif 'gasoline' in fuel:
                 vmt_liquid_fuel = vmt
-                pm25_brakewear, pm25_tirewear_rate, pm25_exhaust_rate, \
+                pm25_brakewear_rate, pm25_tirewear_rate, pm25_exhaust_rate, \
                 nmog_rate, nmog_permeation_rate, nmog_venting_rate, nmog_leaks_rate, nmog_refuel_disp_rate, nmog_refuel_spill_rate, \
                 co_rate, nox_rate, sox_rate, ch4_rate, n2o_rate \
                     = get_vehicle_emission_rate(model_year, sourcetype_name, reg_class_id, fuel, ind_var_value)
@@ -775,7 +775,7 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict): #, adj
 
             elif 'diesel' in fuel:
                 vmt_liquid_fuel = vmt
-                pm25_brakewear, pm25_tirewear_rate, pm25_exhaust_rate, \
+                pm25_brakewear_rate, pm25_tirewear_rate, pm25_exhaust_rate, \
                 nmog_rate, nmog_refuel_spill_rate, \
                 co_rate, nox_rate, sox_rate, ch4_rate, n2o_rate \
                     = get_vehicle_emission_rate(model_year, sourcetype_name, reg_class_id, fuel, ind_var_value)
