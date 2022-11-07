@@ -127,11 +127,12 @@ def calc_lbs_changed_above_threshold(threshold, base_weight, final_weight):
     return lbs_changed
 
 
-def calc_safety_effects(calendar_years):
+def calc_safety_effects(calendar_years, vmt_adjustments):
     """
 
     Args:
         calendar_years: The years for which safety effects will be calculated.
+        vmt_adjustments: object; an object of the AdjustmentsVMT class
 
     Returns:
         A dictionary of various safety effects, including fatalities.
@@ -147,6 +148,7 @@ def calc_safety_effects(calendar_years):
         'base_year_reg_class_id',
         'reg_class_id',
         'in_use_fuel_id',
+        'market_class_id',
         'fueling_class',
         'base_year_powertrain_type',
         'body_style',
@@ -165,76 +167,185 @@ def calc_safety_effects(calendar_years):
             vehicle_safety_dict = dict()
 
             # need vehicle info once for each vehicle, not every calendar year for each vehicle
-            if vad['vehicle_id'] not in vehicle_info_dict:
-                vehicle_info_dict[vad['vehicle_id']] \
-                    = VehicleFinal.get_vehicle_attributes(vad['vehicle_id'], vehicle_attribute_list)
+            vehicle_id = int(vad['vehicle_id'])
 
-            mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, \
+            if vehicle_id not in vehicle_info_dict:
+                vehicle_info_dict[vehicle_id] \
+                    = VehicleFinal.get_vehicle_attributes(vehicle_id, vehicle_attribute_list)
+
+            mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_class_id, fueling_class, \
             base_year_powertrain_type, body_style, base_year_curbweight_lbs, curbweight_lbs \
-                = vehicle_info_dict[vad['vehicle_id']]
+                = vehicle_info_dict[vehicle_id]
 
-            age = int(vad['age'])
-            threshold_lbs, change_per_100lbs_below, change_per_100lbs_above = get_safety_values(body_style)
-            fatality_rate_base = get_fatality_rate(model_year, age)
+            # exclude any vehicle_ids that are considered legacy fleet
+            if model_year >= calendar_years[0]:
+                age = int(vad['age'])
+                threshold_lbs, change_per_100lbs_below, change_per_100lbs_above = get_safety_values(body_style)
+                fatality_rate_base = get_fatality_rate(model_year, age)
 
-            lbs_changed = calc_lbs_changed(base_year_curbweight_lbs, curbweight_lbs)
+                calendar_year_vmt_adj = vmt_adjustments.dict[calendar_year]
+                adjusted_vmt = vad['vmt'] * calendar_year_vmt_adj
+                adjusted_annual_vmt = adjusted_vmt / vad['registered_count']
+                if age == 0:
+                    adjusted_odometer = adjusted_annual_vmt
+                else:
+                    odometer_last_year = safety_effects_dict[(vehicle_id, calendar_year - 1, age - 1)]['odometer']
+                    adjusted_odometer = odometer_last_year + adjusted_annual_vmt
 
-            lbs_changed_below_threshold \
-                = calc_lbs_changed_below_threshold(threshold_lbs, base_year_curbweight_lbs, curbweight_lbs)
+                lbs_changed = calc_lbs_changed(base_year_curbweight_lbs, curbweight_lbs)
 
-            lbs_changed_above_threshold \
-                = calc_lbs_changed_above_threshold(threshold_lbs, base_year_curbweight_lbs, curbweight_lbs)
+                lbs_changed_below_threshold \
+                    = calc_lbs_changed_below_threshold(threshold_lbs, base_year_curbweight_lbs, curbweight_lbs)
 
-            check = abs(lbs_changed_below_threshold) + abs(lbs_changed_above_threshold) - abs(lbs_changed)
+                lbs_changed_above_threshold \
+                    = calc_lbs_changed_above_threshold(threshold_lbs, base_year_curbweight_lbs, curbweight_lbs)
 
-            rate_change_below = change_per_100lbs_below * (-lbs_changed_below_threshold) / 100
-            rate_change_above = change_per_100lbs_above * (-lbs_changed_above_threshold) / 100
+                check = abs(lbs_changed_below_threshold) + abs(lbs_changed_above_threshold) - abs(lbs_changed)
 
-            fatality_rate_session = fatality_rate_base * (1 + rate_change_below) * (1 + rate_change_above)
+                rate_change_below = change_per_100lbs_below * (-lbs_changed_below_threshold) / 100
+                rate_change_above = change_per_100lbs_above * (-lbs_changed_above_threshold) / 100
 
-            fatalities_base = fatality_rate_base * vad['vmt'] / 1000000000
+                fatality_rate_session = fatality_rate_base * (1 + rate_change_below) * (1 + rate_change_above)
 
-            fatalities_session = fatality_rate_session * vad['vmt'] / 1000000000
+                fatalities_base = fatality_rate_base * adjusted_vmt / 1000000000
 
-            vehicle_safety_dict.update({
-                'session_name': omega_globals.options.session_name,
-                'vehicle_id': int(vad['vehicle_id']),
-                'manufacturer_id': mfr_id,
-                'name': name,
-                'calendar_year': int(calendar_year),
-                'model_year': int(model_year),
-                'age': int(vad['age']),
-                'base_year_reg_class_id': base_year_reg_class_id,
-                'reg_class_id': reg_class_id,
-                'in_use_fuel_id': in_use_fuel_id,
-                'fueling_class': fueling_class,
-                'base_year_powertrain_type': base_year_powertrain_type,
-                'registered_count': vad['registered_count'],
-                'annual_vmt': vad['annual_vmt'],
-                'odometer': vad['odometer'],
-                'vmt': vad['vmt'],
-                'body_style': body_style,
-                'change_per_100lbs_below': change_per_100lbs_below,
-                'change_per_100lbs_above': change_per_100lbs_above,
-                'threshold_lbs': threshold_lbs,
-                'base_year_curbweight_lbs': base_year_curbweight_lbs,
-                'curbweight_lbs': curbweight_lbs,
-                'lbs_changed': lbs_changed,
-                'lbs_changed_below_threshold': lbs_changed_below_threshold,
-                'lbs_changed_above_threshold': lbs_changed_above_threshold,
-                'check_for_0': check,
-                'base_fatality_rate': fatality_rate_base,
-                'fatality_rate_change_below_threshold': rate_change_below,
-                'fatality_rate_change_above_threshold': rate_change_above,
-                'session_fatality_rate': fatality_rate_session,
-                'base_fatalities': fatalities_base,
-                'session_fatalities': fatalities_session,
-            }
-            )
+                fatalities_session = fatality_rate_session * adjusted_vmt / 1000000000
 
-            key = (int(vad['vehicle_id']), int(calendar_year), int(vad['age']))
-            calendar_year_safety_dict[key] = vehicle_safety_dict
+                vehicle_safety_dict.update({
+                    'session_name': omega_globals.options.session_name,
+                    'vehicle_id': vehicle_id,
+                    'manufacturer_id': mfr_id,
+                    'name': name,
+                    'calendar_year': calendar_year,
+                    'model_year': int(model_year),
+                    'age': age,
+                    'base_year_reg_class_id': base_year_reg_class_id,
+                    'reg_class_id': reg_class_id,
+                    'in_use_fuel_id': in_use_fuel_id,
+                    'market_class_id': market_class_id,
+                    'fueling_class': fueling_class,
+                    'base_year_powertrain_type': base_year_powertrain_type,
+                    'registered_count': vad['registered_count'],
+                    'vmt_adjustment': calendar_year_vmt_adj,
+                    'annual_vmt': adjusted_annual_vmt,
+                    'odometer': adjusted_odometer,
+                    'vmt': adjusted_vmt,
+                    'body_style': body_style,
+                    'change_per_100lbs_below': change_per_100lbs_below,
+                    'change_per_100lbs_above': change_per_100lbs_above,
+                    'threshold_lbs': threshold_lbs,
+                    'base_year_curbweight_lbs': base_year_curbweight_lbs,
+                    'curbweight_lbs': curbweight_lbs,
+                    'lbs_changed': lbs_changed,
+                    'lbs_changed_below_threshold': lbs_changed_below_threshold,
+                    'lbs_changed_above_threshold': lbs_changed_above_threshold,
+                    'check_for_0': check,
+                    'base_fatality_rate': fatality_rate_base,
+                    'fatality_rate_change_below_threshold': rate_change_below,
+                    'fatality_rate_change_above_threshold': rate_change_above,
+                    'session_fatality_rate': fatality_rate_session,
+                    'base_fatalities': fatalities_base,
+                    'session_fatalities': fatalities_session,
+                }
+                )
+
+                key = (vehicle_id, calendar_year, age)
+                calendar_year_safety_dict[key] = vehicle_safety_dict
 
         safety_effects_dict.update(calendar_year_safety_dict)
 
     return safety_effects_dict
+
+
+def calc_legacy_fleet_safety_effects(calendar_years, vmt_adjustments):
+    """
+
+    Args:
+        calendar_years: The years for which safety effects will be calculated.
+        vmt_adjustments: object; an object of the AdjustmentsVMT class
+
+    Returns:
+        A dictionary of various safety effects, including fatalities.
+
+    """
+    from effects.legacy_fleet import LegacyFleet
+
+    mfr_id = name = 'legacy_fleet'
+
+    legacy_fleet_safety_effects_dict = dict()
+    for key, nested_dict in LegacyFleet._legacy_fleet.items():
+
+        vehicle_id, calendar_year, age = key
+
+        model_year = nested_dict['model_year']
+        market_class_id = nested_dict['market_class_id']
+        reg_class_id = nested_dict['reg_class_id']
+        fuel_id = nested_dict['in_use_fuel_id']
+        registered_count = nested_dict['registered_count']
+        age = nested_dict['age']
+
+        calendar_year_vmt_adj = vmt_adjustments.get_vmt_adjustment(calendar_year)
+        adjusted_vmt = nested_dict['vmt'] * calendar_year_vmt_adj
+        adjusted_annual_vmt = adjusted_vmt / registered_count
+        if nested_dict['calendar_year'] == calendar_years[0]:
+            annual_vmt = nested_dict['annual_vmt']
+            odometer = nested_dict['odometer']
+            adjusted_odometer = odometer - annual_vmt + adjusted_annual_vmt
+        else:
+            odometer_last_year \
+                = legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year - 1, age - 1)]['odometer']
+            adjusted_odometer = odometer_last_year + adjusted_annual_vmt
+
+        fueling_class = base_year_powertrain_type = threshold_lbs = 'ICE'
+        if 'BEV' in market_class_id:
+            fueling_class = base_year_powertrain_type = 'BEV'
+
+        vehicle_safety_dict = dict()
+
+        fatality_rate_base = get_fatality_rate(model_year, age)
+
+        fatalities_base = fatality_rate_base * adjusted_vmt / 1000000000
+
+        vehicle_safety_dict.update({
+            'session_name': omega_globals.options.session_name,
+            'vehicle_id': vehicle_id,
+            'manufacturer_id': mfr_id,
+            'name': name,
+            'calendar_year': int(calendar_year),
+            'model_year': int(model_year),
+            'age': int(age),
+            'base_year_reg_class_id': reg_class_id,
+            'reg_class_id': reg_class_id,
+            'in_use_fuel_id': fuel_id,
+            'market_class_id': market_class_id,
+            'fueling_class': fueling_class,
+            'base_year_powertrain_type': base_year_powertrain_type,
+            'registered_count': registered_count,
+            'vmt_adjustment': calendar_year_vmt_adj,
+            'annual_vmt': adjusted_annual_vmt,
+            'odometer': adjusted_odometer,
+            'vmt': adjusted_vmt,
+            'body_style': nested_dict['body_style'],
+            'change_per_100lbs_below': 0,
+            'change_per_100lbs_above': 0,
+            'threshold_lbs': threshold_lbs,
+            'base_year_curbweight_lbs': nested_dict['curbweight_lbs'],
+            'curbweight_lbs': nested_dict['curbweight_lbs'],
+            'lbs_changed': 0,
+            'lbs_changed_below_threshold': 0,
+            'lbs_changed_above_threshold': 0,
+            'check_for_0': 0,
+            'base_fatality_rate': fatality_rate_base,
+            'fatality_rate_change_below_threshold': 0,
+            'fatality_rate_change_above_threshold': 0,
+            'session_fatality_rate': fatality_rate_base,
+            'base_fatalities': fatalities_base,
+            'session_fatalities': fatalities_base,
+        }
+        )
+
+        key = (vehicle_id, calendar_year, age)
+
+        legacy_fleet_safety_effects_dict[key] = vehicle_safety_dict
+
+    return legacy_fleet_safety_effects_dict

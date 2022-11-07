@@ -361,12 +361,13 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
         column_names_sorted_by_span = sorted(span_dict, key=span_dict.__getitem__)
 
         # generate a range of shares for the first n-1 columns
-        members = pd.DataFrame()
+        members = dict()
         for c in column_names_sorted_by_span[:-1]:
             if max_level_dict[c] > min_level_dict[c]:
                 members[c] = linspace(min_level_dict[c], max_level_dict[c], num_levels)
             else:
-                members[c] = [min_level_dict[c]]
+                members[c] = min_level_dict[c]
+        members = pd.DataFrame.from_dict(members)
 
         # generate cartesian product of first n-1 columns
         x = pd.DataFrame()
@@ -755,6 +756,10 @@ if __name__ == '__main__':
         share_combo = pd.DataFrame({'a':[0.5], 'b': [0.2], 'c': [0.3]})
         column_names = ['a', 'b', 'c']
         dfx = _generate_nearby_shares(column_names, share_combo, half_range_frac=0.02, num_steps=5, min_level=0.001, verbose=True)
+
+        dfx2 = partition(['BEV', 'ICE', 'NO_ALT_BEV', 'NO_ALT_ICE'],
+                         min_constraints={'NO_ALT_BEV': 0.01},
+                         max_constraints={'NO_ALT_BEV': 0.01}, verbose=True)
 
     except:
         import os

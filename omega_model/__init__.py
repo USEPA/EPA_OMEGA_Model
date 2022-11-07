@@ -109,8 +109,9 @@ try:
             self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
             self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods.csv'
             self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
-            self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights.csv'
+            self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights_5545.csv'
             self.drive_cycle_ballast_file = path + 'test_inputs/drive_cycle_ballast.csv'
+            self.context_stock_vmt_file = path + 'test_inputs/context_stock_vmt.csv'
 
             self.ice_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_ice.csv'
             self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_bev.csv'
@@ -174,6 +175,7 @@ try:
             self.refueling_cost_inputs_file = path + 'test_inputs/refueling_cost.csv'
             self.safety_values_file = path + 'test_inputs/safety_values.csv'
             self.fatality_rates_file = path + 'test_inputs/fatality_rates.csv'
+            self.legacy_fleet_file = path + 'test_inputs/legacy_fleet.csv'
 
             self.start_time = 0
             self.end_time = 0
