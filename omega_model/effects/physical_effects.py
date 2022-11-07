@@ -45,13 +45,26 @@ def get_vehicle_emission_rate(model_year, sourcetype_name, reg_class_id, fuel, i
             'co_exhaust_grams_per_mile',
             'nox_exhaust_grams_per_mile',
             'sox_exhaust_grams_per_gallon',
-            # 'benzene_exhaust_grams_per_mile',
-            # 'butadiene13_exhaust_grams_per_mile',
-            # 'formaldehyde_exhaust_grams_per_mile',
-            # 'acetaldehyde_exhaust_grams_per_mile',
-            # 'acrolein_exhaust_grams_per_mile',
             'ch4_exhaust_grams_per_mile',
             'n2o_exhaust_grams_per_mile',
+            'acetaldehyde_exhaust_grams_per_mile',
+            'acrolein_exhaust_grams_per_mile',
+            'benzene_exhaust_grams_per_mile',
+            'benzene_evap_permeation_grams_per_gallon',
+            'benzene_evap_fuel_vapor_venting_grams_per_gallon',
+            'benzene_fuel_leaks_grams_per_mile',
+            'benzene_refueling_displacement_grams_per_gallon',
+            'benzene_refueling_spillage_grams_per_gallon',
+            'ethylbenzene_exhaust_grams_per_mile',
+            'ethylbenzene_fuel_vapor_venting_grams_per_mile',
+            'ethylbenzene_fuel_leaks_grams_per_mile',
+            'ethylbenzene_evap_permeation_grams_per_gallon',
+            'ethylbenzene_refueling_displacement_grams_per_gallon',
+            'ethylbenzene_refueling_spillage_grams_per_gallon',
+            'formaldehyde_exhaust_grams_per_mile',
+            'naphthalene_exhaust_grams_per_mile',
+            '13_butadiene_exhaust_grams_per_mile',
+            '15pah_exhaust_grams_per_mile',
         ]
     elif 'diesel' in fuel:
         rate_names = [
@@ -65,6 +78,17 @@ def get_vehicle_emission_rate(model_year, sourcetype_name, reg_class_id, fuel, i
             'sox_exhaust_grams_per_gallon',
             'ch4_exhaust_grams_per_mile',
             'n2o_exhaust_grams_per_mile',
+            'acetaldehyde_exhaust_grams_per_mile',
+            'acrolein_exhaust_grams_per_mile',
+            'benzene_exhaust_grams_per_mile',
+            'benzene_refueling_spillage_grams_per_gallon',
+            'ethylbenzene_exhaust_grams_per_mile',
+            'ethylbenzene_refueling_spillage_grams_per_gallon',
+            'formaldehyde_exhaust_grams_per_mile',
+            'naphthalene_exhaust_grams_per_mile',
+            'naphthalene_refueling_spillage_grams_per_gallon',
+            '13_butadiene_exhaust_grams_per_mile',
+            '15pah_exhaust_grams_per_mile',
         ]
     elif 'electric' in fuel:
         rate_names = [
@@ -103,6 +127,8 @@ def get_egu_emission_rate(calendar_year, kwh_consumption, kwh_generation):
                   'co2_grams_per_kwh',
                   'ch4_grams_per_kwh',
                   'n2o_grams_per_kwh',
+                  'hcl_grams_per_kwh',
+                  'hg_grams_per_kwh',
                   )
 
     return EmissionRatesEGU.get_emission_rate(calendar_year, kwh_session, rate_names)
@@ -273,8 +299,8 @@ def calc_physical_effects(calendar_years, safety_effects_dict): #, adjusted_vmt)
                     fuel_consumption_kWh_annual += vmt_electricity * onroad_direct_kwh_per_mile
                     fuel_generation_kWh_annual = fuel_consumption_kWh_annual / transmission_efficiency
 
-        # upstream EGU emission rates for electric fuel operation
-        co_egu, nox_egu, pm25_egu, sox_egu, co2_egu, ch4_egu, n2o_egu \
+        # upstream EGU emission rates for this calendar year to apply to electric fuel operation
+        co_egu_rate, nox_egu_rate, pm25_egu_rate, sox_egu_rate, co2_egu_rate, ch4_egu_rate, n2o_egu_rate, hcl_egu_rate, hg_egu_rate \
             = get_egu_emission_rate(calendar_year, fuel_consumption_kWh_annual, fuel_generation_kWh_annual)
 
         for vad in vads:
@@ -314,20 +340,41 @@ def calc_physical_effects(calendar_years, safety_effects_dict): #, adjusted_vmt)
                         = onroad_gallons_per_mile = fuel_consumption_gallons \
                         = fuel_generation_kWh = fuel_consumption_kWh = 0
 
-                    nmog_tailpipe_ustons = nmog_evap_ustons = nmog_vehicle_ustons = 0
-                    co_vehicle_ustons = nox_vehicle_ustons = sox_vehicle_ustons = 0
-                    pm25_tailpipe_ustons = pm25_brakewear_ustons = pm25_tirewear_ustons = pm25_vehicle_ustons = 0
-                        # benzene_tailpipe_ustons = butadiene13_tailpipe_ustons = formaldehyde_tailpipe_ustons \
-                    #     = acetaldehyde_tailpipe_ustons = acrolein_tailpipe_ustons = 0
+                    nmog_exh_ustons = nmog_evap_ustons = nmog_veh_ustons = 0
+                    co_exh_ustons = co_veh_ustons = 0
+                    nox_exh_ustons = nox_veh_ustons = 0
+                    sox_exh_ustons = sox_veh_ustons = 0
+                    pm25_exh_ustons = pm25_brakewear_ustons = pm25_tirewear_ustons = pm25_veh_ustons = 0
+                    acetaldehyde_exh_ustons = acetaldehyde_veh_ustons = 0
+                    acrolein_exh_ustons = acrolein_veh_ustons = 0
+                    benzene_exh_ustons = benzene_evap_ustons = benzene_veh_ustons = 0
+                    ethylbenzene_exh_ustons = ethylbenzene_evap_ustons = ethylbenzene_veh_ustons = 0
+                    naphthalene_exh_ustons = naphthalene_evap_ustons = naphthalene_veh_ustons = 0
+                    formaldehyde_exh_ustons = formaldehyde_veh_ustons = 0
+                    butadiene13_exh_ustons = butadiene13_veh_ustons = 0
+                    pah15_exh_ustons = pah15_veh_ustons = 0
+                    co2_exh_metrictons = co2_veh_metrictons = 0
+                    ch4_exh_metrictons = ch4_veh_metrictons = 0
+                    n2o_exh_metrictons = n2o_veh_metrictons = 0
 
-                    ch4_vehicle_metrictons = n2o_vehicle_metrictons = co2_vehicle_metrictons = 0
+                    co2_upstream_metrictons = ch4_upstream_metrictons = n2o_upstream_metrictons = 0
+                    voc_upstream_ustons = co_upstream_ustons = nox_upstream_ustons = pm25_upstream_ustons = 0
+                    sox_upstream_ustons = hcl_upstream_ustons = hg_upstream_ustons = 0
 
-                    pm25_brakewear_l = pm25_brakewear_e = pm25_tirewear_l = pm25_tirewear_e = 0
-                    pm25_exhaust = nmog = co = nox = sox = ch4 = n2o = 0
-                    nmog_permeation = nmog_venting = nmog_leaks = nmog_refuel_disp = nmog_refuel_spill = 0
+                    pm25_brakewear_rate_l = pm25_brakewear_rate_e = pm25_tirewear_rate_l = pm25_tirewear_rate_e = 0
+                    pm25_exh_rate = co_exh_rate = nox_exh_rate = sox_exh_rate = ch4_exh_rate = n2o_exh_rate = 0
+                    nmog_exh_rate = nmog_permeation_rate = nmog_venting_rate = 0
+                    nmog_leaks_rate = nmog_refuel_disp_rate = nmog_refuel_spill_rate = 0
+                    acetaldehyde_exh_rate = acrolein_exh_rate = 0
+                    benzene_exh_rate = benzene_permeation_rate = benzene_venting_rate = 0
+                    benzene_leaks_rate = benzene_refuel_disp_rate = benzene_refuel_spill_rate = 0
+                    ethylbenzene_exh_rate = ethylbenzene_permeation_rate = ethylbenzene_venting_rate = 0
+                    ethylbenzene_leaks_rate = ethylbenzene_refuel_disp_rate = ethylbenzene_refuel_spill_rate = 0
+                    formaldehyde_exh_rate = naphthalene_exh_rate = naphthalene_refuel_spill_rate = 0
+                    butadiene13_exh_rate = pah15_exh_rate = 0
 
-                    # co_egu = nox_egu = pm25_egu = sox_egu = co2_egu = ch4_egu = n2o_egu = 0
-                    voc_ref = co_ref = nox_ref = pm25_ref = sox_ref = co2_ref = ch4_ref = n2o_ref = 0
+                    voc_ref_rate = co_ref_rate = nox_ref_rate = pm25_ref_rate = sox_ref_rate = 0
+                    co2_ref_rate = ch4_ref_rate = n2o_ref_rate = 0
                     # benzene_ref = butadiene13_ref = formaldehyde_ref = acetaldehyde_ref = acrolein_ref = 0
 
                     veh_rates_by = 'age'  # for now; set as an input if we want to; value can be 'age' or 'odometer'
@@ -350,13 +397,9 @@ def calc_physical_effects(calendar_years, safety_effects_dict): #, adjusted_vmt)
 
                             # vehicle emission rates; PHEVs use the ICE vehicle rates
                             if fueling_class == 'BEV':
-                                pm25_brakewear_e, pm25_tirewear_e \
-                                    = get_vehicle_emission_rate(model_year, sourcetype_name, base_year_reg_class_id, fuel,
-                                                                ind_var_value) #, *bev_veh_rate_names)
-                            #
-                            # # upstream EGU emission factors for electric fuel operation
-                            # co_egu, nox_egu, pm25_egu, sox_egu, co2_egu, ch4_egu, n2o_egu \
-                            #     = get_egu_emission_rate(calendar_year, fuel_generation_kWh)
+                                pm25_brakewear_rate_e, pm25_tirewear_rate_e \
+                                    = get_vehicle_emission_rate(model_year, sourcetype_name, base_year_reg_class_id,
+                                                                fuel, ind_var_value)
 
                         elif fuel != 'US electricity' and onroad_direct_co2e_grams_per_mile:
                             liquid_fuel = fuel
@@ -365,95 +408,135 @@ def calc_physical_effects(calendar_years, safety_effects_dict): #, adjusted_vmt)
                             fuel_consumption_gallons = vmt_liquid_fuel * onroad_gallons_per_mile / transmission_efficiency
 
                             if fuel == 'pump gasoline':
-                                pm25_brakewear_l, pm25_tirewear_l, pm25_exhaust, \
-                                nmog, nmog_permeation, nmog_venting, nmog_leaks, nmog_refuel_disp, nmog_refuel_spill, \
-                                co, nox, sox, ch4, n2o \
+                                pm25_brakewear_rate_l, pm25_tirewear_rate_l, pm25_exh_rate, \
+                                nmog_exh_rate, nmog_permeation_rate, nmog_venting_rate, nmog_leaks_rate, \
+                                nmog_refuel_disp_rate, nmog_refuel_spill_rate, co_exh_rate, nox_exh_rate, \
+                                sox_exh_rate, ch4_exh_rate, n2o_exh_rate, acetaldehyde_exh_rate, acrolein_exh_rate, \
+                                benzene_exh_rate, benzene_permeation_rate, benzene_venting_rate, benzene_leaks_rate, \
+                                benzene_refuel_disp_rate, benzene_refuel_spill_rate, \
+                                ethylbenzene_exh_rate, ethylbenzene_permeation_rate, ethylbenzene_venting_rate, ethylbenzene_leaks_rate, \
+                                ethylbenzene_refuel_disp_rate, ethylbenzene_refuel_spill_rate, \
+                                formaldehyde_exh_rate, naphthalene_exh_rate, \
+                                butadiene13_exh_rate, pah15_exh_rate \
                                     = get_vehicle_emission_rate(model_year, sourcetype_name, base_year_reg_class_id, fuel,
                                                                 ind_var_value)
 
                             elif fuel == 'pump diesel':
-                                pm25_brakewear_l, pm25_tirewear_l, pm25_exhaust, \
-                                nmog, nmog_refuel_spill, \
-                                co, nox, sox, ch4, n2o \
+                                pm25_brakewear_rate_l, pm25_tirewear_rate_l, pm25_exh_rate, \
+                                nmog_exh_rate, nmog_refuel_spill_rate, co_exh_rate, nox_exh_rate, \
+                                sox_exh_rate, ch4_exh_rate, n2o_exh_rate, acetaldehyde_exh_rate, acrolein_exh_rate, \
+                                benzene_exh_rate, benzene_refuel_spill_rate, \
+                                ethylbenzene_exh_rate, ethylbenzene_refuel_spill_rate, \
+                                formaldehyde_exh_rate, naphthalene_exh_rate, naphthalene_refuel_spill_rate, \
+                                butadiene13_exh_rate, pah15_exh_rate \
                                     = get_vehicle_emission_rate(model_year, sourcetype_name, base_year_reg_class_id, fuel,
                                                                 ind_var_value)
                             else:
                                 pass # add additional liquid fuels (E85) if necessary
 
                             # upstream refinery emission factors for liquid fuel operation
-                            # voc_ref, co_ref, nox_ref, pm25_ref, sox_ref, benzene_ref, butadiene13_ref, formaldehyde_ref, \
-                            # acetaldehyde_ref, acrolein_ref, co2_ref, ch4_ref, n2o_ref \
-                            #     = get_refinery_ef(calendar_year, liquid_fuel)
-                            voc_ref, co_ref, nox_ref, pm25_ref, sox_ref, co2_ref, ch4_ref, n2o_ref \
+                            voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, \
+                            co2_ref_rate, ch4_ref_rate, n2o_ref_rate \
                                 = get_refinery_ef(calendar_year, liquid_fuel)
 
-                            # calc tailpipe emissions for liquid fuel operation
+                            # calc exhaust and evaporative emissions for liquid fuel operation
                             factor = vmt_liquid_fuel / grams_per_us_ton
-                            nmog_tailpipe_ustons += nmog * factor
-                            co_vehicle_ustons += co * factor
-                            nox_vehicle_ustons += nox * factor
-                            pm25_tailpipe_ustons += pm25_exhaust * factor
-                            # benzene_tailpipe_ustons += benzene * factor
-                            # butadiene13_tailpipe_ustons += butadiene13 * factor
-                            # formaldehyde_tailpipe_ustons += formaldehyde * factor
-                            # acetaldehyde_tailpipe_ustons += acetaldehyde * factor
-                            # acrolein_tailpipe_ustons += acrolein * factor
+                            pm25_exh_ustons += pm25_exh_rate * factor
+                            nmog_exh_ustons += nmog_exh_rate * factor
+                            co_exh_ustons += co_exh_rate * factor
+                            nox_exh_ustons += nox_exh_rate * factor
+                            acetaldehyde_exh_ustons += acetaldehyde_exh_rate * factor
+                            acrolein_exh_ustons += acrolein_exh_rate * factor
+                            benzene_exh_ustons += benzene_exh_rate * factor
+                            ethylbenzene_exh_ustons += ethylbenzene_exh_rate * factor
+                            formaldehyde_exh_ustons += formaldehyde_exh_rate * factor
+                            naphthalene_exh_ustons += naphthalene_exh_rate * factor
+                            butadiene13_exh_ustons += butadiene13_exh_rate * factor
+                            pah15_exh_ustons += pm25_exh_rate * factor
 
                             factor = fuel_consumption_gallons / grams_per_us_ton
-                            sox_vehicle_ustons += sox * factor
-                            nmog_evap_ustons += sum([nmog_permeation,
-                                                     nmog_venting,
-                                                     nmog_leaks,
-                                                     nmog_refuel_disp,
-                                                     nmog_refuel_spill]) * factor
-
-                            nmog_vehicle_ustons = nmog_tailpipe_ustons + nmog_evap_ustons
+                            sox_exh_ustons += sox_exh_rate * factor
+                            nmog_evap_ustons += sum([nmog_permeation_rate,
+                                                     nmog_venting_rate,
+                                                     nmog_leaks_rate,
+                                                     nmog_refuel_disp_rate,
+                                                     nmog_refuel_spill_rate]) * factor
+                            benzene_evap_ustons += sum([benzene_permeation_rate,
+                                                        benzene_venting_rate,
+                                                        benzene_leaks_rate,
+                                                        benzene_refuel_disp_rate,
+                                                        benzene_refuel_spill_rate]) * factor
+                            ethylbenzene_evap_ustons += sum([ethylbenzene_permeation_rate,
+                                                             ethylbenzene_venting_rate,
+                                                             ethylbenzene_leaks_rate,
+                                                             ethylbenzene_refuel_disp_rate,
+                                                             ethylbenzene_refuel_spill_rate]) * factor
+                            naphthalene_evap_ustons += naphthalene_refuel_spill_rate * factor
 
                             factor = vmt_liquid_fuel / grams_per_metric_ton
-                            ch4_vehicle_metrictons += ch4 * factor
-                            n2o_vehicle_metrictons += n2o * factor
-                            co2_vehicle_metrictons += onroad_direct_co2e_grams_per_mile * factor
+                            ch4_veh_metrictons += ch4_exh_rate * factor
+                            n2o_veh_metrictons += n2o_exh_rate * factor
+                            co2_veh_metrictons += onroad_direct_co2e_grams_per_mile * factor
+                            
+                            # calc vehicle inventories as exhaust plus evap (where applicable)
+                            nmog_veh_ustons = nmog_exh_ustons + nmog_evap_ustons
+                            co_veh_ustons = co_exh_ustons
+                            nox_veh_ustons = nox_exh_ustons
+                            sox_veh_ustons = sox_exh_ustons
+                            acetaldehyde_veh_ustons = acetaldehyde_exh_ustons
+                            acrolein_veh_ustons = acrolein_exh_ustons
+                            benzene_veh_ustons = benzene_exh_ustons + benzene_evap_ustons
+                            ethylbenzene_veh_ustons = ethylbenzene_exh_ustons + ethylbenzene_evap_ustons
+                            formaldehyde_veh_ustons = formaldehyde_exh_ustons
+                            naphthalene_veh_ustons = naphthalene_exh_ustons + naphthalene_evap_ustons
+                            butadiene13_veh_ustons = butadiene13_exh_ustons
+                            pah15_veh_ustons = pah15_exh_ustons
 
-                    # other vehicle emissions
-                    pm25_brakewear_ustons += (vmt_liquid_fuel * pm25_brakewear_l + vmt_electricity * pm25_brakewear_e) \
+                    # calc vehicle pm25 emissions
+                    pm25_brakewear_ustons += (vmt_liquid_fuel * pm25_brakewear_rate_l + vmt_electricity * pm25_brakewear_rate_e) \
                                              / grams_per_us_ton
-                    pm25_tirewear_ustons += (vmt_liquid_fuel * pm25_tirewear_l + vmt_electricity * pm25_tirewear_e) \
+                    pm25_tirewear_ustons += (vmt_liquid_fuel * pm25_tirewear_rate_l + vmt_electricity * pm25_tirewear_rate_e) \
                                             / grams_per_us_ton
 
-                    pm25_vehicle_ustons = pm25_tailpipe_ustons + pm25_brakewear_ustons + pm25_tirewear_ustons
+                    pm25_veh_ustons = pm25_exh_ustons + pm25_brakewear_ustons + pm25_tirewear_ustons
 
                     # calc upstream emissions for both liquid and electric fuel operation
                     kwhs, gallons = fuel_generation_kWh, fuel_consumption_gallons
                     # voc_upstream_ustons = (kwhs * voc_ps + gallons * voc_ref) / grams_per_us_ton
-                    co_upstream_ustons = (kwhs * co_egu + gallons * co_ref) / grams_per_us_ton
-                    nox_upstream_ustons = (kwhs * nox_egu + gallons * nox_ref) / grams_per_us_ton
-                    pm25_upstream_ustons = (kwhs * pm25_egu + gallons * pm25_ref) / grams_per_us_ton
-                    sox_upstream_ustons = (kwhs * sox_egu + gallons * sox_ref) / grams_per_us_ton
+                    co_upstream_ustons = (kwhs * co_egu_rate + gallons * co_ref_rate) / grams_per_us_ton
+                    nox_upstream_ustons = (kwhs * nox_egu_rate + gallons * nox_ref_rate) / grams_per_us_ton
+                    pm25_upstream_ustons = (kwhs * pm25_egu_rate + gallons * pm25_ref_rate) / grams_per_us_ton
+                    sox_upstream_ustons = (kwhs * sox_egu_rate + gallons * sox_ref_rate) / grams_per_us_ton
+                    hcl_upstream_ustons = (kwhs * hcl_egu_rate) / grams_per_us_ton
+                    hg_upstream_ustons = (kwhs * hg_egu_rate) / grams_per_us_ton
                     # benzene_upstream_ustons = (kwhs * benzene_ps + gallons * benzene_ref) / grams_per_us_ton
                     # butadiene13_upstream_ustons = (kwhs * butadiene13_ps + gallons * butadiene13_ref) / grams_per_us_ton
                     # formaldehyde_upstream_ustons = (kwhs * formaldehyde_ps + gallons * formaldehyde_ref) / grams_per_us_ton
                     # acetaldehyde_upstream_ustons = (kwhs * acetaldehyde_ps + gallons * acetaldehyde_ref) / grams_per_us_ton
                     # acrolein_upstream_ustons = (kwhs * acrolein_ps + gallons * acrolein_ref) / grams_per_us_ton
 
-                    co2_upstream_metrictons = (kwhs * co2_egu + gallons * co2_ref) / grams_per_metric_ton
-                    ch4_upstream_metrictons = (kwhs * ch4_egu + gallons * ch4_ref) / grams_per_metric_ton
-                    n2o_upstream_metrictons = (kwhs * n2o_egu + gallons * n2o_ref) / grams_per_metric_ton
+                    co2_upstream_metrictons = (kwhs * co2_egu_rate + gallons * co2_ref_rate) / grams_per_metric_ton
+                    ch4_upstream_metrictons = (kwhs * ch4_egu_rate + gallons * ch4_ref_rate) / grams_per_metric_ton
+                    n2o_upstream_metrictons = (kwhs * n2o_egu_rate + gallons * n2o_ref_rate) / grams_per_metric_ton
 
-                    # sum tailpipe and upstream into totals
+                    # sum vehicle and upstream into totals
                     # voc_total_ustons = voc_tailpipe_ustons + voc_upstream_ustons
-                    nmog_total_ustons = nmog_vehicle_ustons # + nmog_upstream_ustons
-                    co_total_ustons = co_vehicle_ustons + co_upstream_ustons
-                    nox_total_ustons = nox_vehicle_ustons + nox_upstream_ustons
-                    pm25_total_ustons = pm25_vehicle_ustons + pm25_upstream_ustons
-                    sox_total_ustons = sox_vehicle_ustons + sox_upstream_ustons
-                    # benzene_total_ustons = benzene_tailpipe_ustons + benzene_upstream_ustons
-                    # butadiene13_total_ustons = butadiene13_tailpipe_ustons + butadiene13_upstream_ustons
-                    # formaldehyde_total_ustons = formaldehyde_tailpipe_ustons + formaldehyde_upstream_ustons
-                    # acetaldehyde_total_ustons = acetaldehyde_tailpipe_ustons + acetaldehyde_upstream_ustons
-                    # acrolein_total_ustons = acrolein_tailpipe_ustons + acrolein_upstream_ustons
-                    co2_total_metrictons = co2_vehicle_metrictons + co2_upstream_metrictons
-                    ch4_total_metrictons = ch4_vehicle_metrictons + ch4_upstream_metrictons
-                    n2o_total_metrictons = n2o_vehicle_metrictons + n2o_upstream_metrictons
+                    nmog_total_ustons = nmog_veh_ustons # + nmog_upstream_ustons
+                    co_total_ustons = co_veh_ustons + co_upstream_ustons
+                    nox_total_ustons = nox_veh_ustons + nox_upstream_ustons
+                    pm25_total_ustons = pm25_veh_ustons + pm25_upstream_ustons
+                    sox_total_ustons = sox_veh_ustons + sox_upstream_ustons
+                    acetaldehyde_total_ustons = acetaldehyde_veh_ustons # + acetaldehyde_upstream_ustons
+                    acrolein_total_ustons = acrolein_veh_ustons # + acrolein_upstream_ustons
+                    benzene_total_ustons = benzene_veh_ustons # + benzene_upstream_ustons
+                    ethylbenzene_total_ustons = ethylbenzene_veh_ustons # + ethylbenzene_upstream_ustons
+                    formaldehyde_total_ustons = formaldehyde_veh_ustons # + formaldehyde_upstream_ustons
+                    naphthalene_total_ustons = naphthalene_veh_ustons # + naphlathene_upstream_ustons
+                    butadiene13_total_ustons = butadiene13_veh_ustons # + butadiene13_upstream_ustons
+                    pah15_total_ustons = pah15_veh_ustons # + pah15_upstream_ustons
+                    co2_total_metrictons = co2_veh_metrictons + co2_upstream_metrictons
+                    ch4_total_metrictons = ch4_veh_metrictons + ch4_upstream_metrictons
+                    n2o_total_metrictons = n2o_veh_metrictons + n2o_upstream_metrictons
 
                     # calc energy security related attributes and comparisons to year_for_compares
                     oil_bbl = fuel_consumption_gallons * e0_share * e0_energy_density_ratio / gal_per_bbl
@@ -507,40 +590,51 @@ def calc_physical_effects(calendar_years, safety_effects_dict): #, adjusted_vmt)
                         'session_fatalities': session_fatalities,
 
                         # 'voc_tailpipe_ustons': voc_tailpipe_ustons,
-                        'nmog_tailpipe_ustons': nmog_tailpipe_ustons,
+                        'nmog_exhaust_ustons': nmog_exh_ustons,
                         'nmog_evaporative_ustons': nmog_evap_ustons,
-                        'nmog_vehicle_ustons': nmog_vehicle_ustons,
-                        'co_vehicle_ustons': co_vehicle_ustons,
-                        'nox_vehicle_ustons': nox_vehicle_ustons,
-                        'pm25_tailpipe_ustons': pm25_tailpipe_ustons,
+                        'nmog_vehicle_ustons': nmog_veh_ustons,
+                        'co_vehicle_ustons': co_veh_ustons,
+                        'nox_vehicle_ustons': nox_veh_ustons,
+                        'pm25_exhaust_ustons': pm25_exh_ustons,
                         'pm25_brakewear_ustons': pm25_brakewear_ustons,
                         'pm25_tirewear_ustons': pm25_tirewear_ustons,
-                        'pm25_vehicle_ustons': pm25_vehicle_ustons,
-                        'sox_vehicle_ustons': sox_vehicle_ustons,
-                        # 'benzene_tailpipe_ustons': benzene_tailpipe_ustons,
-                        # 'butadiene13_tailpipe_ustons': butadiene13_tailpipe_ustons,
-                        # 'formaldehyde_tailpipe_ustons': formaldehyde_tailpipe_ustons,
-                        # 'acetaldehyde_tailpipe_ustons': acetaldehyde_tailpipe_ustons,
-                        # 'acrolein_tailpipe_ustons': acrolein_tailpipe_ustons,
+                        'pm25_vehicle_ustons': pm25_veh_ustons,
+                        'sox_vehicle_ustons': sox_veh_ustons,
+                        'acetaldehyde_vehicle_ustons': acetaldehyde_veh_ustons,
+                        'acrolein_vehicle_ustons': acrolein_veh_ustons,
+                        'benzene_exhaust_ustons': benzene_exh_ustons,
+                        'benzene_evaporative_ustons': benzene_evap_ustons,
+                        'benzene_vehicle_ustons': benzene_veh_ustons,
+                        'ethylbenzene_exhaust_ustons': ethylbenzene_exh_ustons,
+                        'ethylbenzene_evaporative_ustons': ethylbenzene_evap_ustons,
+                        'ethylbenzene_vehicle_ustons': ethylbenzene_veh_ustons,
+                        'formaldehyde_vehicle_ustons': formaldehyde_veh_ustons,
+                        'naphthalene_exhaust_ustons': naphthalene_exh_ustons,
+                        'naphthalene_evaporative_ustons': naphthalene_evap_ustons,
+                        'naphthalene_vehicle_ustons': naphthalene_veh_ustons,
+                        '13_butadiene_vehicle_ustons': butadiene13_veh_ustons,
+                        '15pah_vehicle_ustons': pah15_veh_ustons,
 
-                        'ch4_vehicle_metrictons': ch4_vehicle_metrictons,
-                        'n2o_vehicle_metrictons': n2o_vehicle_metrictons,
-                        'co2_vehicle_metrictons': co2_vehicle_metrictons,
+                        'ch4_vehicle_metrictons': ch4_veh_metrictons,
+                        'n2o_vehicle_metrictons': n2o_veh_metrictons,
+                        'co2_vehicle_metrictons': co2_veh_metrictons,
 
                         # 'voc_upstream_ustons': voc_upstream_ustons,
                         'co_upstream_ustons': co_upstream_ustons,
                         'nox_upstream_ustons': nox_upstream_ustons,
                         'pm25_upstream_ustons': pm25_upstream_ustons,
                         'sox_upstream_ustons': sox_upstream_ustons,
+                        'hcl_upstream_ustons': hcl_upstream_ustons,
+                        'hg_upstream_ustons': hg_upstream_ustons,
                         # 'benzene_upstream_ustons': benzene_upstream_ustons,
                         # 'butadiene13_upstream_ustons': butadiene13_upstream_ustons,
                         # 'formaldehyde_upstream_ustons': formaldehyde_upstream_ustons,
                         # 'acetaldehyde_upstream_ustons': acetaldehyde_upstream_ustons,
                         # 'acrolein_upstream_ustons': acrolein_upstream_ustons,
 
-                        'co2_upstream_metrictons': co2_upstream_metrictons,
                         'ch4_upstream_metrictons': ch4_upstream_metrictons,
                         'n2o_upstream_metrictons': n2o_upstream_metrictons,
+                        'co2_upstream_metrictons': co2_upstream_metrictons,
 
                         # 'voc_total_ustons': voc_total_ustons,
                         'nmog_total_ustons': nmog_total_ustons,
@@ -548,11 +642,14 @@ def calc_physical_effects(calendar_years, safety_effects_dict): #, adjusted_vmt)
                         'nox_total_ustons': nox_total_ustons,
                         'pm25_total_ustons': pm25_total_ustons,
                         'sox_total_ustons': sox_total_ustons,
-                        # 'benzene_total_ustons': benzene_total_ustons,
-                        # 'butadiene13_total_ustons': butadiene13_total_ustons,
-                        # 'formaldehyde_total_ustons': formaldehyde_total_ustons,
-                        # 'acetaldehyde_total_ustons': acetaldehyde_total_ustons,
-                        # 'acrolein_total_ustons': acrolein_total_ustons,
+                        'acetaldehyde_total_ustons': acetaldehyde_total_ustons,
+                        'acrolein_total_ustons': acrolein_total_ustons,
+                        'benzene_total_ustons': benzene_total_ustons,
+                        'ethylbenzene_total_ustons': ethylbenzene_total_ustons,
+                        'formaldehyde_total_ustons': formaldehyde_total_ustons,
+                        'naphthalene_total_ustons': naphthalene_total_ustons,
+                        '13_butadiene_total_ustons': butadiene13_total_ustons,
+                        '15pah_total_ustons': pah15_total_ustons,
                         'co2_total_metrictons': co2_total_metrictons,
                         'ch4_total_metrictons': ch4_total_metrictons,
                         'n2o_total_metrictons': n2o_total_metrictons,
@@ -722,23 +819,60 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict): #, adj
 
         safety_dict_key = (vehicle_id, calendar_year, age)
 
-        nmog_tailpipe_ustons = nmog_evap_ustons = nmog_vehicle_ustons = 0
-        co_vehicle_ustons = nox_vehicle_ustons = sox_vehicle_ustons = 0
-        pm25_tailpipe_ustons = pm25_brakewear_ustons = pm25_tirewear_ustons = pm25_vehicle_ustons = 0
-        # benzene_tailpipe_ustons = butadiene13_tailpipe_ustons = formaldehyde_tailpipe_ustons \
-        #     = acetaldehyde_tailpipe_ustons = acrolein_tailpipe_ustons = 0
+        nmog_exh_ustons = nmog_evap_ustons = nmog_veh_ustons = 0
+        co_exh_ustons = co_veh_ustons = 0
+        nox_exh_ustons = nox_veh_ustons = 0
+        sox_exh_ustons = sox_veh_ustons = 0
+        pm25_exh_ustons = pm25_brakewear_ustons = pm25_tirewear_ustons = pm25_veh_ustons = 0
+        acetaldehyde_exh_ustons = acetaldehyde_veh_ustons = 0
+        acrolein_exh_ustons = acrolein_veh_ustons = 0
+        benzene_exh_ustons = benzene_evap_ustons = benzene_veh_ustons = 0
+        ethylbenzene_exh_ustons = ethylbenzene_evap_ustons = ethylbenzene_veh_ustons = 0
+        naphthalene_exh_ustons = naphthalene_evap_ustons = naphthalene_veh_ustons = 0
+        formaldehyde_exh_ustons = formaldehyde_veh_ustons = 0
+        butadiene13_exh_ustons = butadiene13_veh_ustons = 0
+        pah15_exh_ustons = pah15_veh_ustons = 0
+        co2_exh_metrictons = co2_veh_metrictons = 0
+        ch4_exh_metrictons = ch4_veh_metrictons = 0
+        n2o_exh_metrictons = n2o_veh_metrictons = 0
+
+        co2_upstream_metrictons = ch4_upstream_metrictons = n2o_upstream_metrictons = 0
+        voc_upstream_ustons = co_upstream_ustons = nox_upstream_ustons = pm25_upstream_ustons = 0
+        sox_upstream_ustons = hcl_upstream_ustons = hg_upstream_ustons = 0
 
         pm25_brakewear_rate = pm25_tirewear_rate = 0
-        pm25_exhaust_rate = nmog_rate = co_rate = nox_rate = sox_rate = ch4_rate = n2o_rate = 0
-        nmog_permeation_rate = nmog_venting_rate = nmog_leaks_rate = nmog_refuel_disp_rate = nmog_refuel_spill_rate = 0
+        pm25_exh_rate = co_exh_rate = nox_exh_rate = sox_exh_rate = ch4_exh_rate = n2o_exh_rate = 0
+        nmog_exh_rate = nmog_permeation_rate = nmog_venting_rate = 0
+        nmog_leaks_rate = nmog_refuel_disp_rate = nmog_refuel_spill_rate = 0
+        acetaldehyde_exh_rate = acrolein_exh_rate = 0
+        benzene_exh_rate = benzene_permeation_rate = benzene_venting_rate = 0
+        benzene_leaks_rate = benzene_refuel_disp_rate = benzene_refuel_spill_rate = 0
+        ethylbenzene_exh_rate = ethylbenzene_permeation_rate = ethylbenzene_venting_rate = 0
+        ethylbenzene_leaks_rate = ethylbenzene_refuel_disp_rate = ethylbenzene_refuel_spill_rate = 0
+        formaldehyde_exh_rate = naphthalene_exh_rate = naphthalene_refuel_spill_rate = 0
+        butadiene13_exh_rate = pah15_exh_rate = 0
 
         voc_ref_rate = co_ref_rate = nox_ref_rate = pm25_ref_rate = sox_ref_rate = 0
         co2_ref_rate = ch4_ref_rate = n2o_ref_rate = 0
+
+        # nmog_tailpipe_ustons = nmog_evap_ustons = nmog_vehicle_ustons = 0
+        # co_vehicle_ustons = nox_vehicle_ustons = sox_vehicle_ustons = 0
+        # pm25_tailpipe_ustons = pm25_brakewear_ustons = pm25_tirewear_ustons = pm25_vehicle_ustons = 0
+        # benzene_tailpipe_ustons = butadiene13_tailpipe_ustons = formaldehyde_tailpipe_ustons \
+        #     = acetaldehyde_tailpipe_ustons = acrolein_tailpipe_ustons = 0
+
+        # pm25_brakewear_rate = pm25_tirewear_rate = 0
+        # pm25_exhaust_rate = nmog_rate = co_rate = nox_rate = sox_rate = ch4_rate = n2o_rate = 0
+        # nmog_permeation_rate = nmog_venting_rate = nmog_leaks_rate = nmog_refuel_disp_rate = nmog_refuel_spill_rate = 0
+
+        # voc_ref_rate = co_ref_rate = nox_ref_rate = pm25_ref_rate = sox_ref_rate = 0
+        # co2_ref_rate = ch4_ref_rate = n2o_ref_rate = 0
         # benzene_ref = butadiene13_ref = formaldehyde_ref = acetaldehyde_ref = acrolein_ref = 0
 
-        co_egu_rate = nox_egu_rate = pm25_egu_rate = sox_egu_rate = co2_egu_rate = ch4_egu_rate = n2o_egu_rate = 0
+        co_egu_rate = nox_egu_rate = pm25_egu_rate = sox_egu_rate = hcl_egu_rate = hg_egu_rate = 0
+        co2_egu_rate = ch4_egu_rate = n2o_egu_rate = 0
 
-        ch4_vehicle_metrictons = n2o_vehicle_metrictons = co2_vehicle_metrictons = 0
+        # ch4_vehicle_metrictons = n2o_vehicle_metrictons = co2_vehicle_metrictons = 0
 
         vmt_electricity = vmt_liquid_fuel = transmission_efficiency = 0
 
@@ -760,14 +894,21 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict): #, adj
                     = get_vehicle_emission_rate(model_year, sourcetype_name, reg_class_id, fuel, ind_var_value)
 
                 # the energy consumption and generation values do not matter here, so set to 0
-                co_egu_rate, nox_egu_rate, pm25_egu_rate, sox_egu_rate, co2_egu_rate, ch4_egu_rate, n2o_egu_rate \
+                co_egu_rate, nox_egu_rate, pm25_egu_rate, sox_egu_rate, co2_egu_rate, ch4_egu_rate, n2o_egu_rate, hcl_egu_rate, hg_egu_rate \
                     = get_egu_emission_rate(calendar_year, 0, 0)
 
             elif 'gasoline' in fuel:
                 vmt_liquid_fuel = vmt
-                pm25_brakewear_rate, pm25_tirewear_rate, pm25_exhaust_rate, \
-                nmog_rate, nmog_permeation_rate, nmog_venting_rate, nmog_leaks_rate, nmog_refuel_disp_rate, nmog_refuel_spill_rate, \
-                co_rate, nox_rate, sox_rate, ch4_rate, n2o_rate \
+                pm25_brakewear_rate, pm25_tirewear_rate, pm25_exh_rate, \
+                nmog_exh_rate, nmog_permeation_rate, nmog_venting_rate, nmog_leaks_rate, \
+                nmog_refuel_disp_rate, nmog_refuel_spill_rate, co_exh_rate, nox_exh_rate, \
+                sox_exh_rate, ch4_exh_rate, n2o_exh_rate, acetaldehyde_exh_rate, acrolein_exh_rate, \
+                benzene_exh_rate, benzene_permeation_rate, benzene_venting_rate, benzene_leaks_rate, \
+                benzene_refuel_disp_rate, benzene_refuel_spill_rate, \
+                ethylbenzene_exh_rate, ethylbenzene_permeation_rate, ethylbenzene_venting_rate, ethylbenzene_leaks_rate, \
+                ethylbenzene_refuel_disp_rate, ethylbenzene_refuel_spill_rate, \
+                formaldehyde_exh_rate, naphthalene_exh_rate, \
+                butadiene13_exh_rate, pah15_exh_rate \
                     = get_vehicle_emission_rate(model_year, sourcetype_name, reg_class_id, fuel, ind_var_value)
 
                 voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co2_ref_rate, ch4_ref_rate, n2o_ref_rate \
@@ -775,9 +916,13 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict): #, adj
 
             elif 'diesel' in fuel:
                 vmt_liquid_fuel = vmt
-                pm25_brakewear_rate, pm25_tirewear_rate, pm25_exhaust_rate, \
-                nmog_rate, nmog_refuel_spill_rate, \
-                co_rate, nox_rate, sox_rate, ch4_rate, n2o_rate \
+                pm25_brakewear_rate, pm25_tirewear_rate, pm25_exh_rate, \
+                nmog_exh_rate, nmog_refuel_spill_rate, co_exh_rate, nox_exh_rate, \
+                sox_exh_rate, ch4_exh_rate, n2o_exh_rate, acetaldehyde_exh_rate, acrolein_exh_rate, \
+                benzene_exh_rate, benzene_refuel_spill_rate, \
+                ethylbenzene_exh_rate, ethylbenzene_refuel_spill_rate, \
+                formaldehyde_exh_rate, naphthalene_exh_rate, naphthalene_refuel_spill_rate, \
+                butadiene13_exh_rate, pah15_exh_rate \
                     = get_vehicle_emission_rate(model_year, sourcetype_name, reg_class_id, fuel, ind_var_value)
 
                 voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co2_ref_rate, ch4_ref_rate, n2o_ref_rate \
@@ -789,38 +934,91 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict): #, adj
         fuel_generation_kWh = fuel_consumption_kWh / transmission_efficiency
         fuel_consumption_gallons = vmt * onroad_gallons_per_mile
 
-        # calc tailpipe emissions
-        factor = vmt / grams_per_us_ton
-        nmog_tailpipe_ustons += nmog_rate * factor
-        co_vehicle_ustons += co_rate * factor
-        nox_vehicle_ustons += nox_rate * factor
-        pm25_tailpipe_ustons += pm25_exhaust_rate * factor
-        # benzene_tailpipe_ustons += benzene * factor
-        # butadiene13_tailpipe_ustons += butadiene13 * factor
-        # formaldehyde_tailpipe_ustons += formaldehyde * factor
-        # acetaldehyde_tailpipe_ustons += acetaldehyde * factor
-        # acrolein_tailpipe_ustons += acrolein * factor
+        # calc exhaust and evaporative emissions for liquid fuel operation
+        factor = vmt_liquid_fuel / grams_per_us_ton
+        pm25_exh_ustons += pm25_exh_rate * factor
+        nmog_exh_ustons += nmog_exh_rate * factor
+        co_exh_ustons += co_exh_rate * factor
+        nox_exh_ustons += nox_exh_rate * factor
+        acetaldehyde_exh_ustons += acetaldehyde_exh_rate * factor
+        acrolein_exh_ustons += acrolein_exh_rate * factor
+        benzene_exh_ustons += benzene_exh_rate * factor
+        ethylbenzene_exh_ustons += ethylbenzene_exh_rate * factor
+        formaldehyde_exh_ustons += formaldehyde_exh_rate * factor
+        naphthalene_exh_ustons += naphthalene_exh_rate * factor
+        butadiene13_exh_ustons += butadiene13_exh_rate * factor
+        pah15_exh_ustons += pm25_exh_rate * factor
 
         factor = fuel_consumption_gallons / grams_per_us_ton
-        sox_vehicle_ustons += sox_rate * factor
+        sox_exh_ustons += sox_exh_rate * factor
         nmog_evap_ustons += sum([nmog_permeation_rate,
                                  nmog_venting_rate,
                                  nmog_leaks_rate,
                                  nmog_refuel_disp_rate,
                                  nmog_refuel_spill_rate]) * factor
+        benzene_evap_ustons += sum([benzene_permeation_rate,
+                                    benzene_venting_rate,
+                                    benzene_leaks_rate,
+                                    benzene_refuel_disp_rate,
+                                    benzene_refuel_spill_rate]) * factor
+        ethylbenzene_evap_ustons += sum([ethylbenzene_permeation_rate,
+                                         ethylbenzene_venting_rate,
+                                         ethylbenzene_leaks_rate,
+                                         ethylbenzene_refuel_disp_rate,
+                                         ethylbenzene_refuel_spill_rate]) * factor
+        naphthalene_evap_ustons += naphthalene_refuel_spill_rate * factor
 
-        nmog_vehicle_ustons = nmog_tailpipe_ustons + nmog_evap_ustons
+        factor = vmt_liquid_fuel / grams_per_metric_ton
+        ch4_veh_metrictons += ch4_exh_rate * factor
+        n2o_veh_metrictons += n2o_exh_rate * factor
+        co2_veh_metrictons += onroad_co2_grams_per_mile * factor
 
-        factor = vmt / grams_per_metric_ton
-        ch4_vehicle_metrictons += ch4_rate * factor
-        n2o_vehicle_metrictons += n2o_rate * factor
-        co2_vehicle_metrictons += onroad_co2_grams_per_mile * factor
+        # calc vehicle inventories as exhaust plus evap (where applicable)
+        nmog_veh_ustons = nmog_exh_ustons + nmog_evap_ustons
+        co_veh_ustons = co_exh_ustons
+        nox_veh_ustons = nox_exh_ustons
+        sox_veh_ustons = sox_exh_ustons
+        acetaldehyde_veh_ustons = acetaldehyde_exh_ustons
+        acrolein_veh_ustons = acrolein_exh_ustons
+        benzene_veh_ustons = benzene_exh_ustons + benzene_evap_ustons
+        ethylbenzene_veh_ustons = ethylbenzene_exh_ustons + ethylbenzene_evap_ustons
+        formaldehyde_veh_ustons = formaldehyde_exh_ustons
+        naphthalene_veh_ustons = naphthalene_exh_ustons + naphthalene_evap_ustons
+        butadiene13_veh_ustons = butadiene13_exh_ustons
+        pah15_veh_ustons = pah15_exh_ustons
+        #
+        # # calc tailpipe emissions
+        # factor = vmt / grams_per_us_ton
+        # nmog_tailpipe_ustons += nmog_rate * factor
+        # co_vehicle_ustons += co_rate * factor
+        # nox_vehicle_ustons += nox_rate * factor
+        # pm25_tailpipe_ustons += pm25_exhaust_rate * factor
+        # # benzene_tailpipe_ustons += benzene * factor
+        # # butadiene13_tailpipe_ustons += butadiene13 * factor
+        # # formaldehyde_tailpipe_ustons += formaldehyde * factor
+        # # acetaldehyde_tailpipe_ustons += acetaldehyde * factor
+        # # acrolein_tailpipe_ustons += acrolein * factor
+        #
+        # factor = fuel_consumption_gallons / grams_per_us_ton
+        # sox_vehicle_ustons += sox_rate * factor
+        # nmog_evap_ustons += sum([nmog_permeation_rate,
+        #                          nmog_venting_rate,
+        #                          nmog_leaks_rate,
+        #                          nmog_refuel_disp_rate,
+        #                          nmog_refuel_spill_rate]) * factor
+        #
+        # nmog_vehicle_ustons = nmog_tailpipe_ustons + nmog_evap_ustons
+        #
+        # factor = vmt / grams_per_metric_ton
+        # ch4_vehicle_metrictons += ch4_rate * factor
+        # n2o_vehicle_metrictons += n2o_rate * factor
+        # co2_vehicle_metrictons += onroad_co2_grams_per_mile * factor
 
         # other vehicle emissions
         pm25_brakewear_ustons += vmt * pm25_brakewear_rate / grams_per_us_ton
         pm25_tirewear_ustons += vmt * pm25_tirewear_rate / grams_per_us_ton
 
-        pm25_vehicle_ustons = pm25_tailpipe_ustons + pm25_brakewear_ustons + pm25_tirewear_ustons
+        pm25_veh_ustons = pm25_exh_ustons + pm25_brakewear_ustons + pm25_tirewear_ustons
 
         # calc upstream emissions for both liquid and electric fuel operation
         kwhs, gallons = fuel_generation_kWh, fuel_consumption_gallons
@@ -839,21 +1037,39 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict): #, adj
         ch4_upstream_metrictons = (kwhs * ch4_egu_rate + gallons * ch4_ref_rate) / grams_per_metric_ton
         n2o_upstream_metrictons = (kwhs * n2o_egu_rate + gallons * n2o_ref_rate) / grams_per_metric_ton
 
-        # sum tailpipe and upstream into totals
+        # sum vehicle and upstream into totals
         # voc_total_ustons = voc_tailpipe_ustons + voc_upstream_ustons
-        nmog_total_ustons = nmog_vehicle_ustons # + nmog_upstream_ustons
-        co_total_ustons = co_vehicle_ustons + co_upstream_ustons
-        nox_total_ustons = nox_vehicle_ustons + nox_upstream_ustons
-        pm25_total_ustons = pm25_vehicle_ustons + pm25_upstream_ustons
-        sox_total_ustons = sox_vehicle_ustons + sox_upstream_ustons
-        # benzene_total_ustons = benzene_tailpipe_ustons + benzene_upstream_ustons
-        # butadiene13_total_ustons = butadiene13_tailpipe_ustons + butadiene13_upstream_ustons
-        # formaldehyde_total_ustons = formaldehyde_tailpipe_ustons + formaldehyde_upstream_ustons
-        # acetaldehyde_total_ustons = acetaldehyde_tailpipe_ustons + acetaldehyde_upstream_ustons
-        # acrolein_total_ustons = acrolein_tailpipe_ustons + acrolein_upstream_ustons
-        co2_total_metrictons = co2_vehicle_metrictons + co2_upstream_metrictons
-        ch4_total_metrictons = ch4_vehicle_metrictons + ch4_upstream_metrictons
-        n2o_total_metrictons = n2o_vehicle_metrictons + n2o_upstream_metrictons
+        nmog_total_ustons = nmog_veh_ustons  # + nmog_upstream_ustons
+        co_total_ustons = co_veh_ustons + co_upstream_ustons
+        nox_total_ustons = nox_veh_ustons + nox_upstream_ustons
+        pm25_total_ustons = pm25_veh_ustons + pm25_upstream_ustons
+        sox_total_ustons = sox_veh_ustons + sox_upstream_ustons
+        acetaldehyde_total_ustons = acetaldehyde_veh_ustons  # + acetaldehyde_upstream_ustons
+        acrolein_total_ustons = acrolein_veh_ustons  # + acrolein_upstream_ustons
+        benzene_total_ustons = benzene_veh_ustons  # + benzene_upstream_ustons
+        ethylbenzene_total_ustons = ethylbenzene_veh_ustons  # + ethylbenzene_upstream_ustons
+        formaldehyde_total_ustons = formaldehyde_veh_ustons  # + formaldehyde_upstream_ustons
+        naphthalene_total_ustons = naphthalene_veh_ustons  # + naphlathene_upstream_ustons
+        butadiene13_total_ustons = butadiene13_veh_ustons  # + butadiene13_upstream_ustons
+        pah15_total_ustons = pah15_veh_ustons  # + pah15_upstream_ustons
+        co2_total_metrictons = co2_veh_metrictons + co2_upstream_metrictons
+        ch4_total_metrictons = ch4_veh_metrictons + ch4_upstream_metrictons
+        n2o_total_metrictons = n2o_veh_metrictons + n2o_upstream_metrictons
+        # # sum tailpipe and upstream into totals
+        # # voc_total_ustons = voc_tailpipe_ustons + voc_upstream_ustons
+        # nmog_total_ustons = nmog_vehicle_ustons # + nmog_upstream_ustons
+        # co_total_ustons = co_vehicle_ustons + co_upstream_ustons
+        # nox_total_ustons = nox_vehicle_ustons + nox_upstream_ustons
+        # pm25_total_ustons = pm25_vehicle_ustons + pm25_upstream_ustons
+        # sox_total_ustons = sox_vehicle_ustons + sox_upstream_ustons
+        # # benzene_total_ustons = benzene_tailpipe_ustons + benzene_upstream_ustons
+        # # butadiene13_total_ustons = butadiene13_tailpipe_ustons + butadiene13_upstream_ustons
+        # # formaldehyde_total_ustons = formaldehyde_tailpipe_ustons + formaldehyde_upstream_ustons
+        # # acetaldehyde_total_ustons = acetaldehyde_tailpipe_ustons + acetaldehyde_upstream_ustons
+        # # acrolein_total_ustons = acrolein_tailpipe_ustons + acrolein_upstream_ustons
+        # co2_total_metrictons = co2_vehicle_metrictons + co2_upstream_metrictons
+        # ch4_total_metrictons = ch4_vehicle_metrictons + ch4_upstream_metrictons
+        # n2o_total_metrictons = n2o_vehicle_metrictons + n2o_upstream_metrictons
 
         # calc energy security related attributes and comparisons to year_for_compares
         oil_bbl = fuel_consumption_gallons * e0_share * e0_energy_density_ratio / gal_per_bbl
@@ -904,40 +1120,51 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict): #, adj
             'session_fatalities': session_fatalities,
 
             # 'voc_tailpipe_ustons': voc_tailpipe_ustons,
-            'nmog_tailpipe_ustons': nmog_tailpipe_ustons,
+            'nmog_exhaust_ustons': nmog_exh_ustons,
             'nmog_evaporative_ustons': nmog_evap_ustons,
-            'nmog_vehicle_ustons': nmog_vehicle_ustons,
-            'co_vehicle_ustons': co_vehicle_ustons,
-            'nox_vehicle_ustons': nox_vehicle_ustons,
-            'pm25_tailpipe_ustons': pm25_tailpipe_ustons,
+            'nmog_vehicle_ustons': nmog_veh_ustons,
+            'co_vehicle_ustons': co_veh_ustons,
+            'nox_vehicle_ustons': nox_veh_ustons,
+            'pm25_exhaust_ustons': pm25_exh_ustons,
             'pm25_brakewear_ustons': pm25_brakewear_ustons,
             'pm25_tirewear_ustons': pm25_tirewear_ustons,
-            'pm25_vehicle_ustons': pm25_vehicle_ustons,
-            'sox_vehicle_ustons': sox_vehicle_ustons,
-            # 'benzene_tailpipe_ustons': benzene_tailpipe_ustons,
-            # 'butadiene13_tailpipe_ustons': butadiene13_tailpipe_ustons,
-            # 'formaldehyde_tailpipe_ustons': formaldehyde_tailpipe_ustons,
-            # 'acetaldehyde_tailpipe_ustons': acetaldehyde_tailpipe_ustons,
-            # 'acrolein_tailpipe_ustons': acrolein_tailpipe_ustons,
+            'pm25_vehicle_ustons': pm25_veh_ustons,
+            'sox_vehicle_ustons': sox_veh_ustons,
+            'acetaldehyde_vehicle_ustons': acetaldehyde_veh_ustons,
+            'acrolein_vehicle_ustons': acrolein_veh_ustons,
+            'benzene_exhaust_ustons': benzene_exh_ustons,
+            'benzene_evaporative_ustons': benzene_evap_ustons,
+            'benzene_vehicle_ustons': benzene_veh_ustons,
+            'ethylbenzene_exhaust_ustons': ethylbenzene_exh_ustons,
+            'ethylbenzene_evaporative_ustons': ethylbenzene_evap_ustons,
+            'ethylbenzene_vehicle_ustons': ethylbenzene_veh_ustons,
+            'formaldehyde_vehicle_ustons': formaldehyde_veh_ustons,
+            'naphthalene_exhaust_ustons': naphthalene_exh_ustons,
+            'naphthalene_evaporative_ustons': naphthalene_evap_ustons,
+            'naphthalene_vehicle_ustons': naphthalene_veh_ustons,
+            '13_butadiene_vehicle_ustons': butadiene13_veh_ustons,
+            '15pah_vehicle_ustons': pah15_veh_ustons,
 
-            'ch4_vehicle_metrictons': ch4_vehicle_metrictons,
-            'n2o_vehicle_metrictons': n2o_vehicle_metrictons,
-            'co2_vehicle_metrictons': co2_vehicle_metrictons,
+            'ch4_vehicle_metrictons': ch4_veh_metrictons,
+            'n2o_vehicle_metrictons': n2o_veh_metrictons,
+            'co2_vehicle_metrictons': co2_veh_metrictons,
 
             # 'voc_upstream_ustons': voc_upstream_ustons,
             'co_upstream_ustons': co_upstream_ustons,
             'nox_upstream_ustons': nox_upstream_ustons,
             'pm25_upstream_ustons': pm25_upstream_ustons,
             'sox_upstream_ustons': sox_upstream_ustons,
+            'hcl_upstream_ustons': hcl_upstream_ustons,
+            'hg_upstream_ustons': hg_upstream_ustons,
             # 'benzene_upstream_ustons': benzene_upstream_ustons,
             # 'butadiene13_upstream_ustons': butadiene13_upstream_ustons,
             # 'formaldehyde_upstream_ustons': formaldehyde_upstream_ustons,
             # 'acetaldehyde_upstream_ustons': acetaldehyde_upstream_ustons,
             # 'acrolein_upstream_ustons': acrolein_upstream_ustons,
 
-            'co2_upstream_metrictons': co2_upstream_metrictons,
             'ch4_upstream_metrictons': ch4_upstream_metrictons,
             'n2o_upstream_metrictons': n2o_upstream_metrictons,
+            'co2_upstream_metrictons': co2_upstream_metrictons,
 
             # 'voc_total_ustons': voc_total_ustons,
             'nmog_total_ustons': nmog_total_ustons,
@@ -945,14 +1172,67 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict): #, adj
             'nox_total_ustons': nox_total_ustons,
             'pm25_total_ustons': pm25_total_ustons,
             'sox_total_ustons': sox_total_ustons,
-            # 'benzene_total_ustons': benzene_total_ustons,
-            # 'butadiene13_total_ustons': butadiene13_total_ustons,
-            # 'formaldehyde_total_ustons': formaldehyde_total_ustons,
-            # 'acetaldehyde_total_ustons': acetaldehyde_total_ustons,
-            # 'acrolein_total_ustons': acrolein_total_ustons,
+            'acetaldehyde_total_ustons': acetaldehyde_total_ustons,
+            'acrolein_total_ustons': acrolein_total_ustons,
+            'benzene_total_ustons': benzene_total_ustons,
+            'ethylbenzene_total_ustons': ethylbenzene_total_ustons,
+            'formaldehyde_total_ustons': formaldehyde_total_ustons,
+            'naphthalene_total_ustons': naphthalene_total_ustons,
+            '13_butadiene_total_ustons': butadiene13_total_ustons,
+            '15pah_total_ustons': pah15_total_ustons,
             'co2_total_metrictons': co2_total_metrictons,
             'ch4_total_metrictons': ch4_total_metrictons,
             'n2o_total_metrictons': n2o_total_metrictons,
+            # # 'voc_tailpipe_ustons': voc_tailpipe_ustons,
+            # 'nmog_tailpipe_ustons': nmog_tailpipe_ustons,
+            # 'nmog_evaporative_ustons': nmog_evap_ustons,
+            # 'nmog_vehicle_ustons': nmog_vehicle_ustons,
+            # 'co_vehicle_ustons': co_vehicle_ustons,
+            # 'nox_vehicle_ustons': nox_vehicle_ustons,
+            # 'pm25_tailpipe_ustons': pm25_tailpipe_ustons,
+            # 'pm25_brakewear_ustons': pm25_brakewear_ustons,
+            # 'pm25_tirewear_ustons': pm25_tirewear_ustons,
+            # 'pm25_vehicle_ustons': pm25_vehicle_ustons,
+            # 'sox_vehicle_ustons': sox_vehicle_ustons,
+            # # 'benzene_tailpipe_ustons': benzene_tailpipe_ustons,
+            # # 'butadiene13_tailpipe_ustons': butadiene13_tailpipe_ustons,
+            # # 'formaldehyde_tailpipe_ustons': formaldehyde_tailpipe_ustons,
+            # # 'acetaldehyde_tailpipe_ustons': acetaldehyde_tailpipe_ustons,
+            # # 'acrolein_tailpipe_ustons': acrolein_tailpipe_ustons,
+            #
+            # 'ch4_vehicle_metrictons': ch4_vehicle_metrictons,
+            # 'n2o_vehicle_metrictons': n2o_vehicle_metrictons,
+            # 'co2_vehicle_metrictons': co2_vehicle_metrictons,
+            #
+            # # 'voc_upstream_ustons': voc_upstream_ustons,
+            # 'co_upstream_ustons': co_upstream_ustons,
+            # 'nox_upstream_ustons': nox_upstream_ustons,
+            # 'pm25_upstream_ustons': pm25_upstream_ustons,
+            # 'sox_upstream_ustons': sox_upstream_ustons,
+            # # 'benzene_upstream_ustons': benzene_upstream_ustons,
+            # # 'butadiene13_upstream_ustons': butadiene13_upstream_ustons,
+            # # 'formaldehyde_upstream_ustons': formaldehyde_upstream_ustons,
+            # # 'acetaldehyde_upstream_ustons': acetaldehyde_upstream_ustons,
+            # # 'acrolein_upstream_ustons': acrolein_upstream_ustons,
+            #
+            # 'co2_upstream_metrictons': co2_upstream_metrictons,
+            # 'ch4_upstream_metrictons': ch4_upstream_metrictons,
+            # 'n2o_upstream_metrictons': n2o_upstream_metrictons,
+            #
+            # # 'voc_total_ustons': voc_total_ustons,
+            # 'nmog_total_ustons': nmog_total_ustons,
+            # 'co_total_ustons': co_total_ustons,
+            # 'nox_total_ustons': nox_total_ustons,
+            # 'pm25_total_ustons': pm25_total_ustons,
+            # 'sox_total_ustons': sox_total_ustons,
+            # # 'benzene_total_ustons': benzene_total_ustons,
+            # # 'butadiene13_total_ustons': butadiene13_total_ustons,
+            # # 'formaldehyde_total_ustons': formaldehyde_total_ustons,
+            # # 'acetaldehyde_total_ustons': acetaldehyde_total_ustons,
+            # # 'acrolein_total_ustons': acrolein_total_ustons,
+            # 'co2_total_metrictons': co2_total_metrictons,
+            # 'ch4_total_metrictons': ch4_total_metrictons,
+            # 'n2o_total_metrictons': n2o_total_metrictons,
         }
         )
         key = (vehicle_id, calendar_year, age)
