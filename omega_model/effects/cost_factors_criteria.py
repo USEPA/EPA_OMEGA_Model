@@ -5,7 +5,8 @@
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
-The data represents $/uston benefits estimates associated with reductions in criteria air pollutants.
+The data represents $/uston benefits estimates associated with reductions in criteria air pollutants. The data should
+be left blank to avoid calculating health effects (criteria air pollution effects) using $/uston values.
 
 File Type
     comma-separated values (CSV)
@@ -34,10 +35,7 @@ Data Column Name and Description
     :pm25_tailpipe_3.0_USD_per_uston:
         The structure for all cost factors is pollutant_source_discount-rate_units, where source is tailpipe or upstream and units are in US dollars per US ton.
 
-
 ----
-
-.. todo: document context_cpi_price_deflators file format
 
 **CODE**
 
