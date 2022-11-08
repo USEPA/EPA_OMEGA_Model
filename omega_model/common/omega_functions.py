@@ -35,6 +35,24 @@ def dataframe_to_numeric(df):
     return df
 
 
+def series_to_numeric(ser):
+    """
+    Convert series entries to numeric (i.e. non-object dtypes) if possible.
+
+    Args:
+        ser (Series): the series to convert to numeric
+
+    Returns:
+        ser with numeric columns where possible
+
+    """
+    ser_out = pd.Series(dtype='float64')
+    for c in ser.keys():
+        ser_out[c] = pd.to_numeric(ser[c], errors='ignore')
+
+    return ser_out
+
+
 def sales_weight_average_dataframe(df):
     """
         Numeric columns are sales-weighted-averaged except for 'model_year' and columns containing
@@ -378,6 +396,9 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
         last = column_names_sorted_by_span[-1]
         x[last] = np.maximum(0, np.maximum(min_level_dict[last], np.minimum(max_level_dict[last], 1 - x.sum(axis=1, skipna=True))))
 
+        # drop duplicate rows:  TODO: figure out how to NOT generate duplicates?  Only happens if num_columns > 2... 3...?
+        x = x.drop_duplicates()
+
         # remove rows that don't add up to 1 and get rid of join column ('_')
         x = x.loc[abs(x.sum(axis=1, numeric_only=True) - 1) <= sys.float_info.epsilon]
         if '_' in x:
@@ -610,6 +631,13 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
 
     """
     dfs = []
+
+    # reorder columns such that last column is an ALT since it equals one minus the sum of the prior columns and we
+    # don't want to blow the constraints on the NO_ALTs
+    alt_columns = [c for c in columns if 'ALT' in c.split('.')]
+    no_alt_columns = [c for c in columns if 'NO_ALT' in c.split('.')]
+
+    columns = no_alt_columns + alt_columns
 
     for i in range(0, len(columns) - 1):
         shares = np.array([])
