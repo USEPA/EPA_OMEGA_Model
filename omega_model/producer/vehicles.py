@@ -406,6 +406,7 @@ class CompositeVehicle(OMEGABase):
         self.reg_class_id = self.vehicle_list[0].reg_class_id
         self.fueling_class = self.vehicle_list[0].fueling_class
         self.market_class_id = self.vehicle_list[0].market_class_id
+        self.alt_type = ''  # 'ALT' / 'NO_ALT'
 
         # weighted values are applied to the source vehicles by interpolating the composite cost curve after production
         # decisions are applied to composite vehicles, then those values are re-calculated for the composite vehicle based

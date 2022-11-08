@@ -33,6 +33,11 @@ import matplotlib.pyplot as plt
 _cache = dict()
 
 
+def error_callback(e):
+    print('error_callback')
+    print(e)
+
+
 def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share_range, verbose=False):
     """
     Create tech sweeps is responsible for creating tech (CO2e g/mi levels) options to
@@ -150,7 +155,7 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
 
 
 def create_share_sweeps(calendar_year, market_class_dict, candidate_production_decisions, share_range,
-                        consumer_response, node_name='', verbose=False):
+                        consumer_response, context_based_total_sales, node_name='', verbose=False):
     """
     Create share sweeps is responsible for creating market share options to
     develop a set of candidate compliance outcomes for the manufacturer in the given year as a function of the
@@ -204,18 +209,18 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
     for k in market_class_dict:
         if verbose:
             print('processing ' + k)
-        if type(market_class_dict[k]) is dict:
+        # if type(market_class_dict[k]) is dict:
+        if type(market_class_dict[k]) is dict and set(market_class_dict[k].keys()) != set(['ALT', 'NO_ALT']):
             # process subtree
-            child_df_list.append(
-                create_share_sweeps(calendar_year, market_class_dict[k],
-                                    candidate_production_decisions, share_range,
-                                    consumer_response,
-                                    node_name=k))
+            child_df_list.append(create_share_sweeps(calendar_year, market_class_dict[k],
+                                candidate_production_decisions, share_range,
+                                consumer_response, context_based_total_sales,
+                                node_name=k))
 
     # Generate market share options
     if consumer_response is None:
         # generate producer desired market shares for responsive market sectors
-        producer_prefix = 'producer_share_frac_'
+        producer_prefix = 'producer_abs_share_frac_'
         if node_name:
             share_column_names = [producer_prefix + node_name + '.' + c for c in children]
         else:
@@ -226,46 +231,104 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
         if all(responsive_children):
             if responsive_children:
                 if len(responsive_children) > 1:
-                    min_constraints = dict()
-                    max_constraints = dict()
-                    for c in share_column_names:
-                        production_min = ProductionConstraints.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
-                        production_max = ProductionConstraints.get_maximum_share(calendar_year, c.replace(producer_prefix, ''))
-                        required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
 
-                        max_constraints[c] = production_max
-                        min_constraints[c] = min(production_max, max(required_zev_share, production_min))
+                    share_column_names = [producer_prefix + node_name + '.' + c + '.' + alt
+                                          for alt in ['ALT', 'NO_ALT'] for c in children]
+
+                    node_abs_share = _cache['mcat_data_%d' % calendar_year][node_name]['abs_share']
 
                     if share_range == 1.0:
-                        # span the whole space of shares
-                        sales_share_df = partition(share_column_names,
+
+                        # calculate RELATIVE share constraints for partition, even though the keys indicate absolute shares:
+                        # --- they will be USED to determine absolute shares ---
+                        min_constraints = dict()
+                        max_constraints = dict()
+
+                        for c, scn in zip(children + children, share_column_names):
+                            if 'NO_ALT' in scn.split('.'):
+                                if scn not in min_constraints:
+                                    min_constraints[scn] = 0
+                                    max_constraints[scn] = 0
+                                for cv in market_class_dict[c]['NO_ALT']:
+                                    no_alt_share = sum([v.projected_sales for v in
+                                                        cv.vehicle_list]) / context_based_total_sales / node_abs_share
+                                    min_constraints[scn] += no_alt_share
+                                    max_constraints[scn] = min_constraints[scn]
+
+                        # print_dict(min_constraints)
+                        # print_dict(max_constraints)
+
+                        # TODO: work production constraints back in, if we want to:
+                        # for c, scn in zip(children, share_column_names):
+                        #     production_min = ProductionConstraints.get_minimum_share(calendar_year, scn.replace(producer_prefix, ''))
+                        #     production_max = ProductionConstraints.get_maximum_share(calendar_year, scn.replace(producer_prefix, ''))
+                        #     required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, scn.replace(producer_prefix, ''))
+                        #
+                        #     max_constraints[scn] = production_max
+                        #     min_constraints[scn] = min(production_max, max(required_zev_share, production_min))
+
+                        sales_share_df = node_abs_share * partition(share_column_names,
                                                    num_levels=omega_globals.options.producer_num_market_share_options,
                                                    min_constraints=min_constraints, max_constraints=max_constraints)
+
+                        # capture constraints
+                        for c in children:
+                            min_constraints[c] = 0
+                            max_constraints[c] = 0
+                        min_constraints[node_name] = 0
+                        for scn in sales_share_df.columns:
+                            min_constraints[scn] = sales_share_df[scn].min() / node_abs_share
+                            max_constraints[scn] = sales_share_df[scn].max() / node_abs_share
+                            for c in children:
+                                if c in scn.split('.'):
+                                    min_constraints[c] += min_constraints[scn]
+                                    max_constraints[c] += max_constraints[scn]
+                            if 'NO_ALT' in scn.split('.'):
+                                min_constraints[node_name] += min_constraints[scn]
+
+                        # print_dict(min_constraints)
+                        # print_dict(max_constraints)
+
+                        # pass constraints to next iteration
+                        sales_share_df['min_constraints_%s' % node_name] = str(min_constraints)
+                        sales_share_df['max_constraints_%s' % node_name] = str(max_constraints)
+
                     else:
                         # narrow search span to a range of shares around the winners
+                        min_constraints = Eval.eval(candidate_production_decisions['min_constraints_%s' % node_name].iloc[0])
+                        max_constraints = Eval.eval(candidate_production_decisions['max_constraints_%s' % node_name].iloc[0])
+
+                        # print_dict(min_constraints)
+                        # print_dict(max_constraints)
+
+                        # convert abs shares to relative shares for generate_constrained_nearby_shares, then scale
+                        # the output by node_abs_share
+                        cpd = candidate_production_decisions.copy()  # create temporary copy for relative shares
+                        for scn in share_column_names:
+                            cpd[scn] /= node_abs_share
+
                         sales_share_df = \
-                            generate_constrained_nearby_shares(share_column_names, candidate_production_decisions,
+                            node_abs_share * generate_constrained_nearby_shares(share_column_names, cpd,
                                                                share_range,
                                                                omega_globals.options.producer_num_market_share_options,
                                                                min_constraints=min_constraints,
                                                                max_constraints=max_constraints)
+
+                        # pass constraints to next iteration
+                        sales_share_df['min_constraints_%s' % node_name] = str(min_constraints)
+                        sales_share_df['max_constraints_%s' % node_name] = str(max_constraints)
                 else:
                     sales_share_df = pd.DataFrame()
-                    for c in share_column_names:
-                        sales_share_df[c] = [1.0]
+                    for scn in share_column_names:
+                        sales_share_df[scn] = [1.0]  # TODO: set to _cache['mcat_data_%d' % calendar_year][node_name]['abs_share']... I think...
             else:
                 sales_share_df = pd.DataFrame()
         else:
-            # partition based on context projection sales share ratios
-            sales_total = 0
-            for c, cn in zip(children, share_column_names):
-                if c in context_new_vehicle_sales(calendar_year):
-                    sales_total += context_new_vehicle_sales(calendar_year)[c]
-
+            # I'm not even sure if we need to do this... if we're setting absolute shares at the leaves...
+            # but I guess it adds some tracking info to the dataframe which might be useful for debugging?
             sales_share_dict = dict()
-            for c, cn in zip(children, share_column_names):
-                if c in context_new_vehicle_sales(calendar_year):
-                    sales_share_dict[cn] = [context_new_vehicle_sales(calendar_year)[c] / sales_total]
+            for c, scn in zip(children, share_column_names):
+                sales_share_dict[scn] = [_cache['mcat_data_%d' % calendar_year][c]['abs_share']]
 
             sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
     else:
@@ -393,7 +456,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         # start_time = time.time()
         share_sweeps = create_share_sweeps(calendar_year, market_class_tree,
                                            candidate_production_decisions, share_range,
-                                           producer_decision_and_response)
+                                           producer_decision_and_response, context_based_total_sales)
         # print('share_sweeps time %f' % (time.time() - start_time))
         #
         # start_time = time.time()
@@ -459,7 +522,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                                 best_candidate_production_decision['strategic_compliance_ratio']),
                                echo_console=True)
 
-        selected_production_decision = pd.to_numeric(best_candidate_production_decision)
+        selected_production_decision = series_to_numeric(best_candidate_production_decision)
 
         selected_production_decision = \
             selected_production_decision.rename({'strategic_compliance_ratio': 'strategic_compliance_ratio_initial',
@@ -482,9 +545,11 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
            producer_compliance_possible
 
 
-def calc_composite_vehicles(mc, rc, mctrc):
-    cv = CompositeVehicle(mctrc[mc][rc], vehicle_id='%s.%s' % (mc, rc), weight_by='model_year_prevalence')
-    cv.market_class_share_frac = sum([v.projected_sales for v in cv.vehicle_list]) / mctrc[mc]['sales']
+def calc_composite_vehicles(mc, rc, alt, mctrc):
+    cv = CompositeVehicle(mctrc[mc][rc][alt], vehicle_id='%s.%s.%s' % (mc, rc, alt), weight_by='model_year_prevalence')
+    # cv.market_class_share_frac = sum([v.projected_sales for v in cv.vehicle_list]) / mctrc[mc]['sales']
+    cv.market_class_share_frac = sum([v.projected_sales for v in cv.vehicle_list]) / mctrc[mc]['%s_sales' % alt]
+    cv.alt_type = alt
 
     return cv
 
@@ -535,6 +600,21 @@ def create_composite_vehicles(calendar_year, compliance_id):
 
         print('Created manufacturer_vehicles %.20f' % (time.time() - start_time))
 
+        alt_vehs = [new_veh for new_veh in manufacturer_vehicles if not new_veh.base_year_product]
+        byp_vehs = [new_veh for new_veh in manufacturer_vehicles if new_veh.base_year_product]
+
+        alt_byvids = set([v.base_year_vehicle_id for v in alt_vehs])
+        byp_byvids = set([v.base_year_vehicle_id for v in byp_vehs])
+        non_covered_byvids = set.difference(byp_byvids, alt_byvids)
+
+        non_covered_vehs = [v for v in manufacturer_vehicles if v.base_year_vehicle_id in non_covered_byvids]
+        covered_vehs = [v for v in manufacturer_vehicles if v.base_year_vehicle_id not in non_covered_byvids]
+
+        # for v in non_covered_vehs:
+        #     print('%80s %20s %10s %20s' % (v.name, v.market_class_id, v.reg_class_id, v.context_size_class))
+        #
+        # print('\nEND non_covered_vehs ##################################\n')
+
         # sum([new_veh.base_year_market_share for new_veh in manufacturer_vehicles]) ~= 2.0 at this point due to
         # intentional duplicate entries for "alternative" powertrain vehicles, but "market_share" is used for relative
         # proportions
@@ -554,9 +634,10 @@ def create_composite_vehicles(calendar_year, compliance_id):
         # group by context size class
         csc_dict = dict()
         for new_veh in manufacturer_vehicles:
-            if new_veh.context_size_class not in csc_dict:
-                csc_dict[new_veh.context_size_class] = []
-            csc_dict[new_veh.context_size_class].append(new_veh)
+            if new_veh.base_year_product:
+                if new_veh.context_size_class not in csc_dict:
+                    csc_dict[new_veh.context_size_class] = []
+                csc_dict[new_veh.context_size_class].append(new_veh)
 
         # distribute context size class sales to manufacturer_vehicles by relative market share
         for csc in csc_dict: # for each context size class
@@ -568,28 +649,116 @@ def create_composite_vehicles(calendar_year, compliance_id):
                                     weight_by='model_year_prevalence',
                                     distribute_to='projected_sales')
 
-        # calculate new prevalence based on vehicle size mix from context
         for new_veh in manufacturer_vehicles:
-            new_veh.model_year_prevalence = new_veh.projected_sales / context_based_total_sales
+            new_veh.model_year_prevalence = 0
 
-        # sum([new_veh.base_year_market_share for new_veh in manufacturer_vehicles]) == 1.0 at this point,
-        # sum([new_veh.initial_registered_count for new_veh in manufacturer_vehicles]) = context_based_total_sales
+        # calculate new prevalence based on vehicle size mix from context
+        myp_dict = dict()
+        for new_veh in manufacturer_vehicles:
+            if new_veh.base_year_product:
+                new_veh.model_year_prevalence = new_veh.projected_sales / context_based_total_sales
+                myp_dict['myp_%s' % new_veh.base_year_vehicle_id] = new_veh.model_year_prevalence
+                myp_dict['ps_%s' % new_veh.base_year_vehicle_id] = new_veh.projected_sales
+
+        # for v in manufacturer_vehicles:
+        #     print('%80s %20s %10s %20s %10f %10d' % (
+        #         v.name, v.market_class_id, v.reg_class_id, v.context_size_class, v.model_year_prevalence,
+        #         v.projected_sales))
+        #
+        # print('\nEND manufacturer_vehicles ##################################\n')
+
+        # sum([new_veh.model_year_prevalence for new_veh in manufacturer_vehicles]) == 1.0 at this point,
+        # sum([new_veh.projected_sales for new_veh in manufacturer_vehicles]) = context_based_total_sales
+
+        for v in manufacturer_vehicles:
+            v.model_year_prevalence = myp_dict['myp_%s' % v.base_year_vehicle_id]
+            v.projected_sales = myp_dict['ps_%s' % v.base_year_vehicle_id]
+
+        # for v in manufacturer_vehicles:
+        #     print('%80s %20s %10s %20s %10f %10d' % (
+        #         v.name, v.market_class_id, v.reg_class_id, v.context_size_class, v.model_year_prevalence,
+        #         v.projected_sales))
+        #
+        # print('\nEND manufacturer_vehicles ##################################\n')
+        #
+        # for v in non_covered_vehs:
+        #     print('%80s %20s %10s %20s %10f %10d' % (
+        #         v.name, v.market_class_id, v.reg_class_id, v.context_size_class, v.model_year_prevalence,
+        #         v.projected_sales))
+        #
+        # print('\nEND non_covered_vehs ##################################\n')
+
+        # sum([v.model_year_prevalence for v in manufacturer_vehicles]) >= 1.0 and that's ok
+        # sum([v.model_year_prevalence for v in byp_vehs]) == 1.0 and alt vehicles get the myp of their respective base vehicles
+
+        # # group by market class (base year products) just to double check total prevalence for debugging
+        # mct = dict()
+        # for mc in omega_globals.options.MarketClass.market_classes:
+        #     mct[mc] = []
+        # for new_veh in manufacturer_vehicles:
+        #     if new_veh.base_year_product:
+        #         mct[new_veh.market_class_id].append(new_veh)
+        #
+        # mc_sum = 0
+        # for k in mct:
+        #     print(k, sum([v.model_year_prevalence for v in mct[k]]))
+        #     mc_sum += sum([v.model_year_prevalence for v in mct[k]])
+        # print('total %f' % mc_sum)
+
+        # sales by market category, ALT / NO_ALT
+        _cache['mcat_data_%d' % calendar_year] = dict()
+        for mcat in omega_globals.options.MarketClass.market_categories:
+            _cache['mcat_data_%d' % calendar_year][mcat] = {'sales': 0, 'abs_share': 0,
+                                                            'NO_ALT_sales': 0, 'ALT_sales': 0,
+                                                            'NO_ALT_abs_share': 0, 'ALT_abs_share': 0}
+        for mcat in omega_globals.options.MarketClass.market_categories:
+            for new_veh in manufacturer_vehicles:
+                new_veh_abs_share = new_veh.projected_sales / context_based_total_sales
+                if new_veh.base_year_vehicle_id in non_covered_byvids:
+                    if mcat in str.split(new_veh.market_class_id, '.'):
+                        _cache['mcat_data_%d' % calendar_year][mcat]['NO_ALT_sales'] += new_veh.projected_sales
+                        _cache['mcat_data_%d' % calendar_year][mcat]['NO_ALT_abs_share'] += new_veh_abs_share
+                        _cache['mcat_data_%d' % calendar_year][mcat]['sales'] += new_veh.projected_sales
+                        _cache['mcat_data_%d' % calendar_year][mcat]['abs_share'] += new_veh_abs_share
+                else:
+                    if mcat in str.split(new_veh.market_class_id, '.'):
+                        if new_veh.base_year_product:
+                            _cache['mcat_data_%d' % calendar_year][mcat]['ALT_sales'] += new_veh.projected_sales
+                            _cache['mcat_data_%d' % calendar_year][mcat]['ALT_abs_share'] += new_veh_abs_share
+                            _cache['mcat_data_%d' % calendar_year][mcat]['sales'] += new_veh.projected_sales
+                            _cache['mcat_data_%d' % calendar_year][mcat]['abs_share'] += new_veh_abs_share
+        # print_dict(_cache['mcat_data_%d' % calendar_year])
 
         # group by market class / reg class
-        mctrc = dict()
+        mctrc = {'ALT_sales': 0, 'NO_ALT_sales': 0}
         for mc in omega_globals.options.MarketClass.market_classes:
-            mctrc[mc] = {'sales': 0}
+            mctrc[mc] = {'sales': 0, 'byp_prevalence': 0, 'NO_ALT_sales': 0, 'ALT_sales': 0}
             for rc in omega_globals.options.RegulatoryClasses.reg_classes:
-                mctrc[mc][rc] = []
+                mctrc[mc][rc] = {'ALT': [], 'NO_ALT': []}
         for new_veh in manufacturer_vehicles:
-            mctrc[new_veh.market_class_id][new_veh.reg_class_id].append(new_veh)
+            if new_veh.base_year_vehicle_id in non_covered_byvids:
+                # NO_ALT
+                mctrc[new_veh.market_class_id][new_veh.reg_class_id]['NO_ALT'].append(new_veh)
+                mctrc[new_veh.market_class_id]['NO_ALT_sales'] += new_veh.projected_sales
+                if new_veh.base_year_product:
+                    mctrc['NO_ALT_sales'] += new_veh.projected_sales
+            else:
+                mctrc[new_veh.market_class_id][new_veh.reg_class_id]['ALT'].append(new_veh)
+                mctrc[new_veh.market_class_id]['ALT_sales'] += new_veh.projected_sales
+                if new_veh.base_year_product:
+                    mctrc['ALT_sales'] += new_veh.projected_sales
             mctrc[new_veh.market_class_id]['sales'] += new_veh.projected_sales
+            mctrc[new_veh.market_class_id]['byp_prevalence'] += new_veh.model_year_prevalence * new_veh.base_year_product
+
+        # context_based_alt_sales = mctrc['ALT_sales']
+        # context_based_no_alt_sales = mctrc['NO_ALT_sales']
 
         mcrc_priority_list = []
         for mc in omega_globals.options.MarketClass.market_classes:
             for rc in omega_globals.options.RegulatoryClasses.reg_classes:
-                if mctrc[mc][rc]:
-                    mcrc_priority_list.append((mc, rc, len(mctrc[mc][rc])))
+                for alt in ['ALT', 'NO_ALT']:
+                    if mctrc[mc][rc][alt]:
+                        mcrc_priority_list.append((mc, rc, alt, len(mctrc[mc][rc][alt])))
         # sort composite vehicles by number of source vehicles
         mcrc_priority_list = sorted(mcrc_priority_list, key=lambda x: x[-1], reverse=True)
 
@@ -597,19 +766,19 @@ def create_composite_vehicles(calendar_year, compliance_id):
 
         composite_vehicles = []
 
-        if omega_globals.options.multiprocessing:
+        if False and omega_globals.options.multiprocessing:
             results = []
             # start longest jobs first!
-            for mc, rc, _ in mcrc_priority_list:
+            for mc, rc, alt, _ in mcrc_priority_list:
                 results.append(omega_globals.pool.apply_async(func=calc_composite_vehicles,
-                                                              args=[mc, rc, mctrc],
+                                                              args=[mc, rc, alt, mctrc],
                                                               callback=None,
                                                               error_callback=error_callback))
 
             composite_vehicles = [r.get() for r in results]
         else:
-            for mc, rc, _ in mcrc_priority_list:
-                composite_vehicles.append(calc_composite_vehicles(mc, rc, mctrc))
+            for mc, rc, alt, _ in mcrc_priority_list:
+                composite_vehicles.append(calc_composite_vehicles(mc, rc, alt, mctrc))
 
         print('Composite Vehicles Elapsed Time %f' % (time.time() - start_time))
         # get empty market class tree
@@ -617,25 +786,33 @@ def create_composite_vehicles(calendar_year, compliance_id):
 
         # populate tree with vehicle objects
         for new_veh in composite_vehicles:
-            omega_globals.options.MarketClass.populate_market_classes(market_class_tree, new_veh.market_class_id,
-                                                                      new_veh)
+            omega_globals.options.MarketClass.\
+                populate_market_classes(market_class_tree,
+                                        '%s.%s' % (new_veh.market_class_id, new_veh.alt_type),
+                                        new_veh)
 
-        # cull leaves that don't contain vehicles
+        # cull branches that don't contain vehicles (e.g. missing body styles)
         keys = list(market_class_tree.keys())
         for k in keys:
             if k not in VehicleFinal.mfr_base_year_share_data[compliance_id] or VehicleFinal.mfr_base_year_share_data[compliance_id][k] == 0.0:
                 market_class_tree.pop(k)
 
         _cache[cache_key] = {'composite_vehicles': composite_vehicles,
-                            'market_class_tree': market_class_tree,
-                            'context_based_total_sales': context_based_total_sales}
+                             'market_class_tree': market_class_tree,
+                             'context_based_total_sales': context_based_total_sales,
+                             # 'context_based_alt_sales': context_based_alt_sales,
+                             # 'context_based_no_alt_sales': context_based_no_alt_sales,
+                             }
     else:
         # pull cached composite vehicles (avoid recompute of composite frontiers, etc)
         composite_vehicles = _cache[cache_key]['composite_vehicles']
         market_class_tree = _cache[cache_key]['market_class_tree']
         context_based_total_sales = _cache[cache_key]['context_based_total_sales']
+        # context_based_alt_sales = _cache[cache_key]['context_based_alt_sales']
+        # context_based_no_alt_sales = _cache[cache_key]['context_based_no_alt_sales']
 
-    return composite_vehicles, market_class_tree, context_based_total_sales
+    return composite_vehicles, market_class_tree, context_based_total_sales #, \
+           # context_based_alt_sales, context_based_no_alt_sales
 
 
 def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_vehicles, producer_decision):
@@ -726,45 +903,53 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
     total_cost_dollars = 0
     total_generalized_cost_dollars = 0
 
+    # clear prior values, if any
+    # for composite_veh in composite_vehicles:
+    #     # share_id = composite_veh.market_class_id
+    #     share_id = composite_veh.market_class_id + '.' + composite_veh.alt_type
+    #     if ('producer_abs_share_frac_%s' % share_id) in production_options:
+    #         production_options['producer_abs_share_frac_%s' % share_id] = 0
+
     for composite_veh in composite_vehicles:
         # assign sales to vehicle based on market share fractions and reg class share fractions
-        market_class = composite_veh.market_class_id
+        # share_id = composite_veh.market_class_id
+        share_id = composite_veh.market_class_id + '.' + composite_veh.alt_type
 
-        if ('consumer_abs_share_frac_%s' % market_class) in production_options:
+        if ('consumer_abs_share_frac_%s' % share_id) in production_options:
             if is_series:
                 market_class_sales = total_sales * production_options[
-                    'consumer_abs_share_frac_%s' % market_class]
+                    'consumer_abs_share_frac_%s' % share_id]
             else:
                 market_class_sales = total_sales * production_options[
-                    'consumer_abs_share_frac_%s' % market_class].values
+                    'consumer_abs_share_frac_%s' % share_id].values
 
-        elif ('producer_abs_share_frac_%s' % market_class) in production_options:
+        elif ('producer_abs_share_frac_%s' % share_id) in production_options:
             if is_series:
                 market_class_sales = total_sales * production_options[
-                    'producer_abs_share_frac_%s' % market_class]
+                    'producer_abs_share_frac_%s' % share_id]
             else:
                 market_class_sales = total_sales * production_options[
-                    'producer_abs_share_frac_%s' % market_class].values
+                    'producer_abs_share_frac_%s' % share_id].values
 
-        else:
-            substrs = market_class.split('.')
-            chain = []
-
-            for i in range(len(substrs)):
-                str = 'producer_share_frac_'
-                for j in range(i + 1):
-                    str = str + substrs[j] + '.' * (j != i)
-                chain.append(str)
-
-            market_class_sales = total_sales
-
-            for c in chain:
-                market_class_sales = market_class_sales * production_options[c].values
-
-            if ('producer_abs_share_frac_%s' % market_class) not in production_options:
-                production_options['producer_abs_share_frac_%s' % market_class] = market_class_sales / total_sales
-            else:
-                production_options['producer_abs_share_frac_%s' % market_class] += market_class_sales / total_sales
+        # else:
+        #     substrs = share_id.split('.')
+        #     chain = []
+        #
+        #     for i in range(len(substrs)):
+        #         str = 'producer_share_frac_'
+        #         for j in range(i + 1):
+        #             str = str + substrs[j] + '.' * (j != i)
+        #         chain.append(str)
+        #
+        #     market_class_sales = total_sales
+        #
+        #     for c in chain:
+        #         market_class_sales = market_class_sales * production_options[c].values
+        #
+        #     if ('producer_abs_share_frac_%s' % share_id) not in production_options:
+        #         production_options['producer_abs_share_frac_%s' % share_id] = market_class_sales / total_sales
+        #     else:
+        #         production_options['producer_abs_share_frac_%s' % share_id] += market_class_sales / total_sales
 
         composite_veh_sales = market_class_sales * composite_veh.market_class_share_frac
         production_options['veh_%s_sales' % composite_veh.vehicle_id] = composite_veh_sales
