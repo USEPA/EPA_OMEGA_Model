@@ -1,5 +1,7 @@
 from omega_model import *
 
+from omega_model.effects.discounting import discount_values
+
 
 def calc_annualized_value(present_value, rate, periods, annualized_offset):
     """
@@ -162,6 +164,9 @@ def calc_present_and_annualized_values(dict_of_values, calendar_years):
     calcs_df = pd.DataFrame(dict_of_values).transpose()
     calcs_df.reset_index(drop=True, inplace=True)
     annual_values_dict = calc_annual_values(calcs_df, all_costs)
+
+    # omega_log.logwrite('\nDiscounting costs')
+    annual_values_dict = discount_values(annual_values_dict)
 
     # first create a dictionary to house data
     calcs_dict = dict()
