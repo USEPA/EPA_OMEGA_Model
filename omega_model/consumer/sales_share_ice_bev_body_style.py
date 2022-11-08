@@ -430,27 +430,29 @@ class SalesShare(OMEGABase, SalesShareBase):
             analysis_pickup_share /= denom
 
         if omega_globals.options.generate_context_calibration_files:
+            context_total_sales = NewVehicleMarket.new_vehicle_data(calendar_year)
+
             if 'sedan_wagon' in VehicleFinal.mfr_base_year_share_data[compliance_id]:
                 context_sedan_wagon_share = \
-                    NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='sedan_wagon',
-                                                value='sales_share_of_total') / 100 * \
-                    VehicleFinal.mfr_base_year_share_data[compliance_id]['sedan_wagon']
+                    (NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='sedan_wagon') /
+                    context_total_sales *
+                    VehicleFinal.mfr_base_year_share_data[compliance_id]['sedan_wagon'])
             else:
                 context_sedan_wagon_share = 0
 
             if 'cuv_suv_van' in VehicleFinal.mfr_base_year_share_data[compliance_id]:
                 context_cuv_suv_van_share = \
-                    NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='cuv_suv_van',
-                                                value='sales_share_of_total') / 100 * \
-                    VehicleFinal.mfr_base_year_share_data[compliance_id]['cuv_suv_van']
+                    (NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='cuv_suv_van') /
+                    context_total_sales *
+                    VehicleFinal.mfr_base_year_share_data[compliance_id]['cuv_suv_van'])
             else:
                 context_cuv_suv_van_share = 0
 
             if 'pickup' in VehicleFinal.mfr_base_year_share_data[compliance_id]:
                 context_pickup_share = \
-                    NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='pickup',
-                                                value='sales_share_of_total') / 100 * \
-                    VehicleFinal.mfr_base_year_share_data[compliance_id]['pickup']
+                    (NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='pickup') /
+                     context_total_sales *
+                     VehicleFinal.mfr_base_year_share_data[compliance_id]['pickup'])
             else:
                 context_pickup_share = 0
 
