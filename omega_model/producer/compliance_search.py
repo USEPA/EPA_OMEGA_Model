@@ -931,26 +931,6 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
                 market_class_sales = total_sales * production_options[
                     'producer_abs_share_frac_%s' % share_id].values
 
-        # else:
-        #     substrs = share_id.split('.')
-        #     chain = []
-        #
-        #     for i in range(len(substrs)):
-        #         str = 'producer_share_frac_'
-        #         for j in range(i + 1):
-        #             str = str + substrs[j] + '.' * (j != i)
-        #         chain.append(str)
-        #
-        #     market_class_sales = total_sales
-        #
-        #     for c in chain:
-        #         market_class_sales = market_class_sales * production_options[c].values
-        #
-        #     if ('producer_abs_share_frac_%s' % share_id) not in production_options:
-        #         production_options['producer_abs_share_frac_%s' % share_id] = market_class_sales / total_sales
-        #     else:
-        #         production_options['producer_abs_share_frac_%s' % share_id] += market_class_sales / total_sales
-
         composite_veh_sales = market_class_sales * composite_veh.market_class_share_frac
         production_options['veh_%s_sales' % composite_veh.vehicle_id] = composite_veh_sales
 

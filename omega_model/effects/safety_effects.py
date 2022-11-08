@@ -185,7 +185,11 @@ def calc_safety_effects(calendar_years, vmt_adjustments):
 
                 calendar_year_vmt_adj = vmt_adjustments.dict[calendar_year]
                 adjusted_vmt = vad['vmt'] * calendar_year_vmt_adj
-                adjusted_annual_vmt = adjusted_vmt / vad['registered_count']
+                if vad['registered_count'] > 0:
+                    adjusted_annual_vmt = adjusted_vmt / vad['registered_count']
+                else:
+                    adjusted_annual_vmt = 0
+
                 if age == 0:
                     adjusted_odometer = adjusted_annual_vmt
                 else:

@@ -958,6 +958,13 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
     for mc in omega_globals.options.MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
         if market_class_vehicles:
+            producer_decision['producer_abs_share_frac_%s' % mc] = 0
+        else:
+            producer_decision['producer_abs_share_frac_%s' % mc] = None
+
+    for mc in omega_globals.options.MarketClass.market_classes:
+        market_class_vehicles = market_class_vehicle_dict[mc]
+        if market_class_vehicles:
             producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc] = \
                 weighted_value(market_class_vehicles, 'initial_registered_count', 'onroad_direct_co2e_grams_per_mile')
 
@@ -974,7 +981,6 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
             producer_decision['average_retail_fuel_price_dollars_per_unit_%s' % mc] = \
                 weighted_value(market_class_vehicles, 'initial_registered_count', 'retail_fuel_price_dollars_per_unit')
 
-            # TODO: also, mpg/mpge.... for NEMS...
             producer_decision['average_curbweight_lbs_%s' % mc] = \
                 weighted_value(market_class_vehicles, 'initial_registered_count', 'curbweight_lbs')
 
@@ -997,8 +1003,11 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
             producer_decision['sales_%s' % mc] = 0
             for v in market_class_vehicles:
                 producer_decision['sales_%s' % mc] += producer_decision['veh_%s_sales' % v.vehicle_id]
+
+            producer_decision['producer_abs_share_frac_%s' % mc] += \
+                producer_decision['sales_%s' % mc] / producer_decision['total_sales']
+
         else:
-            producer_decision['producer_abs_share_frac_%s' % mc] = None
             producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc] = 0
             producer_decision['average_onroad_direct_kwh_pmi_%s' % mc] = 0
             producer_decision['average_new_vehicle_mfr_cost_%s' % mc] = 0
