@@ -347,6 +347,14 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
                 producer_market_classes = calc_market_data(candidate_mfr_composite_vehicles, producer_decision)
 
+                if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
+                    for mc in sorted(omega_globals.options.MarketClass.market_classes):
+                        if 'producer_abs_share_frac_%s' % mc in producer_decision:
+                            omega_log.logwrite(
+                                ('%d producer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %.6f' %
+                                (producer_decision['producer_abs_share_frac_%s' % mc]))
+                    omega_log.logwrite('')
+
                 best_winning_combo_with_sales_response, iteration_log, producer_decision_and_response = \
                     iterate_producer_cross_subsidy(calendar_year, compliance_id, best_winning_combo_with_sales_response,
                                                    candidate_mfr_composite_vehicles, iteration_log,

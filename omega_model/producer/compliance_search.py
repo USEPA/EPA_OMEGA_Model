@@ -531,12 +531,12 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         # log the final iteration, as opposed to the winning iteration:
         selected_production_decision['producer_search_iteration'] = search_iteration - 1
 
-        if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
-            for mc in sorted(omega_globals.options.MarketClass.market_classes):
-                if 'producer_abs_share_frac_%s' % mc in selected_production_decision:
-                    omega_log.logwrite(('%d producer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %.6f' %
-                                   (selected_production_decision['producer_abs_share_frac_%s' % mc]))
-            omega_log.logwrite('')
+        # if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
+        #     for mc in sorted(omega_globals.options.MarketClass.market_classes):
+        #         if 'producer_abs_share_frac_%s' % mc in selected_production_decision:
+        #             omega_log.logwrite(('%d producer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %.6f' %
+        #                            (selected_production_decision['producer_abs_share_frac_%s' % mc]))
+        #     omega_log.logwrite('')
 
         composite_vehicles = apply_production_decision_to_composite_vehicles(composite_vehicles,
                                                                              selected_production_decision)
