@@ -585,7 +585,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
             else:
                 pre_production_vehicles.append(new_veh)
 
-        if True and omega_globals.options.multiprocessing:
+        if omega_globals.options.multiprocessing:
             results = []
             for new_veh in manufacturer_vehicles:
                 results.append(omega_globals.pool.apply_async(func=calc_vehicle_frontier,
@@ -769,7 +769,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
 
         composite_vehicles = []
 
-        if False and omega_globals.options.multiprocessing:
+        if omega_globals.options.multiprocessing:
             results = []
             # start longest jobs first!
             for mc, rc, alt, _ in mcrc_priority_list:
