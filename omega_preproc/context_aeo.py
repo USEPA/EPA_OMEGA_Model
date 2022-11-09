@@ -23,7 +23,8 @@ def read_table(path, table_name, skiprows=4):
         
     """
     # Note that "error_bad_lines" is deprecated in newer pandas versions; change to "on_bad_lines='skip'" with newer pandas
-    return pd.read_csv(path / table_name, skiprows=skiprows, error_bad_lines=False).dropna()
+    # return pd.read_csv(path / table_name, skiprows=skiprows, error_bad_lines=False).dropna()
+    return pd.read_csv(path / table_name, skiprows=skiprows, on_bad_lines='skip').dropna()
 
 
 def return_df(table, col_id, case_id, version_id):
@@ -238,6 +239,48 @@ class GetContext:
         # df_rows.drop(columns=['growth_rate'], inplace=True)
 
         return df_rows
+
+
+def add_body_style(df):
+
+    body_style_dict = {
+        'Minicompact': 'sedan_wagon',
+        'Subcompact': 'sedan_wagon',
+        'Compact': 'sedan_wagon',
+        'Midsize': 'sedan_wagon',
+        'Large': 'sedan_wagon',
+        'Two Seater': 'sedan_wagon',
+        'Small Crossover': 'cuv_suv_van',
+        'Large Crossover': 'cuv_suv_van',
+        'Small Van': 'cuv_suv_van',
+        'Large Van': 'cuv_suv_van',
+        'Small Utility': 'cuv_suv_van',
+        'Large Utility': 'cuv_suv_van',
+        'Small Pickup': 'pickup',
+        'Large Pickup': 'pickup',
+    }
+    df.insert(df.columns.get_loc('context_size_class') + 1, 'body_style', '')
+    context_size_classes = pd.Series(df['context_size_class'].unique())
+    for context_size_class in context_size_classes:
+        df.loc[df['context_size_class'] == context_size_class, 'body_style'] = body_style_dict[context_size_class]
+
+    return df
+
+
+def calc_sales_share_of_body_style(df):
+
+    body_styles = pd.Series(df['body_style'].unique())
+    calendar_years = pd.Series(df['calendar_year'].unique())
+    df.insert(df.columns.get_loc('sales_share_of_regclass'), 'sales_share_of_body_style', 0)
+    for calendar_year in calendar_years:
+        for body_style in body_styles:
+            body_style_sales = df.loc[(df['body_style'] == body_style) & (df['calendar_year'] == calendar_year), 'sales'].sum()
+            df.loc[(df['body_style'] == body_style) & (df['calendar_year'] == calendar_year), 'sales_share_of_body_style'] \
+                = df.loc[(df['body_style'] == body_style) & (df['calendar_year'] == calendar_year), 'sales'] / body_style_sales
+
+    df['sales_share_of_body_style'] = df['sales_share_of_body_style'] * 100
+
+    return df
 
 
 class SetInputs:
@@ -509,6 +552,9 @@ def main():
             case_df = case_df.merge(vehicle_prices_df, on=['full name', 'calendar_year', 'reg_class_id'], how='left')
             case_df.rename(columns={'full name': 'context_size_class'}, inplace=True)
 
+            case_df = add_body_style(case_df)
+            calc_sales_share_of_body_style(case_df)
+
             # lastly, round all the sales shares and force sum to 100
             for yr in range(case_df['calendar_year'].values.min(), case_df['calendar_year'].values.max() + 1):
                 shares = pd.Series(case_df.loc[case_df['calendar_year'] == yr, 'sales_share_of_total']).tolist()
@@ -518,6 +564,12 @@ def main():
                     shares = pd.Series(case_df.loc[(case_df['calendar_year'] == yr) & (case_df['reg_class_id'] == reg_class), 'sales_share_of_regclass']).tolist()
                     new_shares = round_floats_to_100(shares, 2)
                     case_df.loc[(case_df['calendar_year'] == yr) & (case_df['reg_class_id'] == reg_class), 'sales_share_of_regclass'] = new_shares
+                for body_style in ['sedan_wagon', 'cuv_suv_van', 'pickup']:
+                    shares = pd.Series(case_df.loc[(case_df['calendar_year'] == yr) & (
+                                case_df['body_style'] == body_style), 'sales_share_of_body_style']).tolist()
+                    new_shares = round_floats_to_100(shares, 2)
+                    case_df.loc[(case_df['calendar_year'] == yr) & (
+                                case_df['body_style'] == body_style), 'sales_share_of_body_style'] = new_shares
 
             fleet_context_df = pd.concat([fleet_context_df, case_df], axis=0, ignore_index=True)
 

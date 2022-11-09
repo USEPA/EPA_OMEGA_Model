@@ -71,7 +71,12 @@ def discount_values(dict_of_values):
     update_dict = dict()
     for key in dict_of_values.keys():
 
-        vehicle_id, calendar_year, age, discount_rate = key
+        vehicle_id = age = series = None
+
+        if len(key) == 3:
+            calendar_year, discount_rate, series = key
+        else:
+            vehicle_id, calendar_year, age, discount_rate = key
 
         for social_discrate in social_discrates:
             rate_dict = dict()
@@ -111,7 +116,10 @@ def discount_values(dict_of_values):
                 discounted_value = calc_discounted_value(arg_value, emission_discrate, calendar_year, discount_to_year, discount_offset)
                 rate_dict.update({arg: discounted_value})
 
-            update_dict[(vehicle_id, calendar_year, age, social_discrate)] = rate_dict
+            if len(key) == 3:
+                update_dict[(calendar_year, social_discrate, series)] = rate_dict
+            else:
+                update_dict[(vehicle_id, calendar_year, age, social_discrate)] = rate_dict
 
     dict_of_values.update(update_dict)
     return dict_of_values

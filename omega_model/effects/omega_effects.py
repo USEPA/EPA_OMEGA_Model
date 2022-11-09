@@ -36,7 +36,6 @@ Note:
 """
 
 from omega_model import *
-from omega_model.effects.legacy_fleet import LegacyFleet
 from omega_model.effects.vmt_adjustments import AdjustmentsVMT
 from omega_model.effects.safety_effects import calc_safety_effects, calc_legacy_fleet_safety_effects
 from omega_model.effects.physical_effects import calc_physical_effects, calc_legacy_fleet_physical_effects, calc_annual_physical_effects
@@ -56,6 +55,7 @@ def run_effects_calcs():
     """
     from producer.vehicle_annual_data import VehicleAnnualData
     from effects.legacy_fleet import LegacyFleet
+    from effects.cost_factors_criteria import CostFactorsCriteria
 
     safety_effects_df = physical_effects_df = cost_effects_df = present_and_annualized_cost_df = pd.DataFrame()
 
@@ -135,10 +135,11 @@ def run_effects_calcs():
             cost_effects_dict = dict()
 
             omega_log.logwrite('\nCalculating cost effects')
-            cost_effects_dict.update(calc_cost_effects(physical_effects_dict))
+            cost_effects_dict.update(calc_cost_effects(physical_effects_dict,
+                                                       calc_health_effects=CostFactorsCriteria.calc_health_effects))
 
-            omega_log.logwrite('\nDiscounting costs')
-            cost_effects_dict = discount_values(cost_effects_dict)
+            # omega_log.logwrite('\nDiscounting costs')
+            # cost_effects_dict = discount_values(cost_effects_dict)
 
             cost_effects_filename = f'{omega_globals.options.output_folder}' + \
                                     f'{omega_globals.options.session_unique_name}_cost_effects.csv'
@@ -153,14 +154,15 @@ def run_effects_calcs():
             else:
                 cost_effects_df = save_dict_to_csv(cost_effects_dict, cost_effects_filename, index=False)
 
-            omega_log.logwrite('\nCalculating annual, present and annualized values')
+            omega_log.logwrite('\nCalculating annual, discounted, present and annualized values')
             present_and_annualized_dict = calc_present_and_annualized_values(cost_effects_dict, calendar_years)
 
             present_and_annualized_filename = f'{omega_globals.options.output_folder}' + \
                                               f'{omega_globals.options.session_unique_name}_cost_effects_annual_present_and_annualized.csv'
 
             present_and_annualized_cost_df = pd.DataFrame(present_and_annualized_dict).transpose()
-            present_and_annualized_cost_df = calc_social_costs(present_and_annualized_cost_df)
+            present_and_annualized_cost_df = calc_social_costs(present_and_annualized_cost_df,
+                                                               calc_health_effects=CostFactorsCriteria.calc_health_effects)
             present_and_annualized_cost_df.to_csv(present_and_annualized_filename, index=False)
 
     if omega_globals.options.multiprocessing:

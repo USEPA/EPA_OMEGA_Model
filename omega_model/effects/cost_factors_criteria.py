@@ -5,7 +5,8 @@
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
-The data represents $/uston benefits estimates associated with reductions in criteria air pollutants.
+The data represents $/uston benefits estimates associated with reductions in criteria air pollutants. The data should
+be left blank to avoid calculating health effects (criteria air pollution effects) using $/uston values.
 
 File Type
     comma-separated values (CSV)
@@ -34,10 +35,7 @@ Data Column Name and Description
     :pm25_tailpipe_3.0_USD_per_uston:
         The structure for all cost factors is pollutant_source_discount-rate_units, where source is tailpipe or upstream and units are in US dollars per US ton.
 
-
 ----
-
-.. todo: document context_cpi_price_deflators file format
 
 **CODE**
 
@@ -55,6 +53,8 @@ class CostFactorsCriteria(OMEGABase):
     _data = dict()  # private dict, cost factors criteria by calendar year
 
     _cache = dict()
+
+    calc_health_effects = True
 
     @staticmethod
     def get_cost_factors(calendar_year, cost_factors):
@@ -134,17 +134,23 @@ class CostFactorsCriteria(OMEGABase):
         if not template_errors:
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
-            df = df.loc[df['dollar_basis'] != 0, :]
 
             template_errors = validate_template_column_names(filename, cost_factors_input_template_columns,
                                                              df.columns, verbose=verbose)
 
-            cols_to_convert = [col for col in df.columns if 'USD_per_uston' in col]
+            if not sum(df['calendar_year']) == 0:
 
-            if not template_errors:
-                df = gen_fxns.adjust_dollars(df, 'cpi_price_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
+                df = df.loc[df['dollar_basis'] != 0, :]
 
-                CostFactorsCriteria._data = df.set_index('calendar_year').to_dict(orient='index')
+                cols_to_convert = [col for col in df.columns if 'USD_per_uston' in col]
+
+                if not template_errors:
+                    df = gen_fxns.adjust_dollars(df, 'cpi_price_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
+
+                    CostFactorsCriteria._data = df.set_index('calendar_year').to_dict(orient='index')
+
+            else:
+                CostFactorsCriteria.calc_health_effects = False
 
         return template_errors
 
