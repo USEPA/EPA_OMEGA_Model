@@ -313,16 +313,29 @@ class CostCloud(OMEGABase, CostCloudBase):
         vehicle_rlhp60 = \
             calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b, vehicle.base_year_target_coef_c, 60)
 
-        # sweep vehicle params (for now, final ranges TBD)
-#       rlhp20s = (vehicle_rlhp20 * 0.95, vehicle_rlhp20, vehicle_rlhp20 * 1.05)
-#       rlhp60s = (vehicle_rlhp60 * 0.95, vehicle_rlhp60, vehicle_rlhp60 * 1.05)
-        rlhp20s = [vehicle_rlhp20]
-        rlhp60s = [vehicle_rlhp60]
+        if vehicle.model_year - vehicle.prior_redesign_year >= vehicle.redesign_interval:
+            # sweep vehicle params (for now, final ranges TBD)
+            rlhp20s = [vehicle_rlhp20]  # (vehicle_rlhp20 * 0.95, vehicle_rlhp20, vehicle_rlhp20 * 1.05)
+            rlhp60s = [vehicle_rlhp60]  # (vehicle_rlhp60 * 0.95, vehicle_rlhp60, vehicle_rlhp60 * 1.05)
 
-        # vehicle_footprints = [vehicle.base_year_footprint_ft2]
-        vehicle_footprints = (vehicle.base_year_footprint_ft2 * 0.95,
-                              vehicle.base_year_footprint_ft2,
-                              vehicle.base_year_footprint_ft2 * 1.05)
+            # vehicle_footprints = [vehicle.base_year_footprint_ft2]
+            vehicle_footprints = (vehicle.base_year_footprint_ft2 * 0.95,
+                                  vehicle.base_year_footprint_ft2,
+                                  vehicle.base_year_footprint_ft2 * 1.05)
+
+            structure_materials = MassScaling.structure_materials
+
+            cost_curve_classes = _cache[vehicle.fueling_class]
+
+            vehicle.prior_redesign_year = vehicle.model_year
+        else:
+            # maintain vehicle params
+            rlhp20s = [vehicle_rlhp20]
+            rlhp60s = [vehicle_rlhp60]
+            vehicle_footprints = [vehicle.footprint_ft2]
+            structure_materials = [vehicle.structure_material]
+
+            cost_curve_classes = {vehicle.cost_curve_class: _cache[vehicle.fueling_class][vehicle.cost_curve_class]}
 
         # convergence terms init
         convergence_tolerance = 0.01
@@ -332,8 +345,6 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         cloud_points = []  # build a list of dicts that will be dumped into the cloud at the end
                            # (faster than sequentially appending Series objects)
-
-        cost_curve_classes = _cache[vehicle.fueling_class]
 
         for ccc in cost_curve_classes:
             tech_flags = cost_curve_classes[ccc]['tech_flags'].to_dict()
@@ -367,7 +378,7 @@ class CostCloud(OMEGABase, CostCloudBase):
             else:
                 vehicle.powertrain_type = 'ICE'
 
-            for structure_material in MassScaling.structure_materials:
+            for structure_material in structure_materials:
                 for footprint_ft2 in vehicle_footprints:
                     for rlhp20 in rlhp20s:
                         for rlhp60 in rlhp60s:
@@ -492,10 +503,10 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                             cloud_points.append(cloud_point)
 
-
         cost_cloud = pd.DataFrame(cloud_points)
 
         glider_costs = GliderCost.calc_cost(vehicle, cost_cloud)  # includes structure_cost and glider_non_structure_cost
+
         glider_cost_terms = ['structure_cost', 'glider_non_structure_cost']
         for idx, ct in enumerate(glider_cost_terms):
             cost_cloud[ct] = glider_costs[idx]

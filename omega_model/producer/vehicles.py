@@ -1456,8 +1456,7 @@ class VehicleFinal(SQABase, Vehicle):
             else:
                 veh.compliance_id = veh.manufacturer_id
 
-            if not omega_globals.options.session_is_reference and omega_globals.options.consolidate_manufacturers\
-                    and omega_globals.options.credit_market_efficiency == 1.0:
+            if not omega_globals.manufacturer_aggregation:
                 veh.manufacturer_id = 'consolidated_OEM'
 
             VehicleFinal.compliance_ids.add(veh.compliance_id)

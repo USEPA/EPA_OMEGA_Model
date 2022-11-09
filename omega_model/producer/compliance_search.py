@@ -34,7 +34,7 @@ _cache = dict()
 
 
 def error_callback(e):
-    print('error_callback')
+    print('error_callback_%s' % __name__)
     print(e)
 
 
@@ -122,6 +122,16 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
                 cost_curve_options = [cv.cost_curve[cost_curve_interp_key].loc[best_index]]
             else:
                 cost_curve_options = np.linspace(veh_min_cost_curve_index, veh_max_cost_curve_index, num=num_tech_options)
+
+        if len(cv.cost_curve['credits_co2e_Mg_per_vehicle']) > 1:
+            from scipy.interpolate import interp1d
+            nn_fun = interp1d(cv.cost_curve['credits_co2e_Mg_per_vehicle'],
+                              cv.cost_curve['credits_co2e_Mg_per_vehicle'], kind='nearest',
+                              fill_value=(cv.cost_curve['credits_co2e_Mg_per_vehicle'].min(),
+                                      cv.cost_curve['credits_co2e_Mg_per_vehicle'].max()), bounds_error=False)
+            cost_curve_options = np.unique(nn_fun(cost_curve_options))
+        else:
+            cost_curve_options = [cv.cost_curve['credits_co2e_Mg_per_vehicle'].min()]
 
         tech_cost_options = \
             cv.get_from_cost_curve('new_vehicle_mfr_cost_dollars', cost_curve_options)
@@ -426,7 +436,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
     while continue_search:
         share_range = omega_globals.options.producer_compliance_search_convergence_factor ** search_iteration
 
-        composite_vehicles, market_class_tree, context_based_total_sales = \
+        composite_vehicles, pre_production_vehicles, market_class_tree, context_based_total_sales = \
             create_composite_vehicles(calendar_year, compliance_id)
 
         # start_time = time.time()
@@ -522,7 +532,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         composite_vehicles = apply_production_decision_to_composite_vehicles(composite_vehicles,
                                                                              selected_production_decision)
 
-    return composite_vehicles, selected_production_decision, market_class_tree, \
+    return composite_vehicles, pre_production_vehicles, selected_production_decision, market_class_tree, \
            producer_compliance_possible
 
 
@@ -558,6 +568,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         manufacturer_prior_vehicles = VehicleFinal.get_compliance_vehicles(calendar_year - 1, compliance_id)
 
         manufacturer_vehicles = []
+        pre_production_vehicles = []
 
         start_time = time.time()
 
@@ -565,9 +576,16 @@ def create_composite_vehicles(calendar_year, compliance_id):
         for prior_veh in manufacturer_prior_vehicles:
             new_veh = Vehicle()
             transfer_vehicle_data(prior_veh, new_veh, model_year=calendar_year)
-            manufacturer_vehicles.append(new_veh)
 
-        if omega_globals.options.multiprocessing:
+            new_veh.in_production = new_veh.in_production or \
+                                    new_veh.model_year - new_veh.prior_redesign_year >= new_veh.redesign_interval
+
+            if new_veh.in_production:
+                manufacturer_vehicles.append(new_veh)
+            else:
+                pre_production_vehicles.append(new_veh)
+
+        if True and omega_globals.options.multiprocessing:
             results = []
             for new_veh in manufacturer_vehicles:
                 results.append(omega_globals.pool.apply_async(func=calc_vehicle_frontier,
@@ -713,26 +731,29 @@ def create_composite_vehicles(calendar_year, compliance_id):
         # group by market class / reg class
         mctrc = {'ALT_sales': 0, 'NO_ALT_sales': 0}
         for mc in omega_globals.options.MarketClass.market_classes:
-            mctrc[mc] = {'sales': 0, 'byp_prevalence': 0, 'NO_ALT_sales': 0, 'ALT_sales': 0}
+            mctrc[mc] = {'sales': 0, 'byp_prevalence': 0,
+                         'NO_ALT_sales': 0, 'ALT_sales': 0,
+                         'NO_ALT_abs_share': 0, 'ALT_abs_share': 0}
             for rc in omega_globals.options.RegulatoryClasses.reg_classes:
                 mctrc[mc][rc] = {'ALT': [], 'NO_ALT': []}
         for new_veh in manufacturer_vehicles:
+            new_veh_abs_share = new_veh.projected_sales / context_based_total_sales
             if new_veh.base_year_vehicle_id in non_covered_byvids:
                 # NO_ALT
                 mctrc[new_veh.market_class_id][new_veh.reg_class_id]['NO_ALT'].append(new_veh)
                 mctrc[new_veh.market_class_id]['NO_ALT_sales'] += new_veh.projected_sales
+                mctrc[new_veh.market_class_id]['NO_ALT_abs_share'] += new_veh_abs_share
                 if new_veh.base_year_product:
                     mctrc['NO_ALT_sales'] += new_veh.projected_sales
             else:
                 mctrc[new_veh.market_class_id][new_veh.reg_class_id]['ALT'].append(new_veh)
                 mctrc[new_veh.market_class_id]['ALT_sales'] += new_veh.projected_sales
+                mctrc[new_veh.market_class_id]['ALT_abs_share'] += new_veh_abs_share
                 if new_veh.base_year_product:
                     mctrc['ALT_sales'] += new_veh.projected_sales
             mctrc[new_veh.market_class_id]['sales'] += new_veh.projected_sales
             mctrc[new_veh.market_class_id]['byp_prevalence'] += new_veh.model_year_prevalence * new_veh.base_year_product
-
-        # context_based_alt_sales = mctrc['ALT_sales']
-        # context_based_no_alt_sales = mctrc['NO_ALT_sales']
+        # print_dict(mctrc)
 
         mcrc_priority_list = []
         for mc in omega_globals.options.MarketClass.market_classes:
@@ -740,6 +761,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
                 for alt in ['ALT', 'NO_ALT']:
                     if mctrc[mc][rc][alt]:
                         mcrc_priority_list.append((mc, rc, alt, len(mctrc[mc][rc][alt])))
+
         # sort composite vehicles by number of source vehicles
         mcrc_priority_list = sorted(mcrc_priority_list, key=lambda x: x[-1], reverse=True)
 
@@ -779,6 +801,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
                 market_class_tree.pop(k)
 
         _cache[cache_key] = {'composite_vehicles': composite_vehicles,
+                             'pre_production_vehicles': pre_production_vehicles,
                              'market_class_tree': market_class_tree,
                              'context_based_total_sales': context_based_total_sales,
                              # 'context_based_alt_sales': context_based_alt_sales,
@@ -787,16 +810,15 @@ def create_composite_vehicles(calendar_year, compliance_id):
     else:
         # pull cached composite vehicles (avoid recompute of composite frontiers, etc)
         composite_vehicles = _cache[cache_key]['composite_vehicles']
+        pre_production_vehicles = _cache[cache_key]['pre_production_vehicles']
         market_class_tree = _cache[cache_key]['market_class_tree']
         context_based_total_sales = _cache[cache_key]['context_based_total_sales']
-        # context_based_alt_sales = _cache[cache_key]['context_based_alt_sales']
-        # context_based_no_alt_sales = _cache[cache_key]['context_based_no_alt_sales']
 
-    return composite_vehicles, market_class_tree, context_based_total_sales #, \
-           # context_based_alt_sales, context_based_no_alt_sales
+    return composite_vehicles, pre_production_vehicles, market_class_tree, context_based_total_sales
 
 
-def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_vehicles, producer_decision):
+def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_vehicles, pre_production_vehicles,
+                        producer_decision):
     """
     Finalize vehicle production at the conclusion of the compliance search and producer-consumer market share
     iteration.  Source ``Vehicle`` objects from the composite vehicles are converted to ``VehicleFinal`` objects
@@ -830,6 +852,12 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
             veh_final = VehicleFinal()
             transfer_vehicle_data(veh, veh_final)
             manufacturer_new_vehicles.append(veh_final)
+
+    # propagate pre-production vehicles
+    for ppv in pre_production_vehicles:
+        veh_final = VehicleFinal()
+        transfer_vehicle_data(ppv, veh_final)
+        manufacturer_new_vehicles.append(veh_final)
 
     omega_globals.session.add_all(manufacturer_new_vehicles)
 

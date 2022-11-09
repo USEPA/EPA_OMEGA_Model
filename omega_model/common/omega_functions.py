@@ -208,7 +208,7 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=True):
     else:
         frontier_df = cloud
 
-    frontier_df['frontier_factor'] = 0
+    # frontier_df['frontier_factor'] = 0
 
     return frontier_df #.copy()
 

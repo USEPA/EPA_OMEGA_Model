@@ -326,7 +326,8 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                                     producer_consumer_iteration_num),
                                    echo_console=True)
 
-                candidate_mfr_composite_vehicles, producer_decision, market_class_tree, producer_compliant = \
+                candidate_mfr_composite_vehicles, pre_production_vehicles, producer_decision, market_class_tree, \
+                producer_compliant = \
                     compliance_search.search_production_options(compliance_id, calendar_year,
                                                                 producer_decision_and_response,
                                                                 producer_consumer_iteration_num,
@@ -339,7 +340,8 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                     omega_globals.producer_shares_mode = True
                     producer_decision_and_response = None
                     best_winning_combo_with_sales_response = None
-                    candidate_mfr_composite_vehicles, producer_decision, market_class_tree, producer_compliant = \
+                    candidate_mfr_composite_vehicles, pre_production_vehicles, producer_decision, market_class_tree, \
+                    producer_compliant = \
                         compliance_search.search_production_options(compliance_id, calendar_year,
                                                                 producer_decision_and_response,
                                                                 producer_consumer_iteration_num,
@@ -386,7 +388,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
             iteration_log.append(producer_decision_and_response)
 
             compliance_search.finalize_production(calendar_year, compliance_id, candidate_mfr_composite_vehicles,
-                                                  producer_decision_and_response)
+                                                  pre_production_vehicles, producer_decision_and_response)
 
             credit_banks[compliance_id].handle_credit(calendar_year,
                                                      producer_decision_and_response['total_credits_co2e_megagrams'])
@@ -1600,7 +1602,7 @@ def poolwait():
 
 
 def error_callback(e):
-    print('error_callback')
+    print('error_callback_%s' % __name__)
     print(e)
 
 

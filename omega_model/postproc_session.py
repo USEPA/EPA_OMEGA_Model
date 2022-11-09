@@ -62,7 +62,8 @@ def run_postproc(iteration_log, credit_banks):
                                                VehicleFinal.target_co2e_grams_per_mile,
                                                VehicleFinal.cert_co2e_grams_per_mile,
                                                VehicleFinal.cert_direct_kwh_per_mile,
-                                               VehicleFinal.lifetime_VMT, VehicleFinal.compliance_id).all()
+                                               VehicleFinal.lifetime_VMT, VehicleFinal.compliance_id)\
+        .filter(VehicleFinal.in_production).all()
 
     # index vehicle annual data by vehicle id and age for quick access
     vehicle_annual_data_df = pd.DataFrame(VehicleAnnualData._data).set_index(['compliance_id', 'vehicle_id', 'age'])
@@ -77,8 +78,7 @@ def run_postproc(iteration_log, credit_banks):
     vehicle_annual_data_df.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name
                                   + '_vehicle_annual_data.csv')
 
-    if (omega_globals.options.session_is_reference or 0.0 < omega_globals.options.credit_market_efficiency < 1.0) \
-            and omega_globals.options.consolidate_manufacturers:
+    if omega_globals.manufacturer_aggregation:
         from producer.manufacturer_annual_data import ManufacturerAnnualData
         from producer.vehicle_aggregation import aggregation_columns
 
@@ -122,7 +122,7 @@ def run_postproc(iteration_log, credit_banks):
         session_results['%s_sales_total' % manufacturer] = manufacturer_sales[manufacturer][1:]
 
     # generate manufacturer-specific plots and data if not consolidating
-    if 0.0 < omega_globals.options.credit_market_efficiency < 1.0 and omega_globals.options.consolidate_manufacturers:
+    if omega_globals.manufacturer_aggregation:
         compliance_ids = vehicles_table['manufacturer_id'].unique()
         compliance_ids = np.unique(np.append(compliance_ids, vehicles_table['compliance_id'].unique()))
     else:
@@ -308,7 +308,10 @@ def plot_cert_co2e_gpmi(calendar_years):
         vehicle_id_and_vmt_and_co2gpmi = [((v.compliance_id, v.vehicle_id), v.lifetime_VMT, v.cert_co2e_grams_per_mile) for v in vehicle_data if v.model_year == cy]
 
         for vehicle_id, lifetime_vmt, co2gpmi in vehicle_id_and_vmt_and_co2gpmi:
-            weighted_value += vehicle_annual_data[vehicle_id + tuple([0])]['registered_count'] * lifetime_vmt * co2gpmi
+            try:
+                weighted_value += vehicle_annual_data[vehicle_id + tuple([0])]['registered_count'] * lifetime_vmt * co2gpmi
+            except:
+                print('wtf')
             count += vehicle_annual_data[vehicle_id + tuple([0])]['registered_count'] * lifetime_vmt
 
         co2e_data['vehicle'].append(weighted_value / max(1, count))
