@@ -209,31 +209,28 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
     for k in market_class_dict:
         if verbose:
             print('processing ' + k)
-        # if type(market_class_dict[k]) is dict:
-        if type(market_class_dict[k]) is dict and set(market_class_dict[k].keys()) != set(['ALT', 'NO_ALT']):
+        if type(market_class_dict[k]) is dict and set(market_class_dict[k].keys()) != {'ALT', 'NO_ALT'}:
             # process subtree
             child_df_list.append(create_share_sweeps(calendar_year, market_class_dict[k],
                                 candidate_production_decisions, share_range,
                                 consumer_response, context_based_total_sales,
                                 node_name=k))
 
+    if node_name:
+        abs_share_column_names = ['producer_abs_share_frac_' + node_name + '.' + c + '.' + alt
+                                  for alt in ['ALT', 'NO_ALT'] for c in children]
+    else:
+        abs_share_column_names = ['producer_abs_share_frac_' + c for c in children]
+
     # Generate market share options
     if consumer_response is None:
         # generate producer desired market shares for responsive market sectors
-        producer_prefix = 'producer_abs_share_frac_'
-        if node_name:
-            share_column_names = [producer_prefix + node_name + '.' + c for c in children]
-        else:
-            share_column_names = [producer_prefix + c for c in children]
 
         responsive_children = [s in omega_globals.options.MarketClass.responsive_market_categories for s in children if market_class_dict[s]]
 
         if all(responsive_children):
             if responsive_children:
                 if len(responsive_children) > 1:
-
-                    share_column_names = [producer_prefix + node_name + '.' + c + '.' + alt
-                                          for alt in ['ALT', 'NO_ALT'] for c in children]
 
                     node_abs_share = _cache['mcat_data_%d' % calendar_year][node_name]['abs_share']
 
@@ -244,7 +241,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                         min_constraints = dict()
                         max_constraints = dict()
 
-                        for c, scn in zip(children + children, share_column_names):
+                        for c, scn in zip(children + children, abs_share_column_names):
                             if 'NO_ALT' in scn.split('.'):
                                 if scn not in min_constraints:
                                     min_constraints[scn] = 0
@@ -255,11 +252,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                     min_constraints[scn] += no_alt_share
                                     max_constraints[scn] = min_constraints[scn]
 
-                        # print_dict(min_constraints)
-                        # print_dict(max_constraints)
-
                         # TODO: work production constraints back in, if we want to:
-                        # for c, scn in zip(children, share_column_names):
+                        # for c, scn in zip(children, abs_share_column_names):
                         #     production_min = ProductionConstraints.get_minimum_share(calendar_year, scn.replace(producer_prefix, ''))
                         #     production_max = ProductionConstraints.get_maximum_share(calendar_year, scn.replace(producer_prefix, ''))
                         #     required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, scn.replace(producer_prefix, ''))
@@ -267,7 +261,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                         #     max_constraints[scn] = production_max
                         #     min_constraints[scn] = min(production_max, max(required_zev_share, production_min))
 
-                        sales_share_df = node_abs_share * partition(share_column_names,
+                        sales_share_df = node_abs_share * partition(abs_share_column_names,
                                                    num_levels=omega_globals.options.producer_num_market_share_options,
                                                    min_constraints=min_constraints, max_constraints=max_constraints)
 
@@ -286,9 +280,6 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                             if 'NO_ALT' in scn.split('.'):
                                 min_constraints[node_name] += min_constraints[scn]
 
-                        # print_dict(min_constraints)
-                        # print_dict(max_constraints)
-
                         # pass constraints to next iteration
                         sales_share_df['min_constraints_%s' % node_name] = str(min_constraints)
                         sales_share_df['max_constraints_%s' % node_name] = str(max_constraints)
@@ -298,17 +289,14 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                         min_constraints = Eval.eval(candidate_production_decisions['min_constraints_%s' % node_name].iloc[0])
                         max_constraints = Eval.eval(candidate_production_decisions['max_constraints_%s' % node_name].iloc[0])
 
-                        # print_dict(min_constraints)
-                        # print_dict(max_constraints)
-
                         # convert abs shares to relative shares for generate_constrained_nearby_shares, then scale
                         # the output by node_abs_share
                         cpd = candidate_production_decisions.copy()  # create temporary copy for relative shares
-                        for scn in share_column_names:
+                        for scn in abs_share_column_names:
                             cpd[scn] /= node_abs_share
 
                         sales_share_df = \
-                            node_abs_share * generate_constrained_nearby_shares(share_column_names, cpd,
+                            node_abs_share * generate_constrained_nearby_shares(abs_share_column_names, cpd,
                                                                share_range,
                                                                omega_globals.options.producer_num_market_share_options,
                                                                min_constraints=min_constraints,
@@ -319,7 +307,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                         sales_share_df['max_constraints_%s' % node_name] = str(max_constraints)
                 else:
                     sales_share_df = pd.DataFrame()
-                    for scn in share_column_names:
+                    for scn in abs_share_column_names:
                         sales_share_df[scn] = [1.0]  # TODO: set to _cache['mcat_data_%d' % calendar_year][node_name]['abs_share']... I think...
             else:
                 sales_share_df = pd.DataFrame()
@@ -327,17 +315,12 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
             # I'm not even sure if we need to do this... if we're setting absolute shares at the leaves...
             # but I guess it adds some tracking info to the dataframe which might be useful for debugging?
             sales_share_dict = dict()
-            for c, scn in zip(children, share_column_names):
+            for c, scn in zip(children, abs_share_column_names):
                 sales_share_dict[scn] = [_cache['mcat_data_%d' % calendar_year][c]['abs_share']]
 
             sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
     else:
         # inherit absolute market shares from consumer response
-        if node_name:
-            abs_share_column_names = ['producer_abs_share_frac_' + node_name + '.' + c for c in children]
-        else:
-            abs_share_column_names = ['producer_abs_share_frac_' + c for c in children]
-
         sales_share_dict = dict()
         for cn in abs_share_column_names:
             if cn.replace('producer', 'consumer') in consumer_response:
@@ -345,7 +328,10 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
         sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
 
-    # print('generate market share options time = %f' % (time.time() - start_time))
+        if 'min_constraints_%s' % node_name in consumer_response:
+            # pass constraints to next iteration
+            sales_share_df['min_constraints_%s' % node_name] = consumer_response['min_constraints_%s' % node_name]
+            sales_share_df['max_constraints_%s' % node_name] = consumer_response['max_constraints_%s' % node_name]
 
     child_df_list.append(sales_share_df)
 
@@ -356,8 +342,6 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
     for df in child_df_list:
         if not df.empty:
             share_combos_df = cartesian_prod(share_combos_df, df)
-
-    # print('generate share options time = %f' % (time.time() - start_time))
 
     return share_combos_df
 

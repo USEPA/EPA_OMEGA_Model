@@ -961,14 +961,19 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
         Nothing, updates ``producer_decsion`` with calculated market data
 
     """
-    # calculate sales-weighted co2 g/mi and cost by market class
+    # calculate sales-weighted values by market class
 
     for mc in omega_globals.options.MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
-        if market_class_vehicles:
-            producer_decision['producer_abs_share_frac_%s' % mc] = 0
-        else:
+        calc_producer_abs_share_frac_mc = False
+        if not market_class_vehicles:
             producer_decision['producer_abs_share_frac_%s' % mc] = None
+        elif 'producer_abs_share_frac_%s' % mc not in producer_decision:
+            # after create_share_sweeps() we need to calculate this, but we don't want to re-calculate it after the
+            # consumer response or it will short-circuit the producer-consumer iteration, since the consumer response
+            # distributes new sales and the new sales will calculate exactly to the consumer market shares...
+            producer_decision['producer_abs_share_frac_%s' % mc] = 0
+            calc_producer_abs_share_frac_mc = True
 
     for mc in omega_globals.options.MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
@@ -1012,8 +1017,9 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
             for v in market_class_vehicles:
                 producer_decision['sales_%s' % mc] += producer_decision['veh_%s_sales' % v.vehicle_id]
 
-            producer_decision['producer_abs_share_frac_%s' % mc] += \
-                producer_decision['sales_%s' % mc] / producer_decision['total_sales']
+            if calc_producer_abs_share_frac_mc:
+                producer_decision['producer_abs_share_frac_%s' % mc] += \
+                    producer_decision['sales_%s' % mc] / producer_decision['total_sales']
 
         else:
             producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc] = 0
