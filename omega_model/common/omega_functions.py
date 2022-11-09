@@ -379,13 +379,19 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
         column_names_sorted_by_span = sorted(span_dict, key=span_dict.__getitem__)
 
         # generate a range of shares for the first n-1 columns
+        scalars_only = True
         members = dict()
         for c in column_names_sorted_by_span[:-1]:
             if max_level_dict[c] > min_level_dict[c]:
                 members[c] = linspace(min_level_dict[c], max_level_dict[c], num_levels)
+                scalars_only = False
             else:
                 members[c] = min_level_dict[c]
-        members = pd.DataFrame.from_dict(members)
+
+        if scalars_only:
+            members = pd.DataFrame.from_dict([members])
+        else:
+            members = pd.DataFrame.from_dict(members)
 
         # generate cartesian product of first n-1 columns
         x = pd.DataFrame()
