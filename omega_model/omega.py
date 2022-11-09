@@ -714,13 +714,18 @@ def calc_new_vehicle_mfr_generalized_cost(producer_decision, producer_market_cla
     average_new_vehicle_mfr_generalized_cost = 0
     share_total = 0
     for mc in producer_market_classes:
-        if producer_decision['producer_abs_share_frac_%s' % mc] is not None:
+        if 'producer_abs_share_frac_%s' % mc in producer_decision:
             average_new_vehicle_mfr_generalized_cost += \
                 producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] * \
                 producer_decision['producer_abs_share_frac_%s' % mc]
             share_total += producer_decision['producer_abs_share_frac_%s' % mc]
 
-    return average_new_vehicle_mfr_generalized_cost / share_total
+    if share_total > 0:
+        cost = average_new_vehicle_mfr_generalized_cost / share_total
+    else:
+        cost = 0
+
+    return cost
 
 
 def calc_sales_and_cost_data_from_shares(calendar_year, compliance_id, producer_market_classes,
@@ -963,17 +968,16 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
     """
     # calculate sales-weighted values by market class
 
+    calc_producer_abs_share_frac = dict()
     for mc in omega_globals.options.MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
-        calc_producer_abs_share_frac_mc = False
-        if not market_class_vehicles:
-            producer_decision['producer_abs_share_frac_%s' % mc] = None
-        elif 'producer_abs_share_frac_%s' % mc not in producer_decision:
+        calc_producer_abs_share_frac[mc] = False
+        if market_class_vehicles and 'producer_abs_share_frac_%s' % mc not in producer_decision:
             # after create_share_sweeps() we need to calculate this, but we don't want to re-calculate it after the
             # consumer response or it will short-circuit the producer-consumer iteration, since the consumer response
             # distributes new sales and the new sales will calculate exactly to the consumer market shares...
             producer_decision['producer_abs_share_frac_%s' % mc] = 0
-            calc_producer_abs_share_frac_mc = True
+            calc_producer_abs_share_frac[mc] = True
 
     for mc in omega_globals.options.MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
@@ -1017,7 +1021,7 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
             for v in market_class_vehicles:
                 producer_decision['sales_%s' % mc] += producer_decision['veh_%s_sales' % v.vehicle_id]
 
-            if calc_producer_abs_share_frac_mc:
+            if calc_producer_abs_share_frac[mc]:
                 producer_decision['producer_abs_share_frac_%s' % mc] += \
                     producer_decision['sales_%s' % mc] / producer_decision['total_sales']
 
@@ -1103,7 +1107,7 @@ def calc_market_category_data(producer_decision):
                 producer_decision['sales_%s' % mcat] += \
                     np.maximum(1, producer_decision['sales_%s' % mc])
 
-                if producer_decision['producer_abs_share_frac_%s' % mc] is not None:
+                if 'producer_abs_share_frac_%s' % mc in producer_decision:
                     producer_decision['producer_abs_share_frac_%s' % mcat] += \
                         producer_decision['producer_abs_share_frac_%s' % mc]
 
@@ -1757,9 +1761,9 @@ def run_omega(session_runtime_options, standalone_run=False):
             if omega_globals.options.run_profiler:
                 os.system('snakeviz omega_profile.dmp')
 
-        # move appropriate outputs to base output folder, was CME == 1.0
+        # move appropriate outputs to base output folder
         file_io.move_folder_contents('%s%sconsolidate_%d' % (omega_globals.options.output_folder_base, os.sep,
-                                                             omega_globals.options.credit_market_efficiency > 0.0),
+                                                             consolidate[-1]),
                                      omega_globals.options.output_folder_base)
 
         # delete preliminary outputs if not preserving them

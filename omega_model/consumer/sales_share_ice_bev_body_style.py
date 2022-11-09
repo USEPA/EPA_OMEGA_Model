@@ -558,9 +558,19 @@ class SalesShare(OMEGABase, SalesShareBase):
                 market_class_data['consumer_generalized_cost_dollars_%s' % only_child] = \
                     total_cost_w_fuel_per_PMT
 
+                parent_share = market_class_data['consumer_abs_share_frac_%s' % mc_parent]
+
                 market_class_data['consumer_share_frac_%s' % only_child] = 1.0
-                market_class_data['consumer_abs_share_frac_%s' % only_child] = \
-                    producer_decision['producer_abs_share_frac_%s' % only_child]
+                market_class_data['consumer_abs_share_frac_%s' % only_child] = parent_share
+
+                max_constraints = Eval.eval(
+                    producer_decision['max_constraints_%s' % mc_parent])
+
+                for alt in ['ALT', 'NO_ALT']:
+                    only_child = mc_pair[0] + '.' + alt
+                    market_class_data['consumer_share_frac_%s' % only_child] = 1.0 * max_constraints['producer_abs_share_frac_%s' % only_child]
+                    market_class_data['consumer_abs_share_frac_%s' % only_child] = \
+                        parent_share * max_constraints['producer_abs_share_frac_%s' % only_child]
 
         return market_class_data
 
