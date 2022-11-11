@@ -1,9 +1,7 @@
 """
 
 Functions to get vehicle data based on vehicle ID, safety values based on body style and fatality rates based on
-calendar year of vehicle age.
-
-
+calendar year and vehicle age, and to calculate fatalities.
 
 ----
 
@@ -17,7 +15,6 @@ from omega_model import *
 
 def get_safety_values(body_style):
     """
-    Get safety values by body style.
 
     Args:
         body_style (str): the OMEGA body style (e.g., sedan, cuv_suv, pickup)
@@ -35,14 +32,11 @@ def get_safety_values(body_style):
 def get_fatality_rate(model_year, age):
     """
 
-    Get fatality rate for the given age of vehicle in the given model year.
-
     Args:
         model_year (int): the model year for which a fatality rate is needed.
 
     Returns:
-        The curb weight threshold and percentage changes in fatality rates for weight changes above and below
-        that threshold.
+        The average fatality rate for vehicles of a specific model year and age.
 
     """
     from effects.fatality_rates import FatalityRates
@@ -61,7 +55,6 @@ def calc_lbs_changed(base_weight, final_weight):
         The change in curb weight - positive denotes a weight increase, negative a weight decrease.
 
     """
-
     return final_weight - base_weight
 
 
@@ -127,12 +120,13 @@ def calc_lbs_changed_above_threshold(threshold, base_weight, final_weight):
     return lbs_changed
 
 
-def calc_safety_effects(calendar_years, vmt_adjustments):
+def calc_safety_effects(calendar_years, vmt_adjustments, context_fuel_cpm_dict):
     """
 
     Args:
         calendar_years: The years for which safety effects will be calculated.
-        vmt_adjustments: object; an object of the AdjustmentsVMT class
+        vmt_adjustments: object; an object of the AdjustmentsVMT class.
+        context_fuel_cpm_dict: dictionary; the session 0 fuel costs per mile by vehicle_id and age.
 
     Returns:
         A dictionary of various safety effects, including fatalities.
@@ -140,6 +134,11 @@ def calc_safety_effects(calendar_years, vmt_adjustments):
     """
     from producer.vehicle_annual_data import VehicleAnnualData
     from producer.vehicles import VehicleFinal
+    from context.fuel_prices import FuelPrice
+    from context.onroad_fuels import OnroadFuel
+    from context.new_vehicle_market import NewVehicleMarket
+    from effects.general_functions import calc_rebound_effect
+    from common.omega_eval import Eval
 
     vehicle_attribute_list = [
         'manufacturer_id',
@@ -147,6 +146,7 @@ def calc_safety_effects(calendar_years, vmt_adjustments):
         'model_year',
         'base_year_reg_class_id',
         'reg_class_id',
+        'context_size_class',
         'in_use_fuel_id',
         'market_class_id',
         'fueling_class',
@@ -154,10 +154,15 @@ def calc_safety_effects(calendar_years, vmt_adjustments):
         'body_style',
         'base_year_curbweight_lbs',
         'curbweight_lbs',
+        'onroad_direct_co2e_grams_per_mile',
+        'onroad_direct_kwh_per_mile',
     ]
+
+    rebound_rate = omega_globals.options.vmt_rebound_rate
 
     safety_effects_dict = dict()
     vehicle_info_dict = dict()
+
     for calendar_year in calendar_years:
         vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year)
 
@@ -173,8 +178,9 @@ def calc_safety_effects(calendar_years, vmt_adjustments):
                 vehicle_info_dict[vehicle_id] \
                     = VehicleFinal.get_vehicle_attributes(vehicle_id, vehicle_attribute_list)
 
-            mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_class_id, fueling_class, \
-            base_year_powertrain_type, body_style, base_year_curbweight_lbs, curbweight_lbs \
+            mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, size_class, in_use_fuel_id, market_class_id, \
+            fueling_class, base_year_powertrain_type, body_style, base_year_curbweight_lbs, curbweight_lbs, \
+            onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
                 = vehicle_info_dict[vehicle_id]
 
             # exclude any vehicle_ids that are considered legacy fleet
@@ -183,14 +189,45 @@ def calc_safety_effects(calendar_years, vmt_adjustments):
                 threshold_lbs, change_per_100lbs_below, change_per_100lbs_above = get_safety_values(body_style)
                 fatality_rate_base = get_fatality_rate(model_year, age)
 
+                onroad_kwh_per_mile = onroad_gallons_per_mile = fuel_cpm = 0
+
+                rebound_effect = None
+                fuel_dict = Eval.eval(in_use_fuel_id, {'__builtins__': None}, {})
+                for fuel, fuel_share in fuel_dict.items():
+
+                    retail_price = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel)
+
+                    # calc fuel cost per mile
+                    if fuel == 'US electricity' and onroad_direct_kwh_per_mile:
+                        onroad_kwh_per_mile += onroad_direct_kwh_per_mile
+                        fuel_cpm += onroad_kwh_per_mile * retail_price
+
+                    elif fuel != 'US electricity' and onroad_direct_co2e_grams_per_mile:
+                        refuel_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
+                        co2_emissions_grams_per_unit \
+                            = OnroadFuel.get_fuel_attribute(calendar_year, fuel,
+                                                            'direct_co2e_grams_per_unit') / refuel_efficiency
+                        onroad_gallons_per_mile += onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
+                        fuel_cpm += onroad_gallons_per_mile * retail_price
+
+                # get context fuel cost per mile
+                context_fuel_cpm = context_fuel_cpm_dict[(vehicle_id, age)]['fuel_cost_per_mile']
+                rebound_effect = calc_rebound_effect(context_fuel_cpm, fuel_cpm, rebound_rate)
+
                 calendar_year_vmt_adj = vmt_adjustments.dict[calendar_year]
-                adjusted_vmt = vad['vmt'] * calendar_year_vmt_adj
-                adjusted_annual_vmt = adjusted_vmt / vad['registered_count']
+                vmt_adjusted = vad['vmt'] * calendar_year_vmt_adj
+                vmt_rebound = 0
+                if rebound_effect:
+                    vmt_rebound = vmt_adjusted * rebound_effect
+
+                vmt_adjusted = vmt_adjusted + vmt_rebound
+                annual_vmt_adjusted = vmt_adjusted / vad['registered_count']
+                annual_vmt_rebound = vmt_rebound / vad['registered_count']
                 if age == 0:
-                    adjusted_odometer = adjusted_annual_vmt
+                    odometer_adjusted = annual_vmt_adjusted
                 else:
                     odometer_last_year = safety_effects_dict[(vehicle_id, calendar_year - 1, age - 1)]['odometer']
-                    adjusted_odometer = odometer_last_year + adjusted_annual_vmt
+                    odometer_adjusted = odometer_last_year + annual_vmt_adjusted
 
                 lbs_changed = calc_lbs_changed(base_year_curbweight_lbs, curbweight_lbs)
 
@@ -207,9 +244,9 @@ def calc_safety_effects(calendar_years, vmt_adjustments):
 
                 fatality_rate_session = fatality_rate_base * (1 + rate_change_below) * (1 + rate_change_above)
 
-                fatalities_base = fatality_rate_base * adjusted_vmt / 1000000000
+                fatalities_base = fatality_rate_base * vmt_adjusted / 1000000000
 
-                fatalities_session = fatality_rate_session * adjusted_vmt / 1000000000
+                fatalities_session = fatality_rate_session * vmt_adjusted / 1000000000
 
                 vehicle_safety_dict.update({
                     'session_name': omega_globals.options.session_name,
@@ -221,15 +258,18 @@ def calc_safety_effects(calendar_years, vmt_adjustments):
                     'age': age,
                     'base_year_reg_class_id': base_year_reg_class_id,
                     'reg_class_id': reg_class_id,
+                    'context_size_class': size_class,
                     'in_use_fuel_id': in_use_fuel_id,
                     'market_class_id': market_class_id,
                     'fueling_class': fueling_class,
                     'base_year_powertrain_type': base_year_powertrain_type,
                     'registered_count': vad['registered_count'],
-                    'vmt_adjustment': calendar_year_vmt_adj,
-                    'annual_vmt': adjusted_annual_vmt,
-                    'odometer': adjusted_odometer,
-                    'vmt': adjusted_vmt,
+                    'context_vmt_adjustment': calendar_year_vmt_adj,
+                    'annual_vmt': annual_vmt_adjusted,
+                    'odometer': odometer_adjusted,
+                    'vmt': vmt_adjusted,
+                    'annual_vmt_rebound': annual_vmt_rebound,
+                    'vmt_rebound': vmt_rebound,
                     'body_style': body_style,
                     'change_per_100lbs_below': change_per_100lbs_below,
                     'change_per_100lbs_above': change_per_100lbs_above,
@@ -267,6 +307,9 @@ def calc_legacy_fleet_safety_effects(calendar_years, vmt_adjustments):
     Returns:
         A dictionary of various safety effects, including fatalities.
 
+    Note:
+        There is no rebound VMT calculated for the legacy fleet.
+
     """
     from effects.legacy_fleet import LegacyFleet
 
@@ -285,16 +328,16 @@ def calc_legacy_fleet_safety_effects(calendar_years, vmt_adjustments):
         age = nested_dict['age']
 
         calendar_year_vmt_adj = vmt_adjustments.get_vmt_adjustment(calendar_year)
-        adjusted_vmt = nested_dict['vmt'] * calendar_year_vmt_adj
-        adjusted_annual_vmt = adjusted_vmt / registered_count
+        vmt_adjusted = nested_dict['vmt'] * calendar_year_vmt_adj
+        annual_vmt_adjusted = vmt_adjusted / registered_count
         if nested_dict['calendar_year'] == calendar_years[0]:
             annual_vmt = nested_dict['annual_vmt']
             odometer = nested_dict['odometer']
-            adjusted_odometer = odometer - annual_vmt + adjusted_annual_vmt
+            odometer_adjusted = odometer - annual_vmt + annual_vmt_adjusted
         else:
             odometer_last_year \
                 = legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year - 1, age - 1)]['odometer']
-            adjusted_odometer = odometer_last_year + adjusted_annual_vmt
+            odometer_adjusted = odometer_last_year + annual_vmt_adjusted
 
         fueling_class = base_year_powertrain_type = threshold_lbs = 'ICE'
         if 'BEV' in market_class_id:
@@ -304,7 +347,7 @@ def calc_legacy_fleet_safety_effects(calendar_years, vmt_adjustments):
 
         fatality_rate_base = get_fatality_rate(model_year, age)
 
-        fatalities_base = fatality_rate_base * adjusted_vmt / 1000000000
+        fatalities_base = fatality_rate_base * vmt_adjusted / 1000000000
 
         vehicle_safety_dict.update({
             'session_name': omega_globals.options.session_name,
@@ -316,15 +359,18 @@ def calc_legacy_fleet_safety_effects(calendar_years, vmt_adjustments):
             'age': int(age),
             'base_year_reg_class_id': reg_class_id,
             'reg_class_id': reg_class_id,
+            'context_size_class': 'not applicable',
             'in_use_fuel_id': fuel_id,
             'market_class_id': market_class_id,
             'fueling_class': fueling_class,
             'base_year_powertrain_type': base_year_powertrain_type,
             'registered_count': registered_count,
-            'vmt_adjustment': calendar_year_vmt_adj,
-            'annual_vmt': adjusted_annual_vmt,
-            'odometer': adjusted_odometer,
-            'vmt': adjusted_vmt,
+            'context_vmt_adjustment': calendar_year_vmt_adj,
+            'annual_vmt': annual_vmt_adjusted,
+            'odometer': odometer_adjusted,
+            'vmt': vmt_adjusted,
+            'annual_vmt_rebound': 0,
+            'vmt_rebound': 0,
             'body_style': nested_dict['body_style'],
             'change_per_100lbs_below': 0,
             'change_per_100lbs_above': 0,

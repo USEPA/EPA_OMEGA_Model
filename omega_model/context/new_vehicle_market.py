@@ -30,15 +30,16 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,context_new_vehicle_market,input_template_version:,0.2
+       input_template_name:,context_new_vehicle_market,input_template_version:,0.22
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        context_id,dollar_basis,case_id,context_size_class,calendar_year,reg_class_id,sales_share_of_regclass,sales_share_of_total,sales,weight_lbs,horsepower,horsepower_to_weight_ratio,mpg_conventional,mpg_conventional_onroad,mpg_alternative,mpg_alternative_onroad,onroad_to_cycle_mpg_ratio,ice_price_dollars,bev_price_dollars
-        AEO2020,2019,Reference case,Minicompact,2019,car,0.42,0.19,30958.78204,2938.287598,266.538513,0.090712193,32.889961,26.8584355,57.07032,46.60447937,0.816615,76875.038,0
-        AEO2020,2019,Reference case,Large Utility,2019,truck,5.01,2.67,419179.8267,5278.119141,347.891754,0.065912069,25.18989,20.53877833,28.389875,23.1479117,0.815358,62510.323,109753.937
+        context_id,dollar_basis,case_id,context_size_class,body_style,calendar_year,reg_class_id,sales_share_of_body_style,sales_share_of_regclass,sales_share_of_total,sales,weight_lbs,horsepower,horsepower_to_weight_ratio,mpg_conventional,mpg_conventional_onroad,mpg_alternative,mpg_alternative_onroad,onroad_to_cycle_mpg_ratio,ice_price_dollars,bev_price_dollars
+        AEO2020,2019,Reference case,Minicompact,sedan_wagon,2019,car,0.56,0.42,0.19,30958.782039697202,2938.287598,266.538513,0.09071219344948549,32.889961,26.858435502015,57.07032,46.6044793668,0.816615,76875.038,0.0
+        AEO2020,2019,Reference case,Subcompact,sedan_wagon,2019,car,6.1,4.52,2.11,331827.2822319624,3315.591309,263.971893,0.07961532903149494,33.923519,27.702454468185,49.373997,40.319546560155004,0.816615,40670.395,0.0
+
 
 Data Column Name and Description
     :context_id:
@@ -53,6 +54,9 @@ Data Column Name and Description
     :context_size_class:
         The name of the vehicle size class, e.g. 'Minicompact', 'Large Utility', etc
 
+    :body_style:
+        The name of the vehicle body style, e.g., 'sedan_wagon', 'cuv_suv_van', 'pickup'
+
     :calendar_year:
         The calendar year of the vehicle market data
 
@@ -60,6 +64,9 @@ Data Column Name and Description
         The regulatory class of the vehicle data (within the context, reg class definitions may differ across
         years within the simulation based on policy changes. ``reg_class_id`` can be considered a 'historical' or
         'legacy' reg class.
+
+    :sales_share_of_body_style:
+        Sales share of the size class within its body style
 
     :sales_share_of_regclass:
         Sales share of the size class within its regulatory class
@@ -137,6 +144,8 @@ class NewVehicleMarket(OMEGABase):
     context_size_classes = []  # list of known context size classes from the input file (not all may be used, depending on the composition of the base year fleet)
     context_ids = []  # list of known context IDs from the input file
     context_case_ids = []  # list of known case IDs from the input file
+
+    _data = dict()
 
     @classmethod
     def init_context_new_vehicle_generalized_costs(cls, filename):
@@ -354,6 +363,30 @@ class NewVehicleMarket(OMEGABase):
         return context_id in NewVehicleMarket.context_ids
 
     @staticmethod
+    def get_context_size_class_mpg(size_class, reg_class_id, year, onroad=True):
+        """
+
+        Args:
+            size_class (str): the context_size_class, e.g., "Subcompact", "Large Van"
+            reg_class_id (str): e.g., "car", "truck"
+            year (int): the calendar year of new vehicles (i.e., the model year for age=0)
+            onroad (bool): onroad miles per gallon if True; cycle if False
+
+        Returns:
+
+        """
+        arg = 'mpg_conventional_onroad'
+        if not onroad:
+            arg = 'mpg_conventional'
+        if (size_class, reg_class_id, year) in NewVehicleMarket._data:
+            return NewVehicleMarket._data[(size_class, reg_class_id, year)][arg]
+        elif (size_class, 'car', year) in NewVehicleMarket._data:
+            return NewVehicleMarket._data[(size_class, 'car', year)][arg]
+        else:
+            return NewVehicleMarket._data[(size_class, 'truck', year)][arg]
+
+
+    @staticmethod
     def init_from_file(filename, verbose=False):
         """
 
@@ -380,9 +413,9 @@ class NewVehicleMarket(OMEGABase):
         NewVehicleMarket.hauling_context_size_class_info = dict()
 
         input_template_name = 'context_new_vehicle_market'
-        input_template_version = 0.21
+        input_template_version = 0.22
         input_template_columns = {'context_id', 'dollar_basis',	'case_id', 'context_size_class', 'body_style', 'calendar_year', 'reg_class_id',
-                                  'sales_share_of_regclass', 'sales_share_of_total', 'sales', 'weight_lbs',
+                                  'sales_share_of_body_style', 'sales_share_of_regclass', 'sales_share_of_total', 'sales', 'weight_lbs',
                                   'horsepower', 'horsepower_to_weight_ratio', 'mpg_conventional',
                                   'mpg_conventional_onroad', 'mpg_alternative', 'mpg_alternative_onroad',
                                   'onroad_to_cycle_mpg_ratio', 'ice_price_dollars', 'bev_price_dollars'}
@@ -412,6 +445,15 @@ class NewVehicleMarket(OMEGABase):
             NewVehicleMarket.context_size_classes = df['context_size_class'].unique().tolist()
             NewVehicleMarket.context_ids = df['context_id'].unique().tolist()
             NewVehicleMarket.context_case_ids = df['case_id'].unique().tolist()
+
+            df = df.loc[(df['context_id'] == omega_globals.options.context_id)
+                        & (df['case_id'] == omega_globals.options.context_case_id), :]
+            key = pd.Series(zip(
+                df['context_size_class'],
+                df['reg_class_id'],
+                df['calendar_year'],
+            ))
+            NewVehicleMarket._data = df.set_index(key).to_dict(orient='index')
 
         return template_errors
 

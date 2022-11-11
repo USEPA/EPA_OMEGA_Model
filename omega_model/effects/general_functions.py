@@ -115,3 +115,18 @@ def save_dict_to_csv(dict_to_save, save_path, index):
     df.to_csv(f'{save_path}', index=index)
 
     return df
+
+
+def calc_rebound_effect(fuel_cpm_old, fuel_cpm_new, rebound_rate):
+    """
+
+    Args:
+        fuel_cpm_old (numeric): fuel cost per mile prior to a change, whether driven by fuel consumption or fuel price.
+        fuel_cpm_new (numeric): fuel cost per mile after a change, whether driven by fuel consumption or fuel price.
+        rebound_rate (numeric): this should be a negative value if fewer miles are driven upon higher costs per mile.
+
+    Returns:
+        The rebound effect.
+
+    """
+    return rebound_rate * (fuel_cpm_new - fuel_cpm_old) / fuel_cpm_old

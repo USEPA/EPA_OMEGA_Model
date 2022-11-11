@@ -23,8 +23,7 @@ class AdjustmentsVMT:
             calendar_years: The years for which VMT adjustments are to be made.
 
         Returns:
-            Nothing, but it creates a dictionary of adjusted VMT values by vehicle_id and calendar year for use in
-            effects calculations.
+            Nothing, but it creates a dictionary of adjusted VMT values by calendar year for use in effects calculations.
 
         """
         from producer.vehicle_annual_data import VehicleAnnualData
@@ -45,6 +44,7 @@ class AdjustmentsVMT:
             # sum the two to get the fleet vmt
             calendar_year_vmt += calendar_year_legacy_fleet_vmt
 
+            # get projected stock vmt
             context_stock, context_vmt = ContextStockVMT.get_context_stock_vmt(calendar_year)
 
             # calc the vmt adjustment for this calendar year
@@ -56,10 +56,10 @@ class AdjustmentsVMT:
         """
 
         Args:
-            calendar_year: int; the calendar year for which the adjustment factor is sought
+            calendar_year: int; the calendar year for which the adjustment factor is sought.
 
         Returns:
-            The adjustment factor for the passed calendar year
+            The vmt adjustment factor for the passed calendar year.
 
         """
         return self.dict[calendar_year]
