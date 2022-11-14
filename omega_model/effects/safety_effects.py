@@ -223,7 +223,7 @@ def calc_safety_effects(calendar_years, vmt_adjustments, context_fuel_cpm_dict):
 
                 if fuel_flag == 2:
                     rebound_rate = rebound_rate_ice
-                rebound_effect = calc_rebound_effect(context_fuel_cpm, fuel_cpm, rebound_rate)
+                # rebound_effect = calc_rebound_effect(context_fuel_cpm, fuel_cpm, rebound_rate)
                 if context_fuel_cpm > 0:
                     rebound_effect = calc_rebound_effect(context_fuel_cpm, fuel_cpm, rebound_rate)
                 else:

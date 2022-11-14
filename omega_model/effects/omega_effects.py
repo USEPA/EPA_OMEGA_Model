@@ -55,7 +55,7 @@ Note:
 
 """
 import pandas as pd
-from pathlib import Path
+from pathlib import Path, PurePath
 
 from omega_model import *
 from omega_model.effects.context_fuel_cost_per_mile import calc_fuel_cost_per_mile
@@ -114,8 +114,13 @@ def run_effects_calcs():
         omega_log.logwrite('\nCalculating physical effects')
 
         # calculate context fuel costs per mile and save or open saved file
-        context_fuel_cost_per_mile_file = \
-            f'{omega_globals.options.output_folder_base}' + 'context_fuel_cost_per_mile.csv'
+        if omega_globals.options.standalone_run:
+            context_fuel_cpm_filepath = PurePath(f'{omega_globals.options.output_folder_base}')
+        else:
+            context_fuel_cpm_filepath = PurePath(f'{omega_globals.options.output_folder_base}').parent.parent
+        context_fuel_cost_per_mile_file = context_fuel_cpm_filepath / 'context_fuel_cost_per_mile.csv'
+        # context_fuel_cost_per_mile_file = \
+        #     f'{omega_globals.options.output_folder_base}' + 'context_fuel_cost_per_mile.csv'
 
         if omega_globals.options.session_is_reference:
             context_fuel_cpm_dict = calc_fuel_cost_per_mile(calendar_years)
