@@ -59,14 +59,11 @@ class FatalityRates(OMEGABase):
     def get_fatality_rate(model_year, age):
         """
 
-        Get fatality rate for the given age of vehicle in the given model year.
-
         Args:
             model_year (int): the model year for which a fatality rate is needed.
 
         Returns:
-            The curb weight threshold and percentage changes in fatality rates for weight changes above and below
-            that threshold.
+            The average fatality rate for vehicles of a specific model year and age.
 
         """
         year = model_year
