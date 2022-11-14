@@ -459,7 +459,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
         # insert code to cull production options based on policy here #
         GWh_limit = np.interp(calendar_year, omega_globals.options.battery_GWh_limit_years,
-                              omega_globals.options.battery_GWh_limit)
+                              omega_globals.options.battery_GWh_limit[compliance_id])
 
         production_options = production_options[production_options['total_battery_GWh'] <= GWh_limit].copy()
 
