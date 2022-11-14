@@ -821,7 +821,8 @@ class OMEGABatchObject(OMEGABase):
         self.settings.context_case_id = self.read_parameter('Context Case')
         self.settings.new_vehicle_price_elasticity_of_demand = \
             self.read_parameter('New Vehicle Price Elasticity of Demand')
-        self.settings.vmt_rebound_rate = self.read_parameter('VMT Rebound Rate')
+        self.settings.vmt_rebound_rate_ice = self.read_parameter('VMT Rebound Rate ICE')
+        self.settings.vmt_rebound_rate_bev = self.read_parameter('VMT Rebound Rate BEV')
         self.settings.consumer_pricing_multiplier_max = \
             self.read_parameter('Producer Cross Subsidy Multiplier Max')
         self.settings.consumer_pricing_multiplier_min = \
