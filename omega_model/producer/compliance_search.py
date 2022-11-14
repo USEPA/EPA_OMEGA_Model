@@ -258,9 +258,9 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                     max_constraints[scn] = 0
                                 for cv in market_class_dict[c]['NO_ALT']:
                                     # min() to protect against floating point error going a femto over 1
-                                    no_alt_share = min(1.0, sum([v.projected_sales for v in
-                                                        cv.vehicle_list]) / context_based_total_sales / node_abs_share)
-                                    min_constraints[scn] += no_alt_share
+                                    no_alt_share = sum([v.projected_sales for v in cv.vehicle_list]) / \
+                                                   context_based_total_sales / node_abs_share
+                                    min_constraints[scn] = min(1.0, min_constraints[scn] + no_alt_share)
                                     max_constraints[scn] = min_constraints[scn]
 
                         # TODO: work production constraints back in, if we want to:

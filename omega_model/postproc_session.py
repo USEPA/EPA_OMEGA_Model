@@ -78,7 +78,7 @@ def run_postproc(iteration_log, credit_banks):
     vehicle_annual_data_df.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name
                                   + '_vehicle_annual_data.csv')
 
-    if omega_globals.manufacturer_aggregation:
+    if omega_globals.manufacturer_aggregation and omega_globals.options.consolidate_manufacturers:
         from producer.manufacturer_annual_data import ManufacturerAnnualData
         from producer.vehicle_aggregation import aggregation_columns
 
@@ -175,7 +175,7 @@ def run_postproc(iteration_log, credit_banks):
     # base year data, otherwise the dataframe at the end will fail due to inconsistent column lengths
 
     for msr in market_share_results:
-        session_results[msr] = market_share_results[msr] = market_share_results[msr][1:]
+        session_results[msr] = market_share_results[msr] = market_share_results[msr][1:].copy()
 
     for cat in market_categories + market_classes + ['vehicle']:
         session_results \

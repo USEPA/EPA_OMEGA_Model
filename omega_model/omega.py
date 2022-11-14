@@ -1038,6 +1038,7 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
             producer_decision['average_footprint_ft2_%s' % mc] = 0
             producer_decision['average_onroad_mpg_%s' % mc] = 0
             producer_decision['sales_%s' % mc] = 0
+            producer_decision['producer_abs_share_frac_%s' % mc] = 0
 
 
 def calc_market_category_data(producer_decision):

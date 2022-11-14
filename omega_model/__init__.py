@@ -158,6 +158,7 @@ try:
             self.discount_values_to_year = 2021
             self.cost_accrual = 'end-of-year'  # end-of-year means costs accrue at year's end; beginning-of-year means cost accrue at year's beginning
             self.allow_ice_of_bev = False
+            self.vmt_rebound_rate = 0
 
             # effects modeling files
             self.general_inputs_for_effects_file = path + 'test_inputs/general_inputs_for_effects.csv'
