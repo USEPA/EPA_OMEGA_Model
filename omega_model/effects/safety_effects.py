@@ -212,7 +212,10 @@ def calc_safety_effects(calendar_years, vmt_adjustments, context_fuel_cpm_dict):
 
                 # get context fuel cost per mile
                 context_fuel_cpm = context_fuel_cpm_dict[(vehicle_id, age)]['fuel_cost_per_mile']
-                rebound_effect = calc_rebound_effect(context_fuel_cpm, fuel_cpm, rebound_rate)
+                if context_fuel_cpm > 0:
+                    rebound_effect = calc_rebound_effect(context_fuel_cpm, fuel_cpm, rebound_rate)
+                else:
+                    rebound_effect = 0
 
                 calendar_year_vmt_adj = vmt_adjustments.dict[calendar_year]
                 vmt_adjusted = vad['vmt'] * calendar_year_vmt_adj
