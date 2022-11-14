@@ -175,7 +175,7 @@ def run_postproc(iteration_log, credit_banks):
     # base year data, otherwise the dataframe at the end will fail due to inconsistent column lengths
 
     for msr in market_share_results:
-        session_results[msr] = market_share_results[msr] = market_share_results[msr][1:]
+        session_results[msr] = market_share_results[msr] = market_share_results[msr][1:].copy()
 
     for cat in market_categories + market_classes + ['vehicle']:
         session_results \
