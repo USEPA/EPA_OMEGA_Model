@@ -432,6 +432,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
     continue_search = True
     search_iteration = 0
     best_candidate_production_decision = None
+    constraint_ratio = 1.0
 
     while continue_search:
         share_range = omega_globals.options.producer_compliance_search_convergence_factor ** search_iteration
@@ -439,20 +440,13 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         composite_vehicles, pre_production_vehicles, market_class_tree, context_based_total_sales = \
             create_composite_vehicles(calendar_year, compliance_id)
 
-        # start_time = time.time()
-
         tech_sweeps = create_tech_sweeps(composite_vehicles, candidate_production_decisions, share_range)
-        # print('tech_sweeps time %f' % (time.time() - start_time))
 
-        # start_time = time.time()
         share_sweeps = create_share_sweeps(calendar_year, market_class_tree,
                                            candidate_production_decisions, share_range,
                                            producer_decision_and_response, context_based_total_sales)
-        # print('share_sweeps time %f' % (time.time() - start_time))
-        #
-        # start_time = time.time()
+
         tech_and_share_sweeps = cartesian_prod(tech_sweeps, share_sweeps)
-        # print('cartesian_prod time %f' % (time.time() - start_time))
 
         production_options = create_production_options_from_shares(composite_vehicles, tech_and_share_sweeps,
                                                                    context_based_total_sales)
@@ -461,7 +455,30 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         GWh_limit = np.interp(calendar_year, omega_globals.options.battery_GWh_limit_years,
                               omega_globals.options.battery_GWh_limit)
 
-        production_options = production_options[production_options['total_battery_GWh'] <= GWh_limit].copy()
+        valid_production_options = production_options[production_options['total_battery_GWh'] <= GWh_limit].copy()
+
+        if not valid_production_options.empty:
+            production_options = valid_production_options
+            # constraint_ratio = GWh_limit / production_options['total_battery_GWh'].mean()
+            # print('constraint ratio %f, %f, %f' % (
+            # constraint_ratio, GWh_limit, production_options['total_battery_GWh'].mean()))
+        else:  # no valid production options
+            if True or producer_decision_and_response is not None:
+                # find new BEV limits by adjusting constraints
+                constraint_ratio = GWh_limit / production_options['total_battery_GWh'].min()
+                print('*** constraint ratio %f, %f, %f' % (constraint_ratio, GWh_limit, production_options['total_battery_GWh'].min()))
+                # constraints = [k for k in producer_decision_and_response.keys() if 'max_constraint' in k]
+                # for constraint in constraints:
+                #     max_constraints = Eval.eval(producer_decision_and_response[constraint].iloc[0])
+                #     for k in max_constraints:
+                #         if 'BEV.ALT' in k:
+                #             max_constraints[k] *= constraint_ratio
+                #             producer_decision_and_response[constraint] = str(max_constraints)
+
+                production_options = valid_production_options
+            else:
+                # no valid production options, even without the consumer response, accept fate:
+                production_options = valid_production_options
 
         if production_options.empty:
             producer_compliance_possible = None
@@ -533,7 +550,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                                                                              selected_production_decision)
 
     return composite_vehicles, pre_production_vehicles, selected_production_decision, market_class_tree, \
-           producer_compliance_possible
+           producer_compliance_possible, constraint_ratio
 
 
 def calc_composite_vehicles(mc, rc, alt, mctrc):

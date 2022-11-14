@@ -327,25 +327,44 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, pre_production_vehicles, producer_decision, market_class_tree, \
-                producer_compliant = \
+                producer_compliant, constraint_ratio = \
                     compliance_search.search_production_options(compliance_id, calendar_year,
                                                                 producer_decision_and_response,
                                                                 producer_consumer_iteration_num,
                                                                 strategic_target_offset_Mg)
 
+                # if producer_compliant is None:
+                #     # no viable production options, try again in producer shares mode
+                #     omega_log.logwrite('### Production Constraints Violated, Enabling Producer Shares Mode ###')
+                #     producer_consumer_iteration_num += 1
+                #     omega_globals.producer_shares_mode = True
+                #     producer_decision_and_response = None
+                #     best_winning_combo_with_sales_response = None
+                #     candidate_mfr_composite_vehicles, pre_production_vehicles, producer_decision, market_class_tree, \
+                #     producer_compliant, constraint_ratio = \
+                #         compliance_search.search_production_options(compliance_id, calendar_year,
+                #                                                 producer_decision_and_response,
+                #                                                 producer_consumer_iteration_num,
+                #                                                 strategic_target_offset_Mg)
+
                 if producer_compliant is None:
-                    # no viable production options, try again in producer shares mode
-                    omega_log.logwrite('### Production Constraints Violated, Enabling Producer Shares Mode ###')
+                    from common.omega_eval import *
+
+                    # no viable production options, try again in producer shares mode, try again with lower BEV limits
+                    omega_log.logwrite('### Production Constraints Violated, Modifying Constraints (contraint_ratio = %f) ###' % constraint_ratio)
                     producer_consumer_iteration_num += 1
-                    omega_globals.producer_shares_mode = True
-                    producer_decision_and_response = None
-                    best_winning_combo_with_sales_response = None
-                    candidate_mfr_composite_vehicles, pre_production_vehicles, producer_decision, market_class_tree, \
-                    producer_compliant = \
-                        compliance_search.search_production_options(compliance_id, calendar_year,
-                                                                producer_decision_and_response,
-                                                                producer_consumer_iteration_num,
-                                                                strategic_target_offset_Mg)
+
+                    constraints = [k for k in best_winning_combo_with_sales_response.keys() if 'max_constraint' in k]
+                    for constraint in constraints:
+                        max_constraints = Eval.eval(best_winning_combo_with_sales_response[constraint])
+                        for k in max_constraints:
+                            if 'BEV.ALT' in k:
+                                print(k)
+                                max_constraints[k] = best_winning_combo_with_sales_response[k.replace('producer', 'consumer')] * constraint_ratio
+                                best_winning_combo_with_sales_response[constraint] = str(max_constraints)
+                    producer_decision = best_winning_combo_with_sales_response
+                    producer_decision_and_response = None  # not sure if I need to do this...
+                    best_winning_combo_with_sales_response = None  # not sure if I need to do this...
 
                 producer_market_classes = calc_market_data(candidate_mfr_composite_vehicles, producer_decision)
 
