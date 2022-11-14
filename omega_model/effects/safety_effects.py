@@ -224,6 +224,10 @@ def calc_safety_effects(calendar_years, vmt_adjustments, context_fuel_cpm_dict):
                 if fuel_flag == 2:
                     rebound_rate = rebound_rate_ice
                 rebound_effect = calc_rebound_effect(context_fuel_cpm, fuel_cpm, rebound_rate)
+                if context_fuel_cpm > 0:
+                    rebound_effect = calc_rebound_effect(context_fuel_cpm, fuel_cpm, rebound_rate)
+                else:
+                    rebound_effect = 0
 
                 # calendar_year_vmt_adj = vmt_adjustments.dict[calendar_year]
                 vmt_adjusted = vad['vmt'] * calendar_year_vmt_adj
@@ -232,8 +236,14 @@ def calc_safety_effects(calendar_years, vmt_adjustments, context_fuel_cpm_dict):
                 vmt_rebound = vmt_adjusted * rebound_effect
 
                 vmt_adjusted = vmt_adjusted + vmt_rebound
-                annual_vmt_adjusted = vmt_adjusted / vad['registered_count']
-                annual_vmt_rebound = vmt_rebound / vad['registered_count']
+
+                if vad['registered_count'] > 0:
+                    annual_vmt_adjusted = vmt_adjusted / vad['registered_count']
+                    annual_vmt_rebound = vmt_rebound / vad['registered_count']
+                else:
+                    annual_vmt_adjusted = 0
+                    annual_vmt_rebound = 0
+
                 if age == 0:
                     odometer_adjusted = annual_vmt_adjusted
                 else:
