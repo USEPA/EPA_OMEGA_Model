@@ -78,32 +78,31 @@ def run_postproc(iteration_log, credit_banks):
     vehicle_annual_data_df.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name
                                   + '_vehicle_annual_data.csv')
 
-    if omega_globals.manufacturer_aggregation:
+    if omega_globals.manufacturer_aggregation and omega_globals.options.consolidate_manufacturers:
         from producer.manufacturer_annual_data import ManufacturerAnnualData
         from producer.vehicle_aggregation import aggregation_columns
 
         vehicles_table = dataframe_to_numeric(vehicles_table)
 
         # generate after-the-fact manufacturer annual data for individual producers
-        if len(vehicles_table['manufacturer_id'].unique()) > 1:
-            for manufacturer_id in vehicles_table['manufacturer_id'].unique():
-                for calendar_year in vehicle_years[1:]:
-                    mfr_data = vehicles_table[(vehicles_table['manufacturer_id'] == manufacturer_id) &
-                                              (vehicles_table['model_year'] == calendar_year)]
+        for manufacturer_id in vehicles_table['manufacturer_id'].unique():
+            for calendar_year in vehicle_years[1:]:
+                mfr_data = vehicles_table[(vehicles_table['manufacturer_id'] == manufacturer_id) &
+                                          (vehicles_table['model_year'] == calendar_year)]
 
-                    ManufacturerAnnualData. \
-                        create_manufacturer_annual_data(model_year=calendar_year,
-                                                        compliance_id=manufacturer_id,
-                                                        target_co2e_Mg=sum(mfr_data['target_co2e_megagrams']),
-                                                        calendar_year_cert_co2e_Mg=sum(mfr_data['cert_co2e_megagrams']),
-                                                        manufacturer_vehicle_cost_dollars=
-                                                                        sum(mfr_data['new_vehicle_mfr_cost_dollars'] *
-                                                                            mfr_data['_initial_registered_count']),
-                                                        )
+                ManufacturerAnnualData. \
+                    create_manufacturer_annual_data(model_year=calendar_year,
+                                                    compliance_id=manufacturer_id,
+                                                    target_co2e_Mg=sum(mfr_data['target_co2e_megagrams']),
+                                                    calendar_year_cert_co2e_Mg=sum(mfr_data['cert_co2e_megagrams']),
+                                                    manufacturer_vehicle_cost_dollars=
+                                                                    sum(mfr_data['new_vehicle_mfr_cost_dollars'] *
+                                                                        mfr_data['_initial_registered_count']),
+                                                    )
 
-                    credit_banks[manufacturer_id] = None
+                credit_banks[manufacturer_id] = None
 
-            omega_globals.session.flush()
+        omega_globals.session.flush()
 
     manufacturer_annual_data_table = dump_table_to_csv(omega_globals.options.output_folder, 'manufacturer_annual_data',
                       omega_globals.options.session_unique_name + '_manufacturer_annual_data',
