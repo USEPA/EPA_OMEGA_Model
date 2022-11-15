@@ -348,21 +348,60 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                 #                                                 strategic_target_offset_Mg)
 
                 if producer_compliant is None:
-                    from common.omega_eval import *
-
                     # no viable production options, try again in producer shares mode, try again with lower BEV limits
                     omega_log.logwrite('### Production Constraints Violated, Modifying Constraints (contraint_ratio = %f) ###' % constraint_ratio)
                     producer_consumer_iteration_num += 1
 
                     constraints = [k for k in best_winning_combo_with_sales_response.keys() if 'max_constraint' in k]
-                    for constraint in constraints:
-                        max_constraints = Eval.eval(best_winning_combo_with_sales_response[constraint])
+                    node_names = [s.replace('max_constraints_', '') for s in constraints]
+                    for node_name in node_names:
+                        max_constraints = Eval.eval(best_winning_combo_with_sales_response['max_constraints_%s' % node_name])
+                        min_constraints = Eval.eval(best_winning_combo_with_sales_response['min_constraints_%s' % node_name])
+                        print_dict(max_constraints)
                         for k in max_constraints:
                             if 'BEV.ALT' in k:
                                 print(k)
-                                max_constraints[k] = best_winning_combo_with_sales_response[k.replace('producer', 'consumer')] * constraint_ratio
-                                best_winning_combo_with_sales_response[constraint] = str(max_constraints)
+                                max_constraints[k] = \
+                                    (best_winning_combo_with_sales_response[k.replace('producer', 'consumer')] /
+                                    best_winning_combo_with_sales_response['consumer_abs_share_frac_%s' % node_name] *
+                                    constraint_ratio)
+                                min_constraints[k] = min(min_constraints[k], max_constraints[k])
+
+                        ##################################################################################################
+
+                        abs_share_column_names = [k for k in max_constraints.keys() if 'abs_share_frac' in k]
+
+                        sales_share_df = partition(abs_share_column_names,
+                                                   num_levels=omega_globals.options.producer_num_market_share_options,
+                                                   min_constraints=min_constraints,
+                                                   max_constraints=max_constraints)
+
+                        # capture constraints
+                        children = [k for k in max_constraints.keys() if 'abs_share_frac' not in k]
+                        for c in children:
+                            min_constraints[c] = 0
+                            max_constraints[c] = 0
+                        min_constraints[node_name] = 0
+                        for scn in sales_share_df.columns:
+                            min_constraints[scn] = sales_share_df[scn].min()
+                            max_constraints[scn] = sales_share_df[scn].max()
+                            for c in children:
+                                if c in scn.split('.'):
+                                    min_constraints[c] += min_constraints[scn]
+                                    max_constraints[c] += max_constraints[scn]
+                            if 'NO_ALT' in scn.split('.'):
+                                min_constraints[node_name] += min_constraints[scn]
+
+                        # pass constraints to next iteration
+                        best_winning_combo_with_sales_response['min_constraints_%s' % node_name] = str(min_constraints)
+                        best_winning_combo_with_sales_response['max_constraints_%s' % node_name] = str(max_constraints)
+
+                        print_dict(max_constraints)
+
+                        ##################################################################################################
+
                     producer_decision = best_winning_combo_with_sales_response
+                    producer_decision_and_response.to_csv('pdar_initial.csv')
                     producer_decision_and_response = None  # not sure if I need to do this...
                     best_winning_combo_with_sales_response = None  # not sure if I need to do this...
 
@@ -381,6 +420,8 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                                                    candidate_mfr_composite_vehicles, iteration_log,
                                                    producer_consumer_iteration_num, producer_market_classes,
                                                    producer_decision, strategic_target_offset_Mg)
+
+                producer_decision_and_response.to_csv('pdar_final.csv')
 
                 converged, share_convergence_error, cross_subsidy_pricing_error = \
                     detect_producer_consumer_convergence(producer_decision_and_response, producer_market_classes)
