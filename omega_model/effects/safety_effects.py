@@ -158,13 +158,16 @@ def calc_safety_effects(calendar_years, vmt_adjustments, context_fuel_cpm_dict):
         'onroad_direct_kwh_per_mile',
     ]
 
-    rebound_rate = omega_globals.options.vmt_rebound_rate
+    rebound_rate_ice = omega_globals.options.vmt_rebound_rate_ice
+    rebound_rate_bev = omega_globals.options.vmt_rebound_rate_bev
 
     safety_effects_dict = dict()
     vehicle_info_dict = dict()
 
     for calendar_year in calendar_years:
         vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year)
+
+        calendar_year_vmt_adj = vmt_adjustments.dict[calendar_year]
 
         calendar_year_safety_dict = dict()
         for vad in vads:
@@ -191,8 +194,9 @@ def calc_safety_effects(calendar_years, vmt_adjustments, context_fuel_cpm_dict):
 
                 onroad_kwh_per_mile = onroad_gallons_per_mile = fuel_cpm = 0
 
-                rebound_effect = None
+                rebound_rate = rebound_effect = 0
                 fuel_dict = Eval.eval(in_use_fuel_id, {'__builtins__': None}, {})
+                fuel_flag = 0
                 for fuel, fuel_share in fuel_dict.items():
 
                     retail_price = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel)
@@ -201,6 +205,8 @@ def calc_safety_effects(calendar_years, vmt_adjustments, context_fuel_cpm_dict):
                     if fuel == 'US electricity' and onroad_direct_kwh_per_mile:
                         onroad_kwh_per_mile += onroad_direct_kwh_per_mile
                         fuel_cpm += onroad_kwh_per_mile * retail_price
+                        rebound_rate = rebound_rate_bev
+                        fuel_flag += 1
 
                     elif fuel != 'US electricity' and onroad_direct_co2e_grams_per_mile:
                         refuel_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
@@ -209,19 +215,25 @@ def calc_safety_effects(calendar_years, vmt_adjustments, context_fuel_cpm_dict):
                                                             'direct_co2e_grams_per_unit') / refuel_efficiency
                         onroad_gallons_per_mile += onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
                         fuel_cpm += onroad_gallons_per_mile * retail_price
+                        rebound_rate = rebound_rate_ice
+                        fuel_flag += 1
 
                 # get context fuel cost per mile
                 context_fuel_cpm = context_fuel_cpm_dict[(vehicle_id, age)]['fuel_cost_per_mile']
+
+                if fuel_flag == 2:
+                    rebound_rate = rebound_rate_ice
+                # rebound_effect = calc_rebound_effect(context_fuel_cpm, fuel_cpm, rebound_rate)
                 if context_fuel_cpm > 0:
                     rebound_effect = calc_rebound_effect(context_fuel_cpm, fuel_cpm, rebound_rate)
                 else:
                     rebound_effect = 0
 
-                calendar_year_vmt_adj = vmt_adjustments.dict[calendar_year]
+                # calendar_year_vmt_adj = vmt_adjustments.dict[calendar_year]
                 vmt_adjusted = vad['vmt'] * calendar_year_vmt_adj
-                vmt_rebound = 0
-                if rebound_effect:
-                    vmt_rebound = vmt_adjusted * rebound_effect
+                # vmt_rebound = 0
+                # if rebound_effect:
+                vmt_rebound = vmt_adjusted * rebound_effect
 
                 vmt_adjusted = vmt_adjusted + vmt_rebound
 
