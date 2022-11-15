@@ -183,7 +183,7 @@ def run_effects_calcs():
             cost_effects_dict = dict()
 
             omega_log.logwrite('\nCalculating cost effects')
-            cost_effects_dict.update(calc_cost_effects(physical_effects_dict,
+            cost_effects_dict.update(calc_cost_effects(physical_effects_dict, context_fuel_cpm_dict,
                                                        calc_health_effects=CostFactorsCriteria.calc_health_effects))
 
             # omega_log.logwrite('\nDiscounting costs')
