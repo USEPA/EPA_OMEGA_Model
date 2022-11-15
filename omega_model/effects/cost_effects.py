@@ -128,13 +128,14 @@ def get_maintenance_cost(veh_type):
     return d['slope'], d['intercept']
 
 
-def calc_cost_effects(physical_effects_dict, calc_health_effects=False):
+def calc_cost_effects(physical_effects_dict, context_fuel_cpm_dict, calc_health_effects=False):
     """
     Calculate cost effects
 
     Args:
         physical_effects_dict: A dictionary of key, value pairs where the key is a tuple (vehicle_id, calendar_year, age) and the values are a
         dictionary of attributes and attribute value pairs.
+        context_fuel_cpm_dict: dictionary; the session 0 fuel costs per mile by vehicle_id and age.
         calc_health_effects: boolean; pass True to use $/ton values to calculate health effects.
 
     Returns:
@@ -176,7 +177,7 @@ def calc_cost_effects(physical_effects_dict, calc_health_effects=False):
             maintenance_cost_dollars = 0
             repair_cost_dollars = 0
             refueling_cost_dollars = 0
-            driving_cost_dollars = 0
+            value_of_rebound_vmt_cost_dollars = 0
             pm25_tailpipe_3 = pm25_upstream_3 = nox_tailpipe_3 = nox_upstream_3 = sox_tailpipe_3 = sox_upstream_3 = 0
             pm25_tailpipe_7 = pm25_upstream_7 = nox_tailpipe_7 = nox_upstream_7 = sox_tailpipe_7 = sox_upstream_7 = 0
             pm25_vehicle_3_cost_dollars = pm25_upstream_3_cost_dollars = 0
@@ -199,11 +200,12 @@ def calc_cost_effects(physical_effects_dict, calc_health_effects=False):
                   physical['fueling_class'], \
                   physical['base_year_powertrain_type']
 
-            vehicle_count, annual_vmt, odometer, vmt, vmt_liquid, vmt_elec, kwh, gallons, imported_bbl \
+            vehicle_count, annual_vmt, odometer, vmt, vmt_rebound, vmt_liquid, vmt_elec, kwh, gallons, imported_bbl \
                 = physical['registered_count'], \
                   physical['annual_vmt'], \
                   physical['odometer'], \
                   physical['vmt'], \
+                  physical['vmt_rebound'], \
                   physical['vmt_liquid_fuel'], \
                   physical['vmt_electricity'], \
                   physical['fuel_consumption_kWh'], \
@@ -303,6 +305,13 @@ def calc_cost_effects(physical_effects_dict, calc_health_effects=False):
             if vmt_liquid:
                 congestion_cost_dollars += vmt_liquid * congestion_cf
                 noise_cost_dollars += vmt_liquid * noise_cf
+
+            # calc drive value as value of rebound vmt plus the drive surplus; this is negative since calculated as a cost
+            fuel_cpm = fuel_retail_cost_dollars / vmt
+            value_of_rebound_vmt_cost_dollars = 0
+            if (vehicle_id, age) in context_fuel_cpm_dict:
+                context_fuel_cpm = context_fuel_cpm_dict[(vehicle_id, age)]['fuel_cost_per_mile']
+                value_of_rebound_vmt_cost_dollars = -0.5 * vmt_rebound * (fuel_cpm + context_fuel_cpm)
 
             # climate effects
 
@@ -415,7 +424,7 @@ def calc_cost_effects(physical_effects_dict, calc_health_effects=False):
                 'maintenance_cost_dollars': maintenance_cost_dollars,
                 'repair_cost_dollars': repair_cost_dollars,
                 'refueling_cost_dollars': refueling_cost_dollars,
-                'driving_cost_dollars': driving_cost_dollars,
+                'value_of_rebound_vmt_cost_dollars': value_of_rebound_vmt_cost_dollars,
 
                 'co2_global_5.0_cost_dollars': co2_global_5_cost_dollars,
                 'co2_global_3.0_cost_dollars': co2_global_3_cost_dollars,

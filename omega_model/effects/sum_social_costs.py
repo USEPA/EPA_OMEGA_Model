@@ -24,7 +24,7 @@ def calc_social_costs(costs_df, calc_health_effects=False):
         'maintenance_cost_dollars',
         'repair_cost_dollars',
         'refueling_cost_dollars',
-        'driving_cost_dollars',
+        'value_of_rebound_vmt_cost_dollars',
     ]
     if calc_health_effects:
         sum_dict = {
