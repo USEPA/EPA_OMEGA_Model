@@ -350,14 +350,14 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                 if producer_compliant is None:
                     # no viable production options, try again in producer shares mode, try again with lower BEV limits
                     omega_log.logwrite('### Production Constraints Violated, Modifying Constraints (contraint_ratio = %f) ###' % constraint_ratio)
-                    producer_consumer_iteration_num += 1
+                    # producer_consumer_iteration_num += 1
 
                     constraints = [k for k in best_winning_combo_with_sales_response.keys() if 'max_constraint' in k]
                     node_names = [s.replace('max_constraints_', '') for s in constraints]
                     for node_name in node_names:
                         max_constraints = Eval.eval(best_winning_combo_with_sales_response['max_constraints_%s' % node_name])
                         min_constraints = Eval.eval(best_winning_combo_with_sales_response['min_constraints_%s' % node_name])
-                        print_dict(max_constraints)
+                        # print_dict(max_constraints)
                         for k in max_constraints:
                             if 'BEV.ALT' in k:
                                 print(k)
@@ -396,12 +396,12 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                         best_winning_combo_with_sales_response['min_constraints_%s' % node_name] = str(min_constraints)
                         best_winning_combo_with_sales_response['max_constraints_%s' % node_name] = str(max_constraints)
 
-                        print_dict(max_constraints)
+                        # print_dict(max_constraints)
 
                         ##################################################################################################
 
                     producer_decision = best_winning_combo_with_sales_response
-                    producer_decision_and_response.to_csv('pdar_initial.csv')
+                    # producer_decision_and_response.to_csv('pdar_initial.csv')
                     producer_decision_and_response = None  # not sure if I need to do this...
                     best_winning_combo_with_sales_response = None  # not sure if I need to do this...
 
@@ -421,7 +421,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                                                    producer_consumer_iteration_num, producer_market_classes,
                                                    producer_decision, strategic_target_offset_Mg)
 
-                producer_decision_and_response.to_csv('pdar_final.csv')
+                # producer_decision_and_response.to_csv('pdar_final.csv')
 
                 converged, share_convergence_error, cross_subsidy_pricing_error = \
                     detect_producer_consumer_convergence(producer_decision_and_response, producer_market_classes)

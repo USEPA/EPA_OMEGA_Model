@@ -459,22 +459,16 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
         if not valid_production_options.empty:
             production_options = valid_production_options
-            # constraint_ratio = GWh_limit / production_options['total_battery_GWh'].mean()
-            # print('constraint ratio %f, %f, %f' % (
-            # constraint_ratio, GWh_limit, production_options['total_battery_GWh'].mean()))
         else:  # no valid production options
             if True or producer_decision_and_response is not None:
                 # find new BEV limits by adjusting constraints
-                constraint_ratio = GWh_limit / production_options['total_battery_GWh'].min()
-                print('*** constraint ratio %f, %f, %f' % (constraint_ratio, GWh_limit, production_options['total_battery_GWh'].min()))
-                # constraints = [k for k in producer_decision_and_response.keys() if 'max_constraint' in k]
-                # for constraint in constraints:
-                #     max_constraints = Eval.eval(producer_decision_and_response[constraint].iloc[0])
-                #     for k in max_constraints:
-                #         if 'BEV.ALT' in k:
-                #             max_constraints[k] *= constraint_ratio
-                #             producer_decision_and_response[constraint] = str(max_constraints)
-
+                constraint_ratio = 0.999 * (GWh_limit - production_options['total_NO_ALT_battery_GWh'].min()) / \
+                                   production_options['total_ALT_battery_GWh'].min()
+                print('*** constraint ratio %f, %f, %f, %f, %f->%f' % (constraint_ratio, GWh_limit,
+                                                           production_options['total_battery_GWh'].min(),
+                                                           production_options['total_NO_ALT_battery_GWh'].min(),
+                                                           production_options['total_ALT_battery_GWh'].min(),
+                                                           production_options['total_ALT_battery_GWh'].min() * constraint_ratio))
                 production_options = valid_production_options
             else:
                 # no valid production options, even without the consumer response, accept fate:
@@ -924,6 +918,8 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
     is_series = type(production_options) == pd.Series
 
     total_battery_GWh = 0
+    total_NO_ALT_battery_GWh = 0
+    total_ALT_battery_GWh = 0
     total_target_co2e_Mg = 0
     total_cert_co2e_Mg = 0
     total_cost_dollars = 0
@@ -1014,6 +1010,10 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
 
         # update totals
         total_battery_GWh += composite_veh_total_GWh
+        if composite_veh.alt_type == 'NO_ALT':
+            total_NO_ALT_battery_GWh += composite_veh_total_GWh
+        else:
+            total_ALT_battery_GWh += composite_veh_total_GWh
         total_target_co2e_Mg += composite_veh_target_co2e_Mg
         total_cert_co2e_Mg += composite_veh_cert_co2e_Mg
         total_cost_dollars += composite_veh_total_cost_dollars
@@ -1021,6 +1021,8 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
 
     # TODO: looks like we'll need to calculate these, too?  Or use credits directly to select production decisions, not target/cert/strategic_offset...
     production_options['total_battery_GWh'] = total_battery_GWh
+    production_options['total_NO_ALT_battery_GWh'] = total_NO_ALT_battery_GWh
+    production_options['total_ALT_battery_GWh'] = total_ALT_battery_GWh
     production_options['total_target_co2e_megagrams'] = total_target_co2e_Mg
     production_options['total_cert_co2e_megagrams'] = total_cert_co2e_Mg
     production_options['total_cost_dollars'] = total_cost_dollars

@@ -192,7 +192,7 @@ try:
             self.verbose = False
             self.iterate_producer_consumer = True
 
-            self.producer_consumer_max_iterations = 4  # recommend 2+
+            self.producer_consumer_max_iterations = 100  # recommend 2+
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
             self.producer_compliance_search_convergence_factor = 0.9
@@ -204,8 +204,8 @@ try:
             self.flat_context_year = 2021
 
             self.battery_GWh_limit_years = [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040]
-            # self.battery_GWh_limit = [30, 48, 79, 134, 159, 190, 250, 356, 502, 651, 792, 936, 1080, 1224, 1364, 1500, 1500, 1500, 1500, 1500, 1500]
-            self.battery_GWh_limit = [12, 12, 12, 134, 159, 190, 250, 356, 502, 651, 792, 936, 1080, 1224, 1364, 1500, 1500, 1500, 1500, 1500, 1500]
+            self.battery_GWh_limit = [30, 48, 79, 134, 159, 190, 250, 356, 502, 651, 792, 936, 1080, 1224, 1364, 1500, 1500, 1500, 1500, 1500, 1500]
+            # self.battery_GWh_limit = [12, 12, 12, 134, 159, 190, 250, 356, 502, 651, 792, 936, 1080, 1224, 1364, 1500, 1500, 1500, 1500, 1500, 1500]
 
             # list of modules to allow verbose log files, or empty to disable:
             self.verbose_log_modules = ['database_', 'producer_compliance_search_', 'cross_subsidy_search_',
