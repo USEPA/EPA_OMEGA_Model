@@ -354,7 +354,7 @@ class DispyCluster(object):
 
         else:
             print('Starting SharedJobCluster...')
-            cluster = dispy.SharedJobCluster(dispy_node_setup, nodes=self.desired_node_list, ip_addr=self.master_ip,
+            cluster = dispy.SharedJobCluster(dispy_node_setup, nodes=self.desired_node_list, client_port=0,
                                              reentrant=True,
                                              loglevel=self.loglevel, depends=[sysprint],
                                              scheduler_node=self.scheduler_node)
