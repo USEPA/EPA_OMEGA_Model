@@ -400,13 +400,17 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
 
         # calculate values for the last column, honoring it's upper and lower limits
         last = column_names_sorted_by_span[-1]
-        x[last] = np.maximum(0, np.maximum(min_level_dict[last], np.minimum(max_level_dict[last], 1 - x.sum(axis=1, skipna=True))))
+        x[last] = np.maximum(0, np.maximum(min_level_dict[last], np.minimum(max_level_dict[last], 1.0 - x.sum(axis=1, skipna=True))))
 
         # drop duplicate rows:  TODO: figure out how to NOT generate duplicates?  Only happens if num_columns > 2... 3...?
         x = x.drop_duplicates()
 
         # remove rows that don't add up to 1 and get rid of join column ('_')
-        x = x.loc[abs(x.sum(axis=1, numeric_only=True) - 1) <= sys.float_info.epsilon]
+        maybe_x = x.loc[abs(x.sum(axis=1, numeric_only=True) - 1) <= sys.float_info.epsilon]
+
+        if not maybe_x.empty:
+            x = maybe_x
+
         if '_' in x:
             x = x.drop('_', axis=1)
 
