@@ -12,12 +12,15 @@ Context Case,String,Reference case,
 Credit Market Efficiency,#,1,
 Context Fuel Prices File,String,context_fuel_prices.csv,
 Context New Vehicle Market File,String,context_new_vehicle_market-body_style.csv,
+Context Stock and VMT File,String,context_stock_vmt.csv,
 Maintenance Costs File,String,maintenance_cost.csv,
 Repair Costs File,String,repair_cost.csv,
 Refueling Costs File,String,refueling_cost.csv,
 Manufacturers File,String,manufacturers.csv,
 Market Classes File,String,market_classes-body_style.csv,
 New Vehicle Price Elasticity of Demand,#,-0.4,
+VMT Rebound Rate ICE,#,-0.1,
+VMT Rebound Rate BEV,#,0,
 Onroad Fuels File,String,onroad_fuels.csv,
 Onroad Vehicle Calculations File,String,onroad_vehicle_calculations.csv,
 Onroad VMT File,String,annual_vmt_fixed_by_age-body_style.csv,
@@ -42,7 +45,7 @@ Enable Session,TRUE / FALSE,TRUE,TRUE
 Session Name,String,NoActionPolicy,ActionAlternative
 ,,,
 Session Policy Alternatives Settings,,,
-Drive Cycle Weights File,String,drive_cycle_weights.csv,drive_cycle_weights.csv
+Drive Cycle Weights File,String,drive_cycle_weights_5545.csv,drive_cycle_weights_5545.csv
 Drive Cycle Ballast File,String,drive_cycle_ballast.csv,drive_cycle_ballast.csv
 Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
 GHG Credit Params File,String,ghg_credit_params.csv,ghg_credit_params.csv
@@ -68,3 +71,4 @@ Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implic
 Context Consumer Price Index File,String,cpi_price_deflators.csv,cpi_price_deflators.csv
 Context Safety Values File,String,safety_values.csv,safety_values.csv
 Context Fatality Rates File,String,fatality_rates.csv,fatality_rates.csv
+Context Legacy Fleet File,String,legacy_fleet.csv,legacy_fleet.csv

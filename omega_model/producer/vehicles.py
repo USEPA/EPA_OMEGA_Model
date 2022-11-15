@@ -702,8 +702,8 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'context_size_class',
                        'unibody_structure', 'drive_system', 'curbweight_lbs', 'eng_rated_hp', 'footprint_ft2',
                        'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c', 'body_style',
-                       'structure_material', 'base_year_powertrain_type', 'base_year_reg_class_id', 'base_year_market_share',
-                       'base_year_vehicle_id', 'base_year_glider_non_structure_mass_lbs',
+                       'structure_material', 'base_year_powertrain_type', 'base_year_reg_class_id',
+                       'base_year_market_share', 'base_year_vehicle_id', 'base_year_glider_non_structure_mass_lbs',
                        'base_year_glider_non_structure_cost_dollars',
                        'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'base_year_curbweight_lbs_to_hp',
                        'base_year_msrp_dollars', 'battery_kwh', 'motor_kw', 'charge_depleting_range_mi'}
@@ -783,6 +783,7 @@ class Vehicle(OMEGABase):
         self.cert_fuel_id = None
         self.market_class_id = None
         self.initial_registered_count = 0
+        self.projected_sales = 0
         self.cost_curve = None
         self.unibody_structure = 1
         self.drive_system = 1
@@ -798,6 +799,7 @@ class Vehicle(OMEGABase):
         self.base_year_reg_class_id = None
         self.base_year_vehicle_id = 0
         self.base_year_market_share = 0
+        self.model_year_prevalence = 0
         self.base_year_glider_non_structure_mass_lbs = 0
         self.base_year_glider_non_structure_cost_dollars = 0
         self.base_year_footprint_ft2 = 0
@@ -923,7 +925,7 @@ class Vehicle(OMEGABase):
         """
         drive_cycle_weight_year = VehicleOnroadCalculations.battery_sizing_drive_cycle_weight_year
 
-        cloud['onroad_direct_kwh_per_mile'] = 0
+        cloud['battery_sizing_onroad_direct_kwh_per_mile'] = 0
         cloud['nominal_onroad_direct_kwh_per_mile'] = \
             DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(drive_cycle_weight_year,
                                                                     self.fueling_class, cloud)
@@ -931,7 +933,7 @@ class Vehicle(OMEGABase):
         # calc onroad_direct values
         VehicleOnroadCalculations.perform_onroad_calculations(self, cloud)
 
-        cloud['battery_sizing_onroad_direct_kwh_per_mile'] = cloud['onroad_direct_kwh_per_mile']
+        cloud['battery_sizing_onroad_direct_kwh_per_mile'] = cloud['battery_sizing_onroad_direct_kwh_per_mile']
 
         return cloud
 
@@ -1167,6 +1169,7 @@ class VehicleFinal(SQABase, Vehicle):
     base_year_reg_class_id = Column(Enum(*legacy_reg_classes, validate_strings=True))  #: base year regulatory class, historical data
     base_year_vehicle_id = Column(Float)  #: base year vehicle id from vehicles.csv
     base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
+    model_year_prevalence = Column(Float)  #: used to maintain market share relationships within context size classes during market projection
     base_year_glider_non_structure_mass_lbs = Column(Float)  #: base year non-structure mass lbs (i.e. "content")
     base_year_glider_non_structure_cost_dollars = Column(Float)  #: base year non-structure cost dollars
     base_year_footprint_ft2 = Column(Float)  #: base year vehicle footprint, square feet
@@ -1189,6 +1192,7 @@ class VehicleFinal(SQABase, Vehicle):
     eng_rated_hp = Column(Float)  #: engine rated horsepower
 
     _initial_registered_count = Column('_initial_registered_count', Float)
+    projected_sales = Column(Float)  #: used to project context size class sales
 
     # --- static properties ---
     compliance_ids = set()  #: the set of compliance IDs (manufacturer IDs or 'consolidated_OEM')

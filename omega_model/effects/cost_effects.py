@@ -128,13 +128,15 @@ def get_maintenance_cost(veh_type):
     return d['slope'], d['intercept']
 
 
-def calc_cost_effects(physical_effects_dict):
+def calc_cost_effects(physical_effects_dict, context_fuel_cpm_dict, calc_health_effects=False):
     """
     Calculate cost effects
 
     Args:
         physical_effects_dict: A dictionary of key, value pairs where the key is a tuple (vehicle_id, calendar_year, age) and the values are a
         dictionary of attributes and attribute value pairs.
+        context_fuel_cpm_dict: dictionary; the session 0 fuel costs per mile by vehicle_id and age.
+        calc_health_effects: boolean; pass True to use $/ton values to calculate health effects.
 
     Returns:
         A dictionary of key, value pairs where the key is a tuple (vehicle_id, calendar_year, age, discount_rate) and the values are a dictionary
@@ -146,6 +148,7 @@ def calc_cost_effects(physical_effects_dict):
     from context.repair_cost import RepairCost
     from context.refueling_cost import RefuelingCost
     from common.omega_eval import Eval
+    from effects.legacy_fleet import LegacyFleet
 
     # UPDATE cost effects data
     costs_dict = dict()
@@ -154,8 +157,7 @@ def calc_cost_effects(physical_effects_dict):
     refueling_liquid_dict = dict()
     fuel = None
     
-    for key in physical_effects_dict.keys():
-
+    for key in physical_effects_dict:
         vehicle_id, calendar_year, age = key
         physical = physical_effects_dict[key]
         onroad_direct_co2e_grams_per_mile = physical['onroad_direct_co2e_grams_per_mile']
@@ -175,30 +177,35 @@ def calc_cost_effects(physical_effects_dict):
             maintenance_cost_dollars = 0
             repair_cost_dollars = 0
             refueling_cost_dollars = 0
-            driving_cost_dollars = 0
+            value_of_rebound_vmt_cost_dollars = 0
             pm25_tailpipe_3 = pm25_upstream_3 = nox_tailpipe_3 = nox_upstream_3 = sox_tailpipe_3 = sox_upstream_3 = 0
             pm25_tailpipe_7 = pm25_upstream_7 = nox_tailpipe_7 = nox_upstream_7 = sox_tailpipe_7 = sox_upstream_7 = 0
+            pm25_vehicle_3_cost_dollars = pm25_upstream_3_cost_dollars = 0
+            pm25_vehicle_7_cost_dollars = pm25_upstream_7_cost_dollars = 0
+            nox_vehicle_3_cost_dollars = nox_upstream_3_cost_dollars = 0
+            nox_vehicle_7_cost_dollars = nox_upstream_7_cost_dollars = 0
+            sox_vehicle_3_cost_dollars = sox_upstream_3_cost_dollars = 0
+            sox_vehicle_7_cost_dollars = sox_upstream_7_cost_dollars = 0
+            criteria_vehicle_3_cost_dollars = criteria_upstream_3_cost_dollars = 0
+            criteria_vehicle_7_cost_dollars = criteria_upstream_7_cost_dollars = 0
+            criteria_3_cost_dollars = criteria_7_cost_dollars = 0
 
-            attribute_list = ['new_vehicle_mfr_cost_dollars']
-            if vehicle_id not in vehicle_info_dict:
-                vehicle_info_dict[vehicle_id] = VehicleFinal.get_vehicle_attributes(vehicle_id, attribute_list)[0]
-
-            new_vehicle_cost = vehicle_info_dict[vehicle_id]
-
-            mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, base_year_powertrain_type \
+            mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type \
                 = physical['manufacturer_id'], \
                   physical['name'], \
                   physical['base_year_reg_class_id'], \
                   physical['reg_class_id'], \
                   physical['in_use_fuel_id'], \
+                  physical['market_class_id'], \
                   physical['fueling_class'], \
                   physical['base_year_powertrain_type']
 
-            vehicle_count, annual_vmt, odometer, vmt, vmt_liquid, vmt_elec, kwh, gallons, imported_bbl \
+            vehicle_count, annual_vmt, odometer, vmt, vmt_rebound, vmt_liquid, vmt_elec, kwh, gallons, imported_bbl \
                 = physical['registered_count'], \
                   physical['annual_vmt'], \
                   physical['odometer'], \
                   physical['vmt'], \
+                  physical['vmt_rebound'], \
                   physical['vmt_liquid_fuel'], \
                   physical['vmt_electricity'], \
                   physical['fuel_consumption_kWh'], \
@@ -220,6 +227,15 @@ def calc_cost_effects(physical_effects_dict):
                   physical['sox_vehicle_ustons'], \
                   physical['sox_upstream_ustons']
 
+            if vehicle_id not in vehicle_info_dict:
+                if vehicle_id < pow(10, 6):
+                    attribute_list = ['new_vehicle_mfr_cost_dollars']
+                    vehicle_info_dict[vehicle_id] = VehicleFinal.get_vehicle_attributes(vehicle_id, attribute_list)[0]
+                else:
+                    legacy_fleet_key = (vehicle_id, calendar_year, age)
+                    vehicle_info_dict[vehicle_id] = LegacyFleet._legacy_fleet[legacy_fleet_key]['transaction_price_dollars']
+
+            new_vehicle_cost = vehicle_info_dict[vehicle_id]
             # tech costs, only for age=0
             if age == 0:
                 vehicle_cost_dollars = vehicle_count * new_vehicle_cost
@@ -249,7 +265,8 @@ def calc_cost_effects(physical_effects_dict):
             else:
                 operating_veh_type = 'suv'
 
-            repair_cost_per_mile = RepairCost.calc_repair_cost_per_mile(new_vehicle_cost, base_year_powertrain_type, operating_veh_type, age)
+            repair_cost_per_mile \
+                = RepairCost.calc_repair_cost_per_mile(new_vehicle_cost, base_year_powertrain_type, operating_veh_type, age)
             repair_cost_dollars = repair_cost_per_mile * vmt
 
             # refueling costs
@@ -289,6 +306,13 @@ def calc_cost_effects(physical_effects_dict):
                 congestion_cost_dollars += vmt_liquid * congestion_cf
                 noise_cost_dollars += vmt_liquid * noise_cf
 
+            # calc drive value as value of rebound vmt plus the drive surplus; this is negative since calculated as a cost
+            fuel_cpm = fuel_retail_cost_dollars / vmt
+            value_of_rebound_vmt_cost_dollars = 0
+            if (vehicle_id, age) in context_fuel_cpm_dict:
+                context_fuel_cpm = context_fuel_cpm_dict[(vehicle_id, age)]['fuel_cost_per_mile']
+                value_of_rebound_vmt_cost_dollars = -0.5 * vmt_rebound * (fuel_cpm + context_fuel_cpm)
+
             # climate effects
 
             # get scc cost factors
@@ -327,116 +351,120 @@ def calc_cost_effects(physical_effects_dict):
                                           + n2o_global_395_cost_dollars
 
             # criteria effects
+            if calc_health_effects:
+                # get criteria cost factors
+                pm25_tailpipe_3, pm25_upstream_3, nox_tailpipe_3, nox_upstream_3, sox_tailpipe_3, sox_upstream_3, \
+                pm25_tailpipe_7, pm25_upstream_7, nox_tailpipe_7, nox_upstream_7, sox_tailpipe_7, sox_upstream_7 \
+                    = get_criteria_cf(calendar_year)
 
-            # get criteria cost factors
-            pm25_tailpipe_3, pm25_upstream_3, nox_tailpipe_3, nox_upstream_3, sox_tailpipe_3, sox_upstream_3, \
-            pm25_tailpipe_7, pm25_upstream_7, nox_tailpipe_7, nox_upstream_7, sox_tailpipe_7, sox_upstream_7 = get_criteria_cf(calendar_year)
+                # calculate criteria cost effects
+                pm25_vehicle_3_cost_dollars = pm25_tp_tons * pm25_tailpipe_3
+                pm25_upstream_3_cost_dollars = pm25_up_tons * pm25_upstream_3
 
-            # calculate criteria cost effects
-            pm25_vehicle_3_cost_dollars = pm25_tp_tons * pm25_tailpipe_3
-            pm25_upstream_3_cost_dollars = pm25_up_tons * pm25_upstream_3
+                nox_vehicle_3_cost_dollars = nox_tp_tons * nox_tailpipe_3
+                nox_upstream_3_cost_dollars = nox_up_tons * nox_upstream_3
 
-            nox_vehicle_3_cost_dollars = nox_tp_tons * nox_tailpipe_3
-            nox_upstream_3_cost_dollars = nox_up_tons * nox_upstream_3
+                sox_vehicle_3_cost_dollars = sox_tp_tons * sox_tailpipe_3
+                sox_upstream_3_cost_dollars = sox_up_tons * sox_upstream_3
 
-            sox_vehicle_3_cost_dollars = sox_tp_tons * sox_tailpipe_3
-            sox_upstream_3_cost_dollars = sox_up_tons * sox_upstream_3
+                pm25_vehicle_7_cost_dollars = pm25_tp_tons * pm25_tailpipe_7
+                pm25_upstream_7_cost_dollars = pm25_up_tons * pm25_upstream_7
 
-            pm25_vehicle_7_cost_dollars = pm25_tp_tons * pm25_tailpipe_7
-            pm25_upstream_7_cost_dollars = pm25_up_tons * pm25_upstream_7
+                nox_vehicle_7_cost_dollars = nox_tp_tons * nox_tailpipe_7
+                nox_upstream_7_cost_dollars = nox_up_tons * nox_upstream_7
 
-            nox_vehicle_7_cost_dollars = nox_tp_tons * nox_tailpipe_7
-            nox_upstream_7_cost_dollars = nox_up_tons * nox_upstream_7
+                sox_vehicle_7_cost_dollars = sox_tp_tons * sox_tailpipe_7
+                sox_upstream_7_cost_dollars = sox_up_tons * sox_upstream_7
 
-            sox_vehicle_7_cost_dollars = sox_tp_tons * sox_tailpipe_7
-            sox_upstream_7_cost_dollars = sox_up_tons * sox_upstream_7
+                criteria_vehicle_3_cost_dollars = pm25_vehicle_3_cost_dollars \
+                                                   + nox_vehicle_3_cost_dollars \
+                                                   + sox_vehicle_3_cost_dollars
+                criteria_upstream_3_cost_dollars = pm25_upstream_3_cost_dollars \
+                                                   + nox_upstream_3_cost_dollars \
+                                                   + sox_upstream_3_cost_dollars
 
-            criteria_vehicle_3_cost_dollars = pm25_vehicle_3_cost_dollars \
-                                               + nox_vehicle_3_cost_dollars \
-                                               + sox_vehicle_3_cost_dollars
-            criteria_upstream_3_cost_dollars = pm25_upstream_3_cost_dollars \
-                                               + nox_upstream_3_cost_dollars \
-                                               + sox_upstream_3_cost_dollars
+                criteria_vehicle_7_cost_dollars = pm25_vehicle_7_cost_dollars \
+                                                  + nox_vehicle_7_cost_dollars \
+                                                  + sox_vehicle_7_cost_dollars
+                criteria_upstream_7_cost_dollars = pm25_upstream_7_cost_dollars \
+                                                   + nox_upstream_7_cost_dollars \
+                                                   + sox_upstream_7_cost_dollars
 
-            criteria_vehicle_7_cost_dollars = pm25_vehicle_7_cost_dollars \
-                                              + nox_vehicle_7_cost_dollars \
-                                              + sox_vehicle_7_cost_dollars
-            criteria_upstream_7_cost_dollars = pm25_upstream_7_cost_dollars \
-                                               + nox_upstream_7_cost_dollars \
-                                               + sox_upstream_7_cost_dollars
+                criteria_3_cost_dollars = criteria_vehicle_3_cost_dollars + criteria_upstream_3_cost_dollars
+                criteria_7_cost_dollars = criteria_vehicle_7_cost_dollars + criteria_upstream_7_cost_dollars
 
-            criteria_3_cost_dollars = criteria_vehicle_3_cost_dollars + criteria_upstream_3_cost_dollars
-            criteria_7_cost_dollars = criteria_vehicle_7_cost_dollars + criteria_upstream_7_cost_dollars
+            # save results in the vehicle effects dict for this vehicle
+            veh_effects_dict = {
+                'session_name': omega_globals.options.session_name,
+                'discount_rate': 0,
+                'vehicle_id': vehicle_id,
+                'manufacturer_id': mfr_id,
+                'name': name,
+                'calendar_year': calendar_year,
+                'model_year': calendar_year - age,
+                'age': age,
+                'base_year_reg_class_id': base_year_reg_class_id,
+                'reg_class_id': reg_class_id,
+                'in_use_fuel_id': in_use_fuel_id,
+                'fueling_class': fueling_class,
+                'base_year_powertrain_type': base_year_powertrain_type,
+                'registered_count': vehicle_count,
+                'annual_vmt': annual_vmt,
+                'odometer': odometer,
+                'vmt': vmt,
+                'vmt_liquid_fuel': vmt_liquid,
+                'vmt_electricity': vmt_elec,
+                'vehicle_cost_dollars': vehicle_cost_dollars,
+                'fuel_retail_cost_dollars': fuel_retail_cost_dollars,
+                'fuel_pretax_cost_dollars': fuel_pretax_cost_dollars,
+                'fuel_taxes_cost_dollars': fuel_retail_cost_dollars - fuel_pretax_cost_dollars,
+                'energy_security_cost_dollars': energy_security_cost_dollars,
+                'congestion_cost_dollars': congestion_cost_dollars,
+                'noise_cost_dollars': noise_cost_dollars,
+                'maintenance_cost_dollars': maintenance_cost_dollars,
+                'repair_cost_dollars': repair_cost_dollars,
+                'refueling_cost_dollars': refueling_cost_dollars,
+                'value_of_rebound_vmt_cost_dollars': value_of_rebound_vmt_cost_dollars,
 
-            # update vehicle effects dict to include this vehicle
-            veh_effects_dict.update({'session_name': omega_globals.options.session_name,
-                                     'discount_rate': 0,
-                                     'vehicle_id': vehicle_id,
-                                     'manufacturer_id': mfr_id,
-                                     'name': name,
-                                     'calendar_year': calendar_year,
-                                     'model_year': calendar_year - age,
-                                     'age': age,
-                                     'base_year_reg_class_id': base_year_reg_class_id,
-                                     'reg_class_id': reg_class_id,
-                                     'in_use_fuel_id': in_use_fuel_id,
-                                     'fueling_class': fueling_class,
-                                     'base_year_powertrain_type': base_year_powertrain_type,
-                                     'registered_count': vehicle_count,
-                                     'annual_vmt': annual_vmt,
-                                     'odometer': odometer,
-                                     'vmt': vmt,
-                                     'vmt_liquid_fuel': vmt_liquid,
-                                     'vmt_electricity': vmt_elec,
-                                     'vehicle_cost_dollars': vehicle_cost_dollars,
-                                     'fuel_retail_cost_dollars': fuel_retail_cost_dollars,
-                                     'fuel_pretax_cost_dollars': fuel_pretax_cost_dollars,
-                                     'fuel_taxes_cost_dollars': fuel_retail_cost_dollars - fuel_pretax_cost_dollars,
-                                     'energy_security_cost_dollars': energy_security_cost_dollars,
-                                     'congestion_cost_dollars': congestion_cost_dollars,
-                                     'noise_cost_dollars': noise_cost_dollars,
-                                     'maintenance_cost_dollars': maintenance_cost_dollars,
-                                     'repair_cost_dollars': repair_cost_dollars,
-                                     'refueling_cost_dollars': refueling_cost_dollars,
-                                     'driving_cost_dollars': driving_cost_dollars,
-
-                                     'co2_global_5.0_cost_dollars': co2_global_5_cost_dollars,
-                                     'co2_global_3.0_cost_dollars': co2_global_3_cost_dollars,
-                                     'co2_global_2.5_cost_dollars': co2_global_25_cost_dollars,
-                                     'co2_global_3.95_cost_dollars': co2_global_395_cost_dollars,
-                                     'ch4_global_5.0_cost_dollars': ch4_global_5_cost_dollars,
-                                     'ch4_global_3.0_cost_dollars': ch4_global_3_cost_dollars,
-                                     'ch4_global_2.5_cost_dollars': ch4_global_25_cost_dollars,
-                                     'ch4_global_3.95_cost_dollars': ch4_global_395_cost_dollars,
-                                     'n2o_global_5.0_cost_dollars': n2o_global_5_cost_dollars,
-                                     'n2o_global_3.0_cost_dollars': n2o_global_3_cost_dollars,
-                                     'n2o_global_2.5_cost_dollars': n2o_global_25_cost_dollars,
-                                     'n2o_global_3.95_cost_dollars': n2o_global_395_cost_dollars,
-                                     'ghg_global_5.0_cost_dollars': ghg_global_5_cost_dollars,
-                                     'ghg_global_3.0_cost_dollars': ghg_global_3_cost_dollars,
-                                     'ghg_global_2.5_cost_dollars': ghg_global_25_cost_dollars,
-                                     'ghg_global_3.95_cost_dollars': ghg_global_395_cost_dollars,
-
-                                     'pm25_vehicle_3.0_cost_dollars': pm25_vehicle_3_cost_dollars,
-                                     'pm25_upstream_3.0_cost_dollars': pm25_upstream_3_cost_dollars,
-                                     'nox_vehicle_3.0_cost_dollars': nox_vehicle_3_cost_dollars,
-                                     'nox_upstream_3.0_cost_dollars': nox_upstream_3_cost_dollars,
-                                     'sox_vehicle_3.0_cost_dollars': sox_vehicle_3_cost_dollars,
-                                     'sox_upstream_3.0_cost_dollars': sox_upstream_3_cost_dollars,
-                                     'pm25_vehicle_7.0_cost_dollars': pm25_vehicle_7_cost_dollars,
-                                     'pm25_upstream_7.0_cost_dollars': pm25_upstream_7_cost_dollars,
-                                     'nox_vehicle_7.0_cost_dollars': nox_vehicle_7_cost_dollars,
-                                     'nox_upstream_7.0_cost_dollars': nox_upstream_7_cost_dollars,
-                                     'sox_vehicle_7.0_cost_dollars': sox_vehicle_7_cost_dollars,
-                                     'sox_upstream_7.0_cost_dollars': sox_upstream_7_cost_dollars,
-                                     'criteria_vehicle_3.0_cost_dollars': criteria_vehicle_3_cost_dollars,
-                                     'criteria_upstream_3.0_cost_dollars': criteria_upstream_3_cost_dollars,
-                                     'criteria_vehicle_7.0_cost_dollars': criteria_vehicle_7_cost_dollars,
-                                     'criteria_upstream_7.0_cost_dollars': criteria_upstream_7_cost_dollars,
-                                     'criteria_3.0_cost_dollars': criteria_3_cost_dollars,
-                                     'criteria_7.0_cost_dollars': criteria_7_cost_dollars,
-                                     }
-                                    )
+                'co2_global_5.0_cost_dollars': co2_global_5_cost_dollars,
+                'co2_global_3.0_cost_dollars': co2_global_3_cost_dollars,
+                'co2_global_2.5_cost_dollars': co2_global_25_cost_dollars,
+                'co2_global_3.95_cost_dollars': co2_global_395_cost_dollars,
+                'ch4_global_5.0_cost_dollars': ch4_global_5_cost_dollars,
+                'ch4_global_3.0_cost_dollars': ch4_global_3_cost_dollars,
+                'ch4_global_2.5_cost_dollars': ch4_global_25_cost_dollars,
+                'ch4_global_3.95_cost_dollars': ch4_global_395_cost_dollars,
+                'n2o_global_5.0_cost_dollars': n2o_global_5_cost_dollars,
+                'n2o_global_3.0_cost_dollars': n2o_global_3_cost_dollars,
+                'n2o_global_2.5_cost_dollars': n2o_global_25_cost_dollars,
+                'n2o_global_3.95_cost_dollars': n2o_global_395_cost_dollars,
+                'ghg_global_5.0_cost_dollars': ghg_global_5_cost_dollars,
+                'ghg_global_3.0_cost_dollars': ghg_global_3_cost_dollars,
+                'ghg_global_2.5_cost_dollars': ghg_global_25_cost_dollars,
+                'ghg_global_3.95_cost_dollars': ghg_global_395_cost_dollars,
+            }
+            if calc_health_effects:
+                veh_effects_dict.update({
+                    'pm25_vehicle_3.0_cost_dollars': pm25_vehicle_3_cost_dollars,
+                    'pm25_upstream_3.0_cost_dollars': pm25_upstream_3_cost_dollars,
+                    'nox_vehicle_3.0_cost_dollars': nox_vehicle_3_cost_dollars,
+                    'nox_upstream_3.0_cost_dollars': nox_upstream_3_cost_dollars,
+                    'sox_vehicle_3.0_cost_dollars': sox_vehicle_3_cost_dollars,
+                    'sox_upstream_3.0_cost_dollars': sox_upstream_3_cost_dollars,
+                    'pm25_vehicle_7.0_cost_dollars': pm25_vehicle_7_cost_dollars,
+                    'pm25_upstream_7.0_cost_dollars': pm25_upstream_7_cost_dollars,
+                    'nox_vehicle_7.0_cost_dollars': nox_vehicle_7_cost_dollars,
+                    'nox_upstream_7.0_cost_dollars': nox_upstream_7_cost_dollars,
+                    'sox_vehicle_7.0_cost_dollars': sox_vehicle_7_cost_dollars,
+                    'sox_upstream_7.0_cost_dollars': sox_upstream_7_cost_dollars,
+                    'criteria_vehicle_3.0_cost_dollars': criteria_vehicle_3_cost_dollars,
+                    'criteria_upstream_3.0_cost_dollars': criteria_upstream_3_cost_dollars,
+                    'criteria_vehicle_7.0_cost_dollars': criteria_vehicle_7_cost_dollars,
+                    'criteria_upstream_7.0_cost_dollars': criteria_upstream_7_cost_dollars,
+                    'criteria_3.0_cost_dollars': criteria_3_cost_dollars,
+                    'criteria_7.0_cost_dollars': criteria_7_cost_dollars,
+                }
+                )
 
         if flag:
             discount_rate = 0

@@ -1,11 +1,12 @@
 import pandas as pd
 
 
-def calc_social_costs(costs_df):
+def calc_social_costs(costs_df, calc_health_effects=False):
     """
 
     Args:
         costs_df: DataFrame; the annual values, present values and annualized values dataframe.
+        calc_health_effects: boolean; pass True to use $/ton values to calculate health effects.
 
     Returns:
         The passed dataframe with additional columns summing the non-pollution related and pollution related cost
@@ -23,80 +24,49 @@ def calc_social_costs(costs_df):
         'maintenance_cost_dollars',
         'repair_cost_dollars',
         'refueling_cost_dollars',
-        'driving_cost_dollars',
+        'value_of_rebound_vmt_cost_dollars',
     ]
-    ghg5_criteria3_cost_attributes = [
-        'ghg_global_5.0_cost_dollars',
-        'criteria_3.0_cost_dollars',
-    ]
-    ghg3_criteria3_cost_attributes = [
-        'ghg_global_3.0_cost_dollars',
-        'criteria_3.0_cost_dollars',
-    ]
-    ghg25_criteria3_cost_attributes = [
-        'ghg_global_2.5_cost_dollars',
-        'criteria_3.0_cost_dollars',
-    ]
-    ghg395_criteria3_cost_attributes = [
-        'ghg_global_3.95_cost_dollars',
-        'criteria_3.0_cost_dollars',
-    ]
-    ghg5_criteria7_cost_attributes = [
-        'ghg_global_5.0_cost_dollars',
-        'criteria_7.0_cost_dollars',
-    ]
-    ghg3_criteria7_cost_attributes = [
-        'ghg_global_3.0_cost_dollars',
-        'criteria_7.0_cost_dollars',
-    ]
-    ghg25_criteria7_cost_attributes = [
-        'ghg_global_2.5_cost_dollars',
-        'criteria_7.0_cost_dollars',
-    ]
-    ghg395_criteria7_cost_attributes = [
-        'ghg_global_3.95_cost_dollars',
-        'criteria_7.0_cost_dollars',
-    ]
+    if calc_health_effects:
+        sum_dict = {
+            1: {'name': 'social_cost_dollars_ghg5_criteria3',
+                'attributes': ['ghg_global_5.0_cost_dollars', 'criteria_3.0_cost_dollars']},
+            2: {'name': 'social_cost_dollars_ghg3_criteria3',
+                'attributes': ['ghg_global_3.0_cost_dollars', 'criteria_3.0_cost_dollars']},
+            3: {'name': 'social_cost_dollars_ghg25_criteria3',
+                'attributes': ['ghg_global_2.5_cost_dollars', 'criteria_3.0_cost_dollars']},
+            4: {'name': 'social_cost_dollars_ghg395_criteria3',
+                'attributes': ['ghg_global_3.95_cost_dollars', 'criteria_3.0_cost_dollars']},
+            5: {'name': 'social_cost_dollars_ghg5_criteria7',
+                'attributes': ['ghg_global_5.0_cost_dollars', 'criteria_7.0_cost_dollars']},
+            6: {'name': 'social_cost_dollars_ghg3_criteria7',
+                'attributes': ['ghg_global_3.0_cost_dollars', 'criteria_7.0_cost_dollars']},
+            7: {'name': 'social_cost_dollars_ghg25_criteria7',
+                'attributes': ['ghg_global_2.5_cost_dollars', 'criteria_7.0_cost_dollars']},
+            8: {'name': 'social_cost_dollars_ghg395_criteria7',
+                'attributes': ['ghg_global_3.95_cost_dollars', 'criteria_7.0_cost_dollars']},
+        }
+    else:
+        sum_dict = {
+            1: {'name': 'social_cost_dollars_ghg5',
+                'attributes': ['ghg_global_5.0_cost_dollars']},
+            2: {'name': 'social_cost_dollars_ghg3',
+                'attributes': ['ghg_global_3.0_cost_dollars']},
+            3: {'name': 'social_cost_dollars_ghg25',
+                'attributes': ['ghg_global_2.5_cost_dollars']},
+            4: {'name': 'social_cost_dollars_ghg395',
+                'attributes': ['ghg_global_3.95_cost_dollars']},
+        }
 
     non_pollution_costs = df[[item for item in non_pollution_cost_attributes]].sum(axis=1)
 
-    ghg5_criteria3_cost_dollars \
-        = pd.Series(df[[item for item in ghg5_criteria3_cost_attributes]].sum(axis=1) + non_pollution_costs,
-                    name='social_cost_dollars_ghg5_criteria3')
-    ghg3_criteria3_cost_dollars \
-        = pd.Series(df[[item for item in ghg3_criteria3_cost_attributes]].sum(axis=1) + non_pollution_costs,
-                    name='social_cost_dollars_ghg3_criteria3')
-    ghg25_criteria3_cost_dollars \
-        = pd.Series(df[[item for item in ghg25_criteria3_cost_attributes]].sum(axis=1) + non_pollution_costs,
-                    name='social_cost_dollars_ghg25_criteria3')
-    ghg395_criteria3_cost_dollars \
-        = pd.Series(df[[item for item in ghg395_criteria3_cost_attributes]].sum(axis=1) + non_pollution_costs,
-                    name='social_cost_dollars_ghg395_criteria3')
+    series_dict = dict()
 
-    ghg5_criteria7_cost_dollars \
-        = pd.Series(df[[item for item in ghg5_criteria7_cost_attributes]].sum(axis=1) + non_pollution_costs,
-                    name='social_cost_dollars_ghg5_criteria7')
-    ghg3_criteria7_cost_dollars \
-        = pd.Series(df[[item for item in ghg3_criteria7_cost_attributes]].sum(axis=1) + non_pollution_costs,
-                    name='social_cost_dollars_ghg3_criteria7')
-    ghg25_criteria7_cost_dollars \
-        = pd.Series(df[[item for item in ghg25_criteria7_cost_attributes]].sum(axis=1) + non_pollution_costs,
-                    name='social_cost_dollars_ghg25_criteria7')
-    ghg395_criteria7_cost_dollars \
-        = pd.Series(df[[item for item in ghg395_criteria7_cost_attributes]].sum(axis=1) + non_pollution_costs,
-                    name='social_cost_dollars_ghg395_criteria7')
+    for sum_num in sum_dict:
+        series_dict[sum_num] \
+            = pd.Series(df[[item for item in sum_dict[sum_num]['attributes']]].sum(axis=1) + non_pollution_costs,
+                        name=sum_dict[sum_num]['name'])
 
-    df = pd.concat([
-        df,
-        ghg5_criteria3_cost_dollars,
-        ghg3_criteria3_cost_dollars,
-        ghg25_criteria3_cost_dollars,
-        ghg395_criteria3_cost_dollars,
-        ghg5_criteria7_cost_dollars,
-        ghg3_criteria7_cost_dollars,
-        ghg25_criteria7_cost_dollars,
-        ghg395_criteria7_cost_dollars,
-    ], axis=1, ignore_index=False
-    )
+    for k, v in series_dict.items():
+        df = pd.concat([df, v], axis=1, ignore_index=False)
 
     return df
