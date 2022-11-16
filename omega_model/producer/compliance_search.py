@@ -236,7 +236,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
             consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']:
         omega_log.logwrite('### Production Constraints Violated, Modifying Constraints ###')
 
-        constraint_ratio = 1.0 * ((consumer_response['battery_GWh_limit'] -
+        constraint_ratio = 0.99 * ((consumer_response['battery_GWh_limit'] -
                                    consumer_response['total_NO_ALT_battery_GWh']) /
                                   consumer_response['total_ALT_battery_GWh'])
 
@@ -278,7 +278,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                         if consumer_response is not None and \
                                 consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']:
                             # adjust constraints
-                            constraint_ratio = 1.0 * ((consumer_response['battery_GWh_limit'] -
+                            constraint_ratio = 0.99 * ((consumer_response['battery_GWh_limit'] -
                                                         consumer_response['total_NO_ALT_battery_GWh']) /
                                                        consumer_response['total_ALT_battery_GWh'])
 
@@ -488,28 +488,17 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                                                                    context_based_total_sales)
 
         # insert code to cull production options based on policy here #
-        battery_GWh_limit = np.interp(calendar_year, omega_globals.options.battery_GWh_limit_years,
+
+        if compliance_id in omega_globals.options.battery_GWh_limit:
+            battery_GWh_limit = np.interp(calendar_year, omega_globals.options.battery_GWh_limit_years,
                               omega_globals.options.battery_GWh_limit[compliance_id])
+        else:
+            # individual OEM data may not yet be populated, use the default values
+            battery_GWh_limit = np.interp(calendar_year, omega_globals.options.battery_GWh_limit_years,
+                              omega_globals.options.battery_GWh_limit['consolidated_OEM'])
 
         production_options['battery_GWh_limit'] = battery_GWh_limit
         production_options = production_options[production_options['total_battery_GWh'] <= battery_GWh_limit].copy()
-
-        # if not valid_production_options.empty:
-        #     production_options = valid_production_options
-        # else:  # no valid production options
-        #     if True or producer_decision_and_response is not None:
-        #         # find new BEV limits by adjusting constraints
-        #         constraint_ratio = 0.999 * (battery_GWh_limit - production_options['total_NO_ALT_battery_GWh'].min()) / \
-        #                            production_options['total_ALT_battery_GWh'].min()
-        #         print('*** constraint ratio %f, %f, %f, %f, %f->%f' % (constraint_ratio, battery_GWh_limit,
-        #                                                    production_options['total_battery_GWh'].min(),
-        #                                                    production_options['total_NO_ALT_battery_GWh'].min(),
-        #                                                    production_options['total_ALT_battery_GWh'].min(),
-        #                                                    production_options['total_ALT_battery_GWh'].min() * constraint_ratio))
-        #         production_options = valid_production_options
-        #     else:
-        #         # no valid production options, even without the consumer response, accept fate:
-        #         production_options = valid_production_options
 
         if production_options.empty:
             producer_compliance_possible = None
