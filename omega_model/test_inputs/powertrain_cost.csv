@@ -1,4 +1,4 @@
-input_template_name:,powertrain_cost,input_template_version:,0.1,description:,20221025 updated PGM prices & new gpf_cost.
+input_template_name:,powertrain_cost,input_template_version:,0.1,description:,20221116 add battery_cost_scalers
 powertrain_type,item,value,quantity,dollar_basis,notes
 ALL,dollars_per_cylinder,((-28.814) * CYL + 726.27) * CYL * MARKUP_ICE,,2019,
 ALL,dollars_per_liter,((400) * LITERS) * MARKUP_ICE,,2019,
@@ -131,3 +131,4 @@ ROADLOAD,sales_scaler,(10) * 1,,,
 ICE,sales_scaler,(1.5) * 1,,,
 PEV,sales_scaler,(6.6) * 1,,,
 ALL,turb_scaler,(1.2) * 1,,,
+ALL,battery_cost_scalers,"{""scaler"": {2019: 1, 2025: 1, 2029: 0.75, 2035: 0.625, 2050: 0.538, 2060: 0.538}}",,,
