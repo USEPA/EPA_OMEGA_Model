@@ -1637,13 +1637,15 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             session_runtime_options.consolidate_manufacturers = consolidate[omega_globals.pass_num]
 
-            if session_runtime_options.context_new_vehicle_generalized_costs_file is None:
-                session_runtime_options.context_new_vehicle_generalized_costs_file = \
-                    'context_new_vehicle_prices_%d.csv' % session_runtime_options.consolidate_manufacturers
+            # TODO: this will need to be fixed for pre-run context:
+            # if session_runtime_options.context_new_vehicle_generalized_costs_file is None:
+            session_runtime_options.context_new_vehicle_generalized_costs_file = \
+                'context_new_vehicle_prices_%d.csv' % session_runtime_options.consolidate_manufacturers
 
-            if session_runtime_options.sales_share_calibration_file is None:
-                session_runtime_options.sales_share_calibration_file = \
-                    'context_sales_share_calibration_%d.csv' % session_runtime_options.consolidate_manufacturers
+            # TODO: this will need to be fixed for pre-run context:
+            # if session_runtime_options.sales_share_calibration_file is None:
+            session_runtime_options.sales_share_calibration_file = \
+                'context_sales_share_calibration_%d.csv' % session_runtime_options.consolidate_manufacturers
 
             session_runtime_options.output_folder = session_runtime_options.output_folder_base\
                 .replace('out', 'out%sconsolidate_%d' % (os.sep, session_runtime_options.consolidate_manufacturers))
