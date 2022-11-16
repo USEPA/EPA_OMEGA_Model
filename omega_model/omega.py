@@ -327,7 +327,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, pre_production_vehicles, producer_decision, market_class_tree, \
-                producer_compliant, constraint_ratio = \
+                producer_compliant, GWh_limit = \
                     compliance_search.search_production_options(compliance_id, calendar_year,
                                                                 producer_decision_and_response,
                                                                 producer_consumer_iteration_num,
@@ -349,8 +349,22 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
                 if producer_compliant is None:
                     # no viable production options, try again in producer shares mode, try again with lower BEV limits
-                    omega_log.logwrite('### Production Constraints Violated, Modifying Constraints (contraint_ratio = %f) ###' % constraint_ratio)
-                    # producer_consumer_iteration_num += 1
+
+                    constraint_ratio = 0.999 * ((GWh_limit -
+                                                best_winning_combo_with_sales_response['total_NO_ALT_battery_GWh']) /
+                                                best_winning_combo_with_sales_response['total_ALT_battery_GWh'])
+
+                    print('*** constraint ratio %f, %f, %f, %f, %f->%f' % (constraint_ratio, GWh_limit,
+                                                                           best_winning_combo_with_sales_response[
+                                                                               'total_battery_GWh'].min(),
+                                                                           best_winning_combo_with_sales_response[
+                                                                               'total_NO_ALT_battery_GWh'].min(),
+                                                                           best_winning_combo_with_sales_response[
+                                                                               'total_ALT_battery_GWh'].min(),
+                                                                           best_winning_combo_with_sales_response[
+                                                                               'total_ALT_battery_GWh'].min() * constraint_ratio))
+
+                    omega_log.logwrite('### Production Constraints Violated, Modifying Constraints ###' % constraint_ratio)
 
                     constraints = [k for k in best_winning_combo_with_sales_response.keys() if 'max_constraint' in k]
                     node_names = [s.replace('max_constraints_', '') for s in constraints]

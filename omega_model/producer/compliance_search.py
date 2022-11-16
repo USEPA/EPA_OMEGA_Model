@@ -452,27 +452,28 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                                                                    context_based_total_sales)
 
         # insert code to cull production options based on policy here #
-        GWh_limit = np.interp(calendar_year, omega_globals.options.battery_GWh_limit_years,
+        battery_GWh_limit = np.interp(calendar_year, omega_globals.options.battery_GWh_limit_years,
                               omega_globals.options.battery_GWh_limit[compliance_id])
 
-        valid_production_options = production_options[production_options['total_battery_GWh'] <= GWh_limit].copy()
+        production_options['battery_GWh_limit'] = battery_GWh_limit
+        production_options = production_options[production_options['total_battery_GWh'] <= battery_GWh_limit].copy()
 
-        if not valid_production_options.empty:
-            production_options = valid_production_options
-        else:  # no valid production options
-            if True or producer_decision_and_response is not None:
-                # find new BEV limits by adjusting constraints
-                constraint_ratio = 0.999 * (GWh_limit - production_options['total_NO_ALT_battery_GWh'].min()) / \
-                                   production_options['total_ALT_battery_GWh'].min()
-                print('*** constraint ratio %f, %f, %f, %f, %f->%f' % (constraint_ratio, GWh_limit,
-                                                           production_options['total_battery_GWh'].min(),
-                                                           production_options['total_NO_ALT_battery_GWh'].min(),
-                                                           production_options['total_ALT_battery_GWh'].min(),
-                                                           production_options['total_ALT_battery_GWh'].min() * constraint_ratio))
-                production_options = valid_production_options
-            else:
-                # no valid production options, even without the consumer response, accept fate:
-                production_options = valid_production_options
+        # if not valid_production_options.empty:
+        #     production_options = valid_production_options
+        # else:  # no valid production options
+        #     if True or producer_decision_and_response is not None:
+        #         # find new BEV limits by adjusting constraints
+        #         constraint_ratio = 0.999 * (battery_GWh_limit - production_options['total_NO_ALT_battery_GWh'].min()) / \
+        #                            production_options['total_ALT_battery_GWh'].min()
+        #         print('*** constraint ratio %f, %f, %f, %f, %f->%f' % (constraint_ratio, battery_GWh_limit,
+        #                                                    production_options['total_battery_GWh'].min(),
+        #                                                    production_options['total_NO_ALT_battery_GWh'].min(),
+        #                                                    production_options['total_ALT_battery_GWh'].min(),
+        #                                                    production_options['total_ALT_battery_GWh'].min() * constraint_ratio))
+        #         production_options = valid_production_options
+        #     else:
+        #         # no valid production options, even without the consumer response, accept fate:
+        #         production_options = valid_production_options
 
         if production_options.empty:
             producer_compliance_possible = None
@@ -544,7 +545,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                                                                              selected_production_decision)
 
     return composite_vehicles, pre_production_vehicles, selected_production_decision, market_class_tree, \
-           producer_compliance_possible, constraint_ratio
+           producer_compliance_possible, battery_GWh_limit
 
 
 def calc_composite_vehicles(mc, rc, alt, mctrc):
