@@ -110,7 +110,7 @@ def run_postproc(iteration_log, credit_banks):
 
     manufacturer_annual_data_table = dataframe_to_numeric(manufacturer_annual_data_table)
 
-    session_results = pd.DataFrame()
+    session_results = dict()
     session_results['calendar_year'] = analysis_years
     session_results['session_name'] = omega_globals.options.session_name
 
@@ -150,7 +150,7 @@ def run_postproc(iteration_log, credit_banks):
 
     if not omega_globals.options.consolidate_manufacturers:
         for msr in mfr_market_share_results:
-            session_results[msr] = mfr_market_share_results[msr] = mfr_market_share_results[msr][1:]
+            session_results[msr] = mfr_market_share_results[msr][1:]
 
         for macd in mfr_average_cost_data:
             session_results['average_%s_cost' % macd] = mfr_average_cost_data[macd]
@@ -175,7 +175,9 @@ def run_postproc(iteration_log, credit_banks):
     # base year data, otherwise the dataframe at the end will fail due to inconsistent column lengths
 
     for msr in market_share_results:
-        session_results[msr] = market_share_results[msr] = market_share_results[msr][1:].copy()
+        session_results[msr] = market_share_results[msr][1:]
+
+    session_results = pd.DataFrame.from_dict(session_results)
 
     for cat in market_categories + market_classes + ['vehicle']:
         session_results \
@@ -190,23 +192,13 @@ def run_postproc(iteration_log, credit_banks):
             = pd.concat([session_results, pd.Series(average_target_co2e_gpmi_data[cat], name=f'average_{cat}_target_co2e_gpmi')], axis=1)
         session_results \
             = pd.concat([session_results, pd.Series(megagrams_data[cat], name=f'{cat}_co2e_Mg')], axis=1)
-        # session_results['average_%s_cost' % cat] = average_cost_data[cat]
-        # session_results['average_%s_generalized_cost' % cat] = average_generalized_cost_data[cat]
-        # session_results['average_%s_cert_co2e_gpmi' % cat] = average_cert_co2e_gpmi_data[cat]
-        # session_results['average_%s_cert_direct_kwh_pmi' % cat] = average_cert_direct_kwh_pmi_data[cat]
-        # session_results['average_%s_target_co2e_gpmi' % cat] = average_target_co2e_gpmi_data[cat]
-        # session_results['%s_co2e_Mg' % cat] = megagrams_data[cat]
 
     total_vehicle_cost_billions = session_results['average_vehicle_cost'] * session_results['sales_total'] / 1e9
     session_results \
         = pd.concat([session_results, pd.Series(total_vehicle_cost_billions, name='total_vehicle_cost_billions')], axis=1)
 
-    # session_results['total_vehicle_cost_billions'] = \
-    #     session_results['average_vehicle_cost'] * session_results['sales_total'] / 1e9
-
     for k in physical_effects:
         session_results = pd.concat([session_results, pd.Series(physical_effects[k], name=f'{k}')], axis=1)
-        # session_results[k] = physical_effects[k]
 
     # write output files
     summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name \
