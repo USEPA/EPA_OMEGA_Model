@@ -1736,7 +1736,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
         # move appropriate outputs to base output folder, was CME == 1.0
         file_io.move_folder_contents('%s%sconsolidate_%d' % (omega_globals.options.output_folder_base, os.sep,
-                                                             omega_globals.options.credit_market_efficiency > 0.0),
+                                                             consolidate[-1]),
                                      omega_globals.options.output_folder_base)
 
         # delete preliminary outputs if not preserving them
