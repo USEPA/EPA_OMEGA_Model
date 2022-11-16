@@ -282,6 +282,8 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
             omega_globals.options.ghg_credit_params_file,
             omega_globals.options.ghg_credits_file, compliance_id)
 
+        prior_producer_decision_and_response = None
+
         for calendar_year in range(omega_globals.options.analysis_initial_year, analysis_end_year):
 
             credit_banks[compliance_id].update_credit_age(calendar_year)
@@ -327,11 +329,12 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, pre_production_vehicles, producer_decision, market_class_tree, \
-                producer_compliant, GWh_limit = \
+                producer_compliant = \
                     compliance_search.search_production_options(compliance_id, calendar_year,
                                                                 producer_decision_and_response,
                                                                 producer_consumer_iteration_num,
-                                                                strategic_target_offset_Mg)
+                                                                strategic_target_offset_Mg,
+                                                                prior_producer_decision_and_response)
 
                 if producer_compliant is None:
                     omega_log.logwrite('### Production Constraints Violated ... ###')
@@ -386,6 +389,8 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
             stock.update_stock(calendar_year, compliance_id)
 
+            prior_producer_decision_and_response = producer_decision_and_response
+
         credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
                                                        omega_globals.options.session_unique_name +
                                                        ' %s GHG_credit_balances.csv' % compliance_id, index=False)
@@ -393,6 +398,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
         credit_banks[compliance_id].transaction_log.to_csv(
             omega_globals.options.output_folder + omega_globals.options.session_unique_name +
             ' %s GHG_credit_transactions.csv' % compliance_id, index=False)
+
 
     iteration_log_df = pd.DataFrame(iteration_log)
 

@@ -165,7 +165,8 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
 
 
 def create_share_sweeps(calendar_year, market_class_dict, candidate_production_decisions, share_range,
-                        consumer_response, context_based_total_sales, node_name='', verbose=False):
+                        consumer_response, context_based_total_sales, prior_producer_decision_and_response,
+                        node_name='', verbose=False):
     """
     Create share sweeps is responsible for creating market share options to
     develop a set of candidate compliance outcomes for the manufacturer in the given year as a function of the
@@ -224,6 +225,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
             child_df_list.append(create_share_sweeps(calendar_year, market_class_dict[k],
                                 candidate_production_decisions, share_range,
                                 consumer_response, context_based_total_sales,
+                                prior_producer_decision_and_response,
                                 node_name=k))
 
     if node_name:
@@ -249,7 +251,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                consumer_response['total_ALT_battery_GWh'] * constraint_ratio))
 
     # Generate market share options
-    if consumer_response is not None and consumer_response['total_battery_GWh'] <= consumer_response['battery_GWh_limit']:
+    if consumer_response is not None and \
+            consumer_response['total_battery_GWh'] <= consumer_response['battery_GWh_limit']:
         # inherit absolute market shares from consumer response
         sales_share_dict = dict()
         for cn in abs_share_column_names:
@@ -294,7 +297,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                     min_constraints[k] = min(min_constraints[k], max_constraints[k])
 
                         else:
-                            # set up initial constraints
+                            # set up initial constraints for mandatory "NO_ALT" vehicle shares
                             # calculate RELATIVE share constraints for partition, even though the keys indicate absolute shares:
                             # --- they will be USED to determine absolute shares ---
                             min_constraints = dict()
@@ -311,6 +314,17 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                                        context_based_total_sales / node_abs_share
                                         min_constraints[scn] = min(1.0, min_constraints[scn] + no_alt_share)
                                         max_constraints[scn] = min_constraints[scn]
+
+                            if prior_producer_decision_and_response is not None:
+                                # bring in prior production decision as a baseline...
+                                prior_max_constraints = Eval.eval(prior_producer_decision_and_response['max_constraints_%s' % node_name])
+                                prior_min_constraints = Eval.eval(prior_producer_decision_and_response['min_constraints_%s' % node_name])
+
+                                for scn in abs_share_column_names:
+                                    print(scn, prior_producer_decision_and_response[scn] /
+                                          prior_producer_decision_and_response['producer_abs_share_frac_%s' % node_name])
+
+                                print('prior')
 
                         # TODO: work production constraints back in, if we want to:
                         # for c, scn in zip(children, abs_share_column_names):
@@ -425,7 +439,8 @@ def apply_production_decision_to_composite_vehicles(composite_vehicles, selected
 
 
 def search_production_options(compliance_id, calendar_year, producer_decision_and_response,
-                              producer_consumer_iteration_num, strategic_target_offset_Mg):
+                              producer_consumer_iteration_num, strategic_target_offset_Mg,
+                              prior_producer_decision_and_response):
     """
     This function implements the producer search for a set of technologies (CO2e g/mi values) and market shares that
     achieve a desired compliance outcome taking into consideration the strategic target offset which allows
@@ -480,7 +495,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
         share_sweeps = create_share_sweeps(calendar_year, market_class_tree,
                                            candidate_production_decisions, share_range,
-                                           producer_decision_and_response, context_based_total_sales)
+                                           producer_decision_and_response, context_based_total_sales,
+                                           prior_producer_decision_and_response)
 
         tech_and_share_sweeps = cartesian_prod(tech_sweeps, share_sweeps)
 
@@ -570,7 +586,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                                                                              selected_production_decision)
 
     return composite_vehicles, pre_production_vehicles, selected_production_decision, market_class_tree, \
-           producer_compliance_possible, battery_GWh_limit
+           producer_compliance_possible
 
 
 def calc_composite_vehicles(mc, rc, alt, mctrc):
