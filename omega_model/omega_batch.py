@@ -1742,7 +1742,7 @@ if __name__ == '__main__':
     parser.add_argument('--session_num', type=int, help='ID # of session to run from batch')
     parser.add_argument('--analysis_final_year', type=int, help='Override analysis final year')
     parser.add_argument('--calc_effects', type=str,
-                        help='Type of effects calcs to run: "None", "Physical", or "Physical and Costs"',
+                        help='Type of effects calcs to run: "No", "Physical", or "Physical and Costs"',
                         default='No')
     parser.add_argument('--verbose', action='store_true', help='Enable verbose omega_batch messages)')
     parser.add_argument('--timestamp', type=str,
