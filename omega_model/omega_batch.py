@@ -1744,13 +1744,13 @@ if __name__ == '__main__':
     parser.add_argument('--calc_effects', type=str,
                         help='Type of effects calcs to run: "No", "Physical", or "Physical and Costs"',
                         default='No')
-    parser.add_argument('--verbose', action='store_true', help='Enable verbose omega_batch messages)')
+    parser.add_argument('--verbose', action='store_true', help='Enable verbose omega_batch messages')
     parser.add_argument('--timestamp', type=str,
                         help='Timestamp string, overrides creating timestamp from system clock', default=None)
     parser.add_argument('--show_figures', action='store_true', help='Display figure windows (no auto-close)')
     parser.add_argument('--dispy', action='store_true', help='Run sessions on dispynode(s)')
     parser.add_argument('--dispy_ping', action='store_true', help='Ping dispynode(s)')
-    parser.add_argument('--dispy_debug', action='store_true', help='Enable verbose dispy debug messages)')
+    parser.add_argument('--dispy_debug', action='store_true', help='Enable verbose dispy debug messages')
     parser.add_argument('--dispy_exclusive', action='store_true', help='Run exclusive job, do not share dispynodes')
     parser.add_argument('--dispy_scheduler', type=str, help='Override default dispy scheduler IP address',
                         default=None)
