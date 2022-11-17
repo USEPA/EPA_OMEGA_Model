@@ -315,10 +315,16 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                         min_constraints[scn] = min(1.0, min_constraints[scn] + no_alt_share)
                                         max_constraints[scn] = min_constraints[scn]
 
+                                print_dict(min_constraints)
+                                print_dict(max_constraints)
+
                             if prior_producer_decision_and_response is not None:
                                 # bring in prior production decision as a baseline...
                                 prior_max_constraints = Eval.eval(prior_producer_decision_and_response['max_constraints_%s' % node_name])
                                 prior_min_constraints = Eval.eval(prior_producer_decision_and_response['min_constraints_%s' % node_name])
+
+                                print_dict(prior_min_constraints)
+                                print_dict(prior_max_constraints)
 
                                 for scn in abs_share_column_names:
                                     print(scn, prior_producer_decision_and_response[scn] /
