@@ -1594,12 +1594,12 @@ def run_omega(session_runtime_options, standalone_run=False):
     session_runtime_options.standalone_run = standalone_run
     session_runtime_options.multiprocessing = True or session_runtime_options.multiprocessing and not standalone_run
 
-    if session_runtime_options.session_is_reference or 0.0 < session_runtime_options.credit_market_efficiency < 1.0:
+    if session_runtime_options.session_is_reference or 0.0 < session_runtime_options.credit_market_efficiency <= 1.0:
         # imperfect trading and/or reference session
-        consolidate = [True] # , False]
-    elif session_runtime_options.credit_market_efficiency == 1.0:
-        # perfect trading
-        consolidate = [True]
+        consolidate = [True, False]
+    # elif session_runtime_options.credit_market_efficiency == 1.0:
+    #    # perfect trading
+    #    consolidate = [True]
     else:  # session_runtime_options.credit_market_efficiency == 0.0:
         # no trading
         consolidate = [False]
@@ -1618,13 +1618,15 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             session_runtime_options.consolidate_manufacturers = consolidate[omega_globals.pass_num]
 
-            if session_runtime_options.context_new_vehicle_generalized_costs_file is None:
-                session_runtime_options.context_new_vehicle_generalized_costs_file = \
-                    'context_new_vehicle_prices_%d.csv' % session_runtime_options.consolidate_manufacturers
+            # TODO: this will need to be fixed for pre-run context:
+            # if session_runtime_options.context_new_vehicle_generalized_costs_file is None:
+            session_runtime_options.context_new_vehicle_generalized_costs_file = \
+                'context_new_vehicle_prices_%d.csv' % session_runtime_options.consolidate_manufacturers
 
-            if session_runtime_options.sales_share_calibration_file is None:
-                session_runtime_options.sales_share_calibration_file = \
-                    'context_sales_share_calibration_%d.csv' % session_runtime_options.consolidate_manufacturers
+            # TODO: this will need to be fixed for pre-run context:
+            # if session_runtime_options.sales_share_calibration_file is None:
+            session_runtime_options.sales_share_calibration_file = \
+                'context_sales_share_calibration_%d.csv' % session_runtime_options.consolidate_manufacturers
 
             session_runtime_options.output_folder = session_runtime_options.output_folder_base\
                 .replace('out', 'out%sconsolidate_%d' % (os.sep, session_runtime_options.consolidate_manufacturers))
@@ -1736,7 +1738,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
         # move appropriate outputs to base output folder, was CME == 1.0
         file_io.move_folder_contents('%s%sconsolidate_%d' % (omega_globals.options.output_folder_base, os.sep,
-                                                             omega_globals.options.credit_market_efficiency > 0.0),
+                                                             consolidate[-1]),
                                      omega_globals.options.output_folder_base)
 
         # delete preliminary outputs if not preserving them
