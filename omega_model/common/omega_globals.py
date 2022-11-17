@@ -19,3 +19,4 @@ engine = None  #: connection to database engine
 session = None  #: database session
 pass_num = 0  #: multi-pass pass number
 producer_shares_mode = False  #: producer shares mode when True
+manufacturer_aggregation = False  #: true if manufacturer-level detail in vehicle aggregation
