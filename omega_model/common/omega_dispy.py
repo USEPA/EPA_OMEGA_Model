@@ -354,10 +354,16 @@ class DispyCluster(object):
 
         else:
             print('Starting SharedJobCluster...')
-            cluster = dispy.SharedJobCluster(dispy_node_setup, nodes=self.desired_node_list, client_port=0,
+            if dispy.__version__ == '4.12.4':
+                cluster = dispy.SharedJobCluster(dispy_node_setup, nodes=self.desired_node_list, client_port=0,
                                              reentrant=True,
                                              loglevel=self.loglevel, depends=[sysprint],
                                              scheduler_node=self.scheduler_node)
+            else:
+                cluster = dispy.SharedJobCluster(dispy_node_setup, nodes=self.desired_node_list, client_port=0,
+                                             reentrant=True,
+                                             loglevel=self.loglevel, depends=[sysprint],
+                                             scheduler_host=self.scheduler_node)
 
         # need to wait for cluster to startup and transfer dependencies to nodes...
         t = 0
@@ -412,11 +418,18 @@ class DispyCluster(object):
                                             cluster_status=status_cb, callback=job_cb)
         else:
             print('Starting SharedJobCluster...')
-            self.cluster = dispy.SharedJobCluster(dispy_run_session, nodes=self.found_node_list, client_port=0,
-                                                  reentrant=True,
-                                                  loglevel=self.loglevel, depends=[sysprint],
-                                                  scheduler_node=self.scheduler_node, cluster_status=status_cb,
-                                                  callback=job_cb)
+            if dispy.__version__ == '4.12.4':
+                self.cluster = dispy.SharedJobCluster(dispy_run_session, nodes=self.found_node_list, client_port=0,
+                                                      reentrant=True,
+                                                      loglevel=self.loglevel, depends=[sysprint],
+                                                      scheduler_node=self.scheduler_node, cluster_status=status_cb,
+                                                      callback=job_cb)
+            else:
+                self.cluster = dispy.SharedJobCluster(dispy_run_session, nodes=self.found_node_list, client_port=0,
+                                                      reentrant=True,
+                                                      loglevel=self.loglevel, depends=[sysprint],
+                                                      scheduler_host=self.scheduler_node, cluster_status=status_cb,
+                                                      job_status=job_cb)
 
         time.sleep(self.sleep_time_secs)  # need to wait for cluster to startup and transfer dependencies to nodes...
 
