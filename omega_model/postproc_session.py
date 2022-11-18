@@ -218,6 +218,7 @@ def run_postproc(iteration_log, credit_banks):
 
     return manufacturer_annual_data_table, mfr_gigawatthour_data
 
+
 def plot_effects(calendar_years, physical_effects_df):
     """
     Plot physical effects and aggregate vehicle stock data by calendar year.
@@ -911,13 +912,13 @@ def plot_vehicle_megagrams(calendar_years):
     return Mg_data
 
 
-def plot_vehicle_GWh(calendar_years, compliance_id=None):
+def plot_vehicle_GWh(calendar_years, manufacturer_id=None):
     """
     Plot vehicle cert CO2e Mg v. model year, by market class and market category.
 
     Args:
         calendar_years ([years]): list of model years
-        compliance_id (str): compliance id
+        manufacturer_id (str): manufacturer id
 
     Returns:
         dict of vehicle cert CO2e Mg data by total, market class and market category
@@ -929,14 +930,14 @@ def plot_vehicle_GWh(calendar_years, compliance_id=None):
     GWh_data['vehicle'] = []
     for cy in calendar_years:
         GWh_data['vehicle'].append(
-            sum([v._initial_registered_count*v.battery_kwh/1e6 for v in vehicle_data
-                 if v.model_year == cy and (compliance_id is None or v.manufacturer_id == compliance_id)]))
+            sum([v._initial_registered_count * v.battery_kwh / 1e6 for v in vehicle_data
+                 if v.model_year == cy and (manufacturer_id is None or v.manufacturer_id == manufacturer_id)]))
 
     for mcat in market_categories:
         market_category_GWh = []
         for idx, cy in enumerate(calendar_years):
             market_id_and_Mg = [(v.market_class_id, v._initial_registered_count*v.battery_kwh/1e6) for v in vehicle_data
-                                if v.model_year == cy and (compliance_id is None or v.manufacturer_id == compliance_id)]
+                                if v.model_year == cy and (manufacturer_id is None or v.manufacturer_id == manufacturer_id)]
             Mg = 0
             for market_class_id, cert_co2e_Mg in market_id_and_Mg:
                 if mcat in market_class_id.split('.'):
@@ -948,14 +949,14 @@ def plot_vehicle_GWh(calendar_years, compliance_id=None):
     for mc in market_classes:
         market_class_GWh = []
         for idx, cy in enumerate(calendar_years):
-            market_class_GWh.append(sum([v._initial_registered_count*v.battery_kwh/1e6 for v in vehicle_data
+            market_class_GWh.append(sum([v._initial_registered_count * v.battery_kwh / 1e6 for v in vehicle_data
                                          if v.model_year == cy and v.market_class_id == mc and
-                                         (compliance_id is None or v.manufacturer_id == compliance_id)]))
+                                         (manufacturer_id is None or v.manufacturer_id == manufacturer_id)]))
 
         GWh_data[mc] = market_class_GWh
 
-    if compliance_id is None:
-        compliance_id = 'ALL'
+    if manufacturer_id is None:
+        manufacturer_id = 'ALL'
 
         # market category chart
         fig, ax1 = figure(omega_globals.options.auto_close_figures)
@@ -970,7 +971,7 @@ def plot_vehicle_GWh(calendar_years, compliance_id=None):
         label_xyt(ax1, 'Year', 'GWh',
                   '%s\nVehicle GWh by Market Category v Year' % omega_globals.options.session_unique_name)
         fig.savefig(omega_globals.options.output_folder + '%s %s V GWh Mkt Cat.png' %
-                    (omega_globals.options.session_unique_name, compliance_id))
+                    (omega_globals.options.session_unique_name, manufacturer_id))
 
         # market class chart
         fig, ax1 = figure(omega_globals.options.auto_close_figures)
@@ -988,7 +989,7 @@ def plot_vehicle_GWh(calendar_years, compliance_id=None):
                   '%s\nVehicle GWh  by Market Class v Year' % omega_globals.options.session_unique_name)
         ax1.legend(market_classes + ['total_GWh', 'limit'])
         fig.savefig(omega_globals.options.output_folder + '%s %s V GWh Mkt Cls.png' %
-                    (omega_globals.options.session_unique_name, compliance_id))
+                    (omega_globals.options.session_unique_name, manufacturer_id))
 
     return GWh_data
 

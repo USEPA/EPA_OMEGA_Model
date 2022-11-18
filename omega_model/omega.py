@@ -316,8 +316,8 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
             iterate_producer_consumer = True
 
             if omega_globals.options.producer_shares_mode == 'auto':
-                # omega_globals.producer_shares_mode = omega_globals.pass_num == 1
-                pass
+                omega_globals.producer_shares_mode = omega_globals.pass_num == 1
+                # pass
             elif omega_globals.options.producer_shares_mode == True:
                 omega_globals.producer_shares_mode = True
 
@@ -1708,6 +1708,9 @@ def run_omega(session_runtime_options, standalone_run=False):
                 manufacturer_annual_data_table.to_csv('%s/manufacturer_annual_data_table_%d.csv' %
                                                       (omega_globals.options.output_folder_base,
                                                        omega_globals.options.consolidate_manufacturers), index=False)
+
+                omega_log.logwrite('\nmanufacturer_gigawatthour_data:')
+                omega_log.logwrite(print_dict(manufacturer_gigawatthour_data, to_string=True))
 
                 # everybody out of the pool
                 if omega_globals.options.multiprocessing:
