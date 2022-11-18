@@ -18,6 +18,39 @@ import common.omega_globals as omega_globals
 # np.seterr(all='raise')  # for troubleshooting runtime warnings
 
 
+def get_ip_address():
+    """
+    Attempt to get "local" IP address(es)
+
+    Example:
+
+    ::
+
+        >>> socket.gethostbyname_ex(socket.gethostname())
+        ('mac-mini.local', [], ['127.0.0.1', '192.168.1.20'])
+
+    Returns: list of local IP address(es)
+
+    """
+    import socket
+
+    my_ip = []
+
+    retries = 0
+    ip_found = False
+    while not ip_found and retries < 10:
+        try:
+            my_ip = socket.gethostbyname_ex(socket.gethostname())[2]
+            ip_found = True
+        except Exception as e:
+            retries += 1
+
+    if not my_ip.count('127.0.0.1'):
+        my_ip.append('127.0.0.1')  # Add support for local loopback interface
+
+    return my_ip
+
+
 def dataframe_to_numeric(df):
     """
     Convert dataframe columns to numeric (i.e. non-object dtypes) if possible.

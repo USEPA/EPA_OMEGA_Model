@@ -1243,8 +1243,10 @@ class OMEGABatchCLIOptions(OMEGABase):
         """
         import time
         import socket
+        from omega_model.common.omega_functions import get_ip_address
+
         hostname = socket.gethostname()
-        ip_address = socket.gethostbyname(hostname)
+        ip_address = get_ip_address()
 
         self.start_time = time.time()
         self.validate_batch = True
