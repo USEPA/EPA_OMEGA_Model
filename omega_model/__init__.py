@@ -192,7 +192,7 @@ try:
             self.verbose = False
             self.iterate_producer_consumer = True
 
-            self.producer_consumer_max_iterations = 100  # recommend 2+
+            self.producer_consumer_max_iterations = 20  # recommend 2+
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
             self.producer_compliance_search_convergence_factor = 0.9
@@ -213,8 +213,8 @@ try:
             # list of modules to allow verbose console output, or empty to disable
             self.verbose_console_modules = ['producer_compliance_search_',
                                             'p-c_shares_and_costs_', 'p-c_max_iterations_',
-                                            'cross_subsidy_search_', 'cross_subsidy_multipliers_',
-                                            'cross_subsidy_convergence_']
+                                            'cross_subsidy_search_', 'cross_subsidy_multipliers',
+                                            'cross_subsidy_convergence']
 
             self.verbose_postproc = ['iteration_']
 
