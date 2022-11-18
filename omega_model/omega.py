@@ -1633,6 +1633,7 @@ def run_omega(session_runtime_options, standalone_run=False):
     try:
 
         manufacturer_annual_data_table = None
+        manufacturer_gigawatthour_data = None
 
         for omega_globals.pass_num in range(len(consolidate)):
 
@@ -1656,6 +1657,8 @@ def run_omega(session_runtime_options, standalone_run=False):
             output_folders.append(omega_globals.options.output_folder)
 
             omega_globals.options.database_dump_folder = omega_globals.options.output_folder + '__dump' + os.sep
+
+            omega_globals.options.manufacturer_gigawatthour_data = manufacturer_gigawatthour_data
 
             if not init_fail:
                 if omega_globals.options.multiprocessing:
@@ -1694,7 +1697,9 @@ def run_omega(session_runtime_options, standalone_run=False):
                     run_producer_consumer(omega_globals.pass_num, manufacturer_annual_data_table)
 
                 # postproc session
-                manufacturer_annual_data_table = postproc_session.run_postproc(iteration_log, credit_banks)
+                manufacturer_annual_data_table, manufacturer_gigawatthour_data = \
+                    postproc_session.run_postproc(iteration_log, credit_banks)
+
                 manufacturer_annual_data_table['strategic_offset'] = \
                     omega_globals.options.credit_market_efficiency * \
                     (manufacturer_annual_data_table['calendar_year_cert_co2e_megagrams'] - \

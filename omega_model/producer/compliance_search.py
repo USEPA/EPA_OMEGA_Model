@@ -236,9 +236,12 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
             consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']:
         omega_log.logwrite('### Production Constraints Violated, Modifying Constraints ###')
 
-        constraint_ratio = 0.99 * ((consumer_response['battery_GWh_limit'] -
+        if consumer_response['total_ALT_battery_GWh'] > 0:
+            constraint_ratio = max(0, 0.99 * ((consumer_response['battery_GWh_limit'] -
                                    consumer_response['total_NO_ALT_battery_GWh']) /
-                                  consumer_response['total_ALT_battery_GWh'])
+                                   consumer_response['total_ALT_battery_GWh']))
+        else:
+            constraint_ratio = 0
 
         print('*** constraint ratio %f, %f, %f, %f, %f->%f' %
               (constraint_ratio,
@@ -254,6 +257,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
         sales_share_dict = dict()
         for cn in abs_share_column_names:
             if cn.replace('producer', 'consumer') in consumer_response:
+                # sales_share_dict[cn] = \
+                #     [consumer_response[cn.replace('producer', 'consumer')]*0.5 + consumer_response[cn]*0.5]
                 sales_share_dict[cn] = [consumer_response[cn.replace('producer', 'consumer')]]
 
         sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
@@ -278,9 +283,12 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                         if consumer_response is not None and \
                                 consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']:
                             # adjust constraints
-                            constraint_ratio = 0.99 * ((consumer_response['battery_GWh_limit'] -
-                                                        consumer_response['total_NO_ALT_battery_GWh']) /
-                                                       consumer_response['total_ALT_battery_GWh'])
+                            if consumer_response['total_ALT_battery_GWh'] > 0:
+                                constraint_ratio = max(0, 0.99 * ((consumer_response['battery_GWh_limit'] -
+                                                               consumer_response['total_NO_ALT_battery_GWh']) /
+                                                               consumer_response['total_ALT_battery_GWh']))
+                            else:
+                                constraint_ratio = 0
 
                             max_constraints = Eval.eval(consumer_response['max_constraints_%s' % node_name])
                             min_constraints = Eval.eval(consumer_response['min_constraints_%s' % node_name])
@@ -489,13 +497,15 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
         # insert code to cull production options based on policy here #
 
-        if compliance_id in omega_globals.options.battery_GWh_limit:
+        if omega_globals.options.manufacturer_gigawatthour_data is None:
+            # individual OEM data not yet be populated, use the default values
             battery_GWh_limit = np.interp(calendar_year, omega_globals.options.battery_GWh_limit_years,
-                              omega_globals.options.battery_GWh_limit[compliance_id])
+                              omega_globals.options.battery_GWh_limit)
         else:
-            # individual OEM data may not yet be populated, use the default values
-            battery_GWh_limit = np.interp(calendar_year, omega_globals.options.battery_GWh_limit_years,
-                              omega_globals.options.battery_GWh_limit['consolidated_OEM'])
+            # use individual OEM data from first pass
+            battery_GWh_limit = np.interp(calendar_year,
+                                          omega_globals.options.manufacturer_gigawatthour_data['analysis_years'],
+                                          omega_globals.options.manufacturer_gigawatthour_data[compliance_id])
 
         production_options['battery_GWh_limit'] = battery_GWh_limit
         production_options = production_options[production_options['total_battery_GWh'] <= battery_GWh_limit].copy()
