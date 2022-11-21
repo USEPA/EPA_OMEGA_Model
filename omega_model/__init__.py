@@ -91,7 +91,7 @@ try:
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
             self.omega_model_path = path
             self.use_prerun_context_outputs = False
-            self.credit_market_efficiency = 0.5
+            self.credit_market_efficiency = 1.0
             self.consolidate_manufacturers = None
             self.include_manufacturers_list = 'all'
             self.exclude_manufacturers_list = 'none'
@@ -158,6 +158,7 @@ try:
             self.discount_values_to_year = 2021
             self.cost_accrual = 'end-of-year'  # end-of-year means costs accrue at year's end; beginning-of-year means cost accrue at year's beginning
             self.allow_ice_of_bev = False
+            self.redesign_interval_gain = 1.0
             self.vmt_rebound_rate_ice = -0.1
             self.vmt_rebound_rate_bev = 0
 

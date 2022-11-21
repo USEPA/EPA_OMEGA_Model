@@ -66,31 +66,6 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
         if verbose:
             print('responsive: %s' % cross_subsidy_pair)
 
-        # if omega_globals.producer_shares_mode:
-        #     # consumer shares from producer desired shares, no cross-subsidy search and convergence
-        #     for c in cross_subsidy_pair:
-        #         # grab producer decision, all fields:
-        #         cross_subsidy_options_and_response = producer_decision
-        #
-        #         # assign consumer shares:
-        #         cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % c] = \
-        #             producer_decision['producer_abs_share_frac_%s' % c]
-        #
-        #         # for iteration_log:
-        #         cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % c] = \
-        #             producer_decision['average_new_vehicle_mfr_cost_%s' % c]
-        #
-        #         cross_subsidy_options_and_response['average_modified_cross_subsidized_price_%s' % c] = \
-        #             producer_decision['average_new_vehicle_mfr_cost_%s' % c]
-        #
-        #         cross_subsidy_options_and_response['pricing_score'] = 0
-        #
-        #         # for postproc plots:
-        #         cross_subsidy_options_and_response['consumer_generalized_cost_dollars_%s' % c] = 0
-        #
-        #         cross_subsidy_options_and_response['cost_multiplier_%s' % c] = 1
-        #
-        # else:
         if all(mc in market_class_data[compliance_id] for mc in cross_subsidy_pair):
             # search cross subsidy options at this level of the tree
             cross_subsidy_options_and_response, iteration_log = \
@@ -973,31 +948,37 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
 
     for mc in omega_globals.options.MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
+
+        # costs and other values the consumer is basing ICE/BEV decisions on should only be made based on the ALT
+        # vehicles which are comparable to each other, unless there aren't any, then use the NO_ALTs
+        if [mcv for mcv in market_class_vehicles if mcv.alt_type == 'ALT']:
+            market_class_vehicles = [mcv for mcv in market_class_vehicles if mcv.alt_type == 'ALT']
+
         if market_class_vehicles:
             producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'initial_registered_count', 'onroad_direct_co2e_grams_per_mile')
+                weighted_value(market_class_vehicles, 'market_class_share_frac', 'onroad_direct_co2e_grams_per_mile')
 
             producer_decision['average_onroad_direct_kwh_pmi_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'initial_registered_count', 'onroad_direct_kwh_per_mile')
+                weighted_value(market_class_vehicles, 'market_class_share_frac', 'onroad_direct_kwh_per_mile')
 
             producer_decision['average_new_vehicle_mfr_cost_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'initial_registered_count', 'new_vehicle_mfr_cost_dollars')
+                weighted_value(market_class_vehicles, 'market_class_share_frac', 'new_vehicle_mfr_cost_dollars')
 
             producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'initial_registered_count',
+                weighted_value(market_class_vehicles, 'market_class_share_frac',
                                'new_vehicle_mfr_generalized_cost_dollars')
 
             producer_decision['average_retail_fuel_price_dollars_per_unit_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'initial_registered_count', 'retail_fuel_price_dollars_per_unit')
+                weighted_value(market_class_vehicles, 'market_class_share_frac', 'retail_fuel_price_dollars_per_unit')
 
             producer_decision['average_curbweight_lbs_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'initial_registered_count', 'curbweight_lbs')
+                weighted_value(market_class_vehicles, 'market_class_share_frac', 'curbweight_lbs')
 
             producer_decision['average_rated_hp_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'initial_registered_count', 'rated_hp')
+                weighted_value(market_class_vehicles, 'market_class_share_frac', 'rated_hp')
 
             producer_decision['average_footprint_ft2_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'initial_registered_count', 'footprint_ft2')
+                weighted_value(market_class_vehicles, 'market_class_share_frac', 'footprint_ft2')
 
             if 'ICE' in mc:
                 # TODO: should get 8887 from PolicyFuel?, but need calendar year (set in omega_globals so we don't have to pass it in??)
@@ -1009,14 +990,6 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
                     OnroadFuel.kilowatt_hours_per_gallon / \
                     producer_decision['average_onroad_direct_kwh_pmi_%s' % mc]
 
-            producer_decision['sales_%s' % mc] = 0
-            for v in market_class_vehicles:
-                producer_decision['sales_%s' % mc] += producer_decision['veh_%s_sales' % v.vehicle_id]
-
-            if calc_producer_abs_share_frac[mc]:
-                producer_decision['producer_abs_share_frac_%s' % mc] += \
-                    producer_decision['sales_%s' % mc] / producer_decision['total_sales']
-
         else:
             producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc] = 0
             producer_decision['average_onroad_direct_kwh_pmi_%s' % mc] = 0
@@ -1027,6 +1000,19 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
             producer_decision['average_rated_hp_%s' % mc] = 0
             producer_decision['average_footprint_ft2_%s' % mc] = 0
             producer_decision['average_onroad_mpg_%s' % mc] = 0
+
+    # absolute shares and sales are based on all vehicles, whether ALT or not
+    for mc in omega_globals.options.MarketClass.market_classes:
+        market_class_vehicles = market_class_vehicle_dict[mc]
+        if market_class_vehicles:
+            producer_decision['sales_%s' % mc] = 0
+            for v in market_class_vehicles:
+                producer_decision['sales_%s' % mc] += producer_decision['veh_%s_sales' % v.vehicle_id]
+
+            if calc_producer_abs_share_frac[mc]:
+                producer_decision['producer_abs_share_frac_%s' % mc] += \
+                    producer_decision['sales_%s' % mc] / producer_decision['total_sales']
+        else:
             producer_decision['sales_%s' % mc] = 0
             producer_decision['producer_abs_share_frac_%s' % mc] = 0
 
@@ -1649,7 +1635,9 @@ def run_omega(session_runtime_options, standalone_run=False):
                 'context_sales_share_calibration_%d.csv' % session_runtime_options.consolidate_manufacturers
 
             session_runtime_options.output_folder = session_runtime_options.output_folder_base\
-                .replace('out', 'out%sconsolidate_%d' % (os.sep, session_runtime_options.consolidate_manufacturers))
+                .replace(session_runtime_options.output_folder_base,
+                         '%sconsolidate_%d%s' % (session_runtime_options.output_folder_base,
+                                                 session_runtime_options.consolidate_manufacturers, os.sep))
 
             init_fail = init_omega(copy.copy(session_runtime_options))
 
