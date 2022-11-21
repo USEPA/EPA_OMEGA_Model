@@ -158,6 +158,7 @@ try:
             self.discount_values_to_year = 2021
             self.cost_accrual = 'end-of-year'  # end-of-year means costs accrue at year's end; beginning-of-year means cost accrue at year's beginning
             self.allow_ice_of_bev = False
+            self.redesign_interval_gain = 1.0
             self.vmt_rebound_rate_ice = -0.1
             self.vmt_rebound_rate_bev = 0
 
