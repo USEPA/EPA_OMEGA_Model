@@ -113,13 +113,6 @@ def run_effects_calcs():
     if 'Physical' in omega_globals.options.calc_effects:
         omega_log.logwrite('\nCalculating physical effects')
 
-        # calculate context fuel costs per mile and save or open saved file
-        # if omega_globals.options.standalone_run:
-        #     context_fuel_cpm_filepath = PurePath(f'{omega_globals.options.output_folder_base}')
-        # else:
-        #     context_fuel_cpm_filepath = PurePath(f'{omega_globals.options.output_folder_base}').parent.parent
-        # context_fuel_cost_per_mile_file = context_fuel_cpm_filepath / 'context_fuel_cost_per_mile.csv'
-
         context_fuel_cost_per_mile_file = 'context_fuel_cost_per_mile.csv'
         if omega_globals.options.standalone_run:
             context_fuel_cost_per_mile_file = omega_globals.options.output_folder_base + context_fuel_cost_per_mile_file
@@ -131,7 +124,9 @@ def run_effects_calcs():
         else:
             context_fuel_cpm_df = pd.read_csv(context_fuel_cost_per_mile_file)
             key = pd.Series(zip(
-                context_fuel_cpm_df['vehicle_id'],
+                context_fuel_cpm_df['base_year_vehicle_id'],
+                context_fuel_cpm_df['base_year_powertrain_type'],
+                context_fuel_cpm_df['model_year'],
                 context_fuel_cpm_df['age'],
             ))
             context_fuel_cpm_df.set_index(key, inplace=True)
