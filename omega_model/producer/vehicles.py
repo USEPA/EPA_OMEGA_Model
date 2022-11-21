@@ -1441,7 +1441,7 @@ class VehicleFinal(SQABase, Vehicle):
                 charge_depleting_range_mi=df.loc[i, 'charge_depleting_range_mi'],
                 base_year_powertrain_type=df.loc[i, 'base_year_powertrain_type'],
                 prior_redesign_year=df.loc[i, 'prior_redesign_year'],
-                redesign_interval=df.loc[i, 'redesign_interval'],
+                redesign_interval=df.loc[i, 'redesign_interval'] * omega_globals.options.redesign_interval_gain,
                 in_production=True,
                 base_year_product=True,
             )
