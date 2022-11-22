@@ -185,7 +185,7 @@ try:
             self.end_time = 0
 
             # developer settings
-            self.producer_damping_max_delta = 0.2
+            self.producer_market_category_ramp_limit = 0.2
             self.producer_shares_mode = 'auto'
             self.producer_num_market_share_options = 3
             self.producer_num_tech_options_per_ice_vehicle = 3
