@@ -91,6 +91,7 @@ try:
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
             self.omega_model_path = path
             self.use_prerun_context_outputs = False
+            self.prerun_context_folder = ''
             self.credit_market_efficiency = 1.0
             self.consolidate_manufacturers = None
             self.include_manufacturers_list = 'all'

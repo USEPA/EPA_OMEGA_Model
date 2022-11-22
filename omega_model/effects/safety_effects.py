@@ -141,6 +141,7 @@ def calc_safety_effects(calendar_years, vmt_adjustments, context_fuel_cpm_dict):
     from common.omega_eval import Eval
 
     vehicle_attribute_list = [
+        'base_year_vehicle_id',
         'manufacturer_id',
         'name',
         'model_year',
@@ -181,8 +182,9 @@ def calc_safety_effects(calendar_years, vmt_adjustments, context_fuel_cpm_dict):
                 vehicle_info_dict[vehicle_id] \
                     = VehicleFinal.get_vehicle_attributes(vehicle_id, vehicle_attribute_list)
 
-            mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, size_class, in_use_fuel_id, market_class_id, \
-            fueling_class, base_year_powertrain_type, body_style, base_year_curbweight_lbs, curbweight_lbs, \
+            base_year_vehicle_id, mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, size_class, \
+            in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, body_style, \
+            base_year_curbweight_lbs, curbweight_lbs, \
             onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
                 = vehicle_info_dict[vehicle_id]
 
@@ -219,20 +221,17 @@ def calc_safety_effects(calendar_years, vmt_adjustments, context_fuel_cpm_dict):
                         fuel_flag += 1
 
                 # get context fuel cost per mile
-                context_fuel_cpm = context_fuel_cpm_dict[(vehicle_id, age)]['fuel_cost_per_mile']
+                context_fuel_cpm_dict_key = (int(base_year_vehicle_id), base_year_powertrain_type, int(model_year), age)
+                context_fuel_cpm = context_fuel_cpm_dict[context_fuel_cpm_dict_key]['fuel_cost_per_mile']
 
                 if fuel_flag == 2:
                     rebound_rate = rebound_rate_ice
-                # rebound_effect = calc_rebound_effect(context_fuel_cpm, fuel_cpm, rebound_rate)
                 if context_fuel_cpm > 0:
                     rebound_effect = calc_rebound_effect(context_fuel_cpm, fuel_cpm, rebound_rate)
                 else:
                     rebound_effect = 0
 
-                # calendar_year_vmt_adj = vmt_adjustments.dict[calendar_year]
                 vmt_adjusted = vad['vmt'] * calendar_year_vmt_adj
-                # vmt_rebound = 0
-                # if rebound_effect:
                 vmt_rebound = vmt_adjusted * rebound_effect
 
                 vmt_adjusted = vmt_adjusted + vmt_rebound
@@ -272,6 +271,7 @@ def calc_safety_effects(calendar_years, vmt_adjustments, context_fuel_cpm_dict):
                 vehicle_safety_dict.update({
                     'session_name': omega_globals.options.session_name,
                     'vehicle_id': vehicle_id,
+                    'base_year_vehicle_id': int(base_year_vehicle_id),
                     'manufacturer_id': mfr_id,
                     'name': name,
                     'calendar_year': calendar_year,
@@ -373,6 +373,7 @@ def calc_legacy_fleet_safety_effects(calendar_years, vmt_adjustments):
         vehicle_safety_dict.update({
             'session_name': omega_globals.options.session_name,
             'vehicle_id': vehicle_id,
+            'base_year_vehicle_id': vehicle_id,
             'manufacturer_id': mfr_id,
             'name': name,
             'calendar_year': int(calendar_year),

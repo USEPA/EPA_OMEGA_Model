@@ -222,7 +222,7 @@ def run_postproc(iteration_log, credit_banks):
 def plot_effects(calendar_years, physical_effects_df):
     """
     Plot physical effects and aggregate vehicle stock data by calendar year.
-    
+
     Args:
         calendar_years ([years]): list of calendar years
         physical_effects_df (DataFrame): contains physical effects data
@@ -966,7 +966,7 @@ def plot_vehicle_GWh(calendar_years, manufacturer_id=None):
         ax1.set_xlim(ax1.get_xlim())
         ax1.set_ylim(ax1.get_ylim())
         ax1.plot(omega_globals.options.battery_GWh_limit_years,
-                 omega_globals.options.battery_GWh_limit, 'r.-')
+                 omega_globals.options.battery_GWh_limit['consolidated_OEM'], 'r.-')
         ax1.legend(market_categories + ['total_GWh', 'limit'])
         label_xyt(ax1, 'Year', 'GWh',
                   '%s\nVehicle GWh by Market Category v Year' % omega_globals.options.session_unique_name)
@@ -984,7 +984,7 @@ def plot_vehicle_GWh(calendar_years, manufacturer_id=None):
         ax1.set_xlim(ax1.get_xlim())
         ax1.set_ylim(ax1.get_ylim())
         ax1.plot(omega_globals.options.battery_GWh_limit_years,
-                 omega_globals.options.battery_GWh_limit, 'r.-')
+                 omega_globals.options.battery_GWh_limit['consolidated_OEM'], 'r.-')
         label_xyt(ax1, 'Year', 'GWh]',
                   '%s\nVehicle GWh  by Market Class v Year' % omega_globals.options.session_unique_name)
         ax1.legend(market_classes + ['total_GWh', 'limit'])

@@ -239,6 +239,7 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
     from common.omega_eval import Eval
 
     vehicle_attribute_list = [
+        'base_year_vehicle_id',
         'manufacturer_id',
         'name',
         'model_year',
@@ -282,7 +283,7 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                 vehicle_info_dict[vehicle_id] \
                     = VehicleFinal.get_vehicle_attributes(vehicle_id, vehicle_attribute_list)
 
-            mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_class_id, \
+            base_year_vehicle_id, mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_class_id, \
             fueling_class, base_year_powertrain_type, target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, \
             onroad_direct_kwh_per_mile, body_style, base_year_curbweight_lbs, curbweight_lbs \
                 = vehicle_info_dict[vehicle_id]
@@ -308,7 +309,7 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
             vehicle_id = int(vad['vehicle_id'])
             age = int(vad['age'])
 
-            mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_class_id, \
+            base_year_vehicle_id, mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_class_id, \
             fueling_class, base_year_powertrain_type, target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, \
             onroad_direct_kwh_per_mile, body_style, base_year_curbweight_lbs, curbweight_lbs \
                 = vehicle_info_dict[vehicle_id]
@@ -559,6 +560,7 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                     vehicle_effects_dict.update({
                         'session_name': omega_globals.options.session_name,
                         'vehicle_id': vehicle_id,
+                        'base_year_vehicle_id': int(base_year_vehicle_id),
                         'manufacturer_id': mfr_id,
                         'name': name,
                         'calendar_year': int(calendar_year),
@@ -1040,6 +1042,7 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
         vehicle_effects_dict.update({
             'session_name': omega_globals.options.session_name,
             'vehicle_id': vehicle_id,
+            'base_year_vehicle_id': vehicle_id,
             'manufacturer_id': legacy_fleet_safety_effects_dict[safety_dict_key]['manufacturer_id'],
             'name': legacy_fleet_safety_effects_dict[safety_dict_key]['name'],
             'calendar_year': calendar_year,
