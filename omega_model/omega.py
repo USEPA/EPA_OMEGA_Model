@@ -257,6 +257,8 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
             omega_globals.options.ghg_credit_params_file,
             omega_globals.options.ghg_credits_file, compliance_id)
 
+        prior_producer_decision_and_response = None
+
         for calendar_year in range(omega_globals.options.analysis_initial_year, analysis_end_year):
 
             credit_banks[compliance_id].update_credit_age(calendar_year)
@@ -307,7 +309,8 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                     compliance_search.search_production_options(compliance_id, calendar_year,
                                                                 producer_decision_and_response,
                                                                 producer_consumer_iteration_num,
-                                                                strategic_target_offset_Mg)
+                                                                strategic_target_offset_Mg,
+                                                                prior_producer_decision_and_response)
 
                 if producer_compliant is None:
                     omega_log.logwrite('### Production Constraints Violated ... ###')
@@ -361,6 +364,8 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
             omega_globals.options.SalesShare.store_producer_decision_and_response(producer_decision_and_response)
 
             stock.update_stock(calendar_year, compliance_id)
+
+            prior_producer_decision_and_response = producer_decision_and_response
 
         credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
                                                        omega_globals.options.session_unique_name +

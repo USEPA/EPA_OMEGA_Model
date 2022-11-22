@@ -165,7 +165,8 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
 
 
 def create_share_sweeps(calendar_year, market_class_dict, candidate_production_decisions, share_range,
-                        consumer_response, context_based_total_sales, node_name='', verbose=False):
+                        consumer_response, context_based_total_sales, prior_producer_decision_and_response,
+                        node_name='', verbose=False):
     """
     Create share sweeps is responsible for creating market share options to
     develop a set of candidate compliance outcomes for the manufacturer in the given year as a function of the
@@ -224,6 +225,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
             child_df_list.append(create_share_sweeps(calendar_year, market_class_dict[k],
                                 candidate_production_decisions, share_range,
                                 consumer_response, context_based_total_sales,
+                                prior_producer_decision_and_response,
                                 node_name=k))
 
     if node_name:
@@ -249,7 +251,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                consumer_response['total_ALT_battery_GWh'] * constraint_ratio))
 
     # Generate market share options
-    if consumer_response is not None and consumer_response['total_battery_GWh'] <= consumer_response['battery_GWh_limit']:
+    if consumer_response is not None and \
+            consumer_response['total_battery_GWh'] <= consumer_response['battery_GWh_limit']:
         # inherit absolute market shares from consumer response
         sales_share_dict = dict()
         for cn in abs_share_column_names:
@@ -294,7 +297,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                     min_constraints[k] = min(min_constraints[k], max_constraints[k])
 
                         else:
-                            # set up initial constraints
+                            # set up initial constraints for mandatory "NO_ALT" vehicle shares
                             # calculate RELATIVE share constraints for partition, even though the keys indicate absolute shares:
                             # --- they will be USED to determine absolute shares ---
                             min_constraints = dict()
@@ -311,6 +314,60 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                                        context_based_total_sales / node_abs_share
                                         min_constraints[scn] = min(1.0, min_constraints[scn] + no_alt_share)
                                         max_constraints[scn] = min_constraints[scn]
+
+                            if prior_producer_decision_and_response is not None:
+                                # bring in prior production decision as a baseline...
+
+                                # print_dict(min_constraints)
+                                # print_dict(max_constraints)
+
+                                node_market_classes = [node_name + '.' + c for c in children]
+
+                                # calculate prior child partition
+                                prior_market_class_shares_dict = dict()
+                                total_share = 0
+                                for nmc in node_market_classes:
+                                    prior_market_class_shares_dict[nmc] = \
+                                        prior_producer_decision_and_response['producer_abs_share_frac_%s' % nmc]
+                                    total_share += prior_market_class_shares_dict[nmc]
+                                for nmc in node_market_classes:
+                                    prior_market_class_shares_dict[nmc] /= total_share
+                                # print_dict(prior_market_class_shares_dict)
+
+                                # calc max subtract = min(producer_damping_max_delta, current share - minimum (NO_ALT))
+                                max_sub_dict = dict()
+                                for nmc in node_market_classes:
+                                    max_sub = (prior_market_class_shares_dict[nmc] -
+                                             min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc])
+                                    max_sub_dict[nmc] = \
+                                        min(omega_globals.options.producer_damping_max_delta, max_sub)
+                                # print_dict(max_sub_dict)
+
+                                #calc max addition = min(producer_damping_max_delta, sum of max subtract of all other shares)
+                                max_add_dict = dict()
+                                for nmc in node_market_classes:
+                                    # add up max subtract for other node market classes
+                                    total_max_sub = 0
+                                    for onmc in [mc for mc in node_market_classes if mc != nmc]:
+                                        total_max_sub += max_sub_dict[onmc]
+                                    max_add_dict[nmc] = \
+                                        min(omega_globals.options.producer_damping_max_delta, total_max_sub)
+                                # print_dict(max_add_dict)
+
+                                # magic: figure out ALT ranges based on prior shares and max add and max subtract limits
+                                for nmc in node_market_classes:
+                                    min_constraints['producer_abs_share_frac_%s.ALT' % nmc] = \
+                                        prior_market_class_shares_dict[nmc] - max_sub_dict[nmc] - \
+                                        min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]
+                                    max_constraints['producer_abs_share_frac_%s.ALT' % nmc] = \
+                                        prior_market_class_shares_dict[nmc] + max_add_dict[nmc] - \
+                                        min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]
+
+                                # print_dict(prior_market_class_shares_dict)
+                                #
+                                # print_dict(min_constraints)
+                                #
+                                # print_dict(max_constraints)
 
                         # TODO: work production constraints back in, if we want to:
                         # for c, scn in zip(children, abs_share_column_names):
@@ -425,7 +482,8 @@ def apply_production_decision_to_composite_vehicles(composite_vehicles, selected
 
 
 def search_production_options(compliance_id, calendar_year, producer_decision_and_response,
-                              producer_consumer_iteration_num, strategic_target_offset_Mg):
+                              producer_consumer_iteration_num, strategic_target_offset_Mg,
+                              prior_producer_decision_and_response):
     """
     This function implements the producer search for a set of technologies (CO2e g/mi values) and market shares that
     achieve a desired compliance outcome taking into consideration the strategic target offset which allows
@@ -480,7 +538,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
         share_sweeps = create_share_sweeps(calendar_year, market_class_tree,
                                            candidate_production_decisions, share_range,
-                                           producer_decision_and_response, context_based_total_sales)
+                                           producer_decision_and_response, context_based_total_sales,
+                                           prior_producer_decision_and_response)
 
         tech_and_share_sweeps = cartesian_prod(tech_sweeps, share_sweeps)
 
