@@ -605,7 +605,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                                                                              selected_production_decision)
 
     return composite_vehicles, pre_production_vehicles, selected_production_decision, market_class_tree, \
-           producer_compliance_possible
+           producer_compliance_possible, battery_GWh_limit
 
 
 def calc_composite_vehicles(mc, rc, alt, mctrc):
