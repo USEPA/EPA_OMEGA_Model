@@ -91,6 +91,7 @@ try:
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
             self.omega_model_path = path
             self.use_prerun_context_outputs = False
+            self.prerun_context_folder = ''
             self.credit_market_efficiency = 1.0
             self.consolidate_manufacturers = None
             self.include_manufacturers_list = 'all'
@@ -158,6 +159,7 @@ try:
             self.discount_values_to_year = 2021
             self.cost_accrual = 'end-of-year'  # end-of-year means costs accrue at year's end; beginning-of-year means cost accrue at year's beginning
             self.allow_ice_of_bev = False
+            self.redesign_interval_gain = 1.0
             self.vmt_rebound_rate_ice = -0.1
             self.vmt_rebound_rate_bev = 0
 
@@ -192,7 +194,7 @@ try:
             self.verbose = False
             self.iterate_producer_consumer = True
 
-            self.producer_consumer_max_iterations = 2  # recommend 2+
+            self.producer_consumer_max_iterations = 20  # recommend 2+
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
             self.producer_compliance_search_convergence_factor = 0.9
@@ -203,8 +205,8 @@ try:
             self.flat_context = False
             self.flat_context_year = 2021
 
-            self.battery_GWh_limit_years = [2020]
-            self.battery_GWh_limit = [1e9]
+            self.battery_GWh_limit_years = [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040]
+            self.battery_GWh_limit = {"consolidated_OEM": [30, 48, 79, 134, 159, 190, 250, 356, 502, 651, 792, 936, 1080, 1224, 1364, 1500, 1500, 1500, 1500, 1500, 1500]}
 
             # list of modules to allow verbose log files, or empty to disable:
             self.verbose_log_modules = ['database_', 'producer_compliance_search_', 'cross_subsidy_search_',

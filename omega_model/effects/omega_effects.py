@@ -70,6 +70,11 @@ from omega_model.effects.tech_tracking import TechTracking
 from omega_model.effects.sum_social_costs import calc_social_costs
 
 
+def error_callback(e):
+    print('error_callback_%s' % __name__)
+    print(e)
+
+
 def run_effects_calcs():
     """
 
@@ -106,7 +111,7 @@ def run_effects_calcs():
         tech_tracking_result = omega_globals.pool.apply_async(func=save_dict_to_csv,
                                                               args=[tech_tracking_dict, tech_tracking_filename, False],
                                                               callback=None,
-                                                              error_callback=None)
+                                                              error_callback=error_callback)
     else:
         tech_tracking_df = save_dict_to_csv(tech_tracking_dict, tech_tracking_filename, index=False)
 
@@ -156,12 +161,12 @@ def run_effects_calcs():
                                                                    args=[safety_effects_dict, safety_effects_filename,
                                                                          False],
                                                                    callback=None,
-                                                                   error_callback=None)
+                                                                   error_callback=error_callback)
             physical_effects_result = omega_globals.pool.apply_async(func=save_dict_to_csv,
                                                                      args=[physical_effects_dict, physical_effects_filename,
                                                                            False],
                                                                      callback=None,
-                                                                     error_callback=None)
+                                                                     error_callback=error_callback)
         else:
             safety_effects_df = save_dict_to_csv(safety_effects_dict, safety_effects_filename, index=False)
             physical_effects_df = save_dict_to_csv(physical_effects_dict, physical_effects_filename, index=False)
@@ -193,7 +198,7 @@ def run_effects_calcs():
                                                                      args=[cost_effects_dict, cost_effects_filename,
                                                                            False],
                                                                      callback=None,
-                                                                     error_callback=None)
+                                                                     error_callback=error_callback)
             else:
                 cost_effects_df = save_dict_to_csv(cost_effects_dict, cost_effects_filename, index=False)
 

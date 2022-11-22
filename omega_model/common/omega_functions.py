@@ -35,6 +35,24 @@ def dataframe_to_numeric(df):
     return df
 
 
+def series_to_numeric(ser):
+    """
+    Convert series entries to numeric (i.e. non-object dtypes) if possible.
+
+    Args:
+        ser (Series): the series to convert to numeric
+
+    Returns:
+        ser with numeric columns where possible
+
+    """
+    ser_out = pd.Series(dtype='float64')
+    for c in ser.keys():
+        ser_out[c] = pd.to_numeric(ser[c], errors='ignore')
+
+    return ser_out
+
+
 def sales_weight_average_dataframe(df):
     """
         Numeric columns are sales-weighted-averaged except for 'model_year' and columns containing
@@ -190,7 +208,7 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=True):
     else:
         frontier_df = cloud
 
-    frontier_df['frontier_factor'] = 0
+    # frontier_df['frontier_factor'] = 0
 
     return frontier_df #.copy()
 
@@ -246,11 +264,11 @@ def print_dict(dict_in, num_tabs=0):
         for k in dict_in.keys():
             if type(dict_in[k]) == list:
                 if dict_in[k]:
-                    print('\t' * num_tabs + k + ':' + str(dict_in[k]))
+                    print('\t' * num_tabs + str(k) + ':' + str(dict_in[k]))
                 else:
-                    print('\t' * num_tabs + k)
+                    print('\t' * num_tabs + str(k))
             else:
-                print('\t' * num_tabs + k)
+                print('\t' * num_tabs + str(k))
                 print_dict(dict_in[k], num_tabs + 1)
 
     if num_tabs == 0:
@@ -361,13 +379,19 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
         column_names_sorted_by_span = sorted(span_dict, key=span_dict.__getitem__)
 
         # generate a range of shares for the first n-1 columns
+        scalars_only = True
         members = dict()
         for c in column_names_sorted_by_span[:-1]:
             if max_level_dict[c] > min_level_dict[c]:
                 members[c] = linspace(min_level_dict[c], max_level_dict[c], num_levels)
+                scalars_only = False
             else:
                 members[c] = min_level_dict[c]
-        members = pd.DataFrame.from_dict(members)
+
+        if scalars_only:
+            members = pd.DataFrame.from_dict([members])
+        else:
+            members = pd.DataFrame.from_dict(members)
 
         # generate cartesian product of first n-1 columns
         x = pd.DataFrame()
@@ -376,10 +400,17 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
 
         # calculate values for the last column, honoring it's upper and lower limits
         last = column_names_sorted_by_span[-1]
-        x[last] = np.maximum(0, np.maximum(min_level_dict[last], np.minimum(max_level_dict[last], 1 - x.sum(axis=1, skipna=True))))
+        x[last] = np.maximum(0, np.maximum(min_level_dict[last], np.minimum(max_level_dict[last], 1.0 - x.sum(axis=1, skipna=True))))
+
+        # drop duplicate rows:  TODO: figure out how to NOT generate duplicates?  Only happens if num_columns > 2... 3...?
+        x = x.drop_duplicates()
 
         # remove rows that don't add up to 1 and get rid of join column ('_')
-        x = x.loc[abs(x.sum(axis=1, numeric_only=True) - 1) <= sys.float_info.epsilon]
+        maybe_x = x.loc[abs(x.sum(axis=1, numeric_only=True) - 1) <= sys.float_info.epsilon]
+
+        if not maybe_x.empty:
+            x = maybe_x
+
         if '_' in x:
             x = x.drop('_', axis=1)
 
@@ -610,6 +641,13 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
 
     """
     dfs = []
+
+    # reorder columns such that last column is an ALT since it equals one minus the sum of the prior columns and we
+    # don't want to blow the constraints on the NO_ALTs
+    alt_columns = [c for c in columns if 'ALT' in c.split('.')]
+    no_alt_columns = [c for c in columns if 'NO_ALT' in c.split('.')]
+
+    columns = no_alt_columns + alt_columns
 
     for i in range(0, len(columns) - 1):
         shares = np.array([])

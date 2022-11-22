@@ -215,10 +215,18 @@ class DecompositionAttributes(OMEGABase):
                 value = cost_curve_non_numeric_data[attribute_name].iloc[-1]
             elif cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index)] != \
                     cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index) + 1]:
+
                 offset = interp_index - math.trunc(interp_index)
+
                 value = '%s (%.3f):%s (%.3f)' % (
                     cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index)], 1 - offset,
                     cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index) + 1], offset)
+
+                if offset < 0.5:
+                    value = cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index)]
+                else:
+                    value = cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index) + 1]
+
             else:
                 value = cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index)]
         else:
@@ -388,15 +396,17 @@ class CompositeVehicle(OMEGABase):
 
         """
         self.vehicle_list = vehicles_list  # copy.deepcopy(vehicle_list)
-        self.name = 'composite vehicle (%s.%s)' % (self.vehicle_list[0].market_class_id, self.vehicle_list[0].reg_class_id)
+        # self.name = 'composite vehicle (%s.%s)' % (self.vehicle_list[0].market_class_id, self.vehicle_list[0].reg_class_id)
 
         self.vehicle_id = vehicle_id
+        self.name = 'composite vehicle (%s)' % vehicle_id
         self.weight_by = weight_by
 
         self.model_year = self.vehicle_list[0].model_year  # calendar_year?
         self.reg_class_id = self.vehicle_list[0].reg_class_id
         self.fueling_class = self.vehicle_list[0].fueling_class
         self.market_class_id = self.vehicle_list[0].market_class_id
+        self.alt_type = ''  # 'ALT' / 'NO_ALT'
 
         # weighted values are applied to the source vehicles by interpolating the composite cost curve after production
         # decisions are applied to composite vehicles, then those values are re-calculated for the composite vehicle based
@@ -702,11 +712,12 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'context_size_class',
                        'unibody_structure', 'drive_system', 'curbweight_lbs', 'eng_rated_hp', 'footprint_ft2',
                        'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c', 'body_style',
-                       'structure_material', 'base_year_powertrain_type', 'base_year_reg_class_id',
-                       'base_year_market_share', 'base_year_vehicle_id', 'base_year_glider_non_structure_mass_lbs',
+                       'structure_material', 'base_year_powertrain_type', 'base_year_reg_class_id', 'base_year_market_share',
+                       'base_year_vehicle_id', 'base_year_glider_non_structure_mass_lbs',
                        'base_year_glider_non_structure_cost_dollars',
                        'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'base_year_curbweight_lbs_to_hp',
-                       'base_year_msrp_dollars', 'battery_kwh', 'motor_kw', 'charge_depleting_range_mi'}
+                       'base_year_msrp_dollars', 'battery_kwh', 'motor_kw', 'charge_depleting_range_mi',
+                       'prior_redesign_year', 'redesign_interval', 'in_production', 'base_year_product'}
 
     # transfer base properties
     for attr in base_properties:
@@ -793,8 +804,12 @@ class Vehicle(OMEGABase):
         self.base_year_target_coef_a = 0
         self.base_year_target_coef_b = 0
         self.base_year_target_coef_c = 0
+        self.prior_redesign_year = 0
+        self.redesign_interval = 0
+        self.in_production = False
         self.body_style = ''
         self.structure_material = ''
+        self.base_year_product = False
         self.base_year_powertrain_type = ''
         self.base_year_reg_class_id = None
         self.base_year_vehicle_id = 0
@@ -1164,8 +1179,12 @@ class VehicleFinal(SQABase, Vehicle):
     body_style = Column(String)  #: vehicle body style, e.g. 'sedan'
     base_year_powertrain_type = Column(String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
     charge_depleting_range_mi = Column(Float)  #: vehicle charge-depleting range, miles
+    prior_redesign_year = Column(Float)  #: prior redesign year
+    redesign_interval = Column(Float)  #: redesign interval
+    in_production = Column(Boolean)  #: True if vehicle is in production
 
     # "base year properties" - things that may change over time but we want to retain the original values
+    base_year_product = Column(Boolean)  #: True if vehicle was in production in base year
     base_year_reg_class_id = Column(Enum(*legacy_reg_classes, validate_strings=True))  #: base year regulatory class, historical data
     base_year_vehicle_id = Column(Float)  #: base year vehicle id from vehicles.csv
     base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
@@ -1204,7 +1223,8 @@ class VehicleFinal(SQABase, Vehicle):
                                    'cert_fuel_id', 'sales', 'footprint_ft2', 'eng_rated_hp',
                                    'unibody_structure', 'drive_system', 'curbweight_lbs',
                                    'target_coef_a', 'target_coef_b', 'target_coef_c',
-                                   'body_style', 'msrp_dollars', 'structure_material'}  #: mandatory input file columns, the rest can be optional numeric columns
+                                   'body_style', 'msrp_dollars', 'structure_material',
+                                   'prior_redesign_year', 'redesign_interval'}  #: mandatory input file columns, the rest can be optional numeric columns
                                     # TODO: 'battery_kwh', 'motor_kw', 'charge_depleting_range_mi'
 
     dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
@@ -1344,7 +1364,8 @@ class VehicleFinal(SQABase, Vehicle):
                               'base_year_glider_non_structure_cost_dollars',
                               'footprint_ft2', 'base_year_footprint_ft2', 'base_year_curbweight_lbs','drive_system',
                               'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
-                              'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c'] \
+                              'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c',
+                              'prior_redesign_year', 'redesign_interval'] \
                               + VehicleFinal.dynamic_attributes
 
         # model year and registered count are required to make a full-blown VehicleFinal object, compliance_id
@@ -1419,6 +1440,10 @@ class VehicleFinal(SQABase, Vehicle):
                 motor_kw=df.loc[i, 'motor_kw'],
                 charge_depleting_range_mi=df.loc[i, 'charge_depleting_range_mi'],
                 base_year_powertrain_type=df.loc[i, 'base_year_powertrain_type'],
+                prior_redesign_year=df.loc[i, 'prior_redesign_year'],
+                redesign_interval=df.loc[i, 'redesign_interval'] * omega_globals.options.redesign_interval_gain,
+                in_production=True,
+                base_year_product=True,
             )
 
             electrification_class = df.loc[i, 'electrification_class']
@@ -1545,6 +1570,8 @@ class VehicleFinal(SQABase, Vehicle):
 
             if v.fueling_class != 'BEV' or omega_globals.options.allow_ice_of_bev:
                 alt_veh = v.clone_vehicle(v)  # create alternative powertrain clone of vehicle
+                alt_veh.in_production = alt_veh.model_year - alt_veh.prior_redesign_year >= alt_veh.redesign_interval
+                alt_veh.base_year_product = False
 
                 if v.fueling_class == 'ICE':
                     alt_veh.fueling_class = 'BEV'

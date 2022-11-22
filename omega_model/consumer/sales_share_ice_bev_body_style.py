@@ -267,12 +267,36 @@ class SalesShare(OMEGABase, SalesShareBase):
                     sales_share_denominator += sales_share_numerator[market_class_id]
 
                 else:
+                    min_constraints = Eval.eval(
+                        producer_decision['min_constraints_%s' % parent_market_class])
+
+                    max_constraints = Eval.eval(
+                        producer_decision['max_constraints_%s' % parent_market_class])
+
                     demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator
-                    demanded_absolute_share = \
-                        demanded_share * market_class_data['consumer_abs_share_frac_%s' % parent_market_class].values
+
+                    # constrain relative (and by extension, absolute) shares
+                    # TODO: only for context session....??
+                    share_name = market_class_id.replace(parent_market_class + '.', '')
+                    demanded_share = np.minimum(np.maximum(min_constraints[share_name], demanded_share),
+                                                max_constraints[share_name])
+
+                    parent_share = market_class_data['consumer_abs_share_frac_%s' % parent_market_class].values
+
+                    demanded_absolute_share = demanded_share * parent_share
 
                     market_class_data['consumer_share_frac_%s' % market_class_id] = demanded_share
                     market_class_data['consumer_abs_share_frac_%s' % market_class_id] = demanded_absolute_share
+
+                    # distribute absolute shares to ALT / NO_ALT, NO_ALT first:
+                    for alt in ['NO_ALT', 'ALT']:
+                        share_id = 'consumer_abs_share_frac_%s.%s' % (market_class_id, alt)
+                        if alt == 'NO_ALT':
+                            market_class_data[share_id] = \
+                                min_constraints[share_id.replace('consumer', 'producer')] * parent_share
+                            demanded_absolute_share -= market_class_data[share_id]
+                        else:
+                            market_class_data[share_id] = demanded_absolute_share
 
         return market_class_data.copy()
 
@@ -534,9 +558,19 @@ class SalesShare(OMEGABase, SalesShareBase):
                 market_class_data['consumer_generalized_cost_dollars_%s' % only_child] = \
                     total_cost_w_fuel_per_PMT
 
+                parent_share = market_class_data['consumer_abs_share_frac_%s' % mc_parent]
+
                 market_class_data['consumer_share_frac_%s' % only_child] = 1.0
-                market_class_data['consumer_abs_share_frac_%s' % only_child] = \
-                    producer_decision['producer_abs_share_frac_%s' % only_child]
+                market_class_data['consumer_abs_share_frac_%s' % only_child] = parent_share
+
+                max_constraints = Eval.eval(
+                    producer_decision['max_constraints_%s' % mc_parent])
+
+                for alt in ['ALT', 'NO_ALT']:
+                    only_child = mc_pair[0] + '.' + alt
+                    market_class_data['consumer_share_frac_%s' % only_child] = 1.0 * max_constraints['producer_abs_share_frac_%s' % only_child]
+                    market_class_data['consumer_abs_share_frac_%s' % only_child] = \
+                        parent_share * max_constraints['producer_abs_share_frac_%s' % only_child]
 
         return market_class_data
 
