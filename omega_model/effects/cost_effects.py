@@ -190,8 +190,11 @@ def calc_cost_effects(physical_effects_dict, context_fuel_cpm_dict, calc_health_
             criteria_vehicle_7_cost_dollars = criteria_upstream_7_cost_dollars = 0
             criteria_3_cost_dollars = criteria_7_cost_dollars = 0
 
-            mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type \
-                = physical['manufacturer_id'], \
+            base_year_vehicle_id, model_year, mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, \
+            market_class_id, fueling_class, base_year_powertrain_type \
+                = physical['base_year_vehicle_id'],\
+                  physical['model_year'], \
+                  physical['manufacturer_id'], \
                   physical['name'], \
                   physical['base_year_reg_class_id'], \
                   physical['reg_class_id'], \
@@ -309,8 +312,9 @@ def calc_cost_effects(physical_effects_dict, context_fuel_cpm_dict, calc_health_
             # calc drive value as value of rebound vmt plus the drive surplus; this is negative since calculated as a cost
             fuel_cpm = fuel_retail_cost_dollars / vmt
             value_of_rebound_vmt_cost_dollars = 0
-            if (vehicle_id, age) in context_fuel_cpm_dict:
-                context_fuel_cpm = context_fuel_cpm_dict[(vehicle_id, age)]['fuel_cost_per_mile']
+            context_fuel_cpm_dict_key = (int(base_year_vehicle_id), base_year_powertrain_type, int(model_year), age)
+            if context_fuel_cpm_dict_key in context_fuel_cpm_dict:
+                context_fuel_cpm = context_fuel_cpm_dict[context_fuel_cpm_dict_key]['fuel_cost_per_mile']
                 value_of_rebound_vmt_cost_dollars = -0.5 * vmt_rebound * (fuel_cpm + context_fuel_cpm)
 
             # climate effects
@@ -398,10 +402,11 @@ def calc_cost_effects(physical_effects_dict, context_fuel_cpm_dict, calc_health_
                 'session_name': omega_globals.options.session_name,
                 'discount_rate': 0,
                 'vehicle_id': vehicle_id,
+                'base_year_vehicle_id': int(base_year_vehicle_id),
                 'manufacturer_id': mfr_id,
                 'name': name,
                 'calendar_year': calendar_year,
-                'model_year': calendar_year - age,
+                'model_year': int(model_year),
                 'age': age,
                 'base_year_reg_class_id': base_year_reg_class_id,
                 'reg_class_id': reg_class_id,

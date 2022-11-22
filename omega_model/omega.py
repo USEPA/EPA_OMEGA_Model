@@ -305,7 +305,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, pre_production_vehicles, producer_decision, market_class_tree, \
-                producer_compliant = \
+                producer_compliant, GWh_limit = \
                     compliance_search.search_production_options(compliance_id, calendar_year,
                                                                 producer_decision_and_response,
                                                                 producer_consumer_iteration_num,
@@ -374,7 +374,6 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
         credit_banks[compliance_id].transaction_log.to_csv(
             omega_globals.options.output_folder + omega_globals.options.session_unique_name +
             ' %s GHG_credit_transactions.csv' % compliance_id, index=False)
-
 
     iteration_log_df = pd.DataFrame(iteration_log)
 
@@ -1630,15 +1629,15 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             session_runtime_options.consolidate_manufacturers = consolidate[omega_globals.pass_num]
 
-            # TODO: this will need to be fixed for pre-run context:
-            # if session_runtime_options.context_new_vehicle_generalized_costs_file is None:
             session_runtime_options.context_new_vehicle_generalized_costs_file = \
-                'context_new_vehicle_prices_%d.csv' % session_runtime_options.consolidate_manufacturers
+                '%s%scontext_new_vehicle_prices_%d.csv' % \
+                (session_runtime_options.prerun_context_folder, os.sep,
+                 session_runtime_options.consolidate_manufacturers)
 
-            # TODO: this will need to be fixed for pre-run context:
-            # if session_runtime_options.sales_share_calibration_file is None:
             session_runtime_options.sales_share_calibration_file = \
-                'context_sales_share_calibration_%d.csv' % session_runtime_options.consolidate_manufacturers
+                '%s%scontext_sales_share_calibration_%d.csv' % \
+                (session_runtime_options.prerun_context_folder, os.sep,
+                 session_runtime_options.consolidate_manufacturers)
 
             session_runtime_options.output_folder = session_runtime_options.output_folder_base\
                 .replace(session_runtime_options.output_folder_base,

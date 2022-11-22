@@ -1,7 +1,7 @@
 Parameter,Type,Value,
 Batch Settings,,,
 Batch Name,String,test_batch,
-Analysis Final Year,#,2050,
+Analysis Final Year,#,2021,
 Cost Accrual,end-of-year / beginning-of-year,end-of-year,
 Discount Values to Year,#,2021,
 Analysis Dollar Basis,#,2020,

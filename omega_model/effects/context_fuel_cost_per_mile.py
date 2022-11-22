@@ -28,6 +28,8 @@ def calc_fuel_cost_per_mile(calendar_years):
     from common.omega_eval import Eval
 
     vehicle_attribute_list = [
+        'base_year_vehicle_id',
+        'name',
         'model_year',
         'base_year_reg_class_id',
         'reg_class_id',
@@ -60,8 +62,8 @@ def calc_fuel_cost_per_mile(calendar_years):
                 vehicle_info_dict[vehicle_id] \
                     = VehicleFinal.get_vehicle_attributes(vehicle_id, vehicle_attribute_list)
 
-            model_year, base_year_reg_class_id, reg_class_id, size_class, in_use_fuel_id, market_class_id, \
-            fueling_class, base_year_powertrain_type, body_style, \
+            base_year_vehicle_id, name, model_year, base_year_reg_class_id, reg_class_id, size_class, in_use_fuel_id, \
+            market_class_id, fueling_class, base_year_powertrain_type, body_style, \
             onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
                 = vehicle_info_dict[vehicle_id]
 
@@ -90,31 +92,35 @@ def calc_fuel_cost_per_mile(calendar_years):
                         onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
                         fuel_cpm += onroad_gallons_per_mile * retail_price_l
 
-                vehicle_fuel_cpm_dict.update({
-                    'session_name': omega_globals.options.session_name,
-                    'vehicle_id': vehicle_id,
-                    'calendar_year': calendar_year,
-                    'model_year': int(model_year),
-                    'age': age,
-                    'base_year_reg_class_id': base_year_reg_class_id,
-                    'reg_class_id': reg_class_id,
-                    'context_size_class': size_class,
-                    'in_use_fuel_id': in_use_fuel_id,
-                    'market_class_id': market_class_id,
-                    'fueling_class': fueling_class,
-                    'base_year_powertrain_type': base_year_powertrain_type,
-                    'body_style': body_style,
-                    'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,
-                    'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
-                    'onroad_gallons_per_mile': onroad_gallons_per_mile,
-                    'onroad_miles_per_gallon': onroad_miles_per_gallon,
-                    'retail_price_per_gallon': retail_price_l,
-                    'retail_price_per_kwh': retail_price_e,
-                    'fuel_cost_per_mile': fuel_cpm,
-                })
+                key = (int(base_year_vehicle_id), base_year_powertrain_type, int(model_year), int(age))
+                if key in calendar_year_fuel_cpm_dict:
+                    pass
+                else:
+                    vehicle_fuel_cpm_dict.update({
+                        'session_name': omega_globals.options.session_name,
+                        'key': key,
+                        'base_year_vehicle_id': int(base_year_vehicle_id),
+                        'calendar_year': int(calendar_year),
+                        'model_year': int(model_year),
+                        'age': int(age),
+                        'base_year_reg_class_id': base_year_reg_class_id,
+                        'reg_class_id': reg_class_id,
+                        'context_size_class': size_class,
+                        'in_use_fuel_id': in_use_fuel_id,
+                        'market_class_id': market_class_id,
+                        'fueling_class': fueling_class,
+                        'base_year_powertrain_type': base_year_powertrain_type,
+                        'body_style': body_style,
+                        'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,
+                        'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
+                        'onroad_gallons_per_mile': onroad_gallons_per_mile,
+                        'onroad_miles_per_gallon': onroad_miles_per_gallon,
+                        'retail_price_per_gallon': retail_price_l,
+                        'retail_price_per_kwh': retail_price_e,
+                        'fuel_cost_per_mile': fuel_cpm,
+                    })
 
-                key = (vehicle_id, age)
-                calendar_year_fuel_cpm_dict[key] = vehicle_fuel_cpm_dict
+                    calendar_year_fuel_cpm_dict[key] = vehicle_fuel_cpm_dict
 
         context_fuel_cpm_dict.update(calendar_year_fuel_cpm_dict)
 

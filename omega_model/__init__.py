@@ -91,9 +91,10 @@ try:
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
             self.omega_model_path = path
             self.use_prerun_context_outputs = False
+            self.prerun_context_folder = ''
             self.credit_market_efficiency = 1.0
             self.consolidate_manufacturers = None
-            self.include_manufacturers_list = ['Mazda', 'Nissan'] # 'all'
+            self.include_manufacturers_list = 'all'
             self.exclude_manufacturers_list = 'none'
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
             self.vehicles_file = path + 'test_inputs/vehicles.csv'
@@ -193,7 +194,7 @@ try:
             self.verbose = False
             self.iterate_producer_consumer = True
 
-            self.producer_consumer_max_iterations = 100  # recommend 2+
+            self.producer_consumer_max_iterations = 20  # recommend 2+
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
             self.producer_compliance_search_convergence_factor = 0.9
