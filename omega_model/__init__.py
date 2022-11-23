@@ -133,6 +133,8 @@ try:
             self.policy_fuels_file = path + 'test_inputs/policy_fuels.csv'
             self.ghg_credit_params_file = path + 'test_inputs/ghg_credit_params.csv'
             self.ghg_credits_file = path + 'test_inputs/ghg_credits.csv'
+            self.targets_workfactors_file = path + 'test_inputs/ghg_standards_workfactor.csv'
+            self.workfactor_definition_file = path + 'test_inputs/workfactor_definition.csv'
 
             self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market-body_style.csv'
             self.market_classes_file = path + 'test_inputs/market_classes-body_style.csv'
