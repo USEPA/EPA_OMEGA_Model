@@ -475,8 +475,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     producer_decision['context_new_vehicle_sales'] = producer_decision['total_sales']
 
     sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
-                                            producer_decision['average_new_vehicle_mfr_generalized_cost_initial'],
-                                            update_context_new_vehicle_generalized_cost=True)
+                                            producer_decision['average_new_vehicle_mfr_generalized_cost_initial'])
 
     cross_subsidy_options_and_response = pd.DataFrame()
 

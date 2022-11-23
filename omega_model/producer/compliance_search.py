@@ -930,6 +930,7 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
         Nothing, updates the OMEGA database with the finalized vehicles
 
     """
+    from consumer import sales_volume
 
     manufacturer_new_vehicles = []
 
@@ -954,6 +955,10 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
         veh_final = VehicleFinal()
         transfer_vehicle_data(ppv, veh_final)
         manufacturer_new_vehicles.append(veh_final)
+
+    # save generalized costs
+    sales_volume.log_new_vehicle_generalized_cost(calendar_year, compliance_id,
+                                                  producer_decision['average_new_vehicle_mfr_generalized_cost'])
 
     omega_globals.session.add_all(manufacturer_new_vehicles)
 
