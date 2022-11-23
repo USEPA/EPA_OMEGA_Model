@@ -966,7 +966,7 @@ def plot_vehicle_GWh(calendar_years, manufacturer_id=None):
         ax1.set_xlim(ax1.get_xlim())
         ax1.set_ylim(ax1.get_ylim())
         ax1.plot(omega_globals.options.battery_GWh_limit_years,
-                 omega_globals.options.battery_GWh_limit['consolidated_OEM'], 'r.-')
+                 omega_globals.options.battery_GWh_limit, 'r.-')
         ax1.legend(market_categories + ['total_GWh', 'limit'])
         label_xyt(ax1, 'Year', 'GWh',
                   '%s\nVehicle GWh by Market Category v Year' % omega_globals.options.session_unique_name)
@@ -984,7 +984,7 @@ def plot_vehicle_GWh(calendar_years, manufacturer_id=None):
         ax1.set_xlim(ax1.get_xlim())
         ax1.set_ylim(ax1.get_ylim())
         ax1.plot(omega_globals.options.battery_GWh_limit_years,
-                 omega_globals.options.battery_GWh_limit['consolidated_OEM'], 'r.-')
+                 omega_globals.options.battery_GWh_limit, 'r.-')
         label_xyt(ax1, 'Year', 'GWh]',
                   '%s\nVehicle GWh  by Market Class v Year' % omega_globals.options.session_unique_name)
         ax1.legend(market_classes + ['total_GWh', 'limit'])
