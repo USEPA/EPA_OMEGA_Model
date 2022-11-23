@@ -85,12 +85,6 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
         else:
             pass
 
-        if omega_globals.producer_shares_mode:
-            # consumer shares from producer desired shares, no cross-subsidy search and convergence
-            for c in cross_subsidy_pair:
-                # assign consumer shares from producer shares:
-                cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % c] = \
-                    producer_decision['producer_abs_share_frac_%s' % c]
     else:
         if verbose:
             print('non-responsive: %s' % cross_subsidy_pair)
@@ -293,8 +287,8 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
             iterate_producer_consumer = True
 
             if omega_globals.options.producer_shares_mode == 'auto':
-                # omega_globals.producer_shares_mode = omega_globals.pass_num == 1
-                pass
+                # in order to hit the strategic offset we need to bypass the consumer a bit
+                omega_globals.producer_shares_mode = omega_globals.pass_num == 1
             elif omega_globals.options.producer_shares_mode == True:
                 omega_globals.producer_shares_mode = True
 
@@ -525,6 +519,11 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
     update_cross_subsidy_log_data(producer_decision_and_response, calendar_year, compliance_id, mcat_converged,
                                   producer_consumer_iteration_num, compliant, share_convergence_error)
+
+    if omega_globals.producer_shares_mode:
+        # force consumer shares from producer shares, after having logged raw results above
+        for k in [k for k in producer_decision_and_response.keys() if 'consumer_abs_' in k]:
+            producer_decision_and_response[k] = producer_decision_and_response[k.replace('consumer', 'producer')]
 
     iteration_log.append(producer_decision_and_response)
 

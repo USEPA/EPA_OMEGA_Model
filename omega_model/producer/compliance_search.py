@@ -1027,7 +1027,7 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
         # share_id = composite_veh.market_class_id
         share_id = composite_veh.market_class_id + '.' + composite_veh.alt_type
 
-        if ('consumer_abs_share_frac_%s' % share_id) in production_options:
+        if ('consumer_abs_share_frac_%s' % share_id) in production_options and not omega_globals.producer_shares_mode:
             if is_series:
                 market_class_sales = total_sales * production_options[
                     'consumer_abs_share_frac_%s' % share_id]
