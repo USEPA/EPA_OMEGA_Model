@@ -1703,6 +1703,10 @@ def run_omega(session_runtime_options, standalone_run=False):
                 manufacturer_annual_data_table, manufacturer_gigawatthour_data = \
                     postproc_session.run_postproc(iteration_log, credit_banks)
 
+                pd.DataFrame.from_dict(manufacturer_gigawatthour_data).to_csv(
+                    '%s/manufacturer_gigawatthour_data_%d.csv' % (omega_globals.options.output_folder_base,
+                                                                  omega_globals.options.consolidate_manufacturers))
+
                 manufacturer_annual_data_table['strategic_offset'] = \
                     omega_globals.options.credit_market_efficiency * \
                     (manufacturer_annual_data_table['calendar_year_cert_co2e_megagrams'] - \
