@@ -554,7 +554,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                                           omega_globals.options.manufacturer_gigawatthour_data[compliance_id])
 
         production_options['battery_GWh_limit'] = battery_GWh_limit
-        valid_production_options = production_options[production_options['total_battery_GWh'] <= battery_GWh_limit].copy()
+        valid_production_options = \
+            production_options[production_options['total_battery_GWh'] <= battery_GWh_limit].copy()
 
         if valid_production_options.empty:
             omega_log.logwrite('### Production Constraints Violated ... limit: %f, min / max: %f / %f ###' %
