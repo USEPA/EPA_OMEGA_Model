@@ -80,6 +80,8 @@ def run_postproc(iteration_log, credit_banks):
     vehicle_annual_data_df.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name
                                   + '_vehicle_annual_data.csv')
 
+    manufacturer_ids = sorted(vehicles_table['manufacturer_id'].unique())
+
     if omega_globals.manufacturer_aggregation and omega_globals.options.consolidate_manufacturers:
         from producer.manufacturer_annual_data import ManufacturerAnnualData
         from producer.vehicle_aggregation import aggregation_columns
@@ -87,7 +89,7 @@ def run_postproc(iteration_log, credit_banks):
         vehicles_table = dataframe_to_numeric(vehicles_table)
 
         # generate after-the-fact manufacturer annual data for individual producers
-        for manufacturer_id in vehicles_table['manufacturer_id'].unique():
+        for manufacturer_id in manufacturer_ids:
             for calendar_year in vehicle_years[1:]:
                 mfr_data = vehicles_table[(vehicles_table['manufacturer_id'] == manufacturer_id) &
                                           (vehicles_table['model_year'] == calendar_year)]
@@ -116,7 +118,8 @@ def run_postproc(iteration_log, credit_banks):
     session_results['calendar_year'] = analysis_years
     session_results['session_name'] = omega_globals.options.session_name
 
-    context_sales, total_sales, manufacturer_sales = plot_total_sales(vehicle_years, VehicleFinal.compliance_ids)
+    context_sales, total_sales, manufacturer_sales = \
+        plot_total_sales(vehicle_years, set(VehicleFinal.compliance_ids + list(manufacturer_ids)))
 
     session_results['sales_total'] = total_sales[1:]
     session_results['sales_context'] = context_sales
@@ -1271,7 +1274,12 @@ def plot_total_sales(calendar_years, compliance_ids):
         manufacturer_sales[compliance_id] = []
         for cy in calendar_years:
             count = 0
-            vad_ids = [(v.compliance_id, v.vehicle_id, 0) for v in vehicle_data if v.model_year == cy and v.compliance_id == compliance_id]
+            if omega_globals.options.consolidate_manufacturers:
+                vad_ids = [('consolidated_OEM', v.vehicle_id, 0) for v in vehicle_data
+                           if v.model_year == cy and v.manufacturer_id == compliance_id]
+            else:
+                vad_ids = [(v.manufacturer_id, v.vehicle_id, 0) for v in vehicle_data
+                       if v.model_year == cy and v.manufacturer_id == compliance_id]
             for vad_id in vad_ids:
                 count += vehicle_annual_data[vad_id]['registered_count']
             manufacturer_sales[compliance_id].append(count)

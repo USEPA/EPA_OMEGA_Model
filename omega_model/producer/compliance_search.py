@@ -941,6 +941,7 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
         Nothing, updates the OMEGA database with the finalized vehicles
 
     """
+    from consumer import sales_volume
 
     manufacturer_new_vehicles = []
 
@@ -965,6 +966,10 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
         veh_final = VehicleFinal()
         transfer_vehicle_data(ppv, veh_final)
         manufacturer_new_vehicles.append(veh_final)
+
+    # save generalized costs
+    sales_volume.log_new_vehicle_generalized_cost(calendar_year, compliance_id,
+                                                  producer_decision['average_new_vehicle_mfr_generalized_cost'])
 
     omega_globals.session.add_all(manufacturer_new_vehicles)
 
@@ -1033,7 +1038,7 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
         # share_id = composite_veh.market_class_id
         share_id = composite_veh.market_class_id + '.' + composite_veh.alt_type
 
-        if ('consumer_abs_share_frac_%s' % share_id) in production_options:
+        if ('consumer_abs_share_frac_%s' % share_id) in production_options and not omega_globals.producer_shares_mode:
             if is_series:
                 market_class_sales = total_sales * production_options[
                     'consumer_abs_share_frac_%s' % share_id]
