@@ -122,6 +122,11 @@ def run_effects_calcs():
         if omega_globals.options.standalone_run:
             context_fuel_cost_per_mile_file = omega_globals.options.output_folder_base + context_fuel_cost_per_mile_file
 
+        elif (omega_globals.options.use_prerun_context_outputs):
+            context_fuel_cost_per_mile_file = \
+                '%s%scontext_fuel_cost_per_mile.csv' % \
+                (omega_globals.options.prerun_context_folder, os.sep)
+
         if omega_globals.options.session_is_reference:
             context_fuel_cpm_dict = calc_fuel_cost_per_mile(calendar_years)
             context_fuel_cpm_df \
