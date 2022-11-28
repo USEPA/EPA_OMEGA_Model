@@ -1714,9 +1714,6 @@ def run_omega(session_runtime_options, standalone_run=False):
                                                       (omega_globals.options.output_folder_base,
                                                        omega_globals.options.consolidate_manufacturers), index=False)
 
-                omega_log.logwrite('\nmanufacturer_gigawatthour_data:')
-                omega_log.logwrite(print_dict(manufacturer_gigawatthour_data, to_string=True))
-
                 # everybody out of the pool
                 if omega_globals.options.multiprocessing:
                     omega_globals.pool.close()
