@@ -62,7 +62,10 @@ def run_postproc(iteration_log, credit_banks):
                                                VehicleFinal.target_co2e_grams_per_mile,
                                                VehicleFinal.cert_co2e_grams_per_mile,
                                                VehicleFinal.cert_direct_kwh_per_mile,
-                                               VehicleFinal.lifetime_VMT, VehicleFinal.compliance_id).all()
+                                               VehicleFinal.lifetime_VMT, VehicleFinal.compliance_id,
+                                               VehicleFinal.battery_kwh, VehicleFinal._initial_registered_count,
+                                               VehicleFinal.manufacturer_id)\
+        .filter(VehicleFinal.in_production).all()
 
     # index vehicle annual data by vehicle id and age for quick access
     vehicle_annual_data_df = pd.DataFrame(VehicleAnnualData._data).set_index(['compliance_id', 'vehicle_id', 'age'])
@@ -77,6 +80,8 @@ def run_postproc(iteration_log, credit_banks):
     vehicle_annual_data_df.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name
                                   + '_vehicle_annual_data.csv')
 
+    manufacturer_ids = sorted(vehicles_table['manufacturer_id'].unique())
+
     if omega_globals.manufacturer_aggregation and omega_globals.options.consolidate_manufacturers:
         from producer.manufacturer_annual_data import ManufacturerAnnualData
         from producer.vehicle_aggregation import aggregation_columns
@@ -84,7 +89,7 @@ def run_postproc(iteration_log, credit_banks):
         vehicles_table = dataframe_to_numeric(vehicles_table)
 
         # generate after-the-fact manufacturer annual data for individual producers
-        for manufacturer_id in vehicles_table['manufacturer_id'].unique():
+        for manufacturer_id in manufacturer_ids:
             for calendar_year in vehicle_years[1:]:
                 mfr_data = vehicles_table[(vehicles_table['manufacturer_id'] == manufacturer_id) &
                                           (vehicles_table['model_year'] == calendar_year)]
@@ -113,7 +118,8 @@ def run_postproc(iteration_log, credit_banks):
     session_results['calendar_year'] = analysis_years
     session_results['session_name'] = omega_globals.options.session_name
 
-    context_sales, total_sales, manufacturer_sales = plot_total_sales(vehicle_years, VehicleFinal.compliance_ids)
+    context_sales, total_sales, manufacturer_sales = \
+        plot_total_sales(vehicle_years, set(VehicleFinal.compliance_ids + list(manufacturer_ids)))
 
     session_results['sales_total'] = total_sales[1:]
     session_results['sales_context'] = context_sales
@@ -147,6 +153,10 @@ def run_postproc(iteration_log, credit_banks):
 
             mfr_average_cost_data = plot_manufacturer_vehicle_cost(analysis_years, compliance_id)
 
+    mfr_gigawatthour_data = {'analysis_years': analysis_years}
+    for manufacturer_id in vehicles_table['manufacturer_id'].unique():
+        mfr_gigawatthour_data[manufacturer_id] = plot_vehicle_GWh(analysis_years, manufacturer_id)['vehicle']
+
     if not omega_globals.options.consolidate_manufacturers:
         for msr in mfr_market_share_results:
             session_results[msr] = mfr_market_share_results[msr][1:]
@@ -161,6 +171,8 @@ def run_postproc(iteration_log, credit_banks):
     average_generalized_cost_data = plot_vehicle_generalized_cost(analysis_years)
 
     megagrams_data = plot_vehicle_megagrams(analysis_years)
+
+    gigawatthour_data = plot_vehicle_GWh(analysis_years)
 
     average_cert_co2e_gpmi_data = plot_cert_co2e_gpmi(analysis_years)
 
@@ -191,6 +203,8 @@ def run_postproc(iteration_log, credit_banks):
             = pd.concat([session_results, pd.Series(average_target_co2e_gpmi_data[cat], name=f'average_{cat}_target_co2e_gpmi')], axis=1)
         session_results \
             = pd.concat([session_results, pd.Series(megagrams_data[cat], name=f'{cat}_co2e_Mg')], axis=1)
+        session_results \
+            = pd.concat([session_results, pd.Series(gigawatthour_data[cat], name=f'{cat}_GWh')], axis=1)
 
     total_vehicle_cost_billions = session_results['average_vehicle_cost'] * session_results['sales_total'] / 1e9
     session_results \
@@ -205,12 +219,13 @@ def run_postproc(iteration_log, credit_banks):
 
     session_results.to_csv(summary_filename, index=False)
 
-    return manufacturer_annual_data_table
+    return manufacturer_annual_data_table # , mfr_gigawatthour_data
+
 
 def plot_effects(calendar_years, physical_effects_df):
     """
     Plot physical effects and aggregate vehicle stock data by calendar year.
-    
+
     Args:
         calendar_years ([years]): list of calendar years
         physical_effects_df (DataFrame): contains physical effects data
@@ -299,7 +314,10 @@ def plot_cert_co2e_gpmi(calendar_years):
         vehicle_id_and_vmt_and_co2gpmi = [((v.compliance_id, v.vehicle_id), v.lifetime_VMT, v.cert_co2e_grams_per_mile) for v in vehicle_data if v.model_year == cy]
 
         for vehicle_id, lifetime_vmt, co2gpmi in vehicle_id_and_vmt_and_co2gpmi:
-            weighted_value += vehicle_annual_data[vehicle_id + tuple([0])]['registered_count'] * lifetime_vmt * co2gpmi
+            try:
+                weighted_value += vehicle_annual_data[vehicle_id + tuple([0])]['registered_count'] * lifetime_vmt * co2gpmi
+            except:
+                print('wtf')
             count += vehicle_annual_data[vehicle_id + tuple([0])]['registered_count'] * lifetime_vmt
 
         co2e_data['vehicle'].append(weighted_value / max(1, count))
@@ -897,6 +915,88 @@ def plot_vehicle_megagrams(calendar_years):
     return Mg_data
 
 
+def plot_vehicle_GWh(calendar_years, manufacturer_id=None):
+    """
+    Plot vehicle cert CO2e Mg v. model year, by market class and market category.
+
+    Args:
+        calendar_years ([years]): list of model years
+        manufacturer_id (str): manufacturer id
+
+    Returns:
+        dict of vehicle cert CO2e Mg data by total, market class and market category
+
+    """
+    GWh_data = dict()
+
+    # tally up total Mg
+    GWh_data['vehicle'] = []
+    for cy in calendar_years:
+        GWh_data['vehicle'].append(
+            sum([v._initial_registered_count * v.battery_kwh / 1e6 for v in vehicle_data
+                 if v.model_year == cy and (manufacturer_id is None or v.manufacturer_id == manufacturer_id)]))
+
+    for mcat in market_categories:
+        market_category_GWh = []
+        for idx, cy in enumerate(calendar_years):
+            market_id_and_Mg = [(v.market_class_id, v._initial_registered_count*v.battery_kwh/1e6) for v in vehicle_data
+                                if v.model_year == cy and (manufacturer_id is None or v.manufacturer_id == manufacturer_id)]
+            Mg = 0
+            for market_class_id, cert_co2e_Mg in market_id_and_Mg:
+                if mcat in market_class_id.split('.'):
+                    Mg += float(cert_co2e_Mg)
+            market_category_GWh.append(Mg)
+
+        GWh_data[mcat] = market_category_GWh
+
+    for mc in market_classes:
+        market_class_GWh = []
+        for idx, cy in enumerate(calendar_years):
+            market_class_GWh.append(sum([v._initial_registered_count * v.battery_kwh / 1e6 for v in vehicle_data
+                                         if v.model_year == cy and v.market_class_id == mc and
+                                         (manufacturer_id is None or v.manufacturer_id == manufacturer_id)]))
+
+        GWh_data[mc] = market_class_GWh
+
+    if manufacturer_id is None:
+        manufacturer_id = 'ALL'
+
+        # market category chart
+        fig, ax1 = figure(omega_globals.options.auto_close_figures)
+        for mcat in market_categories:
+            ax1.plot(calendar_years, GWh_data[mcat], '.--')
+        ax1.plot(calendar_years, GWh_data['vehicle'], '.-')
+        ax1.set_xlim(ax1.get_xlim())
+        ax1.set_ylim(ax1.get_ylim())
+        ax1.plot(omega_globals.options.battery_GWh_limit_years,
+                 omega_globals.options.battery_GWh_limit['consolidated_OEM'], 'r.-')
+        ax1.legend(market_categories + ['total_GWh', 'limit'])
+        label_xyt(ax1, 'Year', 'GWh',
+                  '%s\nVehicle GWh by Market Category v Year' % omega_globals.options.session_unique_name)
+        fig.savefig(omega_globals.options.output_folder + '%s %s V GWh Mkt Cat.png' %
+                    (omega_globals.options.session_unique_name, manufacturer_id))
+
+        # market class chart
+        fig, ax1 = figure(omega_globals.options.auto_close_figures)
+        for mc in market_classes:
+            if 'ICE' in mc:
+                ax1.plot(calendar_years, GWh_data[mc], '.-')
+            else:
+                ax1.plot(calendar_years, GWh_data[mc], '.--')
+        ax1.plot(calendar_years, GWh_data['vehicle'], '.-')
+        ax1.set_xlim(ax1.get_xlim())
+        ax1.set_ylim(ax1.get_ylim())
+        ax1.plot(omega_globals.options.battery_GWh_limit_years,
+                 omega_globals.options.battery_GWh_limit['consolidated_OEM'], 'r.-')
+        label_xyt(ax1, 'Year', 'GWh]',
+                  '%s\nVehicle GWh  by Market Class v Year' % omega_globals.options.session_unique_name)
+        ax1.legend(market_classes + ['total_GWh', 'limit'])
+        fig.savefig(omega_globals.options.output_folder + '%s %s V GWh Mkt Cls.png' %
+                    (omega_globals.options.session_unique_name, manufacturer_id))
+
+    return GWh_data
+
+
 def plot_market_shares(calendar_years, total_sales):
     """
     Plot absolute market shares v. model year, by market class, market category, context size class and reg class.
@@ -1174,7 +1274,12 @@ def plot_total_sales(calendar_years, compliance_ids):
         manufacturer_sales[compliance_id] = []
         for cy in calendar_years:
             count = 0
-            vad_ids = [(v.compliance_id, v.vehicle_id, 0) for v in vehicle_data if v.model_year == cy and v.compliance_id == compliance_id]
+            if omega_globals.options.consolidate_manufacturers:
+                vad_ids = [('consolidated_OEM', v.vehicle_id, 0) for v in vehicle_data
+                           if v.model_year == cy and v.manufacturer_id == compliance_id]
+            else:
+                vad_ids = [(v.manufacturer_id, v.vehicle_id, 0) for v in vehicle_data
+                       if v.model_year == cy and v.manufacturer_id == compliance_id]
             for vad_id in vad_ids:
                 count += vehicle_annual_data[vad_id]['registered_count']
             manufacturer_sales[compliance_id].append(count)

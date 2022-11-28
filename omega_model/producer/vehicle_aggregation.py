@@ -217,8 +217,10 @@ print('importing %s' % __file__)
 from omega_model import *
 
 # for now, eventually need to be inputs somewhere:
+# 'manufacturer_id' added if not consolidating manufacturers
 aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
-                       'cert_fuel_id', 'reg_class_id', 'drive_system']  #  'manufacturer_id' added if not consolidating manufacturers
+                       'cert_fuel_id', 'reg_class_id', 'drive_system',
+                       'prior_redesign_year', 'redesign_interval', 'cost_curve_class', 'structure_material']
 
 
 class VehicleAggregation(OMEGABase):

@@ -8,7 +8,7 @@
 
 """
 
-from omega import *
+from common.omega_types import *
 
 
 class Eval(OMEGABase):

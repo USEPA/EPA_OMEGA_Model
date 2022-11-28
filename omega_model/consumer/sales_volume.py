@@ -62,7 +62,24 @@ def context_new_vehicle_sales(calendar_year):
     return _cache[calendar_year]
 
 
-def new_vehicle_sales_response(calendar_year, compliance_id, P, update_context_new_vehicle_generalized_cost=False):
+def log_new_vehicle_generalized_cost(calendar_year, compliance_id, P):
+    """
+
+    Args:
+        calendar_year (int): the calendar year to calculate sales in
+        compliance_id (str): manufacturer name, or 'consolidated_OEM'
+        P ($, [$]): a single price representing the final production decision average new vehicle generalized cost
+
+    """
+    from context.new_vehicle_market import NewVehicleMarket
+
+    if omega_globals.options.session_is_reference:
+        NewVehicleMarket.set_context_new_vehicle_generalized_cost(calendar_year, compliance_id, P)
+
+    NewVehicleMarket.set_session_new_vehicle_generalized_cost(calendar_year, compliance_id, P)
+
+
+def new_vehicle_sales_response(calendar_year, compliance_id, P):
     """
     Calculate new vehicle sales fraction relative to a reference sales volume and average new vehicle generalized cost.
     Updates generalized cost table associated with the reference session so those costs can become the reference
@@ -80,27 +97,25 @@ def new_vehicle_sales_response(calendar_year, compliance_id, P, update_context_n
     """
     from context.new_vehicle_market import NewVehicleMarket
 
-    if type(P) is list:
-        P = np.array(P)
+    if omega_globals.options.session_is_reference:
+        # disable elasticity for context session
+        return 1.0
 
-    if omega_globals.options.session_is_reference and isinstance(P, float) and \
-            update_context_new_vehicle_generalized_cost:
-        NewVehicleMarket.set_context_new_vehicle_generalized_cost(calendar_year, compliance_id, P)
+    else:
+        if type(P) is list:
+            P = np.array(P)
 
-    if isinstance(P, float):
-        NewVehicleMarket.set_session_new_vehicle_generalized_cost(calendar_year, compliance_id, P)
+        Q0 = 1
+        P0 = NewVehicleMarket.get_context_new_vehicle_generalized_cost(calendar_year, compliance_id)
 
-    Q0 = 1
-    P0 = NewVehicleMarket.get_context_new_vehicle_generalized_cost(calendar_year, compliance_id)
+        E = omega_globals.options.new_vehicle_price_elasticity_of_demand
 
-    E = omega_globals.options.new_vehicle_price_elasticity_of_demand
+        # M = -(Q0*E - Q0) / (P0/E - P0)  # slope of linear response
+        # Q = Q0 + M * (P-P0)  # point-slope equation of a line
 
-    # M = -(Q0*E - Q0) / (P0/E - P0)  # slope of linear response
-    # Q = Q0 + M * (P-P0)  # point-slope equation of a line
+        Q = 1 - (P - P0)/P * E
 
-    Q = 1 - (P - P0)/P * E
-
-    return Q/Q0
+        return Q/Q0
 
 
 def init_sales_volume():

@@ -221,18 +221,18 @@ class MarketClassBase:
                     if by_reg_class:
                         market_class_dict[prefix] = dict()
                         for rc in omega_globals.options.RegulatoryClasses.reg_classes:
-                            market_class_dict[prefix][rc] = []
+                            market_class_dict[prefix][rc] = {'ALT': [], 'NO_ALT': []}
                     else:
-                        market_class_dict[prefix] = []
+                        market_class_dict[prefix] = {'ALT': [], 'NO_ALT': []}
                 else:
                     # create new dictionary
                     if by_reg_class:
                         rc_dict = {prefix: dict()}
                         for rc in omega_globals.options.RegulatoryClasses.reg_classes:
-                            rc_dict[prefix][rc] = []
+                            rc_dict[prefix][rc] = {'ALT': [], 'NO_ALT': []}
                         return rc_dict
                     else:
-                        return {prefix: []}
+                        return {prefix: {'ALT': [], 'NO_ALT': []}}
             else:
                 if prefix in market_class_dict:
                     # update existing dictionary
