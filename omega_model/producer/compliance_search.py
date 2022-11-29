@@ -310,6 +310,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                             # --- they will be USED to determine absolute shares ---
                             min_constraints = dict()
                             max_constraints = dict()
+                            locked_shares = 0
 
                             for c, scn in zip(children + children, abs_share_column_names):
                                 if 'NO_ALT' in scn.split('.'):
@@ -322,6 +323,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                                        context_based_total_sales / node_abs_share
                                         min_constraints[scn] = min(1.0, min_constraints[scn] + no_alt_share)
                                         max_constraints[scn] = min_constraints[scn]
+                                        locked_shares += no_alt_share
 
                             node_market_classes = [node_name + '.' + c for c in children]
 
@@ -354,71 +356,62 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
                             print_dict(prior_market_class_shares_dict)
 
-                            # # TODO: work production constraints back in, if we want to:
+                            production_min = dict()
                             for nmc in node_market_classes:
-                                production_min = ProductionConstraints.get_minimum_share(calendar_year, nmc)
+                                min_production_share = ProductionConstraints.get_minimum_share(calendar_year, nmc)
                                 required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, nmc)
-                                production_min = min(max_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc],
-                                                     max(production_min, required_zev_share))
+                                production_min[nmc] = max(min_production_share, required_zev_share)
 
-                                print(nmc, production_min, prior_market_class_shares_dict[nmc])
+                            if abs(1-locked_shares) > sys.float_info.epsilon:
+                                for nmc in node_market_classes:
+                                    print(nmc, production_min[nmc], prior_market_class_shares_dict[nmc])
 
-                                if prior_market_class_shares_dict[nmc] < production_min:
-                                    # set minimum, re-apportion other market shares to maintain partition
-                                    delta = production_min - prior_market_class_shares_dict[nmc]
+                                    if prior_market_class_shares_dict[nmc] < production_min[nmc]:
+                                        # set minimum, re-apportion other market shares to maintain partition
+                                        delta = production_min[nmc] - prior_market_class_shares_dict[nmc]
+                                        for onmc in [mc for mc in node_market_classes if mc != nmc]:
+                                            prior_market_class_shares_dict[onmc] -= \
+                                                delta * prior_market_class_shares_dict[onmc] / (1 - prior_market_class_shares_dict[nmc])
+                                        prior_market_class_shares_dict[nmc] = production_min[nmc]
+
+                                    print(nmc, production_min[nmc], prior_market_class_shares_dict[nmc])
+
+                                print_dict(prior_market_class_shares_dict)
+
+                                # calc max subtract = min(producer_damping_max_delta, current share - minimum (NO_ALT))
+                                max_sub_dict = dict()
+                                for nmc in node_market_classes:
+                                    max_sub = (prior_market_class_shares_dict[nmc] -
+                                               max(production_min[nmc],
+                                                   min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))
+
+                                    max_sub_dict[nmc] = \
+                                        min(omega_globals.options.producer_market_category_ramp_limit, max_sub)
+
+                                # calc max addition = min(producer_damping_max_delta, sum of max subtract of all other shares)
+                                max_add_dict = dict()
+                                for nmc in node_market_classes:
+                                    production_max = ProductionConstraints.get_maximum_share(calendar_year, nmc)
+                                    # add up max subtract for other node market classes
+                                    total_max_sub = 0
                                     for onmc in [mc for mc in node_market_classes if mc != nmc]:
-                                        prior_market_class_shares_dict[onmc] -= \
-                                            delta * prior_market_class_shares_dict[onmc] / (1 - prior_market_class_shares_dict[nmc])
-                                    prior_market_class_shares_dict[nmc] = production_min
+                                        total_max_sub += max_sub_dict[onmc]
+                                    max_add_dict[nmc] = \
+                                        min(omega_globals.options.producer_market_category_ramp_limit, total_max_sub,
+                                            production_max - prior_market_class_shares_dict[nmc])
 
-                                print(nmc, production_min, prior_market_class_shares_dict[nmc])
+                                # figure out ALT ranges based on prior shares and max add and max subtract limits
+                                for nmc in node_market_classes:
+                                    min_constraints['producer_abs_share_frac_%s.ALT' % nmc] = \
+                                        prior_market_class_shares_dict[nmc] - max_sub_dict[nmc] - \
+                                        min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]
+                                    max_constraints['producer_abs_share_frac_%s.ALT' % nmc] = \
+                                        prior_market_class_shares_dict[nmc] + max_add_dict[nmc] - \
+                                        max_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]
 
-                            print_dict(prior_market_class_shares_dict)
-
-                            #
-                            #     # apply production constraints
-                            #     prior_market_class_shares_dict[nmc] = max(production_min, required_zev_share,
-                            #                                               min(prior_market_class_shares_dict[nmc],
-                            #                                                   production_max))
-                            #
-                            #     print(nmc, production_min, production_max, required_zev_share,
-                            #           prior_market_class_shares_dict[nmc])
-
-                            # calc max subtract = min(producer_damping_max_delta, current share - minimum (NO_ALT))
-                            max_sub_dict = dict()
-                            for nmc in node_market_classes:
-                                production_min = ProductionConstraints.get_minimum_share(calendar_year, nmc)
-                                required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, nmc)
-                                production_min = min(max_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc],
-                                                     max(production_min, required_zev_share))
-
-                                max_sub = (prior_market_class_shares_dict[nmc] -
-                                           max(production_min,
-                                               min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))
-
-                                max_sub_dict[nmc] = \
-                                    min(omega_globals.options.producer_market_category_ramp_limit, max_sub)
-
-                            #calc max addition = min(producer_damping_max_delta, sum of max subtract of all other shares)
-                            max_add_dict = dict()
-                            for nmc in node_market_classes:
-                                production_max = ProductionConstraints.get_maximum_share(calendar_year, nmc)
-                                # add up max subtract for other node market classes
-                                total_max_sub = 0
-                                for onmc in [mc for mc in node_market_classes if mc != nmc]:
-                                    total_max_sub += max_sub_dict[onmc]
-                                max_add_dict[nmc] = \
-                                    min(omega_globals.options.producer_market_category_ramp_limit, total_max_sub,
-                                        production_max - prior_market_class_shares_dict[nmc])
-
-                            # figure out ALT ranges based on prior shares and max add and max subtract limits
-                            for nmc in node_market_classes:
-                                min_constraints['producer_abs_share_frac_%s.ALT' % nmc] = \
-                                    prior_market_class_shares_dict[nmc] - max_sub_dict[nmc] - \
-                                    min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]
-                                max_constraints['producer_abs_share_frac_%s.ALT' % nmc] = \
-                                    prior_market_class_shares_dict[nmc] + max_add_dict[nmc] - \
-                                    max_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]
+                                print('shares not locked')
+                            else:
+                                print('shares locked')
 
                         node_partition = partition(abs_share_column_names,
                                   num_levels=omega_globals.options.producer_num_market_share_options,
