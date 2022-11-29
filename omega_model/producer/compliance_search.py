@@ -297,7 +297,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                             min_constraints = Eval.eval(consumer_response['min_constraints_%s' % node_name])
 
                             for k in max_constraints:
-                                if 'BEV.ALT' in k:
+                                if 'BEV.ALT' in k:  # TODO: un-hardcode the 'BEV' part here...
                                     max_constraints[k] = \
                                         (consumer_response[k.replace('producer', 'consumer')] /
                                          consumer_response['consumer_abs_share_frac_%s' % node_name] *
@@ -381,9 +381,13 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                 # calc max subtract = min(producer_damping_max_delta, current share - minimum (NO_ALT))
                                 max_sub_dict = dict()
                                 for nmc in node_market_classes:
-                                    max_sub = (prior_market_class_shares_dict[nmc] -
+                                    onmc_add = 0
+                                    for onmc in [mc for mc in node_market_classes if mc != nmc]:
+                                        production_max = ProductionConstraints.get_maximum_share(calendar_year, onmc)
+                                        onmc_add += production_max - prior_market_class_shares_dict[onmc]
+                                    max_sub = min(onmc_add, (prior_market_class_shares_dict[nmc] -
                                                max(production_min[nmc],
-                                                   min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))
+                                                   min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc])))
 
                                     max_sub_dict[nmc] = \
                                         min(omega_globals.options.producer_market_category_ramp_limit, max_sub)
