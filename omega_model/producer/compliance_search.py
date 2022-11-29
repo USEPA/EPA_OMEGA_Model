@@ -358,8 +358,6 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                     prior_market_class_shares_dict[nmc] = \
                                         sales / NewVehicleMarket.base_year_other_sales[node_name]
 
-                            print_dict(prior_market_class_shares_dict)
-
                             production_min = dict()
                             for nmc in node_market_classes:
                                 min_production_share = ProductionConstraints.get_minimum_share(calendar_year, nmc)
@@ -367,31 +365,15 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                 production_min[nmc] = max(min_production_share, required_zev_share)
 
                             if abs(1-locked_shares) > sys.float_info.epsilon:
-                                for nmc in node_market_classes:
-                                    print(nmc, production_min[nmc], prior_market_class_shares_dict[nmc])
-
-                                    if prior_market_class_shares_dict[nmc] < production_min[nmc]:
-                                        # set minimum, re-apportion other market shares to maintain partition
-                                        delta = production_min[nmc] - prior_market_class_shares_dict[nmc]
-                                        for onmc in [mc for mc in node_market_classes if mc != nmc]:
-                                            prior_market_class_shares_dict[onmc] -= \
-                                                delta * prior_market_class_shares_dict[onmc] / (1 - prior_market_class_shares_dict[nmc])
-                                        prior_market_class_shares_dict[nmc] = production_min[nmc]
-
-                                    print(nmc, production_min[nmc], prior_market_class_shares_dict[nmc])
-
-                                print_dict(prior_market_class_shares_dict)
-
                                 # calc max subtract = min(producer_damping_max_delta, current share - minimum (NO_ALT))
                                 max_sub_dict = dict()
                                 for nmc in node_market_classes:
                                     onmc_add = 0
                                     for onmc in [mc for mc in node_market_classes if mc != nmc]:
                                         production_max = ProductionConstraints.get_maximum_share(calendar_year, onmc)
-                                        onmc_add += production_max - prior_market_class_shares_dict[onmc]
-                                    max_sub = min(onmc_add, (prior_market_class_shares_dict[nmc] -
-                                               max(production_min[nmc],
-                                                   min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc])))
+                                        onmc_add += max(production_max, max_constraints['producer_abs_share_frac_%s.NO_ALT' % onmc]) - prior_market_class_shares_dict[onmc]
+                                    max_sub = max(0, min(onmc_add, (prior_market_class_shares_dict[nmc] -
+                                               max(production_min[nmc], min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))))
 
                                     max_sub_dict[nmc] = \
                                         min(omega_globals.options.producer_market_category_ramp_limit, max_sub)
@@ -404,6 +386,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                     total_max_sub = 0
                                     for onmc in [mc for mc in node_market_classes if mc != nmc]:
                                         total_max_sub += max_sub_dict[onmc]
+
                                     max_add_dict[nmc] = \
                                         min(omega_globals.options.producer_market_category_ramp_limit, total_max_sub,
                                             production_max - prior_market_class_shares_dict[nmc])
@@ -416,10 +399,6 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                     max_constraints['producer_abs_share_frac_%s.ALT' % nmc] = \
                                         prior_market_class_shares_dict[nmc] + max_add_dict[nmc] - \
                                         max_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]
-
-                                print('shares not locked')
-                            else:
-                                print('shares locked')
 
                         node_partition = partition(abs_share_column_names,
                                   num_levels=omega_globals.options.producer_num_market_share_options,
