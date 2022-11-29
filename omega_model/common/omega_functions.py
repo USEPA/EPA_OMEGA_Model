@@ -279,6 +279,25 @@ def cull_cloud(cloud, prior_x, x_key):
     return cloud
 
 
+def sum_dict(dict_in, include=None, exclude=None):
+    """
+    Add up all terms in a dict
+
+    Args:
+        dict_in (numeric dict_like): the object with elements to sum
+
+    Returns:
+
+    """
+    keys = sorted(dict_in.keys())
+    if include is not None:
+        keys = [k for k in keys if include in k]
+    if exclude is not None:
+        keys = [k for k in keys if exclude not in k]
+
+    return sum([dict_in[k] for k in keys])
+
+
 def print_keys(dict_in, include=None, exclude=None):
     """
     Print some or all keys in a dict-like object
