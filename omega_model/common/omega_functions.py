@@ -279,6 +279,25 @@ def cull_cloud(cloud, prior_x, x_key):
     return cloud
 
 
+def print_keys(dict_in, include=None, exclude=None):
+    """
+    Print some or all keys in a dict-like object
+
+    Args:
+        dict_in (dict-like): the object with keys to print
+        include (str): a substring that must be present, if provided
+        exclude (str): a substring that must not be present, if provided
+
+    """
+    keys = sorted(dict_in.keys())
+    if include is not None:
+        keys = [k for k in keys if include in k]
+    if exclude is not None:
+        keys = [k for k in keys if exclude not in k]
+    for k in keys:
+        print(k)
+
+
 def print_dict(dict_in, num_tabs=0, to_string=False):
     """
     Attempt to printy-print a dictionary to the Python console.
