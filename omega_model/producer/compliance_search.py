@@ -295,14 +295,18 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
                             max_constraints = Eval.eval(consumer_response['max_constraints_%s' % node_name])
                             min_constraints = Eval.eval(consumer_response['min_constraints_%s' % node_name])
+                            keys = max_constraints.copy().keys()
 
-                            for k in max_constraints:
+                            for k in keys:
                                 if 'BEV.ALT' in k:  # TODO: un-hardcode the 'BEV' part here...
                                     max_constraints[k] = \
                                         (consumer_response[k.replace('producer', 'consumer')] /
                                          consumer_response['consumer_abs_share_frac_%s' % node_name] *
                                          constraint_ratio)
                                     min_constraints[k] = min(min_constraints[k], max_constraints[k])
+                                elif '.ALT' in k:
+                                    # pop other max ALTs, avoid internal inconsistency in constraints and bad partition
+                                    max_constraints.pop(k)
 
                         else:
                             # set up initial constraints for mandatory "NO_ALT" vehicle shares
