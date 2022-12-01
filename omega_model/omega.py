@@ -166,6 +166,17 @@ def logwrite_shares_and_costs(calendar_year, producer_market_classes, share_conv
 
     omega_log.logwrite('')
 
+    for mc in sorted(producer_market_classes):
+        omega_log.logwrite(
+            ('modified cross subsidized price / cost %s' % mc).ljust(59) + '$%d / $%d R:%f' % (
+                producer_decision_and_response['average_modified_cross_subsidized_price_%s' % mc],
+                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc],
+                producer_decision_and_response['average_modified_cross_subsidized_price_%s' % mc] /
+                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc]
+            ))
+
+    omega_log.logwrite('')
+
     for mcat in sorted(omega_globals.options.MarketClass.market_categories):
         try:
             if producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat] > 0:
