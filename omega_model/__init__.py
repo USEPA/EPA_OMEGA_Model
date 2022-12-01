@@ -195,7 +195,7 @@ try:
             self.verbose = False
             self.iterate_producer_consumer = True
 
-            self.producer_consumer_max_iterations = 20  # recommend 2+
+            self.producer_consumer_max_iterations = 5  # recommend 2+
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
             self.producer_compliance_search_convergence_factor = 0.9
