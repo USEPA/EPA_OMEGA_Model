@@ -1576,9 +1576,15 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                                                       "Sessions")
 
             if options.session_num is None:
-                session_list = list({0}.union([s.num for s in batch.sessions if s.enabled]))
+                if not batch.sessions[0].settings.use_prerun_context_outputs:
+                    session_list = list({0}.union([s.num for s in batch.sessions if s.enabled]))
+                else:
+                    session_list = [s.num for s in batch.sessions[1:] if s.enabled]
             else:
-                session_list = list({0, options.session_num})
+                if not batch.sessions[0].settings.use_prerun_context_outputs:
+                    session_list = list({0, options.session_num})
+                else:
+                    session_list = [options.session_num]
 
             for session in batch.sessions:
                 # set Enable Session correctly in expanded batch based on session list
