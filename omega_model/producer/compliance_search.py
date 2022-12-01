@@ -166,7 +166,7 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
 
 def create_share_sweeps(calendar_year, market_class_dict, candidate_production_decisions, share_range,
                         consumer_response, context_based_total_sales, prior_producer_decision_and_response,
-                        node_name='', verbose=False):
+                        producer_consumer_iteration_num, node_name='', verbose=False):
     """
     Create share sweeps is responsible for creating market share options to
     develop a set of candidate compliance outcomes for the manufacturer in the given year as a function of the
@@ -225,7 +225,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
             child_df_list.append(create_share_sweeps(calendar_year, market_class_dict[k],
                                 candidate_production_decisions, share_range,
                                 consumer_response, context_based_total_sales,
-                                prior_producer_decision_and_response,
+                                prior_producer_decision_and_response, producer_consumer_iteration_num,
                                 node_name=k))
 
     if node_name:
@@ -253,15 +253,17 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                consumer_response['total_ALT_battery_GWh'],
                consumer_response['total_ALT_battery_GWh'] * constraint_ratio))
 
+    responsive_children = [s in omega_globals.options.MarketClass.responsive_market_categories for s in children if
+                           market_class_dict[s]]
+
     # Generate market share options
-    if consumer_response is not None and \
-            consumer_response['total_battery_GWh'] <= consumer_response['battery_GWh_limit']:
-        # inherit absolute market shares from consumer response
+    # if consumer_response is not None and \
+    #         consumer_response['total_battery_GWh'] <= consumer_response['battery_GWh_limit']:
+    if consumer_response is not None and not all(responsive_children):
+        # inherit absolute market shares from consumer response for non-responsive children
         sales_share_dict = dict()
         for cn in abs_share_column_names:
             if cn.replace('producer', 'consumer') in consumer_response:
-                # sales_share_dict[cn] = \
-                #     [consumer_response[cn.replace('producer', 'consumer')]*0.5 + consumer_response[cn]*0.5]
                 sales_share_dict[cn] = [consumer_response[cn.replace('producer', 'consumer')]]
 
         sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
@@ -271,20 +273,29 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
             sales_share_df['min_constraints_%s' % node_name] = consumer_response['min_constraints_%s' % node_name]
             sales_share_df['max_constraints_%s' % node_name] = consumer_response['max_constraints_%s' % node_name]
     else:
+    # if True:
         # generate producer desired market shares for responsive market sectors and/or adjust constraints to maintain
         # GWh limit
-        responsive_children = [s in omega_globals.options.MarketClass.responsive_market_categories for s in children if market_class_dict[s]]
-
         if all(responsive_children):
             if responsive_children:
                 if len(responsive_children) > 1:
 
-                    node_abs_share = _cache['mcat_data_%d' % calendar_year][node_name]['abs_share']
+                    if consumer_response is None:
+                        node_abs_share = _cache['mcat_data_%d' % calendar_year][node_name]['abs_share']
+                    else:
+                        node_abs_share = consumer_response['consumer_abs_share_frac_%s' % node_name]
 
                     if share_range == 1.0:
+                        locked_consumer_shares = False
+
+                        if consumer_response is not None:
+                            max_constraints = Eval.eval(consumer_response['max_constraints_%s' % node_name])
+                            min_constraints = Eval.eval(consumer_response['min_constraints_%s' % node_name])
+                            keys = max_constraints.copy().keys()
 
                         if consumer_response is not None and \
                                 consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']:
+                            print("consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']")
                             # adjust constraints
                             if consumer_response['total_ALT_battery_GWh'] > 0:
                                 constraint_ratio = max(0, 0.99 * ((consumer_response['battery_GWh_limit'] -
@@ -292,10 +303,6 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                                                consumer_response['total_ALT_battery_GWh']))
                             else:
                                 constraint_ratio = 0
-
-                            max_constraints = Eval.eval(consumer_response['max_constraints_%s' % node_name])
-                            min_constraints = Eval.eval(consumer_response['min_constraints_%s' % node_name])
-                            keys = max_constraints.copy().keys()
 
                             for k in keys:
                                 if 'BEV.ALT' in k:  # TODO: un-hardcode the 'BEV' part here...
@@ -307,6 +314,49 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                 elif '.ALT' in k:
                                     # pop other max ALTs, avoid internal inconsistency in constraints and bad partition
                                     max_constraints.pop(k)
+
+                        elif consumer_response is not None:
+                            print("consumer_response['total_battery_GWh'] <= consumer_response['battery_GWh_limit']")
+                            node_market_classes = [node_name + '.' + c for c in children]
+
+                            # pop non-partition keys
+                            for k in [node_name] + children:
+                                if k in min_constraints:
+                                    min_constraints.pop(k)
+                                if k in max_constraints:
+                                    max_constraints.pop(k)
+
+                            # print('min_constraints')
+                            # print_dict(min_constraints)
+                            # print('max_constraints')
+                            # print_dict(max_constraints)
+                            #
+                            # for nmc in node_market_classes:
+                            #     print('cost_multiplier_%s' % nmc, consumer_response['cost_multiplier_%s' % nmc])
+
+                            consumer_node_abs_share = consumer_response['consumer_abs_share_frac_%s' % node_name]
+
+                            # don't lock anything in on iteration zero, cross subsdies might be maxed just on the
+                            # basis of body style share mismatch, for example
+                            if producer_consumer_iteration_num > 0:
+                                if min_constraints == max_constraints:
+                                    locked_consumer_shares = True
+                                else:
+                                    # constrain shares that are at min or max cross subsidy, let the others float
+                                    for nmc in node_market_classes:
+                                        multiplier = consumer_response['cost_multiplier_%s' % nmc]
+                                        if (multiplier >= 0.99 * omega_globals.options.consumer_pricing_multiplier_max or
+                                            multiplier <= 1.01 * omega_globals.options.consumer_pricing_multiplier_min):
+                                            # print('cost_multiplier_%s' % nmc, multiplier)
+                                            locked_consumer_shares = True
+                                            for k in min_constraints.keys():
+                                                if '.ALT' in k:
+                                                    # print('%50s, %.5f, %.5f, %.5f, %.5f' % (
+                                                    # k, min_constraints[k], max_constraints[k],
+                                                    # consumer_response[k] / node_abs_share,
+                                                    # consumer_response[k.replace('producer', 'consumer')] / consumer_node_abs_share))
+                                                    min_constraints[k] = consumer_response[k.replace('producer', 'consumer')] / consumer_node_abs_share
+                                                    max_constraints[k] = min_constraints[k]
 
                         else:
                             # set up initial constraints for mandatory "NO_ALT" vehicle shares
@@ -359,10 +409,17 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                         sales / NewVehicleMarket.base_year_other_sales[node_name]
 
                             production_min = dict()
+                            production_max = dict()
                             for nmc in node_market_classes:
-                                min_production_share = ProductionConstraints.get_minimum_share(calendar_year, nmc)
-                                required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, nmc)
-                                production_min[nmc] = max(min_production_share, required_zev_share)
+                                if omega_globals.pass_num == 0:
+                                    min_production_share = ProductionConstraints.get_minimum_share(calendar_year, nmc)
+                                    required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, nmc)
+                                    production_min[nmc] = max(min_production_share, required_zev_share)
+                                    production_max[nmc] = ProductionConstraints.get_maximum_share(calendar_year, nmc)
+                                else:
+                                    # no production limits on second pass, they only apply to the consolidated industry
+                                    production_min[nmc] = 0
+                                    production_max[nmc] = 1
 
                             if abs(1-locked_shares) > sys.float_info.epsilon:
                                 # calc max subtract = min(producer_damping_max_delta, current share - minimum (NO_ALT))
@@ -370,8 +427,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                 for nmc in node_market_classes:
                                     onmc_add = 0
                                     for onmc in [mc for mc in node_market_classes if mc != nmc]:
-                                        production_max = ProductionConstraints.get_maximum_share(calendar_year, onmc)
-                                        onmc_add += max(production_max, max_constraints['producer_abs_share_frac_%s.NO_ALT' % onmc]) - prior_market_class_shares_dict[onmc]
+                                        onmc_add += max(production_max[onmc], max_constraints['producer_abs_share_frac_%s.NO_ALT' % onmc]) - prior_market_class_shares_dict[onmc]
                                     max_sub = max(0, min(onmc_add, (prior_market_class_shares_dict[nmc] -
                                                max(production_min[nmc], min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))))
 
@@ -381,7 +437,6 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                 # calc max addition = min(producer_damping_max_delta, sum of max subtract of all other shares)
                                 max_add_dict = dict()
                                 for nmc in node_market_classes:
-                                    production_max = ProductionConstraints.get_maximum_share(calendar_year, nmc)
                                     # add up max subtract for other node market classes
                                     total_max_sub = 0
                                     for onmc in [mc for mc in node_market_classes if mc != nmc]:
@@ -389,7 +444,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
                                     max_add_dict[nmc] = \
                                         min(omega_globals.options.producer_market_category_ramp_limit, total_max_sub,
-                                            production_max - prior_market_class_shares_dict[nmc])
+                                            production_max[nmc] - prior_market_class_shares_dict[nmc])
 
                                 # figure out ALT ranges based on prior shares and max add and max subtract limits
                                 for nmc in node_market_classes:
@@ -400,9 +455,21 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                         prior_market_class_shares_dict[nmc] + max_add_dict[nmc] - \
                                         max_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]
 
-                        node_partition = partition(abs_share_column_names,
-                                  num_levels=omega_globals.options.producer_num_market_share_options,
-                                  min_constraints=min_constraints, max_constraints=max_constraints)
+                        if locked_consumer_shares:
+                            print('%s locked consumer shares' % node_name)
+                            node_partition = pd.DataFrame.from_dict([min_constraints])
+                        else:
+                            node_partition = partition(abs_share_column_names,
+                                      num_levels=omega_globals.options.producer_num_market_share_options,
+                                      min_constraints=min_constraints, max_constraints=max_constraints)
+
+                        if abs(1-sum_dict(node_partition.iloc[0])) > 1e-6:
+                            print('*** bad_partition! ***')
+                            print('min_constraints')
+                            print_dict(min_constraints)
+                            print('max_constraints')
+                            print_dict(min_constraints)
+                            print('')
 
                         sales_share_df = node_abs_share * node_partition
 
@@ -563,7 +630,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         share_sweeps = create_share_sweeps(calendar_year, market_class_tree,
                                            candidate_production_decisions, share_range,
                                            producer_decision_and_response, context_based_total_sales,
-                                           prior_producer_decision_and_response)
+                                           prior_producer_decision_and_response, producer_consumer_iteration_num)
 
         tech_and_share_sweeps = cartesian_prod(tech_sweeps, share_sweeps)
 
