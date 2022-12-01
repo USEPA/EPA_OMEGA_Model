@@ -161,7 +161,9 @@ def calc_present_and_annualized_values(dict_of_values, calendar_years):
     id_args = [k for k, v in nested_dict.items() if 'cost' not in k]
 
     # convert to pandas DataFrame for faster sum
-    calcs_df = pd.DataFrame(dict_of_values).transpose()
+    # calcs_df = pd.DataFrame(dict_of_values).transpose()
+    calcs_df = pd.DataFrame.from_dict(dict_of_values, orient='index')
+
     calcs_df.reset_index(drop=True, inplace=True)
     annual_values_dict = calc_annual_values(calcs_df, all_costs)
 
@@ -172,7 +174,8 @@ def calc_present_and_annualized_values(dict_of_values, calendar_years):
     calcs_dict = dict()
 
     # now do a cumulative sum year-over-year for each cost arg in calcs_dict - these will be present values (note removal of rate=0)
-    annual_values_df = pd.DataFrame(annual_values_dict).transpose()
+    # annual_values_df = pd.DataFrame(annual_values_dict).transpose()
+    annual_values_df = pd.DataFrame.from_dict(annual_values_dict, orient='index')
     annual_values_df.reset_index(drop=True, inplace=True)
     present_values_dict = calc_present_values(annual_values_df, all_costs)
 

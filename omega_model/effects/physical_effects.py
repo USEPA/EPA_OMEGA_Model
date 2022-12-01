@@ -699,7 +699,8 @@ def calc_annual_physical_effects(input_df):
         }
         num += 1
 
-    elec_trans_efficiency = pd.DataFrame(d).transpose()
+    # elec_trans_efficiency = pd.DataFrame(d).transpose()
+    elec_trans_efficiency = pd.DataFrame.from_dict(d, orient='index')
 
     attributes = [col for col in input_df.columns if ('vmt' in col or 'vmt_' in col) and '_vmt' not in col]
     additional_attributes = ['count', 'consumption', 'generation', 'barrels', 'tons', 'fatalit']

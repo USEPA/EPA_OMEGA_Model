@@ -213,7 +213,9 @@ def run_effects_calcs():
             present_and_annualized_filename = f'{omega_globals.options.output_folder}' + \
                                               f'{omega_globals.options.session_unique_name}_cost_effects_annual_present_and_annualized.csv'
 
-            present_and_annualized_cost_df = pd.DataFrame(present_and_annualized_dict).transpose()
+            # present_and_annualized_cost_df = pd.DataFrame(present_and_annualized_dict).transpose()
+            present_and_annualized_cost_df = pd.DataFrame.from_dict(present_and_annualized_dict, orient='index')
+
             present_and_annualized_cost_df = calc_social_costs(present_and_annualized_cost_df,
                                                                calc_health_effects=CostFactorsCriteria.calc_health_effects)
             present_and_annualized_cost_df.to_csv(present_and_annualized_filename, index=False)
