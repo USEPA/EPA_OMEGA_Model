@@ -870,6 +870,70 @@ def calc_roadload_hp(A_LBSF, B_LBSF, C_LBSF, MPH):
     return roadload_power_hp
 
 
+def send_text(dest, message, email, password):
+    """
+
+    SMS Gateways for each Carrier
+    AT&T: [number]@txt.att.net
+    Sprint: [number]@messaging.sprintpcs.com or [number]@pm.sprint.com
+    T-Mobile: [number]@tmomail.net
+    Verizon: [number]@vtext.com
+    Boost Mobile: [number]@myboostmobile.com
+    Cricket: [number]@sms.mycricket.com
+    Metro PCS: [number]@mymetropcs.com
+    Tracfone: [number]@mmst5.tracfone.com
+    U.S. Cellular: [number]@email.uscc.net
+    Virgin Mobile: [number]@vmobl.com
+
+    Args:
+        dest (str): e.g. '8005552323@myboostmobile.com'
+        message (str): the message to send
+        email (str): the email address of the email server to use, e.g. 'my_email@gmail.com'
+        password (str): the password for the email account, recommend setting up an app-specific password
+
+    """
+    import time
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+
+    sms_gateway = dest
+
+    pas = password
+
+    # The server we use to send emails in our case it will be gmail but every email provider has a different smtp
+    # and port is also provided by the email provider.
+    smtp = "smtp.gmail.com"
+    port = 587
+    # This will start our email server
+    server = smtplib.SMTP(smtp, port)
+    # Starting the server
+    server.starttls()
+    # Now we need to login
+    server.login(email, pas)
+
+    # Now we use the MIME module to structure our message.
+    msg = MIMEMultipart()
+    msg['From'] = email
+    msg['To'] = sms_gateway
+
+    # Make sure you add a new line in the subject
+    timestamp_str = time.strftime('%m/%d/%Y %H:%M:%S')
+    msg['Subject'] = "%s" % timestamp_str + "\n"
+
+    # Make sure you also add new lines to your body
+    if not message.endswith('\n'):
+        message = message + '\n'
+
+    # and then attach that body furthermore you can also send html content.
+    msg.attach(MIMEText(message, 'plain'))
+    sms = msg.as_string()
+    server.sendmail(email, sms_gateway, sms)
+
+    # lastly quit the server
+    server.quit()
+
+
 if __name__ == '__main__':
     try:
         # partition test

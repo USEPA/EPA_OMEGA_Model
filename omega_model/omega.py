@@ -1619,6 +1619,12 @@ def run_omega(session_runtime_options, standalone_run=False):
 
     init_fail = None
 
+    if session_runtime_options.notification_destination and session_runtime_options.notification_email \
+            and session_runtime_options.notification_password:
+        send_text(session_runtime_options.notification_destination,
+                  'Starting %s...' % session_runtime_options.session_unique_name,
+                  session_runtime_options.notification_email, session_runtime_options.notification_password)
+
     try:
 
         manufacturer_annual_data_table = None
@@ -1765,6 +1771,12 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             if omega_globals.options.run_profiler:
                 os.system('snakeviz omega_profile.dmp')
+
+            if omega_globals.options.notification_destination and omega_globals.options.notification_email \
+                and omega_globals.options.notification_password:
+                send_text(omega_globals.options.notification_destination,
+                          '%s Pass %d Complete' % (omega_globals.options.session_unique_name, omega_globals.pass_num),
+                           omega_globals.options.notification_email, omega_globals.options.notification_password)
 
         # move appropriate outputs to base output folder
         file_io.move_folder_contents('%s%sconsolidate_%d' % (omega_globals.options.output_folder_base, os.sep,

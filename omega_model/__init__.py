@@ -245,6 +245,10 @@ try:
             self.MarketClass = None
             self.CostCoud = None
 
+            self.notification_destination = None
+            self.notification_email = None
+            self.notification_password = None
+
 except:
     print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
     os._exit(-1)
