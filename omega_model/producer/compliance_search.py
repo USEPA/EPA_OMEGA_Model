@@ -259,7 +259,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
     # Generate market share options
     # if consumer_response is not None and \
     #         consumer_response['total_battery_GWh'] <= consumer_response['battery_GWh_limit']:
-    if consumer_response is not None and not all(responsive_children):
+    if consumer_response is not None and (not all(responsive_children) or producer_consumer_iteration_num>=3):
         # inherit absolute market shares from consumer response for non-responsive children
         sales_share_dict = dict()
         for cn in abs_share_column_names:
@@ -338,7 +338,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
                             # don't lock anything in on iteration zero, cross subsdies might be maxed just on the
                             # basis of body style share mismatch, for example
-                            if producer_consumer_iteration_num > 0:
+                            if producer_consumer_iteration_num > 1:
                                 if min_constraints == max_constraints:
                                     locked_consumer_shares = True
                                 else:
@@ -351,10 +351,10 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                             locked_consumer_shares = True
                                             for k in min_constraints.keys():
                                                 if '.ALT' in k:
-                                                    # print('%50s, %.5f, %.5f, %.5f, %.5f' % (
-                                                    # k, min_constraints[k], max_constraints[k],
-                                                    # consumer_response[k] / node_abs_share,
-                                                    # consumer_response[k.replace('producer', 'consumer')] / consumer_node_abs_share))
+                                                    print('%50s, %.5f, %.5f, %.5f, %.5f' % (
+                                                    k, min_constraints[k], max_constraints[k],
+                                                    consumer_response[k] / node_abs_share,
+                                                    consumer_response[k.replace('producer', 'consumer')] / consumer_node_abs_share))
                                                     min_constraints[k] = consumer_response[k.replace('producer', 'consumer')] / consumer_node_abs_share
                                                     max_constraints[k] = min_constraints[k]
 
