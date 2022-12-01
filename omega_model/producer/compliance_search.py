@@ -259,7 +259,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
     # Generate market share options
     # if consumer_response is not None and \
     #         consumer_response['total_battery_GWh'] <= consumer_response['battery_GWh_limit']:
-    if consumer_response is not None and (not all(responsive_children) or producer_consumer_iteration_num>=3):
+    if consumer_response is not None and (not all(responsive_children)): # or producer_consumer_iteration_num>=30):
         # inherit absolute market shares from consumer response for non-responsive children
         sales_share_dict = dict()
         for cn in abs_share_column_names:
