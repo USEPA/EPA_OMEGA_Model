@@ -316,6 +316,8 @@ def print_keys(dict_in, include=None, exclude=None):
     for k in keys:
         print(k)
 
+    return keys
+
 
 def print_dict(dict_in, num_tabs=0, to_string=False):
     """
