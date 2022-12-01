@@ -157,8 +157,10 @@ class WorkFactor(OMEGABase):
 
                     xwd = workfactor_info['xwd']
 
-                    WorkFactor._cache[cache_key] = {'workfactor': dict(),
-                                         'xwd': xwd}
+                    WorkFactor._cache[cache_key] = {
+                        'workfactor': dict(),
+                        'xwd': xwd
+                    }
 
                     WorkFactor._cache[cache_key]['workfactor'] \
                         = compile(workfactor_info['workfactor'], '<string>', 'eval')

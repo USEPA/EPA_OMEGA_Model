@@ -19,23 +19,26 @@ File Type
     comma-separated values (CSV)
 
 Template Header
+    input_template_name:, ``[module_name]``, input_template_version:, ``[template_version]``
+
+Sample Header
     .. csv-table::
 
-       input_template_name:,ghg_standards_workfactor,input_template_version:,0.1
+       input_template_name:,policy.targets_workfactor,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        reg_class_id,start_year,cert_fuel_id,useful_life,co2_gram_per_mile
-        2b3,2020,{'gasoline':1.0},120000,0.0440 * work_factor + 339
-        2b3,2021,{'gasoline':1.0},120000,0.0429 * work_factor + 331
-        2b3,2022,{'gasoline':1.0},120000,0.0418 * work_factor + 322
+        reg_class_id,start_year,cert_fuel_id,useful_life_miles,co2_gram_per_mile
+        mediumduty,2020,{'gasoline':1.0},120000,0.0440 * work_factor + 339
+        mediumduty,2021,{'gasoline':1.0},120000,0.0429 * work_factor + 331
+        mediumduty,2022,{'gasoline':1.0},120000,0.0418 * work_factor + 322
 
 Data Column Name and Description
 
 :reg_class_id:
-    Regulatory class name, e.g. '2b3'
+    Regulatory class name, e.g. 'mediumduty'
 
 :start_year:
     The start year of the standard, applies until the next available start year
@@ -43,7 +46,7 @@ Data Column Name and Description
 :cert_fuel_id:
     Minimum footprint limit of the curve (square feet)
 
-:useful_life:
+:useful_life_miles:
     The regulatory useful life during which the standard applies and used for computing CO2e Mg
 
 :co2_gram_per_mile:
@@ -79,7 +82,7 @@ from policy.workfactor_definition import WorkFactor
 # _cache = dict()
 
 
-class VehicleTargets2b3(OMEGABase):
+class VehicleTargets(OMEGABase, VehicleTargetsBase):
     """
     **Implements vehicle workfactor-based GHG targets (CO2e g/mi).**
 
@@ -104,9 +107,11 @@ class VehicleTargets2b3(OMEGABase):
 
         locals_dict = locals()
 
-        if cache_key not in VehicleTargets2b3._data:
+        if cache_key not in VehicleTargets._data:
 
-            start_years = VehicleTargets2b3.start_years[vehicle.cert_fuel_id]
+            VehicleTargets._data[cache_key] = dict()
+
+            start_years = VehicleTargets.start_years[vehicle.cert_fuel_id]
 
             if len(start_years[start_years <= vehicle.model_year]) > 0:
 
@@ -114,43 +119,43 @@ class VehicleTargets2b3(OMEGABase):
 
                 workfactor = WorkFactor.calc_workfactor(vehicle)
 
-                target = eval(VehicleTargets2b3._cache[(vehicle.reg_class_id, model_year, vehicle.cert_fuel_id)]['co2_gram_per_mile'], locals_dict)
+                target = eval(VehicleTargets._cache[(vehicle.reg_class_id, model_year, vehicle.cert_fuel_id)]['co2_gram_per_mile'], locals_dict)
 
-                VehicleTargets2b3._data[cache_key] = target
+                VehicleTargets._data[cache_key] = target
             else:
-                raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, {vehicle.model_year} or prior')
+                raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, {vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
 
-        return VehicleTargets2b3._data[cache_key]
+        return VehicleTargets._data[cache_key]
 
     @staticmethod
-    def calc_cert_lifetime_vmt(reg_class_id, model_year):
+    def calc_cert_useful_life_vmt(reg_class_id, model_year, cert_fuel_id):
         """
-        Get lifetime VMT as a function of regulatory class and model year.
+        Calculate vehicle target CO2e g/mi.
 
         Args:
-            reg_class_id (str): e.g. 'car','truck'
-            model_year (numeric): model year
+            vehicle (Vehicle): the vehicle to get the target for
 
         Returns:
-
-            Lifetime VMT for the regulatory class and model year.
+            Vehicle target CO2e in g/mi.
 
         """
-        pass
-        # cache_key = (reg_class_id, model_year, 'lifetime_vmt')
-        #
-        # if cache_key not in VehicleTargets._data:
-        #     start_years = VehicleTargets._data[reg_class_id]['start_year']
-        #
-        #     if len(start_years[start_years <= model_year]) > 0:
-        #         year = max(start_years[start_years <= model_year])
-        #
-        #         VehicleTargets._data[cache_key] = VehicleTargets._data[reg_class_id, year]['lifetime_vmt']
-        #     else:
-        #         raise Exception('Missing GHG target lifetime VMT parameters for %s, %d or prior'
-        #                         % (reg_class_id, model_year))
-        #
-        # return VehicleTargets._data[cache_key]
+        cache_key = (reg_class_id, model_year, cert_fuel_id)
+
+        locals_dict = locals()
+
+        if cache_key not in VehicleTargets._cache:
+
+            start_years = VehicleTargets.start_years[cert_fuel_id]
+
+            if len(start_years[start_years <= model_year]) > 0:
+
+                year = max(start_years[start_years <= model_year])
+
+                useful_life = VehicleTargets._cache[(reg_class_id, year, cert_fuel_id)]['useful_life_miles']
+            else:
+                raise Exception(f'Missing GHG CO2e g/mi target parameters for {reg_class_id}, {model_year}, {cert_fuel_id} or prior')
+
+        return VehicleTargets._cache[cache_key]['useful_life_miles']
 
     @staticmethod
     def calc_target_co2e_Mg(vehicle, sales_variants=None):
@@ -172,29 +177,29 @@ class VehicleTargets2b3(OMEGABase):
             Target CO2e Mg value(s) for the given vehicle and/or sales variants.
 
         """
-        pass
-        # start_years = VehicleTargets._data[vehicle.reg_class_id]['start_year']
-        #
-        # if len(start_years[start_years <= vehicle.model_year]) > 0:
-        #     vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
-        #
-        #     vehicle.lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_id, vehicle_model_year)
-        #
-        #     co2_gpmi = VehicleTargets.calc_target_co2e_gpmi(vehicle)
-        #
-        #     if sales_variants is not None:
-        #         if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
-        #             sales = np.array(sales_variants)
-        #         else:
-        #             sales = sales_variants
-        #     else:
-        #         sales = vehicle.initial_registered_count
-        #
-        #     return co2_gpmi * vehicle.lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
-        #
-        # else:
-        #     raise Exception('Missing GHG target parameters for %s, %d or prior'
-        #                     % (vehicle.reg_class_id, vehicle.model_year))
+        start_years = VehicleTargets.start_years[vehicle.cert_fuel_id]
+
+        if len(start_years[start_years <= vehicle.model_year]) > 0:
+            model_year = max(start_years[start_years <= vehicle.model_year])
+
+            vehicle.lifetime_VMT \
+                = VehicleTargets.calc_cert_useful_life_vmt(vehicle.reg_class_id, model_year, vehicle.cert_fuel_id)
+
+            co2_gpmi = VehicleTargets.calc_target_co2e_gpmi(vehicle)
+
+            if sales_variants is not None:
+                if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
+                    sales = np.array(sales_variants)
+                else:
+                    sales = sales_variants
+            else:
+                sales = vehicle.initial_registered_count
+
+            # return co2_gpmi * vehicle.lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
+            return co2_gpmi * vehicle.lifetime_VMT * sales / pow(10, 6)
+
+        else:
+            raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, {vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
 
 
     @staticmethod
@@ -219,33 +224,33 @@ class VehicleTargets2b3(OMEGABase):
             Cert CO2e Mg value(s) for the given vehicle, CO2e g/mi variants and/or sales variants.
 
         """
-        pass
-        # start_years = VehicleTargets._data[vehicle.reg_class_id]['start_year']
-        #
-        # if len(start_years[start_years <= vehicle.model_year]) > 0:
-        #
-        #     vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
-        #
-        #     vehicle.lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_id, vehicle_model_year)
-        #
-        #     if co2_gpmi_variants is not None:
-        #         if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
-        #             sales = np.array(sales_variants)
-        #         else:
-        #             sales = sales_variants
-        #
-        #         if not (type(co2_gpmi_variants) == pd.Series) or (type(co2_gpmi_variants) == np.ndarray):
-        #             co2_gpmi = np.array(co2_gpmi_variants)
-        #         else:
-        #             co2_gpmi = co2_gpmi_variants
-        #     else:
-        #         sales = vehicle.initial_registered_count
-        #         co2_gpmi = vehicle.cert_co2e_grams_per_mile
-        #
-        #     return co2_gpmi * vehicle.lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
-        # else:
-        #     raise Exception('Missing GHG target parameters for %s, %d or prior'
-        #                     % (vehicle.reg_class_id, vehicle.model_year))
+        start_years = VehicleTargets.start_years[vehicle.cert_fuel_id]
+
+        if len(start_years[start_years <= vehicle.model_year]) > 0:
+
+            model_year = max(start_years[start_years <= vehicle.model_year])
+
+            vehicle.lifetime_VMT \
+                = VehicleTargets.calc_cert_useful_life_vmt(vehicle.reg_class_id, model_year, vehicle.cert_fuel_id)
+
+            if co2_gpmi_variants is not None:
+                if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
+                    sales = np.array(sales_variants)
+                else:
+                    sales = sales_variants
+
+                if not (type(co2_gpmi_variants) == pd.Series) or (type(co2_gpmi_variants) == np.ndarray):
+                    co2_gpmi = np.array(co2_gpmi_variants)
+                else:
+                    co2_gpmi = co2_gpmi_variants
+            else:
+                sales = vehicle.initial_registered_count
+                co2_gpmi = vehicle.cert_co2e_grams_per_mile
+
+            # return co2_gpmi * vehicle.lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
+            return co2_gpmi * vehicle.lifetime_VMT * sales / pow(10, 6)
+        else:
+            raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, {vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -261,20 +266,20 @@ class VehicleTargets2b3(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        VehicleTargets2b3._cache.clear()
+        VehicleTargets._cache.clear()
 
-        VehicleTargets2b3._data.clear()
+        VehicleTargets._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_name = 'ghg_standards_workfactor'
+        input_template_name = __name__
         input_template_version = 0.1
         input_template_columns = {
             'reg_class_id',
             'start_year',
             'cert_fuel_id',
-            'useful_life',
+            'useful_life_miles',
             'co2_gram_per_mile',
         }
 
@@ -286,34 +291,39 @@ class VehicleTargets2b3(OMEGABase):
             df = pd.read_csv(filename, skiprows=1)
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
-        #
-        # if not template_errors:
-        #     # validate columns
-        #     validation_dict = {'reg_class_id': omega_globals.options.RegulatoryClasses.reg_classes}
-        #
-        #     template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
-            if not template_errors:
-                cache_keys = zip(
-                    df['reg_class_id'],
-                    df['start_year'],
-                    df['cert_fuel_id'],
-                )
-                for cache_key in cache_keys:
-                    VehicleTargets2b3._cache[cache_key] = dict()
+        if not template_errors:
+            # validate columns
+            validation_dict = {'reg_class_id': omega_globals.options.RegulatoryClasses.reg_classes}
 
-                    reg_class_id, start_year, cert_fuel_id = cache_key
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
-                    target_info = df[(df['reg_class_id'] == reg_class_id)
-                                     & (df['start_year'] == start_year)
-                                     & (df['cert_fuel_id'] == cert_fuel_id)].iloc[0]
+        if not template_errors:
+            cache_keys = zip(
+                df['reg_class_id'],
+                df['start_year'],
+                df['cert_fuel_id'],
+            )
+            for cache_key in cache_keys:
+                VehicleTargets._cache[cache_key] = dict()
 
-                    VehicleTargets2b3._cache[cache_key] = {'co2_gram_per_mile': dict()}
-                    VehicleTargets2b3._cache[cache_key]['co2_gram_per_mile'] \
-                        = compile(target_info['co2_gram_per_mile'], '<string>', 'eval')
+                reg_class_id, start_year, cert_fuel_id = cache_key
 
-                for fuel in df['cert_fuel_id'].unique():
-                    VehicleTargets2b3.start_years[fuel] = [yr for yr in df.loc[df['cert_fuel_id'] == fuel, 'start_year']]
+                target_info = df[(df['reg_class_id'] == reg_class_id)
+                                 & (df['start_year'] == start_year)
+                                 & (df['cert_fuel_id'] == cert_fuel_id)].iloc[0]
+
+                useful_life = target_info['useful_life_miles']
+
+                VehicleTargets._cache[cache_key] = {
+                    'co2_gram_per_mile': dict(),
+                    'useful_life_miles': useful_life,
+                }
+                VehicleTargets._cache[cache_key]['co2_gram_per_mile'] \
+                    = compile(target_info['co2_gram_per_mile'], '<string>', 'eval')
+
+            for fuel in df['cert_fuel_id'].unique():
+                VehicleTargets.start_years[fuel] = [yr for yr in df.loc[df['cert_fuel_id'] == fuel, 'start_year']]
 
         return template_errors
 

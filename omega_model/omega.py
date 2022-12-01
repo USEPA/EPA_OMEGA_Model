@@ -1338,7 +1338,6 @@ def init_omega(session_runtime_options):
     from policy.incentives import Incentives
     from policy.policy_fuels import PolicyFuel
     from policy.credit_banking import CreditBank
-    from policy.targets_workfactor import VehicleTargets2b3
     from policy.workfactor_definition import WorkFactor
 
     from producer.manufacturers import Manufacturer
@@ -1444,9 +1443,6 @@ def init_omega(session_runtime_options):
 
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
                                                                         verbose=verbose_init)
-
-        init_fail += VehicleTargets2b3.init_from_file(omega_globals.options.targets_workfactors_file,
-                                                      verbose=verbose_init)
 
         init_fail += WorkFactor.init_from_file(omega_globals.options.workfactor_definition_file, verbose=verbose_init)
 
