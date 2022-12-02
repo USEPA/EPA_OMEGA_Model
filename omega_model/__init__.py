@@ -195,6 +195,8 @@ try:
             self.verbose = False
             self.iterate_producer_consumer = True
 
+            self.producer_voluntary_overcompliance = False
+            self.producer_price_modification_scaler = 1.0
             self.producer_consumer_max_iterations = 5  # recommend 2+
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5

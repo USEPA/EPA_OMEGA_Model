@@ -111,7 +111,9 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
                                                                                            'US electricity',
                                                                                            'refuel_efficiency')
 
-        price_modification = PriceModifications.get_price_modification(vehicle.model_year, vehicle.market_class_id)
+        price_modification = \
+            omega_globals.options.producer_price_modification_scaler * \
+            PriceModifications.get_price_modification(vehicle.model_year, vehicle.market_class_id)
 
         grams_co2e_per_unit = vehicle.onroad_co2e_emissions_grams_per_unit()
         liquid_generalized_fuel_cost = 0

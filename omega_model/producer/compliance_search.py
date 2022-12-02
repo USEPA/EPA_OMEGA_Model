@@ -697,28 +697,29 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                 most_strategic_production_decision = \
                     candidate_production_decisions.loc[most_strategic_index]
 
-            # if (best_candidate_production_decision is None):
-            #     # if cheapest is compliant, it's the best
-            #     if cheapest_compliant:
-            #         best_candidate_production_decision = \
-            #             candidate_production_decisions.loc[cheapest_index]
-            #     else:
-            #         # if cheapest is non-compliant, most strategic is the best
-            #         best_candidate_production_decision = \
-            #             candidate_production_decisions.loc[most_strategic_index]
-            # else:
-            #     # if new candidate is cheaper than the old best and more compliant, it's the best
-            #     if (candidate_production_decisions['total_generalized_cost_dollars'].loc[cheapest_index] <
-            #             best_candidate_production_decision['total_generalized_cost_dollars']) and \
-            #             (candidate_production_decisions['strategic_compliance_ratio'].loc[cheapest_index] <
-            #                 best_candidate_production_decision['strategic_compliance_ratio']):
-            #         best_candidate_production_decision = \
-            #             candidate_production_decisions.loc[cheapest_index]
-            #     elif best_candidate_production_decision['strategic_compliance_error'] > 1.0:
-            #         # if old best was non compliant, new best is most strategic
-            #         best_candidate_production_decision = candidate_production_decisions.loc[most_strategic_index]
-
-            best_candidate_production_decision = most_strategic_production_decision
+            if omega_globals.options.producer_voluntary_overcompliance:
+                if best_candidate_production_decision is None:
+                    # if cheapest is compliant, it's the best
+                    if cheapest_compliant:
+                        best_candidate_production_decision = \
+                            candidate_production_decisions.loc[cheapest_index]
+                    else:
+                        # if cheapest is non-compliant, most strategic is the best
+                        best_candidate_production_decision = \
+                            candidate_production_decisions.loc[most_strategic_index]
+                else:
+                    # if new candidate is cheaper than the old best and more compliant, it's the best
+                    if (candidate_production_decisions['total_generalized_cost_dollars'].loc[cheapest_index] <
+                            best_candidate_production_decision['total_generalized_cost_dollars']) and \
+                            (candidate_production_decisions['strategic_compliance_ratio'].loc[cheapest_index] <
+                                best_candidate_production_decision['strategic_compliance_ratio']):
+                        best_candidate_production_decision = \
+                            candidate_production_decisions.loc[cheapest_index]
+                    elif best_candidate_production_decision['strategic_compliance_error'] > 1.0:
+                        # if old best was non compliant, new best is most strategic
+                        best_candidate_production_decision = candidate_production_decisions.loc[most_strategic_index]
+            else:
+                best_candidate_production_decision = most_strategic_production_decision
 
             if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
                 omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,
@@ -1385,11 +1386,11 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
 
             most_strategic_compliant_tech_share_option = \
                 production_options.loc[[compliant_tech_share_options['weighted_slope'].idxmax()]]
-            # three_points = True
+            three_points = True
         else:
             most_strategic_compliant_tech_share_option = lowest_cost_compliant_tech_share_option
 
-        if three_points:
+        if three_points and omega_globals.options.producer_voluntary_overcompliance:
             pd.concat([most_strategic_compliant_tech_share_option, most_strategic_non_compliant_tech_share_option,
                        lowest_cost_compliant_tech_share_option])
         else:
