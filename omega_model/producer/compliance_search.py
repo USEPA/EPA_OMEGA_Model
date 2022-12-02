@@ -1391,7 +1391,8 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
             most_strategic_compliant_tech_share_option = lowest_cost_compliant_tech_share_option
 
         if three_points and omega_globals.options.producer_voluntary_overcompliance:
-            pd.concat([most_strategic_compliant_tech_share_option, most_strategic_non_compliant_tech_share_option,
+            candidate_production_decisions =\
+                pd.concat([most_strategic_compliant_tech_share_option, most_strategic_non_compliant_tech_share_option,
                        lowest_cost_compliant_tech_share_option])
         else:
             candidate_production_decisions = \
