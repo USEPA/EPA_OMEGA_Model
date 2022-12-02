@@ -111,7 +111,7 @@ def save_dict_to_csv(dict_to_save, save_path, index):
 
     """
     print(f'Saving {save_path}')
-    df = pd.DataFrame(dict_to_save).transpose()
+    df = pd.DataFrame.from_dict(dict_to_save, orient='index')
     df.to_csv(f'{save_path}', index=index)
 
     return df
