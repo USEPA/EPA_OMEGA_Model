@@ -1714,6 +1714,13 @@ def run_omega(session_runtime_options, standalone_run=False):
                 iteration_log, credit_banks = \
                     run_producer_consumer(omega_globals.pass_num, manufacturer_annual_data_table)
 
+                if omega_globals.options.notification_destination and omega_globals.options.notification_email \
+                        and omega_globals.options.notification_password:
+                    send_text(omega_globals.options.notification_destination,
+                              '%s Pass %d Starting Post-processing...' % (
+                              omega_globals.options.session_unique_name, omega_globals.pass_num),
+                              omega_globals.options.notification_email, omega_globals.options.notification_password)
+
                 # postproc session
                 manufacturer_annual_data_table, manufacturer_gigawatthour_data = \
                     postproc_session.run_postproc(iteration_log, credit_banks)
