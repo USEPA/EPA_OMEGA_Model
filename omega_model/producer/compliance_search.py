@@ -449,11 +449,11 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                 # figure out ALT ranges based on prior shares and max add and max subtract limits
                                 for nmc in node_market_classes:
                                     min_constraints['producer_abs_share_frac_%s.ALT' % nmc] = \
-                                        prior_market_class_shares_dict[nmc] - max_sub_dict[nmc] - \
-                                        min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]
+                                        max(0, prior_market_class_shares_dict[nmc] - max_sub_dict[nmc] - \
+                                        min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc])
                                     max_constraints['producer_abs_share_frac_%s.ALT' % nmc] = \
-                                        prior_market_class_shares_dict[nmc] + max_add_dict[nmc] - \
-                                        max_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]
+                                        min(1, prior_market_class_shares_dict[nmc] + max_add_dict[nmc] - \
+                                        max_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc])
 
                         if locked_consumer_shares:
                             print('%s locked consumer shares' % node_name)
