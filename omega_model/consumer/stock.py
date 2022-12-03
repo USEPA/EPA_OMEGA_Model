@@ -100,8 +100,11 @@ def update_stock(calendar_year, compliance_id=None):
 
             registered_count = initial_registered_count * reregistration_factor
 
-            if registered_count > 0:
-                annual_vmt = omega_globals.options.OnroadVMT.get_vmt(calendar_year, market_class_id, age)
+            if reregistration_factor > 0:
+                if initial_registered_count > 0:
+                    annual_vmt = omega_globals.options.OnroadVMT.get_vmt(calendar_year, market_class_id, age)
+                else:
+                    annual_vmt = 0
 
                 odometer = max(0, prior_odometer)
                 odometer += annual_vmt
