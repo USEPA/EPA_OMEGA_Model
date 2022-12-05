@@ -1389,29 +1389,33 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         compliant_tech_share_options = cull_compliant_points(compliant_tech_share_options,
                                                              prior_most_strategic_compliant_tech_share_option)
 
-        # grab best non-compliant option
-        non_compliant_tech_share_options['weighted_slope'] = \
-            non_compliant_tech_share_options['strategic_compliance_ratio'].values * \
-            ((non_compliant_tech_share_options[cost_name].values - lowest_cost_compliant_tech_share_option[cost_name].item()) /
-            (non_compliant_tech_share_options['strategic_compliance_ratio'].values -
-            lowest_cost_compliant_tech_share_option['strategic_compliance_ratio'].item()))
+        if len(non_compliant_tech_share_options > 1):
+            # grab best non-compliant option
+            non_compliant_tech_share_options['weighted_slope'] = \
+                non_compliant_tech_share_options['strategic_compliance_ratio'].values * \
+                ((non_compliant_tech_share_options[cost_name].values - lowest_cost_compliant_tech_share_option[cost_name].item()) /
+                (non_compliant_tech_share_options['strategic_compliance_ratio'].values -
+                lowest_cost_compliant_tech_share_option['strategic_compliance_ratio'].item()))
 
-        most_strategic_non_compliant_tech_share_option = \
-            production_options.loc[[non_compliant_tech_share_options['weighted_slope'].idxmin()]]
+            most_strategic_non_compliant_tech_share_option = \
+                production_options.loc[[non_compliant_tech_share_options['weighted_slope'].idxmin()]]
+        else:
+            most_strategic_non_compliant_tech_share_option = non_compliant_tech_share_options.iloc[0]
 
         three_points = False
-        # if most_strategic_non_compliant_tech_share_option[cost_name].item() > \
-        #         lowest_cost_compliant_tech_share_option[cost_name].item():
         if cloud_slope > 0:
-            # cost cloud up-slopes from left to right, calculate slope relative to best non-compliant option
-            compliant_tech_share_options['weighted_slope'] = \
-                compliant_tech_share_options['strategic_compliance_ratio'].values * \
-                ((compliant_tech_share_options[cost_name].values - most_strategic_non_compliant_tech_share_option[cost_name].item()) /
-                (compliant_tech_share_options['strategic_compliance_ratio'].values -
-                 most_strategic_non_compliant_tech_share_option['strategic_compliance_ratio'].item()))
+            if len(compliant_tech_share_options) > 1:
+                # cost cloud up-slopes from left to right, calculate slope relative to best non-compliant option
+                compliant_tech_share_options['weighted_slope'] = \
+                    compliant_tech_share_options['strategic_compliance_ratio'].values * \
+                    ((compliant_tech_share_options[cost_name].values - most_strategic_non_compliant_tech_share_option[cost_name].item()) /
+                    (compliant_tech_share_options['strategic_compliance_ratio'].values -
+                     most_strategic_non_compliant_tech_share_option['strategic_compliance_ratio'].item()))
 
-            most_strategic_compliant_tech_share_option = \
-                production_options.loc[[compliant_tech_share_options['weighted_slope'].idxmax()]]
+                most_strategic_compliant_tech_share_option = \
+                    production_options.loc[[compliant_tech_share_options['weighted_slope'].idxmax()]]
+            else:
+                most_strategic_compliant_tech_share_option = compliant_tech_share_options.ilod[0]
 
             three_points = True
         else:
