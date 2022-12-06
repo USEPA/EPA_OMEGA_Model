@@ -1614,13 +1614,13 @@ def run_omega(session_runtime_options, standalone_run=False):
     session_runtime_options.standalone_run = standalone_run
     session_runtime_options.multiprocessing = True or session_runtime_options.multiprocessing and not standalone_run
 
-    if session_runtime_options.session_is_reference or 0.0 < session_runtime_options.credit_market_efficiency <= 1.0:
-        # imperfect trading and/or reference session
+    if 0.0 < session_runtime_options.credit_market_efficiency < 1.0 or session_runtime_options.force_two_pass:
+        # imperfect trading or force two-pass
         consolidate = [True, False]
-    # elif session_runtime_options.credit_market_efficiency == 1.0:
-    #    # perfect trading
-    #    consolidate = [True]
-    else:  # session_runtime_options.credit_market_efficiency == 0.0:
+    elif session_runtime_options.credit_market_efficiency == 1.0:
+        # perfect trading
+        consolidate = [True]
+    else:
         # no trading
         consolidate = [False]
 
