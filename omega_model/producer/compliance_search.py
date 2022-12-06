@@ -338,7 +338,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
                             # don't lock anything in on iteration zero, cross subsdies might be maxed just on the
                             # basis of body style share mismatch, for example
-                            if producer_consumer_iteration_num > 1:
+                            if producer_consumer_iteration_num > 1 or omega_globals.options.session_is_reference:
                                 if min_constraints == max_constraints:
                                     locked_consumer_shares = True
                                 else:
