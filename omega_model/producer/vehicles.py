@@ -710,14 +710,15 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'cost_curve_class', 'reg_class_id', 'in_use_fuel_id',
                        'cert_fuel_id', 'market_class_id', 'lifetime_VMT',
                        'context_size_class',
-                       'unibody_structure', 'drive_system', 'curbweight_lbs', 'eng_rated_hp', 'footprint_ft2',
+                       'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs', 'eng_rated_hp', 'footprint_ft2',
                        'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c', 'body_style',
                        'structure_material', 'base_year_powertrain_type', 'base_year_reg_class_id', 'base_year_market_share',
                        'base_year_vehicle_id', 'base_year_glider_non_structure_mass_lbs',
                        'base_year_glider_non_structure_cost_dollars',
                        'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'base_year_curbweight_lbs_to_hp',
                        'base_year_msrp_dollars', 'battery_kwh', 'motor_kw', 'charge_depleting_range_mi',
-                       'prior_redesign_year', 'redesign_interval', 'in_production', 'base_year_product'}
+                       'prior_redesign_year', 'redesign_interval', 'in_production', 'base_year_product',
+                       'workfactor', 'gvwr_lbs', 'gcwr_lbs', 'base_year_workfactor', 'base_year_gvwr_lbs', 'base_year_gcwr_lbs',}
 
     # transfer base properties
     for attr in base_properties:
@@ -798,6 +799,7 @@ class Vehicle(OMEGABase):
         self.cost_curve = None
         self.unibody_structure = 1
         self.drive_system = 1
+        self.dual_rear_wheel = 0
         self.curbweight_lbs = 0
         self.footprint_ft2 = 0
         self.eng_rated_hp = 0
@@ -824,6 +826,12 @@ class Vehicle(OMEGABase):
         self.battery_kwh = 0
         self.motor_kw = 0
         self.charge_depleting_range_mi = 0
+        self.workfactor = 0
+        self.gvwr_lbs = 0
+        self.gcwr_lbs = 0
+        self.base_year_workfactor = 0
+        self.base_year_gvwr_lbs = 0
+        self.base_year_gcwr_lbs = 0
 
         # additional attriutes are added dynamically and may vary based on user inputs (such as off-cycle credits)
         for ccv in DecompositionAttributes.values:
@@ -1176,6 +1184,7 @@ class VehicleFinal(SQABase, Vehicle):
     market_class_id = Column(String)  #: market class ID, as determined by the consumer subpackage
     unibody_structure = Column(Float)  #: unibody structure flag, e.g. 0,1
     drive_system = Column(Float)  #: drive system, 1=FWD, 2=RWD, 4=AWD
+    dual_rear_wheel = Column(Float)  #: dual_rear_wheel, 0=No, 1=Yes
     body_style = Column(String)  #: vehicle body style, e.g. 'sedan'
     base_year_powertrain_type = Column(String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
     charge_depleting_range_mi = Column(Float)  #: vehicle charge-depleting range, miles
@@ -1198,6 +1207,9 @@ class VehicleFinal(SQABase, Vehicle):
     base_year_target_coef_a = Column(Float)  #: roadload A coefficient, lbs
     base_year_target_coef_b = Column(Float)  #: roadload B coefficient, lbs/mph
     base_year_target_coef_c = Column(Float)  #: roadload C coefficient, lbs/mph^2
+    base_year_workfactor = Column(Float)
+    base_year_gvwr_lbs = Column(Float)
+    base_year_gcwr_lbs = Column(Float)
 
     # TODO: non-numeric attributes that >could< change based on interpolating the frontier...:
     cost_curve_class = Column(String)  #: ALPHA modeling result class
@@ -1209,6 +1221,9 @@ class VehicleFinal(SQABase, Vehicle):
     footprint_ft2 = Column(Float)  #: vehicle footprint, square feet
     # TODO: maybe: ?? does rated_hp -> eng_rated_hp?
     eng_rated_hp = Column(Float)  #: engine rated horsepower
+    workfactor = Column(Float)
+    gvwr_lbs = Column(Float)
+    gcwr_lbs = Column(Float)
 
     _initial_registered_count = Column('_initial_registered_count', Float)
     projected_sales = Column(Float)  #: used to project context size class sales
@@ -1221,7 +1236,7 @@ class VehicleFinal(SQABase, Vehicle):
     mandatory_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id',
                                    'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id',
                                    'cert_fuel_id', 'sales', 'footprint_ft2', 'eng_rated_hp',
-                                   'unibody_structure', 'drive_system', 'curbweight_lbs',
+                                   'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs', 'gvwr_lbs', 'gcwr_lbs',
                                    'target_coef_a', 'target_coef_b', 'target_coef_c',
                                    'body_style', 'msrp_dollars', 'structure_material',
                                    'prior_redesign_year', 'redesign_interval'}  #: mandatory input file columns, the rest can be optional numeric columns
@@ -1362,10 +1377,11 @@ class VehicleFinal(SQABase, Vehicle):
                               'base_year_reg_class_id', 'base_year_market_share', 'base_year_vehicle_id',
                               'curbweight_lbs', 'base_year_glider_non_structure_mass_lbs',
                               'base_year_glider_non_structure_cost_dollars',
-                              'footprint_ft2', 'base_year_footprint_ft2', 'base_year_curbweight_lbs','drive_system',
+                              'footprint_ft2', 'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'drive_system', 'dual_rear_wheel',
                               'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
                               'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c',
-                              'prior_redesign_year', 'redesign_interval'] \
+                              'prior_redesign_year', 'redesign_interval',
+                              'workfactor', 'gvwr_lbs', 'gcwr_lbs', 'base_year_workfactor', 'base_year_gvwr_lbs', 'base_year_gcwr_lbs'] \
                               + VehicleFinal.dynamic_attributes
 
         # model year and registered count are required to make a full-blown VehicleFinal object, compliance_id
@@ -1421,6 +1437,7 @@ class VehicleFinal(SQABase, Vehicle):
                 cert_fuel_id=df.loc[i, 'cert_fuel_id'],
                 unibody_structure=df.loc[i, 'unibody_structure'],
                 drive_system=df.loc[i, 'drive_system'],
+                dual_rear_wheel=df.loc[i, 'dual_rear_wheel'],
                 curbweight_lbs=df.loc[i, 'curbweight_lbs'],
                 footprint_ft2=df.loc[i, 'footprint_ft2'],
                 eng_rated_hp=df.loc[i, 'eng_rated_hp'],
@@ -1444,6 +1461,10 @@ class VehicleFinal(SQABase, Vehicle):
                 redesign_interval=df.loc[i, 'redesign_interval'] * omega_globals.options.redesign_interval_gain,
                 in_production=True,
                 base_year_product=True,
+                gvwr_lbs=df.loc[i, 'gvwr_lbs'],
+                gcwr_lbs=df.loc[i, 'gcwr_lbs'],
+                base_year_gvwr_lbs=df.loc[i, 'gvwr_lbs'],
+                base_year_gcwr_lbs=df.loc[i, 'gcwr_lbs'],
             )
 
             electrification_class = df.loc[i, 'electrification_class']
@@ -1789,6 +1810,7 @@ if __name__ == '__main__':
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
             weighted_footprint = weighted_value(vehicle_list, 'initial_registered_count', 'footprint_ft2')
+            weighted_workfactor = weighted_value(vehicle_list, 'initial_registered_count', 'workfactor')
 
         else:
             print(init_fail)

@@ -103,9 +103,13 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             Vehicle target CO2e in g/mi.
 
         """
-        cache_key = (vehicle.reg_class_id, vehicle.model_year, vehicle.cert_fuel_id)
-
         locals_dict = locals()
+        workfactor = vehicle.workfactor
+        # workfactor = WorkFactor.calc_workfactor(vehicle)
+
+        cache_key = (vehicle.reg_class_id, vehicle.model_year, vehicle.cert_fuel_id, workfactor)
+
+        # locals_dict = locals()
 
         if cache_key not in VehicleTargets._data:
 
@@ -113,11 +117,11 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
 
             start_years = VehicleTargets.start_years[vehicle.cert_fuel_id]
 
-            if len(start_years[start_years <= vehicle.model_year]) > 0:
+            if len([yr for yr in start_years if yr <= vehicle.model_year]) > 0:
 
-                model_year = max(start_years[start_years <= vehicle.model_year])
+                model_year = max([yr for yr in start_years if yr <= vehicle.model_year])
 
-                workfactor = WorkFactor.calc_workfactor(vehicle)
+                # workfactor = WorkFactor.calc_workfactor(vehicle)
 
                 target = eval(VehicleTargets._cache[(vehicle.reg_class_id, model_year, vehicle.cert_fuel_id)]['co2_gram_per_mile'], locals_dict)
 
@@ -147,9 +151,9 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
 
             start_years = VehicleTargets.start_years[cert_fuel_id]
 
-            if len(start_years[start_years <= model_year]) > 0:
+            if len([yr for yr in start_years if yr <= model_year]) > 0:
 
-                year = max(start_years[start_years <= model_year])
+                year = max([yr for yr in start_years if yr <= model_year])
 
                 useful_life = VehicleTargets._cache[(reg_class_id, year, cert_fuel_id)]['useful_life_miles']
             else:
@@ -179,8 +183,8 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
         """
         start_years = VehicleTargets.start_years[vehicle.cert_fuel_id]
 
-        if len(start_years[start_years <= vehicle.model_year]) > 0:
-            model_year = max(start_years[start_years <= vehicle.model_year])
+        if len([yr for yr in start_years if yr <= vehicle.model_year]) > 0:
+            model_year = max([yr for yr in start_years if yr <= vehicle.model_year])
 
             vehicle.lifetime_VMT \
                 = VehicleTargets.calc_cert_useful_life_vmt(vehicle.reg_class_id, model_year, vehicle.cert_fuel_id)
@@ -226,9 +230,8 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
         """
         start_years = VehicleTargets.start_years[vehicle.cert_fuel_id]
 
-        if len(start_years[start_years <= vehicle.model_year]) > 0:
-
-            model_year = max(start_years[start_years <= vehicle.model_year])
+        if len([yr for yr in start_years if yr <= vehicle.model_year]) > 0:
+            model_year = max([yr for yr in start_years if yr <= vehicle.model_year])
 
             vehicle.lifetime_VMT \
                 = VehicleTargets.calc_cert_useful_life_vmt(vehicle.reg_class_id, model_year, vehicle.cert_fuel_id)
