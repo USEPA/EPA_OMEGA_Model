@@ -687,6 +687,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             producer_compliance_possible |= compliance_possible
 
             most_strategic_index = candidate_production_decisions['strategic_compliance_error'].idxmin()
+            most_strategic_points = candidate_production_decisions.loc[[most_strategic_index]]
+            most_strategic_point = most_strategic_points.loc[[most_strategic_points['total_generalized_cost_dollars'].idxmin()]].iloc[0]
             cheapest_index = candidate_production_decisions['total_generalized_cost_dollars'].idxmin()
             cheapest_points = candidate_production_decisions.loc[[cheapest_index]]
             most_strategic_cheapest_point = cheapest_points.loc[[cheapest_points['strategic_compliance_ratio'].idxmin()]].iloc[0]
@@ -696,8 +698,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             if (most_strategic_production_decision is None) or \
                     (candidate_production_decisions['strategic_compliance_error'].min() <
                      most_strategic_production_decision['strategic_compliance_error'].min()):
-                most_strategic_production_decision = \
-                    candidate_production_decisions.loc[most_strategic_index]
+                most_strategic_production_decision = most_strategic_point
 
             if omega_globals.options.producer_voluntary_overcompliance:
                 if best_candidate_production_decision is None:
@@ -706,8 +707,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                         best_candidate_production_decision = most_strategic_cheapest_point
                     else:
                         # if cheapest is non-compliant, most strategic is the best
-                        best_candidate_production_decision = \
-                            candidate_production_decisions.loc[most_strategic_index]
+                        best_candidate_production_decision = most_strategic_point
                 else:
                     # if new candidate is cheaper than the old best and compliant, it's the best
                     if (most_strategic_cheapest_point['total_generalized_cost_dollars'] <
@@ -716,7 +716,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                         best_candidate_production_decision = most_strategic_cheapest_point
                     elif best_candidate_production_decision['strategic_compliance_error'] > 1.0:
                         # if old best was non compliant, new best is most strategic
-                        best_candidate_production_decision = candidate_production_decisions.loc[most_strategic_index]
+                        best_candidate_production_decision = most_strategic_point
             else:
                 best_candidate_production_decision = most_strategic_production_decision
 
@@ -727,7 +727,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
             search_iteration += 1
 
-        continue_search = producer_compliance_possible is not None and \
+            continue_search = producer_compliance_possible is not None and \
                         (abs(1 - most_strategic_production_decision['strategic_compliance_ratio']) >
                          omega_globals.options.producer_compliance_search_tolerance) and \
                           (share_range > omega_globals.options.producer_compliance_search_min_share_range)
@@ -1389,7 +1389,7 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         compliant_tech_share_options = cull_compliant_points(compliant_tech_share_options,
                                                              prior_most_strategic_compliant_tech_share_option)
 
-        if len(non_compliant_tech_share_options > 1):
+        if len(non_compliant_tech_share_options) > 1:
             # grab best non-compliant option
             non_compliant_tech_share_options['weighted_slope'] = \
                 non_compliant_tech_share_options['strategic_compliance_ratio'].values * \
@@ -1400,7 +1400,11 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
             most_strategic_non_compliant_tech_share_option = \
                 production_options.loc[[non_compliant_tech_share_options['weighted_slope'].idxmin()]]
         else:
-            most_strategic_non_compliant_tech_share_option = non_compliant_tech_share_options.iloc[0]
+            if len(non_compliant_tech_share_options.columns) == len(mini_df.columns):
+                most_strategic_non_compliant_tech_share_option = \
+                    production_options.loc[[non_compliant_tech_share_options.index[0]]]
+            else:
+                most_strategic_non_compliant_tech_share_option = non_compliant_tech_share_options.iloc[[0]]
 
         three_points = False
         if cloud_slope > 0:
@@ -1415,7 +1419,10 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
                 most_strategic_compliant_tech_share_option = \
                     production_options.loc[[compliant_tech_share_options['weighted_slope'].idxmax()]]
             else:
-                most_strategic_compliant_tech_share_option = compliant_tech_share_options.ilod[0]
+                if len(compliant_tech_share_options.columns) == len(mini_df.columns):
+                    most_strategic_compliant_tech_share_option = production_options.loc[[compliant_tech_share_options.index[0]]]
+                else:
+                    most_strategic_compliant_tech_share_option = compliant_tech_share_options.iloc[[0]]
 
             three_points = True
         else:
@@ -1440,8 +1447,11 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
             cull_non_compliant_points(non_compliant_tech_share_options,
                                       prior_most_strategic_non_compliant_tech_share_option)
 
-        most_strategic_non_compliant_tech_share_option = \
-            production_options.loc[[non_compliant_tech_share_options['strategic_compliance_ratio'].idxmin()]]
+        if len(non_compliant_tech_share_options.columns) == len(mini_df.columns):
+            most_strategic_non_compliant_tech_share_option = \
+                production_options.loc[[non_compliant_tech_share_options['strategic_compliance_ratio'].idxmin()]]
+        else:
+            most_strategic_non_compliant_tech_share_option = non_compliant_tech_share_options.iloc[[0]]
 
         candidate_production_decisions = most_strategic_non_compliant_tech_share_option
 
@@ -1454,15 +1464,20 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         compliant_tech_share_options = cull_compliant_points(compliant_tech_share_options,
                                                              prior_most_strategic_compliant_tech_share_option)
 
-        if omega_globals.options.producer_voluntary_overcompliance:
-            lowest_cost_compliant_tech_share_option = \
-                production_options.loc[[compliant_tech_share_options[cost_name].idxmin()]]
-            candidate_production_decisions = lowest_cost_compliant_tech_share_option
+        if len(compliant_tech_share_options.columns) == len(mini_df.columns):
+            if omega_globals.options.producer_voluntary_overcompliance:
+                # take lowest cost
+                most_strategic_compliant_tech_share_option = \
+                    production_options.loc[[compliant_tech_share_options[cost_name].idxmin()]]
+            else:
+                # take closest to strategic taraget
+                most_strategic_compliant_tech_share_option = \
+                    production_options.loc[[compliant_tech_share_options['strategic_compliance_ratio'].idxmax()]]
         else:
-            most_strategic_compliant_tech_share_option = \
-                production_options.loc[[compliant_tech_share_options['strategic_compliance_ratio'].idxmax()]]
-            candidate_production_decisions = most_strategic_compliant_tech_share_option
-            prior_most_strategic_non_compliant_tech_share_option = most_strategic_compliant_tech_share_option
+            most_strategic_compliant_tech_share_option = compliant_tech_share_options.iloc[[0]]
+
+        candidate_production_decisions = most_strategic_compliant_tech_share_option
+        prior_most_strategic_compliant_tech_share_option = most_strategic_compliant_tech_share_option
 
     candidate_production_decisions['selected_production_option'] = candidate_production_decisions.index
 
