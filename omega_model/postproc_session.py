@@ -8,6 +8,8 @@ post-compliance-modeling output generation (charts, summary files, etc)
 **CODE**
 
 """
+import numpy as np
+
 import effects.omega_effects
 from omega_model import *
 from common.omega_plot import *
@@ -133,13 +135,28 @@ def run_postproc(iteration_log, credit_banks):
     else:
         compliance_ids = VehicleFinal.compliance_ids
 
+    total_calendar_year_cert_co2e_Mg = np.zeros_like(analysis_years, dtype='float')
+    total_model_year_cert_co2e_Mg = np.zeros_like(analysis_years, dtype='float')
+    total_target_co2e_Mg = np.zeros_like(analysis_years, dtype='float')
     for compliance_id in compliance_ids:
         calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg, target_co2e_Mg = \
             plot_manufacturer_compliance(analysis_years, compliance_id, credit_banks[compliance_id])
 
+        total_calendar_year_cert_co2e_Mg += calendar_year_cert_co2e_Mg
+        total_model_year_cert_co2e_Mg += model_year_cert_co2e_Mg
+        total_target_co2e_Mg += target_co2e_Mg
+
         session_results['%s_target_co2e_Mg' % compliance_id] = target_co2e_Mg
         session_results['%s_calendar_year_cert_co2e_Mg' % compliance_id] = calendar_year_cert_co2e_Mg
         session_results['%s_model_year_cert_co2e_Mg' % compliance_id] = model_year_cert_co2e_Mg
+
+    if not omega_globals.options.consolidate_manufacturers:
+        ax1, fig = plot_compliance(analysis_years, total_target_co2e_Mg, total_calendar_year_cert_co2e_Mg,
+                        total_model_year_cert_co2e_Mg)
+        label_xyt(ax1, 'Year', 'CO2e [Mg]', 'Total %s\nCert and Compliance Versus Year' %
+                  omega_globals.options.session_unique_name)
+        fig.savefig(omega_globals.options.output_folder + '%s ALL Cert Mg v Year.png' %
+                    omega_globals.options.session_unique_name)
 
     for compliance_id in VehicleFinal.compliance_ids:
 
@@ -1335,10 +1352,7 @@ def plot_manufacturer_compliance(calendar_years, compliance_id, credit_history):
     model_year_cert_co2e_Mg = ManufacturerAnnualData.get_model_year_cert_co2e_Mg(compliance_id)
     total_cost_billions = ManufacturerAnnualData.get_total_cost_billions(compliance_id)
     # compliance chart
-    fig, ax1 = fplothg(calendar_years, target_co2e_Mg, 'o-', reuse_figure=omega_globals.options.auto_close_figures)
-    ax1.plot(calendar_years, calendar_year_cert_co2e_Mg, 'r.-')
-    ax1.plot(calendar_years, model_year_cert_co2e_Mg, '-')
-    ax1.legend(['target_co2e_Mg', 'calendar_year_cert_co2e_Mg', 'model_year_cert_co2e_Mg'])
+    ax1, fig = plot_compliance(calendar_years, target_co2e_Mg, calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg)
     label_xyt(ax1, 'Year', 'CO2e [Mg]', '%s %s\nCert and Compliance Versus Year\n Total Cost $%.2f Billion' % (
         compliance_id, omega_globals.options.session_unique_name, total_cost_billions))
 
@@ -1373,6 +1387,14 @@ def plot_manufacturer_compliance(calendar_years, compliance_id, credit_history):
                 (omega_globals.options.session_unique_name, compliance_id))
 
     return calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg, target_co2e_Mg
+
+
+def plot_compliance(calendar_years, target_co2e_Mg, calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg):
+    fig, ax1 = fplothg(calendar_years, target_co2e_Mg, 'o-', reuse_figure=omega_globals.options.auto_close_figures)
+    ax1.plot(calendar_years, calendar_year_cert_co2e_Mg, 'r.-')
+    ax1.plot(calendar_years, model_year_cert_co2e_Mg, '-')
+    ax1.legend(['target_co2e_Mg', 'calendar_year_cert_co2e_Mg', 'model_year_cert_co2e_Mg'])
+    return ax1, fig
 
 
 def plot_iteration(iteration_log, compliance_id):
