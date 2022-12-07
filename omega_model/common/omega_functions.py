@@ -336,6 +336,8 @@ def print_dict(dict_in, num_tabs=0, to_string=False):
 
     if num_tabs == 0:
         s += '\n'
+        if type(dict_in) is pd.Series:
+            dict_in = dict_in.to_dict()
 
     if type(dict_in) is list or type(dict_in) is not dict:
         s += '\t' * num_tabs + str(dict_in) + '\n'
