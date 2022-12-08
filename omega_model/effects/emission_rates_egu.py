@@ -115,12 +115,15 @@ class EmissionRatesEGU(OMEGABase):
             # add the kwh_session to the new kwh base value to determine the US demand for the session
             kwh_session += kwh_base
 
-            for rate_name in rate_names:
+            for idx, rate_name in enumerate(rate_names):
                 rate_low = eval(EmissionRatesEGU._data['low_bound', rate_name]['equation_rate_id'], {}, locals_dict)
                 rate_high = eval(EmissionRatesEGU._data['high_bev', rate_name]['equation_rate_id'], {}, locals_dict)
 
                 # interpolate the rate for kwh_demand
                 rate = rate_low - (kwh_demand_low - kwh_session) * (rate_low - rate_high) / (kwh_demand_low - kwh_demand_high)
+
+                if rate <= 0:
+                    rate = EmissionRatesEGU._cache[calendar_year - 1][idx]
 
                 return_rates.append(rate)
 
