@@ -209,6 +209,7 @@ def get_inputs_for_effects(arg=None):
             'gal_per_bbl',
             'e0_in_retail_gasoline',
             'e0_energy_density_ratio',
+            'diesel_energy_density_ratio',
             # 'gallons_of_gasoline_us_annual',
             # 'bbl_oil_us_annual',
             # 'kwh_us_annual',
@@ -257,7 +258,7 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
         'curbweight_lbs',
     ]
 
-    grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio = get_inputs_for_effects()
+    grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, diesel_energy_density_ratio = get_inputs_for_effects()
     # gallons_of_gasoline_us_annual, bbl_oil_us_annual, kwh_us_annual, year_for_compares = get_inputs_for_effects(*input_attributes_list)
 
     # year_for_compares = int(year_for_compares)
@@ -384,6 +385,8 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                         co2_ref_rate = ch4_ref_rate = n2o_ref_rate = 0
                         # benzene_ref = butadiene13_ref = formaldehyde_ref = acetaldehyde_ref = acrolein_ref = 0
 
+                        pure_share = energy_density_ratio = 0
+
                         veh_rates_by = 'age'  # for now; set as an input if we want to; value can be 'age' or 'odometer'
                         ind_var_value = pd.to_numeric(vad['age'])
                         if veh_rates_by == 'odometer':
@@ -429,6 +432,8 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                                         = get_vehicle_emission_rate(model_year, sourcetype_name, base_year_reg_class_id, fuel,
                                                                     ind_var_value)
 
+                                    energy_density_ratio, pure_share = e0_energy_density_ratio, e0_share
+
                                 elif fuel == 'pump diesel':
                                     pm25_brakewear_rate_l, pm25_tirewear_rate_l, pm25_exh_rate, \
                                     nmog_exh_rate, nmog_refuel_spill_rate, co_exh_rate, nox_exh_rate, \
@@ -439,6 +444,8 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                                     butadiene13_exh_rate, pah15_exh_rate \
                                         = get_vehicle_emission_rate(model_year, sourcetype_name, base_year_reg_class_id, fuel,
                                                                     ind_var_value)
+
+                                    energy_density_ratio, pure_share = diesel_energy_density_ratio, 1
                                 else:
                                     pass # add additional liquid fuels (E85) if necessary
 
@@ -547,7 +554,7 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                         n2o_total_metrictons = n2o_veh_metrictons + n2o_upstream_metrictons
 
                         # calc energy security related attributes and comparisons to year_for_compares
-                        oil_bbl = fuel_consumption_gallons * e0_share * e0_energy_density_ratio / gal_per_bbl
+                        oil_bbl = fuel_consumption_gallons * pure_share * energy_density_ratio / gal_per_bbl
                         imported_oil_bbl = oil_bbl * get_energysecurity_cf(calendar_year)
                         imported_oil_bbl_per_day = imported_oil_bbl / 365
                         # share_of_us_annual_gasoline = fuel_consumption_gallons / gallons_of_gasoline_us_annual
@@ -797,7 +804,7 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
     from context.onroad_fuels import OnroadFuel
     from common.omega_eval import Eval
 
-    grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio = get_inputs_for_effects()
+    grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, diesel_energy_density_ratio = get_inputs_for_effects()
 
     physical_effects_dict = dict()
     for key, nested_dict in LegacyFleet._legacy_fleet.items():
@@ -916,6 +923,8 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
                 voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co2_ref_rate, ch4_ref_rate, n2o_ref_rate \
                     = get_refinery_ef(calendar_year, fuel)
 
+                energy_density_ratio, pure_share = e0_energy_density_ratio, e0_share
+
             elif 'diesel' in fuel:
                 vmt_liquid_fuel = vmt
                 pm25_brakewear_rate, pm25_tirewear_rate, pm25_exh_rate, \
@@ -929,6 +938,8 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
 
                 voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co2_ref_rate, ch4_ref_rate, n2o_ref_rate \
                     = get_refinery_ef(calendar_year, fuel)
+
+                energy_density_ratio, pure_share = diesel_energy_density_ratio, 1
 
             transmission_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'transmission_efficiency')
 
@@ -1032,7 +1043,7 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
         n2o_total_metrictons = n2o_veh_metrictons + n2o_upstream_metrictons
 
         # calc energy security related attributes and comparisons to year_for_compares
-        oil_bbl = fuel_consumption_gallons * e0_share * e0_energy_density_ratio / gal_per_bbl
+        oil_bbl = fuel_consumption_gallons * pure_share * energy_density_ratio / gal_per_bbl
         imported_oil_bbl = oil_bbl * get_energysecurity_cf(calendar_year)
         imported_oil_bbl_per_day = imported_oil_bbl / 365
         # share_of_us_annual_gasoline = fuel_consumption_gallons / gallons_of_gasoline_us_annual
