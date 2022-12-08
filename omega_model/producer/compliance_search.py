@@ -316,7 +316,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                     max_constraints.pop(k)
 
                         elif consumer_response is not None:
-                            print("consumer_response['total_battery_GWh'] <= consumer_response['battery_GWh_limit']")
+                            if 'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
+                                print("consumer_response['total_battery_GWh'] <= consumer_response['battery_GWh_limit']")
                             node_market_classes = [node_name + '.' + c for c in children]
 
                             # pop non-partition keys
