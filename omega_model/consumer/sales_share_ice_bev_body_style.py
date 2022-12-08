@@ -248,6 +248,8 @@ class SalesShare(OMEGABase, SalesShareBase):
         sales_share_denominator = 0
         sales_share_numerator = dict()
 
+        market_class_data['consumer_constrained_%s' % parent_market_class] = False
+
         for pass_num in [0, 1]:
             for market_class_id in child_market_classes:
                 if pass_num == 0:
@@ -280,6 +282,9 @@ class SalesShare(OMEGABase, SalesShareBase):
                     share_name = market_class_id.replace(parent_market_class + '.', '')
                     demanded_share = np.minimum(np.maximum(min_constraints[share_name], demanded_share),
                                                 max_constraints[share_name])
+
+                    if all(demanded_share == max_constraints[share_name]):
+                        market_class_data['consumer_constrained_%s' % parent_market_class] = True
 
                     parent_share = market_class_data['consumer_abs_share_frac_%s' % parent_market_class].values
 
