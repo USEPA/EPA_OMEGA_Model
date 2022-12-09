@@ -106,14 +106,10 @@ def run_effects_calcs():
     vmt_adjustments = AdjustmentsVMT()
     vmt_adjustments.calc_vmt_adjustments(calendar_years)
 
-    # if omega_globals.options.multiprocessing:
-    #     print('Starting multiprocess save_dict_to_csv...')
-    #     tech_tracking_result = omega_globals.pool.apply_async(func=save_dict_to_csv,
-    #                                                           args=[tech_tracking_dict, tech_tracking_filename, False],
-    #                                                           callback=None,
-    #                                                           error_callback=error_callback)
-    # else:
-    tech_tracking_df = save_dict_to_csv(tech_tracking_dict, tech_tracking_filename, index=False)
+    if 'effects' in omega_globals.options.verbose_log_modules:
+        tech_tracking_df = save_dict_to_csv(tech_tracking_dict, tech_tracking_filename, index=False)
+    else:
+        tech_tracking_df = pd.DataFrame.from_dict(tech_tracking_dict, orient='index')
 
     if 'Physical' in omega_globals.options.calc_effects:
         omega_log.logwrite('\nCalculating fuel cost per mile')
@@ -165,21 +161,12 @@ def run_effects_calcs():
         safety_effects_dict = {**safety_effects_dict, **legacy_fleet_safety_effects_dict}
         physical_effects_dict = {**physical_effects_dict, **legacy_fleet_physical_effects_dict}
 
-        # if omega_globals.options.multiprocessing:
-        #     print('Starting multiprocess save_dict_to_csv...')
-        #     safety_effects_result = omega_globals.pool.apply_async(func=save_dict_to_csv,
-        #                                                            args=[safety_effects_dict, safety_effects_filename,
-        #                                                                  False],
-        #                                                            callback=None,
-        #                                                            error_callback=error_callback)
-        #     physical_effects_result = omega_globals.pool.apply_async(func=save_dict_to_csv,
-        #                                                              args=[physical_effects_dict, physical_effects_filename,
-        #                                                                    False],
-        #                                                              callback=None,
-        #                                                              error_callback=error_callback)
-        # else:
-        safety_effects_df = save_dict_to_csv(safety_effects_dict, safety_effects_filename, index=False)
-        physical_effects_df = save_dict_to_csv(physical_effects_dict, physical_effects_filename, index=False)
+        if 'effects' in omega_globals.options.verbose_log_modules:
+            safety_effects_df = save_dict_to_csv(safety_effects_dict, safety_effects_filename, index=False)
+            physical_effects_df = save_dict_to_csv(physical_effects_dict, physical_effects_filename, index=False)
+        else:
+            safety_effects_df = pd.DataFrame.from_dict(safety_effects_dict, orient='index')
+            physical_effects_df = pd.DataFrame.from_dict(physical_effects_dict, orient='index')
 
         # if not omega_globals.options.multiprocessing:
         annual_physical_effects_filename = f'{omega_globals.options.output_folder}' + \
@@ -198,21 +185,13 @@ def run_effects_calcs():
             cost_effects_dict.update(calc_cost_effects(physical_effects_dict, context_fuel_cpm_dict,
                                                        calc_health_effects=CostFactorsCriteria.calc_health_effects))
 
-            # omega_log.logwrite('\nDiscounting costs')
-            # cost_effects_dict = discount_values(cost_effects_dict)
-
             cost_effects_filename = f'{omega_globals.options.output_folder}' + \
                                     f'{omega_globals.options.session_unique_name}_cost_effects.csv'
 
-            # if omega_globals.options.multiprocessing:
-            #     print('Starting multiprocess save_dict_to_csv...')
-            #     cost_effects_result = omega_globals.pool.apply_async(func=save_dict_to_csv,
-            #                                                          args=[cost_effects_dict, cost_effects_filename,
-            #                                                                False],
-            #                                                          callback=None,
-            #                                                          error_callback=error_callback)
-            # else:
-            cost_effects_df = save_dict_to_csv(cost_effects_dict, cost_effects_filename, index=False)
+            if 'effects' in omega_globals.options.verbose_log_modules:
+                cost_effects_df = save_dict_to_csv(cost_effects_dict, cost_effects_filename, index=False)
+            else:
+                cost_effects_df = pd.DataFrame.from_dict(cost_effects_dict, orient='index')
 
             omega_log.logwrite('\nCalculating annual, discounted, present and annualized values')
             present_and_annualized_dict = calc_present_and_annualized_values(cost_effects_dict, calendar_years)
@@ -220,7 +199,6 @@ def run_effects_calcs():
             present_and_annualized_filename = f'{omega_globals.options.output_folder}' + \
                                               f'{omega_globals.options.session_unique_name}_cost_effects_annual_present_and_annualized.csv'
 
-            # present_and_annualized_cost_df = pd.DataFrame(present_and_annualized_dict).transpose()
             present_and_annualized_cost_df = pd.DataFrame.from_dict(present_and_annualized_dict, orient='index')
 
             omega_log.logwrite('\nCalculating social costs')
@@ -229,43 +207,6 @@ def run_effects_calcs():
 
             omega_log.logwrite('\nSaving annual, discounted, present and annualized values')
             present_and_annualized_cost_df.to_csv(present_and_annualized_filename, index=False)
-
-    # if omega_globals.options.multiprocessing:
-    #     if omega_globals.options.calc_effects == 'Physical and Costs':
-    #         while not all([tech_tracking_result.ready(),
-    #                        safety_effects_result.ready(),
-    #                        physical_effects_result.ready(),
-    #                        cost_effects_result.ready()]):
-    #             pass
-    #
-    #         tech_tracking_df = tech_tracking_result.get()
-    #         safety_effects_df = safety_effects_result.get()
-    #         physical_effects_df = physical_effects_result.get()
-    #         cost_effects_df = cost_effects_result.get()
-    #
-    #     elif omega_globals.options.calc_effects == 'Physical':
-    #         while not all([tech_tracking_result.ready(),
-    #                        safety_effects_result.ready(),
-    #                        physical_effects_result.ready()]):
-    #             pass
-    #
-    #         tech_tracking_df = tech_tracking_result.get()
-    #         safety_effects_df = safety_effects_result.get()
-    #         physical_effects_df = physical_effects_result.get()
-    #
-    #     else:
-    #         while not all([tech_tracking_result.ready()]):
-    #             pass
-    #
-    #         tech_tracking_df = tech_tracking_result.get()
-    #
-    #     if 'Physical' in omega_globals.options.calc_effects:
-    #         print('Saving Annual Physical Effects...')
-    #         annual_physical_effects_filename = f'{omega_globals.options.output_folder}' + \
-    #                                            f'{omega_globals.options.session_unique_name}_physical_effects_annual.csv'
-    #
-    #         annual_physical_effects_df = calc_annual_physical_effects(physical_effects_df)
-    #         annual_physical_effects_df.to_csv(annual_physical_effects_filename, index=False)
 
     print('OMEGA Effects Complete')
 
