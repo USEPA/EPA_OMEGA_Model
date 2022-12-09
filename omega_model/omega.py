@@ -491,6 +491,13 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                                                 cross_subsidy_options_and_response, producer_consumer_iteration_num,
                                                 iteration_log, node_name='', verbose=False)
 
+    max_error = 0
+    for mcat in market_class_tree:
+        error = cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] / cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat]
+        if error > max_error:
+            max_error = error
+            cross_subsidy_options_and_response['max_share_delta_market_class'] = mcat
+
     duplicate_columns = set.intersection(set(producer_decision.index), set(cross_subsidy_options_and_response.index))
     producer_decision = producer_decision.drop(duplicate_columns)
     producer_decision_and_response = pd.concat([producer_decision, cross_subsidy_options_and_response])
@@ -533,8 +540,8 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
     if omega_globals.producer_shares_mode:
         # force consumer shares from producer shares, after having logged raw results above
-        for k in [k for k in producer_decision_and_response.keys() if 'consumer_abs_' in k]:
-            producer_decision_and_response[k] = producer_decision_and_response[k.replace('consumer', 'producer')]
+        for mcat in [k for k in producer_decision_and_response.keys() if 'consumer_abs_' in k]:
+            producer_decision_and_response[mcat] = producer_decision_and_response[mcat.replace('consumer', 'producer')]
 
     iteration_log.append(producer_decision_and_response)
 
