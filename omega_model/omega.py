@@ -88,7 +88,7 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
     else:
         if verbose:
             print('non-responsive: %s' % cross_subsidy_pair)
-        # do no search cross-subsidy options at this level of the tree
+            # do not search cross-subsidy options at this level of the tree
 
     for child in market_class_tree:
         if type(market_class_tree[child]) is dict:

@@ -371,6 +371,11 @@ class VehicleAggregation(OMEGABase):
                 MassScaling.calc_mass_terms(df, df['structure_material'], df['eng_rated_hp'],
                                             df['battery_kwh'], df['footprint_ft2'])
 
+            if omega_globals.options.vehicles_file_base_year is not None:
+                model_year_delta = omega_globals.options.vehicles_file_base_year - df['model_year']
+                df['prior_redesign_year'] += model_year_delta
+                df['model_year'] += model_year_delta
+
             for idx, row in df.iterrows():
                 # calc powertrain cost
                 veh = Vehicle()
@@ -435,10 +440,7 @@ class VehicleAggregation(OMEGABase):
             else:
                 agg_df['compliance_id'] = agg_df['manufacturer_id']
 
-            if omega_globals.options.vehicles_file_base_year is not None:
-                agg_df['model_year'] = omega_globals.options.vehicles_file_base_year
-            else:
-                agg_df['model_year'] = df['model_year'].iloc[0]
+            agg_df['model_year'] = df['model_year']
 
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
 
