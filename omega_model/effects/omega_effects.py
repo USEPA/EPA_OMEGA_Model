@@ -91,25 +91,24 @@ def run_effects_calcs():
     # calendar_years = np.unique(np.array(VehicleAnnualData.get_calendar_years()))
     calendar_years = [int(year) for year in calendar_years if year >= omega_globals.options.analysis_initial_year]
 
-    omega_log.logwrite('\nCalculating tech volumes and shares')
-    tech_tracking = TechTracking()
-    tech_tracking.create_dict(calendar_years)
-    tech_tracking_dict = tech_tracking._data
-    tech_tracking_df = pd.DataFrame()
-
-    tech_tracking_filename = f'{omega_globals.options.output_folder}' + \
-                             f'{omega_globals.options.session_unique_name}_tech_tracking.csv'
-
     LegacyFleet.build_legacy_fleet_for_analysis(calendar_years)
 
     # with legacy fleet built, adjust VMTs throughout
     vmt_adjustments = AdjustmentsVMT()
     vmt_adjustments.calc_vmt_adjustments(calendar_years)
 
+    tech_tracking_df = pd.DataFrame()
+
     if 'effects' in omega_globals.options.verbose_log_modules:
+        omega_log.logwrite('\nCalculating tech volumes and shares')
+        tech_tracking = TechTracking()
+        tech_tracking.create_dict(calendar_years)
+        tech_tracking_dict = tech_tracking._data
+
+        tech_tracking_filename = f'{omega_globals.options.output_folder}' + \
+                                 f'{omega_globals.options.session_unique_name}_tech_tracking.csv'
+
         tech_tracking_df = save_dict_to_csv(tech_tracking_dict, tech_tracking_filename, index=False)
-    else:
-        tech_tracking_df = pd.DataFrame.from_dict(tech_tracking_dict, orient='index')
 
     if 'Physical' in omega_globals.options.calc_effects:
         omega_log.logwrite('\nCalculating fuel cost per mile')
