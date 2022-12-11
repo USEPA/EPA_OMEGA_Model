@@ -337,7 +337,8 @@ def calc_legacy_fleet_safety_effects(calendar_years, vmt_adjustments):
     """
     from effects.legacy_fleet import LegacyFleet
 
-    mfr_id = name = 'legacy_fleet'
+    # mfr_id = name = 'legacy_fleet'
+    mfr_id = 'legacy_fleet'
 
     legacy_fleet_safety_effects_dict = dict()
     for key, nested_dict in LegacyFleet._legacy_fleet.items():
@@ -350,6 +351,8 @@ def calc_legacy_fleet_safety_effects(calendar_years, vmt_adjustments):
         fuel_id = nested_dict['in_use_fuel_id']
         registered_count = nested_dict['registered_count']
         age = nested_dict['age']
+
+        name = set_legacy_fleet_name(market_class_id)
 
         calendar_year_vmt_adj = vmt_adjustments.get_vmt_adjustment(calendar_year)
         vmt_adjusted = nested_dict['vmt'] * calendar_year_vmt_adj
@@ -420,3 +423,24 @@ def calc_legacy_fleet_safety_effects(calendar_years, vmt_adjustments):
         legacy_fleet_safety_effects_dict[key] = vehicle_safety_dict
 
     return legacy_fleet_safety_effects_dict
+
+
+def set_legacy_fleet_name(market_class_id):
+    """
+
+    Args:
+        market_class_id: the legacy fleet market class id
+
+    Returns:
+        A name for the vehicle primarily for use in cost_effects, repair cost calculations which looks for 'car' or 'Pickup' in the
+        name attribute
+
+    """
+    if market_class_id.__contains__('sedan'):
+        _name = 'car'
+    elif market_class_id.__contains__('pickup'):
+        _name = 'Pickup'
+    else:
+        _name = 'cuv_suv'
+
+    return _name
