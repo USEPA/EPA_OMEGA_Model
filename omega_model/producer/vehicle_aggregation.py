@@ -219,7 +219,7 @@ from omega_model import *
 # for now, eventually need to be inputs somewhere:
 # 'manufacturer_id' added if not consolidating manufacturers
 aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
-                       'cert_fuel_id', 'reg_class_id', 'drive_system',
+                       'cert_fuel_id', 'reg_class_id', 'drive_system', 'model_year',
                        'prior_redesign_year', 'redesign_interval', 'cost_curve_class', 'structure_material']
 
 
@@ -439,8 +439,6 @@ class VehicleAggregation(OMEGABase):
                 agg_df['compliance_id'] = 'consolidated_OEM'
             else:
                 agg_df['compliance_id'] = agg_df['manufacturer_id']
-
-            agg_df['model_year'] = df['model_year']
 
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
 
