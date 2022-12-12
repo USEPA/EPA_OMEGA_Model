@@ -345,19 +345,23 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                 else:
                                     # constrain shares that are at min or max cross subsidy, let the others float
                                     for nmc in node_market_classes:
-                                        multiplier = consumer_response['cost_multiplier_%s' % nmc]
-                                        if ((multiplier >= 0.99 * omega_globals.options.consumer_pricing_multiplier_max or multiplier <= 1.01 * omega_globals.options.consumer_pricing_multiplier_min) and consumer_response['max_share_delta_market_class'] == node_name) or \
-                                                (multiplier == 1.0 and consumer_response['consumer_constrained_%s' % node_name]):
+                                        if 'cost_multiplier_%s' % nmc in consumer_response:
+                                            multiplier = consumer_response['cost_multiplier_%s' % nmc]
+                                            if ((multiplier >= 0.99 * omega_globals.options.consumer_pricing_multiplier_max or multiplier <= 1.01 * omega_globals.options.consumer_pricing_multiplier_min) and consumer_response['max_share_delta_market_class'] == node_name) or \
+                                                    (multiplier == 1.0 and consumer_response['consumer_constrained_%s' % node_name]):
+                                                locked_consumer_shares = True
+                                                for k in min_constraints.keys():
+                                                    if '.ALT' in k:
+                                                        if 'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
+                                                            print('%50s, %.5f, %.5f, %.5f, %.5f' % (
+                                                            k, min_constraints[k], max_constraints[k],
+                                                            consumer_response[k] / node_abs_share,
+                                                            consumer_response[k.replace('producer', 'consumer')] / consumer_node_abs_share))
+                                                        min_constraints[k] = consumer_response[k.replace('producer', 'consumer')] / consumer_node_abs_share
+                                                        max_constraints[k] = min_constraints[k]
+                                        else:  # no cross-subsidy, non-full-line manufacturer, possible epsilon discrepancy
                                             locked_consumer_shares = True
-                                            for k in min_constraints.keys():
-                                                if '.ALT' in k:
-                                                    if 'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
-                                                        print('%50s, %.5f, %.5f, %.5f, %.5f' % (
-                                                        k, min_constraints[k], max_constraints[k],
-                                                        consumer_response[k] / node_abs_share,
-                                                        consumer_response[k.replace('producer', 'consumer')] / consumer_node_abs_share))
-                                                    min_constraints[k] = consumer_response[k.replace('producer', 'consumer')] / consumer_node_abs_share
-                                                    max_constraints[k] = min_constraints[k]
+                                            max_constraints = min_constraints
                         else:
                             # set up initial constraints for mandatory "NO_ALT" vehicle shares
                             # calculate RELATIVE share constraints for partition, even though the keys indicate absolute shares:
