@@ -493,10 +493,11 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
     max_error = 0
     for mcat in market_class_tree:
-        error = cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] / cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat]
-        if error > max_error:
-            max_error = error
-            cross_subsidy_options_and_response['max_share_delta_market_class'] = mcat
+        if 'abs_share_delta_%s' % mcat in cross_subsidy_options_and_response:
+            error = cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] / cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat]
+            if error > max_error:
+                max_error = error
+                cross_subsidy_options_and_response['max_share_delta_market_class'] = mcat
 
     duplicate_columns = set.intersection(set(producer_decision.index), set(cross_subsidy_options_and_response.index))
     producer_decision = producer_decision.drop(duplicate_columns)
