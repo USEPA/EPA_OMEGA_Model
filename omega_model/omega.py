@@ -299,7 +299,8 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
             if omega_globals.options.producer_shares_mode == 'auto':
                 # in order to hit the strategic offset we need to bypass the consumer a bit
-                omega_globals.producer_shares_mode = omega_globals.pass_num == 1
+                # omega_globals.producer_shares_mode = omega_globals.pass_num == 1
+                omega_globals.producer_shares_mode = False
             elif omega_globals.options.producer_shares_mode == True:
                 omega_globals.producer_shares_mode = True
 
