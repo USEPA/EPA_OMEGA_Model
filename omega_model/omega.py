@@ -493,6 +493,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                                                 iteration_log, node_name='', verbose=False)
 
     max_error = 0
+    cross_subsidy_options_and_response['max_share_delta_market_class'] = None
     for mcat in market_class_tree:
         if 'abs_share_delta_%s' % mcat in cross_subsidy_options_and_response:
             error = cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] / cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat]

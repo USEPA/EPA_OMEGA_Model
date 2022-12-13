@@ -347,7 +347,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                     for nmc in node_market_classes:
                                         if 'cost_multiplier_%s' % nmc in consumer_response:
                                             multiplier = consumer_response['cost_multiplier_%s' % nmc]
-                                            if ((multiplier >= 0.99 * omega_globals.options.consumer_pricing_multiplier_max or multiplier <= 1.01 * omega_globals.options.consumer_pricing_multiplier_min) and consumer_response['max_share_delta_market_class'] == node_name) or \
+                                            if ((multiplier >= 0.99 * omega_globals.options.consumer_pricing_multiplier_max or multiplier <= 1.01 * omega_globals.options.consumer_pricing_multiplier_min) and (consumer_response['max_share_delta_market_class'] == node_name or consumer_response['max_share_delta_market_class'] is None)) or \
                                                     (multiplier == 1.0 and consumer_response['consumer_constrained_%s' % node_name]):
                                                 locked_consumer_shares = True
                                                 for k in min_constraints.keys():
