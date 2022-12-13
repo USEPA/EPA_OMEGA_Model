@@ -305,9 +305,9 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                 omega_globals.producer_shares_mode = True
 
             while iterate_producer_consumer:
-                omega_log.logwrite("Running %s:  Year=%s  Iteration=%s" %
+                omega_log.logwrite("Running %s:  Year=%s  Iteration=%s %s" %
                                    (omega_globals.options.session_unique_name, calendar_year,
-                                    producer_consumer_iteration_num),
+                                    producer_consumer_iteration_num, compliance_id),
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, pre_production_vehicles, producer_decision, market_class_tree, \
