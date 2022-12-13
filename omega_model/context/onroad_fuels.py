@@ -154,7 +154,7 @@ class OnroadFuel(OMEGABase):
 
         if not template_errors:
             OnroadFuel._data = df.set_index(['fuel_id', 'start_year']).to_dict(orient='index')
-            OnroadFuel._data.update(df[['start_year', 'fuel_id']].set_index('fuel_id').to_dict(orient='dict'))
+            OnroadFuel._data.update(df[['start_year', 'fuel_id']].set_index('fuel_id').to_dict(orient='series'))
             OnroadFuel.fuel_ids = df['fuel_id'].unique()
 
         return template_errors
