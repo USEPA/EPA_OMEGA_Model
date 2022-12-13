@@ -304,9 +304,9 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                 omega_globals.producer_shares_mode = True
 
             while iterate_producer_consumer:
-                omega_log.logwrite("Running %s:  Year=%s  Iteration=%s" %
+                omega_log.logwrite("Running %s:  Year=%s  Iteration=%s %s" %
                                    (omega_globals.options.session_unique_name, calendar_year,
-                                    producer_consumer_iteration_num),
+                                    producer_consumer_iteration_num, compliance_id),
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, pre_production_vehicles, producer_decision, market_class_tree, \
@@ -492,6 +492,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                                                 iteration_log, node_name='', verbose=False)
 
     max_error = 0
+    cross_subsidy_options_and_response['max_share_delta_market_class'] = None
     for mcat in market_class_tree:
         if 'abs_share_delta_%s' % mcat in cross_subsidy_options_and_response:
             error = cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] / cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat]
