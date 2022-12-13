@@ -102,7 +102,7 @@ class FuelPrice(OMEGABase):
             if omega_globals.options.flat_context:
                 calendar_year = omega_globals.options.flat_context_year
             else:
-                calendar_year = max(calendar_year, FuelPrice._data['min_calendar_year'])
+                calendar_year = max(FuelPrice._data['min_calendar_year'], min(calendar_year, FuelPrice._data['max_calendar_year']))
 
             if type(price_types) is not list:
                 price_types = [price_types]
@@ -186,6 +186,7 @@ class FuelPrice(OMEGABase):
                 FuelPrice._data = df.set_index(['context_id', 'case_id', 'fuel_id', 'calendar_year']).sort_index()\
                     .to_dict(orient='index')
                 FuelPrice._data['min_calendar_year'] = df['calendar_year'].min()
+                FuelPrice._data['max_calendar_year'] = df['calendar_year'].max()
 
         return template_errors
 
