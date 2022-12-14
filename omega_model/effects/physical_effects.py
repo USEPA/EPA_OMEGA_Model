@@ -467,7 +467,7 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                                 formaldehyde_exh_ustons += formaldehyde_exh_rate * factor
                                 naphthalene_exh_ustons += naphthalene_exh_rate * factor
                                 butadiene13_exh_ustons += butadiene13_exh_rate * factor
-                                pah15_exh_ustons += pm25_exh_rate * factor
+                                pah15_exh_ustons += pah15_exh_rate * factor
 
                                 factor = fuel_consumption_gallons / grams_per_us_ton
                                 sox_exh_ustons += sox_exh_rate * factor
@@ -961,7 +961,7 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
         formaldehyde_exh_ustons += formaldehyde_exh_rate * factor
         naphthalene_exh_ustons += naphthalene_exh_rate * factor
         butadiene13_exh_ustons += butadiene13_exh_rate * factor
-        pah15_exh_ustons += pm25_exh_rate * factor
+        pah15_exh_ustons += pah15_exh_rate * factor
 
         factor = fuel_consumption_gallons / grams_per_us_ton
         sox_exh_ustons += sox_exh_rate * factor
