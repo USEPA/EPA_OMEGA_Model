@@ -1798,11 +1798,11 @@ if __name__ == '__main__':
                                 session_summary_dfs.append(pd.read_csv(sf))
 
                             batch_summary_df = pd.concat(session_summary_dfs, ignore_index=True, sort=False)
-                            batch_summary_filename = args.collate_bundle + file_suffix
+                            batch_summary_filename = get_filename(args.collate_bundle) + file_suffix
 
                             os.chdir(args.collate_bundle)
                             batch_summary_df.to_csv(batch_summary_filename, index=False)
-                            print('Collated to %s\n' % batch_summary_filename)
+                            print('Collated to %s\n' % (args.collate_bundle + os.sep + batch_summary_filename))
                         else:
                             print('Found 0 files ending with %s:\n' % file_suffix)
 
