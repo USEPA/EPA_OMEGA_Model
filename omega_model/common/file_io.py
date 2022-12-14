@@ -123,6 +123,20 @@ def get_filepathname(filename):
     return os.path.splitext(filename)[0]
 
 
+def get_absolute_path(filename):
+    """
+    Get the full, absolute path of filename
+
+    Args:
+        filename (str): name of file available on the current path
+
+    Returns:
+        The full, absolute path of filename
+
+    """
+    return os.path.abspath(filename)
+
+
 def get_basename(filename):
     return os.path.basename(filename)
 
