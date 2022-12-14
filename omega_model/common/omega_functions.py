@@ -362,6 +362,19 @@ def print_dict(dict_in, num_tabs=0, to_string=False):
         return s
 
 
+def print_list(list_in):
+    """
+    Print the given list, one line per item
+
+    Args:
+        list_in (list): the list to print
+
+    """
+    for i in list_in:
+        print(i)
+    print()
+
+
 def linspace(min, max, num_values):
     """
     Create a list of num_values evenly spaced values between min and max.  Based on ``Matlab`` linspace command.
