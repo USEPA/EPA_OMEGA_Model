@@ -1489,7 +1489,11 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
             (calendar_year in omega_globals.options.log_producer_compliance_search_years):
         if 'producer_compliance_search' in omega_globals.options.verbose_log_modules:
             # log (some or all) production options cloud and tag selected points
-            production_options.loc[candidate_production_decisions.index, 'candidate_production_option'] = True
+            try:
+                production_options.loc[candidate_production_decisions.index, 'candidate_production_option'] = True
+            except:
+                # candidate may be from a prior iteration, index may not be available
+                pass
             if omega_globals.options.slice_tech_combo_cloud_tables:
                 production_options = production_options[production_options['strategic_compliance_ratio'].values <= 1.2]
             producer_iteration_log.write(production_options)
