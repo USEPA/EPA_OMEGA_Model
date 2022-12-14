@@ -1775,8 +1775,10 @@ if __name__ == '__main__':
         try:
             if args.collate_bundle:
                 print('\nCollating %s...\n' % args.collate_bundle)
-                if file_exists(args.collate_bundle):
+                if file_exists(get_absolute_path(args.collate_bundle)):
                     import pandas as pd
+
+                    args.collate_bundle = get_absolute_path(args.collate_bundle)
 
                     os.chdir(args.collate_bundle)
                     dirs = [get_absolute_path(d) for d in os.listdir() if os.path.isdir(d)]
@@ -1796,12 +1798,13 @@ if __name__ == '__main__':
                                 session_summary_dfs.append(pd.read_csv(sf))
 
                             batch_summary_df = pd.concat(session_summary_dfs, ignore_index=True, sort=False)
-                            batch_summary_filename = get_filename(args.collate_bundle) + file_suffix
+                            batch_summary_filename = args.collate_bundle + file_suffix
 
                             os.chdir(args.collate_bundle)
                             batch_summary_df.to_csv(batch_summary_filename, index=False)
+                            print('Collated to %s\n' % batch_summary_filename)
                         else:
-                            print('Found 0 files ending with %s:' % file_suffix)
+                            print('Found 0 files ending with %s:\n' % file_suffix)
 
                 else:
                     raise Exception('Unable to locate folder "%s"' % args.collate_bundle)
