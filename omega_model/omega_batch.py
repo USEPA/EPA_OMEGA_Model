@@ -465,7 +465,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from common.omega_types import OMEGABase
 from omega_model import OMEGASessionSettings
-from common.file_io import validate_file, relocate_file, get_filenameext
+from common.file_io import *
+from omega_model.common.omega_functions import print_list
 
 bundle_input_folder_name = 'in'
 bundle_output_folder_name = OMEGASessionSettings().output_folder
@@ -1761,6 +1762,8 @@ if __name__ == '__main__':
     parser.add_argument('--dispy_exclusive', action='store_true', help='Run exclusive job, do not share dispynodes')
     parser.add_argument('--dispy_scheduler', type=str, help='Override default dispy scheduler IP address',
                         default=None)
+    parser.add_argument('--collate_bundle', type=str, help='Find and collate summary files in the given bundle folder',
+                        default=None)
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--local', action='store_true', help='Run only on local machine, no network nodes')
@@ -1770,7 +1773,41 @@ if __name__ == '__main__':
         args = parser.parse_args()
 
         try:
-            run_omega_batch(no_validate=args.no_validate, no_sim=args.no_sim, bundle_path=args.bundle_path,
+            if args.collate_bundle:
+                print('\nCollating %s...\n' % args.collate_bundle)
+                if file_exists(args.collate_bundle):
+                    import pandas as pd
+
+                    os.chdir(args.collate_bundle)
+                    dirs = [get_absolute_path(d) for d in os.listdir() if os.path.isdir(d)]
+                    subdirs = [get_absolute_path(d) + os.sep + 'out' + os.sep for d in dirs if 'out' in os.listdir(d)]
+
+                    for file_suffix in ['_summary_results.csv', '_physical_effects_annual.csv',
+                                        '_cost_effects_annual_present_and_annualized.csv']:
+                        summary_files = []
+                        for sd in subdirs:
+                            os.chdir(sd)
+                            summary_files += [get_absolute_path(f) for f in os.listdir(sd) if f.endswith(file_suffix)]
+                        if summary_files:
+                            print('Found %d files ending with %s:' % (len(summary_files), file_suffix))
+                            print_list(summary_files)
+                            session_summary_dfs = []
+                            for sf in summary_files:
+                                session_summary_dfs.append(pd.read_csv(sf))
+
+                            batch_summary_df = pd.concat(session_summary_dfs, ignore_index=True, sort=False)
+                            batch_summary_filename = get_filename(args.collate_bundle) + file_suffix
+
+                            os.chdir(args.collate_bundle)
+                            batch_summary_df.to_csv(batch_summary_filename, index=False)
+                        else:
+                            print('Found 0 files ending with %s:' % file_suffix)
+
+                else:
+                    raise Exception('Unable to locate folder "%s"' % args.collate_bundle)
+
+            else:
+                run_omega_batch(no_validate=args.no_validate, no_sim=args.no_sim, bundle_path=args.bundle_path,
                             no_bundle=args.no_bundle, batch_file=args.batch_file, session_num=args.session_num,
                             verbose=args.verbose, timestamp=args.timestamp, show_figures=args.show_figures,
                             dispy=args.dispy, dispy_ping=args.dispy_ping, dispy_debug=args.dispy_debug,
