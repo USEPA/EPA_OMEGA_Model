@@ -726,8 +726,9 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
             if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
                 omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,
-                                                  search_iteration)).ljust(12) + 'SR:%f CR:%.10f' % (share_range,
-                                        most_strategic_production_decision['strategic_compliance_ratio']))
+                                                  search_iteration)).ljust(12) + 'SR:%f CR:%.10f BCR:%.10f' % (share_range,
+                                        most_strategic_production_decision['strategic_compliance_ratio'],
+                                        best_candidate_production_decision['strategic_compliance_ratio']))
 
             search_iteration += 1
 
