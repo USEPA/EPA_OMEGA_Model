@@ -1377,8 +1377,19 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         else:
             cloud_slope = 1
 
-    compliant_tech_share_options = mini_df[mini_df['total_credits_with_offset_co2e_megagrams'].values >= 0].copy()
-    non_compliant_tech_share_options = mini_df[mini_df['total_credits_with_offset_co2e_megagrams'].values < 0].copy()
+    compliant_points = mini_df['total_credits_with_offset_co2e_megagrams'].values >= 0
+    non_compliant_points = mini_df['total_credits_with_offset_co2e_megagrams'].values < 0
+
+    allowed_voc_points = \
+        (mini_df['strategic_compliance_ratio'].values >=
+         omega_globals.options.producer_voluntary_overcompliance_min_strategic_compliance_ratio)
+
+    if omega_globals.options.producer_voluntary_overcompliance and any(allowed_voc_points):
+        compliant_tech_share_options = mini_df[compliant_points & allowed_voc_points].copy()
+    else:
+        compliant_tech_share_options = mini_df[compliant_points].copy()
+
+    non_compliant_tech_share_options = mini_df[non_compliant_points].copy()
 
     non_compliant_tech_share_options = cull_non_compliant_points(non_compliant_tech_share_options,
                                                                  prior_most_strategic_non_compliant_tech_share_option)

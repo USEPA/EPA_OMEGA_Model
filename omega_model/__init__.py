@@ -197,7 +197,8 @@ try:
             self.iterate_producer_consumer = True
 
             self.producer_voluntary_overcompliance = False
-            self.producer_voluntary_overcompliance_min_benefit_frac = 1.0  # minimum benefit of overcompliance, as a fraction of compliance cost
+            self.producer_voluntary_overcompliance_min_benefit_frac = 0.0  # minimum benefit of overcompliance, as a fraction of compliance cost
+            self.producer_voluntary_overcompliance_min_strategic_compliance_ratio = 0.95
             self.producer_price_modification_scaler = 1.0
             self.producer_consumer_max_iterations = 5  # recommend 2+
             self.producer_consumer_convergence_tolerance = 5e-4
@@ -219,7 +220,7 @@ try:
             self.manufacturer_gigawatthour_data = None
 
             # list of modules to allow verbose log files, or empty to disable:
-            self.verbose_log_modules = ['database_', 'producer_compliance_search_', 'cross_subsidy_search_',
+            self.verbose_log_modules = ['database_', 'producer_compliance_search', 'cross_subsidy_search_',
                                         'cv_cost_curves_', 'v_cost_curves_', 'v_cost_clouds_', 'v_cloud_plots_',
                                         'effects_']
 
@@ -232,7 +233,7 @@ try:
             self.verbose_postproc = ['iteration_']
 
             self.log_vehicle_cloud_years = []  # = 'all' or list of years to log, empty list to disable logging
-            self.log_producer_compliance_search_years = []  # = 'all' or list of years to log, empty list to disable logging
+            self.log_producer_compliance_search_years = [2029]  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging
 
