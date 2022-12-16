@@ -197,7 +197,7 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
             OffCycleCredits._data = df.set_index(['credit_name', 'start_year']).to_dict(orient='index')
             # add 'start_year' key which returns start years by credit name
             OffCycleCredits._data.update(
-                df[['credit_name', 'start_year']].set_index('credit_name').to_dict(orient='dict'))
+                df[['credit_name', 'start_year']].set_index('credit_name').to_dict(orient='series'))
 
         return template_errors
 

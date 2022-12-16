@@ -220,6 +220,7 @@ from omega_model import *
 # 'manufacturer_id' added if not consolidating manufacturers
 aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
                        'cert_fuel_id', 'reg_class_id', 'drive_system', 'dual_rear_wheel',
+                       'cert_fuel_id', 'reg_class_id', 'drive_system', 'model_year',
                        'prior_redesign_year', 'redesign_interval', 'cost_curve_class', 'structure_material']
 
 
@@ -374,6 +375,11 @@ class VehicleAggregation(OMEGABase):
                                             df['battery_kwh'], df['footprint_ft2'])
             df.insert(len(df.columns), 'workfactor', 0)
 
+            if omega_globals.options.vehicles_file_base_year is not None:
+                model_year_delta = omega_globals.options.vehicles_file_base_year - df['model_year']
+                df['prior_redesign_year'] += model_year_delta
+                df['model_year'] += model_year_delta
+
             for idx, row in df.iterrows():
                 # calc powertrain cost
                 veh = Vehicle()
@@ -447,11 +453,6 @@ class VehicleAggregation(OMEGABase):
                 agg_df['compliance_id'] = 'consolidated_OEM'
             else:
                 agg_df['compliance_id'] = agg_df['manufacturer_id']
-
-            if omega_globals.options.vehicles_file_base_year is not None:
-                agg_df['model_year'] = omega_globals.options.vehicles_file_base_year
-            else:
-                agg_df['model_year'] = df['model_year'].iloc[0]
 
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
 

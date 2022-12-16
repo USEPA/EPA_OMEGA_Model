@@ -94,6 +94,7 @@ try:
             self.prerun_context_folder = ''
             self.credit_market_efficiency = 1.0
             self.consolidate_manufacturers = None
+            self.force_two_pass = False
             self.include_manufacturers_list = 'all'
             self.exclude_manufacturers_list = 'none'
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
@@ -155,8 +156,8 @@ try:
             self.new_vehicle_price_elasticity_of_demand = -0.4
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
-            self.calc_effects = 'Physical and Costs' # options are 'No', 'Physical' and 'Physical and Costs' as strings
-            self.analysis_dollar_basis = 2020 # Note that the implicit_price_deflator.csv input file must contain data for this entry.
+            self.calc_effects = 'Physical and Costs'  # options are 'No', 'Physical' and 'Physical and Costs' as strings
+            self.analysis_dollar_basis = 2020  # Note that the implicit_price_deflator.csv input file must contain data for this entry.
             self.discount_values_to_year = 2021
             self.cost_accrual = 'end-of-year'  # end-of-year means costs accrue at year's end; beginning-of-year means cost accrue at year's beginning
             self.allow_ice_of_bev = False
@@ -196,7 +197,10 @@ try:
             self.verbose = False
             self.iterate_producer_consumer = True
 
-            self.producer_consumer_max_iterations = 20  # recommend 2+
+            self.producer_voluntary_overcompliance = False
+            self.producer_voluntary_overcompliance_min_benefit_frac = 1.0  # minimum benefit of overcompliance, as a fraction of compliance cost
+            self.producer_price_modification_scaler = 1.0
+            self.producer_consumer_max_iterations = 5  # recommend 2+
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
             self.producer_compliance_search_convergence_factor = 0.9
@@ -207,17 +211,23 @@ try:
             self.flat_context = False
             self.flat_context_year = 2021
 
-            self.battery_GWh_limit_years = [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040]
-            self.battery_GWh_limit = {"consolidated_OEM": [30, 48, 79, 134, 159, 190, 250, 356, 502, 651, 792, 936, 1080, 1224, 1364, 1500, 1500, 1500, 1500, 1500, 1500]}
+            self.battery_GWh_limit_years = [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031,
+                                            2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040]
+
+            self.battery_GWh_limit = [30, 48, 79, 134, 159, 190, 250, 356, 502, 651, 792, 936, 1080, 1224, 1364, 1500,
+                                      1500, 1500, 1500, 1500, 1500]
+
+            self.manufacturer_gigawatthour_data = None
 
             # list of modules to allow verbose log files, or empty to disable:
             self.verbose_log_modules = ['database_', 'producer_compliance_search_', 'cross_subsidy_search_',
-                                        'cv_cost_curves_', 'v_cost_curves_', 'v_cost_clouds_', 'v_cloud_plots_']
+                                        'cv_cost_curves_', 'v_cost_curves_', 'v_cost_clouds_', 'v_cloud_plots_',
+                                        'effects_']
 
             # list of modules to allow verbose console output, or empty to disable
             self.verbose_console_modules = ['producer_compliance_search_',
-                                            'p-c_shares_and_costs_', 'p-c_max_iterations_',
-                                            'cross_subsidy_search_', 'cross_subsidy_multipliers_',
+                                            'p-c_shares_and_costs', 'p-c_max_iterations_',
+                                            'cross_subsidy_search_', 'cross_subsidy_multipliers',
                                             'cross_subsidy_convergence_']
 
             self.verbose_postproc = ['iteration_']
@@ -240,6 +250,10 @@ try:
             self.ProducerGeneralizedCost = None
             self.MarketClass = None
             self.CostCoud = None
+
+            self.notification_destination = None
+            self.notification_email = None
+            self.notification_password = None
 
 except:
     print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

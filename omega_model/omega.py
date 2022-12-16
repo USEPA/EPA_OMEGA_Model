@@ -88,7 +88,7 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
     else:
         if verbose:
             print('non-responsive: %s' % cross_subsidy_pair)
-        # do no search cross-subsidy options at this level of the tree
+            # do not search cross-subsidy options at this level of the tree
 
     for child in market_class_tree:
         if type(market_class_tree[child]) is dict:
@@ -161,6 +161,17 @@ def logwrite_shares_and_costs(calendar_year, producer_market_classes, share_conv
                 producer_decision_and_response['average_cross_subsidized_price_%s' % mc],
                 producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc],
                 producer_decision_and_response['average_cross_subsidized_price_%s' % mc] /
+                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc]
+            ))
+
+    omega_log.logwrite('')
+
+    for mc in sorted(producer_market_classes):
+        omega_log.logwrite(
+            ('modified cross subsidized price / cost %s' % mc).ljust(59) + '$%d / $%d R:%f' % (
+                producer_decision_and_response['average_modified_cross_subsidized_price_%s' % mc],
+                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc],
+                producer_decision_and_response['average_modified_cross_subsidized_price_%s' % mc] /
                 producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc]
             ))
 
@@ -274,7 +285,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                 strategic_target_offset_Mg = 0
                 current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
                 for c in current_debits:
-                    strategic_target_offset_Mg += c.remaining_balance_Mg
+                    strategic_target_offset_Mg += c.remaining_balance_Mg * (1 / max(1, c.remaining_years-1))
             else:
                 strategic_target_offset_Mg = \
                     manufacturer_annual_data_table[(manufacturer_annual_data_table['compliance_id'] == compliance_id) &
@@ -288,14 +299,15 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
             if omega_globals.options.producer_shares_mode == 'auto':
                 # in order to hit the strategic offset we need to bypass the consumer a bit
-                omega_globals.producer_shares_mode = omega_globals.pass_num == 1
+                # omega_globals.producer_shares_mode = omega_globals.pass_num == 1
+                omega_globals.producer_shares_mode = False
             elif omega_globals.options.producer_shares_mode == True:
                 omega_globals.producer_shares_mode = True
 
             while iterate_producer_consumer:
-                omega_log.logwrite("Running %s:  Year=%s  Iteration=%s" %
+                omega_log.logwrite("Running %s:  Year=%s  Iteration=%s %s" %
                                    (omega_globals.options.session_unique_name, calendar_year,
-                                    producer_consumer_iteration_num),
+                                    producer_consumer_iteration_num, compliance_id),
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, pre_production_vehicles, producer_decision, market_class_tree, \
@@ -480,6 +492,15 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                                                 cross_subsidy_options_and_response, producer_consumer_iteration_num,
                                                 iteration_log, node_name='', verbose=False)
 
+    max_error = 0
+    cross_subsidy_options_and_response['max_share_delta_market_class'] = None
+    for mcat in market_class_tree:
+        if 'abs_share_delta_%s' % mcat in cross_subsidy_options_and_response:
+            error = cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] / cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat]
+            if error > max_error:
+                max_error = error
+                cross_subsidy_options_and_response['max_share_delta_market_class'] = mcat
+
     duplicate_columns = set.intersection(set(producer_decision.index), set(cross_subsidy_options_and_response.index))
     producer_decision = producer_decision.drop(duplicate_columns)
     producer_decision_and_response = pd.concat([producer_decision, cross_subsidy_options_and_response])
@@ -522,8 +543,8 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
     if omega_globals.producer_shares_mode:
         # force consumer shares from producer shares, after having logged raw results above
-        for k in [k for k in producer_decision_and_response.keys() if 'consumer_abs_' in k]:
-            producer_decision_and_response[k] = producer_decision_and_response[k.replace('consumer', 'producer')]
+        for mcat in [k for k in producer_decision_and_response.keys() if 'consumer_abs_' in k]:
+            producer_decision_and_response[mcat] = producer_decision_and_response[mcat.replace('consumer', 'producer')]
 
     iteration_log.append(producer_decision_and_response)
 
@@ -596,7 +617,7 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pai
 
         calc_cross_subsidy_metrics(mcat, cross_subsidy_pair, producer_decision, cross_subsidy_options_and_response)
 
-        price_weight = 0.925
+        price_weight = 1-0.925
 
         # calculate score, weighted distance to the origin
         cross_subsidy_options_and_response['pricing_score'] = \
@@ -638,6 +659,10 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pai
         iteration_log.append(cross_subsidy_options_and_response)
 
         continue_search = continue_search and not mcat_converged
+
+    if cross_subsidy_options_and_response['consumer_constrained_%s' % mcat] and \
+        'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
+            omega_log.logwrite('### consumer %s shares constrained ###' % mcat)
 
     update_cross_subsidy_pair_console_log(cross_subsidy_pair, share_convergence_error, cross_subsidy_pricing_error,
                                           mcat_converged)
@@ -1600,13 +1625,13 @@ def run_omega(session_runtime_options, standalone_run=False):
     session_runtime_options.standalone_run = standalone_run
     session_runtime_options.multiprocessing = True or session_runtime_options.multiprocessing and not standalone_run
 
-    if session_runtime_options.session_is_reference or 0.0 < session_runtime_options.credit_market_efficiency <= 1.0:
-        # imperfect trading and/or reference session
+    if 0.0 < session_runtime_options.credit_market_efficiency < 1.0 or session_runtime_options.force_two_pass:
+        # imperfect trading or force two-pass
         consolidate = [True, False]
-    # elif session_runtime_options.credit_market_efficiency == 1.0:
-    #    # perfect trading
-    #    consolidate = [True]
-    else:  # session_runtime_options.credit_market_efficiency == 0.0:
+    elif session_runtime_options.credit_market_efficiency == 1.0:
+        # perfect trading
+        consolidate = [True]
+    else:
         # no trading
         consolidate = [False]
 
@@ -1616,9 +1641,16 @@ def run_omega(session_runtime_options, standalone_run=False):
 
     init_fail = None
 
+    if session_runtime_options.notification_destination and session_runtime_options.notification_email \
+            and session_runtime_options.notification_password:
+        send_text(session_runtime_options.notification_destination,
+                  'Starting %s...' % session_runtime_options.session_unique_name,
+                  session_runtime_options.notification_email, session_runtime_options.notification_password)
+
     try:
 
         manufacturer_annual_data_table = None
+        manufacturer_gigawatthour_data = None
 
         for omega_globals.pass_num in range(len(consolidate)):
 
@@ -1654,6 +1686,8 @@ def run_omega(session_runtime_options, standalone_run=False):
             output_folders.append(omega_globals.options.output_folder)
 
             omega_globals.options.database_dump_folder = omega_globals.options.output_folder + '__dump' + os.sep
+
+            omega_globals.options.manufacturer_gigawatthour_data = manufacturer_gigawatthour_data
 
             if not init_fail:
                 if omega_globals.options.multiprocessing:
@@ -1691,8 +1725,21 @@ def run_omega(session_runtime_options, standalone_run=False):
                 iteration_log, credit_banks = \
                     run_producer_consumer(omega_globals.pass_num, manufacturer_annual_data_table)
 
+                if omega_globals.options.notification_destination and omega_globals.options.notification_email \
+                        and omega_globals.options.notification_password:
+                    send_text(omega_globals.options.notification_destination,
+                              '%s Pass %d Starting Post-processing...' % (
+                              omega_globals.options.session_unique_name, omega_globals.pass_num),
+                              omega_globals.options.notification_email, omega_globals.options.notification_password)
+
                 # postproc session
-                manufacturer_annual_data_table = postproc_session.run_postproc(iteration_log, credit_banks)
+                manufacturer_annual_data_table, manufacturer_gigawatthour_data = \
+                    postproc_session.run_postproc(iteration_log, credit_banks)
+
+                pd.DataFrame.from_dict(manufacturer_gigawatthour_data).to_csv(
+                    '%s/manufacturer_gigawatthour_data_%d.csv' % (omega_globals.options.output_folder_base,
+                                                                  omega_globals.options.consolidate_manufacturers))
+
                 manufacturer_annual_data_table['strategic_offset'] = \
                     omega_globals.options.credit_market_efficiency * \
                     (manufacturer_annual_data_table['calendar_year_cert_co2e_megagrams'] - \
@@ -1753,6 +1800,12 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             if omega_globals.options.run_profiler:
                 os.system('snakeviz omega_profile.dmp')
+
+            if omega_globals.options.notification_destination and omega_globals.options.notification_email \
+                and omega_globals.options.notification_password:
+                send_text(omega_globals.options.notification_destination,
+                          '%s Pass %d Complete' % (omega_globals.options.session_unique_name, omega_globals.pass_num),
+                           omega_globals.options.notification_email, omega_globals.options.notification_password)
 
         # move appropriate outputs to base output folder
         file_io.move_folder_contents('%s%sconsolidate_%d' % (omega_globals.options.output_folder_base, os.sep,

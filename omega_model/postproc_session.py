@@ -8,6 +8,8 @@ post-compliance-modeling output generation (charts, summary files, etc)
 **CODE**
 
 """
+import numpy as np
+
 import effects.omega_effects
 from omega_model import *
 from common.omega_plot import *
@@ -133,13 +135,28 @@ def run_postproc(iteration_log, credit_banks):
     else:
         compliance_ids = VehicleFinal.compliance_ids
 
+    total_calendar_year_cert_co2e_Mg = np.zeros_like(analysis_years, dtype='float')
+    total_model_year_cert_co2e_Mg = np.zeros_like(analysis_years, dtype='float')
+    total_target_co2e_Mg = np.zeros_like(analysis_years, dtype='float')
     for compliance_id in compliance_ids:
         calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg, target_co2e_Mg = \
             plot_manufacturer_compliance(analysis_years, compliance_id, credit_banks[compliance_id])
 
+        total_calendar_year_cert_co2e_Mg += calendar_year_cert_co2e_Mg
+        total_model_year_cert_co2e_Mg += model_year_cert_co2e_Mg
+        total_target_co2e_Mg += target_co2e_Mg
+
         session_results['%s_target_co2e_Mg' % compliance_id] = target_co2e_Mg
         session_results['%s_calendar_year_cert_co2e_Mg' % compliance_id] = calendar_year_cert_co2e_Mg
         session_results['%s_model_year_cert_co2e_Mg' % compliance_id] = model_year_cert_co2e_Mg
+
+    if not omega_globals.options.consolidate_manufacturers:
+        ax1, fig = plot_compliance(analysis_years, total_target_co2e_Mg, total_calendar_year_cert_co2e_Mg,
+                        total_model_year_cert_co2e_Mg)
+        label_xyt(ax1, 'Year', 'CO2e [Mg]', 'Total %s\nCert and Compliance Versus Year' %
+                  omega_globals.options.session_unique_name)
+        fig.savefig(omega_globals.options.output_folder + '%s ALL Cert Mg v Year.png' %
+                    omega_globals.options.session_unique_name)
 
     for compliance_id in VehicleFinal.compliance_ids:
 
@@ -219,7 +236,7 @@ def run_postproc(iteration_log, credit_banks):
 
     session_results.to_csv(summary_filename, index=False)
 
-    return manufacturer_annual_data_table # , mfr_gigawatthour_data
+    return manufacturer_annual_data_table, mfr_gigawatthour_data
 
 
 def plot_effects(calendar_years, physical_effects_df):
@@ -969,7 +986,7 @@ def plot_vehicle_GWh(calendar_years, manufacturer_id=None):
         ax1.set_xlim(ax1.get_xlim())
         ax1.set_ylim(ax1.get_ylim())
         ax1.plot(omega_globals.options.battery_GWh_limit_years,
-                 omega_globals.options.battery_GWh_limit['consolidated_OEM'], 'r.-')
+                 omega_globals.options.battery_GWh_limit, 'r.-')
         ax1.legend(market_categories + ['total_GWh', 'limit'])
         label_xyt(ax1, 'Year', 'GWh',
                   '%s\nVehicle GWh by Market Category v Year' % omega_globals.options.session_unique_name)
@@ -987,7 +1004,7 @@ def plot_vehicle_GWh(calendar_years, manufacturer_id=None):
         ax1.set_xlim(ax1.get_xlim())
         ax1.set_ylim(ax1.get_ylim())
         ax1.plot(omega_globals.options.battery_GWh_limit_years,
-                 omega_globals.options.battery_GWh_limit['consolidated_OEM'], 'r.-')
+                 omega_globals.options.battery_GWh_limit, 'r.-')
         label_xyt(ax1, 'Year', 'GWh]',
                   '%s\nVehicle GWh  by Market Class v Year' % omega_globals.options.session_unique_name)
         ax1.legend(market_classes + ['total_GWh', 'limit'])
@@ -1335,10 +1352,7 @@ def plot_manufacturer_compliance(calendar_years, compliance_id, credit_history):
     model_year_cert_co2e_Mg = ManufacturerAnnualData.get_model_year_cert_co2e_Mg(compliance_id)
     total_cost_billions = ManufacturerAnnualData.get_total_cost_billions(compliance_id)
     # compliance chart
-    fig, ax1 = fplothg(calendar_years, target_co2e_Mg, 'o-', reuse_figure=omega_globals.options.auto_close_figures)
-    ax1.plot(calendar_years, calendar_year_cert_co2e_Mg, 'r.-')
-    ax1.plot(calendar_years, model_year_cert_co2e_Mg, '-')
-    ax1.legend(['target_co2e_Mg', 'calendar_year_cert_co2e_Mg', 'model_year_cert_co2e_Mg'])
+    ax1, fig = plot_compliance(calendar_years, target_co2e_Mg, calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg)
     label_xyt(ax1, 'Year', 'CO2e [Mg]', '%s %s\nCert and Compliance Versus Year\n Total Cost $%.2f Billion' % (
         compliance_id, omega_globals.options.session_unique_name, total_cost_billions))
 
@@ -1348,28 +1362,39 @@ def plot_manufacturer_compliance(calendar_years, compliance_id, credit_history):
 
     if credit_history is not None:
         for _, t in credit_history.transaction_log.iterrows():
-            if type(t.credit_destination) is not str and t.model_year in calendar_year_cert_co2e_Mg_dict:
-                draw_transfer_arrow(t.model_year, calendar_year_cert_co2e_Mg_dict[t.model_year],
+            try:
+                if type(t.credit_destination) is not str and t.model_year in calendar_year_cert_co2e_Mg_dict:
+                    draw_transfer_arrow(t.model_year, calendar_year_cert_co2e_Mg_dict[t.model_year],
                                     t.credit_destination, target_co2e_Mg_dict[t.credit_destination])
-            elif type(t.credit_destination) is not str and t.model_year not in calendar_year_cert_co2e_Mg_dict:
-                ax1.plot(t.model_year, target_co2e_Mg_dict[calendar_years[0]], 'o', color='orange')
-                draw_transfer_arrow(t.model_year, target_co2e_Mg_dict[calendar_years[0]],
-                                    t.credit_destination, model_year_cert_co2e_Mg_dict[t.credit_destination])
-                ax1.set_xlim(calendar_years[0] - 5, ax1.get_xlim()[1])
-            elif t.credit_destination == 'EXPIRATION' and t.model_year in calendar_year_cert_co2e_Mg_dict:
-                draw_expiration_arrow(t.model_year, calendar_year_cert_co2e_Mg_dict[t.model_year])
-            elif t.credit_destination == 'EXPIRATION' and t.model_year not in calendar_year_cert_co2e_Mg_dict:
-                ax1.plot(t.model_year, target_co2e_Mg_dict[calendar_years[0]], 'o', color='orange')
-                draw_expiration_arrow(t.model_year, target_co2e_Mg_dict[calendar_years[0]])
-            else:  # "PAST_DUE"
-                ax1.plot(t.model_year, calendar_year_cert_co2e_Mg_dict[t.model_year], 'x', color='red')
-                plt.scatter(t.model_year, calendar_year_cert_co2e_Mg_dict[t.model_year], s=80, facecolors='none',
-                            edgecolors='r')
+                elif type(t.credit_destination) is not str and t.model_year not in calendar_year_cert_co2e_Mg_dict:
+                    ax1.plot(t.model_year, target_co2e_Mg_dict[calendar_years[0]], 'o', color='orange')
+                    draw_transfer_arrow(t.model_year, target_co2e_Mg_dict[calendar_years[0]],
+                                        t.credit_destination, model_year_cert_co2e_Mg_dict[t.credit_destination])
+                    ax1.set_xlim(calendar_years[0] - 5, ax1.get_xlim()[1])
+                elif t.credit_destination == 'EXPIRATION' and t.model_year in calendar_year_cert_co2e_Mg_dict:
+                    draw_expiration_arrow(t.model_year, calendar_year_cert_co2e_Mg_dict[t.model_year])
+                elif t.credit_destination == 'EXPIRATION' and t.model_year not in calendar_year_cert_co2e_Mg_dict:
+                    ax1.plot(t.model_year, target_co2e_Mg_dict[calendar_years[0]], 'o', color='orange')
+                    draw_expiration_arrow(t.model_year, target_co2e_Mg_dict[calendar_years[0]])
+                else:  # "PAST_DUE"
+                    ax1.plot(t.model_year, calendar_year_cert_co2e_Mg_dict[t.model_year], 'x', color='red')
+                    plt.scatter(t.model_year, calendar_year_cert_co2e_Mg_dict[t.model_year], s=80, facecolors='none',
+                                edgecolors='r')
+            except:
+                1==1
 
     fig.savefig(omega_globals.options.output_folder + '%s %s Cert Mg v Year.png' %
                 (omega_globals.options.session_unique_name, compliance_id))
 
     return calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg, target_co2e_Mg
+
+
+def plot_compliance(calendar_years, target_co2e_Mg, calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg):
+    fig, ax1 = fplothg(calendar_years, target_co2e_Mg, 'o-', reuse_figure=omega_globals.options.auto_close_figures)
+    ax1.plot(calendar_years, calendar_year_cert_co2e_Mg, 'r.-')
+    ax1.plot(calendar_years, model_year_cert_co2e_Mg, '-')
+    ax1.legend(['target_co2e_Mg', 'calendar_year_cert_co2e_Mg', 'model_year_cert_co2e_Mg'])
+    return ax1, fig
 
 
 def plot_iteration(iteration_log, compliance_id):

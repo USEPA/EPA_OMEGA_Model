@@ -18,6 +18,39 @@ import common.omega_globals as omega_globals
 # np.seterr(all='raise')  # for troubleshooting runtime warnings
 
 
+def get_ip_address():
+    """
+    Attempt to get "local" IP address(es)
+
+    Example:
+
+    ::
+
+        >>> socket.gethostbyname_ex(socket.gethostname())
+        ('mac-mini.local', [], ['127.0.0.1', '192.168.1.20'])
+
+    Returns: list of local IP address(es)
+
+    """
+    import socket
+
+    my_ip = []
+
+    retries = 0
+    ip_found = False
+    while not ip_found and retries < 10:
+        try:
+            my_ip = socket.gethostbyname_ex(socket.gethostname())[2]
+            ip_found = True
+        except Exception as e:
+            retries += 1
+
+    if not my_ip.count('127.0.0.1'):
+        my_ip.append('127.0.0.1')  # Add support for local loopback interface
+
+    return my_ip
+
+
 def dataframe_to_numeric(df):
     """
     Convert dataframe columns to numeric (i.e. non-object dtypes) if possible.
@@ -246,33 +279,100 @@ def cull_cloud(cloud, prior_x, x_key):
     return cloud
 
 
-def print_dict(dict_in, num_tabs=0):
+def sum_dict(dict_in, include=None, exclude=None):
+    """
+    Add up all terms in a dict
+
+    Args:
+        dict_in (numeric dict_like): the object with elements to sum
+
+    Returns:
+
+    """
+    keys = sorted(dict_in.keys())
+    if include is not None:
+        keys = [k for k in keys if include in k]
+    if exclude is not None:
+        keys = [k for k in keys if exclude not in k]
+
+    return sum([dict_in[k] for k in keys])
+
+
+def print_keys(dict_in, include=None, exclude=None):
+    """
+    Print some or all keys in a dict-like object
+
+    Args:
+        dict_in (dict-like): the object with keys to print
+        include (str): a substring that must be present, if provided
+        exclude (str): a substring that must not be present, if provided
+
+    """
+    keys = sorted(dict_in.keys())
+    if include is not None:
+        keys = [k for k in keys if include in k]
+    if exclude is not None:
+        keys = [k for k in keys if exclude not in k]
+    for k in keys:
+        print(k)
+
+    return keys
+
+
+def print_dict(dict_in, num_tabs=0, to_string=False):
     """
     Attempt to printy-print a dictionary to the Python console.
 
     Args:
         dict_in (dict): dictionary to print
         num_tabs (int): optional argument, used to indent subsequent layers of the dictionary
+        to_string (Bool): if True then result will be returned as a printable string, instead of printed to the console
+
+    Returns:
+        print_dict string if to_string==True
 
     """
+    s = ''
+
     if num_tabs == 0:
-        print()
+        s += '\n'
+        if type(dict_in) is pd.Series:
+            dict_in = dict_in.to_dict()
 
     if type(dict_in) is list or type(dict_in) is not dict:
-        print('\t' * num_tabs + str(dict_in))
+        s += '\t' * num_tabs + str(dict_in) + '\n'
     else:
         for k in dict_in.keys():
             if type(dict_in[k]) == list:
                 if dict_in[k]:
-                    print('\t' * num_tabs + str(k) + ':' + str(dict_in[k]))
+                    s += '\t' * num_tabs + str(k) + ':' + str(dict_in[k]) + '\n'
                 else:
-                    print('\t' * num_tabs + str(k))
+                    s += '\t' * num_tabs + str(k) + '\n'
             else:
-                print('\t' * num_tabs + str(k))
-                print_dict(dict_in[k], num_tabs + 1)
+                s += '\t' * num_tabs + str(k) + '\n'
+                s += print_dict(dict_in[k], num_tabs + 1, to_string=True)
 
     if num_tabs == 0:
-        print()
+        s += '\n'
+
+    if not to_string:
+        print(s[:-1])
+
+    if to_string:
+        return s
+
+
+def print_list(list_in):
+    """
+    Print the given list, one line per item
+
+    Args:
+        list_in (list): the list to print
+
+    """
+    for i in list_in:
+        print(i)
+    print()
 
 
 def linspace(min, max, num_values):
@@ -363,12 +463,12 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
         # determine maximum allowed values
         for c in column_names:
             other_columns = set(column_names).difference({c})
-            max_level_dict[c] = min(max_level_dict[c], 1 - np.sum([min_level_dict[c] for c in other_columns]))
+            max_level_dict[c] = max(0, min(max_level_dict[c], 1 - np.sum([min_level_dict[c] for c in other_columns])))
 
         # determine minimum allowed values
         for c in column_names:
             other_columns = set(column_names).difference({c})
-            min_level_dict[c] = max(min_level_dict[c], 1 - np.sum([max_level_dict[c] for c in other_columns]))
+            min_level_dict[c] = min(1, max(min_level_dict[c], 1 - np.sum([max_level_dict[c] for c in other_columns])))
 
         # calculate span of values (max-min)
         span_dict = dict()
@@ -783,6 +883,70 @@ def calc_roadload_hp(A_LBSF, B_LBSF, C_LBSF, MPH):
     roadload_power_hp = roadload_power_kW * KW2HP
 
     return roadload_power_hp
+
+
+def send_text(dest, message, email, password):
+    """
+
+    SMS Gateways for each Carrier
+    AT&T: [number]@txt.att.net
+    Sprint: [number]@messaging.sprintpcs.com or [number]@pm.sprint.com
+    T-Mobile: [number]@tmomail.net
+    Verizon: [number]@vtext.com
+    Boost Mobile: [number]@myboostmobile.com
+    Cricket: [number]@sms.mycricket.com
+    Metro PCS: [number]@mymetropcs.com
+    Tracfone: [number]@mmst5.tracfone.com
+    U.S. Cellular: [number]@email.uscc.net
+    Virgin Mobile: [number]@vmobl.com
+
+    Args:
+        dest (str): e.g. '8005552323@myboostmobile.com'
+        message (str): the message to send
+        email (str): the email address of the email server to use, e.g. 'my_email@gmail.com'
+        password (str): the password for the email account, recommend setting up an app-specific password
+
+    """
+    import time
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+
+    sms_gateway = dest
+
+    pas = password
+
+    # The server we use to send emails in our case it will be gmail but every email provider has a different smtp
+    # and port is also provided by the email provider.
+    smtp = "smtp.gmail.com"
+    port = 587
+    # This will start our email server
+    server = smtplib.SMTP(smtp, port)
+    # Starting the server
+    server.starttls()
+    # Now we need to login
+    server.login(email, pas)
+
+    # Now we use the MIME module to structure our message.
+    msg = MIMEMultipart()
+    msg['From'] = email
+    msg['To'] = sms_gateway
+
+    # Make sure you add a new line in the subject
+    timestamp_str = time.strftime('%m/%d/%Y %H:%M:%S')
+    msg['Subject'] = "%s" % timestamp_str + "\n"
+
+    # Make sure you also add new lines to your body
+    if not message.endswith('\n'):
+        message = message + '\n'
+
+    # and then attach that body furthermore you can also send html content.
+    msg.attach(MIMEText(message, 'plain'))
+    sms = msg.as_string()
+    server.sendmail(email, sms_gateway, sms)
+
+    # lastly quit the server
+    server.quit()
 
 
 if __name__ == '__main__':

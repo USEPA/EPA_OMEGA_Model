@@ -115,6 +115,10 @@ class EmissionRatesVehicles(OMEGABase):
 
                 rate = eval(EmissionRatesVehicles._data[rate_key]['equation'], {}, locals_dict)
 
+                if rate < 0:
+                    temp_key = (model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age - 1, rate_name)
+                    rate = _cache[temp_key]
+
                 _cache[cache_key] = rate
 
             return_rates.append(rate)
