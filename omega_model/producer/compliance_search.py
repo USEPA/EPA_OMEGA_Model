@@ -1456,12 +1456,18 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         lowest_cost_dollars = lowest_cost_compliant_tech_share_option[cost_name].item()
         most_strategic_cost_dollars = most_strategic_compliant_tech_share_option[cost_name].item()
 
+        if three_points:
+            print('most_strat_norm_$ minus lowest_norm_$ %.6f' % (most_strategic_normalized_cost - lowest_normalized_cost))
+
         # TODO: try most_strategic_normalized_cost - lowest_normalized_cost >=
         #  omega_globals.options.producer_voluntary_overcompliance_min_benefit_frac as threshold...
 
+        # if three_points and omega_globals.options.producer_voluntary_overcompliance and \
+        #     lowest_cost_dollars / most_strategic_cost_dollars < \
+        #     (1 - omega_globals.options.producer_voluntary_overcompliance_min_benefit_frac):
         if three_points and omega_globals.options.producer_voluntary_overcompliance and \
-            lowest_cost_dollars / most_strategic_cost_dollars < \
-            (1 - omega_globals.options.producer_voluntary_overcompliance_min_benefit_frac):
+                (most_strategic_normalized_cost - lowest_normalized_cost) >= \
+                omega_globals.options.producer_voluntary_overcompliance_min_benefit_frac:
                 # take lowest cost if it's at least X percent cheaper than the most strategic
                 candidate_production_decisions =\
                     pd.concat([most_strategic_compliant_tech_share_option, most_strategic_non_compliant_tech_share_option,
