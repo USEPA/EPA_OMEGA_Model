@@ -1361,6 +1361,10 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
     mini_df['total_generalized_cost_dollars'] = production_options['total_generalized_cost_dollars']
     mini_df['strategic_compliance_ratio'] = production_options['strategic_compliance_ratio']
 
+    production_options['normalized_total_generalized_cost_dollars'] = \
+        ((production_options['total_generalized_cost_dollars'] - production_options['total_generalized_cost_dollars'].min()) /
+         (production_options['total_generalized_cost_dollars'].max() - production_options['total_generalized_cost_dollars'].min()))
+
     production_options['producer_search_iteration'] = search_iteration
     production_options['selected_production_option'] = False
     production_options['candidate_production_option'] = False
@@ -1444,8 +1448,16 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         else:
             most_strategic_compliant_tech_share_option = lowest_cost_compliant_tech_share_option
 
+        lowest_normalized_cost = \
+            lowest_cost_compliant_tech_share_option['normalized_total_generalized_cost_dollars'].item()
+        most_strategic_normalized_cost = \
+            most_strategic_compliant_tech_share_option['normalized_total_generalized_cost_dollars'].item()
+
         lowest_cost_dollars = lowest_cost_compliant_tech_share_option[cost_name].item()
         most_strategic_cost_dollars = most_strategic_compliant_tech_share_option[cost_name].item()
+
+        # TODO: try most_strategic_normalized_cost - lowest_normalized_cost >=
+        #  omega_globals.options.producer_voluntary_overcompliance_min_benefit_frac as threshold...
 
         if three_points and omega_globals.options.producer_voluntary_overcompliance and \
             lowest_cost_dollars / most_strategic_cost_dollars < \
