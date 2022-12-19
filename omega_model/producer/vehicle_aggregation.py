@@ -219,8 +219,7 @@ from omega_model import *
 # for now, eventually need to be inputs somewhere:
 # 'manufacturer_id' added if not consolidating manufacturers
 aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
-                       'cert_fuel_id', 'reg_class_id', 'drive_system', 'dual_rear_wheel',
-                       'cert_fuel_id', 'reg_class_id', 'drive_system', 'model_year',
+                       'cert_fuel_id', 'reg_class_id', 'drive_system', 'dual_rear_wheel', 'model_year',
                        'prior_redesign_year', 'redesign_interval', 'cost_curve_class', 'structure_material']
 
 
@@ -423,13 +422,14 @@ class VehicleAggregation(OMEGABase):
                 df.loc[idx, 'glider_non_structure_cost_dollars'] = \
                     float(GliderCost.calc_cost(veh, pd.DataFrame([row]))[1])
 
-                workfactor \
-                    = WorkFactor.calc_workfactor(
-                    row['model_year'], row['curbweight_lbs'], row['gvwr_lbs'], row['gcwr_lbs'], row['drive_system']
-                )
+                my, cw, gvwr, gcwr, drivesys \
+                    = row['model_year'], row['curbweight_lbs'], row['gvwr_lbs'], row['gcwr_lbs'], row['drive_system']
+                workfactor = WorkFactor.calc_workfactor(my, cw, gvwr, gcwr, drivesys)
                 df.at[idx, 'workfactor'] = workfactor
                 veh.workfactor = workfactor
                 veh.base_year_workfactor = workfactor
+                veh.gvwr_lbs = row['gvwr_lbs']
+                veh.gcwr_lbs = row['gcwr_lbs']
                 veh.base_year_gvwr_lbs = row['gvwr_lbs']
                 veh.base_year_gcwr_lbs = row['gcwr_lbs']
 

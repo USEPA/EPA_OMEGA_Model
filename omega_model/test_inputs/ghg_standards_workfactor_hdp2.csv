@@ -16,3 +16,11 @@ mediumduty,2024,{'diesel':1.0},120000,0.0376 * workfactor + 289
 mediumduty,2025,{'diesel':1.0},120000,0.0367 * workfactor + 282
 mediumduty,2026,{'diesel':1.0},120000,0.0357 * workfactor + 275
 mediumduty,2027,{'diesel':1.0},120000,0.0348 * workfactor + 268
+mediumduty,2020,{'electricity':1.0},120000,0.0416 * workfactor + 320
+mediumduty,2021,{'electricity':1.0},120000,0.0406 * workfactor + 312
+mediumduty,2022,{'electricity':1.0},120000,0.0395 * workfactor + 304
+mediumduty,2023,{'electricity':1.0},120000,0.0386 * workfactor + 297
+mediumduty,2024,{'electricity':1.0},120000,0.0376 * workfactor + 289
+mediumduty,2025,{'electricity':1.0},120000,0.0367 * workfactor + 282
+mediumduty,2026,{'electricity':1.0},120000,0.0357 * workfactor + 275
+mediumduty,2027,{'electricity':1.0},120000,0.0348 * workfactor + 268

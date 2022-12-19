@@ -55,15 +55,19 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
+_cache = dict()  # the input file equations
+start_years = dict()
+_data = dict()  # private dict, work factors by year
+
 
 class WorkFactor(OMEGABase):
     """
     **Work factor definition and calculations.**
 
     """
-    _cache = dict()  # the input file equations
-    start_years = dict()
-    _data = dict()  # private dict, work factors by year
+    # _cache = dict()  # the input file equations
+    # start_years = dict()
+    # _data = dict()  # private dict, work factors by year
 
     @staticmethod
     def calc_workfactor(year, curbwt, gvwr, gcwr, drive):
@@ -83,17 +87,20 @@ class WorkFactor(OMEGABase):
 
         # if cache_key not in WorkFactor._data:
 
-        start_years = WorkFactor.start_years[drive]
+        # start_years = WorkFactor.start_years[drive]
+        start_yrs = start_years[drive]
 
-        if len([yr for yr in start_years if yr <= year]) > 0:
+        if len([yr for yr in start_yrs if yr <= year]) > 0:
 
-            model_year = max([yr for yr in start_years if yr <= year])
+            model_year = max([yr for yr in start_yrs if yr <= year])
 
             gvwr_lbs, gcwr_lbs, curbweight_lbs = gvwr, gcwr, curbwt
 
-            xwd = WorkFactor._cache[(model_year, drive)]['xwd']
+            # xwd = WorkFactor._cache[(model_year, drive)]['xwd']
+            xwd = _cache[(model_year, drive)]['xwd']
 
-            workfactor = eval(WorkFactor._cache[(model_year, drive)]['workfactor'], {}, locals_dict)
+            # workfactor = eval(WorkFactor._cache[(model_year, drive)]['workfactor'], {}, locals_dict)
+            workfactor = eval(_cache[(model_year, drive)]['workfactor'], {}, locals_dict)
 
             # WorkFactor._data[cache_key] = workfactor
 
@@ -153,9 +160,12 @@ class WorkFactor(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        WorkFactor._cache.clear()
+        # WorkFactor._cache.clear()
+        #
+        # WorkFactor._data.clear()
+        _cache.clear()
 
-        WorkFactor._data.clear()
+        _data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -185,7 +195,7 @@ class WorkFactor(OMEGABase):
                     df['drive_system'],
                 )
                 for cache_key in cache_keys:
-                    WorkFactor._cache[cache_key] = dict()
+                    _cache[cache_key] = dict()
 
                     start_year, drive_system = cache_key
 
@@ -194,16 +204,16 @@ class WorkFactor(OMEGABase):
 
                     xwd = workfactor_info['xwd']
 
-                    WorkFactor._cache[cache_key] = {
+                    _cache[cache_key] = {
                         'workfactor': dict(),
                         'xwd': xwd
                     }
 
-                    WorkFactor._cache[cache_key]['workfactor'] \
+                    _cache[cache_key]['workfactor'] \
                         = compile(workfactor_info['workfactor'], '<string>', 'eval')
 
                 for drive_system in df['drive_system'].unique():
-                    WorkFactor.start_years[drive_system] \
+                    start_years[drive_system] \
                         = [yr for yr in df.loc[df['drive_system'] == drive_system, 'start_year']]
 
         return template_errors
