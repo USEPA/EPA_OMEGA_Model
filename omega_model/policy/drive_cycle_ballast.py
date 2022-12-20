@@ -105,7 +105,9 @@ class DriveCycleBallast(OMEGABase):
             if len(start_years[start_years <= vehicle.model_year]) > 0:
                 calendar_year = max(start_years[start_years <= vehicle.model_year])
 
-                DriveCycleBallast._data[cache_key] = DriveCycleBallast._data[vehicle.reg_class_id, calendar_year]['ballast_lbs']
+                DriveCycleBallast._data[cache_key] = \
+                    Eval.eval(DriveCycleBallast._data[vehicle.reg_class_id, calendar_year]['ballast_lbs'], {},
+                              {'vehicle': vehicle})
             else:
                 raise Exception('Missing drive cycle ballast parameters for %s, %d or prior' %
                                 (vehicle.reg_class_id, vehicle.model_year))
