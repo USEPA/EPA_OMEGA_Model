@@ -1452,6 +1452,7 @@ class VehicleFinal(SQABase, Vehicle):
                 base_year_msrp_dollars=df.loc[i, 'msrp_dollars'],
                 base_year_glider_non_structure_mass_lbs=df.loc[i, 'glider_non_structure_mass_lbs'],
                 base_year_glider_non_structure_cost_dollars=df.loc[i, 'glider_non_structure_cost_dollars'],
+                base_year_workfactor=df.loc[i, 'workfactor'],
                 base_year_vehicle_id=i,  # i.e. aggregated_vehicles.csv index number...
                 battery_kwh=df.loc[i, 'battery_kwh'],
                 motor_kw=df.loc[i, 'motor_kw'],
@@ -1461,6 +1462,7 @@ class VehicleFinal(SQABase, Vehicle):
                 redesign_interval=df.loc[i, 'redesign_interval'] * omega_globals.options.redesign_interval_gain,
                 in_production=True,
                 base_year_product=True,
+                workfactor=df.loc[i, 'workfactor'],
                 gvwr_lbs=df.loc[i, 'gvwr_lbs'],
                 gcwr_lbs=df.loc[i, 'gcwr_lbs'],
                 base_year_gvwr_lbs=df.loc[i, 'gvwr_lbs'],

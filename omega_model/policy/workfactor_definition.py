@@ -55,96 +55,53 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-_cache = dict()  # the input file equations
-start_years = dict()
-_data = dict()  # private dict, work factors by year
-
 
 class WorkFactor(OMEGABase):
     """
     **Work factor definition and calculations.**
 
     """
-    # _cache = dict()  # the input file equations
-    # start_years = dict()
-    # _data = dict()  # private dict, work factors by year
+    _cache = dict()  # the input file equations
+    start_years = dict()
+    _data = dict()  # private dict, work factors by year
 
     @staticmethod
-    def calc_workfactor(year, curbwt, gvwr, gcwr, drive):
+    def calc_workfactor(model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system):
         """
         Calculate vehicle workfactor.
 
         Args:
-            vehicle (Vehicle): the vehicle for which to calculate the workfactor
+            model_year (int): vehicle model year
+            curbweight_lbs (float): vehicle curb weight in lbs
+            gvwr_lbs (float): vehicle gross vehicle weight rating in lbs
+            gcwr_lbs (float): vehicle combined weight rating in lbs
+            drive_system (int): drive system, 2=two wheel drive, 4=four wheel drive, etc
 
         Returns:
             Vehicle workfactor.
 
         """
-        cache_key = (year, drive)
+        cache_key = (model_year, drive_system)
 
-        locals_dict = locals()
+        if cache_key not in WorkFactor._data:
 
-        # if cache_key not in WorkFactor._data:
+            start_years = WorkFactor.start_years[drive_system]
 
-        # start_years = WorkFactor.start_years[drive]
-        start_yrs = start_years[drive]
+            if len([yr for yr in start_years if yr <= model_year]) > 0:
 
-        if len([yr for yr in start_yrs if yr <= year]) > 0:
+                model_year = max([yr for yr in start_years if yr <= model_year])
 
-            model_year = max([yr for yr in start_yrs if yr <= year])
+                xwd = WorkFactor._cache[(model_year, drive_system)]['xwd']
 
-            gvwr_lbs, gcwr_lbs, curbweight_lbs = gvwr, gcwr, curbwt
+                WorkFactor._data[cache_key] = \
+                    eval(WorkFactor._cache[(model_year, drive_system)]['workfactor'], {}, locals())
 
-            # xwd = WorkFactor._cache[(model_year, drive)]['xwd']
-            xwd = _cache[(model_year, drive)]['xwd']
+            else:
+                raise Exception(
+                    f'Missing workfactor calculation parameters for {model_year} or prior')
 
-            # workfactor = eval(WorkFactor._cache[(model_year, drive)]['workfactor'], {}, locals_dict)
-            workfactor = eval(_cache[(model_year, drive)]['workfactor'], {}, locals_dict)
+        return WorkFactor._data[cache_key]
 
-            # WorkFactor._data[cache_key] = workfactor
-
-        else:
-            raise Exception(
-                f'Missing workfactor calculation parameters for {year} or prior')
-
-        return workfactor # WorkFactor._data[cache_key]
-    # @staticmethod
-    # def calc_workfactor(vehicle):
-    #     """
-    #     Calculate vehicle workfactor.
-    #
-    #     Args:
-    #         vehicle (Vehicle): the vehicle for which to calculate the workfactor
-    #
-    #     Returns:
-    #         Vehicle workfactor.
-    #
-    #     """
-    #     cache_key = (vehicle.model_year, vehicle.drive_system)
-    #
-    #     locals_dict = locals()
-    #
-    #     if cache_key not in WorkFactor._data:
-    #
-    #         start_years = WorkFactor.start_years[vehicle.drive_system]
-    #
-    #         if len([yr for yr in start_years if yr <= vehicle.model_year]) > 0:
-    #
-    #             model_year = max([yr for yr in start_years if yr <= vehicle.model_year])
-    #
-    #             gvwr_lbs, gcwr_lbs, curbweight_lbs = vehicle.gvwr_lbs, vehicle.gcwr_lbs, vehicle.curbweight_lbs
-    #
-    #             xwd = WorkFactor._cache[(model_year, vehicle.drive_system)]['xwd']
-    #
-    #             workfactor = eval(WorkFactor._cache[(model_year, vehicle.drive_system)]['workfactor'], {}, locals_dict)
-    #
-    #             WorkFactor._data[cache_key] = workfactor
-    #
-    #         else:
-    #             raise Exception(f'Missing workfactor calculation parameters for {vehicle.reg_class_id}, {vehicle.model_year} or prior')
-    #
-    #     return WorkFactor._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -160,12 +117,8 @@ class WorkFactor(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        # WorkFactor._cache.clear()
-        #
-        # WorkFactor._data.clear()
-        _cache.clear()
-
-        _data.clear()
+        WorkFactor._cache.clear()
+        WorkFactor._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -195,7 +148,7 @@ class WorkFactor(OMEGABase):
                     df['drive_system'],
                 )
                 for cache_key in cache_keys:
-                    _cache[cache_key] = dict()
+                    WorkFactor._cache[cache_key] = dict()
 
                     start_year, drive_system = cache_key
 
@@ -204,16 +157,16 @@ class WorkFactor(OMEGABase):
 
                     xwd = workfactor_info['xwd']
 
-                    _cache[cache_key] = {
+                    WorkFactor._cache[cache_key] = {
                         'workfactor': dict(),
                         'xwd': xwd
                     }
 
-                    _cache[cache_key]['workfactor'] \
+                    WorkFactor._cache[cache_key]['workfactor'] \
                         = compile(workfactor_info['workfactor'], '<string>', 'eval')
 
                 for drive_system in df['drive_system'].unique():
-                    start_years[drive_system] \
+                    WorkFactor.start_years[drive_system] \
                         = [yr for yr in df.loc[df['drive_system'] == drive_system, 'start_year']]
 
         return template_errors

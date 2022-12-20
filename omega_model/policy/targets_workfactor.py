@@ -103,13 +103,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             Vehicle target CO2e in g/mi.
 
         """
-        locals_dict = locals()
-        workfactor = vehicle.workfactor
-        # workfactor = WorkFactor.calc_workfactor(vehicle)
-
-        cache_key = (vehicle.reg_class_id, vehicle.model_year, vehicle.cert_fuel_id, workfactor)
-
-        # locals_dict = locals()
+        cache_key = (vehicle.reg_class_id, vehicle.model_year, vehicle.cert_fuel_id, vehicle.workfactor)
 
         if cache_key not in VehicleTargets._data:
 
@@ -121,9 +115,9 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
 
                 model_year = max([yr for yr in start_years if yr <= vehicle.model_year])
 
-                # workfactor = WorkFactor.calc_workfactor(vehicle)
+                workfactor = vehicle.workfactor
 
-                target = eval(VehicleTargets._cache[(vehicle.reg_class_id, model_year, vehicle.cert_fuel_id)]['co2_gram_per_mile'], locals_dict)
+                target = eval(VehicleTargets._cache[(vehicle.reg_class_id, model_year, vehicle.cert_fuel_id)]['co2_gram_per_mile'], locals())
 
                 VehicleTargets._data[cache_key] = target
             else:
