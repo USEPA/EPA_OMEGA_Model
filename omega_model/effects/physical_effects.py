@@ -335,6 +335,12 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                     sourcetype_name = 'passenger car' # TODO does this come from somewhere at some point?
                     if base_year_reg_class_id == 'truck':
                         sourcetype_name = 'passenger truck'
+                    elif base_year_reg_class_id == 'mediumduty' and 'cuv' in body_style:
+                        sourcetype_name = 'passenger truck'
+                    elif base_year_reg_class_id == 'mediumduty' and 'pickup' in body_style:
+                        sourcetype_name = 'light commercial truck'
+                    else:
+                        print('Improper sourcetype_name for vehicle emission rates.')
 
                     # need vehicle effects for each vehicle and for each calendar year since they change year-over-year
                     vehicle_effects_dict = dict()
@@ -817,15 +823,16 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
         # get vmt and session fatalities from safety_effects_dict
         safety_effects_key = (vehicle_id, calendar_year, age)
         safety = legacy_fleet_safety_effects_dict[safety_effects_key]
-        session_fatalities, vmt, annual_vmt, odometer, calendar_year_vmt_adj, vmt_rebound, annual_vmt_rebound, size_class \
+        session_fatalities, vmt, annual_vmt, odometer, calendar_year_vmt_adj, vmt_rebound, annual_vmt_rebound, size_class, body_style \
             = safety['session_fatalities'], \
-              safety['vmt'], \
-              safety['annual_vmt'], \
-              safety['odometer'], \
-              safety['context_vmt_adjustment'], \
-              safety['vmt_rebound'], \
-              safety['annual_vmt_rebound'], \
-              safety['context_size_class']
+            safety['vmt'], \
+            safety['annual_vmt'], \
+            safety['odometer'], \
+            safety['context_vmt_adjustment'], \
+            safety['vmt_rebound'], \
+            safety['annual_vmt_rebound'], \
+            safety['context_size_class'], \
+            safety['body_style']
 
         model_year = nested_dict['model_year']
         reg_class_id = nested_dict['reg_class_id']
@@ -889,6 +896,12 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
         sourcetype_name = 'passenger car'
         if reg_class_id == 'truck':
             sourcetype_name = 'passenger truck'
+        elif reg_class_id == 'mediumduty' and 'cuv' in body_style:
+            sourcetype_name = 'passenger truck'
+        elif reg_class_id == 'mediumduty' and 'pickup' in body_style:
+            sourcetype_name = 'light commercial truck'
+        else:
+            print('Improper sourcetype_name for vehicle emission rates.')
 
         veh_rates_by = 'age'  # for now; set as an input if we want to; value can be 'age' or 'odometer'
         ind_var_value = pd.to_numeric(age)

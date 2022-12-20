@@ -351,6 +351,7 @@ def calc_legacy_fleet_safety_effects(calendar_years, vmt_adjustments):
         fuel_id = nested_dict['in_use_fuel_id']
         registered_count = nested_dict['registered_count']
         age = nested_dict['age']
+        body_style = nested_dict['body_style']
 
         name = set_legacy_fleet_name(market_class_id)
 
@@ -399,7 +400,7 @@ def calc_legacy_fleet_safety_effects(calendar_years, vmt_adjustments):
             'vmt': vmt_adjusted,
             'annual_vmt_rebound': 0,
             'vmt_rebound': 0,
-            'body_style': nested_dict['body_style'],
+            'body_style': body_style,
             'change_per_100lbs_below': 0,
             'change_per_100lbs_above': 0,
             'threshold_lbs': threshold_lbs,
@@ -436,9 +437,9 @@ def set_legacy_fleet_name(market_class_id):
         name attribute
 
     """
-    if market_class_id.__contains__('sedan'):
+    if 'sedan' in market_class_id:
         _name = 'car'
-    elif market_class_id.__contains__('pickup'):
+    elif 'pickup' in market_class_id:
         _name = 'Pickup'
     else:
         _name = 'cuv_suv'

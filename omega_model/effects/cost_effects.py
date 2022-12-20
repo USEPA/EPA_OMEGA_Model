@@ -261,9 +261,9 @@ def calc_cost_effects(physical_effects_dict, context_fuel_cpm_dict, calc_health_
             maintenance_cost_dollars = maintenance_cost_per_mile * vmt
 
             # repair costs
-            if name.__contains__('car'):
+            if 'car' in name:
                 operating_veh_type = 'car'
-            elif name.__contains__('Pickup'):
+            elif 'Pickup' in name:
                 operating_veh_type = 'truck'
             else:
                 operating_veh_type = 'suv'
