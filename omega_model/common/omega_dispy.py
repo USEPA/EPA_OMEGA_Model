@@ -56,7 +56,7 @@ def dispy_node_setup():
 
     """
     import socket
-    sysprint('node "%s" standing by...' % str(socket.gethostbyname_ex(socket.gethostname())))
+    sysprint('node %s standing by...' % str(socket.gethostbyname_ex(socket.gethostname())))
     sysprint('.')
 
 
