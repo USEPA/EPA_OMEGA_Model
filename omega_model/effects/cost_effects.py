@@ -41,13 +41,14 @@ def get_scc_cf(calendar_year):
     return CostFactorsSCC.get_cost_factors(calendar_year, cost_factors)
 
 
-def get_criteria_cf(calendar_year):
+def get_criteria_cf(calendar_year, source_id):
     """
 
     Get criteria cost factors
 
     Args:
         calendar_year (int): The calendar year for which criteria cost factors are needed.
+        source_id (str): the pollutant source, e.g., 'car pump gasoline', 'egu', 'refinery'
 
     Returns:
         A list of cost factors as specified in the cost_factors list for the given calendar year.
@@ -55,21 +56,21 @@ def get_criteria_cf(calendar_year):
     """
     from effects.cost_factors_criteria import CostFactorsCriteria
 
-    cost_factors = ('pm25_tailpipe_3.0_USD_per_uston',
-                    'pm25_upstream_3.0_USD_per_uston',
-                    'nox_tailpipe_3.0_USD_per_uston',
-                    'nox_upstream_3.0_USD_per_uston',
-                    'sox_tailpipe_3.0_USD_per_uston',
-                    'sox_upstream_3.0_USD_per_uston',
-                    'pm25_tailpipe_7.0_USD_per_uston',
-                    'pm25_upstream_7.0_USD_per_uston',
-                    'nox_tailpipe_7.0_USD_per_uston',
-                    'nox_upstream_7.0_USD_per_uston',
-                    'sox_tailpipe_7.0_USD_per_uston',
-                    'sox_upstream_7.0_USD_per_uston',
+    cost_factors = ('pm25_low_3.0_USD_per_uston',
+                    'sox_low_3.0_USD_per_uston',
+                    'nox_low_3.0_USD_per_uston',
+                    'pm25_low_7.0_USD_per_uston',
+                    'sox_low_7.0_USD_per_uston',
+                    'nox_low_7.0_USD_per_uston',
+                    'pm25_high_3.0_USD_per_uston',
+                    'sox_high_3.0_USD_per_uston',
+                    'nox_high_3.0_USD_per_uston',
+                    'pm25_high_7.0_USD_per_uston',
+                    'sox_high_7.0_USD_per_uston',
+                    'nox_high_7.0_USD_per_uston',
                     )
 
-    return CostFactorsCriteria.get_cost_factors(calendar_year, cost_factors)
+    return CostFactorsCriteria.get_cost_factors(calendar_year, source_id, cost_factors)
 
 
 def get_energysecurity_cf(calendar_year):
@@ -178,17 +179,33 @@ def calc_cost_effects(physical_effects_dict, context_fuel_cpm_dict, calc_health_
             repair_cost_dollars = 0
             refueling_cost_dollars = 0
             value_of_rebound_vmt_cost_dollars = 0
-            pm25_tailpipe_3 = pm25_upstream_3 = nox_tailpipe_3 = nox_upstream_3 = sox_tailpipe_3 = sox_upstream_3 = 0
-            pm25_tailpipe_7 = pm25_upstream_7 = nox_tailpipe_7 = nox_upstream_7 = sox_tailpipe_7 = sox_upstream_7 = 0
-            pm25_vehicle_3_cost_dollars = pm25_upstream_3_cost_dollars = 0
-            pm25_vehicle_7_cost_dollars = pm25_upstream_7_cost_dollars = 0
-            nox_vehicle_3_cost_dollars = nox_upstream_3_cost_dollars = 0
-            nox_vehicle_7_cost_dollars = nox_upstream_7_cost_dollars = 0
-            sox_vehicle_3_cost_dollars = sox_upstream_3_cost_dollars = 0
-            sox_vehicle_7_cost_dollars = sox_upstream_7_cost_dollars = 0
-            criteria_vehicle_3_cost_dollars = criteria_upstream_3_cost_dollars = 0
-            criteria_vehicle_7_cost_dollars = criteria_upstream_7_cost_dollars = 0
-            criteria_3_cost_dollars = criteria_7_cost_dollars = 0
+            
+            pm25_veh_low_3_cost_dollars = sox_veh_low_3_cost_dollars = nox_veh_low_3_cost_dollars = 0
+            pm25_veh_low_7_cost_dollars = sox_veh_low_7_cost_dollars = nox_veh_low_7_cost_dollars = 0
+            pm25_veh_high_3_cost_dollars = sox_veh_high_3_cost_dollars = nox_veh_high_3_cost_dollars = 0
+            pm25_veh_high_7_cost_dollars = sox_veh_high_7_cost_dollars = nox_veh_high_7_cost_dollars = 0
+            
+            pm25_up_low_3_cost_dollars = sox_up_low_3_cost_dollars = nox_up_low_3_cost_dollars = 0
+            pm25_up_low_7_cost_dollars = sox_up_low_7_cost_dollars = nox_up_low_7_cost_dollars = 0
+            pm25_up_high_3_cost_dollars = sox_up_high_3_cost_dollars = nox_up_high_3_cost_dollars = 0
+            pm25_up_high_7_cost_dollars = sox_up_high_7_cost_dollars = nox_up_high_7_cost_dollars = 0
+            
+            criteria_veh_low_3_cost_dollars = criteria_veh_low_7_cost_dollars = 0
+            criteria_veh_high_3_cost_dollars = criteria_veh_high_7_cost_dollars = 0
+            criteria_up_low_3_cost_dollars = criteria_up_low_7_cost_dollars = 0
+            criteria_up_high_3_cost_dollars = criteria_up_high_7_cost_dollars = 0
+            criteria_low_3_cost_dollars = criteria_low_7_cost_dollars = 0
+            criteria_high_3_cost_dollars = criteria_high_7_cost_dollars = 0
+            
+            # pm25_vehicle_3_cost_dollars = pm25_upstream_3_cost_dollars = 0
+            # pm25_vehicle_7_cost_dollars = pm25_upstream_7_cost_dollars = 0
+            # nox_vehicle_3_cost_dollars = nox_upstream_3_cost_dollars = 0
+            # nox_vehicle_7_cost_dollars = nox_upstream_7_cost_dollars = 0
+            # sox_vehicle_3_cost_dollars = sox_upstream_3_cost_dollars = 0
+            # sox_vehicle_7_cost_dollars = sox_upstream_7_cost_dollars = 0
+            # criteria_vehicle_3_cost_dollars = criteria_upstream_3_cost_dollars = 0
+            # criteria_vehicle_7_cost_dollars = criteria_upstream_7_cost_dollars = 0
+            # criteria_3_cost_dollars = criteria_7_cost_dollars = 0
 
             base_year_vehicle_id, model_year, mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, \
             market_class_id, fueling_class, base_year_powertrain_type \
@@ -222,7 +239,7 @@ def calc_cost_effects(physical_effects_dict, context_fuel_cpm_dict, calc_health_
                   physical['n2o_total_metrictons']
 
             # criteria air pollutant tons
-            pm25_tp_tons, pm25_up_tons, nox_tp_tons, nox_up_tons, sox_tp_tons, sox_up_tons \
+            pm25_veh_tons, pm25_up_tons, nox_veh_tons, nox_up_tons, sox_veh_tons, sox_up_tons \
                 = physical['pm25_vehicle_ustons'], \
                   physical['pm25_upstream_ustons'], \
                   physical['nox_vehicle_ustons'], \
@@ -356,46 +373,81 @@ def calc_cost_effects(physical_effects_dict, context_fuel_cpm_dict, calc_health_
 
             # criteria effects
             if calc_health_effects:
-                # get criteria cost factors
-                pm25_tailpipe_3, pm25_upstream_3, nox_tailpipe_3, nox_upstream_3, sox_tailpipe_3, sox_upstream_3, \
-                pm25_tailpipe_7, pm25_upstream_7, nox_tailpipe_7, nox_upstream_7, sox_tailpipe_7, sox_upstream_7 \
-                    = get_criteria_cf(calendar_year)
+                # get vehicle criteria cost factors
+                source_id = f'{reg_class_id} {fuel}'
+                pm25_low_3, sox_low_3, nox_low_3, \
+                    pm25_low_7, sox_low_7, nox_low_7, \
+                    pm25_high_3, sox_high_3, nox_high_3, \
+                    pm25_high_7, sox_high_7, nox_high_7 = get_criteria_cf(calendar_year, source_id)
 
-                # calculate criteria cost effects
-                pm25_vehicle_3_cost_dollars = pm25_tp_tons * pm25_tailpipe_3
-                pm25_upstream_3_cost_dollars = pm25_up_tons * pm25_upstream_3
+                pm25_veh_low_3_cost_dollars = pm25_veh_tons * pm25_low_3
+                sox_veh_low_3_cost_dollars = sox_veh_tons * sox_low_3
+                nox_veh_low_3_cost_dollars = nox_veh_tons * nox_low_3
+                pm25_veh_low_7_cost_dollars = pm25_veh_tons * pm25_low_7
+                sox_veh_low_7_cost_dollars = sox_veh_tons * sox_low_7
+                nox_veh_low_7_cost_dollars = nox_veh_tons * nox_low_7
+                pm25_veh_high_3_cost_dollars = pm25_veh_tons * pm25_high_3
+                sox_veh_high_3_cost_dollars = sox_veh_tons * sox_high_3
+                nox_veh_high_3_cost_dollars = nox_veh_tons * nox_high_3
+                pm25_veh_high_7_cost_dollars = pm25_veh_tons * pm25_high_7
+                sox_veh_high_7_cost_dollars = sox_veh_tons * sox_high_7
+                nox_veh_high_7_cost_dollars = nox_veh_tons * nox_high_7
 
-                nox_vehicle_3_cost_dollars = nox_tp_tons * nox_tailpipe_3
-                nox_upstream_3_cost_dollars = nox_up_tons * nox_upstream_3
+                # get upstream criteria cost factors
+                if 'electricity' in fuel:
+                    source_id = 'egu'
+                else:
+                    source_id = 'refinery'
 
-                sox_vehicle_3_cost_dollars = sox_tp_tons * sox_tailpipe_3
-                sox_upstream_3_cost_dollars = sox_up_tons * sox_upstream_3
+                pm25_low_3, sox_low_3, nox_low_3, \
+                    pm25_low_7, sox_low_7, nox_low_7, \
+                    pm25_high_3, sox_high_3, nox_high_3, \
+                    pm25_high_7, sox_high_7, nox_high_7 = get_criteria_cf(calendar_year, source_id)
 
-                pm25_vehicle_7_cost_dollars = pm25_tp_tons * pm25_tailpipe_7
-                pm25_upstream_7_cost_dollars = pm25_up_tons * pm25_upstream_7
+                pm25_up_low_3_cost_dollars = pm25_up_tons * pm25_low_3
+                sox_up_low_3_cost_dollars = sox_up_tons * sox_low_3
+                nox_up_low_3_cost_dollars = nox_up_tons * nox_low_3
+                pm25_up_low_7_cost_dollars = pm25_up_tons * pm25_low_7
+                sox_up_low_7_cost_dollars = sox_up_tons * sox_low_7
+                nox_up_low_7_cost_dollars = nox_up_tons * nox_low_7
+                pm25_up_high_3_cost_dollars = pm25_up_tons * pm25_high_3
+                sox_up_high_3_cost_dollars = sox_up_tons * sox_high_3
+                nox_up_high_3_cost_dollars = nox_up_tons * nox_high_3
+                pm25_up_high_7_cost_dollars = pm25_up_tons * pm25_high_7
+                sox_up_high_7_cost_dollars = sox_up_tons * sox_high_7
+                nox_up_high_7_cost_dollars = nox_up_tons * nox_high_7
 
-                nox_vehicle_7_cost_dollars = nox_tp_tons * nox_tailpipe_7
-                nox_upstream_7_cost_dollars = nox_up_tons * nox_upstream_7
+                criteria_veh_low_3_cost_dollars = pm25_veh_low_3_cost_dollars \
+                                                  + sox_veh_low_3_cost_dollars \
+                                                  + nox_veh_low_3_cost_dollars
+                criteria_veh_low_7_cost_dollars = pm25_veh_low_7_cost_dollars \
+                                                  + sox_veh_low_7_cost_dollars \
+                                                  + nox_veh_low_7_cost_dollars
+                criteria_veh_high_3_cost_dollars = pm25_veh_high_3_cost_dollars \
+                                                   + sox_veh_high_3_cost_dollars \
+                                                   + nox_veh_high_3_cost_dollars
+                criteria_veh_high_7_cost_dollars = pm25_veh_high_7_cost_dollars \
+                                                   + sox_veh_high_7_cost_dollars \
+                                                   + nox_veh_high_7_cost_dollars
 
-                sox_vehicle_7_cost_dollars = sox_tp_tons * sox_tailpipe_7
-                sox_upstream_7_cost_dollars = sox_up_tons * sox_upstream_7
+                criteria_up_low_3_cost_dollars = pm25_up_low_3_cost_dollars \
+                                                 + sox_up_low_3_cost_dollars \
+                                                 + nox_up_low_3_cost_dollars
+                criteria_up_low_7_cost_dollars = pm25_up_low_7_cost_dollars \
+                                                 + sox_up_low_7_cost_dollars \
+                                                 + nox_up_low_7_cost_dollars
+                criteria_up_high_3_cost_dollars = pm25_up_high_3_cost_dollars \
+                                                  + sox_up_high_3_cost_dollars \
+                                                  + nox_up_high_3_cost_dollars
+                criteria_up_high_7_cost_dollars = pm25_up_high_7_cost_dollars \
+                                                  + sox_up_high_7_cost_dollars \
+                                                  + nox_up_high_7_cost_dollars
 
-                criteria_vehicle_3_cost_dollars = pm25_vehicle_3_cost_dollars \
-                                                   + nox_vehicle_3_cost_dollars \
-                                                   + sox_vehicle_3_cost_dollars
-                criteria_upstream_3_cost_dollars = pm25_upstream_3_cost_dollars \
-                                                   + nox_upstream_3_cost_dollars \
-                                                   + sox_upstream_3_cost_dollars
+                criteria_low_3_cost_dollars = criteria_veh_low_3_cost_dollars + criteria_up_low_3_cost_dollars
+                criteria_low_7_cost_dollars = criteria_veh_low_7_cost_dollars + criteria_up_low_7_cost_dollars
 
-                criteria_vehicle_7_cost_dollars = pm25_vehicle_7_cost_dollars \
-                                                  + nox_vehicle_7_cost_dollars \
-                                                  + sox_vehicle_7_cost_dollars
-                criteria_upstream_7_cost_dollars = pm25_upstream_7_cost_dollars \
-                                                   + nox_upstream_7_cost_dollars \
-                                                   + sox_upstream_7_cost_dollars
-
-                criteria_3_cost_dollars = criteria_vehicle_3_cost_dollars + criteria_upstream_3_cost_dollars
-                criteria_7_cost_dollars = criteria_vehicle_7_cost_dollars + criteria_upstream_7_cost_dollars
+                criteria_high_3_cost_dollars = criteria_veh_high_3_cost_dollars + criteria_up_high_3_cost_dollars
+                criteria_high_7_cost_dollars = criteria_veh_high_7_cost_dollars + criteria_up_high_7_cost_dollars
 
             # save results in the vehicle effects dict for this vehicle
             veh_effects_dict = {
@@ -450,24 +502,48 @@ def calc_cost_effects(physical_effects_dict, context_fuel_cpm_dict, calc_health_
             }
             if calc_health_effects:
                 veh_effects_dict.update({
-                    'pm25_vehicle_3.0_cost_dollars': pm25_vehicle_3_cost_dollars,
-                    'pm25_upstream_3.0_cost_dollars': pm25_upstream_3_cost_dollars,
-                    'nox_vehicle_3.0_cost_dollars': nox_vehicle_3_cost_dollars,
-                    'nox_upstream_3.0_cost_dollars': nox_upstream_3_cost_dollars,
-                    'sox_vehicle_3.0_cost_dollars': sox_vehicle_3_cost_dollars,
-                    'sox_upstream_3.0_cost_dollars': sox_upstream_3_cost_dollars,
-                    'pm25_vehicle_7.0_cost_dollars': pm25_vehicle_7_cost_dollars,
-                    'pm25_upstream_7.0_cost_dollars': pm25_upstream_7_cost_dollars,
-                    'nox_vehicle_7.0_cost_dollars': nox_vehicle_7_cost_dollars,
-                    'nox_upstream_7.0_cost_dollars': nox_upstream_7_cost_dollars,
-                    'sox_vehicle_7.0_cost_dollars': sox_vehicle_7_cost_dollars,
-                    'sox_upstream_7.0_cost_dollars': sox_upstream_7_cost_dollars,
-                    'criteria_vehicle_3.0_cost_dollars': criteria_vehicle_3_cost_dollars,
-                    'criteria_upstream_3.0_cost_dollars': criteria_upstream_3_cost_dollars,
-                    'criteria_vehicle_7.0_cost_dollars': criteria_vehicle_7_cost_dollars,
-                    'criteria_upstream_7.0_cost_dollars': criteria_upstream_7_cost_dollars,
-                    'criteria_3.0_cost_dollars': criteria_3_cost_dollars,
-                    'criteria_7.0_cost_dollars': criteria_7_cost_dollars,
+                    'pm25_vehicle_low_3.0_cost_dollars': pm25_veh_low_3_cost_dollars,
+                    'sox_vehicle_low_3.0_cost_dollars': sox_veh_low_3_cost_dollars,
+                    'nox_vehicle_low_3.0_cost_dollars': nox_veh_low_3_cost_dollars,
+                    'pm25_vehicle_low_7.0_cost_dollars': pm25_veh_low_7_cost_dollars,
+                    'sox_vehicle_low_7.0_cost_dollars': sox_veh_low_7_cost_dollars,
+                    'nox_vehicle_low_7.0_cost_dollars': nox_veh_low_7_cost_dollars,
+                    
+                    'pm25_vehicle_high_3.0_cost_dollars': pm25_veh_high_3_cost_dollars,
+                    'sox_vehicle_high_3.0_cost_dollars': sox_veh_high_3_cost_dollars,
+                    'nox_vehicle_high_3.0_cost_dollars': nox_veh_high_3_cost_dollars,
+                    'pm25_vehicle_high_7.0_cost_dollars': pm25_veh_high_7_cost_dollars,
+                    'sox_vehicle_high_7.0_cost_dollars': sox_veh_high_7_cost_dollars,
+                    'nox_vehicle_high_7.0_cost_dollars': nox_veh_high_7_cost_dollars,
+
+                    'pm25_upstream_low_3.0_cost_dollars': pm25_up_low_3_cost_dollars,
+                    'sox_upstream_low_3.0_cost_dollars': sox_up_low_3_cost_dollars,
+                    'nox_upstream_low_3.0_cost_dollars': nox_up_low_3_cost_dollars,
+                    'pm25_upstream_low_7.0_cost_dollars': pm25_up_low_7_cost_dollars,
+                    'sox_upstream_low_7.0_cost_dollars': sox_up_low_7_cost_dollars,
+                    'nox_upstream_low_7.0_cost_dollars': nox_up_low_7_cost_dollars,
+
+                    'pm25_upstream_high_3.0_cost_dollars': pm25_up_high_3_cost_dollars,
+                    'sox_upstream_high_3.0_cost_dollars': sox_up_high_3_cost_dollars,
+                    'nox_upstream_high_3.0_cost_dollars': nox_up_high_3_cost_dollars,
+                    'pm25_upstream_high_7.0_cost_dollars': pm25_up_high_7_cost_dollars,
+                    'sox_upstream_high_7.0_cost_dollars': sox_up_high_7_cost_dollars,
+                    'nox_upstream_high_7.0_cost_dollars': nox_up_high_7_cost_dollars,
+                    
+                    'criteria_vehicle_low_3.0_cost_dollars': criteria_veh_low_3_cost_dollars,
+                    'criteria_vehicle_low_7.0_cost_dollars': criteria_veh_low_7_cost_dollars,
+                    'criteria_vehicle_high_3.0_cost_dollars': criteria_veh_high_3_cost_dollars,
+                    'criteria_vehicle_high_7.0_cost_dollars': criteria_veh_high_7_cost_dollars,
+                    
+                    'criteria_upstream_low_3.0_cost_dollars': criteria_up_low_3_cost_dollars,
+                    'criteria_upstream_low_7.0_cost_dollars': criteria_up_low_7_cost_dollars,
+                    'criteria_upstream_high_3.0_cost_dollars': criteria_up_high_3_cost_dollars,
+                    'criteria_upstream_high_7.0_cost_dollars': criteria_up_high_7_cost_dollars,
+
+                    'criteria_low_3.0_cost_dollars': criteria_low_3_cost_dollars,
+                    'criteria_low_7.0_cost_dollars': criteria_low_7_cost_dollars,
+                    'criteria_high_3.0_cost_dollars': criteria_high_3_cost_dollars,
+                    'criteria_high_7.0_cost_dollars': criteria_high_7_cost_dollars,
                 }
                 )
 
