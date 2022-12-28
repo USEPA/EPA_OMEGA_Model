@@ -14,15 +14,16 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,cost_factors_criteria,input_template_version:,0.3
+       input_template_name:,cost_factors_criteria,input_template_version:,0.4
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        calendar_year,dollar_basis,pm25_tailpipe_3.0_USD_per_uston,pm25_upstream_3.0_USD_per_uston,nox_tailpipe_3.0_USD_per_uston,nox_upstream_3.0_USD_per_uston,so2_tailpipe_3.0_USD_per_uston,so2_upstream_3.0_USD_per_uston,pm25_tailpipe_7.0_USD_per_uston,pm25_upstream_7.0_USD_per_uston,nox_tailpipe_7.0_USD_per_uston,nox_upstream_7.0_USD_per_uston,so2_tailpipe_7.0_USD_per_uston,so2_upstream_7.0_USD_per_uston
-        2020,2018,602362.7901,380000,6394.459424,8100,153440.3911,81000,543698.0811,350000,5770.584738,7300,138496.0826,74000
-        2025,2018,662886.8303,420000,6919.989335,8800,168685.8807,90000,598246.6516,380000,6243.868985,7900,152236.6921,80000
+        calendar_year,dollar_basis,source_id,pm25_low_3.0_USD_per_uston,sox_low_3.0_USD_per_uston,nox_low_3.0_USD_per_uston,pm25_low_7.0_USD_per_uston,sox_low_7.0_USD_per_uston,nox_low_7.0_USD_per_uston,pm25_high_3.0_USD_per_uston,sox_high_3.0_USD_per_uston,nox_high_3.0_USD_per_uston,pm25_high_7.0_USD_per_uston,sox_high_7.0_USD_per_uston,nox_high_7.0_USD_per_uston
+        2025,2020,car pump gasoline,709156.4844,127863.083,7233.620573,636535.1272,114771.2217,6494.477664,1515307.974,273678.4484,15369.82202,1362598.818,246100.5307,13822.37696
+        2030,2020,car pump gasoline,813628.2611,146570.4771,8157.897937,730502.0075,131597.8376,7325.874024,1681059.868,303337.4514,16764.7674,1511757.523,272790.6288,15077.6831
+        2035,2020,car pump gasoline,938850.3917,169075.4785,9195.259845,843175.5181,151847.912,8259.336809,1890653.219,340989.946,18455.67509,1700420.74,306683.2824,16599.76534
 
 Data Column Name and Description
     :calendar_year:
@@ -32,8 +33,11 @@ Data Column Name and Description
         The dollar basis of values within the table. Values are converted in-code to 'analysis_dollar_basis' using the
         cpi_price_deflators input file.
 
-    :pm25_tailpipe_3.0_USD_per_uston:
-        The structure for all cost factors is pollutant_source_discount-rate_units, where source is tailpipe or upstream and units are in US dollars per US ton.
+    :source_id:
+        The source of the pollutant, whether it be a gasoline car or an EGU or refinery.
+
+    :pm25_low_3.0_USD_per_uston:
+        The structure for all cost factors is pollutant_study_discount-rate_units, where study refers to the low or high valuation and units are in US dollars per US ton.
 
 ----
 
@@ -57,29 +61,33 @@ class CostFactorsCriteria(OMEGABase):
     calc_health_effects = True
 
     @staticmethod
-    def get_cost_factors(calendar_year, cost_factors):
+    def get_cost_factors(calendar_year, source_id, cost_factors):
         """
 
         Get cost factors by calendar year
 
         Args:
             calendar_year (int): calendar year to get cost factors for
+            source_id: (str): the pollutant source, e.g., 'car pump gasoline', 'egu', 'refinery'
             cost_factors (str, [strs]): name of cost factor or list of cost factor attributes to get
 
         Returns:
             Cost factor or list of cost factors
 
         """
-        cache_key = (calendar_year, cost_factors)
+        cache_key = (calendar_year, source_id, cost_factors)
 
         if cache_key not in CostFactorsCriteria._cache:
 
-            calendar_years = CostFactorsCriteria._data.keys()
+            calendar_years \
+                = [v['calendar_year'] for k, v in CostFactorsCriteria._data.items() if v['source_id'] == source_id]
+            # calendar_years = CostFactorsCriteria._data.keys()
             year = max([yr for yr in calendar_years if yr <= calendar_year])
 
             factors = []
             for cf in cost_factors:
-                factors.append(CostFactorsCriteria._data[year][cf])
+                factors.append(CostFactorsCriteria._data[year, source_id][cf])
+                # factors.append(CostFactorsCriteria._data[year][cf])
 
             if len(cost_factors) == 1:
                 CostFactorsCriteria._cache[cache_key] = factors[0]
@@ -110,22 +118,23 @@ class CostFactorsCriteria(OMEGABase):
             omega_log.logwrite(f'\nInitializing database from {filename} ...')
 
         input_template_name = 'cost_factors_criteria'
-        input_template_version = 0.31
+        input_template_version = 0.4
         cost_factors_input_template_columns = {
             'calendar_year',
             'dollar_basis',
-            'pm25_tailpipe_3.0_USD_per_uston',
-            'pm25_upstream_3.0_USD_per_uston',
-            'nox_tailpipe_3.0_USD_per_uston',
-            'nox_upstream_3.0_USD_per_uston',
-            'sox_tailpipe_3.0_USD_per_uston',
-            'sox_upstream_3.0_USD_per_uston',
-            'pm25_tailpipe_7.0_USD_per_uston',
-            'pm25_upstream_7.0_USD_per_uston',
-            'nox_tailpipe_7.0_USD_per_uston',
-            'nox_upstream_7.0_USD_per_uston',
-            'sox_tailpipe_7.0_USD_per_uston',
-            'sox_upstream_7.0_USD_per_uston'
+            'source_id',
+            'pm25_low_3.0_USD_per_uston',
+            'sox_low_3.0_USD_per_uston',
+            'nox_low_3.0_USD_per_uston',
+            'pm25_low_7.0_USD_per_uston',
+            'sox_low_7.0_USD_per_uston',
+            'nox_low_7.0_USD_per_uston',
+            'pm25_high_3.0_USD_per_uston',
+            'sox_high_3.0_USD_per_uston',
+            'nox_high_3.0_USD_per_uston',
+            'pm25_high_7.0_USD_per_uston',
+            'sox_high_7.0_USD_per_uston',
+            'nox_high_7.0_USD_per_uston',
         }
 
         template_errors = validate_template_version_info(filename, input_template_name,
@@ -147,7 +156,9 @@ class CostFactorsCriteria(OMEGABase):
                 if not template_errors:
                     df = gen_fxns.adjust_dollars(df, 'cpi_price_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
 
-                    CostFactorsCriteria._data = df.set_index('calendar_year').to_dict(orient='index')
+                    key = pd.Series(zip(df['calendar_year'], df['source_id']))
+
+                    CostFactorsCriteria._data = df.set_index(key).to_dict(orient='index')
 
             else:
                 CostFactorsCriteria.calc_health_effects = False
