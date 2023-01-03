@@ -210,6 +210,7 @@ def get_inputs_for_effects(arg=None):
             'e0_in_retail_gasoline',
             'e0_energy_density_ratio',
             'diesel_energy_density_ratio',
+            'fuel_reduction_leading_to_reduced_domestic_refining',
             # 'gallons_of_gasoline_us_annual',
             # 'bbl_oil_us_annual',
             # 'kwh_us_annual',
@@ -258,7 +259,8 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
         'curbweight_lbs',
     ]
 
-    grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, diesel_energy_density_ratio = get_inputs_for_effects()
+    grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, \
+        diesel_energy_density_ratio, fuel_reduction_leading_to_reduced_domestic_refining = get_inputs_for_effects()
     # gallons_of_gasoline_us_annual, bbl_oil_us_annual, kwh_us_annual, year_for_compares = get_inputs_for_effects(*input_attributes_list)
 
     # year_for_compares = int(year_for_compares)
@@ -523,11 +525,12 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
 
                         # calc upstream emissions for both liquid and electric fuel operation
                         kwhs, gallons = fuel_generation_kWh, fuel_consumption_gallons
-                        # voc_upstream_ustons = (kwhs * voc_ps + gallons * voc_ref) / grams_per_us_ton
-                        co_upstream_ustons = (kwhs * co_egu_rate + gallons * co_ref_rate) / grams_per_us_ton
-                        nox_upstream_ustons = (kwhs * nox_egu_rate + gallons * nox_ref_rate) / grams_per_us_ton
-                        pm25_upstream_ustons = (kwhs * pm25_egu_rate + gallons * pm25_ref_rate) / grams_per_us_ton
-                        sox_upstream_ustons = (kwhs * sox_egu_rate + gallons * sox_ref_rate) / grams_per_us_ton
+                        ref_factor = fuel_reduction_leading_to_reduced_domestic_refining
+                        voc_upstream_ustons = (gallons * voc_ref_rate * ref_factor) / grams_per_us_ton
+                        co_upstream_ustons = (kwhs * co_egu_rate + gallons * co_ref_rate * ref_factor) / grams_per_us_ton
+                        nox_upstream_ustons = (kwhs * nox_egu_rate + gallons * nox_ref_rate * ref_factor) / grams_per_us_ton
+                        pm25_upstream_ustons = (kwhs * pm25_egu_rate + gallons * pm25_ref_rate * ref_factor) / grams_per_us_ton
+                        sox_upstream_ustons = (kwhs * sox_egu_rate + gallons * sox_ref_rate * ref_factor) / grams_per_us_ton
                         hcl_upstream_ustons = (kwhs * hcl_egu_rate) / grams_per_us_ton
                         hg_upstream_ustons = (kwhs * hg_egu_rate) / grams_per_us_ton
                         # benzene_upstream_ustons = (kwhs * benzene_ps + gallons * benzene_ref) / grams_per_us_ton
@@ -536,12 +539,12 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                         # acetaldehyde_upstream_ustons = (kwhs * acetaldehyde_ps + gallons * acetaldehyde_ref) / grams_per_us_ton
                         # acrolein_upstream_ustons = (kwhs * acrolein_ps + gallons * acrolein_ref) / grams_per_us_ton
 
-                        co2_upstream_metrictons = (kwhs * co2_egu_rate + gallons * co2_ref_rate) / grams_per_metric_ton
-                        ch4_upstream_metrictons = (kwhs * ch4_egu_rate + gallons * ch4_ref_rate) / grams_per_metric_ton
-                        n2o_upstream_metrictons = (kwhs * n2o_egu_rate + gallons * n2o_ref_rate) / grams_per_metric_ton
+                        co2_upstream_metrictons = (kwhs * co2_egu_rate + gallons * co2_ref_rate * ref_factor) / grams_per_metric_ton
+                        ch4_upstream_metrictons = (kwhs * ch4_egu_rate + gallons * ch4_ref_rate * ref_factor) / grams_per_metric_ton
+                        n2o_upstream_metrictons = (kwhs * n2o_egu_rate + gallons * n2o_ref_rate * ref_factor) / grams_per_metric_ton
 
                         # sum vehicle and upstream into totals
-                        # voc_total_ustons = voc_tailpipe_ustons + voc_upstream_ustons
+                        voc_total_ustons = voc_upstream_ustons # + voc_tailpipe_ustons
                         nmog_total_ustons = nmog_veh_ustons # + nmog_upstream_ustons
                         co_total_ustons = co_veh_ustons + co_upstream_ustons
                         nox_total_ustons = nox_veh_ustons + nox_upstream_ustons
@@ -645,7 +648,7 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                             'n2o_vehicle_metrictons': n2o_veh_metrictons,
                             'co2_vehicle_metrictons': co2_veh_metrictons,
 
-                            # 'voc_upstream_ustons': voc_upstream_ustons,
+                            'voc_upstream_ustons': voc_upstream_ustons,
                             'co_upstream_ustons': co_upstream_ustons,
                             'nox_upstream_ustons': nox_upstream_ustons,
                             'pm25_upstream_ustons': pm25_upstream_ustons,
@@ -662,7 +665,7 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                             'n2o_upstream_metrictons': n2o_upstream_metrictons,
                             'co2_upstream_metrictons': co2_upstream_metrictons,
 
-                            # 'voc_total_ustons': voc_total_ustons,
+                            'voc_total_ustons': voc_total_ustons,
                             'nmog_total_ustons': nmog_total_ustons,
                             'co_total_ustons': co_total_ustons,
                             'nox_total_ustons': nox_total_ustons,
@@ -811,7 +814,8 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
     from context.onroad_fuels import OnroadFuel
     from common.omega_eval import Eval
 
-    grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, diesel_energy_density_ratio = get_inputs_for_effects()
+    grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, \
+        diesel_energy_density_ratio, fuel_reduction_leading_to_reduced_domestic_refining = get_inputs_for_effects()
 
     physical_effects_dict = dict()
     for key, nested_dict in LegacyFleet._legacy_fleet.items():
@@ -1022,23 +1026,24 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
 
         # calc upstream emissions for both liquid and electric fuel operation
         kwhs, gallons = fuel_generation_kWh, fuel_consumption_gallons
-        # voc_upstream_ustons = (kwhs * voc_ps + gallons * voc_ref) / grams_per_us_ton
-        co_upstream_ustons = (kwhs * co_egu_rate + gallons * co_ref_rate) / grams_per_us_ton
-        nox_upstream_ustons = (kwhs * nox_egu_rate + gallons * nox_ref_rate) / grams_per_us_ton
-        pm25_upstream_ustons = (kwhs * pm25_egu_rate + gallons * pm25_ref_rate) / grams_per_us_ton
-        sox_upstream_ustons = (kwhs * sox_egu_rate + gallons * sox_ref_rate) / grams_per_us_ton
+        ref_factor = fuel_reduction_leading_to_reduced_domestic_refining
+        voc_upstream_ustons = (gallons * voc_ref_rate * ref_factor) / grams_per_us_ton
+        co_upstream_ustons = (kwhs * co_egu_rate + gallons * co_ref_rate * ref_factor) / grams_per_us_ton
+        nox_upstream_ustons = (kwhs * nox_egu_rate + gallons * nox_ref_rate * ref_factor) / grams_per_us_ton
+        pm25_upstream_ustons = (kwhs * pm25_egu_rate + gallons * pm25_ref_rate * ref_factor) / grams_per_us_ton
+        sox_upstream_ustons = (kwhs * sox_egu_rate + gallons * sox_ref_rate * ref_factor) / grams_per_us_ton
         # benzene_upstream_ustons = (kwhs * benzene_ps + gallons * benzene_ref) / grams_per_us_ton
         # butadiene13_upstream_ustons = (kwhs * butadiene13_ps + gallons * butadiene13_ref) / grams_per_us_ton
         # formaldehyde_upstream_ustons = (kwhs * formaldehyde_ps + gallons * formaldehyde_ref) / grams_per_us_ton
         # acetaldehyde_upstream_ustons = (kwhs * acetaldehyde_ps + gallons * acetaldehyde_ref) / grams_per_us_ton
         # acrolein_upstream_ustons = (kwhs * acrolein_ps + gallons * acrolein_ref) / grams_per_us_ton
 
-        co2_upstream_metrictons = (kwhs * co2_egu_rate + gallons * co2_ref_rate) / grams_per_metric_ton
-        ch4_upstream_metrictons = (kwhs * ch4_egu_rate + gallons * ch4_ref_rate) / grams_per_metric_ton
-        n2o_upstream_metrictons = (kwhs * n2o_egu_rate + gallons * n2o_ref_rate) / grams_per_metric_ton
+        co2_upstream_metrictons = (kwhs * co2_egu_rate + gallons * co2_ref_rate * ref_factor) / grams_per_metric_ton
+        ch4_upstream_metrictons = (kwhs * ch4_egu_rate + gallons * ch4_ref_rate * ref_factor) / grams_per_metric_ton
+        n2o_upstream_metrictons = (kwhs * n2o_egu_rate + gallons * n2o_ref_rate * ref_factor) / grams_per_metric_ton
 
         # sum vehicle and upstream into totals
-        # voc_total_ustons = voc_tailpipe_ustons + voc_upstream_ustons
+        voc_total_ustons = voc_upstream_ustons # + voc_tailpipe_ustons
         nmog_total_ustons = nmog_veh_ustons  # + nmog_upstream_ustons
         co_total_ustons = co_veh_ustons + co_upstream_ustons
         nox_total_ustons = nox_veh_ustons + nox_upstream_ustons
@@ -1139,7 +1144,7 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
             'n2o_vehicle_metrictons': n2o_veh_metrictons,
             'co2_vehicle_metrictons': co2_veh_metrictons,
 
-            # 'voc_upstream_ustons': voc_upstream_ustons,
+            'voc_upstream_ustons': voc_upstream_ustons,
             'co_upstream_ustons': co_upstream_ustons,
             'nox_upstream_ustons': nox_upstream_ustons,
             'pm25_upstream_ustons': pm25_upstream_ustons,
@@ -1156,7 +1161,7 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
             'n2o_upstream_metrictons': n2o_upstream_metrictons,
             'co2_upstream_metrictons': co2_upstream_metrictons,
 
-            # 'voc_total_ustons': voc_total_ustons,
+            'voc_total_ustons': voc_total_ustons,
             'nmog_total_ustons': nmog_total_ustons,
             'co_total_ustons': co_total_ustons,
             'nox_total_ustons': nox_total_ustons,
