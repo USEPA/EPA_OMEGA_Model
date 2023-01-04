@@ -82,8 +82,9 @@ class WorkFactor(OMEGABase):
 
         """
         cache_key = (model_year, drive_system)
+        data_key = (model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system)
 
-        if cache_key not in WorkFactor._data:
+        if data_key not in WorkFactor._data:
 
             start_years = WorkFactor.start_years[drive_system]
 
@@ -93,14 +94,14 @@ class WorkFactor(OMEGABase):
 
                 xwd = WorkFactor._cache[(model_year, drive_system)]['xwd']
 
-                WorkFactor._data[cache_key] = \
+                WorkFactor._data[data_key] = \
                     eval(WorkFactor._cache[(model_year, drive_system)]['workfactor'], {}, locals())
 
             else:
                 raise Exception(
                     f'Missing workfactor calculation parameters for {model_year} or prior')
 
-        return WorkFactor._data[cache_key]
+        return WorkFactor._data[data_key]
 
 
     @staticmethod

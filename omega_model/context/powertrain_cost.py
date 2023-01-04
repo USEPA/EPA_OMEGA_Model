@@ -127,7 +127,7 @@ class PowertrainCost(OMEGABase):
         trans_cost = cyl_cost = liter_cost = 0
         high_eff_alt_cost = start_stop_cost = deac_pd_cost = deac_fc_cost = cegr_cost = atk2_cost = gdi_cost = 0
         turb12_cost = turb11_cost = 0
-        twc_cost = gpf_cost = 0
+        twc_cost = gpf_cost = diesel_eas_cost = 0
         ac_leakage_cost = ac_efficiency_cost = 0
         induction_inverter_cost = 0
         turb_scaler = 1  # default value adjusted below for turb packages
@@ -139,6 +139,7 @@ class PowertrainCost(OMEGABase):
         power_management_and_distribution_cost = brake_sensors_actuators_cost = 0
         additional_pair_of_half_shafts_cost = 0
         emachine_cost = 0
+        gasoline_flag = diesel_flag = 0
 
         CURBWT = pkg_info['curbweight_lbs']
         # VEHICLE_SIZE_CLASS = np.array([weight_bins.index(min([v for v in weight_bins if cw < v])) for cw in CURBWT])
@@ -233,25 +234,33 @@ class PowertrainCost(OMEGABase):
             turb_scaler += (turb_input_scaler - turb_scaler) * (pkg_info['turb11'] | pkg_info['turb12'])
 
             # 3-way catalyst cost
-            adj_factor_sub = _cache['ALL', 'twc_substrate']['dollar_adjustment']
-            adj_factor_wash = _cache['ALL', 'twc_washcoat']['dollar_adjustment']
-            adj_factor_can = _cache['ALL', 'twc_canning']['dollar_adjustment']
-            TWC_SWEPT_VOLUME = eval(_cache['ALL', 'twc_swept_volume']['value'], {'np': np}, locals_dict)
-            locals_dict = locals()
-            twc_substrate = eval(_cache['ALL', 'twc_substrate']['value'], {'np': np}, locals_dict) \
-                            * adj_factor_sub * learn
-            twc_washcoat = eval(_cache['ALL', 'twc_washcoat']['value'], {'np': np}, locals_dict) \
-                           * adj_factor_wash * learn
-            twc_canning = eval(_cache['ALL', 'twc_canning']['value'], {'np': np}, locals_dict) \
-                          * adj_factor_can * learn
-            twc_pgm = eval(_cache['ALL', 'twc_pgm']['value'], {'np': np}, locals_dict)
-            twc_cost = (twc_substrate + twc_washcoat + twc_canning + twc_pgm) * gasoline_flag
+            if gasoline_flag == 1:
+                adj_factor_sub = _cache['ALL', 'twc_substrate']['dollar_adjustment']
+                adj_factor_wash = _cache['ALL', 'twc_washcoat']['dollar_adjustment']
+                adj_factor_can = _cache['ALL', 'twc_canning']['dollar_adjustment']
+                TWC_SWEPT_VOLUME = eval(_cache['ALL', 'twc_swept_volume']['value'], {'np': np}, locals_dict)
+                locals_dict = locals()
+                twc_substrate = eval(_cache['ALL', 'twc_substrate']['value'], {'np': np}, locals_dict) \
+                                * adj_factor_sub * learn
+                twc_washcoat = eval(_cache['ALL', 'twc_washcoat']['value'], {'np': np}, locals_dict) \
+                               * adj_factor_wash * learn
+                twc_canning = eval(_cache['ALL', 'twc_canning']['value'], {'np': np}, locals_dict) \
+                              * adj_factor_can * learn
+                twc_pgm = eval(_cache['ALL', 'twc_pgm']['value'], {'np': np}, locals_dict)
+                twc_cost = (twc_substrate + twc_washcoat + twc_canning + twc_pgm)
 
-            # gpf cost
-            adj_factor_gpf = _cache['ALL', 'gpf_cost']['dollar_adjustment']
-            locals_dict = locals()
-            gpf_cost = eval(_cache['ALL', 'gpf_cost']['value'], {'np': np}, locals_dict) \
-                       * adj_factor_sub * learn * gasoline_flag
+                # gpf cost
+                adj_factor_gpf = _cache['ALL', 'gpf_cost']['dollar_adjustment']
+                locals_dict = locals()
+                gpf_cost = eval(_cache['ALL', 'gpf_cost']['value'], {'np': np}, locals_dict) \
+                           * adj_factor_gpf * learn
+
+            # diesel exhaust aftertreatment cost
+            elif diesel_flag == 1:
+                adj_factor_diesel_eas = _cache['ALL', 'diesel_aftertreatment_system']['dollar_adjustment']
+                locals_dict = locals()
+                diesel_eas_cost = eval(_cache['ALL', 'diesel_aftertreatment_system']['value'], {'np': np}, locals_dict) \
+                                  * adj_factor_diesel_eas * learn
 
         if powertrain_type in ['MHEV', 'HEV', 'PHEV', 'BEV']:
 
@@ -416,11 +425,15 @@ class PowertrainCost(OMEGABase):
         hvac_cost = eval(_cache[powertrain_type, 'HVAC']['value'], {'np': np}, locals_dict) \
                     * adj_factor * learn * quantity
 
-        engine_cost = (cyl_cost + liter_cost) * turb_scaler \
+        diesel_engine_cost_scaler = 1
+        if diesel_flag == 1:
+            diesel_engine_cost_scaler = eval(_cache['ALL', 'diesel_engine_cost_scaler']['value'], {'np': np}, locals_dict)
+
+        engine_cost = (cyl_cost + liter_cost) * turb_scaler * diesel_engine_cost_scaler \
                       + deac_pd_cost + deac_fc_cost \
                       + cegr_cost + atk2_cost + gdi_cost \
                       + turb12_cost + turb11_cost \
-                      + twc_cost + gpf_cost
+                      + twc_cost + gpf_cost + diesel_eas_cost
 
         driveline_cost = trans_cost \
                          + high_eff_alt_cost + start_stop_cost \
