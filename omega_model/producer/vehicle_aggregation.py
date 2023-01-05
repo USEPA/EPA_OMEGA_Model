@@ -422,9 +422,11 @@ class VehicleAggregation(OMEGABase):
                 df.loc[idx, 'glider_non_structure_cost_dollars'] = \
                     float(GliderCost.calc_cost(veh, pd.DataFrame([row]))[1])
 
-                model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system \
-                    = row['model_year'], row['curbweight_lbs'], row['gvwr_lbs'], row['gcwr_lbs'], row['drive_system']
-                workfactor = WorkFactor.calc_workfactor(model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system)
+                workfactor = 0
+                if row['reg_class_id'] == 'mediumduty':
+                    model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system \
+                        = row['model_year'], row['curbweight_lbs'], row['gvwr_lbs'], row['gcwr_lbs'], row['drive_system']
+                    workfactor = WorkFactor.calc_workfactor(model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system)
                 df.at[idx, 'workfactor'] = workfactor
                 veh.gvwr_lbs = row['gvwr_lbs']
                 veh.gcwr_lbs = row['gcwr_lbs']

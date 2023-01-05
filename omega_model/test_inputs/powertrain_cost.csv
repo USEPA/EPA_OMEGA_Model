@@ -1,4 +1,4 @@
-input_template_name:,powertrain_cost,input_template_version:,0.1,description:,20230104 add diesel entries
+input_template_name:,powertrain_cost,input_template_version:,0.1,description:,"20230104 add diesel entries, update HEV & MHEV battery costs"
 powertrain_type,item,value,quantity,dollar_basis,notes
 ALL,dollars_per_cylinder,((-28.814) * CYL + 726.27) * CYL * MARKUP_ICE,,2019,
 ALL,dollars_per_liter,((400) * LITERS) * MARKUP_ICE,,2019,
@@ -37,8 +37,8 @@ ICE,HVAC,((11.5) * VEHICLE_SIZE_CLASS + 195.5) * MARKUP_ICE,1,2019,set equal to 
 BEV,battery,261.61 * (KWH ** -0.184) * KWH * MARKUP_BEV,,2019,KWH denotes gross kWh; coefficients denote 250K production volume
 BEV,battery_offset,"{""dollars_per_kwh"": {2023: -45, 2024: -45, 2025: -45, 2026: -45, 2027: -45, 2028: -45, 2029: -45, 2030: -33.75, 2031: -22.50, 2032: -11.25}}",,,
 PHEV,battery,261.61 * (KWH ** -0.184) * KWH * MARKUP_PHEV,,2019,KWH denotes gross kWh; coefficients denote 250K production volume
-HEV,battery,((-250.72) * KWH + 1058.2) * KWH * MARKUP_HEV,,2017,
-MHEV,battery,((-250.72) * KWH + 1058.2) * KWH * MARKUP_HEV,,2017,
+HEV,battery,"max(((-250.72) * KWH + 1058.2), 532) * KWH * MARKUP_HEV",,2017,
+MHEV,battery,"max(((-250.72) * KWH + 1058.2), 532) * KWH * MARKUP_HEV",,2017,
 BEV,motor_single,((4.29) * KW) * MARKUP_BEV,1,2019,Costing_Guide_BEV_HEV_Draft_04_30_2021.xlsx
 BEV,inverter_single,((2.5) * KW) * MARKUP_BEV,1,2019,ibid
 BEV,induction_motor_single,(0) * 1,0,2019,ibid

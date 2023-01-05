@@ -334,8 +334,9 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                           safety['annual_vmt_rebound'], \
                           safety['context_size_class']
 
-                    sourcetype_name = 'passenger car' # TODO does this come from somewhere at some point?
-                    if base_year_reg_class_id == 'truck':
+                    if base_year_reg_class_id == 'car':
+                        sourcetype_name = 'passenger car'
+                    elif base_year_reg_class_id == 'truck':
                         sourcetype_name = 'passenger truck'
                     elif base_year_reg_class_id == 'mediumduty' and 'cuv' in body_style:
                         sourcetype_name = 'passenger truck'
@@ -897,8 +898,9 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
 
         vmt_electricity = vmt_liquid_fuel = transmission_efficiency = 0
 
-        sourcetype_name = 'passenger car'
-        if reg_class_id == 'truck':
+        if reg_class_id == 'car':
+            sourcetype_name = 'passenger car'
+        elif reg_class_id == 'truck':
             sourcetype_name = 'passenger truck'
         elif reg_class_id == 'mediumduty' and 'cuv' in body_style:
             sourcetype_name = 'passenger truck'
