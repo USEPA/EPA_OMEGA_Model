@@ -120,16 +120,18 @@ def get_egu_emission_rate(calendar_year, kwh_consumption, kwh_generation):
 
     kwh_session = kwh_consumption
 
-    rate_names = ('co_grams_per_kwh',
-                  'nox_grams_per_kwh',
-                  'pm25_grams_per_kwh',
-                  'sox_grams_per_kwh',
-                  'co2_grams_per_kwh',
-                  'ch4_grams_per_kwh',
-                  'n2o_grams_per_kwh',
-                  'hcl_grams_per_kwh',
-                  'hg_grams_per_kwh',
-                  )
+    rate_names = (
+        'voc_grams_per_kwh',
+        'co_grams_per_kwh',
+        'nox_grams_per_kwh',
+        'pm25_grams_per_kwh',
+        'sox_grams_per_kwh',
+        'co2_grams_per_kwh',
+        'ch4_grams_per_kwh',
+        'n2o_grams_per_kwh',
+        'hcl_grams_per_kwh',
+        'hg_grams_per_kwh',
+    )
 
     return EmissionRatesEGU.get_emission_rate(calendar_year, kwh_session, rate_names)
 
@@ -305,7 +307,7 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                         fuel_generation_kWh_annual = fuel_consumption_kWh_annual / transmission_efficiency
 
         # upstream EGU emission rates for this calendar year to apply to electric fuel operation
-        co_egu_rate, nox_egu_rate, pm25_egu_rate, sox_egu_rate, co2_egu_rate, ch4_egu_rate, n2o_egu_rate, hcl_egu_rate, hg_egu_rate \
+        voc_egu_rate, co_egu_rate, nox_egu_rate, pm25_egu_rate, sox_egu_rate, co2_egu_rate, ch4_egu_rate, n2o_egu_rate, hcl_egu_rate, hg_egu_rate \
             = get_egu_emission_rate(calendar_year, fuel_consumption_kWh_annual, fuel_generation_kWh_annual)
 
         for vad in vads:
@@ -527,7 +529,7 @@ def calc_physical_effects(calendar_years, safety_effects_dict):
                         # calc upstream emissions for both liquid and electric fuel operation
                         kwhs, gallons = fuel_generation_kWh, fuel_consumption_gallons
                         ref_factor = fuel_reduction_leading_to_reduced_domestic_refining
-                        voc_upstream_ustons = (gallons * voc_ref_rate * ref_factor) / grams_per_us_ton
+                        voc_upstream_ustons = (kwhs * voc_egu_rate + gallons * voc_ref_rate * ref_factor) / grams_per_us_ton
                         co_upstream_ustons = (kwhs * co_egu_rate + gallons * co_ref_rate * ref_factor) / grams_per_us_ton
                         nox_upstream_ustons = (kwhs * nox_egu_rate + gallons * nox_ref_rate * ref_factor) / grams_per_us_ton
                         pm25_upstream_ustons = (kwhs * pm25_egu_rate + gallons * pm25_ref_rate * ref_factor) / grams_per_us_ton
@@ -893,7 +895,7 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
         voc_ref_rate = co_ref_rate = nox_ref_rate = pm25_ref_rate = sox_ref_rate = 0
         co2_ref_rate = ch4_ref_rate = n2o_ref_rate = 0
 
-        co_egu_rate = nox_egu_rate = pm25_egu_rate = sox_egu_rate = hcl_egu_rate = hg_egu_rate = 0
+        voc_egu_rate = co_egu_rate = nox_egu_rate = pm25_egu_rate = sox_egu_rate = hcl_egu_rate = hg_egu_rate = 0
         co2_egu_rate = ch4_egu_rate = n2o_egu_rate = 0
 
         vmt_electricity = vmt_liquid_fuel = transmission_efficiency = 0
@@ -923,7 +925,7 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
                     = get_vehicle_emission_rate(model_year, sourcetype_name, reg_class_id, fuel, ind_var_value)
 
                 # the energy consumption and generation values do not matter here, so set to 0
-                co_egu_rate, nox_egu_rate, pm25_egu_rate, sox_egu_rate, co2_egu_rate, ch4_egu_rate, n2o_egu_rate, hcl_egu_rate, hg_egu_rate \
+                voc_egu_rate, co_egu_rate, nox_egu_rate, pm25_egu_rate, sox_egu_rate, co2_egu_rate, ch4_egu_rate, n2o_egu_rate, hcl_egu_rate, hg_egu_rate \
                     = get_egu_emission_rate(calendar_year, 0, 0)
 
             elif 'gasoline' in fuel:
@@ -1029,7 +1031,7 @@ def calc_legacy_fleet_physical_effects(legacy_fleet_safety_effects_dict):
         # calc upstream emissions for both liquid and electric fuel operation
         kwhs, gallons = fuel_generation_kWh, fuel_consumption_gallons
         ref_factor = fuel_reduction_leading_to_reduced_domestic_refining
-        voc_upstream_ustons = (gallons * voc_ref_rate * ref_factor) / grams_per_us_ton
+        voc_upstream_ustons = (kwhs * voc_egu_rate + gallons * voc_ref_rate * ref_factor) / grams_per_us_ton
         co_upstream_ustons = (kwhs * co_egu_rate + gallons * co_ref_rate * ref_factor) / grams_per_us_ton
         nox_upstream_ustons = (kwhs * nox_egu_rate + gallons * nox_ref_rate * ref_factor) / grams_per_us_ton
         pm25_upstream_ustons = (kwhs * pm25_egu_rate + gallons * pm25_ref_rate * ref_factor) / grams_per_us_ton
