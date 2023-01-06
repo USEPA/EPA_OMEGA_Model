@@ -39,6 +39,7 @@ Powertrain Cost File,String,powertrain_cost.csv,
 Glider Cost File,String,glider_cost.csv,
 Body Styles File,String,body_styles.csv,
 Mass Scaling File,String,mass_scaling.csv,
+Workfactor Definition File,String,workfactor_definition.csv,workfactor_definition.csv
 ,,,
 Session Settings,,,
 Enable Session,TRUE / FALSE,TRUE,TRUE
