@@ -86,6 +86,7 @@ Sample Data Columns
         Production Multipliers File,String,production_multipliers.csv
         Regulatory Classes File,String,regulatory_classes.csv
         Required Sales Share File,String,required_sales_share.csv
+        Workfactor Definition File,String,workfactor_definition.csv
         ,,
         Session Postproc Settings,,
         General Inputs for Effects File,String,general_inputs_for_effects.csv
@@ -248,6 +249,10 @@ Data Row Name and Description
 :Mass Scaling File *(str)*:
     The relative or absolute path to the mass scaling file,
     loaded by ``context.mass_scaling``
+
+:Workfactor Definition File *(str)*:
+    The relative or absolute path to the workfactor definition file,
+    loaded by ``policy.workfactor_definition.WorkFactor``
 
 :General Inputs for Effects File *(str)*:
     The relative or absolute path to the general inputs used for effects calculations,
@@ -856,6 +861,7 @@ class OMEGABatchObject(OMEGABase):
         self.settings.glider_cost_input_file = self.read_parameter('Glider Cost File')
         self.settings.body_styles_file = self.read_parameter('Body Styles File')
         self.settings.mass_scaling_file = self.read_parameter('Mass Scaling File')
+        self.settings.workfactor_definition_file = self.read_parameter('Workfactor Definition File')
 
         # read postproc settings
         self.settings.general_inputs_for_effects_file = self.read_parameter('General Inputs for Effects File')
@@ -1017,6 +1023,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.glider_cost_input_file = self.read_parameter('Glider Cost File')
         self.settings.body_styles_file = self.read_parameter('Body Styles File')
         self.settings.mass_scaling_file = self.read_parameter('Mass Scaling File')
+        self.settings.workfactor_definition_file = self.read_parameter('Workfactor Definition File')
 
         # read postproc settings
         self.settings.general_inputs_for_effects_file = self.read_parameter('General Inputs for Effects File')
