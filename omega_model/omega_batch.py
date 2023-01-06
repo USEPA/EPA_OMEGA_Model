@@ -1350,8 +1350,18 @@ def run_bundled_sessions(options, remote_batchfile, session_list):
                         batch.batch_log.logwrite('??? Weird Summary File for Session "%s" : last_line = "%s" ???' % (
                             batch.sessions[s_index].name, last_line))
 
-                    os.rename(os.path.join(batch_path, batch.sessions[s_index].name),
-                              os.path.join(batch_path, completion_prefix + batch.sessions[s_index].name))
+                    rename_complete = False
+                    wait_time = 0
+                    while not rename_complete and (wait_time < 3600):
+                        time.sleep(1)
+                        wait_time += 1
+                        try:
+                            os.rename(os.path.join(batch_path, batch.sessions[s_index].name),
+                                  os.path.join(batch_path, completion_prefix + batch.sessions[s_index].name))
+                            rename_complete = True
+                            batch.batch_log.logwrite('Rename complete after %s seconds' % wait_time)
+                        except:
+                            pass
             else:
                 # abnormal run, display fault
                 batch.batch_log.logwrite(
