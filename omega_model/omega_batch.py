@@ -1361,7 +1361,8 @@ def run_bundled_sessions(options, remote_batchfile, session_list):
                             rename_complete = True
                             batch.batch_log.logwrite('Rename complete after %s seconds' % wait_time)
                         except:
-                            pass
+                            if wait_time % 15 == 0:
+                                print('Retrying folder rename after fail, attempt #%d' % wait_time)
             else:
                 # abnormal run, display fault
                 batch.batch_log.logwrite(
