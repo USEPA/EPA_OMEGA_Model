@@ -367,9 +367,11 @@ def calc_legacy_fleet_safety_effects(calendar_years, vmt_adjustments):
                 = legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year - 1, age - 1)]['odometer']
             odometer_adjusted = odometer_last_year + annual_vmt_adjusted
 
-        fueling_class = base_year_powertrain_type = threshold_lbs = 'ICE'
+        fueling_class = base_year_powertrain_type = 'ICE'
         if 'BEV' in market_class_id:
             fueling_class = base_year_powertrain_type = 'BEV'
+
+        threshold_lbs, change_per_100lbs_below, change_per_100lbs_above = get_safety_values(body_style)
 
         vehicle_safety_dict = dict()
 
