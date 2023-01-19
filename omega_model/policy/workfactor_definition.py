@@ -95,7 +95,7 @@ class WorkFactor(OMEGABase):
                 xwd = WorkFactor._cache[(model_year, drive_system)]['xwd']
 
                 WorkFactor._data[data_key] = \
-                    eval(WorkFactor._cache[(model_year, drive_system)]['workfactor'], {}, locals())
+                    eval(WorkFactor._cache[(model_year, drive_system)]['workfactor'], {'np': np}, locals())
 
             else:
                 raise Exception(
@@ -144,6 +144,10 @@ class WorkFactor(OMEGABase):
                                                              verbose=verbose)
 
             if not template_errors:
+
+                df['workfactor'] = df['workfactor'] \
+                    .apply(lambda x: str.replace(x, 'max(', 'np.maximum(').replace('min(', 'np.minimum('))
+
                 cache_keys = zip(
                     df['start_year'],
                     df['drive_system'],
