@@ -197,9 +197,9 @@ try:
             self.verbose = False
             self.iterate_producer_consumer = True
 
-            self.producer_voluntary_overcompliance = False
-            self.producer_voluntary_overcompliance_min_benefit_frac = 0.0  # minimum benefit of overcompliance, as a fraction of compliance cost
-            self.producer_voluntary_overcompliance_min_strategic_compliance_ratio = 0.95
+            self.producer_voluntary_overcompliance = True
+            self.producer_voluntary_overcompliance_min_benefit_frac = 0.01  # minimum benefit of overcompliance, as a fraction of compliance cost
+            self.producer_voluntary_overcompliance_min_strategic_compliance_ratio = 0.9
             self.producer_price_modification_scaler = 1.0
             self.producer_footprint_wtp = 400
             self.producer_consumer_max_iterations = 5  # recommend 2+
