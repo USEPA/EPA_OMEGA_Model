@@ -89,6 +89,23 @@ class VehicleTargetsBase:
                         inspect.currentframe().f_code.co_name)
 
     @staticmethod
+    def calc_cert_useful_life_vmt(reg_class_id, model_year, cert_fuel_id):
+        """
+        Get lifetime VMT as a function of regulatory class and model year.
+
+        Args:
+            reg_class_id (str): e.g. 'car','truck'
+            model_year (numeric): model year
+
+        Returns:
+
+            Lifetime VMT for the regulatory class and model year.
+
+        """
+        raise Exception('**Attempt to call abstract method TargetsBase.%s() without child class override**' %
+                        inspect.currentframe().f_code.co_name)
+
+    @staticmethod
     def calc_target_co2e_Mg(vehicle, sales_variants=None):
         """
         Calculate vehicle target CO2e Mg as a function of the vehicle, the standards and optional sales options.

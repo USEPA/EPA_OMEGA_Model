@@ -7,6 +7,7 @@ bbl_oil_us_annual,6660000000,6.66 billion BBL oil consumption in US in 2020 (htt
 year_for_compares,2020,,
 e0_in_retail_gasoline,0.9,,
 e0_energy_density_ratio,0.880697154,114200/129670; ratio of E0 to crude oil energy density (BTU/gal) according to GREET 2017,
-diesel_energy_density_ratio,0.998,129488/129670 ratio of diesel to crude oil energy density (BTU/gal) see NTR parameters file
+diesel_energy_density_ratio,0.998,129488/129670 ratio of diesel to crude oil energy density (BTU/gal) see NTR parameters file,
 grams_per_us_ton,907185,,
 grams_per_metric_ton,1000000,,
+fuel_reduction_leading_to_reduced_domestic_refining,0.07,,

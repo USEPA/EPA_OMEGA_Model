@@ -12,7 +12,7 @@ Defines class OMEGARuntimeOptions which control an individual simulation session
 """
 
 # OMEGA code version number
-code_version = "2.0.1"
+code_version = "2.1.0"
 print('loading omega version %s' % code_version)
 
 import os, sys
@@ -57,7 +57,7 @@ try:
     # enumerated values
     fueling_classes = OMEGAEnum(['BEV', 'ICE'])
     ownership_classes = OMEGAEnum(['shared', 'private'])
-    legacy_reg_classes = OMEGAEnum(['car', 'truck'])
+    legacy_reg_classes = OMEGAEnum(['car', 'truck', 'mediumduty'])
     fuel_units = OMEGAEnum(['gallon', 'kWh'])
 
 
@@ -135,6 +135,7 @@ try:
             self.policy_fuels_file = path + 'test_inputs/policy_fuels.csv'
             self.ghg_credit_params_file = path + 'test_inputs/ghg_credit_params.csv'
             self.ghg_credits_file = path + 'test_inputs/ghg_credits.csv'
+            self.workfactor_definition_file = path + 'test_inputs/workfactor_definition.csv'
 
             self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market-body_style.csv'
             self.market_classes_file = path + 'test_inputs/market_classes-body_style.csv'
@@ -200,6 +201,7 @@ try:
             self.producer_voluntary_overcompliance_min_benefit_frac = 0.0  # minimum benefit of overcompliance, as a fraction of compliance cost
             self.producer_voluntary_overcompliance_min_strategic_compliance_ratio = 0.95
             self.producer_price_modification_scaler = 1.0
+            self.producer_footprint_wtp = 400
             self.producer_consumer_max_iterations = 5  # recommend 2+
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5

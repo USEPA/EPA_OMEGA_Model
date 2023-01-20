@@ -34,6 +34,7 @@ from common import omega_log
 
 from omega_model import OMEGASessionSettings
 bundle_output_folder_name = OMEGASessionSettings().output_folder
+MsgTimeout = 120
 
 print('importing %s' % __file__)
 
@@ -273,6 +274,9 @@ class DispyCluster(object):
 
         """
         import dispy
+
+        dispy.config.MsgTimeout = MsgTimeout
+
         self.master_ip = ''
         self.desired_node_list = []
         self.found_node_list = []

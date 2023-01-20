@@ -109,8 +109,19 @@ class EmissionRatesVehicles(OMEGABase):
                        and k[3] == in_use_fuel_id
                        and k[4] == rate_name
                 ]
-                max_start_year = max([k[0] for k in rate_keys])
-                start_year = min(model_year, max_start_year)
+                if rate_keys == []:
+                    rate_keys = [
+                        k for k in EmissionRatesVehicles._data
+                        if k[1] == sourcetype_name
+                           and k[2] == reg_class_id
+                           and k[3] == in_use_fuel_id
+                           and k[4] == rate_name
+                    ]
+                    start_year = min([k[0] for k in rate_keys])
+                else:
+                    max_start_year = max([k[0] for k in rate_keys])
+                    start_year = min(model_year, max_start_year)
+
                 rate_key = start_year, sourcetype_name, reg_class_id, in_use_fuel_id, rate_name
 
                 rate = eval(EmissionRatesVehicles._data[rate_key]['equation'], {}, locals_dict)

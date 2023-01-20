@@ -302,21 +302,25 @@ class NewVehicleMarket(OMEGABase):
                 return 0
 
         elif context_size_class and not context_reg_class:
-            return sum(NewVehicleMarket._data_by_csc[value][omega_globals.options.context_id,
+            return np.sum(NewVehicleMarket._data_by_csc[value][omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
-                                                    context_size_class, calendar_year].values)
+                                                    context_size_class, calendar_year])
 
         elif context_reg_class and not context_size_class:
-            return NewVehicleMarket._data_by_rc[value].loc[omega_globals.options.context_id,
+            if (omega_globals.options.context_id, omega_globals.options.context_case_id, context_reg_class,
+                calendar_year) in NewVehicleMarket._data_by_rc[value]:
+                    return NewVehicleMarket._data_by_rc[value].loc[omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
                                                     context_reg_class, calendar_year]
+            else:
+                return 0
 
         elif context_body_style:
-            return sum(NewVehicleMarket._data_by_bs[value].loc[omega_globals.options.context_id,
+            return np.sum(NewVehicleMarket._data_by_bs[value].loc[omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
                                                     context_body_style, calendar_year])
         else:
-            return sum(NewVehicleMarket._data_by_total[value][omega_globals.options.context_id,
+            return np.sum(NewVehicleMarket._data_by_total[value][omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
                                                     calendar_year].values)
 

@@ -175,7 +175,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                     _cache[powertrain_type][cost_curve_class] = {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
 
                     for c in rse_columns:
-                        _cache[powertrain_type][cost_curve_class]['rse'][c] = compile(class_cloud[c], '<string>', 'eval')
+                        _cache[powertrain_type][cost_curve_class]['rse'][c] = compile(str(class_cloud[c]), '<string>', 'eval')
 
                     rse_tuple = (sorted(rse_columns), tuple(class_cloud[sorted(rse_columns)]))
 

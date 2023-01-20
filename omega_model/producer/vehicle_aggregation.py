@@ -219,7 +219,7 @@ from omega_model import *
 # for now, eventually need to be inputs somewhere:
 # 'manufacturer_id' added if not consolidating manufacturers
 aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
-                       'cert_fuel_id', 'reg_class_id', 'drive_system', 'model_year',
+                       'cert_fuel_id', 'reg_class_id', 'drive_system', 'dual_rear_wheel', 'model_year',
                        'prior_redesign_year', 'redesign_interval', 'cost_curve_class', 'structure_material']
 
 
@@ -257,6 +257,7 @@ class VehicleAggregation(OMEGABase):
         from context.new_vehicle_market import NewVehicleMarket
         from context.glider_cost import GliderCost
         from context.powertrain_cost import PowertrainCost
+        from policy.workfactor_definition import WorkFactor
 
         omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
 
@@ -291,6 +292,7 @@ class VehicleAggregation(OMEGABase):
                                'cert_fuel_id': ["{'gasoline':1.0}", "{'diesel':1.0}", "{'hydrogen':1.0}",
                                                 "{'electricity':1.0}"],
                                'drive_system': [2, 4],  # for now, anyway... 1,2,3??
+                               'dual_rear_wheel': [0, 1],
                                'high_eff_alternator': [0, 1],
                                'start_stop': [0, 1],
                                'hev': [0, 1],
@@ -370,6 +372,7 @@ class VehicleAggregation(OMEGABase):
             df['delta_glider_non_structure_mass_lbs'], df['usable_battery_capacity_norm'] = \
                 MassScaling.calc_mass_terms(df, df['structure_material'], df['eng_rated_hp'],
                                             df['battery_kwh'], df['footprint_ft2'])
+            df.insert(len(df.columns), 'workfactor', 0)
 
             if omega_globals.options.vehicles_file_base_year is not None:
                 model_year_delta = omega_globals.options.vehicles_file_base_year - df['model_year']
@@ -418,6 +421,17 @@ class VehicleAggregation(OMEGABase):
 
                 df.loc[idx, 'glider_non_structure_cost_dollars'] = \
                     float(GliderCost.calc_cost(veh, pd.DataFrame([row]))[1])
+
+                workfactor = 0
+                if row['reg_class_id'] == 'mediumduty':
+                    model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system \
+                        = row['model_year'], row['curbweight_lbs'], row['gvwr_lbs'], row['gcwr_lbs'], row['drive_system']
+                    workfactor = WorkFactor.calc_workfactor(model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system)
+                df.at[idx, 'workfactor'] = workfactor
+                veh.gvwr_lbs = row['gvwr_lbs']
+                veh.gcwr_lbs = row['gcwr_lbs']
+                veh.base_year_gvwr_lbs = row['gvwr_lbs']
+                veh.base_year_gcwr_lbs = row['gcwr_lbs']
 
                 # glider_costs = GliderCost.calc_cost(veh, pd.DataFrame([row]))  # includes structure_cost and glider_non_structure_cost
                 # glider_cost_terms = ['structure_cost', 'glider_non_structure_cost']
