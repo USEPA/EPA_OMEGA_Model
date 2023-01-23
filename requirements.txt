@@ -32,7 +32,7 @@ pyDOE2
 openpyxl
 
 # for omega_gui:
-#PySide2
+PySide2
 multitimer
 playsound
 PyYAML
