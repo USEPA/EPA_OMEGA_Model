@@ -17,13 +17,13 @@ SQLAlchemy<1.4.0
 treelib
 
 # for readthedocs:
-sphinx-rtd-theme>=1.0.0<=2.0.0
+sphinx-rtd-theme>=1.0.0,<=2.0.0
 
 # for dispy parallel processing:
 dispy==4.15.2
 pycos==4.12.2
 psutil
-netifaces
+netifaces ; platform_system!="Windows" or python_version<="3.8"
 
 # for omega batch process:
 pyDOE2
@@ -31,8 +31,8 @@ pyDOE2
 # for reading excel files (omega_preproc):
 openpyxl
 
-# for omega_gui:
-PySide2
-multitimer
-playsound
-PyYAML
+# for omega_gui (PySide2 is INTEL only):
+PySide2 ; platform_machine=="x86_64"
+multitimer ; platform_machine=="x86_64"
+playsound ; platform_machine=="x86_64"
+PyYAML ; platform_machine=="x86_64"
