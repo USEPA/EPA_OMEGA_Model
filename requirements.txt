@@ -20,8 +20,8 @@ treelib
 sphinx-rtd-theme>=1.0.0<=2.0.0
 
 # for dispy parallel processing:
-dispy==4.12.4
-pycos==4.11.0
+dispy==4.15.2
+pycos==4.12.2
 psutil
 netifaces
 
@@ -32,7 +32,7 @@ pyDOE2
 openpyxl
 
 # for omega_gui:
-PySide2
+#PySide2
 multitimer
 playsound
 PyYAML
