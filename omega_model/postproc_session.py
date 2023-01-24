@@ -85,6 +85,7 @@ def run_postproc(iteration_log, credit_banks):
     manufacturer_ids = sorted(vehicles_table['manufacturer_id'].unique())
 
     if omega_globals.manufacturer_aggregation and omega_globals.options.consolidate_manufacturers:
+        # create individual OEM annual data from production vehicle data
         from producer.manufacturer_annual_data import ManufacturerAnnualData
         from producer.vehicle_aggregation import aggregation_columns
 
@@ -109,6 +110,26 @@ def run_postproc(iteration_log, credit_banks):
                 credit_banks[manufacturer_id] = None
 
         omega_globals.session.flush()
+    elif not omega_globals.options.consolidate_manufacturers:
+        # create consolidated_OEM annual data from individual OEM annual data
+        from producer.manufacturer_annual_data import ManufacturerAnnualData
+
+        vehicles_table = dataframe_to_numeric(vehicles_table)
+
+        manufacturer_id = 'consolidated_OEM'
+
+        for calendar_year in vehicle_years[1:]:
+            mfr_data = vehicles_table[vehicles_table['model_year'] == calendar_year]
+
+            ManufacturerAnnualData. \
+                create_manufacturer_annual_data(model_year=calendar_year,
+                                                compliance_id=manufacturer_id,
+                                                target_co2e_Mg=sum(mfr_data['target_co2e_megagrams']),
+                                                calendar_year_cert_co2e_Mg=sum(mfr_data['cert_co2e_megagrams']),
+                                                manufacturer_vehicle_cost_dollars=
+                                                sum(mfr_data['new_vehicle_mfr_cost_dollars'] *
+                                                    mfr_data['_initial_registered_count']),
+                                                )
 
     manufacturer_annual_data_table = dump_table_to_csv(omega_globals.options.output_folder, 'manufacturer_annual_data',
                       omega_globals.options.session_unique_name + '_manufacturer_annual_data',
@@ -135,6 +156,39 @@ def run_postproc(iteration_log, credit_banks):
     else:
         compliance_ids = VehicleFinal.compliance_ids
 
+    if not omega_globals.options.consolidate_manufacturers:
+        # create consolidated_OEM credits and transactions based on individual OEM cert by model year
+        from policy.credit_banking import CreditBank
+
+        compliance_id = 'consolidated_OEM'
+
+        credit_banks[compliance_id] = CreditBank(
+            omega_globals.options.ghg_credit_params_file,
+            omega_globals.options.ghg_credits_file, compliance_id)
+
+        for calendar_year in \
+                range(omega_globals.options.analysis_initial_year,
+                      omega_globals.options.analysis_final_year + 1):
+            credit_banks[compliance_id].update_credit_age(calendar_year)
+
+            mad = manufacturer_annual_data_table[(manufacturer_annual_data_table['compliance_id'] == compliance_id) &
+                                                 (manufacturer_annual_data_table['model_year'] == calendar_year)]
+
+            credit_Mg = mad['target_co2e_megagrams'].item() - mad['model_year_cert_co2e_megagrams'].item()
+
+            credit_banks[compliance_id].handle_credit(calendar_year, credit_Mg)
+
+        credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
+                                                       omega_globals.options.session_unique_name +
+                                                       ' %s GHG_credit_balances.csv' % compliance_id,
+                                                       index=False)
+
+        credit_banks[compliance_id].transaction_log.to_csv(
+            omega_globals.options.output_folder + omega_globals.options.session_unique_name +
+            ' %s GHG_credit_transactions.csv' % compliance_id, index=False)
+
+        compliance_ids = np.append(compliance_ids, 'consolidated_OEM')
+
     total_calendar_year_cert_co2e_Mg = np.zeros_like(analysis_years, dtype='float')
     total_model_year_cert_co2e_Mg = np.zeros_like(analysis_years, dtype='float')
     total_target_co2e_Mg = np.zeros_like(analysis_years, dtype='float')
@@ -149,14 +203,6 @@ def run_postproc(iteration_log, credit_banks):
         session_results['%s_target_co2e_Mg' % compliance_id] = target_co2e_Mg
         session_results['%s_calendar_year_cert_co2e_Mg' % compliance_id] = calendar_year_cert_co2e_Mg
         session_results['%s_model_year_cert_co2e_Mg' % compliance_id] = model_year_cert_co2e_Mg
-
-    if not omega_globals.options.consolidate_manufacturers:
-        ax1, fig = plot_compliance(analysis_years, total_target_co2e_Mg, total_calendar_year_cert_co2e_Mg,
-                        total_model_year_cert_co2e_Mg)
-        label_xyt(ax1, 'Year', 'CO2e [Mg]', 'Total %s\nCert and Compliance Versus Year' %
-                  omega_globals.options.session_unique_name)
-        fig.savefig(omega_globals.options.output_folder + '%s ALL Cert Mg v Year.png' %
-                    omega_globals.options.session_unique_name)
 
     for compliance_id in VehicleFinal.compliance_ids:
 
