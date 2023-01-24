@@ -578,6 +578,13 @@ def logwrite_cross_subsidy_results(calendar_year, producer_market_classes, cross
                 omega_log.logwrite(('FINAL %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc],
                                echo_console=True)
 
+    omega_globals.price_modification_data = dict()
+
+    for mc, mc_mult in zip(sorted(producer_market_classes), producer_decision_and_response[multiplier_columns]):
+        omega_globals.price_modification_data[mc] = dict()
+        omega_globals.price_modification_data[mc]['market_class_multiplier'] = mc_mult
+        omega_globals.price_modification_data[mc]['market_class_price_modification'] = PriceModifications.get_price_modification(calendar_year, mc)
+
 
 def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pair, producer_decision,
                            cross_subsidy_options_and_response, producer_consumer_iteration_num, iteration_log):
