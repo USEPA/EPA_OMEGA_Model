@@ -1089,6 +1089,17 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
         for veh in cv.vehicle_list:
             veh_final = VehicleFinal()
             transfer_vehicle_data(veh, veh_final)
+
+            veh_final.price_modification_dollars = \
+                omega_globals.price_modification_data[veh_final.market_class_id]['market_class_price_modification']
+
+            veh_final.market_class_cross_subsidy_multiplier = \
+                omega_globals.price_modification_data[veh_final.market_class_id]['market_class_multiplier']
+
+            veh_final.modified_cross_subsidized_price_dollars = \
+                veh_final.new_vehicle_mfr_cost_dollars * veh_final.market_class_cross_subsidy_multiplier + \
+                veh_final.price_modification_dollars
+
             manufacturer_new_vehicles.append(veh_final)
 
     # propagate pre-production vehicles

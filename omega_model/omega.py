@@ -578,6 +578,13 @@ def logwrite_cross_subsidy_results(calendar_year, producer_market_classes, cross
                 omega_log.logwrite(('FINAL %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc],
                                echo_console=True)
 
+    omega_globals.price_modification_data = dict()
+
+    for mc, mc_mult in zip(sorted(producer_market_classes), producer_decision_and_response[multiplier_columns]):
+        omega_globals.price_modification_data[mc] = dict()
+        omega_globals.price_modification_data[mc]['market_class_multiplier'] = mc_mult
+        omega_globals.price_modification_data[mc]['market_class_price_modification'] = PriceModifications.get_price_modification(calendar_year, mc)
+
 
 def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pair, producer_decision,
                            cross_subsidy_options_and_response, producer_consumer_iteration_num, iteration_log):
@@ -1741,10 +1748,16 @@ def run_omega(session_runtime_options, standalone_run=False):
                     '%s/manufacturer_gigawatthour_data_%d.csv' % (omega_globals.options.output_folder_base,
                                                                   omega_globals.options.consolidate_manufacturers))
 
-                manufacturer_annual_data_table['strategic_offset'] = \
-                    omega_globals.options.credit_market_efficiency * \
-                    (manufacturer_annual_data_table['calendar_year_cert_co2e_megagrams'] - \
-                    manufacturer_annual_data_table['target_co2e_megagrams'])
+                cert_offset = \
+                    manufacturer_annual_data_table['calendar_year_cert_co2e_megagrams'] - \
+                    manufacturer_annual_data_table['target_co2e_megagrams']
+
+                manufacturer_annual_data_table['cert_offset'] = cert_offset
+                manufacturer_annual_data_table['strategic_offset'] = cert_offset
+
+                # under-achievers under-achieve less, if CME < 1.0:
+                manufacturer_annual_data_table.loc[cert_offset > 0, 'strategic_offset'] = \
+                    manufacturer_annual_data_table['strategic_offset'] * omega_globals.options.credit_market_efficiency
 
                 manufacturer_annual_data_table.to_csv('%s/manufacturer_annual_data_table_%d.csv' %
                                                       (omega_globals.options.output_folder_base,
