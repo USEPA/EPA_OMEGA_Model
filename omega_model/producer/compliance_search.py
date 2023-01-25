@@ -432,8 +432,12 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                     onmc_add = 0
                                     for onmc in [mc for mc in node_market_classes if mc != nmc]:
                                         onmc_add += max(production_max[onmc], max_constraints['producer_abs_share_frac_%s.NO_ALT' % onmc]) - prior_market_class_shares_dict[onmc]
-                                    max_sub = max(0, min(onmc_add, (prior_market_class_shares_dict[nmc] -
-                                               max(production_min[nmc], min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))))
+                                    # max_sub = max(0, min(onmc_add, (prior_market_class_shares_dict[nmc] -
+                                    #            max(production_min[nmc], min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))))
+                                    max_sub = min(onmc_add,
+                                                  (prior_market_class_shares_dict[nmc] - max(production_min[nmc],
+                                                                                             min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))
+                                                  )
 
                                     max_sub_dict[nmc] = \
                                         min(omega_globals.options.producer_market_category_ramp_limit, max_sub)
