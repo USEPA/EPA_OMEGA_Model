@@ -317,7 +317,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
                     'useful_life_miles': useful_life,
                 }
                 VehicleTargets._cache[cache_key]['co2_gram_per_mile'] \
-                    = compile(target_info['co2_gram_per_mile'], '<string>', 'eval')
+                    = compile(str(target_info['co2_gram_per_mile']), '<string>', 'eval')
 
             for fuel in df['cert_fuel_id'].unique():
                 VehicleTargets.start_years[fuel] = [yr for yr in df.loc[df['cert_fuel_id'] == fuel, 'start_year']]

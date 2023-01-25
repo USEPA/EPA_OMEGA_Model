@@ -200,6 +200,6 @@ class GliderCost(OMEGABase):
                         adj_factor = dollar_adjustment_factor('ip_deflators', int(cost_info['dollar_basis']))
                         _cache[cost_key]['dollar_adjustment'] = adj_factor
 
-                    _cache[cost_key]['value'] = compile(cost_info['value'], '<string>', 'eval')
+                    _cache[cost_key]['value'] = compile(str(cost_info['value']), '<string>', 'eval')
 
         return template_errors

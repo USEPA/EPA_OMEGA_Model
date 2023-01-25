@@ -208,6 +208,6 @@ class EmissionRatesVehicles(OMEGABase):
 
                 rate_eq = EmissionRatesVehicles._data[rate_key]['equation']
 
-                EmissionRatesVehicles._data[rate_key].update({'equation': compile(rate_eq, '<string>', 'eval')})
+                EmissionRatesVehicles._data[rate_key].update({'equation': compile(str(rate_eq), '<string>', 'eval')})
 
         return template_errors
