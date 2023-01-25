@@ -1365,13 +1365,6 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
 
     cost_name = 'total_generalized_cost_dollars'
 
-    mini_df = pd.DataFrame()
-    mini_df['total_credits_with_offset_co2e_megagrams'] = \
-        production_options['total_credits_co2e_megagrams'] + strategic_target_offset_Mg
-    mini_df['total_cost_dollars'] = production_options['total_cost_dollars']
-    mini_df['total_generalized_cost_dollars'] = production_options['total_generalized_cost_dollars']
-    mini_df['strategic_compliance_ratio'] = production_options['strategic_compliance_ratio']
-
     production_options['normalized_total_generalized_cost_dollars'] = \
         ((production_options['total_generalized_cost_dollars'] - production_options['total_generalized_cost_dollars'].min()) /
          (production_options['total_generalized_cost_dollars'].max() - production_options['total_generalized_cost_dollars'].min()))
@@ -1380,6 +1373,14 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
     production_options['selected_production_option'] = False
     production_options['candidate_production_option'] = False
     production_options['strategic_compliance_error'] = abs(1 - production_options['strategic_compliance_ratio'].values)
+
+    mini_df = pd.DataFrame()
+    mini_df['total_credits_with_offset_co2e_megagrams'] = \
+        production_options['total_credits_co2e_megagrams'] + strategic_target_offset_Mg
+    mini_df['total_cost_dollars'] = production_options['total_cost_dollars']
+    mini_df['total_generalized_cost_dollars'] = production_options['total_generalized_cost_dollars']
+    mini_df['strategic_compliance_ratio'] = production_options['strategic_compliance_ratio']
+    mini_df['normalized_total_generalized_cost_dollars'] = production_options['normalized_total_generalized_cost_dollars']
 
     if search_iteration == 0:
         prior_most_strategic_compliant_tech_share_option = None
@@ -1514,6 +1515,12 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
                                                              prior_most_strategic_compliant_tech_share_option)
 
         if len(compliant_tech_share_options.columns) == len(mini_df.columns):
+
+            lowest_normalized_cost = \
+                production_options.loc[[compliant_tech_share_options['normalized_total_generalized_cost_dollars'].idxmin()]]['normalized_total_generalized_cost_dollars'].item()
+            most_strategic_normalized_cost = \
+                production_options.loc[[compliant_tech_share_options['strategic_compliance_ratio'].idxmax()]]['normalized_total_generalized_cost_dollars'].item()
+
             lowest_cost_dollars = \
                 production_options.loc[[compliant_tech_share_options[cost_name].idxmin()]][cost_name].item()
             most_strategic_cost_dollars = \
