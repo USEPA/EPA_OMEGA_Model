@@ -1365,9 +1365,12 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
 
     cost_name = 'total_generalized_cost_dollars'
 
-    production_options['normalized_total_generalized_cost_dollars'] = \
-        ((production_options['total_generalized_cost_dollars'] - production_options['total_generalized_cost_dollars'].min()) /
-         (production_options['total_generalized_cost_dollars'].max() - production_options['total_generalized_cost_dollars'].min()))
+    if production_options['total_generalized_cost_dollars'].max() != production_options['total_generalized_cost_dollars'].min():
+        production_options['normalized_total_generalized_cost_dollars'] = \
+            ((production_options['total_generalized_cost_dollars'] - production_options['total_generalized_cost_dollars'].min()) /
+             (production_options['total_generalized_cost_dollars'].max() - production_options['total_generalized_cost_dollars'].min()))
+    else:
+        production_options['normalized_total_generalized_cost_dollars'] = 0
 
     production_options['producer_search_iteration'] = search_iteration
     production_options['selected_production_option'] = False
