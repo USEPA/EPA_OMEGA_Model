@@ -276,9 +276,10 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                 # strategic_target_offset_Mg = expiring_credits_Mg + expiring_debits_Mg
 
                 # strategy: use credits and pay debits over their remaining lifetime, instead of all at once:
+                # strategic_target_offset_Mg = 0
                 # current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
                 # for c in current_credits + current_debits:
-                #     strategic_target_offset_Mg += (c.remaining_balance_Mg / c.remaining_years)
+                #     strategic_target_offset_Mg += c.remaining_balance_Mg * (1 / max(1, c.remaining_years-1))
 
                 # strategy: try to hit the target and make up for minor previous compliance discrepancies
                 #           (ignoring base year banked credits):
@@ -576,6 +577,13 @@ def logwrite_cross_subsidy_results(calendar_year, producer_market_classes, cross
             if cc in producer_decision_and_response:
                 omega_log.logwrite(('FINAL %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc],
                                echo_console=True)
+
+    omega_globals.price_modification_data = dict()
+
+    for mc, mc_mult in zip(sorted(producer_market_classes), producer_decision_and_response[multiplier_columns]):
+        omega_globals.price_modification_data[mc] = dict()
+        omega_globals.price_modification_data[mc]['market_class_multiplier'] = mc_mult
+        omega_globals.price_modification_data[mc]['market_class_price_modification'] = PriceModifications.get_price_modification(calendar_year, mc)
 
 
 def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pair, producer_decision,

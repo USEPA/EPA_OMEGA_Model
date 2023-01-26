@@ -432,8 +432,12 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                     onmc_add = 0
                                     for onmc in [mc for mc in node_market_classes if mc != nmc]:
                                         onmc_add += max(production_max[onmc], max_constraints['producer_abs_share_frac_%s.NO_ALT' % onmc]) - prior_market_class_shares_dict[onmc]
-                                    max_sub = max(0, min(onmc_add, (prior_market_class_shares_dict[nmc] -
-                                               max(production_min[nmc], min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))))
+                                    # max_sub = max(0, min(onmc_add, (prior_market_class_shares_dict[nmc] -
+                                    #            max(production_min[nmc], min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))))
+                                    max_sub = min(onmc_add,
+                                                  (prior_market_class_shares_dict[nmc] - max(production_min[nmc],
+                                                                                             min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))
+                                                  )
 
                                     max_sub_dict[nmc] = \
                                         min(omega_globals.options.producer_market_category_ramp_limit, max_sub)
@@ -1089,6 +1093,17 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
         for veh in cv.vehicle_list:
             veh_final = VehicleFinal()
             transfer_vehicle_data(veh, veh_final)
+
+            veh_final.price_modification_dollars = \
+                omega_globals.price_modification_data[veh_final.market_class_id]['market_class_price_modification']
+
+            veh_final.market_class_cross_subsidy_multiplier = \
+                omega_globals.price_modification_data[veh_final.market_class_id]['market_class_multiplier']
+
+            veh_final.modified_cross_subsidized_price_dollars = \
+                veh_final.new_vehicle_mfr_cost_dollars * veh_final.market_class_cross_subsidy_multiplier + \
+                veh_final.price_modification_dollars
+
             manufacturer_new_vehicles.append(veh_final)
 
     # propagate pre-production vehicles

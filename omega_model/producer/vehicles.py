@@ -1191,6 +1191,9 @@ class VehicleFinal(SQABase, Vehicle):
     prior_redesign_year = Column(Float)  #: prior redesign year
     redesign_interval = Column(Float)  #: redesign interval
     in_production = Column(Boolean)  #: True if vehicle is in production
+    price_modification_dollars = Column(Float)  #: vehicle price modification (i.e. incentive value) in dollars
+    modified_cross_subsidized_price_dollars = Column(Float)  #: vehicle modified cross subsidized price in dollars
+    market_class_cross_subsidy_multiplier = Column(Float)  #: vehicle market class cross subsidy multiplier
 
     # "base year properties" - things that may change over time but we want to retain the original values
     base_year_product = Column(Boolean)  #: True if vehicle was in production in base year
