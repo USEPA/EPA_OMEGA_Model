@@ -90,6 +90,7 @@ class LegacyFleet(OMEGABase):
 
     """
 
+    _data_df = pd.DataFrame()
     _data = dict()  # private dict, the legacy_fleet_file data
     _legacy_fleet = dict() # the built legacy fleet for the analysis
 
@@ -182,19 +183,13 @@ class LegacyFleet(OMEGABase):
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                key = pd.Series(zip(
-                    df['age'],
-                    df['calendar_year'],
-                    df['reg_class_id'],
-                    df['market_class_id'],
-                    df['in_use_fuel_id'],
-                ))
+
                 # add attributes that are populated in build_legacy_fleet_for_analysis
                 df.insert(0, 'vehicle_id', pow(10, 6))
                 df.insert(len(df.columns), 'annual_vmt', 0)
                 df.insert(len(df.columns), 'odometer', 0)
                 df.insert(len(df.columns), 'vmt', 0)
-                LegacyFleet._data = df.set_index(key).to_dict(orient='index')
+                LegacyFleet._data_df = df.copy()
 
         return template_errors
 
@@ -203,6 +198,24 @@ class LegacyFleet(OMEGABase):
 
         from consumer.reregistration_fixed_by_age import Reregistration
         from consumer.annual_vmt_fixed_by_age import OnroadVMT
+
+        # make adjustments to calendar year and model year of LegacyFleet._data for consistency with analysis_initial_year
+        calendar_year_df = LegacyFleet._data_df['calendar_year'].unique()
+        if len(calendar_year_df) > 1:
+            omega_log.logwrite('\nLegacy fleet input file should have just one calendar year of data.')
+        adjustment = calendar_years[0] - calendar_year_df
+        for arg in ['calendar_year', 'model_year']:
+            LegacyFleet._data_df[arg] = LegacyFleet._data_df[arg] + adjustment
+
+        key = pd.Series(zip(
+            LegacyFleet._data_df['age'],
+            LegacyFleet._data_df['calendar_year'],
+            LegacyFleet._data_df['reg_class_id'],
+            LegacyFleet._data_df['market_class_id'],
+            LegacyFleet._data_df['in_use_fuel_id'],
+        ))
+
+        LegacyFleet._data = LegacyFleet._data_df.set_index(key).to_dict(orient='index')
 
         vehicle_id_increment = 0
         for calendar_year in calendar_years:
