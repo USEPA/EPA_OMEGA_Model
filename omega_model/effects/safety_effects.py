@@ -168,7 +168,7 @@ def calc_safety_effects(calendar_years, vmt_adjustments, context_fuel_cpm_dict):
     for calendar_year in calendar_years:
         vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year)
 
-        calendar_year_vmt_adj = vmt_adjustments.dict[calendar_year]
+        calendar_year_vmt_adj = vmt_adjustments.get_vmt_adjustment(calendar_year)
 
         calendar_year_safety_dict = dict()
         for vad in vads:
@@ -238,13 +238,6 @@ def calc_safety_effects(calendar_years, vmt_adjustments, context_fuel_cpm_dict):
                     vmt_adjusted = vmt_adjusted + vmt_rebound
                     annual_vmt_adjusted = vmt_adjusted / vad['registered_count']
                     annual_vmt_rebound = vmt_rebound / vad['registered_count']
-
-                    # if vad['registered_count'] > 0:
-                    #     annual_vmt_adjusted = vmt_adjusted / vad['registered_count']
-                    #     annual_vmt_rebound = vmt_rebound / vad['registered_count']
-                    # else:
-                    #     annual_vmt_adjusted = 0
-                    #     annual_vmt_rebound = 0
 
                     if age == 0:
                         odometer_adjusted = annual_vmt_adjusted
@@ -355,9 +348,15 @@ def calc_legacy_fleet_safety_effects(calendar_years, vmt_adjustments):
 
         name = set_legacy_fleet_name(market_class_id)
 
+        # adjust vmt and legacy fleet stock
         calendar_year_vmt_adj = vmt_adjustments.get_vmt_adjustment(calendar_year)
         vmt_adjusted = nested_dict['vmt'] * calendar_year_vmt_adj
-        annual_vmt_adjusted = vmt_adjusted / registered_count
+
+        calendar_year_stock_adj = vmt_adjustments.get_stock_adjustment(calendar_year)
+        stock_adjusted = registered_count * calendar_year_stock_adj
+
+        annual_vmt_adjusted = vmt_adjusted / stock_adjusted
+
         if nested_dict['calendar_year'] == calendar_years[0]:
             annual_vmt = nested_dict['annual_vmt']
             odometer = nested_dict['odometer']
@@ -395,7 +394,7 @@ def calc_legacy_fleet_safety_effects(calendar_years, vmt_adjustments):
             'market_class_id': market_class_id,
             'fueling_class': fueling_class,
             'base_year_powertrain_type': base_year_powertrain_type,
-            'registered_count': registered_count,
+            'registered_count': stock_adjusted,
             'context_vmt_adjustment': calendar_year_vmt_adj,
             'annual_vmt': annual_vmt_adjusted,
             'odometer': odometer_adjusted,
