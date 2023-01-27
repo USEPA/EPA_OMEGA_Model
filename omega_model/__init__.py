@@ -219,6 +219,10 @@ try:
             self.battery_GWh_limit = [30, 48, 79, 134, 159, 190, 250, 356, 502, 651, 792, 936, 1080, 1224, 1364, 1500,
                                       1500, 1500, 1500, 1500, 1500]
 
+            self.kwh_per_mile_scale_years = [2020]
+
+            self.kwh_per_mile_scale = [1.0]
+
             self.manufacturer_gigawatthour_data = None
 
             # list of modules to allow verbose log files, or empty to disable:

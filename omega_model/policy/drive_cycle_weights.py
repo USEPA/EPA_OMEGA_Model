@@ -246,8 +246,13 @@ class DriveCycleWeights(OMEGABase):
             A pandas ``Series`` object of the weighted results
 
         """
-        return DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
+        cd_cert_direct_oncycle_kwh_per_mile = DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
                                                      'cd_cert_direct_oncycle_kwh_per_mile', weighted=False)
+
+        kwh_per_mile_scale = np.interp(calendar_year, omega_globals.options.kwh_per_mile_scale_years,
+                                      omega_globals.options.kwh_per_mile_scale)
+
+        return cd_cert_direct_oncycle_kwh_per_mile * kwh_per_mile_scale
 
 
 if __name__ == '__main__':
