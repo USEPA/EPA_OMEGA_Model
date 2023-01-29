@@ -164,7 +164,7 @@ class WorkFactor(OMEGABase):
                     }
 
                     WorkFactor._cache[cache_key]['workfactor'] \
-                        = compile(workfactor_info['workfactor'], '<string>', 'eval')
+                        = compile(str(workfactor_info['workfactor']), '<string>', 'eval')
 
                 for drive_system in df['drive_system'].unique():
                     WorkFactor.start_years[drive_system] \

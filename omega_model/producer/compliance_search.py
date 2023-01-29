@@ -1369,17 +1369,25 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
 
     cost_name = 'total_generalized_cost_dollars'
 
+    if production_options['total_generalized_cost_dollars'].max() != production_options['total_generalized_cost_dollars'].min():
+        production_options['normalized_total_generalized_cost_dollars'] = \
+            ((production_options['total_generalized_cost_dollars'] - production_options['total_generalized_cost_dollars'].min()) /
+             (production_options['total_generalized_cost_dollars'].max() - production_options['total_generalized_cost_dollars'].min()))
+    else:
+        production_options['normalized_total_generalized_cost_dollars'] = 0
+
+    production_options['producer_search_iteration'] = search_iteration
+    production_options['selected_production_option'] = False
+    production_options['candidate_production_option'] = False
+    production_options['strategic_compliance_error'] = abs(1 - production_options['strategic_compliance_ratio'].values)
+
     mini_df = pd.DataFrame()
     mini_df['total_credits_with_offset_co2e_megagrams'] = \
         production_options['total_credits_co2e_megagrams'] + strategic_target_offset_Mg
     mini_df['total_cost_dollars'] = production_options['total_cost_dollars']
     mini_df['total_generalized_cost_dollars'] = production_options['total_generalized_cost_dollars']
     mini_df['strategic_compliance_ratio'] = production_options['strategic_compliance_ratio']
-
-    production_options['producer_search_iteration'] = search_iteration
-    production_options['selected_production_option'] = False
-    production_options['candidate_production_option'] = False
-    production_options['strategic_compliance_error'] = abs(1 - production_options['strategic_compliance_ratio'].values)
+    mini_df['normalized_total_generalized_cost_dollars'] = production_options['normalized_total_generalized_cost_dollars']
 
     if search_iteration == 0:
         prior_most_strategic_compliant_tech_share_option = None
@@ -1392,8 +1400,19 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         else:
             cloud_slope = 1
 
-    compliant_tech_share_options = mini_df[mini_df['total_credits_with_offset_co2e_megagrams'].values >= 0].copy()
-    non_compliant_tech_share_options = mini_df[mini_df['total_credits_with_offset_co2e_megagrams'].values < 0].copy()
+    compliant_points = mini_df['total_credits_with_offset_co2e_megagrams'].values >= 0
+    non_compliant_points = mini_df['total_credits_with_offset_co2e_megagrams'].values < 0
+
+    allowed_voc_points = \
+        (mini_df['strategic_compliance_ratio'].values >=
+         omega_globals.options.producer_voluntary_overcompliance_min_strategic_compliance_ratio)
+
+    if omega_globals.options.producer_voluntary_overcompliance and any(allowed_voc_points):
+        compliant_tech_share_options = mini_df[compliant_points & allowed_voc_points].copy()
+    else:
+        compliant_tech_share_options = mini_df[compliant_points].copy()
+
+    non_compliant_tech_share_options = mini_df[non_compliant_points].copy()
 
     non_compliant_tech_share_options = cull_non_compliant_points(non_compliant_tech_share_options,
                                                                  prior_most_strategic_non_compliant_tech_share_option)
@@ -1448,12 +1467,23 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         else:
             most_strategic_compliant_tech_share_option = lowest_cost_compliant_tech_share_option
 
+        lowest_normalized_cost = \
+            lowest_cost_compliant_tech_share_option['normalized_total_generalized_cost_dollars'].item()
+        most_strategic_normalized_cost = \
+            most_strategic_compliant_tech_share_option['normalized_total_generalized_cost_dollars'].item()
+
         lowest_cost_dollars = lowest_cost_compliant_tech_share_option[cost_name].item()
         most_strategic_cost_dollars = most_strategic_compliant_tech_share_option[cost_name].item()
 
+        if three_points:
+            print('most_strat_norm_$ minus lowest_norm_$ %.6f' % (most_strategic_normalized_cost - lowest_normalized_cost))
+
+        # if three_points and omega_globals.options.producer_voluntary_overcompliance and \
+        #     lowest_cost_dollars / most_strategic_cost_dollars < \
+        #     (1 - omega_globals.options.producer_voluntary_overcompliance_min_benefit_frac):
         if three_points and omega_globals.options.producer_voluntary_overcompliance and \
-            lowest_cost_dollars / most_strategic_cost_dollars < \
-            (1 - omega_globals.options.producer_voluntary_overcompliance_min_benefit_frac):
+                (most_strategic_normalized_cost - lowest_normalized_cost) >= \
+                omega_globals.options.producer_voluntary_overcompliance_min_benefit_frac:
                 # take lowest cost if it's at least X percent cheaper than the most strategic
                 candidate_production_decisions =\
                     pd.concat([most_strategic_compliant_tech_share_option, most_strategic_non_compliant_tech_share_option,
@@ -1492,14 +1522,23 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
                                                              prior_most_strategic_compliant_tech_share_option)
 
         if len(compliant_tech_share_options.columns) == len(mini_df.columns):
+
+            lowest_normalized_cost = \
+                production_options.loc[[compliant_tech_share_options['normalized_total_generalized_cost_dollars'].idxmin()]]['normalized_total_generalized_cost_dollars'].item()
+            most_strategic_normalized_cost = \
+                production_options.loc[[compliant_tech_share_options['strategic_compliance_ratio'].idxmax()]]['normalized_total_generalized_cost_dollars'].item()
+
             lowest_cost_dollars = \
                 production_options.loc[[compliant_tech_share_options[cost_name].idxmin()]][cost_name].item()
             most_strategic_cost_dollars = \
                 production_options.loc[[compliant_tech_share_options['strategic_compliance_ratio'].idxmax()]][cost_name].item()
 
+            # if omega_globals.options.producer_voluntary_overcompliance and \
+            #         lowest_cost_dollars / most_strategic_cost_dollars < \
+            #         (1 - omega_globals.options.producer_voluntary_overcompliance_min_benefit_frac):
             if omega_globals.options.producer_voluntary_overcompliance and \
-                    lowest_cost_dollars / most_strategic_cost_dollars < \
-                    (1 - omega_globals.options.producer_voluntary_overcompliance_min_benefit_frac):
+                    (most_strategic_normalized_cost - lowest_normalized_cost) >= \
+                    omega_globals.options.producer_voluntary_overcompliance_min_benefit_frac:
                 # take lowest cost if it's at least X percent cheaper than the most strategic
                 most_strategic_compliant_tech_share_option = \
                     production_options.loc[[compliant_tech_share_options[cost_name].idxmin()]]

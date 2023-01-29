@@ -197,9 +197,9 @@ class EmissionRatesEGU(OMEGABase):
                     kwh_consumption_eq = EmissionRatesEGU._data[rate_key]['equation_kwh_consumption_metric']
 
                     EmissionRatesEGU._data[rate_key].update({
-                        'equation_rate_id': compile(rate_eq, '<string>', 'eval'),
-                        'equation_kwh_demand_metric': compile(kwh_demand_eq, '<string>', 'eval'),
-                        'equation_kwh_consumption_metric': compile(kwh_consumption_eq, '<string>', 'eval'),
+                        'equation_rate_id': compile(str(rate_eq), '<string>', 'eval'),
+                        'equation_kwh_demand_metric': compile(str(kwh_demand_eq), '<string>', 'eval'),
+                        'equation_kwh_consumption_metric': compile(str(kwh_consumption_eq), '<string>', 'eval'),
                     })
 
         return template_errors

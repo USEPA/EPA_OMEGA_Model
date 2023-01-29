@@ -180,6 +180,6 @@ class RefuelingCost(OMEGABase):
                         adj_factor = dollar_adjustment_factor('ip_deflators', int(cost_info['dollar_basis']))
                         RefuelingCost._data[cost_key]['dollar_adjustment'] = adj_factor
 
-                    RefuelingCost._data[cost_key]['value'] = compile(cost_info['value'], '<string>', 'eval')
+                    RefuelingCost._data[cost_key]['value'] = compile(str(cost_info['value']), '<string>', 'eval')
 
         return template_errors

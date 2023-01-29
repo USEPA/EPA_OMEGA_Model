@@ -37,7 +37,7 @@ class Eval(OMEGABase):
 
         """
         if source not in cls._compiled_source:
-            cls._compiled_source[source] = compile(source, '<string>', 'eval')
+            cls._compiled_source[source] = compile(str(source), '<string>', 'eval')
 
         return eval(cls._compiled_source[source], global_vars, local_vars)
 

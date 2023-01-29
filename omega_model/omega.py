@@ -276,17 +276,17 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                 # strategic_target_offset_Mg = expiring_credits_Mg + expiring_debits_Mg
 
                 # strategy: use credits and pay debits over their remaining lifetime, instead of all at once:
-                # strategic_target_offset_Mg = 0
-                # current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
-                # for c in current_credits + current_debits:
-                #     strategic_target_offset_Mg += c.remaining_balance_Mg * (1 / max(1, c.remaining_years-1))
+                strategic_target_offset_Mg = 0
+                current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
+                for c in current_credits + current_debits:
+                    strategic_target_offset_Mg += c.remaining_balance_Mg * (1 / max(1, c.remaining_years-1))
 
                 # strategy: try to hit the target and make up for minor previous compliance discrepancies
                 #           (ignoring base year banked credits):
-                strategic_target_offset_Mg = 0
-                current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
-                for c in current_debits:
-                    strategic_target_offset_Mg += c.remaining_balance_Mg * (1 / max(1, c.remaining_years-1))
+                # strategic_target_offset_Mg = 0
+                # current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
+                # for c in current_debits:
+                #     strategic_target_offset_Mg += c.remaining_balance_Mg * (1 / max(1, c.remaining_years-1))
             else:
                 strategic_target_offset_Mg = \
                     manufacturer_annual_data_table[(manufacturer_annual_data_table['compliance_id'] == compliance_id) &
@@ -1748,10 +1748,16 @@ def run_omega(session_runtime_options, standalone_run=False):
                     '%s/manufacturer_gigawatthour_data_%d.csv' % (omega_globals.options.output_folder_base,
                                                                   omega_globals.options.consolidate_manufacturers))
 
-                manufacturer_annual_data_table['strategic_offset'] = \
-                    omega_globals.options.credit_market_efficiency * \
-                    (manufacturer_annual_data_table['calendar_year_cert_co2e_megagrams'] - \
-                    manufacturer_annual_data_table['target_co2e_megagrams'])
+                cert_offset = \
+                    manufacturer_annual_data_table['calendar_year_cert_co2e_megagrams'] - \
+                    manufacturer_annual_data_table['target_co2e_megagrams']
+
+                manufacturer_annual_data_table['cert_offset'] = cert_offset
+                manufacturer_annual_data_table['strategic_offset'] = cert_offset
+
+                # under-achievers under-achieve less, if CME < 1.0:
+                manufacturer_annual_data_table.loc[cert_offset > 0, 'strategic_offset'] = \
+                    manufacturer_annual_data_table['strategic_offset'] * omega_globals.options.credit_market_efficiency
 
                 manufacturer_annual_data_table.to_csv('%s/manufacturer_annual_data_table_%d.csv' %
                                                       (omega_globals.options.output_folder_base,
