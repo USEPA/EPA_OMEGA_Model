@@ -82,27 +82,22 @@ class WorkFactor(OMEGABase):
 
         """
         cache_key = (model_year, drive_system)
-        data_key = (model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system)
 
-        if data_key not in WorkFactor._data:
+        start_years = WorkFactor.start_years[drive_system]
 
-            start_years = WorkFactor.start_years[drive_system]
+        if len([yr for yr in start_years if yr <= model_year]) > 0:
 
-            if len([yr for yr in start_years if yr <= model_year]) > 0:
+            model_year = max([yr for yr in start_years if yr <= model_year])
 
-                model_year = max([yr for yr in start_years if yr <= model_year])
+            xwd = WorkFactor._cache[(model_year, drive_system)]['xwd']
 
-                xwd = WorkFactor._cache[(model_year, drive_system)]['xwd']
+            workfactor = eval(WorkFactor._cache[(model_year, drive_system)]['workfactor'], {'np': np}, locals())
 
-                WorkFactor._data[data_key] = \
-                    eval(WorkFactor._cache[(model_year, drive_system)]['workfactor'], {'np': np}, locals())
+        else:
+            raise Exception(
+                f'Missing workfactor calculation parameters for {model_year} or prior')
 
-            else:
-                raise Exception(
-                    f'Missing workfactor calculation parameters for {model_year} or prior')
-
-        return WorkFactor._data[data_key]
-
+        return workfactor
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -119,6 +114,7 @@ class WorkFactor(OMEGABase):
 
         """
         WorkFactor._cache.clear()
+        WorkFactor.start_years.clear()
         WorkFactor._data.clear()
 
         if verbose:

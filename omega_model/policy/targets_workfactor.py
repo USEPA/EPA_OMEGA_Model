@@ -103,27 +103,24 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             Vehicle target CO2e in g/mi.
 
         """
-        cache_key = (vehicle.reg_class_id, vehicle.model_year, vehicle.cert_fuel_id, vehicle.workfactor)
+        start_years = VehicleTargets.start_years[vehicle.cert_fuel_id]
 
-        if cache_key not in VehicleTargets._data:
+        if len([yr for yr in start_years if yr <= vehicle.model_year]) > 0:
 
-            VehicleTargets._data[cache_key] = dict()
+            workfactor = 0
+            if vehicle.reg_class_id == 'mediumduty':
+                model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system \
+                    = vehicle.model_year, vehicle.curbweight_lbs, vehicle.gvwr_lbs, vehicle.gcwr_lbs, vehicle.drive_system
+                workfactor = WorkFactor.calc_workfactor(model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system)
 
-            start_years = VehicleTargets.start_years[vehicle.cert_fuel_id]
+            vehicle.workfactor = workfactor
+            year = max([yr for yr in start_years if yr <= vehicle.model_year])
+            target = eval(VehicleTargets._cache[(vehicle.reg_class_id, year, vehicle.cert_fuel_id)]['co2_gram_per_mile'], locals())
 
-            if len([yr for yr in start_years if yr <= vehicle.model_year]) > 0:
+        else:
+            raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, {vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
 
-                model_year = max([yr for yr in start_years if yr <= vehicle.model_year])
-
-                workfactor = vehicle.workfactor
-
-                target = eval(VehicleTargets._cache[(vehicle.reg_class_id, model_year, vehicle.cert_fuel_id)]['co2_gram_per_mile'], locals())
-
-                VehicleTargets._data[cache_key] = target
-            else:
-                raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, {vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
-
-        return VehicleTargets._data[cache_key]
+        return target
 
     @staticmethod
     def calc_cert_useful_life_vmt(reg_class_id, model_year, cert_fuel_id):
@@ -141,19 +138,17 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
 
         locals_dict = locals()
 
-        if cache_key not in VehicleTargets._cache:
+        start_years = VehicleTargets.start_years[cert_fuel_id]
 
-            start_years = VehicleTargets.start_years[cert_fuel_id]
+        if len([yr for yr in start_years if yr <= model_year]) > 0:
 
-            if len([yr for yr in start_years if yr <= model_year]) > 0:
+            year = max([yr for yr in start_years if yr <= model_year])
 
-                year = max([yr for yr in start_years if yr <= model_year])
+            useful_life = VehicleTargets._cache[(reg_class_id, year, cert_fuel_id)]['useful_life_miles']
+        else:
+            raise Exception(f'Missing GHG CO2e g/mi target parameters for {reg_class_id}, {model_year}, {cert_fuel_id} or prior')
 
-                useful_life = VehicleTargets._cache[(reg_class_id, year, cert_fuel_id)]['useful_life_miles']
-            else:
-                raise Exception(f'Missing GHG CO2e g/mi target parameters for {reg_class_id}, {model_year}, {cert_fuel_id} or prior')
-
-        return VehicleTargets._cache[cache_key]['useful_life_miles']
+        return useful_life
 
     @staticmethod
     def calc_target_co2e_Mg(vehicle, sales_variants=None):
@@ -264,7 +259,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
 
         """
         VehicleTargets._cache.clear()
-
+        VehicleTargets.start_years.clear()
         VehicleTargets._data.clear()
 
         if verbose:
