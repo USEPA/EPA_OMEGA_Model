@@ -2,9 +2,9 @@ import pandas as pd
 import glob
 import os
 
-maindir = 'C:/Users/KBolon/Documents/OMEGA_runs/2022Aug/'
-runname = '2022_08_13_22_52_16_OS_strngncy_A_fpload_20220813a'
-sessionnames = ['_NTR_wupstrm', '_C65m0p7Tutiloffst', '_C75m0p7Tutiloffst', '_C85m0p7Tutiloffst', '_C105m0p7Tutiloffst', '_C125m0p7Tutiloffst']
+maindir = 'C:/Users/KBOLON/OMEGA'
+runname = '2022_12_19_15_31_49_fpwtp_20221219b'
+sessionnames = ['_NTR', '_Proposal-0wtp', '_Proposal-200wtp', '_Proposal-400wtp', '_Proposal-600wtp', '_Proposal-800wtp', '_SAFE']
 model_year = 2030
 
 #drop_columns_pre_run = []
@@ -174,7 +174,8 @@ df_all.drop(columns=drop_columns_post_run, inplace=True) # reduce output file si
 
 df_all['vehicle_name'] = df_all['vehicle_name'].str.replace('BEV of ', '').str.replace('\'', '').str.replace('ICE of ', '').str.replace('{', '').str.replace('}', '') # prepare vehicle_name field for delimited split
 df_all[['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
-                       'cert_fuel_id', 'cert_fuel_share', 'reg_class_id', 'drive_system']] = df_all['vehicle_name'].str.split(':', expand=True) # add 'manufacturer_id' when OMEGA is run in non-consolidated mode
+                       'cert_fuel_id', 'reg_class_id', 'drive_system', 'model_year',
+                       'prior_redesign_year', 'redesign_interval', 'cost_curve_class', 'structure_material']] = df_all['vehicle_name'].str.split(':', expand=True) # add 'manufacturer_id' when OMEGA is run in non-consolidated mode
 df_all.drop(columns=['vehicle_name'], inplace=True)
 
 
