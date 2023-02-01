@@ -948,8 +948,11 @@ class Vehicle(OMEGABase):
         """
         drive_cycle_weight_year = VehicleOnroadCalculations.battery_sizing_drive_cycle_weight_year
 
+        kwh_per_mile_scale = np.interp(self.model_year, omega_globals.options.kwh_per_mile_scale_years,
+                                      omega_globals.options.kwh_per_mile_scale)
+
         cloud['battery_sizing_onroad_direct_kwh_per_mile'] = 0
-        cloud['nominal_onroad_direct_kwh_per_mile'] = \
+        cloud['nominal_onroad_direct_kwh_per_mile'] = kwh_per_mile_scale * \
             DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(drive_cycle_weight_year,
                                                                     self.fueling_class, cloud)
 
