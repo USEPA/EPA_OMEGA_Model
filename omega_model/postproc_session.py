@@ -37,7 +37,7 @@ def run_postproc(iteration_log, credit_banks):
 
     """
     from producer.vehicles import VehicleFinal
-    from effects.omega_effects import run_effects_calcs
+    # from effects.omega_effects import run_effects_calcs
     import pandas as pd
     global vehicle_data, vehicle_annual_data
 
@@ -46,8 +46,8 @@ def run_postproc(iteration_log, credit_banks):
     market_categories = omega_globals.options.MarketClass.market_categories
 
     # this runs tech_tracking always and physical/cost effects based on globals.options:
-    tech_tracking_df, safety_effects_df, physical_effects_df, cost_effects_df, present_and_annualized_cost_df \
-        = run_effects_calcs()
+    # tech_tracking_df, safety_effects_df, physical_effects_df, cost_effects_df, present_and_annualized_cost_df \
+    #     = run_effects_calcs()
 
     if not omega_globals.options.standalone_run:
         omega_log.logwrite('%s: Post Processing ...' % omega_globals.options.session_name)
@@ -243,7 +243,7 @@ def run_postproc(iteration_log, credit_banks):
 
     average_target_co2e_gpmi_data = plot_target_co2e_gpmi(analysis_years)
 
-    physical_effects = plot_effects(analysis_years, physical_effects_df)
+    # physical_effects = plot_effects(analysis_years, physical_effects_df)
 
     # market share results include base year data, but the rest of the data doesn't, so drop the
     # base year data, otherwise the dataframe at the end will fail due to inconsistent column lengths
@@ -273,8 +273,8 @@ def run_postproc(iteration_log, credit_banks):
     session_results \
         = pd.concat([session_results, pd.Series(total_vehicle_cost_billions, name='total_vehicle_cost_billions')], axis=1)
 
-    for k in physical_effects:
-        session_results = pd.concat([session_results, pd.Series(physical_effects[k], name=f'{k}')], axis=1)
+    # for k in physical_effects:
+    #     session_results = pd.concat([session_results, pd.Series(physical_effects[k], name=f'{k}')], axis=1)
 
     # write output files
     summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name \
