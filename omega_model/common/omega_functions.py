@@ -298,14 +298,15 @@ def sum_dict(dict_in, include=None, exclude=None):
     return sum([dict_in[k] for k in keys])
 
 
-def print_keys(dict_in, include=None, exclude=None):
+def print_keys(dict_in, include=None, exclude=None, values=True):
     """
-    Print some or all keys in a dict-like object
+    Print some or all keys (and optionally values) in a dict-like object
 
     Args:
         dict_in (dict-like): the object with keys to print
         include (str): a substring that must be present, if provided
         exclude (str): a substring that must not be present, if provided
+        values (bool): print values if ``True``
 
     """
     keys = sorted(dict_in.keys())
@@ -313,8 +314,15 @@ def print_keys(dict_in, include=None, exclude=None):
         keys = [k for k in keys if include in k]
     if exclude is not None:
         keys = [k for k in keys if exclude not in k]
+
+    max_key_len = max([len(k) for k in keys])
+
     for k in keys:
-        print(k)
+        if values:
+            format_str = '%' + '%d' % max_key_len + 's: %s'
+            print(format_str % (k, dict_in[k]))
+        else:
+            print(k)
 
     return keys
 
