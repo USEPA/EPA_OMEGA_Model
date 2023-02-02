@@ -580,10 +580,17 @@ def logwrite_cross_subsidy_results(calendar_year, producer_market_classes, cross
 
     omega_globals.price_modification_data = dict()
 
-    for mc, mc_mult in zip(sorted(producer_market_classes), producer_decision_and_response[multiplier_columns]):
-        omega_globals.price_modification_data[mc] = dict()
-        omega_globals.price_modification_data[mc]['market_class_multiplier'] = mc_mult
-        omega_globals.price_modification_data[mc]['market_class_price_modification'] = PriceModifications.get_price_modification(calendar_year, mc)
+    if all(mc in producer_decision_and_response for mc in multiplier_columns):
+        for mc, mc_mult in zip(sorted(producer_market_classes), producer_decision_and_response[multiplier_columns]):
+            omega_globals.price_modification_data[mc] = dict()
+            omega_globals.price_modification_data[mc]['market_class_multiplier'] = mc_mult
+            omega_globals.price_modification_data[mc]['market_class_price_modification'] = PriceModifications.get_price_modification(calendar_year, mc)
+    else:
+        # no multipliers are generated when a market class tree has an only child (e.g. Tesla is BEV-only, no ICE)
+        for mc in sorted(producer_market_classes):
+            omega_globals.price_modification_data[mc] = dict()
+            omega_globals.price_modification_data[mc]['market_class_multiplier'] = 1.0
+            omega_globals.price_modification_data[mc]['market_class_price_modification'] = PriceModifications.get_price_modification(calendar_year, mc)
 
 
 def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pair, producer_decision,
