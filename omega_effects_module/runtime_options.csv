@@ -1,0 +1,5 @@
+Parameters,Entry,Notes
+Batch Settings File,C:\Users\TSHERWOO\PycharmProjects\EPA_OMEGA_Model\omega_effects_module\test_inputs\batch_settings_effects_md.csv,"enter full path, including drive id"
+Save Path,D:\TSh\omega\effects,"enter full path, including drive id but do not include unique run identifiers"
+Save Vehicle-Level Output Files,False,"enter True or False, these files can be large, especially in CSV format"
+Format for Vehicle-Level Output Files,parquet,"enter 'csv' for large Excel-readable files; 'parquet' for compressed files usable in Pandas"
