@@ -1196,6 +1196,7 @@ class VehicleFinal(SQABase, Vehicle):
     in_production = Column(Boolean)  #: True if vehicle is in production
     price_modification_dollars = Column(Float)  #: vehicle price modification (i.e. incentive value) in dollars
     modified_cross_subsidized_price_dollars = Column(Float)  #: vehicle modified cross subsidized price in dollars
+    price_dollars = Column(Float)  #: vehicle price in dollars
     market_class_cross_subsidy_multiplier = Column(Float)  #: vehicle market class cross subsidy multiplier
 
     # "base year properties" - things that may change over time but we want to retain the original values

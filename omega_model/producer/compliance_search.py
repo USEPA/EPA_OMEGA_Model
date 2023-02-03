@@ -1104,6 +1104,9 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
                 veh_final.new_vehicle_mfr_cost_dollars * veh_final.market_class_cross_subsidy_multiplier + \
                 veh_final.price_modification_dollars
 
+            veh_final.price_dollars = \
+                veh_final.new_vehicle_mfr_cost_dollars * veh_final.market_class_cross_subsidy_multiplier
+
             manufacturer_new_vehicles.append(veh_final)
 
     # propagate pre-production vehicles
