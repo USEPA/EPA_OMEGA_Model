@@ -1,6 +1,9 @@
 # Version number of the omega effects module, not the omega model
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
+
+# 0.4.0
+# Add model year lifetime cost calcs to cost_effects.py.
 
 # 0.3.0
 # Add option to save or not the large vehicle-level files.

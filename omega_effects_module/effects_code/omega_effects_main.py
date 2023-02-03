@@ -20,7 +20,7 @@ from effects.context_fuel_cost_per_mile import calc_fuel_cost_per_mile
 from effects.safety_effects import calc_safety_effects, calc_legacy_fleet_safety_effects
 from effects.physical_effects import calc_physical_effects, calc_legacy_fleet_physical_effects, \
     calc_annual_physical_effects
-from effects.cost_effects import calc_cost_effects, calc_annual_cost_effects
+from effects.cost_effects import calc_cost_effects, calc_annual_cost_effects, calc_lifetime_consumer_view
 from effects.present_and_annualized_values import PVandEAV
 from effects.benefits import calc_benefits
 from effects.sum_social_effects import calc_social_effects
@@ -74,6 +74,7 @@ def main():
     # loop thru sessions to calc safety effects, physical effects, cost effects for each _______________________________
     annual_physical_effects_df = pd.DataFrame()
     annual_cost_effects_df = pd.DataFrame()
+    my_lifetime_cost_effects_df = pd.DataFrame()
 
     effects_log.logwrite(f'\nStarting work on sessions')
     for session_num in batch_settings.session_dict:
@@ -147,10 +148,18 @@ def main():
         effects_log.logwrite(f'\nCalculating annual costs effects for {session_name}')
         session_annual_cost_effects_df = calc_annual_cost_effects(session_cost_effects_df)
 
+        effects_log.logwrite(f'\nCalculating model year lifetime costs effects for {session_name}')
+        session_my_lifetime_cost_effects_df = calc_lifetime_consumer_view(batch_settings, session_cost_effects_df)
+
         # for use in benefits calcs, create an annual_cost_effects_df of undiscounted annual costs
         annual_cost_effects_df \
             = pd.concat([annual_cost_effects_df, session_annual_cost_effects_df], axis=0, ignore_index=True)
         annual_cost_effects_df.reset_index(inplace=True, drop=True)
+
+        # for use in consumer calcs, create a my_lifetime_cost_effects_df of undiscounted lifetime costs
+        my_lifetime_cost_effects_df = pd.concat([my_lifetime_cost_effects_df, session_my_lifetime_cost_effects_df],
+                                                axis=0, ignore_index=True)
+        my_lifetime_cost_effects_df.reset_index(inplace=True, drop=True)
 
     effects_log.logwrite('\nCalculating present and annualized costs for the batch')
     pv_and_eav_costs_dict = PVandEAV().calc_present_and_annualized_values(batch_settings, annual_cost_effects_df)
@@ -187,6 +196,7 @@ def main():
     pv_and_eav_costs_df.to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv', index=False)
     pv_and_eav_benefits_df.to_csv(path_of_run_folder / f'{start_time_readable}_benefits_annual.csv', index=False)
     social_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_social_effects_annual.csv', index=False)
+    my_lifetime_cost_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_MY_lifetime_costs.csv', index=False)
 
     # add identifying info to CSV files --------------------------------------------------------------------------------
     output_file_id_info = [f'Batch Name: {batch_settings.batch_name}', f'Effects Run: {start_time_readable}_{run_id}']
@@ -198,6 +208,7 @@ def main():
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv', output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_benefits_annual.csv', output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_social_effects_annual.csv', output_file_id_info)
+    add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_lifetime_costs.csv', output_file_id_info)
 
     shutil.copy2(runtime_options.batch_settings_file, path_of_run_folder / f'{runtime_options.batch_settings_file_name}')
     set_paths.copy_code_to_destination(path_of_code_folder)

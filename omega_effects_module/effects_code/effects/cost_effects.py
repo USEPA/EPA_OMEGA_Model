@@ -76,7 +76,8 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
         if onroad_direct_co2e_grams_per_mile or onroad_direct_kwh_per_mile:
             flag = 1
 
-            vehicle_cost_dollars = 0
+            vehicle_cost_dollars  = consumer_price_dollars = purchase_credit_dollars = 0
+            avg_vehicle_cost = avg_consumer_price = avg_purchase_credit = 0
             fuel_retail_cost_dollars = 0
             fuel_pretax_cost_dollars = 0
             congestion_cost_dollars = 0
@@ -116,17 +117,30 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
 
             if vehicle_id not in vehicle_info_dict:
                 if vehicle_id < pow(10, 6):
-                    attribute_list = ['new_vehicle_mfr_cost_dollars']
+                    attribute_list = [
+                        'new_vehicle_mfr_cost_dollars',
+                        'modified_cross_subsidized_price_dollars',
+                        'price_modification_dollars'
+                    ]
                     vehicle_info_dict[vehicle_id] = session_settings.vehicles.get_vehicle_attributes(vehicle_id, *attribute_list)
+                    avg_vehicle_cost, avg_consumer_price, avg_purchase_credit = \
+                        vehicle_info_dict[vehicle_id][0], \
+                            vehicle_info_dict[vehicle_id][1], \
+                            vehicle_info_dict[vehicle_id][2]
                 else:
                     legacy_fleet_key = (vehicle_id, calendar_year, age)
                     vehicle_info_dict[vehicle_id] \
                         = batch_settings.legacy_fleet._legacy_fleet[legacy_fleet_key]['transaction_price_dollars']
+                    avg_vehicle_cost, avg_consumer_price, avg_purchase_credit = \
+                        vehicle_info_dict[vehicle_id], \
+                            vehicle_info_dict[vehicle_id], \
+                            vehicle_info_dict[vehicle_id]
 
-            new_vehicle_cost = vehicle_info_dict[vehicle_id]
             # tech costs, only for age=0
             if age == 0:
-                vehicle_cost_dollars = vehicle_count * new_vehicle_cost
+                vehicle_cost_dollars = vehicle_count * avg_vehicle_cost
+                consumer_price_dollars = vehicle_count * avg_consumer_price
+                purchase_credit_dollars = vehicle_count * avg_purchase_credit
 
             # fuel costs
             fuel_dict = eval(in_use_fuel_id)
@@ -158,7 +172,7 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 operating_veh_type = 'suv'
 
             repair_cost_per_mile \
-                = batch_settings.repair_cost.calc_repair_cost_per_mile(new_vehicle_cost, base_year_powertrain_type,
+                = batch_settings.repair_cost.calc_repair_cost_per_mile(avg_vehicle_cost, base_year_powertrain_type,
                                                                        operating_veh_type, age)
             repair_cost_dollars = repair_cost_per_mile * vmt
 
@@ -226,6 +240,8 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 'vmt_liquid_fuel': vmt_liquid,
                 'vmt_electricity': vmt_elec,
                 'vehicle_cost_dollars': vehicle_cost_dollars,
+                'consumer_price_dollars': consumer_price_dollars,
+                'purchase_credit_dollars': purchase_credit_dollars,
                 'fuel_retail_cost_dollars': fuel_retail_cost_dollars,
                 'fuel_pretax_cost_dollars': fuel_pretax_cost_dollars,
                 'fuel_taxes_cost_dollars': fuel_retail_cost_dollars - fuel_pretax_cost_dollars,
@@ -256,13 +272,13 @@ def calc_annual_cost_effects(input_df):
 
     """
     attributes = [col for col in input_df.columns if ('vmt' in col or 'vmt_' in col) and '_vmt' not in col]
-    additional_attributes = ['count', 'cost']
+    additional_attributes = ['count', 'dollars']
     for additional_attribute in additional_attributes:
         for col in input_df:
             if additional_attribute in col:
                 attributes.append(col)
 
-    # groupby calendar year, regclass and fueling class
+    # groupby calendar year, regclass and fuel
     groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id']
     return_df = input_df[[*groupby_cols, *attributes]]
     return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
@@ -276,5 +292,74 @@ def calc_annual_cost_effects(input_df):
     return_df.insert(return_df.columns.get_loc('calendar_year') + 1, 'discount_rate', 0)
     return_df.insert(return_df.columns.get_loc('calendar_year') + 1, 'periods', 1)
     return_df.insert(return_df.columns.get_loc('calendar_year') + 1, 'series', 'AnnualValue')
+
+    return return_df
+
+
+def calc_lifetime_consumer_view(batch_settings, input_df):
+    """
+
+    Args:
+        batch_settings: an instance of the BatchSettings class.
+        input_df: DataFrame of cost effects by vehicle in each analysis year.
+
+    Returns:
+        A DataFrame of cost effects by model year of available lifetime, body style and fuel type.
+
+    """
+    attributes = [col for col in input_df.columns if ('vmt' in col or 'vmt_' in col) and '_vmt' not in col]
+    additional_attributes = ['count', 'dollars']
+    for additional_attribute in additional_attributes:
+        for col in input_df:
+            if additional_attribute in col:
+                attributes.append(col)
+
+    # groupby model year, body_style and fuel, first eliminate legacy_fleet
+    df = input_df.loc[input_df['manufacturer_id'] != 'legacy_fleet', :]
+
+    # now create a sales column for use in some of the 'per vehicle' calcs below
+    df.insert(df.columns.get_loc('registered_count'), 'sales', df['registered_count'])
+    df.loc[df['age'] != 0, 'sales'] = 0
+    groupby_cols = ['session_policy', 'session_name', 'model_year', 'body_style', 'in_use_fuel_id']
+    attributes.append('sales')
+    return_df = df[[*groupby_cols, *attributes]]
+    return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+
+    return_df.insert(
+        return_df.columns.get_loc('in_use_fuel_id') + 1,
+        'fueling_class',
+        '')
+
+    return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
+    return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
+
+    return_df.insert(return_df.columns.get_loc('model_year') + 1, 'discount_rate', 0)
+    return_df.insert(return_df.columns.get_loc('model_year') + 1, 'periods', 1)
+    return_df.insert(return_df.columns.get_loc('model_year') + 1, 'series', 'PeriodValue')
+
+    # calc periods
+    return_df['periods'] = batch_settings.analysis_final_year - return_df['model_year']
+
+    # now calc values per vehicle
+    for attribute in attributes:
+        if attribute in ['vehicle_cost_dollars', 'consumer_price_dollars', 'purchase_credit_dollars', 'sales']:
+            return_df.insert(
+                len(return_df.columns),
+                f'{attribute}_per_vehicle',
+                return_df[attribute] / return_df['sales']
+            )
+        else:
+            return_df.insert(
+                len(return_df.columns),
+                f'{attribute}_per_vehicle',
+                return_df[attribute] / return_df['registered_count']
+            )
+    # and values per mile
+    for attribute in attributes:
+        return_df.insert(
+            len(return_df.columns),
+            f'{attribute}_per_mile',
+            return_df[attribute] / return_df['vmt']
+        )
 
     return return_df
