@@ -1156,6 +1156,11 @@ class Vehicle(OMEGABase):
 
         self.cost_curve = cost_curve
 
+    @property
+    def fueling_class_reg_class_id(self):
+        #: combined fueling class and reg class string
+        return '%s.%s' % (self.fueling_class, self.reg_class_id)
+
 
 class VehicleFinal(SQABase, Vehicle):
     """
