@@ -5,6 +5,7 @@ from effects.vehicle_annual_data import VehicleAnnualData
 
 from effects.emission_rates_egu import EmissionRatesEGU
 from effects.emission_factors_refinery import EmissionFactorsRefinery
+from effects.emission_rates_refinery import EmissionRatesRefinery
 from effects.emission_rates_vehicles import EmissionRatesVehicles
 from effects.safety_values import SafetyValues
 from effects.fatality_rates import FatalityRates
@@ -16,9 +17,10 @@ class SessionSettings:
         self.session_policy = None
         self.session_name = None
 
-        self.powersector_emission_factors_file = None
+        self.powersector_emission_rates_file = None
         self.refinery_emission_factors_file = None
-        self.vehicle_emission_factors_file = None
+        self.refinery_emission_rates_file = None
+        self.vehicle_emission_rates_file = None
         self.safety_values_file = None
         self.fatality_rates_file = None
 
@@ -27,6 +29,7 @@ class SessionSettings:
 
         self.emission_rates_egu = None
         self.emission_factors_refinery = None
+        self.emission_rates_refinery = None
         self.emission_rates_vehicles = None
         self.safety_values = None
         self.fatality_rates = None
@@ -84,12 +87,22 @@ class SessionSettings:
             = path_session_out / f'{batch_settings.batch_name}_{self.session_name}_vehicle_annual_data.csv'
 
         # Get effects-specific files from appropriate folder as specified in batch_settings.csv.
-        self.powersector_emission_factors_file \
-            = batch_settings.get_attribute_value(('Context Powersector Emission Factors File', f'{self.session_policy}'), 'full_path')
-        self.refinery_emission_factors_file \
-            = batch_settings.get_attribute_value(('Context Refinery Emission Factors File', f'{self.session_policy}'), 'full_path')
-        self.vehicle_emission_factors_file \
-            = batch_settings.get_attribute_value(('Context Vehicle Emission Factors File', f'{self.session_policy}'), 'full_path')
+        self.powersector_emission_rates_file \
+            = batch_settings.get_attribute_value(('Context Powersector Emission Rates File', f'{self.session_policy}'), 'full_path')
+
+        try:
+            self.refinery_emission_factors_file \
+                = batch_settings.get_attribute_value(('Context Refinery Emission Factors File', f'{self.session_policy}'), 'full_path')
+        except Exception as e:
+            effects_log.logwrite(f'Refinery Emission Factors file not used, {e}')
+        try:
+            self.refinery_emission_rates_file \
+                = batch_settings.get_attribute_value(('Context Refinery Emission Rates File', f'{self.session_policy}'), 'full_path')
+        except Exception as e:
+            effects_log.logwrite(f'Refinery Emission Rates file not used, {e}')
+
+        self.vehicle_emission_rates_file \
+            = batch_settings.get_attribute_value(('Context Vehicle Emission Rates File', f'{self.session_policy}'), 'full_path')
         self.safety_values_file \
             = batch_settings.get_attribute_value(('Context Safety Values File', f'{self.session_policy}'), 'full_path')
         self.fatality_rates_file \
@@ -143,13 +156,17 @@ class SessionSettings:
             self.vehicle_annual_data.init_from_file(self.vehicle_annual_data_file, effects_log)
 
             self.emission_rates_egu = EmissionRatesEGU()
-            self.emission_rates_egu.init_from_file(self.powersector_emission_factors_file, effects_log)
+            self.emission_rates_egu.init_from_file(self.powersector_emission_rates_file, effects_log)
 
-            self.emission_factors_refinery = EmissionFactorsRefinery()
-            self.emission_factors_refinery.init_from_file(self.refinery_emission_factors_file, effects_log)
+            if self.refinery_emission_factors_file:
+                self.emission_factors_refinery = EmissionFactorsRefinery()
+                self.emission_factors_refinery.init_from_file(self.refinery_emission_factors_file, effects_log)
+            else:
+                self.emission_rates_refinery = EmissionRatesRefinery()
+                self.emission_rates_refinery.init_from_file(self.refinery_emission_rates_file, effects_log)
 
             self.emission_rates_vehicles = EmissionRatesVehicles()
-            self.emission_rates_vehicles.init_from_file(self.vehicle_emission_factors_file, effects_log)
+            self.emission_rates_vehicles.init_from_file(self.vehicle_emission_rates_file, effects_log)
 
             self.safety_values = SafetyValues()
             self.safety_values.init_from_file(self.safety_values_file, effects_log)

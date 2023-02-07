@@ -91,7 +91,7 @@ class EmissionRatesEGU:
         # don't forget to update the module docstring with changes here
         input_template_name = 'emission_rates_egu'
         input_template_version = 0.3
-        input_template_columns = {
+        input_template_columns = [
             'case',
             'rate_name',
             'independent_variable',
@@ -101,7 +101,7 @@ class EmissionRatesEGU:
             'equation_rate_id',
             'equation_kwh_demand_metric',
             'equation_kwh_consumption_metric',
-        }
+        ]
 
         df = read_input_file(filepath, effects_log)
         validate_template_version_info(df, input_template_name, input_template_version, effects_log)
@@ -123,17 +123,17 @@ class EmissionRatesEGU:
 
         self._data = df.to_dict('index')
 
-        for rate_key in rate_keys:
-
-            rate_eq = self._data[rate_key]['equation_rate_id']
-            kwh_demand_eq = self._data[rate_key]['equation_kwh_demand_metric']
-            kwh_consumption_eq = self._data[rate_key]['equation_kwh_consumption_metric']
-
-            self._data[rate_key].update({
-                'equation_rate_id': compile(rate_eq, '<string>', 'eval'),
-                'equation_kwh_demand_metric': compile(kwh_demand_eq, '<string>', 'eval'),
-                'equation_kwh_consumption_metric': compile(kwh_consumption_eq, '<string>', 'eval'),
-            })
+        # for rate_key in self._data:
+        #
+        #     rate_eq = self._data[rate_key]['equation_rate_id']
+        #     kwh_demand_eq = self._data[rate_key]['equation_kwh_demand_metric']
+        #     kwh_consumption_eq = self._data[rate_key]['equation_kwh_consumption_metric']
+        #
+        #     self._data[rate_key].update({
+        #         'equation_rate_id': compile(rate_eq, '<string>', 'eval'),
+        #         'equation_kwh_demand_metric': compile(kwh_demand_eq, '<string>', 'eval'),
+        #         'equation_kwh_consumption_metric': compile(kwh_consumption_eq, '<string>', 'eval'),
+        #     })
 
     def get_emission_rate(self, calendar_year, kwh_session, rate_names):
         """
