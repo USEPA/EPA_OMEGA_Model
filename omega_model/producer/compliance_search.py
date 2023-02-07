@@ -722,7 +722,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                             best_candidate_production_decision['total_generalized_cost_dollars']) and \
                             cheapest_compliant:
                         best_candidate_production_decision = most_strategic_cheapest_point
-                    elif best_candidate_production_decision['strategic_compliance_error'] > 1.0:
+                    elif best_candidate_production_decision['strategic_compliance_ratio'] > 1.0:
                         # if old best was non compliant, new best is most strategic
                         best_candidate_production_decision = most_strategic_point
             else:
