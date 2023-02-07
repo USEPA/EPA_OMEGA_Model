@@ -1088,77 +1088,63 @@ def calc_market_category_data(producer_decision):
         producer_decision['producer_abs_share_frac_%s' % mcat] = 0
 
         for mc in omega_globals.options.MarketClass.market_classes:
+            mc_sales = np.maximum(1, producer_decision['sales_%s' % mc])
+
             if mcat in mc.split('.'):
                 producer_decision['average_onroad_direct_co2e_gpmi_%s' % mcat] += \
-                    producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc] * \
-                    np.maximum(1, producer_decision['sales_%s' % mc])
+                    producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc] * mc_sales
 
                 producer_decision['average_onroad_direct_kwh_pmi_%s' % mcat] += \
-                    producer_decision['average_onroad_direct_kwh_pmi_%s' % mc] * \
-                    np.maximum(1, producer_decision['sales_%s' % mc])
+                    producer_decision['average_onroad_direct_kwh_pmi_%s' % mc] * mc_sales
 
                 producer_decision['average_new_vehicle_mfr_cost_%s' % mcat] += \
-                    producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * \
-                    np.maximum(1, producer_decision['sales_%s' % mc])
+                    producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * mc_sales
 
                 producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mcat] += \
-                    producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] * \
-                    np.maximum(1, producer_decision['sales_%s' % mc])
+                    producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] * mc_sales
 
                 if 'average_cross_subsidized_price_%s' % mc in producer_decision:
                     producer_decision['average_cross_subsidized_price_%s' % mcat] += \
-                        producer_decision['average_cross_subsidized_price_%s' % mc] * \
-                        np.maximum(1, producer_decision['sales_%s' % mc])
+                        producer_decision['average_cross_subsidized_price_%s' % mc] * mc_sales
 
                 producer_decision['average_curbweight_lbs_%s' % mcat] += \
-                    producer_decision['average_curbweight_lbs_%s' % mc] * \
-                    np.maximum(1, producer_decision['sales_%s' % mc])
+                    producer_decision['average_curbweight_lbs_%s' % mc] * mc_sales
 
                 producer_decision['average_rated_hp_%s' % mcat] += \
-                    producer_decision['average_rated_hp_%s' % mc] * \
-                    np.maximum(1, producer_decision['sales_%s' % mc])
+                    producer_decision['average_rated_hp_%s' % mc] * mc_sales
 
                 producer_decision['average_footprint_ft2_%s' % mcat] += \
-                    producer_decision['average_footprint_ft2_%s' % mc] * \
-                    np.maximum(1, producer_decision['sales_%s' % mc])
+                    producer_decision['average_footprint_ft2_%s' % mc] * mc_sales
 
                 producer_decision['average_onroad_mpg_%s' % mcat] += \
-                    producer_decision['average_onroad_mpg_%s' % mc] * \
-                    np.maximum(1, producer_decision['sales_%s' % mc])
+                    producer_decision['average_onroad_mpg_%s' % mc] * mc_sales
 
                 producer_decision['sales_%s' % mcat] += \
-                    np.maximum(1, producer_decision['sales_%s' % mc])
+                    producer_decision['sales_%s' % mc]
 
                 if 'producer_abs_share_frac_%s' % mc in producer_decision:
                     producer_decision['producer_abs_share_frac_%s' % mcat] += \
                         producer_decision['producer_abs_share_frac_%s' % mc]
 
-        producer_decision['average_onroad_direct_co2e_gpmi_%s' % mcat] /= \
-            producer_decision['sales_%s' % mcat]
+        mcat_sales = np.maximum(1, producer_decision['sales_%s' % mcat])
 
-        producer_decision['average_onroad_direct_kwh_pmi_%s' % mcat] /= \
-            producer_decision['sales_%s' % mcat]
+        producer_decision['average_onroad_direct_co2e_gpmi_%s' % mcat] /= mcat_sales
 
-        producer_decision['average_new_vehicle_mfr_cost_%s' % mcat] /= \
-            producer_decision['sales_%s' % mcat]
+        producer_decision['average_onroad_direct_kwh_pmi_%s' % mcat] /= mcat_sales
 
-        producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mcat] /= \
-            producer_decision['sales_%s' % mcat]
+        producer_decision['average_new_vehicle_mfr_cost_%s' % mcat] /= mcat_sales
 
-        producer_decision['average_cross_subsidized_price_%s' % mcat] /= \
-            producer_decision['sales_%s' % mcat]
+        producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mcat] /= mcat_sales
 
-        producer_decision['average_curbweight_lbs_%s' % mcat] /= \
-            producer_decision['sales_%s' % mcat]
+        producer_decision['average_cross_subsidized_price_%s' % mcat] /= mcat_sales
 
-        producer_decision['average_rated_hp_%s' % mcat] /= \
-            producer_decision['sales_%s' % mcat]
+        producer_decision['average_curbweight_lbs_%s' % mcat] /= mcat_sales
 
-        producer_decision['average_footprint_ft2_%s' % mcat] /= \
-            producer_decision['sales_%s' % mcat]
+        producer_decision['average_rated_hp_%s' % mcat] /= mcat_sales
 
-        producer_decision['average_onroad_mpg_%s' % mcat] /= \
-            producer_decision['sales_%s' % mcat]
+        producer_decision['average_footprint_ft2_%s' % mcat] /= mcat_sales
+
+        producer_decision['average_onroad_mpg_%s' % mcat] /= mcat_sales
 
 
 def detect_producer_consumer_convergence(producer_decision_and_response, producer_market_classes):
