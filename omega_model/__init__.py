@@ -197,9 +197,9 @@ try:
             self.verbose = False
             self.iterate_producer_consumer = True
 
-            self.producer_voluntary_overcompliance = True
+            self.producer_voluntary_overcompliance = False  # disable voc by default
             self.producer_voluntary_overcompliance_min_benefit_frac = 0.01  # minimum benefit of overcompliance, as a fraction of compliance cost
-            self.producer_voluntary_overcompliance_min_strategic_compliance_ratio = 1.0  # disable voc by default
+            self.producer_voluntary_overcompliance_min_strategic_compliance_ratio = 0.9999  # minimal voc by default
             self.producer_price_modification_scaler = 0.0
             self.producer_footprint_wtp = 400
             self.producer_consumer_max_iterations = 5  # recommend num_market_classes + 2
@@ -231,7 +231,7 @@ try:
                                         'effects_']
 
             # list of modules to allow verbose console output, or empty to disable
-            self.verbose_console_modules = ['producer_compliance_search_',
+            self.verbose_console_modules = ['producer_compliance_search',
                                             'p-c_shares_and_costs', 'p-c_max_iterations_',
                                             'cross_subsidy_search_', 'cross_subsidy_multipliers',
                                             'cross_subsidy_convergence_']
