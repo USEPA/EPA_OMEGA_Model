@@ -1,6 +1,9 @@
 # Version number of the omega effects module, not the omega model
 
-__version__ = '0.4.1'
+__version__ = '0.4.2'
+
+# 0.4.2
+# Add entry (set in general_inputs_for_effects.csv) to control how many years to include in consumer view.
 
 # 0.4.1
 # Add new emission_rates_refinery.py to make use of AQM derived rates.

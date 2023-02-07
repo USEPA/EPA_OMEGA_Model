@@ -314,12 +314,18 @@ def calc_lifetime_consumer_view(batch_settings, input_df):
             if additional_attribute in col:
                 attributes.append(col)
 
-    # groupby model year, body_style and fuel, first eliminate legacy_fleet
-    df = input_df.loc[input_df['manufacturer_id'] != 'legacy_fleet', :]
+    # eliminate legacy_fleet and ages not desired for consumer view
+    periods = batch_settings.general_inputs_for_effects.get_value('years_in_consumer_view')
+
+    # if periods = 8, then max_age should be 7 since year 1 is age=0
+    max_age = periods - 1
+    df = input_df.loc[(input_df['manufacturer_id'] != 'legacy_fleet') & (input_df['age'] <= max_age), :]
 
     # now create a sales column for use in some of the 'per vehicle' calcs below
     df.insert(df.columns.get_loc('registered_count'), 'sales', df['registered_count'])
     df.loc[df['age'] != 0, 'sales'] = 0
+
+    # groupby model year, body_style and fuel,
     groupby_cols = ['session_policy', 'session_name', 'model_year', 'body_style', 'in_use_fuel_id']
     attributes.append('sales')
     return_df = df[[*groupby_cols, *attributes]]
@@ -334,11 +340,14 @@ def calc_lifetime_consumer_view(batch_settings, input_df):
     return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
 
     return_df.insert(return_df.columns.get_loc('model_year') + 1, 'discount_rate', 0)
-    return_df.insert(return_df.columns.get_loc('model_year') + 1, 'periods', 1)
+    return_df.insert(return_df.columns.get_loc('model_year') + 1, 'periods', 0)
     return_df.insert(return_df.columns.get_loc('model_year') + 1, 'series', 'PeriodValue')
 
     # calc periods
-    return_df['periods'] = batch_settings.analysis_final_year - return_df['model_year'] + 1
+    model_years = df['model_year'].unique()
+    for model_year in model_years:
+        max_age = max(df.loc[df['model_year'] == model_year, 'age'])
+        return_df.loc[return_df['model_year'] == model_year, 'periods'] = max_age + 1
 
     # now calc values per vehicle
     for attribute in attributes:
