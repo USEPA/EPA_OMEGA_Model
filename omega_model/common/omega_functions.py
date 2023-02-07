@@ -764,8 +764,11 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
             val = combo[k]
             min_val = np.maximum(min_constraints[k], val - half_range_frac)
             max_val = np.minimum(max_constraints[k], val + half_range_frac)
-            shares = np.append(np.append(shares, np.linspace(min_val, max_val, num_steps)), val) # create new share spread and include previous value
-        dfs.append(pd.DataFrame({k: np.unique(np.round(shares, 10))}))
+            if min_val == max_val:
+                shares = np.append(shares, val)
+            else:
+                shares = np.append(np.append(shares, np.linspace(min_val, max_val, num_steps)), val) # create new share spread and include previous value
+        dfs.append(pd.DataFrame({k: np.unique(np.round(shares, 20))}))
 
     dfx = pd.DataFrame()
     for df in dfs:

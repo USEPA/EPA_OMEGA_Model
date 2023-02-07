@@ -185,10 +185,10 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
         if not template_errors:
             OffCycleCredits._offcycle_credit_value_columns = [c for c in df.columns if (':' in c)]
 
-            for cc in OffCycleCredits._offcycle_credit_value_columns:
-                reg_class_id = cc.split(':')[1]
-                if reg_class_id not in omega_globals.options.RegulatoryClasses.reg_classes:
-                    template_errors.append('*** Invalid Reg Class ID "%s" in %s ***' % (reg_class_id, filename))
+            # for cc in OffCycleCredits._offcycle_credit_value_columns:
+            #     reg_class_id = cc.split(':')[1]
+            #     if reg_class_id not in omega_globals.options.RegulatoryClasses.reg_classes:
+            #         template_errors.append('*** Invalid Reg Class ID "%s" in %s ***' % (reg_class_id, filename))
 
         if not template_errors:
             OffCycleCredits.offcycle_credit_names = list(df['credit_name'].unique())

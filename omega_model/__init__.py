@@ -197,9 +197,9 @@ try:
             self.verbose = False
             self.iterate_producer_consumer = True
 
-            self.producer_voluntary_overcompliance = True
+            self.producer_voluntary_overcompliance = False  # disable voc by default
             self.producer_voluntary_overcompliance_min_benefit_frac = 0.01  # minimum benefit of overcompliance, as a fraction of compliance cost
-            self.producer_voluntary_overcompliance_min_strategic_compliance_ratio = 1.0  # disable voc by default
+            self.producer_voluntary_overcompliance_min_strategic_compliance_ratio = 0.9999  # minimal voc by default
             self.producer_price_modification_scaler = 0.0
             self.producer_footprint_wtp = 400
             self.producer_consumer_max_iterations = 5  # recommend num_market_classes + 2
@@ -213,14 +213,10 @@ try:
             self.flat_context = False
             self.flat_context_year = 2021
 
-            self.battery_GWh_limit_years = [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031,
-                                            2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040]
-
-            self.battery_GWh_limit = [30, 48, 79, 134, 159, 190, 250, 356, 502, 651, 792, 936, 1080, 1224, 1364, 1500,
-                                      1500, 1500, 1500, 1500, 1500]
+            self.battery_GWh_limit_years = [2020]
+            self.battery_GWh_limit = [1e9]
 
             self.kwh_per_mile_scale_years = [2020]
-
             self.kwh_per_mile_scale = [1.0]
 
             self.manufacturer_gigawatthour_data = None
