@@ -1,6 +1,10 @@
 # Version number of the omega effects module, not the omega model
 
-__version__ = '0.4.0'
+__version__ = '0.4.1'
+
+# 0.4.1
+# Add new emission_rates_refinery.py to make use of AQM derived rates.
+# Fix periods calc in consumer view function of cost_effects.py.
 
 # 0.4.0
 # Add model year lifetime cost calcs to cost_effects.py.

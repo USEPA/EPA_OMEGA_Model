@@ -132,6 +132,27 @@ def get_egu_emission_rate(session_settings, calendar_year, kwh_consumption, kwh_
     return session_settings.emission_rates_egu.get_emission_rate(calendar_year, kwh_session, rate_names)
 
 
+def get_refinery_emission_rate(session_settings, calendar_year):
+    """
+
+    Args:
+        session_settings: an instance of the SessionSettings class.
+        calendar_year: The calendar year for which a refinery emission factors are needed.
+
+    Returns:
+        A list of refinery emission rates as specified in the emission_rates list for the given calendar year.
+
+    """
+    emission_rates = (
+        'voc_grams_per_gallon',
+        'nox_grams_per_gallon',
+        'pm25_grams_per_gallon',
+        'sox_grams_per_gallon',
+    )
+
+    return session_settings.emission_rates_refinery.get_emission_rate(calendar_year, emission_rates)
+
+
 def get_refinery_ef(session_settings, calendar_year, fuel):
     """
 
@@ -463,9 +484,13 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                                     pass # add additional liquid fuels (E85) if necessary
 
                                 # upstream refinery emission factors for liquid fuel operation
-                                voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, \
-                                co2_ref_rate, ch4_ref_rate, n2o_ref_rate \
-                                    = get_refinery_ef(session_settings, calendar_year, liquid_fuel)
+                                if session_settings.emission_factors_refinery:
+                                    voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, \
+                                    co2_ref_rate, ch4_ref_rate, n2o_ref_rate \
+                                        = get_refinery_ef(session_settings, calendar_year, liquid_fuel)
+                                else:
+                                    voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate = \
+                                        get_refinery_emission_rate(session_settings, calendar_year)
 
                                 # calc exhaust and evaporative emissions for liquid fuel operation
                                 factor = vmt_liquid_fuel / grams_per_us_ton
@@ -906,8 +931,8 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                 butadiene13_exh_rate, pah15_exh_rate \
                     = get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg_class_id, fuel, ind_var_value)
 
-                voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co2_ref_rate, ch4_ref_rate, n2o_ref_rate \
-                    = get_refinery_ef(session_settings, calendar_year, fuel)
+                # voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co2_ref_rate, ch4_ref_rate, n2o_ref_rate \
+                #     = get_refinery_ef(session_settings, calendar_year, fuel)
 
                 energy_density_ratio, pure_share = e0_energy_density_ratio, e0_share
 
@@ -922,10 +947,18 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                 butadiene13_exh_rate, pah15_exh_rate \
                     = get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg_class_id, fuel, ind_var_value)
 
-                voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co2_ref_rate, ch4_ref_rate, n2o_ref_rate \
-                    = get_refinery_ef(session_settings, calendar_year, fuel)
+                # voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co2_ref_rate, ch4_ref_rate, n2o_ref_rate \
+                #     = get_refinery_ef(session_settings, calendar_year, fuel)
 
                 energy_density_ratio, pure_share = diesel_energy_density_ratio, 1
+
+            if session_settings.emission_factors_refinery:
+                voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, \
+                    co2_ref_rate, ch4_ref_rate, n2o_ref_rate \
+                    = get_refinery_ef(session_settings, calendar_year, fuel)
+            else:
+                voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate = \
+                    get_refinery_emission_rate(session_settings, calendar_year)
 
             transmission_efficiency \
                 = batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'transmission_efficiency')

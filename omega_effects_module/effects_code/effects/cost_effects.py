@@ -338,7 +338,7 @@ def calc_lifetime_consumer_view(batch_settings, input_df):
     return_df.insert(return_df.columns.get_loc('model_year') + 1, 'series', 'PeriodValue')
 
     # calc periods
-    return_df['periods'] = batch_settings.analysis_final_year - return_df['model_year']
+    return_df['periods'] = batch_settings.analysis_final_year - return_df['model_year'] + 1
 
     # now calc values per vehicle
     for attribute in attributes:
