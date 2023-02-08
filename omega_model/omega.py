@@ -572,13 +572,19 @@ def logwrite_cross_subsidy_results(calendar_year, producer_market_classes, cross
 
     multiplier_columns = ['cost_multiplier_%s' % mc for mc in sorted(producer_market_classes)]
 
+    omega_globals.price_modification_data = dict()
+    if producer_consumer_iteration_num == 0:
+        omega_globals.locked_price_modification_data = dict()
+
     if 'cross_subsidy_multipliers' in omega_globals.options.verbose_console_modules:
         for mc, cc in zip(sorted(producer_market_classes), multiplier_columns):
             if cc in producer_decision_and_response:
-                omega_log.logwrite(('FINAL %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc],
+                if mc in omega_globals.locked_price_modification_data:
+                    omega_log.logwrite(('LOCKED %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc],
+                                       echo_console=True)
+                else:
+                    omega_log.logwrite(('FINAL  %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc],
                                echo_console=True)
-
-    omega_globals.price_modification_data = dict()
 
     if all(mc in producer_decision_and_response for mc in multiplier_columns):
         for mc, mc_mult in zip(sorted(producer_market_classes), producer_decision_and_response[multiplier_columns]):
@@ -844,6 +850,10 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
                                                                           producer_decision_and_response,
                                                                           search_collapsed)
         else:
+            if omega_globals.locked_price_modification_data and mc in omega_globals.locked_price_modification_data:
+                # use recorded multipliers
+                multiplier_range = \
+                    np.array([omega_globals.locked_price_modification_data[mc]['market_class_multiplier']])
             if 'cross_subsidy_search' in omega_globals.options.verbose_console_modules:
                 omega_log.logwrite(('%s' % mcc).ljust(35) + '= MR:%s' % multiplier_range,
                                    echo_console=True)
