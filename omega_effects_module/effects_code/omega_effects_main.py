@@ -20,7 +20,7 @@ from effects.context_fuel_cost_per_mile import calc_fuel_cost_per_mile
 from effects.safety_effects import calc_safety_effects, calc_legacy_fleet_safety_effects
 from effects.physical_effects import calc_physical_effects, calc_legacy_fleet_physical_effects, \
     calc_annual_physical_effects
-from effects.cost_effects import calc_cost_effects, calc_annual_cost_effects, calc_lifetime_consumer_view
+from effects.cost_effects import calc_cost_effects, calc_annual_cost_effects, calc_period_consumer_view
 from effects.present_and_annualized_values import PVandEAV
 from effects.benefits import calc_benefits
 from effects.sum_social_effects import calc_social_effects
@@ -38,7 +38,7 @@ def main():
 
     version = omega_effects_module.effects_code.__version__
 
-    effects_log.logwrite(f'EPA OMEGA Model Effects Module version {version} started at {start_time_readable}\n')
+    effects_log.logwrite(f'\nEPA OMEGA Model Effects Module version {version} started at {start_time_readable}\n')
 
     runtime_options = RuntimeOptions()
     runtime_options.init_from_file(set_paths.path_module / 'runtime_options.csv', effects_log)
@@ -148,8 +148,8 @@ def main():
         effects_log.logwrite(f'\nCalculating annual costs effects for {session_name}')
         session_annual_cost_effects_df = calc_annual_cost_effects(session_cost_effects_df)
 
-        effects_log.logwrite(f'\nCalculating model year lifetime costs effects for {session_name}')
-        session_my_lifetime_cost_effects_df = calc_lifetime_consumer_view(batch_settings, session_cost_effects_df)
+        effects_log.logwrite(f'\nCalculating model year period-duration cost effects for {session_name}')
+        session_my_period_cost_effects_df = calc_period_consumer_view(batch_settings, session_cost_effects_df)
 
         # for use in benefits calcs, create an annual_cost_effects_df of undiscounted annual costs
         annual_cost_effects_df \
@@ -157,7 +157,7 @@ def main():
         annual_cost_effects_df.reset_index(inplace=True, drop=True)
 
         # for use in consumer calcs, create a my_lifetime_cost_effects_df of undiscounted lifetime costs
-        my_lifetime_cost_effects_df = pd.concat([my_lifetime_cost_effects_df, session_my_lifetime_cost_effects_df],
+        my_lifetime_cost_effects_df = pd.concat([my_lifetime_cost_effects_df, session_my_period_cost_effects_df],
                                                 axis=0, ignore_index=True)
         my_lifetime_cost_effects_df.reset_index(inplace=True, drop=True)
 
@@ -208,7 +208,7 @@ def main():
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv', output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_benefits_annual.csv', output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_social_effects_annual.csv', output_file_id_info)
-    add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_lifetime_costs.csv', output_file_id_info)
+    add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', output_file_id_info)
 
     shutil.copy2(runtime_options.batch_settings_file, path_of_run_folder / f'{runtime_options.batch_settings_file_name}')
     set_paths.copy_code_to_destination(path_of_code_folder)

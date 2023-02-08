@@ -296,7 +296,7 @@ def calc_annual_cost_effects(input_df):
     return return_df
 
 
-def calc_lifetime_consumer_view(batch_settings, input_df):
+def calc_period_consumer_view(batch_settings, input_df):
     """
 
     Args:
@@ -349,25 +349,37 @@ def calc_lifetime_consumer_view(batch_settings, input_df):
         max_age = max(df.loc[df['model_year'] == model_year, 'age'])
         return_df.loc[return_df['model_year'] == model_year, 'periods'] = max_age + 1
 
-    # now calc values per vehicle
+    # now calc total values per vehicle over the period and average annual values per vehicle over the period
     for attribute in attributes:
-        if attribute in ['vehicle_cost_dollars', 'consumer_price_dollars', 'purchase_credit_dollars', 'sales']:
+        if attribute in ['sales', 'registered_count']:
+            pass
+        elif attribute in ['vehicle_cost_dollars', 'consumer_price_dollars', 'purchase_credit_dollars']:
             return_df.insert(
                 len(return_df.columns),
-                f'{attribute}_per_vehicle',
+                f'{attribute}_per_period',
                 return_df[attribute] / return_df['sales']
+            )
+            return_df.insert(
+                len(return_df.columns),
+                f'{attribute}_per_year_in_period',
+                return_df[attribute] / return_df['sales'] / return_df['periods']
             )
         else:
             return_df.insert(
                 len(return_df.columns),
-                f'{attribute}_per_vehicle',
+                f'{attribute}_per_period',
+                (return_df[attribute] / return_df['registered_count']) * return_df['periods']
+            )
+            return_df.insert(
+                len(return_df.columns),
+                f'{attribute}_per_year_in_period',
                 return_df[attribute] / return_df['registered_count']
             )
     # and values per mile
     for attribute in attributes:
         return_df.insert(
             len(return_df.columns),
-            f'{attribute}_per_mile',
+            f'{attribute}_per_mile_in_period',
             return_df[attribute] / return_df['vmt']
         )
 
