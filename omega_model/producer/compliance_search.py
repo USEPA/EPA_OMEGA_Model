@@ -352,8 +352,9 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                                 locked_consumer_shares = True
                                                 # record multipliers
                                                 for nmc in node_market_classes:
-                                                    omega_globals.locked_price_modification_data[nmc] = \
-                                                        omega_globals.price_modification_data[nmc]
+                                                    if nmc in omega_globals.price_modification_data:
+                                                        omega_globals.locked_price_modification_data[nmc] = \
+                                                            omega_globals.price_modification_data[nmc]
                                                 for k in min_constraints.keys():
                                                     if '.ALT' in k:
                                                         if 'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
