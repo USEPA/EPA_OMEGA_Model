@@ -100,7 +100,7 @@ class CreditInfo(OMEGABase):
     Used by GHG_credit_bank.get_credit_info() to return a list of non-expired credit and debit data
 
     """
-    def __init__(self, remaining_balance_Mg, remaining_years):
+    def __init__(self, remaining_balance_Mg, remaining_years, model_year):
         """
         Create GHG_credit_info object
 
@@ -110,6 +110,7 @@ class CreditInfo(OMEGABase):
         """
         self.remaining_balance_Mg = remaining_balance_Mg
         self.remaining_years = remaining_years
+        self.model_year = model_year
 
 
 class CreditBank(OMEGABase):
@@ -328,7 +329,8 @@ class CreditBank(OMEGABase):
                 credit_max_life_years = self.get_credit_param(credit['model_year'], 'credit_carryforward_years')
                 if credit['age'] <= credit_max_life_years:
                     current_credits.append(
-                        CreditInfo(credit['ending_balance_Mg'], credit_max_life_years - credit['age'] + 1))
+                        CreditInfo(credit['ending_balance_Mg'], credit_max_life_years - credit['age'] + 1,
+                                   credit['model_year']))
 
         current_debits = []
 
@@ -339,7 +341,8 @@ class CreditBank(OMEGABase):
                 debit_max_life_years = self.get_credit_param(debit['model_year'], 'credit_carryback_years')
                 if debit['age'] <= debit_max_life_years:
                     current_debits.append(
-                        CreditInfo(debit['ending_balance_Mg'], debit_max_life_years - debit['age'] + 1))
+                        CreditInfo(debit['ending_balance_Mg'], debit_max_life_years - debit['age'] + 1,
+                                   debit['model_year']))
 
         return current_credits, current_debits
 
