@@ -269,24 +269,18 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
             credit_banks[compliance_id].update_credit_age(calendar_year)
 
             if manufacturer_annual_data_table is None:
-                # TODO: make credit strategy modular, like upstream methods?
-                # strategy: use expiring credits, pay any expiring debits in one shot:
-                # expiring_credits_Mg = credit_banks[compliance_id].get_expiring_credits_Mg(calendar_year)
-                # expiring_debits_Mg = credit_banks[compliance_id].get_expiring_debits_Mg(calendar_year)
-                # strategic_target_offset_Mg = expiring_credits_Mg + expiring_debits_Mg
-
                 # strategy: use credits and pay debits over their remaining lifetime, instead of all at once:
                 strategic_target_offset_Mg = 0
                 current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
                 for c in current_credits + current_debits:
-                    strategic_target_offset_Mg += c.remaining_balance_Mg * (1 / max(1, c.remaining_years-1))
-
-                # strategy: try to hit the target and make up for minor previous compliance discrepancies
-                #           (ignoring base year banked credits):
-                # strategic_target_offset_Mg = 0
-                # current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
-                # for c in current_debits:
-                #     strategic_target_offset_Mg += c.remaining_balance_Mg * (1 / max(1, c.remaining_years-1))
+                    if c.model_year < omega_globals.options.analysis_initial_year:
+                        # allow strategic under-compliance for historical credits
+                        strategic_target_offset_Mg += \
+                            c.remaining_balance_Mg * (1 / max(1, c.remaining_years-1))
+                    else:
+                        # don't allow strategic under-compliance for analysis year credits
+                        strategic_target_offset_Mg += \
+                            min(0, c.remaining_balance_Mg) * (1 / max(1, c.remaining_years-1))
             else:
                 strategic_target_offset_Mg = \
                     manufacturer_annual_data_table[(manufacturer_annual_data_table['compliance_id'] == compliance_id) &
