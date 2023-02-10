@@ -356,11 +356,16 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
             iteration_log.append(producer_decision_and_response)
 
-            compliance_search.finalize_production(calendar_year, compliance_id, candidate_mfr_composite_vehicles,
-                                                  pre_production_vehicles, producer_decision_and_response)
+            total_credits_co2e_megagrams = \
+                compliance_search.finalize_production(calendar_year, compliance_id,
+                                                      candidate_mfr_composite_vehicles,
+                                                      pre_production_vehicles,
+                                                      producer_decision_and_response)
 
-            credit_banks[compliance_id].handle_credit(calendar_year,
-                                                     producer_decision_and_response['total_credits_co2e_megagrams'])
+            credit_banks[compliance_id].handle_credit(calendar_year, total_credits_co2e_megagrams)
+
+            # credit_banks[compliance_id].handle_credit(calendar_year,
+            #                                          producer_decision_and_response['total_credits_co2e_megagrams'])
 
             omega_globals.options.SalesShare.store_producer_decision_and_response(producer_decision_and_response)
 
