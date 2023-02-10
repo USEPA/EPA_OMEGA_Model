@@ -311,7 +311,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         Args:
             calendar_year (int):
-            prev_producer_decision_and_response1:
+            producer_decision:
             market_class (str): e.g. 'hauling' or 'non_hauling'
 
         Returns:

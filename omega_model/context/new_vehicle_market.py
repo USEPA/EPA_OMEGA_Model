@@ -262,7 +262,8 @@ class NewVehicleMarket(OMEGABase):
         cls._session_new_vehicle_generalized_costs['%s_%s' % (calendar_year, compliance_id)] = generalized_cost
 
     @staticmethod
-    def new_vehicle_data(calendar_year, context_size_class=None, context_reg_class=None, context_body_style=None, value='sales'):
+    def new_vehicle_data(calendar_year, context_size_class=None, context_reg_class=None, context_body_style=None,
+                         value='sales'):
         """
         Get new vehicle sales by session context ID, session context case, calendar year, context size class
         and context reg class.  User can specify total sales (no optional arguments) or sales by context size class or
