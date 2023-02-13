@@ -1140,6 +1140,8 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
                                         )
     omega_globals.session.flush()
 
+    return target_co2e_Mg - cert_co2e_Mg
+
 
 def decompose_candidate_vehicles(calendar_year, candidate_mfr_composite_vehicles, producer_decision):
     for cv in candidate_mfr_composite_vehicles:

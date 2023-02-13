@@ -314,14 +314,18 @@ class CostCloud(OMEGABase, CostCloudBase):
             calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b, vehicle.base_year_target_coef_c, 60)
 
         if vehicle.model_year - vehicle.prior_redesign_year >= vehicle.redesign_interval:
-            # sweep vehicle params (for now, final ranges TBD)
-            rlhp20s = [vehicle_rlhp20]  # (vehicle_rlhp20 * 0.95, vehicle_rlhp20, vehicle_rlhp20 * 1.05)
-            rlhp60s = [vehicle_rlhp60]  # (vehicle_rlhp60 * 0.95, vehicle_rlhp60, vehicle_rlhp60 * 1.05)
+            # sweep vehicle params
+            rlhp20s = np.unique((vehicle_rlhp20 * omega_globals.options.rlhp20_min_scaler,
+                                 vehicle_rlhp20,
+                                 vehicle_rlhp20 * omega_globals.options.rlhp20_max_scaler))
 
-            # vehicle_footprints = [vehicle.base_year_footprint_ft2]
-            vehicle_footprints = (vehicle.base_year_footprint_ft2 * 0.95,
+            rlhp60s = np.unique((vehicle_rlhp60 * omega_globals.options.rlhp60_min_scaler,
+                                 vehicle_rlhp60,
+                                 vehicle_rlhp60 * omega_globals.options.rlhp60_max_scaler))
+
+            vehicle_footprints = np.unique((vehicle.base_year_footprint_ft2 * omega_globals.options.footprint_min_scaler,
                                   vehicle.base_year_footprint_ft2,
-                                  vehicle.base_year_footprint_ft2 * 1.05)
+                                  vehicle.base_year_footprint_ft2 * omega_globals.options.footprint_max_scaler))
 
             structure_materials = MassScaling.structure_materials
 

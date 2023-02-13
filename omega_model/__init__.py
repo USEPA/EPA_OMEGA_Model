@@ -197,11 +197,17 @@ try:
             self.verbose = False
             self.iterate_producer_consumer = True
 
+            self.footprint_min_scaler = 1/1.05
+            self.footprint_max_scaler = 1.05
+            self.rlhp20_min_scaler = 1.0
+            self.rlhp20_max_scaler = 1.0
+            self.rlhp60_min_scaler = 1.0
+            self.rlhp60_max_scaler = 1.0
             self.producer_voluntary_overcompliance = False  # disable voc by default
             self.producer_voluntary_overcompliance_min_benefit_frac = 0.01  # minimum benefit of overcompliance, as a fraction of compliance cost
             self.producer_voluntary_overcompliance_min_strategic_compliance_ratio = 0.9999  # minimal voc by default
             self.producer_price_modification_scaler = 0.0
-            self.producer_footprint_wtp = 400
+            self.producer_footprint_wtp = 200
             self.producer_consumer_max_iterations = 5  # recommend num_market_classes + 2
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
