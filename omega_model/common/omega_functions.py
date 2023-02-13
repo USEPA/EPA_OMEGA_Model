@@ -750,6 +750,8 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
     """
     dfs = []
 
+    machine_resolution = int(str.split(str(sys.float_info.epsilon), 'e-')[1])-1
+
     # reorder columns such that last column is an ALT since it equals one minus the sum of the prior columns and we
     # don't want to blow the constraints on the NO_ALTs
     alt_columns = [c for c in columns if 'ALT' in c.split('.')]
@@ -762,13 +764,14 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
         for idx, combo in combos.iterrows():
             k = columns[i]
             val = combo[k]
-            min_val = np.maximum(min_constraints[k], val - half_range_frac)
-            max_val = np.minimum(max_constraints[k], val + half_range_frac)
+            min_val = np.round(np.maximum(min_constraints[k], val - half_range_frac), machine_resolution)
+            max_val = np.round(np.minimum(max_constraints[k], val + half_range_frac), machine_resolution)
             if min_val == max_val:
-                shares = np.append(shares, val)
+                shares = np.append(shares, np.round(val, machine_resolution))
             else:
-                shares = np.append(np.append(shares, np.linspace(min_val, max_val, num_steps)), val) # create new share spread and include previous value
-        dfs.append(pd.DataFrame({k: np.unique(np.round(shares, 20))}))
+                shares = np.append(np.append(shares, np.linspace(min_val, max_val, num_steps)),
+                                   np.round(val, machine_resolution)) # create new share spread and include previous value
+        dfs.append(pd.DataFrame({k: np.unique(shares)}))
 
     dfx = pd.DataFrame()
     for df in dfs:
