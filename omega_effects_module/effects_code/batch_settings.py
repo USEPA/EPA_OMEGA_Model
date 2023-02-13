@@ -38,6 +38,7 @@ class BatchSettings:
         self.batch_name = None
         self._dict = dict()
         self.session_dict = dict()
+        self.vehicles_base_year = 0
         self.analysis_initial_year = 0
         self.analysis_final_year = 0
         self.calendar_years = 0
@@ -156,8 +157,9 @@ class BatchSettings:
         self.batch_folder = self.get_attribute_value(('batch_folder', 'all'), 'full_path')
         self.batch_name = Path(self.batch_folder).name
 
-        self.analysis_initial_year \
-            = pd.to_numeric(self.get_attribute_value(('Analysis Initial Year', 'all'), 'value'))
+        self.vehicles_base_year \
+            = pd.to_numeric(self.get_attribute_value(('Vehicles File Base Year', 'all'), 'value'))
+        self.analysis_initial_year = self.vehicles_base_year + 1
         self.analysis_final_year \
             = pd.to_numeric(self.get_attribute_value(('Analysis Final Year', 'all'), 'value'))
         self.cost_accrual = self.get_attribute_value(('Cost Accrual', 'all'), 'value')
@@ -210,12 +212,15 @@ class BatchSettings:
                     'session_name': self.get_attribute_value(('Session Name', f'action_{session_num}'), 'value')
                 }
 
-        if not self.session_dict[0]:
-            effects_log.logwrite('Must have a no_action session name')
+        if self.session_dict[0]['session_name']:
+            pass
+        else:
+            effects_log.logwrite('\n *** Must have a no_action session name ***')
             sys.exit()
-        if not self.session_dict[1]:
-            effects_log.logwrite('Must have an action_1 session name')
+        if len(self.session_dict) < 2:
+            effects_log.logwrite('\n *** Must have an action_1 session name ***')
             sys.exit()
+
 
     def init_batch_classes(self, effects_log):
         """
@@ -272,7 +277,7 @@ class BatchSettings:
             self.onroad_fuels.init_from_file(self.onroad_fuels_file, effects_log)
 
             self.legacy_fleet = LegacyFleet()
-            self.legacy_fleet.init_from_file(self.legacy_fleet_file, self.analysis_initial_year, effects_log)
+            self.legacy_fleet.init_from_file(self.legacy_fleet_file, self.vehicles_base_year, effects_log)
 
             self.context_stock_and_vmt = ContextStockVMT()
             self.context_stock_and_vmt.init_from_file(self.context_stock_and_vmt_file, self, effects_log)

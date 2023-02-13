@@ -50,13 +50,17 @@ class AdjustmentsVMT:
             # get projected stock vmt
             context_stock, context_vmt = batch_settings.context_stock_and_vmt.get_context_stock_vmt(calendar_year)
 
-            # calc the vmt adjustment for this calendar year
+            # calc the vmt and stock adjustments for this calendar year, provided legacy fleet vehicles still exist
             calendar_year_vmt_adj = context_vmt / calendar_year_vmt
-            calendar_year_legacy_fleet_stock_adj = \
-                (context_stock - calendar_year_stock) / calendar_year_legacy_fleet_stock
+            calendar_year_legacy_fleet_stock_adj = 0
+            if calendar_year_legacy_fleet_stock != 0:
+                calendar_year_legacy_fleet_stock_adj = \
+                    (context_stock - calendar_year_stock) / calendar_year_legacy_fleet_stock
 
-            self.dict[calendar_year] = {'vmt_adj': calendar_year_vmt_adj,
-                                        'legacy_stock_adj': calendar_year_legacy_fleet_stock_adj}
+            self.dict[calendar_year] = {
+                'vmt_adj': calendar_year_vmt_adj,
+                'legacy_stock_adj': calendar_year_legacy_fleet_stock_adj,
+            }
 
     def get_vmt_adjustment(self, calendar_year):
         """
