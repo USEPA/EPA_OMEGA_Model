@@ -68,9 +68,13 @@ class RuntimeOptions:
             'Yes': True,
             'yes': True,
             'YES': True,
+            'Y': True,
+            'y': True,
             'No': False,
             'no': False,
             'NO': False,
+            'N': False,
+            'n': False,
         })
 
     def init_from_file(self, filepath, effects_log):
