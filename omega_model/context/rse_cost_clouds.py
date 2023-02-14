@@ -345,7 +345,6 @@ class CostCloud(OMEGABase, CostCloudBase):
         convergence_tolerance = 0.01
         vehicle_ballast = DriveCycleBallast.get_ballast_lbs(vehicle)
         battery_kwh = vehicle.battery_kwh  # for now...
-        motor_kw = vehicle.motor_kw  # for now...
 
         cloud_points = []  # build a list of dicts that will be dumped into the cloud at the end
                            # (faster than sequentially appending Series objects)
@@ -389,8 +388,6 @@ class CostCloud(OMEGABase, CostCloudBase):
                             cloud_point = copy.copy(tech_flags) # cost_curve_classes[ccc]['tech_flags'].to_dict()
 
                             cloud_point['powertrain_type'] = vehicle.powertrain_type
-
-                            _cloud_point = dict()
 
                             # ------------------------------------------------------------------------------------#
                             prior_powertrain_mass_lbs = 1
@@ -477,7 +474,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                             else:
                                 # battery size and motor power determined by vehicle and iterative range calculation
                                 cloud_point['battery_kwh'] = battery_kwh
-                                cloud_point['motor_kw'] = motor_kw
+                                cloud_point['motor_kw'] = rated_hp / 1.34102
 
                             # informative data for troubleshooting:
                             if vehicle.model_year in omega_globals.options.log_vehicle_cloud_years or \
