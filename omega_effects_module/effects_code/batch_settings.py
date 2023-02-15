@@ -49,6 +49,7 @@ class BatchSettings:
         self.context_case = None
         self.vmt_rebound_rate_ice = None
         self.vmt_rebound_rate_bev = None
+        self.net_benefit_ghg_scope = 'global' # default value; change via batch file ('domestic' and 'both' are options)
 
         self.maintenance_costs_file = None
         self.repair_costs_file = None
@@ -176,6 +177,8 @@ class BatchSettings:
         self.context_name = self.get_attribute_value(('Context Name', 'all'), 'value')
         self.context_case = self.get_attribute_value(('Context Case', 'all'), 'value')
 
+        self.net_benefit_ghg_scope = self.get_attribute_value(('SC-GHG in Net Benefits', 'all'), 'value')
+
         self.maintenance_costs_file = self.get_attribute_value(('Maintenance Costs File', 'all'), 'full_path')
         self.repair_costs_file = self.get_attribute_value(('Repair Costs File', 'all'), 'full_path')
         self.refueling_costs_file = self.get_attribute_value(('Refueling Costs File', 'all'), 'full_path')
@@ -220,7 +223,6 @@ class BatchSettings:
         if len(self.session_dict) < 2:
             effects_log.logwrite('\n *** Must have an action_1 session name ***')
             sys.exit()
-
 
     def init_batch_classes(self, effects_log):
         """

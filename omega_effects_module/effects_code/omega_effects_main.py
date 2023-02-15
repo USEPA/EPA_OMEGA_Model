@@ -187,9 +187,17 @@ def main():
 
     # summarize costs, benefits and net benefits _______________________________________________________________________
     effects_log.logwrite('\nSummarizing social effects and calculating net benefits')
-    social_effects_df = \
-        calc_social_effects(pv_and_eav_costs_df, pv_and_eav_benefits_df,
-                            calc_health_effects=batch_settings.criteria_cost_factors.calc_health_effects)
+    social_effects_global_df = social_effects_domestic_df = None
+
+    if batch_settings.net_benefit_ghg_scope in ['global', 'both']:
+        social_effects_global_df = \
+            calc_social_effects(pv_and_eav_costs_df, pv_and_eav_benefits_df, 'global',
+                                calc_health_effects=batch_settings.criteria_cost_factors.calc_health_effects)
+
+    if batch_settings.net_benefit_ghg_scope in ['domestic', 'both']:
+        social_effects_domestic_df = \
+            calc_social_effects(pv_and_eav_costs_df, pv_and_eav_benefits_df, 'domestic',
+                                calc_health_effects=batch_settings.criteria_cost_factors.calc_health_effects)
 
     annual_physical_effects_deltas_df = pd.DataFrame.from_dict(delta_physical_effects_dict, orient='index')
     annual_physical_effects_deltas_df.reset_index(inplace=True, drop=True)
@@ -202,7 +210,12 @@ def main():
         index=False)
     pv_and_eav_costs_df.to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv', index=False)
     pv_and_eav_benefits_df.to_csv(path_of_run_folder / f'{start_time_readable}_benefits_annual.csv', index=False)
-    social_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_social_effects_annual.csv', index=False)
+    if batch_settings.net_benefit_ghg_scope in ['global', 'both']:
+        social_effects_global_df.to_csv(
+            path_of_run_folder / f'{start_time_readable}_social_effects_global_ghg_annual.csv', index=False)
+    if batch_settings.net_benefit_ghg_scope in ['domestic', 'both']:
+        social_effects_domestic_df.to_csv(
+            path_of_run_folder / f'{start_time_readable}_social_effects_domestic_ghg_annual.csv', index=False)
     my_lifetime_cost_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', index=False)
 
     # add identifying info to CSV files ________________________________________________________________________________
@@ -214,7 +227,12 @@ def main():
         output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv', output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_benefits_annual.csv', output_file_id_info)
-    add_id_to_csv(path_of_run_folder / f'{start_time_readable}_social_effects_annual.csv', output_file_id_info)
+    if batch_settings.net_benefit_ghg_scope in ['global', 'both']:
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_social_effects_global_ghg_annual.csv',
+                      output_file_id_info)
+    if batch_settings.net_benefit_ghg_scope in ['domestic', 'both']:
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_social_effects_domestic_ghg_annual.csv',
+                      output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', output_file_id_info)
 
     shutil.copy2(runtime_options.batch_settings_file, path_of_run_folder / f'{runtime_options.batch_settings_file_name}')

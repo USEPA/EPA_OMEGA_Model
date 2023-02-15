@@ -40,7 +40,6 @@ Data Column Name and Description
 **CODE**
 
 """
-
 from omega_effects_module.effects_code.general.general_functions import read_input_file
 from omega_effects_module.effects_code.general.input_validation import \
     validate_template_version_info, validate_template_column_names
@@ -71,8 +70,8 @@ class CostFactorsSCC:
         """
         # don't forget to update the module docstring with changes here
         input_template_name = 'cost_factors_scc'
-        input_template_version = 0.2
-        input_template_columns = {
+        input_template_version = 0.3
+        input_template_columns = [
             'calendar_year',
             'dollar_basis',
             'co2_global_5.0_USD_per_metricton',
@@ -87,7 +86,19 @@ class CostFactorsSCC:
             'n2o_global_3.0_USD_per_metricton',
             'n2o_global_2.5_USD_per_metricton',
             'n2o_global_3.95_USD_per_metricton',
-        }
+            'co2_domestic_5.0_USD_per_metricton',
+            'co2_domestic_3.0_USD_per_metricton',
+            'co2_domestic_2.5_USD_per_metricton',
+            'co2_domestic_3.95_USD_per_metricton',
+            'ch4_domestic_5.0_USD_per_metricton',
+            'ch4_domestic_3.0_USD_per_metricton',
+            'ch4_domestic_2.5_USD_per_metricton',
+            'ch4_domestic_3.95_USD_per_metricton',
+            'n2o_domestic_5.0_USD_per_metricton',
+            'n2o_domestic_3.0_USD_per_metricton',
+            'n2o_domestic_2.5_USD_per_metricton',
+            'n2o_domestic_3.95_USD_per_metricton',
+        ]
 
         df = read_input_file(filepath, effects_log)
         validate_template_version_info(df, input_template_name, input_template_version, effects_log)

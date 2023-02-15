@@ -26,6 +26,18 @@ def get_scc_cf(batch_settings, calendar_year):
         'n2o_global_3.0_USD_per_metricton',
         'n2o_global_2.5_USD_per_metricton',
         'n2o_global_3.95_USD_per_metricton',
+        'co2_domestic_5.0_USD_per_metricton',
+        'co2_domestic_3.0_USD_per_metricton',
+        'co2_domestic_2.5_USD_per_metricton',
+        'co2_domestic_3.95_USD_per_metricton',
+        'ch4_domestic_5.0_USD_per_metricton',
+        'ch4_domestic_3.0_USD_per_metricton',
+        'ch4_domestic_2.5_USD_per_metricton',
+        'ch4_domestic_3.95_USD_per_metricton',
+        'n2o_domestic_5.0_USD_per_metricton',
+        'n2o_domestic_3.0_USD_per_metricton',
+        'n2o_domestic_2.5_USD_per_metricton',
+        'n2o_domestic_3.95_USD_per_metricton',
     )
 
     return batch_settings.scc_cost_factors.get_cost_factors(calendar_year, cost_factors)
@@ -167,8 +179,11 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
             # climate effects
             # get scc cost factors
             co2_global_5, co2_global_3, co2_global_25, co2_global_395, \
-            ch4_global_5, ch4_global_3, ch4_global_25, ch4_global_395, \
-            n2o_global_5, n2o_global_3, n2o_global_25, n2o_global_395 \
+                ch4_global_5, ch4_global_3, ch4_global_25, ch4_global_395, \
+                n2o_global_5, n2o_global_3, n2o_global_25, n2o_global_395, \
+                co2_domestic_5, co2_domestic_3, co2_domestic_25, co2_domestic_395, \
+                ch4_domestic_5, ch4_domestic_3, ch4_domestic_25, ch4_domestic_395, \
+                n2o_domestic_5, n2o_domestic_3, n2o_domestic_25, n2o_domestic_395 \
                 = get_scc_cf(batch_settings, calendar_year)
             
             ghg_tons_dict = dict()
@@ -186,24 +201,36 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
             for ghg in ghg_list:
                 ghg_tons_dict[ghg] = physical_na[ghg] - physical_a[ghg]
     
-            # calculate climate cost effects
+            # calculate climate benefits
             co2_tons = ghg_tons_dict['co2_total_metrictons']
             co2_global_5_benefit_dollars = co2_tons * co2_global_5
             co2_global_3_benefit_dollars = co2_tons * co2_global_3
             co2_global_25_benefit_dollars = co2_tons * co2_global_25
             co2_global_395_benefit_dollars = co2_tons * co2_global_395
+            co2_domestic_5_benefit_dollars = co2_tons * co2_domestic_5
+            co2_domestic_3_benefit_dollars = co2_tons * co2_domestic_3
+            co2_domestic_25_benefit_dollars = co2_tons * co2_domestic_25
+            co2_domestic_395_benefit_dollars = co2_tons * co2_domestic_395
         
             ch4_tons = ghg_tons_dict['ch4_total_metrictons']
             ch4_global_5_benefit_dollars = ch4_tons * ch4_global_5
             ch4_global_3_benefit_dollars = ch4_tons * ch4_global_3
             ch4_global_25_benefit_dollars = ch4_tons * ch4_global_25
             ch4_global_395_benefit_dollars = ch4_tons * ch4_global_395
+            ch4_domestic_5_benefit_dollars = ch4_tons * ch4_domestic_5
+            ch4_domestic_3_benefit_dollars = ch4_tons * ch4_domestic_3
+            ch4_domestic_25_benefit_dollars = ch4_tons * ch4_domestic_25
+            ch4_domestic_395_benefit_dollars = ch4_tons * ch4_domestic_395
     
             n2o_tons = ghg_tons_dict['n2o_total_metrictons']
             n2o_global_5_benefit_dollars = n2o_tons * n2o_global_5
             n2o_global_3_benefit_dollars = n2o_tons * n2o_global_3
             n2o_global_25_benefit_dollars = n2o_tons * n2o_global_25
             n2o_global_395_benefit_dollars = n2o_tons * n2o_global_395
+            n2o_domestic_5_benefit_dollars = n2o_tons * n2o_domestic_5
+            n2o_domestic_3_benefit_dollars = n2o_tons * n2o_domestic_3
+            n2o_domestic_25_benefit_dollars = n2o_tons * n2o_domestic_25
+            n2o_domestic_395_benefit_dollars = n2o_tons * n2o_domestic_395
 
             ghg_global_5_benefit_dollars = co2_global_5_benefit_dollars \
                                            + ch4_global_5_benefit_dollars \
@@ -217,6 +244,19 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
             ghg_global_395_benefit_dollars = co2_global_395_benefit_dollars \
                                              + ch4_global_395_benefit_dollars \
                                              + n2o_global_395_benefit_dollars
+
+            ghg_domestic_5_benefit_dollars = co2_domestic_5_benefit_dollars \
+                                           + ch4_domestic_5_benefit_dollars \
+                                           + n2o_domestic_5_benefit_dollars
+            ghg_domestic_3_benefit_dollars = co2_domestic_3_benefit_dollars \
+                                           + ch4_domestic_3_benefit_dollars \
+                                           + n2o_domestic_3_benefit_dollars
+            ghg_domestic_25_benefit_dollars = co2_domestic_25_benefit_dollars \
+                                            + ch4_domestic_25_benefit_dollars \
+                                            + n2o_domestic_25_benefit_dollars
+            ghg_domestic_395_benefit_dollars = co2_domestic_395_benefit_dollars \
+                                             + ch4_domestic_395_benefit_dollars \
+                                             + n2o_domestic_395_benefit_dollars
             
             # toxics
             toxics_tons_dict = dict()
@@ -383,6 +423,23 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 'ghg_global_3.0_benefit_dollars': ghg_global_3_benefit_dollars,
                 'ghg_global_2.5_benefit_dollars': ghg_global_25_benefit_dollars,
                 'ghg_global_3.95_benefit_dollars': ghg_global_395_benefit_dollars,
+
+                'co2_domestic_5.0_benefit_dollars': co2_domestic_5_benefit_dollars,
+                'co2_domestic_3.0_benefit_dollars': co2_domestic_3_benefit_dollars,
+                'co2_domestic_2.5_benefit_dollars': co2_domestic_25_benefit_dollars,
+                'co2_domestic_3.95_benefit_dollars': co2_domestic_395_benefit_dollars,
+                'ch4_domestic_5.0_benefit_dollars': ch4_domestic_5_benefit_dollars,
+                'ch4_domestic_3.0_benefit_dollars': ch4_domestic_3_benefit_dollars,
+                'ch4_domestic_2.5_benefit_dollars': ch4_domestic_25_benefit_dollars,
+                'ch4_domestic_3.95_benefit_dollars': ch4_domestic_395_benefit_dollars,
+                'n2o_domestic_5.0_benefit_dollars': n2o_domestic_5_benefit_dollars,
+                'n2o_domestic_3.0_benefit_dollars': n2o_domestic_3_benefit_dollars,
+                'n2o_domestic_2.5_benefit_dollars': n2o_domestic_25_benefit_dollars,
+                'n2o_domestic_3.95_benefit_dollars': n2o_domestic_395_benefit_dollars,
+                'ghg_domestic_5.0_benefit_dollars': ghg_domestic_5_benefit_dollars,
+                'ghg_domestic_3.0_benefit_dollars': ghg_domestic_3_benefit_dollars,
+                'ghg_domestic_2.5_benefit_dollars': ghg_domestic_25_benefit_dollars,
+                'ghg_domestic_3.95_benefit_dollars': ghg_domestic_395_benefit_dollars,
             }
             if calc_health_effects:
                 benefits_dict_for_key.update({
