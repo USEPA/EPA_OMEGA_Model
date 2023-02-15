@@ -125,7 +125,7 @@ class RuntimeOptions:
             # protect against NaN or empty string
             self.file_format = self._dict['Format for Vehicle-Level Output Files']['Entry'].lower()
             if self.save_vehicle_detail_files:
-                effects_log.logwrite(f'Format for Vehicle-Level Output Files is {self.file_format}')
+                effects_log.logwrite(f'Format for Vehicle-Level Output Files is {self.file_format}\n')
         except Exception as e:
             effects_log.logwrite('\nVehicle-Level Output File Save Format in runtime_settings.csv must be "csv" or "parquet"')
             effects_log.logwrite(e)
