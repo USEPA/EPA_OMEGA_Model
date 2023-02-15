@@ -1358,12 +1358,8 @@ def init_omega(session_runtime_options):
     from context.production_constraints import ProductionConstraints
     from context.mass_scaling import MassScaling
     from context.body_styles import BodyStyles
-    from context.maintenance_cost import MaintenanceCost
-    from context.repair_cost import RepairCost
-    from context.refueling_cost import RefuelingCost
     from context.powertrain_cost import PowertrainCost
     from context.glider_cost import GliderCost
-    from context.context_stock_vmt import ContextStockVMT
 
     from policy.upstream_methods import UpstreamMethods
     from policy.required_sales_share import RequiredSalesShare
@@ -1382,19 +1378,8 @@ def init_omega(session_runtime_options):
     from producer.vehicle_annual_data import VehicleAnnualData
     from producer import compliance_search
 
-    from effects.general_inputs_for_effects import GeneralInputsForEffects
-    from effects.cost_factors_criteria import CostFactorsCriteria
-    from effects.cost_factors_scc import CostFactorsSCC
-    from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
-    from effects.cost_factors_congestion_noise import CostFactorsCongestionNoise
-    from effects.emission_rates_egu import EmissionRatesEGU
-    from effects.emission_factors_refinery import EmissionFactorsRefinery
-    from effects.emission_rates_vehicles import EmissionRatesVehicles
     from effects.cpi_price_deflators import CPIPriceDeflators
     from effects.ip_deflators import ImplictPriceDeflators
-    from effects.safety_values import SafetyValues
-    from effects.fatality_rates import FatalityRates
-    from effects.legacy_fleet import LegacyFleet
 
     from consumer.sales_volume import init_sales_volume
 
@@ -1497,9 +1482,6 @@ def init_omega(session_runtime_options):
         init_fail += GliderCost.init_from_file(omega_globals.options.glider_cost_input_file,
                                                verbose=verbose_init)
 
-        init_fail += ContextStockVMT.init_from_file(omega_globals.options.context_stock_vmt_file,
-                                                    verbose=verbose_init)
-
         init_fail += VehicleAnnualData.init_vehicle_annual_data()
 
         if not init_fail:
@@ -1508,77 +1490,6 @@ def init_omega(session_runtime_options):
 
             init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
                                                      verbose=verbose_init)
-
-        if omega_globals.options.calc_effects == 'Physical and Costs':
-            init_fail += GeneralInputsForEffects.init_from_file(omega_globals.options.general_inputs_for_effects_file,
-                                                          verbose=verbose_init)
-
-            init_fail += EmissionRatesEGU.init_from_file(omega_globals.options.emission_factors_powersector_file,
-                                                           verbose=verbose_init)
-
-            # init_fail += EmissionFactorsPowersector.init_from_file(omega_globals.options.emission_factors_powersector_file,
-            #                                                        verbose=verbose_init)
-
-            init_fail += EmissionFactorsRefinery.init_from_file(omega_globals.options.emission_factors_refinery_file,
-                                                                verbose=verbose_init)
-
-            # init_fail += EmissionFactorsVehicles.init_from_file(omega_globals.options.emission_factors_vehicles_file,
-            #                                                     verbose=verbose_init)
-
-            init_fail += EmissionRatesVehicles.init_from_file(omega_globals.options.emission_factors_vehicles_file,
-                                                              verbose=verbose_init)
-
-            init_fail += CostFactorsCriteria.init_from_file(omega_globals.options.criteria_cost_factors_file,
-                                                            verbose=verbose_init)
-
-            init_fail += CostFactorsSCC.init_from_file(omega_globals.options.scc_cost_factors_file,
-                                                       verbose=verbose_init)
-
-            init_fail += CostFactorsEnergySecurity.init_from_file(omega_globals.options.energysecurity_cost_factors_file,
-                                                                  verbose=verbose_init)
-
-            init_fail += CostFactorsCongestionNoise.init_from_file(omega_globals.options.congestion_noise_cost_factors_file,
-                                                                   verbose=verbose_init)
-
-            init_fail += MaintenanceCost.init_from_file(omega_globals.options.maintenance_cost_inputs_file,
-                                                        verbose=verbose_init)
-
-            init_fail += RepairCost.init_from_file(omega_globals.options.repair_cost_inputs_file,
-                                                   verbose=verbose_init)
-
-            init_fail += RefuelingCost.init_from_file(omega_globals.options.refueling_cost_inputs_file,
-                                                      verbose=verbose_init)
-
-            init_fail += SafetyValues.init_from_file(omega_globals.options.safety_values_file,
-                                                     verbose=verbose_init)
-
-            init_fail += FatalityRates.init_from_file(omega_globals.options.fatality_rates_file,
-                                                      verbose=verbose_init)
-
-            init_fail += LegacyFleet.init_from_file(omega_globals.options.legacy_fleet_file,
-                                                    verbose=verbose_init)
-
-        if omega_globals.options.calc_effects == 'Physical':
-            init_fail += GeneralInputsForEffects.init_from_file(omega_globals.options.general_inputs_for_effects_file,
-                                                                verbose=verbose_init)
-
-            init_fail += EmissionRatesEGU.init_from_file(omega_globals.options.emission_factors_powersector_file,
-                                                           verbose=verbose_init)
-
-            init_fail += EmissionFactorsRefinery.init_from_file(omega_globals.options.emission_factors_refinery_file,
-                                                                verbose=verbose_init)
-
-            init_fail += EmissionRatesVehicles.init_from_file(omega_globals.options.emission_factors_vehicles_file,
-                                                              verbose=verbose_init)
-
-            init_fail += SafetyValues.init_from_file(omega_globals.options.safety_values_file,
-                                                     verbose=verbose_init)
-
-            init_fail += FatalityRates.init_from_file(omega_globals.options.fatality_rates_file,
-                                                      verbose=verbose_init)
-
-            init_fail += LegacyFleet.init_from_file(omega_globals.options.legacy_fleet_file,
-                                                    verbose=verbose_init)
 
         if not init_fail:
             # initial year = initial fleet model year (latest year of data)
@@ -1674,7 +1585,6 @@ def run_omega(session_runtime_options, standalone_run=False):
             else:
                 session_runtime_options.context_new_vehicle_generalized_costs_file = \
                     'context_new_vehicle_prices_%d.csv' % session_runtime_options.consolidate_manufacturers
-
 
             if session_runtime_options.use_prerun_context_outputs:
                 session_runtime_options.sales_share_calibration_file = \

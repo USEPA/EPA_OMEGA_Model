@@ -158,30 +158,13 @@ try:
 
             self.calc_effects = 'No'  # options are 'No', 'Physical' and 'Physical and Costs' as strings
             self.analysis_dollar_basis = 2020  # Note that the implicit_price_deflator.csv input file must contain data for this entry.
-            self.discount_values_to_year = 2021
-            self.cost_accrual = 'end-of-year'  # end-of-year means costs accrue at year's end; beginning-of-year means cost accrue at year's beginning
+
             self.allow_ice_of_bev = False
             self.redesign_interval_gain = 1.0
-            self.vmt_rebound_rate_ice = -0.1
-            self.vmt_rebound_rate_bev = 0
 
             # effects modeling files
-            self.general_inputs_for_effects_file = path + 'test_inputs/general_inputs_for_effects.csv'
             self.ip_deflators_file = path + 'test_inputs/implicit_price_deflators.csv'
             self.cpi_deflators_file = path + 'test_inputs/cpi_price_deflators.csv'
-            self.scc_cost_factors_file = path + 'test_inputs/cost_factors_scc.csv'
-            self.criteria_cost_factors_file = path + 'test_inputs/cost_factors_criteria.csv'
-            self.energysecurity_cost_factors_file = path + 'test_inputs/cost_factors_energysecurity.csv'
-            self.congestion_noise_cost_factors_file = path + 'test_inputs/cost_factors_congestion_noise.csv'
-            self.emission_factors_vehicles_file = path + 'test_inputs/emission_rates_vehicles-no_gpf.csv'
-            self.emission_factors_powersector_file = path + 'test_inputs/emission_rates_egu.csv'
-            self.emission_factors_refinery_file = path + 'test_inputs/emission_factors_refinery.csv'
-            self.maintenance_cost_inputs_file = path + 'test_inputs/maintenance_cost.csv'
-            self.repair_cost_inputs_file = path + 'test_inputs/repair_cost.csv'
-            self.refueling_cost_inputs_file = path + 'test_inputs/refueling_cost.csv'
-            self.safety_values_file = path + 'test_inputs/safety_values.csv'
-            self.fatality_rates_file = path + 'test_inputs/fatality_rates.csv'
-            self.legacy_fleet_file = path + 'test_inputs/legacy_fleet.csv'
 
             self.start_time = 0
             self.end_time = 0
