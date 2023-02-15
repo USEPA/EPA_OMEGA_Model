@@ -529,7 +529,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     mcat_converged, share_convergence_error, cross_subsidy_pricing_error = \
         detect_producer_consumer_convergence(producer_decision_and_response, producer_market_classes)
 
-    if (best_producer_decision_and_response is None) or \
+    if True or (best_producer_decision_and_response is None) or \
             (producer_decision_and_response['pricing_score']
              < best_producer_decision_and_response['pricing_score']):
         best_producer_decision_and_response = producer_decision_and_response.copy()
@@ -637,7 +637,7 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pai
 
         calc_cross_subsidy_metrics(mcat, cross_subsidy_pair, producer_decision, cross_subsidy_options_and_response)
 
-        price_weight = 1-0.925
+        price_weight = 0.925  # 1-0.925
 
         # calculate score, weighted distance to the origin
         cross_subsidy_options_and_response['pricing_score'] = \
