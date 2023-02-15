@@ -13,24 +13,25 @@ def get_scc_cf(batch_settings, calendar_year):
         A list of cost factors as specified in the cost_factors list for the given calendar year.
 
     """
-    cost_factors = ('co2_global_5.0_USD_per_metricton',
-                    'co2_global_3.0_USD_per_metricton',
-                    'co2_global_2.5_USD_per_metricton',
-                    'co2_global_3.95_USD_per_metricton',
-                    'ch4_global_5.0_USD_per_metricton',
-                    'ch4_global_3.0_USD_per_metricton',
-                    'ch4_global_2.5_USD_per_metricton',
-                    'ch4_global_3.95_USD_per_metricton',
-                    'n2o_global_5.0_USD_per_metricton',
-                    'n2o_global_3.0_USD_per_metricton',
-                    'n2o_global_2.5_USD_per_metricton',
-                    'n2o_global_3.95_USD_per_metricton',
-                    )
+    cost_factors = (
+        'co2_global_5.0_USD_per_metricton',
+        'co2_global_3.0_USD_per_metricton',
+        'co2_global_2.5_USD_per_metricton',
+        'co2_global_3.95_USD_per_metricton',
+        'ch4_global_5.0_USD_per_metricton',
+        'ch4_global_3.0_USD_per_metricton',
+        'ch4_global_2.5_USD_per_metricton',
+        'ch4_global_3.95_USD_per_metricton',
+        'n2o_global_5.0_USD_per_metricton',
+        'n2o_global_3.0_USD_per_metricton',
+        'n2o_global_2.5_USD_per_metricton',
+        'n2o_global_3.95_USD_per_metricton',
+    )
 
     return batch_settings.scc_cost_factors.get_cost_factors(calendar_year, cost_factors)
 
 
-def get_criteria_cf(batch_settings, calendar_year, source_id):
+def get_cap_cf(batch_settings, calendar_year, source_id):
     """
 
     Get criteria cost factors
@@ -44,19 +45,20 @@ def get_criteria_cf(batch_settings, calendar_year, source_id):
         A list of cost factors as specified in the cost_factors list for the given calendar year.
 
     """
-    cost_factors = ('pm25_low_3.0_USD_per_uston',
-                    'sox_low_3.0_USD_per_uston',
-                    'nox_low_3.0_USD_per_uston',
-                    'pm25_low_7.0_USD_per_uston',
-                    'sox_low_7.0_USD_per_uston',
-                    'nox_low_7.0_USD_per_uston',
-                    'pm25_high_3.0_USD_per_uston',
-                    'sox_high_3.0_USD_per_uston',
-                    'nox_high_3.0_USD_per_uston',
-                    'pm25_high_7.0_USD_per_uston',
-                    'sox_high_7.0_USD_per_uston',
-                    'nox_high_7.0_USD_per_uston',
-                    )
+    cost_factors = (
+        'pm25_Wu_3.0_USD_per_uston',
+        'sox_Wu_3.0_USD_per_uston',
+        'nox_Wu_3.0_USD_per_uston',
+        'pm25_Wu_7.0_USD_per_uston',
+        'sox_Wu_7.0_USD_per_uston',
+        'nox_Wu_7.0_USD_per_uston',
+        'pm25_Pope_3.0_USD_per_uston',
+        'sox_Pope_3.0_USD_per_uston',
+        'nox_Pope_3.0_USD_per_uston',
+        'pm25_Pope_7.0_USD_per_uston',
+        'sox_Pope_7.0_USD_per_uston',
+        'nox_Pope_7.0_USD_per_uston',
+    )
 
     return batch_settings.criteria_cost_factors.get_cost_factors(calendar_year, source_id, cost_factors)
 
@@ -86,7 +88,7 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
         batch_settings: an instance of the BatchSettings class.
         annual_physical_effects_df (DataFrame): a DataFrame of physical effects by calendar year, reg class, fuel type.
         annual_cost_effects_df (DataFrame): a DataFrame of cost effects by calendar year, reg class, fuel type.
-        calc_health_effects (bool): criteria air pollutant benefits will be calculated if True.
+        calc_health_effects (bool): criteria air pollutant (cap) benefits will be calculated if True.
 
     Returns:
         Two dictionaries: one of benefits for each action session relative to the no_action session; and one of physical
@@ -262,91 +264,93 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 for cap in cap_list:
                     cap_tons_dict[cap] = physical_na[cap] - physical_a[cap]
                 
-                # get vehicle criteria cost factors
+                # get vehicle cap cost factors
                 source_id = f'{reg_class_id} {fuel}'
-                pm25_low_3, sox_low_3, nox_low_3, \
-                    pm25_low_7, sox_low_7, nox_low_7, \
-                    pm25_high_3, sox_high_3, nox_high_3, \
-                    pm25_high_7, sox_high_7, nox_high_7 = get_criteria_cf(batch_settings, calendar_year, source_id)
+                pm25_Wu_3, sox_Wu_3, nox_Wu_3, \
+                    pm25_Wu_7, sox_Wu_7, nox_Wu_7, \
+                    pm25_Pope_3, sox_Pope_3, nox_Pope_3, \
+                    pm25_Pope_7, sox_Pope_7, nox_Pope_7 = get_cap_cf(batch_settings, calendar_year, source_id)
 
                 pm25_tons, sox_tons, nox_tons = \
                     cap_tons_dict['pm25_vehicle_ustons'], cap_tons_dict['sox_vehicle_ustons'], cap_tons_dict['nox_vehicle_ustons']
-                pm25_veh_low_3_benefit_dollars = pm25_tons * pm25_low_3
-                sox_veh_low_3_benefit_dollars = sox_tons * sox_low_3
-                nox_veh_low_3_benefit_dollars = nox_tons * nox_low_3
-                pm25_veh_low_7_benefit_dollars = pm25_tons * pm25_low_7
-                sox_veh_low_7_benefit_dollars = sox_tons * sox_low_7
-                nox_veh_low_7_benefit_dollars = nox_tons * nox_low_7
-                pm25_veh_high_3_benefit_dollars = pm25_tons * pm25_high_3
-                sox_veh_high_3_benefit_dollars = sox_tons * sox_high_3
-                nox_veh_high_3_benefit_dollars = nox_tons * nox_high_3
-                pm25_veh_high_7_benefit_dollars = pm25_tons * pm25_high_7
-                sox_veh_high_7_benefit_dollars = sox_tons * sox_high_7
-                nox_veh_high_7_benefit_dollars = nox_tons * nox_high_7
-    
-                # get upstream criteria cost factors
+                pm25_veh_Wu_3_benefit_dollars = pm25_tons * pm25_Wu_3
+                sox_veh_Wu_3_benefit_dollars = sox_tons * sox_Wu_3
+                nox_veh_Wu_3_benefit_dollars = nox_tons * nox_Wu_3
+                pm25_veh_Wu_7_benefit_dollars = pm25_tons * pm25_Wu_7
+                sox_veh_Wu_7_benefit_dollars = sox_tons * sox_Wu_7
+                nox_veh_Wu_7_benefit_dollars = nox_tons * nox_Wu_7
+                pm25_veh_Pope_3_benefit_dollars = pm25_tons * pm25_Pope_3
+                sox_veh_Pope_3_benefit_dollars = sox_tons * sox_Pope_3
+                nox_veh_Pope_3_benefit_dollars = nox_tons * nox_Pope_3
+                pm25_veh_Pope_7_benefit_dollars = pm25_tons * pm25_Pope_7
+                sox_veh_Pope_7_benefit_dollars = sox_tons * sox_Pope_7
+                nox_veh_Pope_7_benefit_dollars = nox_tons * nox_Pope_7
+
+                # get upstream cap cost factors
                 if 'electricity' in fuel:
                     source_id = 'egu'
                 else:
                     source_id = 'refinery'
-    
-                pm25_low_3, sox_low_3, nox_low_3, \
-                    pm25_low_7, sox_low_7, nox_low_7, \
-                    pm25_high_3, sox_high_3, nox_high_3, \
-                    pm25_high_7, sox_high_7, nox_high_7 = get_criteria_cf(batch_settings, calendar_year, source_id)
+
+                pm25_Wu_3, sox_Wu_3, nox_Wu_3, \
+                    pm25_Wu_7, sox_Wu_7, nox_Wu_7, \
+                    pm25_Pope_3, sox_Pope_3, nox_Pope_3, \
+                    pm25_Pope_7, sox_Pope_7, nox_Pope_7 = get_cap_cf(batch_settings, calendar_year, source_id)
 
                 pm25_tons, sox_tons, nox_tons = \
-                    cap_tons_dict['pm25_upstream_ustons'], cap_tons_dict['sox_upstream_ustons'], cap_tons_dict['nox_upstream_ustons']
-                pm25_up_low_3_benefit_dollars = pm25_tons * pm25_low_3
-                sox_up_low_3_benefit_dollars = sox_tons * sox_low_3
-                nox_up_low_3_benefit_dollars = nox_tons * nox_low_3
-                pm25_up_low_7_benefit_dollars = pm25_tons * pm25_low_7
-                sox_up_low_7_benefit_dollars = sox_tons * sox_low_7
-                nox_up_low_7_benefit_dollars = nox_tons * nox_low_7
-                pm25_up_high_3_benefit_dollars = pm25_tons * pm25_high_3
-                sox_up_high_3_benefit_dollars = sox_tons * sox_high_3
-                nox_up_high_3_benefit_dollars = nox_tons * nox_high_3
-                pm25_up_high_7_benefit_dollars = pm25_tons * pm25_high_7
-                sox_up_high_7_benefit_dollars = sox_tons * sox_high_7
-                nox_up_high_7_benefit_dollars = nox_tons * nox_high_7
-    
-                criteria_veh_low_3_benefit_dollars = pm25_veh_low_3_benefit_dollars \
-                                                  + sox_veh_low_3_benefit_dollars \
-                                                  + nox_veh_low_3_benefit_dollars
-                criteria_veh_low_7_benefit_dollars = pm25_veh_low_7_benefit_dollars \
-                                                  + sox_veh_low_7_benefit_dollars \
-                                                  + nox_veh_low_7_benefit_dollars
-                criteria_veh_high_3_benefit_dollars = pm25_veh_high_3_benefit_dollars \
-                                                   + sox_veh_high_3_benefit_dollars \
-                                                   + nox_veh_high_3_benefit_dollars
-                criteria_veh_high_7_benefit_dollars = pm25_veh_high_7_benefit_dollars \
-                                                   + sox_veh_high_7_benefit_dollars \
-                                                   + nox_veh_high_7_benefit_dollars
-    
-                criteria_up_low_3_benefit_dollars = pm25_up_low_3_benefit_dollars \
-                                                 + sox_up_low_3_benefit_dollars \
-                                                 + nox_up_low_3_benefit_dollars
-                criteria_up_low_7_benefit_dollars = pm25_up_low_7_benefit_dollars \
-                                                 + sox_up_low_7_benefit_dollars \
-                                                 + nox_up_low_7_benefit_dollars
-                criteria_up_high_3_benefit_dollars = pm25_up_high_3_benefit_dollars \
-                                                  + sox_up_high_3_benefit_dollars \
-                                                  + nox_up_high_3_benefit_dollars
-                criteria_up_high_7_benefit_dollars = pm25_up_high_7_benefit_dollars \
-                                                  + sox_up_high_7_benefit_dollars \
-                                                  + nox_up_high_7_benefit_dollars
+                    cap_tons_dict['pm25_upstream_ustons'], \
+                        cap_tons_dict['sox_upstream_ustons'], \
+                        cap_tons_dict['nox_upstream_ustons']
+                pm25_up_Wu_3_benefit_dollars = pm25_tons * pm25_Wu_3
+                sox_up_Wu_3_benefit_dollars = sox_tons * sox_Wu_3
+                nox_up_Wu_3_benefit_dollars = nox_tons * nox_Wu_3
+                pm25_up_Wu_7_benefit_dollars = pm25_tons * pm25_Wu_7
+                sox_up_Wu_7_benefit_dollars = sox_tons * sox_Wu_7
+                nox_up_Wu_7_benefit_dollars = nox_tons * nox_Wu_7
+                pm25_up_Pope_3_benefit_dollars = pm25_tons * pm25_Pope_3
+                sox_up_Pope_3_benefit_dollars = sox_tons * sox_Pope_3
+                nox_up_Pope_3_benefit_dollars = nox_tons * nox_Pope_3
+                pm25_up_Pope_7_benefit_dollars = pm25_tons * pm25_Pope_7
+                sox_up_Pope_7_benefit_dollars = sox_tons * sox_Pope_7
+                nox_up_Pope_7_benefit_dollars = nox_tons * nox_Pope_7
 
-                criteria_low_3_benefit_dollars = criteria_veh_low_3_benefit_dollars + \
-                                                 criteria_up_low_3_benefit_dollars
+                cap_veh_Wu_3_benefit_dollars = pm25_veh_Wu_3_benefit_dollars \
+                                               + sox_veh_Wu_3_benefit_dollars \
+                                               + nox_veh_Wu_3_benefit_dollars
+                cap_veh_Wu_7_benefit_dollars = pm25_veh_Wu_7_benefit_dollars \
+                                               + sox_veh_Wu_7_benefit_dollars \
+                                               + nox_veh_Wu_7_benefit_dollars
+                cap_veh_Pope_3_benefit_dollars = pm25_veh_Pope_3_benefit_dollars \
+                                                 + sox_veh_Pope_3_benefit_dollars \
+                                                 + nox_veh_Pope_3_benefit_dollars
+                cap_veh_Pope_7_benefit_dollars = pm25_veh_Pope_7_benefit_dollars \
+                                                 + sox_veh_Pope_7_benefit_dollars \
+                                                 + nox_veh_Pope_7_benefit_dollars
 
-                criteria_low_7_benefit_dollars = criteria_veh_low_7_benefit_dollars + \
-                                                 criteria_up_low_7_benefit_dollars
+                cap_up_Wu_3_benefit_dollars = pm25_up_Wu_3_benefit_dollars \
+                                              + sox_up_Wu_3_benefit_dollars \
+                                              + nox_up_Wu_3_benefit_dollars
+                cap_up_Wu_7_benefit_dollars = pm25_up_Wu_7_benefit_dollars \
+                                              + sox_up_Wu_7_benefit_dollars \
+                                              + nox_up_Wu_7_benefit_dollars
+                cap_up_Pope_3_benefit_dollars = pm25_up_Pope_3_benefit_dollars \
+                                                + sox_up_Pope_3_benefit_dollars \
+                                                + nox_up_Pope_3_benefit_dollars
+                cap_up_Pope_7_benefit_dollars = pm25_up_Pope_7_benefit_dollars \
+                                                + sox_up_Pope_7_benefit_dollars \
+                                                + nox_up_Pope_7_benefit_dollars
 
-                criteria_high_3_benefit_dollars = criteria_veh_high_3_benefit_dollars + \
-                                                  criteria_up_high_3_benefit_dollars
+                cap_Wu_3_benefit_dollars = cap_veh_Wu_3_benefit_dollars + \
+                                           cap_up_Wu_3_benefit_dollars
 
-                criteria_high_7_benefit_dollars = criteria_veh_high_7_benefit_dollars + \
-                                                  criteria_up_high_7_benefit_dollars
+                cap_Wu_7_benefit_dollars = cap_veh_Wu_7_benefit_dollars + \
+                                           cap_up_Wu_7_benefit_dollars
+
+                cap_Pope_3_benefit_dollars = cap_veh_Pope_3_benefit_dollars + \
+                                             cap_up_Pope_3_benefit_dollars
+
+                cap_Pope_7_benefit_dollars = cap_veh_Pope_7_benefit_dollars + \
+                                             cap_up_Pope_7_benefit_dollars
 
             # save monetized benefit results in the benefits_dict for this key
             benefits_dict_for_key = {
@@ -382,48 +386,48 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
             }
             if calc_health_effects:
                 benefits_dict_for_key.update({
-                    'pm25_vehicle_low_3.0_benefit_dollars': pm25_veh_low_3_benefit_dollars,
-                    'sox_vehicle_low_3.0_benefit_dollars': sox_veh_low_3_benefit_dollars,
-                    'nox_vehicle_low_3.0_benefit_dollars': nox_veh_low_3_benefit_dollars,
-                    'pm25_vehicle_low_7.0_benefit_dollars': pm25_veh_low_7_benefit_dollars,
-                    'sox_vehicle_low_7.0_benefit_dollars': sox_veh_low_7_benefit_dollars,
-                    'nox_vehicle_low_7.0_benefit_dollars': nox_veh_low_7_benefit_dollars,
+                    'pm25_vehicle_Wu_3.0_benefit_dollars': pm25_veh_Wu_3_benefit_dollars,
+                    'sox_vehicle_Wu_3.0_benefit_dollars': sox_veh_Wu_3_benefit_dollars,
+                    'nox_vehicle_Wu_3.0_benefit_dollars': nox_veh_Wu_3_benefit_dollars,
+                    'pm25_vehicle_Wu_7.0_benefit_dollars': pm25_veh_Wu_7_benefit_dollars,
+                    'sox_vehicle_Wu_7.0_benefit_dollars': sox_veh_Wu_7_benefit_dollars,
+                    'nox_vehicle_Wu_7.0_benefit_dollars': nox_veh_Wu_7_benefit_dollars,
 
-                    'pm25_vehicle_high_3.0_benefit_dollars': pm25_veh_high_3_benefit_dollars,
-                    'sox_vehicle_high_3.0_benefit_dollars': sox_veh_high_3_benefit_dollars,
-                    'nox_vehicle_high_3.0_benefit_dollars': nox_veh_high_3_benefit_dollars,
-                    'pm25_vehicle_high_7.0_benefit_dollars': pm25_veh_high_7_benefit_dollars,
-                    'sox_vehicle_high_7.0_benefit_dollars': sox_veh_high_7_benefit_dollars,
-                    'nox_vehicle_high_7.0_benefit_dollars': nox_veh_high_7_benefit_dollars,
+                    'pm25_vehicle_Pope_3.0_benefit_dollars': pm25_veh_Pope_3_benefit_dollars,
+                    'sox_vehicle_Pope_3.0_benefit_dollars': sox_veh_Pope_3_benefit_dollars,
+                    'nox_vehicle_Pope_3.0_benefit_dollars': nox_veh_Pope_3_benefit_dollars,
+                    'pm25_vehicle_Pope_7.0_benefit_dollars': pm25_veh_Pope_7_benefit_dollars,
+                    'sox_vehicle_Pope_7.0_benefit_dollars': sox_veh_Pope_7_benefit_dollars,
+                    'nox_vehicle_Pope_7.0_benefit_dollars': nox_veh_Pope_7_benefit_dollars,
 
-                    'pm25_upstream_low_3.0_benefit_dollars': pm25_up_low_3_benefit_dollars,
-                    'sox_upstream_low_3.0_benefit_dollars': sox_up_low_3_benefit_dollars,
-                    'nox_upstream_low_3.0_benefit_dollars': nox_up_low_3_benefit_dollars,
-                    'pm25_upstream_low_7.0_benefit_dollars': pm25_up_low_7_benefit_dollars,
-                    'sox_upstream_low_7.0_benefit_dollars': sox_up_low_7_benefit_dollars,
-                    'nox_upstream_low_7.0_benefit_dollars': nox_up_low_7_benefit_dollars,
+                    'pm25_upstream_Wu_3.0_benefit_dollars': pm25_up_Wu_3_benefit_dollars,
+                    'sox_upstream_Wu_3.0_benefit_dollars': sox_up_Wu_3_benefit_dollars,
+                    'nox_upstream_Wu_3.0_benefit_dollars': nox_up_Wu_3_benefit_dollars,
+                    'pm25_upstream_Wu_7.0_benefit_dollars': pm25_up_Wu_7_benefit_dollars,
+                    'sox_upstream_Wu_7.0_benefit_dollars': sox_up_Wu_7_benefit_dollars,
+                    'nox_upstream_Wu_7.0_benefit_dollars': nox_up_Wu_7_benefit_dollars,
 
-                    'pm25_upstream_high_3.0_benefit_dollars': pm25_up_high_3_benefit_dollars,
-                    'sox_upstream_high_3.0_benefit_dollars': sox_up_high_3_benefit_dollars,
-                    'nox_upstream_high_3.0_benefit_dollars': nox_up_high_3_benefit_dollars,
-                    'pm25_upstream_high_7.0_benefit_dollars': pm25_up_high_7_benefit_dollars,
-                    'sox_upstream_high_7.0_benefit_dollars': sox_up_high_7_benefit_dollars,
-                    'nox_upstream_high_7.0_benefit_dollars': nox_up_high_7_benefit_dollars,
+                    'pm25_upstream_Pope_3.0_benefit_dollars': pm25_up_Pope_3_benefit_dollars,
+                    'sox_upstream_Pope_3.0_benefit_dollars': sox_up_Pope_3_benefit_dollars,
+                    'nox_upstream_Pope_3.0_benefit_dollars': nox_up_Pope_3_benefit_dollars,
+                    'pm25_upstream_Pope_7.0_benefit_dollars': pm25_up_Pope_7_benefit_dollars,
+                    'sox_upstream_Pope_7.0_benefit_dollars': sox_up_Pope_7_benefit_dollars,
+                    'nox_upstream_Pope_7.0_benefit_dollars': nox_up_Pope_7_benefit_dollars,
 
-                    'criteria_vehicle_low_3.0_benefit_dollars': criteria_veh_low_3_benefit_dollars,
-                    'criteria_vehicle_low_7.0_benefit_dollars': criteria_veh_low_7_benefit_dollars,
-                    'criteria_vehicle_high_3.0_benefit_dollars': criteria_veh_high_3_benefit_dollars,
-                    'criteria_vehicle_high_7.0_benefit_dollars': criteria_veh_high_7_benefit_dollars,
+                    'cap_vehicle_Wu_3.0_benefit_dollars': cap_veh_Wu_3_benefit_dollars,
+                    'cap_vehicle_Wu_7.0_benefit_dollars': cap_veh_Wu_7_benefit_dollars,
+                    'cap_vehicle_Pope_3.0_benefit_dollars': cap_veh_Pope_3_benefit_dollars,
+                    'cap_vehicle_Pope_7.0_benefit_dollars': cap_veh_Pope_7_benefit_dollars,
 
-                    'criteria_upstream_low_3.0_benefit_dollars': criteria_up_low_3_benefit_dollars,
-                    'criteria_upstream_low_7.0_benefit_dollars': criteria_up_low_7_benefit_dollars,
-                    'criteria_upstream_high_3.0_benefit_dollars': criteria_up_high_3_benefit_dollars,
-                    'criteria_upstream_high_7.0_benefit_dollars': criteria_up_high_7_benefit_dollars,
+                    'cap_upstream_Wu_3.0_benefit_dollars': cap_up_Wu_3_benefit_dollars,
+                    'cap_upstream_Wu_7.0_benefit_dollars': cap_up_Wu_7_benefit_dollars,
+                    'cap_upstream_Pope_3.0_benefit_dollars': cap_up_Pope_3_benefit_dollars,
+                    'cap_upstream_Pope_7.0_benefit_dollars': cap_up_Pope_7_benefit_dollars,
 
-                    'criteria_low_3.0_benefit_dollars': criteria_low_3_benefit_dollars,
-                    'criteria_low_7.0_benefit_dollars': criteria_low_7_benefit_dollars,
-                    'criteria_high_3.0_benefit_dollars': criteria_high_3_benefit_dollars,
-                    'criteria_high_7.0_benefit_dollars': criteria_high_7_benefit_dollars,
+                    'cap_Wu_3.0_benefit_dollars': cap_Wu_3_benefit_dollars,
+                    'cap_Wu_7.0_benefit_dollars': cap_Wu_7_benefit_dollars,
+                    'cap_Pope_3.0_benefit_dollars': cap_Pope_3_benefit_dollars,
+                    'cap_Pope_7.0_benefit_dollars': cap_Pope_7_benefit_dollars,
                 }
                 )
             # save physical effects (reductions) to delta_physical_effects_dict, these were calculated as no_action

@@ -14,8 +14,6 @@ def calc_social_effects(costs_df, benefits_df, calc_health_effects=False):
         A summary effects DataFrame with additional columns summing costs and benefits.
 
     """
-    policy_sessions = [name for name in benefits_df['session_policy'].unique()]
-
     dfc = costs_df.copy()
     dfc.set_index(pd.Series(zip(
         dfc['session_policy'],
@@ -56,49 +54,125 @@ def calc_social_effects(costs_df, benefits_df, calc_health_effects=False):
     # the if-else below is focused on benefits; costs are subtracted from benefits near the end to get net benefits
     if calc_health_effects:
         sum_dict = {
-            1: {'name': 'net_benefit_dollars_ghg5_criteria3_low',
-                'attributes': [*non_emission_bens, 'ghg_global_5.0_benefit_dollars', 'criteria_low_3.0_benefit_dollars']},
-            2: {'name': 'net_benefit_dollars_ghg3_criteria3_low',
-                'attributes': [*non_emission_bens, 'ghg_global_3.0_benefit_dollars', 'criteria_low_3.0_benefit_dollars']},
-            3: {'name': 'net_benefit_dollars_ghg25_criteria3_low',
-                'attributes': [*non_emission_bens, 'ghg_global_2.5_benefit_dollars', 'criteria_low_3.0_benefit_dollars']},
-            4: {'name': 'net_benefit_dollars_ghg395_criteria3_low',
-                'attributes': [*non_emission_bens, 'ghg_global_3.95_benefit_dollars', 'criteria_low_3.0_benefit_dollars']},
-            5: {'name': 'net_benefit_dollars_ghg5_criteria7_low',
-                'attributes': [*non_emission_bens, 'ghg_global_5.0_benefit_dollars', 'criteria_low_7.0_benefit_dollars']},
-            6: {'name': 'net_benefit_dollars_ghg3_criteria7_low',
-                'attributes': [*non_emission_bens, 'ghg_global_3.0_benefit_dollars', 'criteria_low_7.0_benefit_dollars']},
-            7: {'name': 'net_benefit_dollars_ghg25_criteria7_low',
-                'attributes': [*non_emission_bens, 'ghg_global_2.5_benefit_dollars', 'criteria_low_7.0_benefit_dollars']},
-            8: {'name': 'net_benefit_dollars_ghg395_criteria7_low',
-                'attributes': [*non_emission_bens, 'ghg_global_3.95_benefit_dollars', 'criteria_low_7.0_benefit_dollars']},
-            9: {'name': 'net_benefit_dollars_ghg5_criteria3_high',
-                'attributes': [*non_emission_bens, 'ghg_global_5.0_benefit_dollars', 'criteria_high_3.0_benefit_dollars']},
-            10: {'name': 'net_benefit_dollars_ghg3_criteria3_high',
-                 'attributes': [*non_emission_bens, 'ghg_global_3.0_benefit_dollars', 'criteria_high_3.0_benefit_dollars']},
-            11: {'name': 'net_benefit_dollars_ghg25_criteria3_high',
-                 'attributes': [*non_emission_bens, 'ghg_global_2.5_benefit_dollars', 'criteria_high_3.0_benefit_dollars']},
-            12: {'name': 'net_benefit_dollars_ghg395_criteria3_high',
-                 'attributes': [*non_emission_bens, 'ghg_global_3.95_benefit_dollars', 'criteria_high_3.0_benefit_dollars']},
-            13: {'name': 'net_benefit_dollars_ghg5_criteria7_high',
-                 'attributes': [*non_emission_bens, 'ghg_global_5.0_benefit_dollars', 'criteria_high_7.0_benefit_dollars']},
-            14: {'name': 'net_benefit_dollars_ghg3_criteria7_high',
-                 'attributes': [*non_emission_bens, 'ghg_global_3.0_benefit_dollars', 'criteria_high_7.0_benefit_dollars']},
-            15: {'name': 'net_benefit_dollars_ghg25_criteria7_high',
-                 'attributes': [*non_emission_bens, 'ghg_global_2.5_benefit_dollars', 'criteria_high_7.0_benefit_dollars']},
-            16: {'name': 'net_benefit_dollars_ghg395_criteria7_high',
-                 'attributes': [*non_emission_bens, 'ghg_global_3.95_benefit_dollars', 'criteria_high_7.0_benefit_dollars']},
+            1: {'name': 'ghg5_global_cap3_Wu_net_benefit_dollars',
+                'attributes': [
+                    *non_emission_bens,
+                    'ghg_global_5.0_benefit_dollars',
+                    'cap_Wu_3.0_benefit_dollars'
+                ]},
+            2: {'name': 'ghg3_global_cap3_Wu_net_benefit_dollars',
+                'attributes': [
+                    *non_emission_bens,
+                    'ghg_global_3.0_benefit_dollars',
+                    'cap_Wu_3.0_benefit_dollars'
+                ]},
+            3: {'name': 'ghg25_global_cap3_Wu_net_benefit_dollars',
+                'attributes': [
+                    *non_emission_bens,
+                    'ghg_global_2.5_benefit_dollars',
+                    'cap_Wu_3.0_benefit_dollars'
+                ]},
+            4: {'name': 'ghg395_global_cap3_Wu_net_benefit_dollars',
+                'attributes': [
+                    *non_emission_bens,
+                    'ghg_global_3.95_benefit_dollars',
+                    'cap_Wu_3.0_benefit_dollars'
+                ]},
+            5: {'name': 'ghg5_global_cap7_Wu_net_benefit_dollars',
+                'attributes': [
+                    *non_emission_bens,
+                    'ghg_global_5.0_benefit_dollars',
+                    'cap_Wu_7.0_benefit_dollars'
+                ]},
+            6: {'name': 'ghg3_global_cap7_Wu_net_benefit_dollars',
+                'attributes': [
+                    *non_emission_bens,
+                    'ghg_global_3.0_benefit_dollars',
+                    'cap_Wu_7.0_benefit_dollars'
+                ]},
+            7: {'name': 'ghg25_global_cap7_Wu_net_benefit_dollars',
+                'attributes': [
+                    *non_emission_bens,
+                    'ghg_global_2.5_benefit_dollars',
+                    'cap_Wu_7.0_benefit_dollars'
+                ]},
+            8: {'name': 'ghg395_global_cap7_Wu_net_benefit_dollars',
+                'attributes': [
+                    *non_emission_bens,
+                    'ghg_global_3.95_benefit_dollars',
+                    'cap_Wu_7.0_benefit_dollars'
+                ]},
+            9: {'name': 'ghg5_global_cap3_Pope_net_benefit_dollars',
+                'attributes': [
+                    *non_emission_bens,
+                    'ghg_global_5.0_benefit_dollars',
+                    'cap_Pope_3.0_benefit_dollars'
+                ]},
+            10: {'name': 'ghg3_global_cap3_Pope_net_benefit_dollars',
+                 'attributes': [
+                     *non_emission_bens,
+                     'ghg_global_3.0_benefit_dollars',
+                     'cap_Pope_3.0_benefit_dollars'
+                 ]},
+            11: {'name': 'ghg25_global_cap3_Pope_net_benefit_dollars',
+                 'attributes': [
+                     *non_emission_bens,
+                     'ghg_global_2.5_benefit_dollars',
+                     'cap_Pope_3.0_benefit_dollars'
+                 ]},
+            12: {'name': 'ghg395_global_cap3_Pope_net_benefit_dollars',
+                 'attributes': [
+                     *non_emission_bens,
+                     'ghg_global_3.95_benefit_dollars',
+                     'cap_Pope_3.0_benefit_dollars'
+                 ]},
+            13: {'name': 'ghg5_global_cap7_Pope_net_benefit_dollars',
+                 'attributes': [
+                     *non_emission_bens,
+                     'ghg_global_5.0_benefit_dollars',
+                     'cap_Pope_7.0_benefit_dollars'
+                 ]},
+            14: {'name': 'ghg3_global_cap7_Pope_net_benefit_dollars',
+                 'attributes': [
+                     *non_emission_bens,
+                     'ghg_global_3.0_benefit_dollars',
+                     'cap_Pope_7.0_benefit_dollars'
+                 ]},
+            15: {'name': 'ghg25_global_cap7_Pope_net_benefit_dollars',
+                 'attributes': [
+                     *non_emission_bens,
+                     'ghg_global_2.5_benefit_dollars',
+                     'cap_Pope_7.0_benefit_dollars'
+                 ]},
+            16: {'name': 'ghg395_global_cap7_Pope_net_benefit_dollars',
+                 'attributes': [
+                     *non_emission_bens,
+                     'ghg_global_3.95_benefit_dollars',
+                     'cap_Pope_7.0_benefit_dollars'
+                 ]},
         }
     else:
         sum_dict = {
-            1: {'name': 'net_benefit_dollars_ghg5',
-                'attributes': [*non_emission_bens, 'ghg_global_5.0_benefit_dollars']},
-            2: {'name': 'net_benefit_dollars_ghg3',
-                'attributes': [*non_emission_bens, 'ghg_global_3.0_benefit_dollars']},
-            3: {'name': 'net_benefit_dollars_ghg25',
-                'attributes': [*non_emission_bens, 'ghg_global_2.5_benefit_dollars']},
-            4: {'name': 'net_benefit_dollars_ghg395',
-                'attributes': [*non_emission_bens, 'ghg_global_3.95_benefit_dollars']},
+            1: {'name': 'ghg5_global_net_benefit_dollars',
+                'attributes': [
+                    *non_emission_bens,
+                    'ghg_global_5.0_benefit_dollars'
+                ]},
+            2: {'name': 'ghg3_global_net_benefit_dollars',
+                'attributes': [
+                    *non_emission_bens,
+                    'ghg_global_3.0_benefit_dollars'
+                ]},
+            3: {'name': 'ghg25_global_net_benefit_dollars',
+                'attributes': [
+                    *non_emission_bens,
+                    'ghg_global_2.5_benefit_dollars'
+                ]},
+            4: {'name': 'ghg395_global_net_benefit_dollars',
+                'attributes': [
+                    *non_emission_bens,
+                    'ghg_global_3.95_benefit_dollars'
+                ]},
         }
 
     costs_dict = dfc.to_dict(orient='index')
