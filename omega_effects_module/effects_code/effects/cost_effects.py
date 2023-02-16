@@ -76,8 +76,8 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
         if onroad_direct_co2e_grams_per_mile or onroad_direct_kwh_per_mile:
             flag = 1
 
-            vehicle_cost_dollars  = consumer_price_dollars = purchase_credit_dollars = 0
-            avg_vehicle_cost = avg_consumer_price = avg_purchase_credit = 0
+            mfr_cost_dollars  = purchase_price_dollars = purchase_credit_dollars = 0
+            avg_mfr_cost = avg_purchase_price = avg_purchase_credit = 0
             fuel_retail_cost_dollars = 0
             fuel_pretax_cost_dollars = 0
             congestion_cost_dollars = 0
@@ -119,11 +119,11 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 if vehicle_id < pow(10, 6):
                     attribute_list = [
                         'new_vehicle_mfr_cost_dollars',
-                        'modified_cross_subsidized_price_dollars',
+                        'price_dollars',
                         'price_modification_dollars'
                     ]
                     vehicle_info_dict[vehicle_id] = session_settings.vehicles.get_vehicle_attributes(vehicle_id, *attribute_list)
-                    avg_vehicle_cost, avg_consumer_price, avg_purchase_credit = \
+                    avg_mfr_cost, avg_purchase_price, avg_purchase_credit = \
                         vehicle_info_dict[vehicle_id][0], \
                             vehicle_info_dict[vehicle_id][1], \
                             vehicle_info_dict[vehicle_id][2]
@@ -131,15 +131,15 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                     legacy_fleet_key = (vehicle_id, calendar_year, age)
                     vehicle_info_dict[vehicle_id] \
                         = batch_settings.legacy_fleet._legacy_fleet[legacy_fleet_key]['transaction_price_dollars']
-                    avg_vehicle_cost, avg_consumer_price, avg_purchase_credit = \
+                    avg_mfr_cost, avg_purchase_price, avg_purchase_credit = \
                         vehicle_info_dict[vehicle_id], \
                             vehicle_info_dict[vehicle_id], \
                             vehicle_info_dict[vehicle_id]
 
             # tech costs, only for age=0
             if age == 0:
-                vehicle_cost_dollars = vehicle_count * avg_vehicle_cost
-                consumer_price_dollars = vehicle_count * avg_consumer_price
+                mfr_cost_dollars = vehicle_count * avg_mfr_cost
+                purchase_price_dollars = vehicle_count * avg_purchase_price
                 purchase_credit_dollars = vehicle_count * avg_purchase_credit
 
             # fuel costs
@@ -172,7 +172,7 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 operating_veh_type = 'suv'
 
             repair_cost_per_mile \
-                = batch_settings.repair_cost.calc_repair_cost_per_mile(avg_vehicle_cost, base_year_powertrain_type,
+                = batch_settings.repair_cost.calc_repair_cost_per_mile(avg_mfr_cost, base_year_powertrain_type,
                                                                        operating_veh_type, age)
             repair_cost_dollars = repair_cost_per_mile * vmt
 
@@ -239,8 +239,8 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 'vmt': vmt,
                 'vmt_liquid_fuel': vmt_liquid,
                 'vmt_electricity': vmt_elec,
-                'vehicle_cost_dollars': vehicle_cost_dollars,
-                'consumer_price_dollars': consumer_price_dollars,
+                'vehicle_cost_dollars': mfr_cost_dollars,
+                'purchase_price_dollars': purchase_price_dollars,
                 'purchase_credit_dollars': purchase_credit_dollars,
                 'fuel_retail_cost_dollars': fuel_retail_cost_dollars,
                 'fuel_pretax_cost_dollars': fuel_pretax_cost_dollars,
@@ -353,7 +353,7 @@ def calc_period_consumer_view(batch_settings, input_df):
     for attribute in attributes:
         if attribute in ['sales', 'registered_count']:
             pass
-        elif attribute in ['vehicle_cost_dollars', 'consumer_price_dollars', 'purchase_credit_dollars']:
+        elif attribute in ['vehicle_cost_dollars', 'purchase_price_dollars', 'purchase_credit_dollars']:
             return_df.insert(
                 len(return_df.columns),
                 f'{attribute}_per_period',
