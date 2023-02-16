@@ -1182,3 +1182,77 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
         physical_effects_dict[key] = vehicle_effects_dict
 
     return physical_effects_dict
+
+
+def calc_period_consumer_physical_view(batch_settings, input_df):
+    """
+
+    Args:
+        batch_settings: an instance of the BatchSettings class.
+        input_df: DataFrame of physical effects by vehicle in each analysis year.
+
+    Returns:
+        A DataFrame of physical effects by model year of available lifetime, body style and fuel type.
+
+    """
+    attributes = [col for col in input_df.columns if ('vmt' in col or 'vmt_' in col)
+                  and '_vmt' not in col
+                  and '_per' not in col]
+    additional_attributes = ['count', 'consumption_gallons', 'consumption_kWh', 'barrels', '_total_']
+    for additional_attribute in additional_attributes:
+        for col in input_df:
+            if additional_attribute in col:
+                attributes.append(col)
+
+    # eliminate legacy_fleet and ages not desired for consumer view
+    periods = batch_settings.general_inputs_for_effects.get_value('years_in_consumer_view')
+
+    # if periods = 8, then max_age should be 7 since year 1 is age=0
+    max_age = periods - 1
+    df = input_df.loc[(input_df['manufacturer_id'] != 'legacy_fleet') & (input_df['age'] <= max_age), :]
+
+    # now create a sales column for use in some of the 'per vehicle' calcs below
+    df.insert(df.columns.get_loc('registered_count'), 'sales', df['registered_count'])
+    df.loc[df['age'] != 0, 'sales'] = 0
+
+    # groupby model year, body_style and fuel,
+    groupby_cols = ['session_policy', 'session_name', 'model_year', 'body_style', 'in_use_fuel_id']
+    attributes.append('sales')
+    return_df = df[[*groupby_cols, *attributes]]
+    return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+
+    return_df.insert(
+        return_df.columns.get_loc('in_use_fuel_id') + 1,
+        'fueling_class',
+        '')
+
+    return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
+    return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
+
+    return_df.insert(return_df.columns.get_loc('model_year') + 1, 'periods', 0)
+    return_df.insert(return_df.columns.get_loc('model_year') + 1, 'series', 'PeriodValue')
+
+    # calc periods
+    model_years = df['model_year'].unique()
+    for model_year in model_years:
+        max_age = max(df.loc[df['model_year'] == model_year, 'age'])
+        return_df.loc[return_df['model_year'] == model_year, 'periods'] = max_age + 1
+
+    # now calc total values per vehicle over the period and average annual values per vehicle over the period
+    for attribute in attributes:
+        if attribute in ['sales', 'registered_count']:
+            pass
+        else:
+            s = pd.Series((return_df[attribute] / return_df['registered_count']) * return_df['periods'],
+                          name=f'{attribute}_per_period')
+            return_df = pd.concat([return_df, s], axis=1)
+
+            s = pd.Series(return_df[attribute] / return_df['registered_count'], name=f'{attribute}_per_year_in_period')
+            return_df = pd.concat([return_df, s], axis=1)
+
+    # and values per mile
+    for attribute in attributes:
+        s = pd.Series(return_df[attribute] / return_df['vmt'], name=f'{attribute}_per_mile_in_period')
+        return_df = pd.concat([return_df, s], axis=1)
+
+    return return_df

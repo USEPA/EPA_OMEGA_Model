@@ -19,7 +19,7 @@ from effects.vmt_adjustments import AdjustmentsVMT
 from effects.context_fuel_cost_per_mile import calc_fuel_cost_per_mile
 from effects.safety_effects import calc_safety_effects, calc_legacy_fleet_safety_effects
 from effects.physical_effects import calc_physical_effects, calc_legacy_fleet_physical_effects, \
-    calc_annual_physical_effects
+    calc_annual_physical_effects, calc_period_consumer_physical_view
 from effects.cost_effects import calc_cost_effects, calc_annual_cost_effects, calc_period_consumer_view
 from effects.present_and_annualized_values import PVandEAV
 from effects.benefits import calc_benefits
@@ -54,7 +54,7 @@ def main():
     try:
         batch_settings.legacy_fleet.build_legacy_fleet_for_analysis(batch_settings)
     except Exception as e:
-        effects_log.logwrite(e)
+        effects_log.logwrite(f'{e}')
         sys.exit()
 
     # context fuel cost per mile and vmt adjustments ___________________________________________________________________
@@ -75,6 +75,7 @@ def main():
     # loop thru sessions to calc safety effects, physical effects, cost effects for each _______________________________
     annual_physical_effects_df = pd.DataFrame()
     annual_cost_effects_df = pd.DataFrame()
+    my_lifetime_physical_effects_df = pd.DataFrame()
     my_lifetime_cost_effects_df = pd.DataFrame()
 
     effects_log.logwrite(f'\nStarting work on sessions')
@@ -134,10 +135,20 @@ def main():
         effects_log.logwrite(f'\nCalculating annual physical effects for {session_name}')
         session_annual_physical_effects_df = calc_annual_physical_effects(batch_settings, session_physical_effects_df)
 
+        effects_log.logwrite(f'\nCalculating model year period_duration physical effects for {session_name}')
+        session_my_period_physical_effects_df = \
+            calc_period_consumer_physical_view(batch_settings, session_physical_effects_df)
+
         # for use in benefits calcs, create an annual_physical_effects_df
         annual_physical_effects_df \
             = pd.concat([annual_physical_effects_df, session_annual_physical_effects_df], axis=0, ignore_index=True)
         annual_physical_effects_df.reset_index(inplace=True, drop=True)
+
+        # for use in consumer calcs, create a my_lifetime_physical_effects_df of lifetime physical effects
+        my_lifetime_physical_effects_df = \
+            pd.concat([my_lifetime_physical_effects_df, session_my_period_physical_effects_df],
+                      axis=0, ignore_index=True)
+        my_lifetime_physical_effects_df.reset_index(inplace=True, drop=True)
 
         # cost effects _________________________________________________________________________________________________
         effects_log.logwrite(f'\nCalculating cost effects for {session_name}')
@@ -216,6 +227,8 @@ def main():
     if batch_settings.net_benefit_ghg_scope in ['domestic', 'both']:
         social_effects_domestic_df.to_csv(
             path_of_run_folder / f'{start_time_readable}_social_effects_domestic_ghg_annual.csv', index=False)
+    my_lifetime_physical_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv',
+                                           index=False)
     my_lifetime_cost_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', index=False)
 
     # add identifying info to CSV files ________________________________________________________________________________
@@ -233,6 +246,7 @@ def main():
     if batch_settings.net_benefit_ghg_scope in ['domestic', 'both']:
         add_id_to_csv(path_of_run_folder / f'{start_time_readable}_social_effects_domestic_ghg_annual.csv',
                       output_file_id_info)
+    add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv', output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', output_file_id_info)
 
     shutil.copy2(runtime_options.batch_settings_file, path_of_run_folder / f'{runtime_options.batch_settings_file_name}')

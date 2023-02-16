@@ -8,6 +8,7 @@ other functions here are called from within the calc_cost_effects function.
 **CODE**
 
 """
+import pandas as pd
 
 
 def get_congestion_noise_cf(batch_settings, reg_class_id):
@@ -354,33 +355,23 @@ def calc_period_consumer_view(batch_settings, input_df):
         if attribute in ['sales', 'registered_count']:
             pass
         elif attribute in ['vehicle_cost_dollars', 'purchase_price_dollars', 'purchase_credit_dollars']:
-            return_df.insert(
-                len(return_df.columns),
-                f'{attribute}_per_period',
-                return_df[attribute] / return_df['sales']
-            )
-            return_df.insert(
-                len(return_df.columns),
-                f'{attribute}_per_year_in_period',
-                return_df[attribute] / return_df['sales'] / return_df['periods']
-            )
+            s = pd.Series(return_df[attribute] / return_df['sales'], name=f'{attribute}_per_period')
+            return_df = pd.concat([return_df, s], axis=1)
+
+            s = pd.Series(return_df[attribute] / return_df['sales'] / return_df['periods'],
+                          name=f'{attribute}_per_year_in_period')
+            return_df = pd.concat([return_df, s], axis=1)
         else:
-            return_df.insert(
-                len(return_df.columns),
-                f'{attribute}_per_period',
-                (return_df[attribute] / return_df['registered_count']) * return_df['periods']
-            )
-            return_df.insert(
-                len(return_df.columns),
-                f'{attribute}_per_year_in_period',
-                return_df[attribute] / return_df['registered_count']
-            )
+            s = pd.Series((return_df[attribute] / return_df['registered_count']) * return_df['periods'],
+                          name=f'{attribute}_per_period')
+            return_df = pd.concat([return_df, s], axis=1)
+
+            s = pd.Series(return_df[attribute] / return_df['registered_count'], name=f'{attribute}_per_year_in_period')
+            return_df = pd.concat([return_df, s], axis=1)
+
     # and values per mile
     for attribute in attributes:
-        return_df.insert(
-            len(return_df.columns),
-            f'{attribute}_per_mile_in_period',
-            return_df[attribute] / return_df['vmt']
-        )
+        s = pd.Series(return_df[attribute] / return_df['vmt'], name=f'{attribute}_per_mile_in_period')
+        return_df = pd.concat([return_df, s], axis=1)
 
     return return_df
