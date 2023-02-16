@@ -1,6 +1,18 @@
 # Version number of the omega effects module, not the omega model
 
-__version__ = '0.4.3'
+__version__ = '0.5.0'
+
+# 0.5.0
+# Add MY calcs for physical effects.
+# Cleanup to use pd.concat() rather than df.insert().
+
+# MY function now uses purchase_price attribute rather than consumer_price.
+# Add domestic SCC calcs.
+# batch file now includes toggle for net benefits using 'global', 'domestic' or 'both'
+# Refactor CAP benefit attribute names to use study names rather than low/high distinction.
+# No change to results.
+# Fixes to vmt adjustments and legacy fleet handling, largely for MD.
+# vmt and stock adjustments now handled separate from safety calcs.
 
 # 0.4.3
 # Slight change to MY lifetime outputs and attribute names.
