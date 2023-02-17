@@ -99,6 +99,7 @@ class LegacyFleet:
         self._legacy_fleet = dict() # the built legacy fleet for the analysis
         self.adjusted_legacy_fleet = dict()
         self.legacy_fleet_calendar_year_max = 0
+        self.legacy_fleet_vehicle_id_start = pow(10, 6)
 
     def init_from_file(self, filepath, vehicles_base_year, effects_log):
         """
@@ -119,23 +120,23 @@ class LegacyFleet:
 
         input_template_name = 'legacy_fleet'
         input_template_version = 0.1
-        input_template_columns = {'model_year',
-                                  'age',
-                                  'calendar_year',
-                                  'reg_class_id',
-                                  'body_style',
-                                  'market_class_id',
-                                  'in_use_fuel_id',
-                                  'registered_count',
-                                  'miles_per_gallon',
-                                  'horsepower',
-                                  'curbweight_lbs',
-                                  'fuel_capacity_gallons',
-                                  'kwh_per_mile',
-                                  'range_miles',
-                                  'transaction_price_dollars',
-                                  }
-
+        input_template_columns = [
+            'model_year',
+            'age',
+            'calendar_year',
+            'reg_class_id',
+            'body_style',
+            'market_class_id',
+            'in_use_fuel_id',
+            'registered_count',
+            'miles_per_gallon',
+            'horsepower',
+            'curbweight_lbs',
+            'fuel_capacity_gallons',
+            'kwh_per_mile',
+            'range_miles',
+            'transaction_price_dollars',
+        ]
         validate_template_version_info(df, input_template_name, input_template_version, effects_log)
 
         # read in the data portion of the input file
@@ -160,7 +161,7 @@ class LegacyFleet:
             df['in_use_fuel_id'],
         ))
         # add attributes that are populated in build_legacy_fleet_for_analysis
-        df.insert(0, 'vehicle_id', pow(10, 6))
+        df.insert(0, 'vehicle_id', self.legacy_fleet_vehicle_id_start)
         df.insert(len(df.columns), 'annual_vmt', 0)
         df.insert(len(df.columns), 'odometer', 0)
         df.insert(len(df.columns), 'vmt', 0)
@@ -232,7 +233,7 @@ class LegacyFleet:
                 else:
                     vehicle_id_increment += 1
                     annual_vmt = batch_settings.onroad_vmt.get_vmt(calendar_year, market_class_id, new_age)
-                    if nested_dict['vehicle_id'] == pow(10, 6):
+                    if nested_dict['vehicle_id'] == self.legacy_fleet_vehicle_id_start:
                         self._data[key].update({'vehicle_id': nested_dict['vehicle_id'] + vehicle_id_increment})
 
                     update_dict = nested_dict.copy()
@@ -264,10 +265,6 @@ class LegacyFleet:
         self.adjusted_legacy_fleet = dict()
 
         calendar_years = batch_settings.calendar_years
-
-        # for calendar_year in calendar_years:
-        #
-        #     if calendar_year <= self.legacy_fleet_calendar_year_max:
 
         for key, nested_dict in self._legacy_fleet.items():
 

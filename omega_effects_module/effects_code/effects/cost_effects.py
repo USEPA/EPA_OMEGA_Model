@@ -87,6 +87,7 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
             repair_cost_dollars = 0
             refueling_cost_dollars = 0
             drive_value_cost_dollars = 0
+            bev_flag = phev_flag = hev_flag = mhev_flag = 0
 
             base_year_vehicle_id, model_year, mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, \
                 market_class_id, fueling_class, base_year_powertrain_type, body_style, footprint, workfactor \
@@ -117,25 +118,35 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                   physical['barrels_of_imported_oil']
 
             if vehicle_id not in vehicle_info_dict:
-                if vehicle_id < pow(10, 6):
+                if vehicle_id < batch_settings.legacy_fleet.legacy_fleet_vehicle_id_start:
                     attribute_list = [
                         'new_vehicle_mfr_cost_dollars',
                         'price_dollars',
-                        'price_modification_dollars'
+                        'price_modification_dollars',
+                        'bev',
+                        'phev',
+                        'hev',
+                        'mhev',
                     ]
                     vehicle_info_dict[vehicle_id] = session_settings.vehicles.get_vehicle_attributes(vehicle_id, *attribute_list)
-                    avg_mfr_cost, avg_purchase_price, avg_purchase_credit = \
-                        vehicle_info_dict[vehicle_id][0], \
-                            vehicle_info_dict[vehicle_id][1], \
-                            vehicle_info_dict[vehicle_id][2]
+                    avg_mfr_cost, avg_purchase_price, avg_purchase_credit, bev_flag, phev_flag, hev_flag, mhev_flag = \
+                        vehicle_info_dict[vehicle_id]
+
                 else:
                     legacy_fleet_key = (vehicle_id, calendar_year, age)
                     vehicle_info_dict[vehicle_id] \
                         = batch_settings.legacy_fleet._legacy_fleet[legacy_fleet_key]['transaction_price_dollars']
-                    avg_mfr_cost, avg_purchase_price, avg_purchase_credit = \
-                        vehicle_info_dict[vehicle_id], \
-                            vehicle_info_dict[vehicle_id], \
-                            vehicle_info_dict[vehicle_id]
+                    avg_mfr_cost, avg_purchase_price, avg_purchase_credit = 3 * [vehicle_info_dict[vehicle_id]]
+                    if base_year_powertrain_type == 'BEV':
+                        bev_flag = 1
+                    elif base_year_powertrain_type == 'PHEV':
+                        phev_flag = 1
+                    elif base_year_powertrain_type == 'HEV':
+                        hev_flag = 1
+                    elif base_year_powertrain_type == 'MHEV':
+                        mhev_flag = 1
+                    else:
+                        pass
 
             # tech costs, only for age=0
             if age == 0:
@@ -160,7 +171,14 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                     fuel_pretax_cost_dollars += pretax_price * gallons
 
             # maintenance costs
-            slope, intercept = get_maintenance_cost(batch_settings, base_year_powertrain_type)
+            m_and_r_powertrain_type = 'ICE'
+            if bev_flag == 1:
+                m_and_r_powertrain_type = 'BEV'
+            elif phev_flag == 1:
+                m_and_r_powertrain_type = 'PHEV'
+            elif hev_flag == 1 or mhev_flag == 1:
+                m_and_r_powertrain_type = 'HEV'
+            slope, intercept = get_maintenance_cost(batch_settings, m_and_r_powertrain_type)
             maintenance_cost_per_mile = slope * odometer + intercept
             maintenance_cost_dollars = maintenance_cost_per_mile * vmt
 
@@ -173,12 +191,12 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 operating_veh_type = 'suv'
 
             repair_cost_per_mile \
-                = batch_settings.repair_cost.calc_repair_cost_per_mile(avg_mfr_cost, base_year_powertrain_type,
+                = batch_settings.repair_cost.calc_repair_cost_per_mile(avg_mfr_cost, m_and_r_powertrain_type,
                                                                        operating_veh_type, age)
             repair_cost_dollars = repair_cost_per_mile * vmt
 
             # refueling costs
-            if base_year_powertrain_type == 'BEV':
+            if bev_flag == 1:
                 range = 300 # TODO do we stay with this or will range be an attribute tracked within omega
                 if (operating_veh_type, range) in refueling_bev_dict.keys():
                     refueling_cost_per_mile = refueling_bev_dict[(operating_veh_type, range)]

@@ -1,6 +1,10 @@
 # Version number of the omega effects module, not the omega model
 
-__version__ = '0.5.0'
+__version__ = '0.6.0'
+
+# 0.6.0
+# Fixes for better tracking of powertrain type for maintenance and repair costs by using tech flags rather than
+# base_year_powertrain_type.
 
 # 0.5.0
 # Add MY calcs for physical effects.
