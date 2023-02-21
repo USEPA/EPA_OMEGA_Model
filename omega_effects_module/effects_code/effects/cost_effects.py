@@ -129,14 +129,11 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                         'mhev',
                     ]
                     vehicle_info_dict[vehicle_id] = session_settings.vehicles.get_vehicle_attributes(vehicle_id, *attribute_list)
-                    avg_mfr_cost, avg_purchase_price, avg_purchase_credit, bev_flag, phev_flag, hev_flag, mhev_flag = \
-                        vehicle_info_dict[vehicle_id]
 
                 else:
                     legacy_fleet_key = (vehicle_id, calendar_year, age)
-                    vehicle_info_dict[vehicle_id] \
-                        = batch_settings.legacy_fleet._legacy_fleet[legacy_fleet_key]['transaction_price_dollars']
-                    avg_mfr_cost, avg_purchase_price, avg_purchase_credit = 3 * [vehicle_info_dict[vehicle_id]]
+                    price_data = batch_settings.legacy_fleet._legacy_fleet[legacy_fleet_key]['transaction_price_dollars']
+                    avg_mfr_cost, avg_purchase_price, avg_purchase_credit = 3 * [price_data]
                     if base_year_powertrain_type == 'BEV':
                         bev_flag = 1
                     elif base_year_powertrain_type == 'PHEV':
@@ -147,6 +144,11 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                         mhev_flag = 1
                     else:
                         pass
+                    vehicle_info_dict[vehicle_id] = \
+                        avg_mfr_cost, avg_purchase_price, avg_purchase_credit, bev_flag, phev_flag, hev_flag, mhev_flag
+
+            avg_mfr_cost, avg_purchase_price, avg_purchase_credit, bev_flag, phev_flag, hev_flag, mhev_flag = \
+                vehicle_info_dict[vehicle_id]
 
             # tech costs, only for age=0
             if age == 0:
@@ -171,14 +173,14 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                     fuel_pretax_cost_dollars += pretax_price * gallons
 
             # maintenance costs
-            m_and_r_powertrain_type = 'ICE'
+            powertrain_type = 'ICE'
             if bev_flag == 1:
-                m_and_r_powertrain_type = 'BEV'
+                powertrain_type = 'BEV'
             elif phev_flag == 1:
-                m_and_r_powertrain_type = 'PHEV'
+                powertrain_type = 'PHEV'
             elif hev_flag == 1 or mhev_flag == 1:
-                m_and_r_powertrain_type = 'HEV'
-            slope, intercept = get_maintenance_cost(batch_settings, m_and_r_powertrain_type)
+                powertrain_type = 'HEV'
+            slope, intercept = get_maintenance_cost(batch_settings, powertrain_type)
             maintenance_cost_per_mile = slope * odometer + intercept
             maintenance_cost_dollars = maintenance_cost_per_mile * vmt
 
@@ -191,7 +193,7 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 operating_veh_type = 'suv'
 
             repair_cost_per_mile \
-                = batch_settings.repair_cost.calc_repair_cost_per_mile(avg_mfr_cost, m_and_r_powertrain_type,
+                = batch_settings.repair_cost.calc_repair_cost_per_mile(avg_mfr_cost, powertrain_type,
                                                                        operating_veh_type, age)
             repair_cost_dollars = repair_cost_per_mile * vmt
 
@@ -249,6 +251,7 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 'in_use_fuel_id': in_use_fuel_id,
                 'fueling_class': fueling_class,
                 'base_year_powertrain_type': base_year_powertrain_type,
+                'powertrain_type': powertrain_type,
                 'body_style': body_style,
                 'footprint_ft2': footprint,
                 'workfactor': workfactor,
@@ -344,8 +347,8 @@ def calc_period_consumer_view(batch_settings, input_df):
     df.insert(df.columns.get_loc('registered_count'), 'sales', df['registered_count'])
     df.loc[df['age'] != 0, 'sales'] = 0
 
-    # groupby model year, body_style and fuel,
-    groupby_cols = ['session_policy', 'session_name', 'model_year', 'body_style', 'in_use_fuel_id']
+    # groupby model year, body_style, powertrain and fuel,
+    groupby_cols = ['session_policy', 'session_name', 'model_year', 'body_style', 'powertrain_type', 'in_use_fuel_id']
     attributes.append('sales')
     return_df = df[[*groupby_cols, *attributes]]
     return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
