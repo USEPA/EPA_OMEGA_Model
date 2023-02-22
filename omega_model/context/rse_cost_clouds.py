@@ -93,7 +93,7 @@ from context.glider_cost import GliderCost
 
 from policy.drive_cycle_ballast import DriveCycleBallast
 
-from producer.vehicles import VehicleOnroadCalculations, Vehicle
+from producer.vehicles import VehicleOnroadCalculations, Vehicle, is_up_for_redesign
 
 _cache = dict()
 
@@ -313,7 +313,7 @@ class CostCloud(OMEGABase, CostCloudBase):
         vehicle_rlhp60 = \
             calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b, vehicle.base_year_target_coef_c, 60)
 
-        if vehicle.model_year - vehicle.prior_redesign_year >= vehicle.redesign_interval:
+        if is_up_for_redesign(vehicle):
             # sweep vehicle params
             rlhp20s = np.unique((vehicle_rlhp20 * omega_globals.options.rlhp20_min_scaler,
                                  vehicle_rlhp20,

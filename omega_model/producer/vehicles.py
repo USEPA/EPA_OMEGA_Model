@@ -690,6 +690,25 @@ def calc_vehicle_frontier(vehicle):
     return vehicle
 
 
+def is_up_for_redesign(vehicle):
+    """
+        Return ``True`` if vehicle is available for production and/or redesign
+
+    Args:
+        vehicle (VehicleFinal, Vehicle): the vehicle object
+
+    Returns:
+        ``True`` if vehicle is at or past its redesign interval
+
+    """
+    redesign_interval_gain = \
+        np.interp(vehicle.model_year,
+                  omega_globals.options.redesign_interval_gain_years,
+                  omega_globals.options.redesign_interval_gain)
+
+    return vehicle.model_year - vehicle.prior_redesign_year >= vehicle.redesign_interval * redesign_interval_gain
+
+
 def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     """
 
@@ -1474,7 +1493,7 @@ class VehicleFinal(SQABase, Vehicle):
                 charge_depleting_range_mi=df.loc[i, 'charge_depleting_range_mi'],
                 base_year_powertrain_type=df.loc[i, 'base_year_powertrain_type'],
                 prior_redesign_year=df.loc[i, 'prior_redesign_year'],
-                redesign_interval=df.loc[i, 'redesign_interval'] * omega_globals.options.redesign_interval_gain,
+                redesign_interval=df.loc[i, 'redesign_interval'],
                 in_production=True,
                 base_year_product=True,
                 workfactor=df.loc[i, 'workfactor'],
@@ -1608,7 +1627,7 @@ class VehicleFinal(SQABase, Vehicle):
 
             if v.fueling_class != 'BEV' or omega_globals.options.allow_ice_of_bev:
                 alt_veh = v.clone_vehicle(v)  # create alternative powertrain clone of vehicle
-                alt_veh.in_production = alt_veh.model_year - alt_veh.prior_redesign_year >= alt_veh.redesign_interval
+                alt_veh.in_production = is_up_for_redesign(alt_veh)
                 alt_veh.base_year_product = False
 
                 if v.fueling_class == 'ICE':

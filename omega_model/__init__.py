@@ -160,7 +160,6 @@ try:
             self.analysis_dollar_basis = 2020  # Note that the implicit_price_deflator.csv input file must contain data for this entry.
 
             self.allow_ice_of_bev = False
-            self.redesign_interval_gain = 1.0
 
             # effects modeling files
             self.ip_deflators_file = path + 'test_inputs/implicit_price_deflators.csv'
@@ -207,6 +206,9 @@ try:
 
             self.kwh_per_mile_scale_years = [2020]
             self.kwh_per_mile_scale = [1.0]
+
+            self.redesign_interval_gain_years = [2020]
+            self.redesign_interval_gain = [1.0]
 
             self.manufacturer_gigawatthour_data = None
 
