@@ -151,23 +151,26 @@ class PowertrainCost(OMEGABase):
 
             trans = get_trans(pkg_info)
 
-            gasoline_flag = pkg_info['gas_fuel']
-
-            diesel_flag = pkg_info['diesel_fuel']
+            gasoline_flag = 1
+            diesel_flag = 0
+            if 'diesel' in base_year_cert_fuel_id:
+                diesel_flag = 1
+                gasoline_flag = 0
 
             CYL = pkg_info['engine_cylinders']
             LITERS = pkg_info['engine_displacement_L']
 
             locals_dict = locals()
 
-            # PGM costs and loadings
-            PT_USD_PER_OZ = eval(_cache['ALL', 'pt_dollars_per_oz']['value'], {'np': np}, locals_dict)
-            PD_USD_PER_OZ = eval(_cache['ALL', 'pd_dollars_per_oz']['value'], {'np': np}, locals_dict)
-            RH_USD_PER_OZ = eval(_cache['ALL', 'rh_dollars_per_oz']['value'], {'np': np}, locals_dict)
-            PT_GRAMS_PER_LITER_TWC = eval(_cache['ALL', 'twc_pt_grams_per_liter']['value'], {'np': np}, locals_dict)
-            PD_GRAMS_PER_LITER_TWC = eval(_cache['ALL', 'twc_pd_grams_per_liter']['value'], {'np': np}, locals_dict)
-            RH_GRAMS_PER_LITER_TWC = eval(_cache['ALL', 'twc_rh_grams_per_liter']['value'], {'np': np}, locals_dict)
-            OZ_PER_GRAM = eval(_cache['ALL', 'troy_oz_per_gram']['value'], {'np': np}, locals_dict)  # note that these are Troy ounces
+            # PGM costs and loadings for gasoline
+            if gasoline_flag == 1:
+                PT_USD_PER_OZ = eval(_cache['ALL', 'pt_dollars_per_oz']['value'], {'np': np}, locals_dict)
+                PD_USD_PER_OZ = eval(_cache['ALL', 'pd_dollars_per_oz']['value'], {'np': np}, locals_dict)
+                RH_USD_PER_OZ = eval(_cache['ALL', 'rh_dollars_per_oz']['value'], {'np': np}, locals_dict)
+                PT_GRAMS_PER_LITER_TWC = eval(_cache['ALL', 'twc_pt_grams_per_liter']['value'], {'np': np}, locals_dict)
+                PD_GRAMS_PER_LITER_TWC = eval(_cache['ALL', 'twc_pd_grams_per_liter']['value'], {'np': np}, locals_dict)
+                RH_GRAMS_PER_LITER_TWC = eval(_cache['ALL', 'twc_rh_grams_per_liter']['value'], {'np': np}, locals_dict)
+                OZ_PER_GRAM = eval(_cache['ALL', 'troy_oz_per_gram']['value'], {'np': np}, locals_dict)  # note that these are Troy ounces
 
             turb_input_scaler = eval(_cache['ALL', 'turb_scaler']['value'], {'np': np}, locals_dict)
 

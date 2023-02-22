@@ -29,7 +29,7 @@ def validate_template_column_names(filepath, df, column_names, effects_log):
     Args:
         filepath: the Path object to the file.
         df: the DataFrame to validate.
-        column_names (list): the column names that are necessary.
+        column_names (list or set): the column names that are necessary.
         effects_log: an instance of the EffectsLog class.
 
     Returns:
