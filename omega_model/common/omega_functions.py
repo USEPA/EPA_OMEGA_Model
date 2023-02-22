@@ -350,7 +350,12 @@ def print_dict(dict_in, num_tabs=0, to_string=False):
     if type(dict_in) is list or type(dict_in) is not dict:
         s += '\t' * num_tabs + str(dict_in) + '\n'
     else:
-        for k in sorted(dict_in.keys()):
+        try:
+            keys = sorted(dict_in.keys())
+        except:
+            keys = dict_in.keys()
+
+        for k in keys:
             if type(dict_in[k]) == list:
                 if dict_in[k]:
                     s += '\t' * num_tabs + str(k) + ':' + str(dict_in[k]) + '\n'
