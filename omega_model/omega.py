@@ -356,11 +356,15 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
             iteration_log.append(producer_decision_and_response)
 
-            total_credits_co2e_megagrams = \
+            total_credits_co2e_megagrams, production_battery_gigawatthours = \
                 compliance_search.finalize_production(calendar_year, compliance_id,
                                                       candidate_mfr_composite_vehicles,
                                                       pre_production_vehicles,
                                                       producer_decision_and_response)
+
+            if pass_num == 0:
+                omega_globals.cumulative_battery_GWh['total'] += production_battery_gigawatthours
+                omega_globals.cumulative_battery_GWh[calendar_year] = omega_globals.cumulative_battery_GWh['total']
 
             credit_banks[compliance_id].handle_credit(calendar_year, total_credits_co2e_megagrams)
 
@@ -1572,6 +1576,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
         manufacturer_annual_data_table = None
         manufacturer_gigawatthour_data = None
+        omega_globals.cumulative_battery_GWh = {'total': 0}
 
         for omega_globals.pass_num in range(len(consolidate)):
 

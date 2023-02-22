@@ -1086,6 +1086,8 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
     # pull final vehicles from composite vehicles
     decompose_candidate_vehicles(calendar_year, candidate_mfr_composite_vehicles, producer_decision)
 
+    production_battery_gigawatthours = 0
+
     for cv in candidate_mfr_composite_vehicles:
         if (omega_globals.options.log_vehicle_cloud_years == 'all') or \
                 (calendar_year in omega_globals.options.log_vehicle_cloud_years):
@@ -1110,6 +1112,8 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
 
             veh_final.price_dollars = \
                 veh_final.new_vehicle_mfr_cost_dollars * veh_final.market_class_cross_subsidy_multiplier
+
+            production_battery_gigawatthours += veh_final.battery_kwh / 1e6 * veh_final.initial_registered_count
 
             manufacturer_new_vehicles.append(veh_final)
 
@@ -1139,7 +1143,7 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
                                         )
     omega_globals.session.flush()
 
-    return target_co2e_Mg - cert_co2e_Mg
+    return target_co2e_Mg - cert_co2e_Mg, production_battery_gigawatthours
 
 
 def decompose_candidate_vehicles(calendar_year, candidate_mfr_composite_vehicles, producer_decision):
