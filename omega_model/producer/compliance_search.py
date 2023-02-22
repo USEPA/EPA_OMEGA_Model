@@ -1214,7 +1214,6 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
                     'producer_abs_share_frac_%s' % share_id].values
 
         composite_veh_sales = market_class_sales * composite_veh.market_class_share_frac
-        production_options['veh_%s_sales' % composite_veh.vehicle_id] = composite_veh_sales
 
         # calculate vehicle total cost
         if is_series:
@@ -1249,8 +1248,6 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
             composite_veh_cost_curve_options = production_options[
                 'veh_%s_cost_curve_indices' % composite_veh.vehicle_id].values
 
-        production_options['veh_%s_total_cost_dollars' % composite_veh.vehicle_id] = composite_veh_total_cost_dollars
-
         # composite_veh_credits_co2e_Mg = \
         #     composite_veh_sales * composite_veh_cost_curve_options
 
@@ -1265,8 +1262,18 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
             DecompositionAttributes.interp1d(composite_veh, composite_veh.cost_curve, cost_curve_interp_key,
                                              composite_veh_cost_curve_options, 'target_co2e_Mg_per_vehicle')
 
-        production_options['veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_cert_co2e_Mg
-        production_options['veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_target_co2e_Mg
+        if type(production_options) is pd.DataFrame:
+            # avoid 'fragmented' Dataframe warnings...
+            production_options = production_options.assign(**{
+                'veh_%s_sales' % composite_veh.vehicle_id: composite_veh_sales,
+                'veh_%s_total_cost_dollars' % composite_veh.vehicle_id: composite_veh_total_cost_dollars,
+                'veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id: composite_veh_cert_co2e_Mg,
+                'veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id: composite_veh_target_co2e_Mg})
+        else:
+            production_options['veh_%s_sales' % composite_veh.vehicle_id] = composite_veh_sales
+            production_options['veh_%s_total_cost_dollars' % composite_veh.vehicle_id] = composite_veh_total_cost_dollars
+            production_options['veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_cert_co2e_Mg
+            production_options['veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_target_co2e_Mg
 
         # update totals
         total_battery_GWh += composite_veh_total_GWh
