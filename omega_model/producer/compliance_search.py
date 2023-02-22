@@ -859,9 +859,9 @@ def create_composite_vehicles(calendar_year, compliance_id):
         #
         # print('\nEND non_covered_vehs ##################################\n')
 
-        # sum([new_veh.base_year_market_share for new_veh in manufacturer_vehicles]) ~= 2.0 at this point due to
-        # intentional duplicate entries for "alternative" powertrain vehicles, but "market_share" is used for relative
-        # proportions
+        # sum([new_veh.base_year_market_share for new_veh in manufacturer_vehicles]) ~= 2.0 at this point
+        # (if all vehicles were available for redesign) due to intentional duplicate entries for "alternative"
+        # powertrain vehicles, but "base year market share" is used for relative proportions
 
         context_based_total_sales = 0  # sales total by compliance id size class share
         for csc in NewVehicleMarket.base_year_context_size_class_sales: # for each context size class
@@ -911,8 +911,8 @@ def create_composite_vehicles(calendar_year, compliance_id):
         #
         # print('\nEND manufacturer_vehicles ##################################\n')
 
-        # sum([new_veh.model_year_prevalence for new_veh in manufacturer_vehicles]) == 1.0 at this point,
-        # sum([new_veh.projected_sales for new_veh in manufacturer_vehicles]) = context_based_total_sales
+        # np.sum([new_veh.model_year_prevalence for new_veh in manufacturer_vehicles]) == 1.0 at this point,
+        # np.sum([new_veh.projected_sales for new_veh in manufacturer_vehicles]) = context_based_total_sales
 
         for v in manufacturer_vehicles:
             v.model_year_prevalence = myp_dict['myp_%s' % v.base_year_vehicle_id]
