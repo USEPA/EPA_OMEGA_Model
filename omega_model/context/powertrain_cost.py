@@ -94,7 +94,8 @@ class PowertrainCost(OMEGABase):
             A list of cost values indexed the same as pkg_df.
 
         """
-        market_class_id, model_year = vehicle.market_class_id, vehicle.model_year
+        market_class_id, model_year, base_year_cert_fuel_id = \
+            vehicle.market_class_id, vehicle.model_year, vehicle.base_year_cert_fuel_id
 
         locals_dict = locals()
 

@@ -713,7 +713,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs', 'eng_rated_hp', 'footprint_ft2',
                        'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c', 'body_style',
                        'structure_material', 'base_year_powertrain_type', 'base_year_reg_class_id', 'base_year_market_share',
-                       'base_year_vehicle_id', 'base_year_glider_non_structure_mass_lbs',
+                       'base_year_vehicle_id', 'base_year_glider_non_structure_mass_lbs', 'base_year_cert_fuel_id',
                        'base_year_glider_non_structure_cost_dollars',
                        'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'base_year_curbweight_lbs_to_hp',
                        'base_year_msrp_dollars', 'battery_kwh', 'motor_kw', 'charge_depleting_range_mi',
@@ -814,6 +814,7 @@ class Vehicle(OMEGABase):
         self.base_year_product = False
         self.base_year_powertrain_type = ''
         self.base_year_reg_class_id = None
+        self.base_year_cert_fuel_id = None
         self.base_year_vehicle_id = 0
         self.base_year_market_share = 0
         self.model_year_prevalence = 0
@@ -1222,6 +1223,7 @@ class VehicleFinal(SQABase, Vehicle):
     base_year_workfactor = Column(Float)
     base_year_gvwr_lbs = Column(Float)
     base_year_gcwr_lbs = Column(Float)
+    base_year_cert_fuel_id = Column(String)
 
     # TODO: non-numeric attributes that >could< change based on interpolating the frontier...:
     cost_curve_class = Column(String)  #: ALPHA modeling result class
@@ -1387,7 +1389,7 @@ class VehicleFinal(SQABase, Vehicle):
         inherit_properties = ['name', 'manufacturer_id', 'compliance_id',
                               'reg_class_id', 'context_size_class', 'unibody_structure', 'body_style',
                               'base_year_reg_class_id', 'base_year_market_share', 'base_year_vehicle_id',
-                              'curbweight_lbs', 'base_year_glider_non_structure_mass_lbs',
+                              'curbweight_lbs', 'base_year_glider_non_structure_mass_lbs', 'base_year_cert_fuel_id',
                               'base_year_glider_non_structure_cost_dollars',
                               'footprint_ft2', 'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'drive_system', 'dual_rear_wheel',
                               'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
@@ -1466,6 +1468,7 @@ class VehicleFinal(SQABase, Vehicle):
                 base_year_glider_non_structure_cost_dollars=df.loc[i, 'glider_non_structure_cost_dollars'],
                 base_year_workfactor=df.loc[i, 'workfactor'],
                 base_year_vehicle_id=i,  # i.e. aggregated_vehicles.csv index number...
+                base_year_cert_fuel_id=df.loc[i, 'cert_fuel_id'],
                 battery_kwh=df.loc[i, 'battery_kwh'],
                 motor_kw=df.loc[i, 'motor_kw'],
                 charge_depleting_range_mi=df.loc[i, 'charge_depleting_range_mi'],

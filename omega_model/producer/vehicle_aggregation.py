@@ -390,6 +390,8 @@ class VehicleAggregation(OMEGABase):
                     veh.base_year_powertrain_type = 'BEV'  # TODO: for costing purposes, for now
 
                 veh.base_year_reg_class_id = row['reg_class_id']
+                veh.base_year_cert_fuel_id = row['cert_fuel_id']
+
                 veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
                 row['market_class_id'] = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
                 veh.drive_system = row['drive_system']
