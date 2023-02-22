@@ -190,7 +190,7 @@ try:
             self.producer_voluntary_overcompliance_min_strategic_compliance_ratio = 0.9999  # minimal voc by default
             self.producer_price_modification_scaler = 0.0
             self.producer_footprint_wtp = 200
-            self.producer_consumer_max_iterations = 5  # recommend num_market_classes + 2
+            self.producer_consumer_max_iterations = 5
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
             self.producer_compliance_search_convergence_factor = 0.9

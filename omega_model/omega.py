@@ -1647,6 +1647,10 @@ def run_omega(session_runtime_options, standalone_run=False):
                     profiler = cProfile.Profile()
                     profiler.enable()
 
+                omega_globals.options.producer_consumer_max_iterations = \
+                    max(omega_globals.options.producer_consumer_max_iterations,
+                        len(omega_globals.options.MarketClass.market_classes)/2 + 1)
+
                 iteration_log, credit_banks = \
                     run_producer_consumer(omega_globals.pass_num, manufacturer_annual_data_table)
 
