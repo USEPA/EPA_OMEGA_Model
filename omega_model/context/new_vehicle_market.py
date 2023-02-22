@@ -296,9 +296,9 @@ class NewVehicleMarket(OMEGABase):
         if context_size_class and context_reg_class:
             if (omega_globals.options.context_id, omega_globals.options.context_case_id,
                     context_size_class, context_reg_class, calendar_year) in NewVehicleMarket._data_by_csc_rc:
-                return NewVehicleMarket._data_by_csc_rc[omega_globals.options.context_id,
+                return np.sum(NewVehicleMarket._data_by_csc_rc[omega_globals.options.context_id,
                                                         omega_globals.options.context_case_id,
-                                                        context_size_class, context_reg_class, calendar_year]['sales'].values
+                                                        context_size_class, context_reg_class, calendar_year]['sales'].values)
             else:
                 return 0
 
@@ -443,7 +443,7 @@ class NewVehicleMarket(OMEGABase):
             from producer.vehicle_aggregation import sales_weight_average_dataframe
             NewVehicleMarket._data_by_rc = df.groupby(['context_id', 'case_id', 'reg_class_id', 'calendar_year']).apply(sales_weight_average_dataframe)
 
-            NewVehicleMarket._data_by_csc_rc = df.set_index(['context_id', 'case_id', 'context_size_class', 'reg_class_id', 'calendar_year']).sort_index().to_dict(orient='index')
+            NewVehicleMarket._data_by_csc_rc = df.set_index(['context_id', 'case_id', 'context_size_class', 'reg_class_id', 'calendar_year']).sort_index().to_dict(orient='series')
             NewVehicleMarket._data_by_csc = df.set_index(['context_id', 'case_id', 'context_size_class', 'calendar_year']).sort_index().to_dict(orient='series')
             NewVehicleMarket._data_by_bs = df.set_index(['context_id', 'case_id', 'body_style', 'calendar_year']).sort_index().to_dict(orient='series')
             NewVehicleMarket._data_by_total = df.set_index(['context_id', 'case_id', 'calendar_year']).sort_index().to_dict(orient='series')
@@ -458,7 +458,7 @@ class NewVehicleMarket(OMEGABase):
                 df['reg_class_id'],
                 df['calendar_year'],
             ))
-            NewVehicleMarket._data = df.set_index(key).to_dict(orient='index')
+            NewVehicleMarket._data = df.set_index(key).to_dict(orient='series')
 
         return template_errors
 
