@@ -786,6 +786,9 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
     dfx = dfx[dfx.sum(axis=1).values <= 1]
     dfx.loc[:, columns[-1]] = 1 - dfx.sum(axis=1).values  # using ".loc" in combination with dfx2 prevents errors
 
+    if dfx.empty:
+        raise Exception('empty partition!! :(')
+
     if verbose:
         print(dfx)
 
