@@ -175,8 +175,8 @@ try:
             # developer settings
             self.producer_market_category_ramp_limit = 0.2
             self.producer_shares_mode = 'auto'
-            self.producer_num_market_share_options = 3
-            self.producer_num_tech_options_per_ice_vehicle = 3
+            self.producer_num_market_share_options = 2
+            self.producer_num_tech_options_per_ice_vehicle = 2
             self.producer_num_tech_options_per_bev_vehicle = 1
             self.cost_curve_frontier_affinity_factor = 0.75
             self.slice_tech_combo_cloud_tables = False
@@ -198,7 +198,7 @@ try:
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
             self.producer_compliance_search_convergence_factor = 0.9
-            self.producer_compliance_search_tolerance = 1e-6
+            self.producer_compliance_search_tolerance = 1e-4
             self.producer_cross_subsidy_price_tolerance = 5e-3
             self.run_profiler = False
             self.multiprocessing = True and not self.run_profiler and not getattr(sys, 'frozen', False)
