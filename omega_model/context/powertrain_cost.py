@@ -34,7 +34,9 @@ Sample Data Columns
 
 print('importing %s' % __file__)
 
-from omega_model import *
+# from omega_model import *
+from common.omega_types import *
+from common.input_validation import *
 from effects.general_functions import dollar_adjustment_factor
 
 _cache = dict()
@@ -99,7 +101,7 @@ class PowertrainCost(OMEGABase):
 
         locals_dict = locals()
 
-        if model_year <= 2022:
+        if model_year <= 2022 or omega_globals.cumulative_battery_GWh['total'] == 0:
             learning_pev_battery_scaling_factor = 1
         else:
             CUMULATIVE_GWH = omega_globals.cumulative_battery_GWh[model_year - 1]
