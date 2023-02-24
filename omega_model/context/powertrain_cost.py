@@ -34,7 +34,8 @@ Sample Data Columns
 
 print('importing %s' % __file__)
 
-from omega_model import *
+from common.omega_types import *
+from common.input_validation import *
 from effects.general_functions import dollar_adjustment_factor
 
 _cache = dict()
