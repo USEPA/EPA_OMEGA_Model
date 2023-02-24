@@ -103,8 +103,9 @@ class PowertrainCost(OMEGABase):
         if model_year <= 2022 or omega_globals.cumulative_battery_GWh['total'] == 0:
             learning_pev_battery_scaling_factor = 1
         else:
-            CUMULATIVE_GWH = omega_globals.cumulative_battery_GWh[model_year - 1]
-            learning_pev_battery_scaling_factor = eval(_cache['PEV', 'battery_GWh_learning_curve']['value'], {'np': np}, locals_dict)
+            locals_dict.update({'CUMULATIVE_GWH': omega_globals.cumulative_battery_GWh[model_year - 1]})
+            learning_pev_battery_scaling_factor = eval(_cache['PEV', 'battery_GWh_learning_curve']['value'],
+                                                       {'np': np}, locals_dict)
 
         # markups and learning
         MARKUP_ICE = eval(_cache['ICE', 'markup']['value'], {'np': np}, locals_dict)
