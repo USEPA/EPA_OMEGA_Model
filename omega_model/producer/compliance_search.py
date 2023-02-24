@@ -647,6 +647,10 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                                            producer_decision_and_response, context_based_total_sales,
                                            prior_producer_decision_and_response, producer_consumer_iteration_num)
 
+        # attempt to save some RAM...
+        tech_sweeps = tech_sweeps.astype(np.float32)
+        share_sweeps = share_sweeps.convert_dtypes()
+
         tech_and_share_sweeps = cartesian_prod(tech_sweeps, share_sweeps)
 
         production_options = create_production_options_from_shares(composite_vehicles, tech_and_share_sweeps,
@@ -733,6 +737,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                         best_candidate_production_decision = most_strategic_point
             else:
                 best_candidate_production_decision = most_strategic_production_decision
+
+            candidate_production_decisions = most_strategic_points
 
             if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
                 omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,
@@ -1143,6 +1149,8 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
                                             producer_decision['total_cost_dollars'],
                                         )
     omega_globals.session.flush()
+
+    _cache.clear()
 
     return target_co2e_Mg - cert_co2e_Mg, production_battery_gigawatthours
 
