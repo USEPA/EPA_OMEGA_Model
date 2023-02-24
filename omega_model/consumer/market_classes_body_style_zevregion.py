@@ -64,6 +64,10 @@ class MarketClass(OMEGABase, MarketClassBase):
     responsive_market_categories = ['ICE', 'BEV']  #: market categories that have consumer response (i.e. price -> sales)
     non_responsive_market_categories = ['sedan_wagon_r1nonzev', 'cuv_suv_van_r1nonzev', 'pickup_r1nonzev', 'sedan_wagon_r2zev', 'cuv_suv_van_r2zev', 'pickup_r2zev']  #: market categories that do not have consumer response
 
+    linked_market_classes = {'sedan_wagon_r2zev.ICE': 'sedan_wagon_r1nonzev.ICE',
+                             'cuv_suv_van_r2zev.ICE': 'cuv_suv_van_r1nonzev.ICE',
+                             'pickup_r2zev.ICE': 'pickup_r1nonzev.ICE'}
+
     @staticmethod
     def get_vehicle_market_class(vehicle):
         """

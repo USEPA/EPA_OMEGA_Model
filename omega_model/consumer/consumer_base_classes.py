@@ -192,6 +192,7 @@ class MarketClassBase:
     market_categories = []
     responsive_market_categories = []
     non_responsive_market_categories = []
+    linked_market_classes = dict()
 
     @staticmethod
     def parse_market_classes(market_class_list, market_class_dict=None, by_reg_class=False):

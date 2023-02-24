@@ -163,6 +163,16 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
 
     # print('cartesian_prod tech options time = %f' % (time.time() - start_time))
 
+    # handle 'linked' market classes:
+    for lmc in omega_globals.options.MarketClass.linked_market_classes:
+        for col in tech_combos_df:
+            if lmc in col:
+                linked_col = col.replace(lmc, omega_globals.options.MarketClass.linked_market_classes[lmc])
+                if linked_col in tech_combos_df:
+                    tech_combos_df[col] = tech_combos_df[linked_col]
+
+    tech_combos_df = tech_combos_df.drop_duplicates()
+
     return tech_combos_df
 
 
