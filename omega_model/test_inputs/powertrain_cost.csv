@@ -1,4 +1,4 @@
-input_template_name:,powertrain_cost,input_template_version:,0.1,description:,20230106 add markup to diesel eas
+input_template_name:,powertrain_cost,input_template_version:,0.1,description:,20230224 add battery_GWh_cost_curve
 powertrain_type,item,value,quantity,dollar_basis,notes
 ALL,dollars_per_cylinder,((-28.814) * CYL + 726.27) * CYL * MARKUP_ICE,,2019,
 ALL,dollars_per_liter,((400) * LITERS) * MARKUP_ICE,,2019,
@@ -134,3 +134,4 @@ ALL,turb_scaler,(1.2) * 1,,,
 ALL,battery_cost_scalers,"{""scaler"": {2019: 1, 2025: 1, 2029: 0.75, 2035: 0.625, 2050: 0.538, 2060: 0.538}}",,,
 ALL,diesel_aftertreatment_system,(700) * LITERS* MARKUP_ICE,,2020,HD2027 NPRM
 ALL,diesel_engine_cost_scaler,(1.5) * 1,,,"diesel engine cost = (engine_cylinder_cost + engine_displacement_cost) * diesel_engine_cost_scaler; i.e., 1.5 times the gasoline engine cost of equivalent size"
+PEV,battery_GWh_learning_curve,(1.3954 * CUMULATIVE_GWH ** -0.095) ,,,
