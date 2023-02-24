@@ -99,6 +99,12 @@ class PowertrainCost(OMEGABase):
 
         locals_dict = locals()
 
+        if model_year <= 2022:
+            learning_pev_battery_scaling_factor = 1
+        else:
+            CUMULATIVE_GWH = omega_globals.cumulative_battery_GWh[model_year - 1]
+            learning_pev_battery_scaling_factor = eval(_cache['PEV', 'battery_GWh_learning_curve']['value'], {'np': np}, locals_dict)
+
         # markups and learning
         MARKUP_ICE = eval(_cache['ICE', 'markup']['value'], {'np': np}, locals_dict)
         MARKUP_HEV = eval(_cache['HEV', 'markup']['value'], {'np': np}, locals_dict)
@@ -303,27 +309,27 @@ class PowertrainCost(OMEGABase):
 
             # battery cost
             if powertrain_type in ['MHEV', 'HEV', 'PHEV', 'BEV']:
-                battery_cost_scaler_dict \
-                    = eval(_cache['ALL', 'battery_cost_scalers']['value'], {'np': np}, locals_dict)
-
-                if model_year in battery_cost_scaler_dict['scaler'].keys():
-                    cost_scaler = battery_cost_scaler_dict['scaler'][model_year]
-                elif model_year in PowertrainCost.battery_cost_scalers:
-                    cost_scaler = PowertrainCost.battery_cost_scalers[model_year]
-                else:
-                    min_year = max([yr for yr in battery_cost_scaler_dict['scaler'].keys() if yr < model_year])
-                    max_year = min([yr for yr in battery_cost_scaler_dict['scaler'].keys() if yr > model_year])
-                    min_year_scaler = battery_cost_scaler_dict['scaler'][min_year]
-                    max_year_scaler = battery_cost_scaler_dict['scaler'][max_year]
-
-                    m = (max_year_scaler - min_year_scaler) / (max_year - min_year)
-                    cost_scaler = m * (model_year - min_year) + min_year_scaler
-
-                    PowertrainCost.battery_cost_scalers[model_year] = cost_scaler
+                # battery_cost_scaler_dict \
+                #     = eval(_cache['ALL', 'battery_cost_scalers']['value'], {'np': np}, locals_dict)
+                #
+                # if model_year in battery_cost_scaler_dict['scaler'].keys():
+                #     cost_scaler = battery_cost_scaler_dict['scaler'][model_year]
+                # elif model_year in PowertrainCost.battery_cost_scalers:
+                #     cost_scaler = PowertrainCost.battery_cost_scalers[model_year]
+                # else:
+                #     min_year = max([yr for yr in battery_cost_scaler_dict['scaler'].keys() if yr < model_year])
+                #     max_year = min([yr for yr in battery_cost_scaler_dict['scaler'].keys() if yr > model_year])
+                #     min_year_scaler = battery_cost_scaler_dict['scaler'][min_year]
+                #     max_year_scaler = battery_cost_scaler_dict['scaler'][max_year]
+                #
+                #     m = (max_year_scaler - min_year_scaler) / (max_year - min_year)
+                #     cost_scaler = m * (model_year - min_year) + min_year_scaler
+                #
+                #     PowertrainCost.battery_cost_scalers[model_year] = cost_scaler
 
                 adj_factor = _cache[powertrain_type, 'battery']['dollar_adjustment']
                 battery_cost = eval(_cache[powertrain_type, 'battery']['value'], {'np': np}, locals_dict) \
-                               * adj_factor * cost_scaler
+                               * adj_factor * learning_pev_battery_scaling_factor
 
             if powertrain_type == 'BEV':
                 battery_offset_dict = eval(_cache[powertrain_type, 'battery_offset']['value'], {'np': np}, locals_dict)
