@@ -133,6 +133,8 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
         else:
             cost_curve_options = [cv.cost_curve['credits_co2e_Mg_per_vehicle'].min()]
 
+        # omega_log.logwrite('%s cost_curve_options %d' % (cv.vehicle_id, len(cost_curve_options)))
+
         tech_cost_options = \
             cv.get_from_cost_curve('new_vehicle_mfr_cost_dollars', cost_curve_options)
         tech_generalized_cost_options = \
@@ -640,8 +642,10 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         composite_vehicles, pre_production_vehicles, market_class_tree, context_based_total_sales = \
             create_composite_vehicles(calendar_year, compliance_id)
 
+        # print('create_tech_sweeps')
         tech_sweeps = create_tech_sweeps(composite_vehicles, candidate_production_decisions, share_range)
 
+        # print('create_share_sweeps')
         share_sweeps = create_share_sweeps(calendar_year, market_class_tree,
                                            candidate_production_decisions, share_range,
                                            producer_decision_and_response, context_based_total_sales,
@@ -653,8 +657,20 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
         tech_and_share_sweeps = cartesian_prod(tech_sweeps, share_sweeps)
 
+        # if candidate_production_decisions is not None:
+        #     omega_log.logwrite('candidates %s, tech_shape %s, share_shape %s, tech_and_share_shape %s' %
+        #                    (len(candidate_production_decisions), tech_sweeps.shape,
+        #                     share_sweeps.shape, tech_and_share_sweeps.shape))
+        # else:
+        #     omega_log.logwrite('tech_shape %s, share_shape %s, tech_and_share_shape %s' %
+        #                    (tech_sweeps.shape,
+        #                     share_sweeps.shape, tech_and_share_sweeps.shape))
+
+        # print('starting create_production_options_from_shares...')
         production_options = create_production_options_from_shares(composite_vehicles, tech_and_share_sweeps,
                                                                    context_based_total_sales)
+
+        # print('done')
 
         # insert code to cull production options based on policy here #
 
@@ -1270,18 +1286,22 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
             DecompositionAttributes.interp1d(composite_veh, composite_veh.cost_curve, cost_curve_interp_key,
                                              composite_veh_cost_curve_options, 'target_co2e_Mg_per_vehicle')
 
-        if type(production_options) is pd.DataFrame:
-            # avoid 'fragmented' Dataframe warnings...
-            production_options = production_options.assign(**{
-                'veh_%s_sales' % composite_veh.vehicle_id: composite_veh_sales,
-                'veh_%s_total_cost_dollars' % composite_veh.vehicle_id: composite_veh_total_cost_dollars,
-                'veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id: composite_veh_cert_co2e_Mg,
-                'veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id: composite_veh_target_co2e_Mg})
-        else:
-            production_options['veh_%s_sales' % composite_veh.vehicle_id] = composite_veh_sales
-            production_options['veh_%s_total_cost_dollars' % composite_veh.vehicle_id] = composite_veh_total_cost_dollars
-            production_options['veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_cert_co2e_Mg
-            production_options['veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_target_co2e_Mg
+        # if type(production_options) is pd.DataFrame:
+        #     # avoid 'fragmented' Dataframe warnings...
+        #     # production_options = production_options.assign(**{
+        #     #     'veh_%s_sales' % composite_veh.vehicle_id: composite_veh_sales,
+        #     #     'veh_%s_total_cost_dollars' % composite_veh.vehicle_id: composite_veh_total_cost_dollars,
+        #     #     'veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id: composite_veh_cert_co2e_Mg,
+        #     #     'veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id: composite_veh_target_co2e_Mg})
+        #     composite_vehicle_data['veh_%s_sales' % composite_veh.vehicle_id] = composite_veh_sales
+        #     composite_vehicle_data['veh_%s_total_cost_dollars' % composite_veh.vehicle_id] = composite_veh_total_cost_dollars
+        #     composite_vehicle_data['veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_cert_co2e_Mg
+        #     composite_vehicle_data['veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_target_co2e_Mg
+        # else:
+        production_options['veh_%s_sales' % composite_veh.vehicle_id] = composite_veh_sales
+        production_options['veh_%s_total_cost_dollars' % composite_veh.vehicle_id] = composite_veh_total_cost_dollars
+        production_options['veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_cert_co2e_Mg
+        production_options['veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_target_co2e_Mg
 
         # update totals
         total_battery_GWh += composite_veh_total_GWh
