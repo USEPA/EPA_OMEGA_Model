@@ -755,7 +755,7 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
     """
     dfs = []
 
-    machine_resolution = int(str.split(str(sys.float_info.epsilon), 'e-')[1]) # -1*0
+    machine_resolution = 6  # int(str.split(str(sys.float_info.epsilon), 'e-')[1])-1
 
     # reorder columns such that last column is an ALT since it equals one minus the sum of the prior columns and we
     # don't want to blow the constraints on the NO_ALTs
@@ -764,30 +764,40 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
 
     columns = no_alt_columns + alt_columns
 
-    for i in range(0, len(columns) - 1):
-        shares = np.array([])
-        for idx, combo in combos.iterrows():
-            k = columns[i]
-            val = combo[k]
-            min_val = ASTM_round(np.maximum(min_constraints[k], val - half_range_frac), machine_resolution)
-            max_val = ASTM_round(np.minimum(max_constraints[k], val + half_range_frac), machine_resolution)
-            if min_val == max_val:
-                shares = np.append(shares, ASTM_round(val, machine_resolution))
-            else:
-                shares = np.append(np.append(shares, np.linspace(min_val, max_val, num_steps)),
-                                   ASTM_round(val, machine_resolution)) # create new share spread and include previous value
-        dfs.append(pd.DataFrame({k: np.unique(shares)}))
+    if all([min_constraints[c] == max_constraints[c] for c in columns]):
+        dfx = pd.DataFrame()
+        for c in columns[:-1]:
+            dfx[c] = [ASTM_round(max_constraints[c], machine_resolution)]
+        dfx.loc[:, columns[-1]] = 1 - dfx.sum(axis=1)[0]
+        if verbose:
+            print('%.20f' % dfx.sum(axis=1)[0])
+    else:
+        for i in range(0, len(columns) - 1):
+            shares = np.array([])
+            for idx, combo in combos.iterrows():
+                k = columns[i]
+                val = combo[k]
+                min_val = ASTM_round(np.maximum(min_constraints[k], val - half_range_frac), machine_resolution)
+                max_val = ASTM_round(np.minimum(max_constraints[k], val + half_range_frac), machine_resolution)
+                if min_val == max_val:
+                    shares = np.append(shares, ASTM_round(val, machine_resolution))
+                else:
+                    shares = np.append(np.append(shares, np.linspace(min_val, max_val, num_steps)),
+                                       ASTM_round(val, machine_resolution))  # create new share spread and include previous value
+            dfs.append(pd.DataFrame({k: np.unique(shares)}))
 
-    dfx = pd.DataFrame()
-    for df in dfs:
-        dfx = cartesian_prod(dfx, df)
+        dfx = pd.DataFrame()
+        for df in dfs:
+            dfx = cartesian_prod(dfx, df)
 
-    # dfx2 prevents >>intermittent<< "A value is trying to be set on a copy of a slice from a DataFrame." errors
-    dfx = dfx[dfx.sum(axis=1).values <= 1]
-    dfx.loc[:, columns[-1]] = 1 - dfx.sum(axis=1).values  # using ".loc" in combination with dfx2 prevents errors
+        # dfx2 prevents >>intermittent<< "A value is trying to be set on a copy of a slice from a DataFrame." errors
+        dfx = dfx[dfx.sum(axis=1).values <= 1]
+        dfx.loc[:, columns[-1]] = 1 - dfx.sum(axis=1).values  # using ".loc" in combination with dfx2 prevents errors
 
-    if dfx.empty:
-        raise Exception('empty partition!! :(')
+        if dfx.empty:
+            raise Exception('empty partition!! :(')
+
+    dfx = dfx.drop_duplicates()
 
     if verbose:
         print(dfx)
