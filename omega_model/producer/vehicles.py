@@ -706,7 +706,7 @@ def is_up_for_redesign(vehicle):
                   omega_globals.options.redesign_interval_gain_years,
                   omega_globals.options.redesign_interval_gain)
 
-    return vehicle.model_year - vehicle.prior_redesign_year >= vehicle.redesign_interval * redesign_interval_gain
+    return vehicle.model_year - int(vehicle.prior_redesign_year) >= vehicle.redesign_interval * redesign_interval_gain
 
 
 def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
