@@ -133,6 +133,8 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
         else:
             cost_curve_options = [cv.cost_curve['credits_co2e_Mg_per_vehicle'].min()]
 
+        # omega_log.logwrite('%s cost_curve_options %d' % (cv.vehicle_id, len(cost_curve_options)))
+
         tech_cost_options = \
             cv.get_from_cost_curve('new_vehicle_mfr_cost_dollars', cost_curve_options)
         tech_generalized_cost_options = \
@@ -640,17 +642,35 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         composite_vehicles, pre_production_vehicles, market_class_tree, context_based_total_sales = \
             create_composite_vehicles(calendar_year, compliance_id)
 
+        # print('create_tech_sweeps')
         tech_sweeps = create_tech_sweeps(composite_vehicles, candidate_production_decisions, share_range)
 
+        # print('create_share_sweeps')
         share_sweeps = create_share_sweeps(calendar_year, market_class_tree,
                                            candidate_production_decisions, share_range,
                                            producer_decision_and_response, context_based_total_sales,
                                            prior_producer_decision_and_response, producer_consumer_iteration_num)
 
+        # attempt to save some RAM...
+        tech_sweeps = tech_sweeps.astype(np.float32)
+        share_sweeps = share_sweeps.convert_dtypes()
+
         tech_and_share_sweeps = cartesian_prod(tech_sweeps, share_sweeps)
 
+        # if candidate_production_decisions is not None:
+        #     omega_log.logwrite('candidates %s, tech_shape %s, share_shape %s, tech_and_share_shape %s' %
+        #                    (len(candidate_production_decisions), tech_sweeps.shape,
+        #                     share_sweeps.shape, tech_and_share_sweeps.shape))
+        # else:
+        #     omega_log.logwrite('tech_shape %s, share_shape %s, tech_and_share_shape %s' %
+        #                    (tech_sweeps.shape,
+        #                     share_sweeps.shape, tech_and_share_sweeps.shape))
+
+        # print('starting create_production_options_from_shares...')
         production_options = create_production_options_from_shares(composite_vehicles, tech_and_share_sweeps,
                                                                    context_based_total_sales)
+
+        # print('done')
 
         # insert code to cull production options based on policy here #
 
@@ -733,6 +753,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                         best_candidate_production_decision = most_strategic_point
             else:
                 best_candidate_production_decision = most_strategic_production_decision
+
+            candidate_production_decisions = most_strategic_points
 
             if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
                 omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,
@@ -1144,6 +1166,8 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
                                         )
     omega_globals.session.flush()
 
+    _cache.clear()
+
     return target_co2e_Mg - cert_co2e_Mg, production_battery_gigawatthours
 
 
@@ -1262,18 +1286,22 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
             DecompositionAttributes.interp1d(composite_veh, composite_veh.cost_curve, cost_curve_interp_key,
                                              composite_veh_cost_curve_options, 'target_co2e_Mg_per_vehicle')
 
-        if type(production_options) is pd.DataFrame:
-            # avoid 'fragmented' Dataframe warnings...
-            production_options = production_options.assign(**{
-                'veh_%s_sales' % composite_veh.vehicle_id: composite_veh_sales,
-                'veh_%s_total_cost_dollars' % composite_veh.vehicle_id: composite_veh_total_cost_dollars,
-                'veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id: composite_veh_cert_co2e_Mg,
-                'veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id: composite_veh_target_co2e_Mg})
-        else:
-            production_options['veh_%s_sales' % composite_veh.vehicle_id] = composite_veh_sales
-            production_options['veh_%s_total_cost_dollars' % composite_veh.vehicle_id] = composite_veh_total_cost_dollars
-            production_options['veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_cert_co2e_Mg
-            production_options['veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_target_co2e_Mg
+        # if type(production_options) is pd.DataFrame:
+        #     # avoid 'fragmented' Dataframe warnings...
+        #     # production_options = production_options.assign(**{
+        #     #     'veh_%s_sales' % composite_veh.vehicle_id: composite_veh_sales,
+        #     #     'veh_%s_total_cost_dollars' % composite_veh.vehicle_id: composite_veh_total_cost_dollars,
+        #     #     'veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id: composite_veh_cert_co2e_Mg,
+        #     #     'veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id: composite_veh_target_co2e_Mg})
+        #     composite_vehicle_data['veh_%s_sales' % composite_veh.vehicle_id] = composite_veh_sales
+        #     composite_vehicle_data['veh_%s_total_cost_dollars' % composite_veh.vehicle_id] = composite_veh_total_cost_dollars
+        #     composite_vehicle_data['veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_cert_co2e_Mg
+        #     composite_vehicle_data['veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_target_co2e_Mg
+        # else:
+        production_options['veh_%s_sales' % composite_veh.vehicle_id] = composite_veh_sales
+        production_options['veh_%s_total_cost_dollars' % composite_veh.vehicle_id] = composite_veh_total_cost_dollars
+        production_options['veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_cert_co2e_Mg
+        production_options['veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_target_co2e_Mg
 
         # update totals
         total_battery_GWh += composite_veh_total_GWh
@@ -1496,8 +1524,8 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         lowest_cost_dollars = lowest_cost_compliant_tech_share_option[cost_name].item()
         most_strategic_cost_dollars = most_strategic_compliant_tech_share_option[cost_name].item()
 
-        if three_points:
-            print('most_strat_norm_$ minus lowest_norm_$ %.6f' % (most_strategic_normalized_cost - lowest_normalized_cost))
+        # if three_points:
+        #     print('most_strat_norm_$ minus lowest_norm_$ %.6f' % (most_strategic_normalized_cost - lowest_normalized_cost))
 
         # if three_points and omega_globals.options.producer_voluntary_overcompliance and \
         #     lowest_cost_dollars / most_strategic_cost_dollars < \
