@@ -1524,8 +1524,8 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         lowest_cost_dollars = lowest_cost_compliant_tech_share_option[cost_name].item()
         most_strategic_cost_dollars = most_strategic_compliant_tech_share_option[cost_name].item()
 
-        if three_points:
-            print('most_strat_norm_$ minus lowest_norm_$ %.6f' % (most_strategic_normalized_cost - lowest_normalized_cost))
+        # if three_points:
+        #     print('most_strat_norm_$ minus lowest_norm_$ %.6f' % (most_strategic_normalized_cost - lowest_normalized_cost))
 
         # if three_points and omega_globals.options.producer_voluntary_overcompliance and \
         #     lowest_cost_dollars / most_strategic_cost_dollars < \
