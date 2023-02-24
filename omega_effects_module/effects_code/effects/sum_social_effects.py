@@ -47,6 +47,7 @@ def calc_social_effects(costs_df, benefits_df, ghg_scope, calc_health_effects=Fa
     non_net_benefit_cost_attributes = [
         'fuel_retail_cost_dollars',
         'fuel_taxes_cost_dollars',
+        'purchase_credit_dollars',
     ]
     non_emission_bens = [
         'energy_security_benefit_dollars',
