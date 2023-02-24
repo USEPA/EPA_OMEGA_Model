@@ -583,7 +583,8 @@ def logwrite_cross_subsidy_results(calendar_year, producer_market_classes, cross
         for mc, cc in zip(sorted(producer_market_classes), multiplier_columns):
             if cc in producer_decision_and_response:
                 if mc in omega_globals.locked_price_modification_data:
-                    omega_log.logwrite(('LOCKED %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc],
+                    omega_log.logwrite(('LOCKED %s' % cc).ljust(50) + '= %.5f' %
+                                       omega_globals.locked_price_modification_data[mc]['market_class_multiplier'],
                                        echo_console=True)
                 else:
                     omega_log.logwrite(('FINAL  %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc],
