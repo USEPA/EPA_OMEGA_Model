@@ -266,6 +266,7 @@ class BatchSettings:
 
             self.congestion_noise_cost_factors = CostFactorsCongestionNoise()
             self.congestion_noise_cost_factors.init_from_file(self.congestion_noise_cost_factors_file, self, effects_log)
+
             self.context_fuel_prices = FuelPrice()
             self.context_fuel_prices.init_from_file(self.context_fuel_prices_file, self, effects_log)
 
