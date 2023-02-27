@@ -396,6 +396,8 @@ class VehicleAggregation(OMEGABase):
                 row['market_class_id'] = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
                 veh.drive_system = row['drive_system']
 
+                veh.global_cumulative_battery_GWh = omega_globals.cumulative_battery_GWh
+
                 powertrain_cost = sum(PowertrainCost.calc_cost(veh, row, veh.base_year_powertrain_type))
 
                 # powertrain_costs = PowertrainCost.calc_cost(veh, pd.DataFrame([row]))  # includes battery cost

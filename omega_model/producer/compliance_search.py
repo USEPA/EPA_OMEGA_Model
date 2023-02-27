@@ -857,6 +857,8 @@ def create_composite_vehicles(calendar_year, compliance_id):
             transfer_vehicle_data(prior_veh, new_veh, model_year=calendar_year)
 
             new_veh.in_production = new_veh.in_production or is_up_for_redesign(new_veh)
+            # pass global cumulative GWh as vehicle attribute so subprocess can access it
+            new_veh.global_cumulative_battery_GWh = omega_globals.cumulative_battery_GWh
 
             if new_veh.in_production:
                 manufacturer_vehicles.append(new_veh)
