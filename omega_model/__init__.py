@@ -35,8 +35,8 @@ try:
     import time
 
     import pandas as pd
-    from warnings import simplefilter
-    simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
+    # from warnings import simplefilter
+    # simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
     pd.set_option('chained_assignment', 'raise')
     from pandas.api.types import is_numeric_dtype
 
