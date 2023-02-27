@@ -176,6 +176,22 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
     return tech_combos_df
 
 
+def round_constraints(constraints, min_val=0.0, max_val=1.0):
+    """
+
+    Args:
+        constraints:
+        min_val:
+        max_val:
+
+    Returns:
+
+    """
+    for k in constraints:
+        constraints[k] = ASTM_round(max(min_val, min(max_val, constraints[k])), omega_globals.share_precision)
+        # constraints[k]= np.round(max(min_val, min(max_val, constraints[k])), omega_globals.share_precision)
+
+
 def create_share_sweeps(calendar_year, market_class_dict, candidate_production_decisions, share_range,
                         consumer_response, context_based_total_sales, prior_producer_decision_and_response,
                         producer_consumer_iteration_num, node_name='', verbose=False):
@@ -301,8 +317,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                         locked_consumer_shares = False
 
                         if consumer_response is not None:
-                            max_constraints = Eval.eval(consumer_response['max_constraints_%s' % node_name])
-                            min_constraints = Eval.eval(consumer_response['min_constraints_%s' % node_name])
+                            max_constraints = omega_globals.constraints['max_constraints_%s' % node_name]
+                            min_constraints = omega_globals.constraints['min_constraints_%s' % node_name]
                             keys = max_constraints.copy().keys()
 
                         if consumer_response is not None and \
@@ -379,6 +395,10 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                         else:  # no cross-subsidy, non-full-line manufacturer, possible epsilon discrepancy
                                             locked_consumer_shares = True
                                             max_constraints = min_constraints
+
+                            round_constraints(min_constraints)
+                            round_constraints(max_constraints)
+
                         else:
                             # set up initial constraints for mandatory "NO_ALT" vehicle shares
                             # calculate RELATIVE share constraints for partition, even though the keys indicate absolute shares:
@@ -481,6 +501,9 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                             max(0, prior_market_class_shares_dict[nmc] - max_sub_dict[nmc] - \
                                             min_constraints['producer_abs_share_frac_%s.NO_ALT' % nmc]))
 
+                        round_constraints(min_constraints)
+                        round_constraints(max_constraints)
+
                         if locked_consumer_shares:
                             print('%s locked consumer shares' % node_name)
                             node_partition = pd.DataFrame.from_dict([min_constraints])
@@ -514,14 +537,17 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                             if 'NO_ALT' in scn.split('.'):
                                 min_constraints[node_name] += min_constraints[scn]
 
+                        round_constraints(min_constraints)
+                        round_constraints(max_constraints)
+
                         # pass constraints to next iteration
-                        sales_share_df['min_constraints_%s' % node_name] = str(min_constraints)
-                        sales_share_df['max_constraints_%s' % node_name] = str(max_constraints)
+                        omega_globals.constraints['min_constraints_%s' % node_name] = min_constraints
+                        omega_globals.constraints['max_constraints_%s' % node_name] = max_constraints
 
                     else:
                         # narrow search span to a range of shares around the winners
-                        min_constraints = Eval.eval(candidate_production_decisions['min_constraints_%s' % node_name].iloc[0])
-                        max_constraints = Eval.eval(candidate_production_decisions['max_constraints_%s' % node_name].iloc[0])
+                        min_constraints = omega_globals.constraints['min_constraints_%s' % node_name]
+                        max_constraints = omega_globals.constraints['max_constraints_%s' % node_name]
 
                         # convert abs shares to relative shares for generate_constrained_nearby_shares, then scale
                         # the output by node_abs_share
@@ -537,8 +563,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                                                max_constraints=max_constraints)
 
                         # pass constraints to next iteration
-                        sales_share_df['min_constraints_%s' % node_name] = str(min_constraints)
-                        sales_share_df['max_constraints_%s' % node_name] = str(max_constraints)
+                        omega_globals.constraints['min_constraints_%s' % node_name] = min_constraints
+                        omega_globals.constraints['max_constraints_%s' % node_name] = max_constraints
             else:
                 sales_share_df = pd.DataFrame()
         else:
@@ -663,7 +689,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
         # attempt to save some RAM...
         tech_sweeps = tech_sweeps.astype(np.float32)
-        share_sweeps = share_sweeps.convert_dtypes()
+        share_sweeps = share_sweeps.astype(np.float32)
 
         tech_and_share_sweeps = cartesian_prod(tech_sweeps, share_sweeps)
 
@@ -794,7 +820,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                                 best_candidate_production_decision['strategic_compliance_ratio']),
                                echo_console=True)
 
-        selected_production_decision = series_to_numeric(best_candidate_production_decision)
+        selected_production_decision = best_candidate_production_decision
 
         selected_production_decision = \
             selected_production_decision.rename({'strategic_compliance_ratio': 'strategic_compliance_ratio_initial',
@@ -1440,8 +1466,8 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         production_options['normalized_total_generalized_cost_dollars'] = 0
 
     production_options['producer_search_iteration'] = search_iteration
-    production_options['selected_production_option'] = False
-    production_options['candidate_production_option'] = False
+    production_options['selected_production_option'] = False * 1  # create numeric bool
+    production_options['candidate_production_option'] = False * 1  # create numeric bool
     production_options['strategic_compliance_error'] = abs(1 - production_options['strategic_compliance_ratio'].values)
 
     mini_df = pd.DataFrame()
@@ -1622,7 +1648,7 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         if 'producer_compliance_search' in omega_globals.options.verbose_log_modules:
             # log (some or all) production options cloud and tag selected points
             try:
-                production_options.loc[candidate_production_decisions.index, 'candidate_production_option'] = True
+                production_options.loc[candidate_production_decisions.index, 'candidate_production_option'] = True * 1
             except:
                 # candidate may be from a prior iteration, index may not be available
                 pass

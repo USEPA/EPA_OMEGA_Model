@@ -239,11 +239,8 @@ class SalesShare(OMEGABase, SalesShareBase):
                     sales_share_denominator += sales_share_numerator[market_class_id]
 
                 else:
-                    min_constraints = Eval.eval(
-                        producer_decision['min_constraints_%s' % parent_market_class])
-
-                    max_constraints = Eval.eval(
-                        producer_decision['max_constraints_%s' % parent_market_class])
+                    min_constraints = omega_globals.constraints['min_constraints_%s' % parent_market_class]
+                    max_constraints = omega_globals.constraints['max_constraints_%s' % parent_market_class]
 
                     demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator
 
@@ -414,8 +411,7 @@ class SalesShare(OMEGABase, SalesShareBase):
                 market_class_data['consumer_share_frac_%s' % only_child] = 1.0
                 market_class_data['consumer_abs_share_frac_%s' % only_child] = parent_share
 
-                max_constraints = Eval.eval(
-                    producer_decision['max_constraints_%s' % mc_parent])
+                max_constraints = omega_globals.constraints['max_constraints_%s' % mc_parent]
 
                 for alt in ['ALT', 'NO_ALT']:
                     only_child = mc_pair[0] + '.' + alt

@@ -755,7 +755,7 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
     """
     dfs = []
 
-    machine_resolution = 6  # int(str.split(str(sys.float_info.epsilon), 'e-')[1])-1
+    machine_resolution = omega_globals.share_precision
 
     # reorder columns such that last column is an ALT since it equals one minus the sum of the prior columns and we
     # don't want to blow the constraints on the NO_ALTs
@@ -767,8 +767,8 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
     if all([min_constraints[c] == max_constraints[c] for c in columns]):
         dfx = pd.DataFrame()
         for c in columns[:-1]:
-            dfx[c] = [ASTM_round(max_constraints[c], machine_resolution)]
-        dfx.loc[:, columns[-1]] = 1 - dfx.sum(axis=1)[0]
+            dfx[c] = np.atleast_1d(max_constraints[c])
+        dfx.loc[:, columns[-1]] = np.maximum(0.0, 1.0 - dfx.sum(axis=1)[0])
         if verbose:
             print('%.20f' % dfx.sum(axis=1)[0])
     else:
@@ -790,9 +790,8 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
         for df in dfs:
             dfx = cartesian_prod(dfx, df)
 
-        # dfx2 prevents >>intermittent<< "A value is trying to be set on a copy of a slice from a DataFrame." errors
         dfx = dfx[dfx.sum(axis=1).values <= 1]
-        dfx.loc[:, columns[-1]] = 1 - dfx.sum(axis=1).values  # using ".loc" in combination with dfx2 prevents errors
+        dfx.loc[:, columns[-1]] = np.maximum(0.0, 1 - dfx.sum(axis=1).values)  # using ".loc" in combination with dfx2 prevents errors
 
         if dfx.empty:
             raise Exception('empty partition!! :(')
