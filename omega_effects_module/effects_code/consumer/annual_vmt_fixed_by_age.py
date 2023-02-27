@@ -58,6 +58,7 @@ import numpy as np
 from omega_effects_module.effects_code.general.general_functions import read_input_file
 from omega_effects_module.effects_code.general.input_validation import \
     validate_template_version_info, validate_template_column_names
+from omega_effects_module.effects_code.consumer import deregionalizer
 
 
 class OnroadVMT:
@@ -101,10 +102,15 @@ class OnroadVMT:
 
         validate_template_column_names(filepath, df, input_template_columns, effects_log)
 
+        df = deregionalizer.remove_region_entries(df, 'market_class_id', 'r2zev', 'r1nonzev',
+                                                  'sedan_wagon', 'cuv_suv_van', 'pickup')
+
         # convert dataframe to dict keyed by market class ID, age, and start year
         self._data = df.set_index(['market_class_id', 'age', 'start_year']).sort_index().to_dict(orient='index')
+
         # add 'start_year' key which returns start years by market class ID
-        self._data.update(df[['market_class_id', 'age', 'start_year']].set_index('market_class_id').to_dict(orient='dict'))
+        self._data.update(
+            df[['market_class_id', 'age', 'start_year']].set_index('market_class_id').to_dict(orient='dict'))
 
     def get_vmt(self, calendar_year, market_class_id, age):
         """

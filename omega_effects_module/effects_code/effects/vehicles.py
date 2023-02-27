@@ -1,4 +1,5 @@
 from omega_effects_module.effects_code.general.general_functions import read_input_file
+from omega_effects_module.effects_code.consumer import deregionalizer
 
 
 class Vehicles:
@@ -20,6 +21,9 @@ class Vehicles:
 
         """
         df = read_input_file(filepath, effects_log, index_col=0)
+
+        df = deregionalizer.deregionalize_entries(df, 'market_class_id', 'r1nonzev', 'r2zev')
+        df = deregionalizer.deregionalize_entries(df, 'body_style', 'r1nonzev', 'r2zev')
 
         self._dict = df.to_dict('index')
 
