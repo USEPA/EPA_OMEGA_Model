@@ -1625,6 +1625,9 @@ def run_omega(session_runtime_options, standalone_run=False):
 
                     num_processes = min(len(omega_globals.options.MarketClass.market_classes), os.cpu_count() - 2)
 
+                    if not omega_globals.options.standalone_run and not omega_globals.options.session_is_reference:
+                        num_processes = int(num_processes/2)
+
                     start_time = time.time()
                     omega_globals.pool = Pool(processes=num_processes,
                                               initializer=omega.init_omega, initargs=[omega_globals.options])
