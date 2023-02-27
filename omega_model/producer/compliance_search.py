@@ -764,7 +764,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             else:
                 best_candidate_production_decision = most_strategic_production_decision
 
-            candidate_production_decisions = most_strategic_points
+            # candidate_production_decisions = most_strategic_points
 
             if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
                 omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,
@@ -774,10 +774,12 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
             search_iteration += 1
 
-            continue_search = producer_compliance_possible is not None and \
-                        (abs(1 - most_strategic_production_decision['strategic_compliance_ratio']) >
-                         omega_globals.options.producer_compliance_search_tolerance) and \
-                          (share_range > omega_globals.options.producer_compliance_search_min_share_range)
+            # continue_search = producer_compliance_possible is not None and \
+            #                   ((abs(1 - most_strategic_production_decision['strategic_compliance_ratio']) >
+            #              omega_globals.options.producer_compliance_search_tolerance) or search_iteration < 10) and \
+            #               (share_range > omega_globals.options.producer_compliance_search_min_share_range)
+
+            continue_search = (share_range > omega_globals.options.producer_compliance_search_min_share_range)
 
     if producer_compliance_possible is not None:
         if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:

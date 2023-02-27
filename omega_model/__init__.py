@@ -197,8 +197,8 @@ try:
             self.producer_consumer_max_iterations = 5
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
-            self.producer_compliance_search_convergence_factor = 0.9
-            self.producer_compliance_search_tolerance = 1e-4
+            self.producer_compliance_search_convergence_factor = 0.8
+            self.producer_compliance_search_tolerance = 1e-6
             self.producer_cross_subsidy_price_tolerance = 5e-3
             self.run_profiler = False
             self.multiprocessing = True and not self.run_profiler and not getattr(sys, 'frozen', False)
