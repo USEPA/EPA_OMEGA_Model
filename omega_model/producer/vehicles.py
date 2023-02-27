@@ -725,19 +725,22 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
         Nothing, updates ``to_vehicle`` attributes
 
     """
-    base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year', 'fueling_class',
+    base_properties = ('name', 'manufacturer_id', 'compliance_id', 'model_year', 'fueling_class',
                        'cost_curve_class', 'reg_class_id', 'in_use_fuel_id',
                        'cert_fuel_id', 'market_class_id', 'lifetime_VMT',
                        'context_size_class',
-                       'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs', 'eng_rated_hp', 'footprint_ft2',
+                       'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs', 'eng_rated_hp',
+                       'footprint_ft2',
                        'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c', 'body_style',
-                       'structure_material', 'base_year_powertrain_type', 'base_year_reg_class_id', 'base_year_market_share',
+                       'structure_material', 'base_year_powertrain_type', 'base_year_reg_class_id',
+                       'base_year_market_share',
                        'base_year_vehicle_id', 'base_year_glider_non_structure_mass_lbs', 'base_year_cert_fuel_id',
                        'base_year_glider_non_structure_cost_dollars',
                        'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'base_year_curbweight_lbs_to_hp',
                        'base_year_msrp_dollars', 'battery_kwh', 'motor_kw', 'charge_depleting_range_mi',
                        'prior_redesign_year', 'redesign_interval', 'in_production', 'base_year_product',
-                       'workfactor', 'gvwr_lbs', 'gcwr_lbs', 'base_year_workfactor', 'base_year_gvwr_lbs', 'base_year_gcwr_lbs',}
+                       'workfactor', 'gvwr_lbs', 'gcwr_lbs', 'base_year_workfactor', 'base_year_gvwr_lbs',
+                       'base_year_gcwr_lbs', )
 
     # transfer base properties
     for attr in base_properties:
