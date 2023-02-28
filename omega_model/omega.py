@@ -338,7 +338,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                 # decide whether to continue iterating or not
                 iterate_producer_consumer = omega_globals.options.iterate_producer_consumer \
                                             and producer_consumer_iteration_num < omega_globals.options.producer_consumer_max_iterations \
-                                            and not converged
+                                            and (not converged or producer_decision_and_response['total_battery_GWh'] > GWh_limit)
 
                 if iterate_producer_consumer:
                     producer_consumer_iteration_num += 1

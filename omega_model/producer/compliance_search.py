@@ -273,7 +273,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
         else:
             constraint_ratio = 0
 
-        print('*** constraint ratio %f, %f, %f, %f, %f->%f' %
+        omega_log.logwrite('*** constraint ratio %f, %f, %f, %f, %f->%f' %
               (constraint_ratio,
                consumer_response['battery_GWh_limit'],
                consumer_response['total_battery_GWh'],
@@ -323,7 +323,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
                         if consumer_response is not None and \
                                 consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']:
-                            print("consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']")
+                            omega_log.logwrite("consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']")
                             # adjust constraints
                             if consumer_response['total_ALT_battery_GWh'] > 0:
                                 constraint_ratio = max(0, 0.99 * ((consumer_response['battery_GWh_limit'] -
