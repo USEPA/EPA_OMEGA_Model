@@ -766,8 +766,10 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             cheapest_compliant = most_strategic_cheapest_point['strategic_compliance_ratio'] <= 1.0
 
             if (most_strategic_production_decision is None) or \
-                    (candidate_production_decisions['strategic_compliance_error'].min() <
-                     most_strategic_production_decision['strategic_compliance_error'].min()):
+                    (most_strategic_point['strategic_compliance_error'] <=
+                     most_strategic_production_decision['strategic_compliance_error']) or (most_strategic_point['strategic_compliance_error'] ==
+                     most_strategic_production_decision['strategic_compliance_error'] and (most_strategic_point['total_generalized_cost_dollars'] <=
+                     most_strategic_production_decision['total_generalized_cost_dollars'])):
                 most_strategic_production_decision = most_strategic_point
 
             if omega_globals.options.producer_voluntary_overcompliance:
@@ -790,7 +792,13 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             else:
                 best_candidate_production_decision = most_strategic_production_decision
 
-            # candidate_production_decisions = most_strategic_points
+            if omega_globals.options.producer_compliance_search_multipoint:
+                # enable multi-point search, might still be a single point
+                candidate_production_decisions = candidate_production_decisions
+            else:
+                # single-point search:
+                candidate_production_decisions = \
+                    most_strategic_points.loc[[most_strategic_points['strategic_compliance_error'].idxmin()]]
 
             if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
                 omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,
