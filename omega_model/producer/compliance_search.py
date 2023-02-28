@@ -1487,10 +1487,14 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
     else:
         compliant_tech_share_options = mini_df[compliant_points].copy()
 
+    compliant_tech_share_options = compliant_tech_share_options.drop_duplicates()
+
     non_compliant_tech_share_options = mini_df[non_compliant_points].copy()
 
     non_compliant_tech_share_options = cull_non_compliant_points(non_compliant_tech_share_options,
                                                                  prior_most_strategic_non_compliant_tech_share_option)
+
+    non_compliant_tech_share_options = non_compliant_tech_share_options.drop_duplicates()
 
     if not compliant_tech_share_options.empty and not non_compliant_tech_share_options.empty:
         # tech share options straddle compliance target
@@ -1505,14 +1509,22 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
 
         if len(non_compliant_tech_share_options) > 1:
             # grab best non-compliant option
-            non_compliant_tech_share_options['weighted_slope'] = \
-                non_compliant_tech_share_options['strategic_compliance_ratio'].values * \
-                ((non_compliant_tech_share_options[cost_name].values - lowest_cost_compliant_tech_share_option[cost_name].item()) /
-                (non_compliant_tech_share_options['strategic_compliance_ratio'].values -
-                lowest_cost_compliant_tech_share_option['strategic_compliance_ratio'].item()))
+            dx = (non_compliant_tech_share_options['strategic_compliance_ratio'].values -
+                lowest_cost_compliant_tech_share_option['strategic_compliance_ratio'].item())
 
-            most_strategic_non_compliant_tech_share_option = \
-                production_options.loc[[non_compliant_tech_share_options['weighted_slope'].idxmin()]]
+            if np.max(dx) == 0:
+                most_strategic_non_compliant_tech_share_option = \
+                    production_options.loc[[non_compliant_tech_share_options[cost_name].idxmin()]]
+            else:
+                dy = (non_compliant_tech_share_options[cost_name].values -
+                      lowest_cost_compliant_tech_share_option[cost_name].item())
+
+                non_compliant_tech_share_options['weighted_slope'] = \
+                    non_compliant_tech_share_options['strategic_compliance_ratio'].values * dy / dx
+
+                most_strategic_non_compliant_tech_share_option = \
+                    production_options.loc[[non_compliant_tech_share_options['weighted_slope'].idxmin()]]
+
         else:
             if len(non_compliant_tech_share_options.columns) == len(mini_df.columns):
                 most_strategic_non_compliant_tech_share_option = \
@@ -1523,15 +1535,22 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         three_points = False
         if cloud_slope > 0:
             if len(compliant_tech_share_options) > 1:
-                # cost cloud up-slopes from left to right, calculate slope relative to best non-compliant option
-                compliant_tech_share_options['weighted_slope'] = \
-                    compliant_tech_share_options['strategic_compliance_ratio'].values * \
-                    ((compliant_tech_share_options[cost_name].values - most_strategic_non_compliant_tech_share_option[cost_name].item()) /
-                    (compliant_tech_share_options['strategic_compliance_ratio'].values -
-                     most_strategic_non_compliant_tech_share_option['strategic_compliance_ratio'].item()))
+                dx = (compliant_tech_share_options['strategic_compliance_ratio'].values -
+                     most_strategic_non_compliant_tech_share_option['strategic_compliance_ratio'].item())
 
-                most_strategic_compliant_tech_share_option = \
-                    production_options.loc[[compliant_tech_share_options['weighted_slope'].idxmax()]]
+                if np.max(dx) == 0:
+                    most_strategic_compliant_tech_share_option = \
+                        production_options.loc[[compliant_tech_share_options[cost_name].idxmin()]]
+                else:
+                    dy = (compliant_tech_share_options[cost_name].values -
+                           most_strategic_non_compliant_tech_share_option[cost_name].item())
+
+                    # cost cloud up-slopes from left to right, calculate slope relative to best non-compliant option
+                    compliant_tech_share_options['weighted_slope'] = \
+                        compliant_tech_share_options['strategic_compliance_ratio'].values * dy / dx
+
+                    most_strategic_compliant_tech_share_option = \
+                        production_options.loc[[compliant_tech_share_options['weighted_slope'].idxmax()]]
             else:
                 if len(compliant_tech_share_options.columns) == len(mini_df.columns):
                     most_strategic_compliant_tech_share_option = production_options.loc[[compliant_tech_share_options.index[0]]]
