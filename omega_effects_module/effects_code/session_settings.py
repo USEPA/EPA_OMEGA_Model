@@ -17,6 +17,7 @@ class SessionSettings:
         self.session_policy = None
         self.session_name = None
 
+        self.inputs_filelist = list()
         self.powersector_emission_rates_file = None
         self.refinery_emission_factors_file = None
         self.refinery_emission_rates_file = None
@@ -60,7 +61,7 @@ class SessionSettings:
         self.vehicle_annual_data_file \
             = path_session_out / f'{batch_settings.batch_name}_{batch_settings.context_session_name}_vehicle_annual_data.csv'
 
-        self.init_context_classes(batch_settings, effects_log)
+        self.init_context_classes(effects_log)
 
     def get_session_settings(self, batch_settings, session_num, effects_log):
         """
@@ -108,13 +109,12 @@ class SessionSettings:
         self.fatality_rates_file \
             = batch_settings.get_attribute_value(('Context Fatality Rates File', f'{self.session_policy}'), 'full_path')
 
-        self.init_session_classes(batch_settings, self.session_name, effects_log)
+        self.init_session_classes(self.session_name, effects_log)
 
-    def init_context_classes(self, batch_settings, effects_log):
+    def init_context_classes(self, effects_log):
         """
 
         Args:
-            batch_settings: an instance of the BatchSettings class.
             effects_log: an instance of the EffectsLog class.
 
         Returns:
@@ -126,19 +126,20 @@ class SessionSettings:
         try:
             self.vehicles = Vehicles()
             self.vehicles.init_from_file(self.vehicles_file, effects_log)
+            self.inputs_filelist.append(self.vehicles_file)
 
             self.vehicle_annual_data = VehicleAnnualData()
             self.vehicle_annual_data.init_from_file(self.vehicle_annual_data_file, effects_log)
+            self.inputs_filelist.append(self.vehicle_annual_data_file)
 
         except Exception as e:
             effects_log.logwrite(e)
             sys.exit()
 
-    def init_session_classes(self, batch_settings, session_name, effects_log):
+    def init_session_classes(self, session_name, effects_log):
         """
 
         Args:
-            batch_settings: an instance of the BatchSettings class.
             session_name (str): the session name.
             effects_log: an instance of the EffectsLog class.
 
@@ -151,28 +152,36 @@ class SessionSettings:
         try:
             self.vehicles = Vehicles()
             self.vehicles.init_from_file(self.vehicles_file, effects_log)
+            self.inputs_filelist.append(self.vehicles_file)
 
             self.vehicle_annual_data = VehicleAnnualData()
             self.vehicle_annual_data.init_from_file(self.vehicle_annual_data_file, effects_log)
+            self.inputs_filelist.append(self.vehicle_annual_data_file)
 
             self.emission_rates_egu = EmissionRatesEGU()
             self.emission_rates_egu.init_from_file(self.powersector_emission_rates_file, effects_log)
+            self.inputs_filelist.append(self.powersector_emission_rates_file)
 
             if self.refinery_emission_factors_file:
                 self.emission_factors_refinery = EmissionFactorsRefinery()
                 self.emission_factors_refinery.init_from_file(self.refinery_emission_factors_file, effects_log)
+                self.inputs_filelist.append(self.refinery_emission_factors_file)
             else:
                 self.emission_rates_refinery = EmissionRatesRefinery()
                 self.emission_rates_refinery.init_from_file(self.refinery_emission_rates_file, effects_log)
+                self.inputs_filelist.append(self.refinery_emission_rates_file)
 
             self.emission_rates_vehicles = EmissionRatesVehicles()
             self.emission_rates_vehicles.init_from_file(self.vehicle_emission_rates_file, effects_log)
+            self.inputs_filelist.append(self.vehicle_emission_rates_file)
 
             self.safety_values = SafetyValues()
             self.safety_values.init_from_file(self.safety_values_file, effects_log)
+            self.inputs_filelist.append(self.safety_values_file)
 
             self.fatality_rates = FatalityRates()
             self.fatality_rates.init_from_file(self.fatality_rates_file, effects_log)
+            self.inputs_filelist.append(self.fatality_rates_file)
 
         except Exception as e:
             effects_log.logwrite(e)

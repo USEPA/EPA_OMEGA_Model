@@ -13,6 +13,7 @@ from session_settings import SessionSettings
 
 from general.effects_log import EffectsLog
 from general.runtime_options import RuntimeOptions
+from general.general_functions import copy_files
 from general.file_id_and_save import add_id_to_csv, save_file
 
 from effects.vmt_adjustments import AdjustmentsVMT
@@ -60,6 +61,8 @@ def main():
     # context fuel cost per mile and vmt adjustments ___________________________________________________________________
     session_settings = SessionSettings()
     session_settings.get_context_session_settings(batch_settings, effects_log)
+    if runtime_options.save_input_files:
+        copy_files(session_settings.inputs_filelist, path_of_run_folder / 'context_inputs')
 
     effects_log.logwrite('\nCalculating context vmt adjustments and context fuel cost per mile')
     vmt_adjustments_context = AdjustmentsVMT()
@@ -84,6 +87,8 @@ def main():
         session_settings = SessionSettings()
         session_settings.get_session_settings(batch_settings, session_num, effects_log)
         session_name = session_settings.session_name
+        if runtime_options.save_input_files:
+            copy_files(session_settings.inputs_filelist, path_of_run_folder / f'{session_name}_inputs')
 
         # vmt adjustments to vehicle annual data _______________________________________________________________________
         effects_log.logwrite(f'\nCalculating vmt adjustments for session {session_name}')
@@ -251,6 +256,9 @@ def main():
 
     shutil.copy2(runtime_options.batch_settings_file, path_of_run_folder / f'{runtime_options.batch_settings_file_name}')
     set_paths.copy_code_to_destination(path_of_code_folder)
+
+    if runtime_options.save_input_files:
+        copy_files(batch_settings.inputs_filelist, path_of_run_folder / 'batch_inputs')
 
     elapsed_runtime = round(time() - start_time, 2)
     elapsed_runtime_minutes = round(elapsed_runtime / 60, 2)
