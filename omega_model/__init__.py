@@ -175,8 +175,8 @@ try:
             # developer settings
             self.producer_market_category_ramp_limit = 0.2
             self.producer_shares_mode = 'auto'
-            self.producer_num_market_share_options = 2
-            self.producer_num_tech_options_per_ice_vehicle = 2
+            self.producer_num_market_share_options = 3
+            self.producer_num_tech_options_per_ice_vehicle = 3
             self.producer_num_tech_options_per_bev_vehicle = 1
             self.cost_curve_frontier_affinity_factor = 0.75
             self.slice_tech_combo_cloud_tables = False
@@ -197,7 +197,7 @@ try:
             self.producer_consumer_max_iterations = 5
             self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
-            self.producer_compliance_search_convergence_factor = 0.8
+            self.producer_compliance_search_convergence_factor = 0.9
             self.producer_compliance_search_tolerance = 1e-6
             self.producer_cross_subsidy_price_tolerance = 5e-3
             self.run_profiler = False
@@ -222,7 +222,7 @@ try:
                                         'effects_']
 
             # list of modules to allow verbose console output, or empty to disable
-            self.verbose_console_modules = ['producer_compliance_search_',
+            self.verbose_console_modules = ['producer_compliance_search',
                                             'p-c_shares_and_costs', 'p-c_max_iterations_',
                                             'cross_subsidy_search_', 'cross_subsidy_multipliers',
                                             'cross_subsidy_convergence_']
