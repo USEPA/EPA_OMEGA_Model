@@ -782,12 +782,15 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                         best_candidate_production_decision = most_strategic_point
                 else:
                     # if new candidate is cheaper than the old best and compliant, it's the best
-                    if (((most_strategic_cheapest_point['total_generalized_cost_dollars'] <
-                            best_candidate_production_decision['total_generalized_cost_dollars'])) or
-                            ((most_strategic_cheapest_point['total_generalized_cost_dollars'] ==
-                            best_candidate_production_decision['total_generalized_cost_dollars']) and
-                             (most_strategic_cheapest_point['strategic_compliance_error'] <
-                            best_candidate_production_decision['strategic_compliance_error']))) and \
+                    # if (((most_strategic_cheapest_point['total_generalized_cost_dollars'] <
+                    #         best_candidate_production_decision['total_generalized_cost_dollars'])) or
+                    #         ((most_strategic_cheapest_point['total_generalized_cost_dollars'] ==
+                    #         best_candidate_production_decision['total_generalized_cost_dollars']) and
+                    #          (most_strategic_cheapest_point['strategic_compliance_error'] <
+                    #         best_candidate_production_decision['strategic_compliance_error']))) and \
+                    #         most_strategic_compliant:
+                    if (most_strategic_cheapest_point['total_generalized_cost_dollars'] <
+                          best_candidate_production_decision['total_generalized_cost_dollars']) and \
                             most_strategic_compliant:
                         best_candidate_production_decision = most_strategic_cheapest_point
                     elif best_candidate_production_decision['strategic_compliance_ratio'] > 1.0:
