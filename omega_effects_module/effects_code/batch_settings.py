@@ -51,6 +51,7 @@ class BatchSettings:
         self.vmt_rebound_rate_bev = None
         self.net_benefit_ghg_scope = 'global' # default value; change via batch file ('domestic' and 'both' are options)
 
+        self.inputs_filelist = list()
         self.maintenance_costs_file = None
         self.repair_costs_file = None
         self.refueling_costs_file = None
@@ -239,51 +240,67 @@ class BatchSettings:
         try:
             self.ip_deflators = ImplictPriceDeflators()
             self.ip_deflators.init_from_file(self.ip_deflators_file, effects_log)
+            self.inputs_filelist.append(self.ip_deflators_file)
 
             self.cpi_deflators = CPIPriceDeflators()
             self.cpi_deflators.init_from_file(self.cpi_deflators_file, effects_log)
+            self.inputs_filelist.append(self.cpi_deflators_file)
 
             self.maintenance_cost = MaintenanceCost()
             self.maintenance_cost.init_from_file(self.maintenance_costs_file, self, effects_log)
+            self.inputs_filelist.append(self.maintenance_costs_file)
 
             self.repair_cost = RepairCost()
             self.repair_cost.init_from_file(self.repair_costs_file, effects_log)
+            self.inputs_filelist.append(self.repair_costs_file)
 
             self.refueling_cost = RefuelingCost()
             self.refueling_cost.init_from_file(self.refueling_costs_file, self, effects_log)
+            self.inputs_filelist.append(self.refueling_costs_file)
 
             self.general_inputs_for_effects = GeneralInputsForEffects()
             self.general_inputs_for_effects.init_from_file(self.general_inputs_for_effects_file, effects_log)
+            self.inputs_filelist.append(self.general_inputs_for_effects_file)
 
             self.criteria_cost_factors = CostFactorsCriteria()
             self.criteria_cost_factors.init_from_file(self.criteria_cost_factors_file, self, effects_log)
+            self.inputs_filelist.append(self.criteria_cost_factors_file)
 
             self.scc_cost_factors = CostFactorsSCC()
             self.scc_cost_factors.init_from_file(self.scc_cost_factors_file, self, effects_log)
+            self.inputs_filelist.append(self.scc_cost_factors_file)
 
             self.energy_security_cost_factors = CostFactorsEnergySecurity()
             self.energy_security_cost_factors.init_from_file(self.energy_security_cost_factors_file, self, effects_log)
+            self.inputs_filelist.append(self.energy_security_cost_factors_file)
 
             self.congestion_noise_cost_factors = CostFactorsCongestionNoise()
             self.congestion_noise_cost_factors.init_from_file(self.congestion_noise_cost_factors_file, self, effects_log)
+            self.inputs_filelist.append(self.congestion_noise_cost_factors_file)
 
             self.context_fuel_prices = FuelPrice()
             self.context_fuel_prices.init_from_file(self.context_fuel_prices_file, self, effects_log)
+            self.inputs_filelist.append(self.context_fuel_prices_file)
 
             self.reregistration = Reregistration()
             self.reregistration.init_from_file(self.vehicle_reregistration_file, effects_log)
+            self.inputs_filelist.append(self.vehicle_reregistration_file)
 
             self.onroad_vmt = OnroadVMT()
             self.onroad_vmt.init_from_file(self.onroad_vmt_file, effects_log)
+            self.inputs_filelist.append(self.onroad_vmt_file)
 
             self.onroad_fuels = OnroadFuel()
             self.onroad_fuels.init_from_file(self.onroad_fuels_file, effects_log)
+            self.inputs_filelist.append(self.onroad_fuels_file)
 
             self.legacy_fleet = LegacyFleet()
             self.legacy_fleet.init_from_file(self.legacy_fleet_file, self.vehicles_base_year, effects_log)
+            self.inputs_filelist.append(self.legacy_fleet_file)
 
             self.context_stock_and_vmt = ContextStockVMT()
             self.context_stock_and_vmt.init_from_file(self.context_stock_and_vmt_file, self, effects_log)
+            self.inputs_filelist.append(self.context_stock_and_vmt_file)
 
         except Exception as e:
             effects_log.logwrite(e)

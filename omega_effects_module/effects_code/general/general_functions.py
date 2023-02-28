@@ -3,41 +3,24 @@ from pathlib import PurePath
 import os
 import sys
 import time
-from datetime import datetime
+import shutil
 
 
-def inputs_filenames(input_files_pathlist):
+def copy_files(file_list, folder_name):
     """
 
-    Parameters:
-        input_files_pathlist: List; those input files that are specified in the input_files file contained in the
-        general folder.
+    Args:
+        file_list (list): List of file Path objects to copy into a new location.
+        folder_name: Path object for the folder into which to copy files.
 
     Returns:
-        A list of input file full paths - these will be copied directly to the output folder so that general and outputs
-        end up bundled together in the output folder associated with the given run.
+        Nothing, but copies files in file_list into folder_name.
 
     """
-    _filename_list = [PurePath(path).name for path in input_files_pathlist]
+    folder_name.mkdir(exist_ok=False)
 
-    return _filename_list
-
-
-def get_file_datetime_df(list_of_files):
-    """
-
-    Parameters:
-        list_of_files: List; the files for which datetimes are required.
-
-    Returns:
-        A DataFrame of input files (full path) and corresponding datetimes (date stamps) for those files.
-
-    """
-    file_datetime_df = pd.DataFrame()
-    file_datetime_df.insert(0, 'Item', [path_to_file for path_to_file in list_of_files])
-    file_datetime_df.insert(1, 'Results', [time.ctime(os.path.getmtime(path_to_file)) for path_to_file in list_of_files])
-
-    return file_datetime_df
+    for file in file_list:
+        shutil.copy2(file, folder_name)
 
 
 def get_file_datetime(filepath):
