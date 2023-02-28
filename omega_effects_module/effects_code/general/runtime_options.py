@@ -56,6 +56,7 @@ class RuntimeOptions:
         self.file_format = None
         self.path_outputs = None
         self.save_vehicle_detail_files = None
+        self.save_input_files = False
 
         self.true_false_dict = dict({
             True: True,
@@ -135,3 +136,8 @@ class RuntimeOptions:
             # protect against improper save format
             effects_log.logwrite('\nVehicle-Level Output File Save Format in runtime_settings.csv must be "csv" or "parquet"')
             sys.exit()
+
+        self.save_input_files = self._dict['Save Input Files']['Entry']
+        if self.save_input_files in self.true_false_dict:
+            self.save_input_files = self.true_false_dict[self.save_input_files]
+            effects_log.logwrite(f'Save Input Files is {self.save_input_files}\n')
