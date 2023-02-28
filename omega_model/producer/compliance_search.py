@@ -1664,7 +1664,7 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
             # log candidate production decisions only
             producer_iteration_log.write(candidate_production_decisions)
 
-    candidate_production_decisions = candidate_production_decisions.drop_duplicates()
+    candidate_production_decisions = candidate_production_decisions.drop_duplicates(ignore_index=True)
 
     return candidate_production_decisions.copy(), compliance_possible
 
