@@ -55,7 +55,10 @@ class RuntimeOptions:
         self.batch_settings_file_name = None
         self.file_format = None
         self.path_outputs = None
-        self.save_vehicle_detail_files = None
+        self.save_context_fuel_cost_per_mile_file = None
+        self.save_vehicle_safety_effects_files = None
+        self.save_vehicle_physical_effects_files = None
+        self.save_vehicle_cost_effects_files = None
         self.save_input_files = False
 
         self.true_false_dict = dict({
@@ -110,10 +113,33 @@ class RuntimeOptions:
 
         self.path_outputs = Path(save_path_string)
 
-        self.save_vehicle_detail_files = self._dict['Save Vehicle-Level Output Files']['Entry']
-        if self.save_vehicle_detail_files in self.true_false_dict:
-            self.save_vehicle_detail_files = self.true_false_dict[self.save_vehicle_detail_files]
-            effects_log.logwrite(f'Save Vehicle-Level Output Files is {self.save_vehicle_detail_files}\n')
+        string_id = 'Save Context Fuel Cost per Mile File'
+        self.save_context_fuel_cost_per_mile_file = self._dict[string_id]['Entry']
+        if self.save_context_fuel_cost_per_mile_file in self.true_false_dict:
+            self.save_context_fuel_cost_per_mile_file = self.true_false_dict[self.save_context_fuel_cost_per_mile_file]
+            effects_log.logwrite(
+                f'{string_id} is {self.save_context_fuel_cost_per_mile_file}\n')
+
+        string_id = 'Save Vehicle-Level Safety Effects Files'
+        self.save_vehicle_safety_effects_files = self._dict[string_id]['Entry']
+        if self.save_vehicle_safety_effects_files in self.true_false_dict:
+            self.save_vehicle_safety_effects_files = self.true_false_dict[self.save_vehicle_safety_effects_files]
+            effects_log.logwrite(
+                f'{string_id} is {self.save_vehicle_safety_effects_files}\n')
+
+        string_id = 'Save Vehicle-Level Physical Effects Files'
+        self.save_vehicle_physical_effects_files = self._dict[string_id]['Entry']
+        if self.save_vehicle_physical_effects_files in self.true_false_dict:
+            self.save_vehicle_physical_effects_files = self.true_false_dict[self.save_vehicle_physical_effects_files]
+            effects_log.logwrite(
+                f'{string_id} is {self.save_vehicle_physical_effects_files}\n')
+
+        string_id = 'Save Vehicle-Level Cost Effects Files'
+        self.save_vehicle_cost_effects_files = self._dict[string_id]['Entry']
+        if self.save_vehicle_cost_effects_files in self.true_false_dict:
+            self.save_vehicle_cost_effects_files = self.true_false_dict[self.save_vehicle_cost_effects_files]
+            effects_log.logwrite(
+                f'{string_id} is {self.save_vehicle_cost_effects_files}\n')
 
         try:
             self.batch_settings_file_name = self.batch_settings_file.name
@@ -124,20 +150,26 @@ class RuntimeOptions:
 
         try:
             # protect against NaN or empty string
-            self.file_format = self._dict['Format for Vehicle-Level Output Files']['Entry'].lower()
-            if self.save_vehicle_detail_files:
-                effects_log.logwrite(f'Format for Vehicle-Level Output Files is {self.file_format}\n')
+            string_id = 'Format for Vehicle-Level Output Files'
+            self.file_format = self._dict[string_id]['Entry'].lower()
+            if self.save_vehicle_safety_effects_files \
+                    or self.save_vehicle_physical_effects_files \
+                    or self.save_vehicle_cost_effects_files:
+                effects_log.logwrite(f'{string_id} is {self.file_format}\n')
         except Exception as e:
-            effects_log.logwrite('\nVehicle-Level Output File Save Format in runtime_settings.csv must be "csv" or "parquet"')
+            effects_log.logwrite(
+                '\nVehicle-Level Output File Save Format in runtime_settings.csv must be "csv" or "parquet"')
             effects_log.logwrite(e)
             sys.exit()
 
         if self.file_format not in ['csv', 'parquet']:
             # protect against improper save format
-            effects_log.logwrite('\nVehicle-Level Output File Save Format in runtime_settings.csv must be "csv" or "parquet"')
+            effects_log.logwrite(
+                '\nVehicle-Level Output File Save Format in runtime_settings.csv must be "csv" or "parquet"')
             sys.exit()
 
-        self.save_input_files = self._dict['Save Input Files']['Entry']
+        string_id = 'Save Input Files'
+        self.save_input_files = self._dict[string_id]['Entry']
         if self.save_input_files in self.true_false_dict:
             self.save_input_files = self.true_false_dict[self.save_input_files]
-            effects_log.logwrite(f'Save Input Files is {self.save_input_files}\n')
+            effects_log.logwrite(f'{string_id} is {self.save_input_files}\n')

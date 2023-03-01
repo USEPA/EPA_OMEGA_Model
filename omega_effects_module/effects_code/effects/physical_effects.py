@@ -753,7 +753,7 @@ def calc_annual_physical_effects(batch_settings, input_df):
             if additional_attribute in col:
                 attributes.append(col)
 
-    # groupby calendar year, regclass and fueling class
+    # groupby calendar year, regclass and fuel
     groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id']
     return_df = input_df[[*groupby_cols, *attributes]]
     return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()

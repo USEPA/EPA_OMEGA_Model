@@ -8,7 +8,7 @@ calendar year and vehicle age, and to calculate fatalities.
 **CODE**
 
 """
-from omega_effects_module.effects_code.general.general_functions import calc_rebound_effect
+import pandas as pd
 
 
 def get_safety_values(session_settings, body_style):
@@ -323,8 +323,8 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
             'body_style': body_style,
             'footprint_ft2': 0,
             'workfactor': 0,
-            'change_per_100lbs_below': 0,
-            'change_per_100lbs_above': 0,
+            'change_per_100lbs_below': change_per_100lbs_below,
+            'change_per_100lbs_above': change_per_100lbs_above,
             'threshold_lbs': threshold_lbs,
             'base_year_curbweight_lbs': nested_dict['curbweight_lbs'],
             'curbweight_lbs': nested_dict['curbweight_lbs'],
@@ -367,3 +367,54 @@ def set_legacy_fleet_name(market_class_id):
         _name = 'cuv_suv'
 
     return _name
+
+
+def calc_annual_avg_safety_effects(input_df):
+    """
+
+    Args:
+        input_df: DataFrame of physical effects by vehicle.
+
+    Returns:
+        A DataFrame of physical effects by calendar year.
+
+    """
+    attributes = [col for col in input_df.columns
+                  if ('vmt' in col or 'vmt_' in col)
+                  and '_vmt' not in col]
+    attribute_keys_for_weighting = ['lbs']
+    attributes_to_weight = list()
+    for attribute in attribute_keys_for_weighting:
+        for col in input_df:
+            if attribute in col:
+                attributes_to_weight.append(col)
+
+    # weight appropriate columns by registered_count to work toward weighted averages
+    temp_df = pd.DataFrame()
+    wtd_attributes = list()
+    for attribute in attributes_to_weight:
+        wtd_attributes.append(f'wtd_avg_{attribute}')
+        s = pd.Series(input_df['registered_count'] * input_df[attribute], name=f'wtd_avg_{attribute}')
+        temp_df = pd.concat([temp_df, s], axis=1)
+
+    cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id',
+            'registered_count', 'base_fatalities', 'session_fatalities']
+    for attribute in attributes:
+        cols.append(attribute)
+    df = input_df[cols]
+    df = pd.concat([df, temp_df], axis=1)
+
+    # groupby calendar year, regclass and fuel
+    groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id']
+    return_df = df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+
+    for attribute in wtd_attributes:
+        return_df[attribute] = return_df[attribute] / return_df['registered_count']
+
+    return_df.insert(return_df.columns.get_loc('in_use_fuel_id') + 1,
+                     'fueling_class',
+                     '')
+    return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
+    return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
+
+    return return_df

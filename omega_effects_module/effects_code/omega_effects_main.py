@@ -18,7 +18,7 @@ from general.file_id_and_save import add_id_to_csv, save_file
 
 from effects.vmt_adjustments import AdjustmentsVMT
 from effects.context_fuel_cost_per_mile import calc_fuel_cost_per_mile
-from effects.safety_effects import calc_safety_effects, calc_legacy_fleet_safety_effects
+from effects.safety_effects import calc_safety_effects, calc_legacy_fleet_safety_effects, calc_annual_avg_safety_effects
 from effects.physical_effects import calc_physical_effects, calc_legacy_fleet_physical_effects, \
     calc_annual_physical_effects, calc_period_consumer_physical_view
 from effects.cost_effects import calc_cost_effects, calc_annual_cost_effects, calc_period_consumer_view
@@ -69,13 +69,14 @@ def main():
     vmt_adjustments_context.calc_vmt_adjustments(batch_settings, session_settings)
 
     context_fuel_cpm_dict = calc_fuel_cost_per_mile(batch_settings, session_settings)
-    if runtime_options.save_vehicle_detail_files:
+    if runtime_options.save_context_fuel_cost_per_mile_file:
         effects_log.logwrite(f'Saving context fuel cost per mile file')
         context_fuel_cpm_df = pd.DataFrame.from_dict(context_fuel_cpm_dict, orient='index').reset_index(drop=True)
         save_file(session_settings, context_fuel_cpm_df, path_of_run_folder, 'context_fuel_cost_per_mile',
                   effects_log, extension=runtime_options.file_format)
 
     # loop thru sessions to calc safety effects, physical effects, cost effects for each _______________________________
+    annual_safety_effects_df = pd.DataFrame()
     annual_physical_effects_df = pd.DataFrame()
     annual_cost_effects_df = pd.DataFrame()
     my_lifetime_physical_effects_df = pd.DataFrame()
@@ -111,12 +112,21 @@ def main():
 
         session_safety_effects_dict = {**analysis_fleet_safety_effects_dict, **legacy_fleet_safety_effects_dict}
 
-        if runtime_options.save_vehicle_detail_files:
+        session_safety_effects_df = \
+            pd.DataFrame.from_dict(session_safety_effects_dict, orient='index').reset_index(drop=True)
+
+        if runtime_options.save_vehicle_safety_effects_files:
             effects_log.logwrite(f'Saving safety effects file for {session_name}')
-            session_safety_effects_df = \
-                pd.DataFrame.from_dict(session_safety_effects_dict, orient='index').reset_index(drop=True)
             save_file(session_settings, session_safety_effects_df, path_of_run_folder, 'safety_effects',
                       effects_log, extension=runtime_options.file_format)
+
+        effects_log.logwrite(f'\nCalculating annual average safety effects for {session_name}')
+        session_annual_safety_effects_df = calc_annual_avg_safety_effects(session_safety_effects_df)
+
+        # create an annual_safety_effects_df
+        annual_safety_effects_df \
+            = pd.concat([annual_safety_effects_df, session_annual_safety_effects_df], axis=0, ignore_index=True)
+        annual_safety_effects_df.reset_index(inplace=True, drop=True)
 
         # physical effects _____________________________________________________________________________________________
         effects_log.logwrite(f'\nCalculating analysis fleet physical effects for {session_name}')
@@ -132,7 +142,7 @@ def main():
         session_physical_effects_df = \
             pd.DataFrame.from_dict(session_physical_effects_dict, orient='index').reset_index(drop=True)
 
-        if runtime_options.save_vehicle_detail_files:
+        if runtime_options.save_vehicle_physical_effects_files:
             effects_log.logwrite(f'Saving physical effects file for {session_name}')
             save_file(session_settings, session_physical_effects_df, path_of_run_folder, 'physical_effects', effects_log,
                       extension=runtime_options.file_format)
@@ -163,7 +173,7 @@ def main():
 
         session_cost_effects_df = pd.DataFrame.from_dict(session_cost_effects_dict, orient='index').reset_index(drop=True)
 
-        if runtime_options.save_vehicle_detail_files:
+        if runtime_options.save_vehicle_cost_effects_files:
             effects_log.logwrite(f'Saving cost effects file for {session_name}')
             save_file(session_settings, session_cost_effects_df, path_of_run_folder, 'cost_effects', effects_log,
                       extension=runtime_options.file_format)
@@ -219,6 +229,8 @@ def main():
     annual_physical_effects_deltas_df.reset_index(inplace=True, drop=True)
 
     # save files to CSV ________________________________________________________________________________________________
+    annual_safety_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_safety_effects_annual_average.csv',
+                                      index=False)
     annual_physical_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv',
                                       index=False)
     annual_physical_effects_deltas_df.to_csv(
@@ -239,6 +251,7 @@ def main():
     # add identifying info to CSV files ________________________________________________________________________________
     output_file_id_info = [f'Batch Name: {batch_settings.batch_name}', f'Effects Run: {start_time_readable}_{run_id}']
 
+    add_id_to_csv(path_of_run_folder / f'{start_time_readable}_safety_effects_annual_average.csv', output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv', output_file_id_info)
     add_id_to_csv(
         path_of_run_folder / f'{start_time_readable}_physical_effects_annual_action_minus_no_action.csv',
