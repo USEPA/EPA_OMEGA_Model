@@ -25,6 +25,8 @@ class Vehicles:
         df = deregionalizer.deregionalize_entries(df, 'market_class_id', 'r1nonzev', 'r2zev')
         df = deregionalizer.deregionalize_entries(df, 'body_style', 'r1nonzev', 'r2zev')
 
+        df = deregionalizer.clean_body_styles(df)
+
         self._dict = df.to_dict('index')
 
     def get_vehicle_attributes(self, vehicle_id, *attribute_names):
