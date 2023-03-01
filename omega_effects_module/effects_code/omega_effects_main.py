@@ -120,7 +120,7 @@ def main():
             save_file(session_settings, session_safety_effects_df, path_of_run_folder, 'safety_effects',
                       effects_log, extension=runtime_options.file_format)
 
-        effects_log.logwrite(f'\nCalculating annual average safety effects for {session_name}')
+        effects_log.logwrite(f'\nCalculating safety effects summary for {session_name}')
         session_annual_safety_effects_df = calc_annual_avg_safety_effects(session_safety_effects_df)
 
         # create an annual_safety_effects_df
@@ -229,8 +229,8 @@ def main():
     annual_physical_effects_deltas_df.reset_index(inplace=True, drop=True)
 
     # save files to CSV ________________________________________________________________________________________________
-    annual_safety_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_safety_effects_annual_average.csv',
-                                      index=False)
+    annual_safety_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv',
+                                    index=False)
     annual_physical_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv',
                                       index=False)
     annual_physical_effects_deltas_df.to_csv(
@@ -251,7 +251,7 @@ def main():
     # add identifying info to CSV files ________________________________________________________________________________
     output_file_id_info = [f'Batch Name: {batch_settings.batch_name}', f'Effects Run: {start_time_readable}_{run_id}']
 
-    add_id_to_csv(path_of_run_folder / f'{start_time_readable}_safety_effects_annual_average.csv', output_file_id_info)
+    add_id_to_csv(path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv', output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv', output_file_id_info)
     add_id_to_csv(
         path_of_run_folder / f'{start_time_readable}_physical_effects_annual_action_minus_no_action.csv',
