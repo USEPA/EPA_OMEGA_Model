@@ -100,7 +100,7 @@ class PowertrainCost(OMEGABase):
 
         locals_dict = locals()
 
-        if model_year <= 2022 or vehicle.global_cumulative_battery_GWh['total'] == 0 \
+        if model_year <= 2025 or vehicle.global_cumulative_battery_GWh['total'] == 0 \
                 or vehicle.global_cumulative_battery_GWh[model_year - 1] == 0:
             learning_pev_battery_scaling_factor = 1
         else:

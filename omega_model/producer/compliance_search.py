@@ -763,7 +763,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             cheapest_points = candidate_production_decisions.loc[[cheapest_index]]
             most_strategic_cheapest_point = cheapest_points.loc[[cheapest_points['strategic_compliance_ratio'].idxmin()]].iloc[0]
 
-            cheapest_compliant = most_strategic_cheapest_point['strategic_compliance_ratio'] <= 1.0
+            most_strategic_compliant = most_strategic_cheapest_point['strategic_compliance_ratio'] <= 1.0
 
             if (most_strategic_production_decision is None) or \
                     (most_strategic_point['strategic_compliance_error'] <=
@@ -775,16 +775,23 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             if omega_globals.options.producer_voluntary_overcompliance:
                 if best_candidate_production_decision is None:
                     # if cheapest is compliant, it's the best
-                    if cheapest_compliant:
+                    if most_strategic_compliant:
                         best_candidate_production_decision = most_strategic_cheapest_point
                     else:
                         # if cheapest is non-compliant, most strategic is the best
                         best_candidate_production_decision = most_strategic_point
                 else:
                     # if new candidate is cheaper than the old best and compliant, it's the best
+                    # if (((most_strategic_cheapest_point['total_generalized_cost_dollars'] <
+                    #         best_candidate_production_decision['total_generalized_cost_dollars'])) or
+                    #         ((most_strategic_cheapest_point['total_generalized_cost_dollars'] ==
+                    #         best_candidate_production_decision['total_generalized_cost_dollars']) and
+                    #          (most_strategic_cheapest_point['strategic_compliance_error'] <
+                    #         best_candidate_production_decision['strategic_compliance_error']))) and \
+                    #         most_strategic_compliant:
                     if (most_strategic_cheapest_point['total_generalized_cost_dollars'] <
-                            best_candidate_production_decision['total_generalized_cost_dollars']) and \
-                            cheapest_compliant:
+                          best_candidate_production_decision['total_generalized_cost_dollars']) and \
+                            most_strategic_compliant:
                         best_candidate_production_decision = most_strategic_cheapest_point
                     elif best_candidate_production_decision['strategic_compliance_ratio'] > 1.0:
                         # if old best was non compliant, new best is most strategic
