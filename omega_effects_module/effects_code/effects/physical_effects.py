@@ -272,6 +272,7 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
         'body_style',
         'base_year_curbweight_lbs',
         'curbweight_lbs',
+        'battery_kwh',
     ]
 
     grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, \
@@ -305,7 +306,7 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
 
             base_year_vehicle_id, mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_class_id, \
             fueling_class, base_year_powertrain_type, footprint, workfactor, target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, \
-            onroad_direct_kwh_per_mile, body_style, base_year_curbweight_lbs, curbweight_lbs \
+            onroad_direct_kwh_per_mile, body_style, base_year_curbweight_lbs, curbweight_lbs, battery_kwh \
                 = vehicle_info_dict[vehicle_id]
 
             fuel_dict = eval(in_use_fuel_id)
@@ -334,7 +335,7 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
 
             base_year_vehicle_id, mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_class_id, \
             fueling_class, base_year_powertrain_type, footprint, workfactor, target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, \
-            onroad_direct_kwh_per_mile, body_style, base_year_curbweight_lbs, curbweight_lbs \
+            onroad_direct_kwh_per_mile, body_style, base_year_curbweight_lbs, curbweight_lbs, battery_kwh \
                 = vehicle_info_dict[vehicle_id]
 
             if model_year >= calendar_years[0]:
@@ -634,6 +635,7 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                         'vmt_rebound': vmt_rebound,
                         'vmt_liquid_fuel': vmt_liquid_fuel,
                         'vmt_electricity': vmt_electricity,
+                        'battery_kwh': battery_kwh,
                         'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,
                         'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
                         'onroad_gallons_per_mile': onroad_gallons_per_mile,
@@ -747,7 +749,7 @@ def calc_annual_physical_effects(batch_settings, input_df):
     elec_trans_efficiency = pd.DataFrame.from_dict(d, orient='index')
 
     attributes = [col for col in input_df.columns if ('vmt' in col or 'vmt_' in col) and '_vmt' not in col]
-    additional_attributes = ['count', 'consumption', 'generation', 'barrels', 'tons', 'fatalit']
+    additional_attributes = ['count', 'consumption', 'generation', 'barrels', 'tons', 'fatalit', 'battery']
     for additional_attribute in additional_attributes:
         for col in input_df:
             if additional_attribute in col:
@@ -1102,6 +1104,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'vmt_rebound': vmt_rebound,
             'vmt_liquid_fuel': vmt_liquid_fuel,
             'vmt_electricity': vmt_electricity,
+            'battery_kwh': 75,
             'onroad_direct_co2e_grams_per_mile': onroad_co2_grams_per_mile,
             'onroad_direct_kwh_per_mile': onroad_kwh_per_mile,
             'onroad_gallons_per_mile': onroad_gallons_per_mile,

@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 from effects.vehicles import Vehicles
 from effects.vehicle_annual_data import VehicleAnnualData
@@ -9,6 +10,7 @@ from effects.emission_rates_refinery import EmissionRatesRefinery
 from effects.emission_rates_vehicles import EmissionRatesVehicles
 from effects.safety_values import SafetyValues
 from effects.fatality_rates import FatalityRates
+from context.powertrain_cost import PowertrainCost
 
 
 class SessionSettings:
@@ -24,6 +26,7 @@ class SessionSettings:
         self.vehicle_emission_rates_file = None
         self.safety_values_file = None
         self.fatality_rates_file = None
+        self.powertrain_cost_file = None
 
         self.vehicles_file = None
         self.vehicle_annual_data_file = None
@@ -34,6 +37,7 @@ class SessionSettings:
         self.emission_rates_vehicles = None
         self.safety_values = None
         self.fatality_rates = None
+        self.powertrain_cost = None
 
         self.vehicles = None
         self.vehicle_annual_data = None
@@ -79,6 +83,7 @@ class SessionSettings:
         self.session_policy, self.session_name = session_deets['session_policy'], session_deets['session_name']
         
         path_session = batch_settings.batch_folder / f'_{self.session_name}'
+        path_session_in = path_session / 'in'
         path_session_out = path_session / 'out'
 
         # Get vehicles_file and vehicle_annual_data_file from the batch/session/out folder.
@@ -108,6 +113,12 @@ class SessionSettings:
             = batch_settings.get_attribute_value(('Context Safety Values File', f'{self.session_policy}'), 'full_path')
         self.fatality_rates_file \
             = batch_settings.get_attribute_value(('Context Fatality Rates File', f'{self.session_policy}'), 'full_path')
+
+        try:
+            self.powertrain_cost_file = self.find_file(path_session_in, 'powertrain_cost')
+        except FileNotFoundError:
+            effects_log(f'{path_session_in} does not contain a powertrain_cost file.')
+            sys.exit()
 
         self.init_session_classes(self.session_name, effects_log)
 
@@ -183,6 +194,27 @@ class SessionSettings:
             self.fatality_rates.init_from_file(self.fatality_rates_file, effects_log)
             self.inputs_filelist.append(self.fatality_rates_file)
 
+            self.powertrain_cost = PowertrainCost()
+            self.powertrain_cost.init_from_file(self.powertrain_cost_file, effects_log)
+            self.inputs_filelist.append(self.powertrain_cost_file)
+
         except Exception as e:
             effects_log.logwrite(e)
             sys.exit()
+
+    @staticmethod
+    def find_file(folder, file_id_string):
+        """
+
+        Args:
+            folder:
+            file_id_string:
+
+        Returns:
+
+        """
+        files_in_folder = (entry for entry in folder.iterdir() if entry.is_file())
+        for file in files_in_folder:
+            filename = Path(file).name
+            if file_id_string in filename:
+                return Path(file)
