@@ -1549,7 +1549,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
     session_runtime_options.start_time = time.time()
     session_runtime_options.standalone_run = standalone_run
-    session_runtime_options.multiprocessing = True or session_runtime_options.multiprocessing and not standalone_run
+    # session_runtime_options.multiprocessing = session_runtime_options.multiprocessing
 
     if 0.0 < session_runtime_options.credit_market_efficiency < 1.0 or session_runtime_options.force_two_pass:
         # imperfect trading or force two-pass
