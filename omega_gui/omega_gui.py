@@ -888,7 +888,7 @@ class Form(QObject):
                         color = status_output_color(g)
                         if color == "red":
                             model_error_count = model_error_count + 1
-                            print('***', model_error_count)
+                            # print('***', model_error_count)
                         # Output to event monitor
                         self.event_monitor(g, color, 'dt')
                         # Increment total number of read lines in log file counter
