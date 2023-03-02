@@ -281,6 +281,7 @@ def main():
     effects_log.logwrite(
         message=f'\n{datetime.now().strftime("%Y%m%d_%H%M%S")}: Output files have been saved to {path_of_run_folder}')
     shutil.copy2(effects_log.logfile_name, path_of_run_folder / effects_log.file_name)
+    shutil.copy2(set_paths.path_module / 'runtime_options.csv', path_of_run_folder / 'runtime_options.csv')
 
 
 if __name__ == '__main__':
