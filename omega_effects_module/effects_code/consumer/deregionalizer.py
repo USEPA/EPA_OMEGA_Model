@@ -43,3 +43,22 @@ def deregionalize_entries(df, attribute, *args):
         df_return[attribute].replace({f'_{arg}': ''}, regex=True, inplace=True)
 
     return df_return
+
+
+def clean_body_styles(df):
+    """
+
+    Args:
+        df (DataFrame): DataFrame containing body_style entries to be made consistent.
+
+    Returns:
+        DataFrame with body_styles consistent with effects inputs.
+
+    """
+    body_style_dict = {'sedan_wagon': 'sedan',
+                       'cuv_suv_van': 'cuv_suv',
+                       }
+    for style in body_style_dict:
+        df['body_style'].replace({style: body_style_dict[style]}, inplace=True)
+
+    return df
