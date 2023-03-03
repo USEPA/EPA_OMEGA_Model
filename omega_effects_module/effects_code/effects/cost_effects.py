@@ -77,8 +77,8 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
         if onroad_direct_co2e_grams_per_mile or onroad_direct_kwh_per_mile:
             flag = 1
 
-            mfr_cost_dollars  = purchase_price_dollars = purchase_credit_dollars = 0
-            avg_mfr_cost = avg_purchase_price = avg_purchase_credit = 0
+            mfr_cost_dollars  = purchase_price_dollars = purchase_credit_dollars = battery_cost_dollars = 0
+            avg_mfr_cost = avg_purchase_price = avg_purchase_credit = battery_cost_dollars_per_kwh = 0
             fuel_retail_cost_dollars = 0
             fuel_pretax_cost_dollars = 0
             congestion_cost_dollars = 0
@@ -125,6 +125,7 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                         'new_vehicle_mfr_cost_dollars',
                         'price_dollars',
                         'price_modification_dollars',
+                        'battery_cost',
                         'bev',
                         'phev',
                         'hev',
@@ -136,6 +137,7 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                     legacy_fleet_key = (vehicle_id, calendar_year, age)
                     price_data = batch_settings.legacy_fleet._legacy_fleet[legacy_fleet_key]['transaction_price_dollars']
                     avg_mfr_cost, avg_purchase_price, avg_purchase_credit = 3 * [price_data]
+                    battery_cost = 0 # this won't matter for legacy fleet since calculated only for age==0
                     if base_year_powertrain_type == 'BEV':
                         bev_flag = 1
                     elif base_year_powertrain_type == 'PHEV':
@@ -147,9 +149,10 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                     else:
                         pass
                     vehicle_info_dict[vehicle_id] = \
-                        avg_mfr_cost, avg_purchase_price, avg_purchase_credit, bev_flag, phev_flag, hev_flag, mhev_flag
+                        avg_mfr_cost, avg_purchase_price, avg_purchase_credit, battery_cost, \
+                            bev_flag, phev_flag, hev_flag, mhev_flag
 
-            avg_mfr_cost, avg_purchase_price, avg_purchase_credit, bev_flag, phev_flag, hev_flag, mhev_flag = \
+            avg_mfr_cost, avg_purchase_price, avg_purchase_credit, battery_cost, bev_flag, phev_flag, hev_flag, mhev_flag = \
                 vehicle_info_dict[vehicle_id]
 
             # tech costs, only for age=0
@@ -157,6 +160,9 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 mfr_cost_dollars = vehicle_count * avg_mfr_cost
                 purchase_price_dollars = vehicle_count * avg_purchase_price
                 purchase_credit_dollars = vehicle_count * avg_purchase_credit
+                battery_cost_dollars = vehicle_count * battery_cost
+                if battery_kwh > 0:
+                    battery_cost_dollars_per_kwh = battery_cost_dollars / battery_kwh
 
                 if bev_flag == 1:
                     battery_credit_dollars = \
@@ -269,6 +275,8 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 'vmt_electricity': vmt_elec,
                 'battery_kwh': battery_kwh,
                 'vehicle_cost_dollars': mfr_cost_dollars,
+                'battery_cost_dollars': battery_cost_dollars,
+                'battery_cost_per_kWh': battery_cost_dollars_per_kwh,
                 'battery_credit_dollars': battery_credit_dollars,
                 'purchase_price_dollars': purchase_price_dollars,
                 'purchase_credit_dollars': purchase_credit_dollars,
@@ -302,7 +310,7 @@ def calc_annual_cost_effects(input_df):
 
     """
     attributes = [col for col in input_df.columns if ('vmt' in col or 'vmt_' in col) and '_vmt' not in col]
-    additional_attributes = ['count', 'dollars']
+    additional_attributes = ['count', 'dollars', 'battery_kwh']
     for additional_attribute in additional_attributes:
         for col in input_df:
             if additional_attribute in col:
@@ -322,6 +330,8 @@ def calc_annual_cost_effects(input_df):
     return_df.insert(return_df.columns.get_loc('calendar_year') + 1, 'discount_rate', 0)
     return_df.insert(return_df.columns.get_loc('calendar_year') + 1, 'periods', 1)
     return_df.insert(return_df.columns.get_loc('calendar_year') + 1, 'series', 'AnnualValue')
+
+    return_df['battery_cost_per_kwh'] = return_df['battery_cost_dollars'] / return_df['battery_kwh']
 
     return return_df
 

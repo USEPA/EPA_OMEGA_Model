@@ -114,10 +114,12 @@ class SessionSettings:
         self.fatality_rates_file \
             = batch_settings.get_attribute_value(('Context Fatality Rates File', f'{self.session_policy}'), 'full_path')
 
+        find_string = None
         try:
-            self.powertrain_cost_file = self.find_file(path_session_in, 'powertrain_cost')
+            find_string = 'powertrain_cost'
+            self.powertrain_cost_file = self.find_file(path_session_in, find_string)
         except FileNotFoundError:
-            effects_log(f'{path_session_in} does not contain a powertrain_cost file.')
+            effects_log(f'{path_session_in} does not contain a {find_string} file.')
             sys.exit()
 
         self.init_session_classes(self.session_name, effects_log)

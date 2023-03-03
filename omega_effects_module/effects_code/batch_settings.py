@@ -194,16 +194,61 @@ class BatchSettings:
         self.congestion_noise_cost_factors_file \
             = self.get_attribute_value(('Context Congestion-Noise Cost Factors File', 'all'), 'full_path')
         self.legacy_fleet_file = self.get_attribute_value(('Context Legacy Fleet File', 'all'), 'full_path')
-        self.ip_deflators_file = self.get_attribute_value(('Context Implicit Price Deflators File', 'all'), 'full_path')
-        self.cpi_deflators_file = self.get_attribute_value(('Context Consumer Price Index File', 'all'), 'full_path')
 
         self.context_session_name = self.get_attribute_value(('Session Name', 'context'), 'value')
-        self.context_fuel_prices_file = self.get_attribute_value(('Context Fuel Prices File', 'context'), 'full_path')
+        path_context_in = self.batch_folder / f'_{self.context_session_name}' / 'in'
+
         self.context_stock_and_vmt_file = self.get_attribute_value(('Context Stock and VMT File', 'context'), 'full_path')
-        self.onroad_fuels_file = self.get_attribute_value(('Onroad Fuels File', 'context'), 'full_path')
-        self.onroad_vehicle_calculations_file = self.get_attribute_value(('Onroad Vehicle Calculations File', 'context'), 'full_path')
-        self.onroad_vmt_file = self.get_attribute_value(('Onroad VMT File', 'context'), 'full_path')
-        self.vehicle_reregistration_file = self.get_attribute_value(('Vehicle Reregistration File', 'context'), 'full_path')
+
+        find_string = None
+        try:
+            find_string = 'implicit_price_deflators'
+            self.ip_deflators_file = self.find_file(path_context_in, find_string)
+        except FileNotFoundError:
+            effects_log(f'{path_context_in} does not contain a {find_string} file.')
+            sys.exit()
+
+        try:
+            find_string = 'cpi_price_deflators'
+            self.cpi_deflators_file = self.find_file(path_context_in, find_string)
+        except FileNotFoundError:
+            effects_log(f'{path_context_in} does not contain a {find_string} file.')
+            sys.exit()
+
+        try:
+            find_string = 'context_fuel_prices'
+            self.context_fuel_prices_file = self.find_file(path_context_in, find_string)
+        except FileNotFoundError:
+            effects_log(f'{path_context_in} does not contain a {find_string} file.')
+            sys.exit()
+
+        try:
+            find_string = 'onroad_fuels'
+            self.onroad_fuels_file = self.find_file(path_context_in, find_string)
+        except FileNotFoundError:
+            effects_log(f'{path_context_in} does not contain a {find_string} file.')
+            sys.exit()
+
+        try:
+            find_string = 'onroad_vehicle_calculations'
+            self.onroad_vehicle_calculations_file = self.find_file(path_context_in, find_string)
+        except FileNotFoundError:
+            effects_log(f'{path_context_in} does not contain a {find_string} file.')
+            sys.exit()
+
+        try:
+            find_string = 'annual_vmt'
+            self.onroad_vmt_file = self.find_file(path_context_in, find_string)
+        except FileNotFoundError:
+            effects_log(f'{path_context_in} does not contain a {find_string} file.')
+            sys.exit()
+
+        try:
+            find_string = 'reregistration'
+            self.vehicle_reregistration_file = self.find_file(path_context_in, find_string)
+        except FileNotFoundError:
+            effects_log(f'{path_context_in} does not contain a {find_string} file.')
+            sys.exit()
 
         self.session_dict[0] = {'session_policy': 'no_action',
                                 'session_name': self.get_attribute_value(('Session Name', 'no_action'), 'value'),
@@ -320,3 +365,21 @@ class BatchSettings:
             [v['session_policy'] for k, v in self.session_dict.items() if v['session_name'] == session_name]
 
         return session_policy[0]
+
+    @staticmethod
+    def find_file(folder, file_id_string):
+        """
+
+        Args:
+            folder: Path object of folder in which to find the file.
+            file_id_string (str): The search string in the filename needed.
+
+        Returns:
+            A Path object to the first file found that contains file_id_string in its name.
+
+        """
+        files_in_folder = (entry for entry in folder.iterdir() if entry.is_file())
+        for file in files_in_folder:
+            filename = Path(file).name
+            if file_id_string in filename:
+                return Path(file)
