@@ -314,7 +314,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                                                                 prior_producer_decision_and_response)
 
                 if producer_compliant is None:
-                    omega_log.logwrite('%%% Production Constraints Violated ... %%%')
+                    omega_log.logwrite('%%%%%% Production Constraints Violated ... %%%%%%')
 
                 producer_market_classes = calc_market_data(candidate_mfr_composite_vehicles, producer_decision)
 
@@ -687,7 +687,7 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pai
 
     if cross_subsidy_options_and_response['consumer_constrained_%s' % mcat] and \
         'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
-            omega_log.logwrite('%%% consumer %s shares constrained %%%' % mcat)
+            omega_log.logwrite('%%%%%% consumer %s shares constrained %%%%%%' % mcat)
 
     update_cross_subsidy_pair_console_log(cross_subsidy_pair, share_convergence_error, cross_subsidy_pricing_error,
                                           mcat_converged)
