@@ -264,7 +264,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
     if node_name == '' and share_range == 1.0 and consumer_response is not None and \
             consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']:
-        omega_log.logwrite('%%% Production Constraints Violated, Modifying Constraints %%%')
+        omega_log.logwrite('%%%%%% Production Constraints Violated, Modifying Constraints %%%%%%')
 
         if consumer_response['total_ALT_battery_GWh'] > 0:
             constraint_ratio = max(0, 0.99 * ((consumer_response['battery_GWh_limit'] -
@@ -725,7 +725,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             production_options[production_options['total_battery_GWh'] <= battery_GWh_limit].copy()
 
         if valid_production_options.empty:
-            omega_log.logwrite('%%% Production Constraints Violated ... limit: %f, min / max: %f / %f %%%' %
+            omega_log.logwrite('%%%%%% Production Constraints Violated ... limit: %f, min / max: %f / %f %%%%%%' %
                                (battery_GWh_limit,
                                 production_options['total_battery_GWh'].min(),
                                 production_options['total_battery_GWh'].max())
