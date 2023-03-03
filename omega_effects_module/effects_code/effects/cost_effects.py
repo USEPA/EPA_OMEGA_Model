@@ -88,9 +88,10 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
             refueling_cost_dollars = 0
             drive_value_cost_dollars = 0
             bev_flag = phev_flag = hev_flag = mhev_flag = 0
+            battery_credit_dollars = 0
 
             base_year_vehicle_id, model_year, mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, \
-                market_class_id, fueling_class, base_year_powertrain_type, body_style, footprint, workfactor \
+                market_class_id, fueling_class, base_year_powertrain_type, body_style, footprint, workfactor, battery_kwh \
                 = physical['base_year_vehicle_id'], \
                 physical['model_year'], \
                 physical['manufacturer_id'], \
@@ -103,7 +104,8 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 physical['base_year_powertrain_type'], \
                 physical['body_style'], \
                 physical['footprint_ft2'], \
-                physical['workfactor']
+                physical['workfactor'], \
+                physical['battery_kwh'],
 
             vehicle_count, annual_vmt, odometer, vmt, vmt_rebound, vmt_liquid, vmt_elec, kwh, gallons, imported_bbl \
                 = physical['registered_count'], \
@@ -155,6 +157,10 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 mfr_cost_dollars = vehicle_count * avg_mfr_cost
                 purchase_price_dollars = vehicle_count * avg_purchase_price
                 purchase_credit_dollars = vehicle_count * avg_purchase_credit
+
+                if bev_flag == 1:
+                    battery_credit_dollars = \
+                        session_settings.powertrain_cost.get_battery_tax_offset(model_year, battery_kwh)
 
             # fuel costs
             fuel_dict = eval(in_use_fuel_id)
@@ -261,7 +267,9 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 'vmt': vmt,
                 'vmt_liquid_fuel': vmt_liquid,
                 'vmt_electricity': vmt_elec,
+                'battery_kwh': battery_kwh,
                 'vehicle_cost_dollars': mfr_cost_dollars,
+                'battery_credit_dollars': battery_credit_dollars,
                 'purchase_price_dollars': purchase_price_dollars,
                 'purchase_credit_dollars': purchase_credit_dollars,
                 'fuel_retail_cost_dollars': fuel_retail_cost_dollars,
