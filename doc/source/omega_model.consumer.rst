@@ -25,26 +25,10 @@ omega\_model.consumer.consumer\_base\_classes module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.consumer.market\_classes module
---------------------------------------------
-
-.. automodule:: omega_model.consumer.market_classes
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 omega\_model.consumer.reregistration\_fixed\_by\_age module
 -----------------------------------------------------------
 
 .. automodule:: omega_model.consumer.reregistration_fixed_by_age
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-omega\_model.consumer.sales\_share module
------------------------------------------
-
-.. automodule:: omega_model.consumer.sales_share
    :members:
    :undoc-members:
    :show-inheritance:
