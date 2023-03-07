@@ -1364,7 +1364,9 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
     if type(production_options) is pd.DataFrame:
         production_options = pd.concat([production_options, pd.DataFrame(production_data)], axis=1)
     else:
-        production_options = pd.concat([production_options, pd.Series(production_data)])
+        # apply updated data to production_options
+        for k in production_data:
+            production_options[k] = production_data[k]
 
     return production_options
 
