@@ -13,6 +13,7 @@
 import os
 import sys
 path = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(path, '..', '..', 'omega_effects_module'))  # picks up omega_effects sub-packages
 sys.path.insert(0, os.path.join(path, '..', '..', 'omega_model'))  # picks up omega_model sub-packages
 sys.path.insert(0, os.path.join(path, '..', '..', 'omega_gui'))  # picks up omega_model sub-packages
 sys.path.insert(0, os.path.join(path, '..', '..'))  # picks up the top-level packages
