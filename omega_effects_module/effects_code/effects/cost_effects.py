@@ -130,6 +130,7 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                         'phev',
                         'hev',
                         'mhev',
+                        'charge_depleting_range_mi',
                     ]
                     vehicle_info_dict[vehicle_id] = session_settings.vehicles.get_vehicle_attributes(vehicle_id, *attribute_list)
 
@@ -137,9 +138,11 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                     legacy_fleet_key = (vehicle_id, calendar_year, age)
                     price_data = batch_settings.legacy_fleet._legacy_fleet[legacy_fleet_key]['transaction_price_dollars']
                     avg_mfr_cost, avg_purchase_price, avg_purchase_credit = 3 * [price_data]
-                    battery_cost = 0 # this won't matter for legacy fleet since calculated only for age==0
+                    battery_cost = 0  # this won't matter for legacy fleet since calculated only for age==0
+                    charge_depleting_range = 0
                     if base_year_powertrain_type == 'BEV':
                         bev_flag = 1
+                        charge_depleting_range = 300  # this is for legacy fleet only
                     elif base_year_powertrain_type == 'PHEV':
                         phev_flag = 1
                     elif base_year_powertrain_type == 'HEV':
@@ -150,9 +153,10 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                         pass
                     vehicle_info_dict[vehicle_id] = \
                         avg_mfr_cost, avg_purchase_price, avg_purchase_credit, battery_cost, \
-                            bev_flag, phev_flag, hev_flag, mhev_flag
+                            bev_flag, phev_flag, hev_flag, mhev_flag, charge_depleting_range
 
-            avg_mfr_cost, avg_purchase_price, avg_purchase_credit, battery_cost, bev_flag, phev_flag, hev_flag, mhev_flag = \
+            avg_mfr_cost, avg_purchase_price, avg_purchase_credit, battery_cost, \
+                bev_flag, phev_flag, hev_flag, mhev_flag, charge_depleting_range = \
                 vehicle_info_dict[vehicle_id]
 
             # tech costs, only for age=0
@@ -211,16 +215,15 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
 
             # refueling costs
             if bev_flag == 1:
-                range = 300 # TODO do we stay with this or will range be an attribute tracked within omega
-                if (operating_veh_type, range) in refueling_bev_dict.keys():
-                    refueling_cost_per_mile = refueling_bev_dict[(operating_veh_type, range)]
+                if (operating_veh_type, charge_depleting_range) in refueling_bev_dict:
+                    refueling_cost_per_mile = refueling_bev_dict[(operating_veh_type, charge_depleting_range)]
                 else:
                     refueling_cost_per_mile \
-                        = batch_settings.refueling_cost.calc_bev_refueling_cost_per_mile(operating_veh_type, range)
-                    refueling_bev_dict.update({(operating_veh_type, range): refueling_cost_per_mile})
+                        = batch_settings.refueling_cost.calc_bev_refueling_cost_per_mile(operating_veh_type, charge_depleting_range)
+                    refueling_bev_dict.update({(operating_veh_type, charge_depleting_range): refueling_cost_per_mile})
                 refueling_cost_dollars = refueling_cost_per_mile * vmt
             else:
-                if operating_veh_type in refueling_liquid_dict.keys():
+                if operating_veh_type in refueling_liquid_dict:
                     refueling_cost_per_gallon = refueling_liquid_dict[operating_veh_type]
                 else:
                     refueling_cost_per_gallon \
