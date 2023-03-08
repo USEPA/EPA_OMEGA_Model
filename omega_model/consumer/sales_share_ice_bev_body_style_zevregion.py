@@ -139,19 +139,19 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         Args:
             calendar_year (int): calendar year to calculate market shares in
-            market_class_data (DataFrame): DataFrame with 'average_modified_cross_subsidized_price_MC' columns,
+            market_class_data (DataFrame): DataFrame with 'average_ALT_modified_cross_subsidized_price_MC' columns,
                 where MC = market class ID
             market_class_id (str}: e.g. 'hauling.ICE'
             producer_decision (Series): selected producer compliance option with
-                'average_retail_fuel_price_dollars_per_unit_MC',
-                'average_onroad_direct_co2e_gpmi_MC', 'average_onroad_direct_kwh_pmi_MC' attributes,
+                'average_ALT_retail_fuel_price_dollars_per_unit_MC',
+                'average_ALT_onroad_direct_co2e_gpmi_MC', 'average_ALT_onroad_direct_kwh_pmi_MC' attributes,
                 where MC = market class ID
 
         Returns:
             Consumer cost in $/mi
 
         """
-        fuel_cost = producer_decision['average_retail_fuel_price_dollars_per_unit_%s' % market_class_id]
+        fuel_cost = producer_decision['average_ALT_retail_fuel_price_dollars_per_unit_%s' % market_class_id]
         gcam_data_cy = SalesShare.get_gcam_params(calendar_year, market_class_id)
         price_amortization_period = float(gcam_data_cy['price_amortization_period'])
         discount_rate = gcam_data_cy['discount_rate']
@@ -160,13 +160,13 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         if type(market_class_data) is pd.DataFrame:
             total_capital_costs = market_class_data[
-                'average_modified_cross_subsidized_price_%s' % market_class_id].values
+                'average_ALT_modified_cross_subsidized_price_%s' % market_class_id].values
         else:
             total_capital_costs = market_class_data[
-                'average_modified_cross_subsidized_price_%s' % market_class_id]
+                'average_ALT_modified_cross_subsidized_price_%s' % market_class_id]
 
-        average_co2e_gpmi = producer_decision['average_onroad_direct_co2e_gpmi_%s' % market_class_id]
-        average_kwh_pmi = producer_decision['average_onroad_direct_kwh_pmi_%s' % market_class_id]
+        average_co2e_gpmi = producer_decision['average_ALT_onroad_direct_co2e_gpmi_%s' % market_class_id]
+        average_kwh_pmi = producer_decision['average_ALT_onroad_direct_kwh_pmi_%s' % market_class_id]
         carbon_intensity_gasoline = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
                                                                   'direct_co2e_grams_per_unit')
         refuel_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
@@ -195,10 +195,10 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         Args:
             producer_decision (Series): selected producer compliance option with
-                'average_retail_fuel_price_dollars_per_unit_MC',
-                'average_onroad_direct_co2e_gpmi_MC', 'average_onroad_direct_kwh_pmi_MC' attributes,
+                'average_ALT_retail_fuel_price_dollars_per_unit_MC',
+                'average_ALT_onroad_direct_co2e_gpmi_MC', 'average_ALT_onroad_direct_kwh_pmi_MC' attributes,
                 where MC = market class ID
-            market_class_data (DataFrame): DataFrame with 'average_modified_cross_subsidized_price_MC' columns,
+            market_class_data (DataFrame): DataFrame with 'average_ALT_modified_cross_subsidized_price_MC' columns,
                 where MC = market class ID
             calendar_year (int): calendar year to calculate market shares in
             parent_market_class (str): e.g. 'non_hauling'
@@ -283,8 +283,11 @@ class SalesShare(OMEGABase, SalesShareBase):
             producer_decision (Series): selected producer compliance option with
                 'average_retail_fuel_price_dollars_per_unit_MC',
                 'average_onroad_direct_co2e_gpmi_MC', 'average_onroad_direct_kwh_pmi_MC' attributes,
+                where MC = market category ID
+                'average_ALT_retail_fuel_price_dollars_per_unit_MC',
+                'average_ALT_onroad_direct_co2e_gpmi_MC', 'average_ALT_onroad_direct_kwh_pmi_MC' attributes,
                 where MC = market class ID
-            market_class_data (DataFrame): DataFrame with 'average_modified_cross_subsidized_price_MC' columns,
+            market_class_data (DataFrame): DataFrame with 'average_ALT_modified_cross_subsidized_price_MC' columns,
                 where MC = market class ID
             mc_parent (str): e.g. '' for the total market, 'hauling' or 'non_hauling', etc
             mc_pair ([strs]): e.g. '['hauling', 'non_hauling'] or ['hauling.ICE', 'hauling.BEV'], etc
@@ -390,11 +393,11 @@ class SalesShare(OMEGABase, SalesShareBase):
                 only_child = mc_pair[0]
 
                 # populate fields that normally come from cross subsidy iteration
-                market_class_data['average_cross_subsidized_price_%s' % only_child] = \
-                    producer_decision['average_new_vehicle_mfr_cost_%s' % only_child]
+                market_class_data['average_ALT_cross_subsidized_price_%s' % only_child] = \
+                    producer_decision['average_ALT_new_vehicle_mfr_cost_%s' % only_child]
 
-                market_class_data['average_modified_cross_subsidized_price_%s' % only_child] = \
-                    producer_decision['average_new_vehicle_mfr_cost_%s' % only_child]
+                market_class_data['average_ALT_modified_cross_subsidized_price_%s' % only_child] = \
+                    producer_decision['average_ALT_new_vehicle_mfr_cost_%s' % only_child]
 
                 market_class_data['pricing_score'] = 0
 
@@ -573,10 +576,10 @@ if __name__ == '__main__':
             # test market shares at different CO2e and price levels
             mcd = pd.DataFrame()
             for mc in omega_globals.options.MarketClass.market_classes:
-                mcd['average_modified_cross_subsidized_price_%s' % mc] = [35000, 25000]
-                mcd['average_onroad_direct_kwh_pmi_%s' % mc] = [0, 0]
-                mcd['average_onroad_direct_co2e_gpmi_%s' % mc] = [125, 150]
-                mcd['average_retail_fuel_price_dollars_per_unit_%s' % mc] = [2.75, 3.25]
+                mcd['average_ALT_modified_cross_subsidized_price_%s' % mc] = [35000, 25000]
+                mcd['average_ALT_onroad_direct_kwh_pmi_%s' % mc] = [0, 0]
+                mcd['average_ALT_onroad_direct_co2e_gpmi_%s' % mc] = [125, 150]
+                mcd['average_ALT_retail_fuel_price_dollars_per_unit_%s' % mc] = [2.75, 3.25]
                 mcd['producer_abs_share_frac_non_hauling'] = [0.8, 0.85]
                 mcd['producer_abs_share_frac_hauling'] = [0.2, 0.15]
 
