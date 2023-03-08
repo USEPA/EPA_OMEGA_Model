@@ -1644,7 +1644,10 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.cert_fuel_id = "{'electricity':1.0}"
                     alt_veh.battery_kwh = 60  # TODO: do we need this?  it gets set in the cloud search
                     alt_veh.motor_kw = 150 + 100 * (v.drive_system == 4)  # TODO: where does power come from?
-                    alt_veh.charge_depleting_range_mi = 300  # TODO: where does 300 come from?
+                    if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
+                        alt_veh.charge_depleting_range_mi = 150
+                    else:
+                        alt_veh.charge_depleting_range_mi = 300  # TODO: where does 300 come from?
                     alt_veh.eng_rated_hp = 0
                     alt_veh.eng_cyls_num = 0
                     alt_veh.eng_disp_liters = 0
