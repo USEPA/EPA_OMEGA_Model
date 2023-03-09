@@ -274,7 +274,7 @@ def run_postproc(iteration_log, credit_banks):
     summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name \
                        + '_summary_results.csv'
 
-    session_results.to_csv(summary_filename, index=False)
+    session_results.to_csv(summary_filename, index=False, columns=sorted(session_results.columns))
 
     return manufacturer_annual_data_table, mfr_gigawatthour_data
 
