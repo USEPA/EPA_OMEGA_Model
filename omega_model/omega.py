@@ -989,7 +989,8 @@ def calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehic
 
     calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict, producer_decision)
 
-    return list(market_class_vehicle_dict.keys())
+    return [k for k in market_class_vehicle_dict.keys() if
+            market_class_vehicle_dict[k]]
 
 
 def calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict, producer_decision):
