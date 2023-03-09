@@ -180,7 +180,7 @@ class MarketClass(OMEGABase, MarketClassBase):
 
 if __name__ == '__main__':
 
-    __name__ = 'consumer.market_classes'
+    __name__ = 'consumer.market_classes_unibody'
 
     try:
         if '__file__' in locals():
@@ -208,6 +208,8 @@ if __name__ == '__main__':
         omega_log.init_logfile()
 
         SQABase.metadata.create_all(omega_globals.engine)
+
+        omega_globals.options.market_classes_file = '../test_inputs/market_classes.csv'
 
         init_fail += MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)
@@ -239,20 +241,20 @@ if __name__ == '__main__':
             market_class_dict_rc = MarketClass.parse_market_classes(market_class_list, by_reg_class=True)
             print_dict(market_class_dict_rc)
 
-            MarketClass.populate_market_classes(market_class_dict, 'hauling.ICE', 'F150')
-            MarketClass.populate_market_classes(market_class_dict, 'hauling.ICE', 'Silverado')
-            MarketClass.populate_market_classes(market_class_dict, 'hauling.BEV', 'Cybertruck')
-            MarketClass.populate_market_classes(market_class_dict, 'non_hauling.ICE', '240Z')
-            MarketClass.populate_market_classes(market_class_dict, 'non_hauling.BEV', 'Tesla3')
-            MarketClass.populate_market_classes(market_class_dict, 'non_hauling.BEV', 'TeslaS')
+            MarketClass.populate_market_classes(market_class_dict, 'hauling.ICE.ALT', 'F150')
+            MarketClass.populate_market_classes(market_class_dict, 'hauling.ICE.NO_ALT', 'Silverado')
+            MarketClass.populate_market_classes(market_class_dict, 'hauling.BEV.NO_ALT', 'Cybertruck')
+            MarketClass.populate_market_classes(market_class_dict, 'non_hauling.ICE.ALT', '240Z')
+            MarketClass.populate_market_classes(market_class_dict, 'non_hauling.BEV.NO_ALT', 'Tesla3')
+            MarketClass.populate_market_classes(market_class_dict, 'non_hauling.BEV.NO_ALT', 'TeslaS')
             print_dict(market_class_dict)
 
-            MarketClass.populate_market_classes(market_class_dict_rc, 'hauling.ICE.truck', 'F150')
-            MarketClass.populate_market_classes(market_class_dict_rc, 'hauling.ICE.truck', 'Silverado')
-            MarketClass.populate_market_classes(market_class_dict_rc, 'hauling.BEV.truck', 'Cybertruck')
-            MarketClass.populate_market_classes(market_class_dict_rc, 'non_hauling.ICE.car', '240Z')
-            MarketClass.populate_market_classes(market_class_dict_rc, 'non_hauling.ICE.car', 'Sentra')
-            MarketClass.populate_market_classes(market_class_dict_rc, 'non_hauling.BEV.car', 'Tesla3')
+            MarketClass.populate_market_classes(market_class_dict_rc, 'hauling.ICE.truck.ALT', 'F150')
+            MarketClass.populate_market_classes(market_class_dict_rc, 'hauling.ICE.truck.ALT', 'Silverado')
+            MarketClass.populate_market_classes(market_class_dict_rc, 'hauling.BEV.truck.NO_ALT', 'Cybertruck')
+            MarketClass.populate_market_classes(market_class_dict_rc, 'non_hauling.ICE.car.ALT', '240Z')
+            MarketClass.populate_market_classes(market_class_dict_rc, 'non_hauling.ICE.car.ALT', 'Sentra')
+            MarketClass.populate_market_classes(market_class_dict_rc, 'non_hauling.BEV.car.NO_ALT', 'Tesla3')
             print_dict(market_class_dict_rc)
 
         else:
