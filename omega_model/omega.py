@@ -145,7 +145,7 @@ def logwrite_shares_and_costs(calendar_year, producer_market_classes, share_conv
     omega_log.logwrite('')
 
     for mc in sorted(producer_market_classes):
-        omega_log.logwrite(('%d producer / consumer_abs_share_frac_%s' % (calendar_year, mc)).ljust(55) +
+        omega_log.logwrite(('%d producer / consumer_abs_share_frac_%s' % (calendar_year, mc)).ljust(70) +
                            '= %.6f / %.6f (DELTA:%.6f)' % (
                                producer_decision_and_response['producer_abs_share_frac_%s' % mc],
                                producer_decision_and_response['consumer_abs_share_frac_%s' % mc],
@@ -157,45 +157,45 @@ def logwrite_shares_and_costs(calendar_year, producer_market_classes, share_conv
 
     for mc in sorted(producer_market_classes):
         omega_log.logwrite(
-            ('cross subsidized price / cost %s' % mc).ljust(50) + '$%d / $%d R:%f' % (
-                producer_decision_and_response['average_cross_subsidized_price_%s' % mc],
-                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc],
-                producer_decision_and_response['average_cross_subsidized_price_%s' % mc] /
-                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc]
+            ('cross subsidized price / cost ALT %s' % mc).ljust(70) + '$%d / $%d R:%f' % (
+                producer_decision_and_response['average_ALT_cross_subsidized_price_%s' % mc],
+                producer_decision_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mc],
+                producer_decision_and_response['average_ALT_cross_subsidized_price_%s' % mc] /
+                producer_decision_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mc]
             ))
 
     omega_log.logwrite('')
 
     for mc in sorted(producer_market_classes):
         omega_log.logwrite(
-            ('modified cross subsidized price / cost %s' % mc).ljust(59) + '$%d / $%d R:%f' % (
-                producer_decision_and_response['average_modified_cross_subsidized_price_%s' % mc],
-                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc],
-                producer_decision_and_response['average_modified_cross_subsidized_price_%s' % mc] /
-                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc]
+            ('modified cross subsidized price / cost ALT %s' % mc).ljust(70) + '$%d / $%d R:%f' % (
+                producer_decision_and_response['average_ALT_modified_cross_subsidized_price_%s' % mc],
+                producer_decision_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mc],
+                producer_decision_and_response['average_ALT_modified_cross_subsidized_price_%s' % mc] /
+                producer_decision_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mc]
             ))
 
     omega_log.logwrite('')
 
     for mcat in sorted(omega_globals.options.MarketClass.market_categories):
         try:
-            if producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat] > 0:
+            if producer_decision_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat] > 0:
                 omega_log.logwrite(
-                    ('cross subsidized price / cost %s' % mcat).ljust(50) + '$%d / $%d R:%f' % (
-                        producer_decision_and_response['average_cross_subsidized_price_%s' % mcat],
-                        producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat],
-                        producer_decision_and_response['average_cross_subsidized_price_%s' % mcat] /
-                        producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat]
+                    ('cross subsidized price / cost ALT %s' % mcat).ljust(70) + '$%d / $%d R:%f' % (
+                        producer_decision_and_response['average_ALT_cross_subsidized_price_%s' % mcat],
+                        producer_decision_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat],
+                        producer_decision_and_response['average_ALT_cross_subsidized_price_%s' % mcat] /
+                        producer_decision_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat]
                     ))
         except:
             pass
 
     omega_log.logwrite(
-        'cross subsidized price / cost TOTAL'.ljust(50) + '$%d / $%d R:%f' % (
-            producer_decision_and_response['average_cross_subsidized_price_total'],
-            producer_decision_and_response['average_new_vehicle_mfr_cost'],
-            producer_decision_and_response['average_cross_subsidized_price_total'] /
-            producer_decision_and_response['average_new_vehicle_mfr_cost']
+        'cross subsidized price / cost ALT TOTAL'.ljust(70) + '$%d / $%d R:%f' % (
+            producer_decision_and_response['average_ALT_cross_subsidized_price_total'],
+            producer_decision_and_response['average_ALT_new_vehicle_mfr_cost'],
+            producer_decision_and_response['average_ALT_cross_subsidized_price_total'] /
+            producer_decision_and_response['average_ALT_new_vehicle_mfr_cost']
         ))
 
     omega_log.logwrite('')
@@ -316,7 +316,11 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                 if producer_compliant is None:
                     omega_log.logwrite('%%%%%% Production Constraints Violated ... %%%%%%')
 
-                producer_market_classes = calc_market_data(candidate_mfr_composite_vehicles, producer_decision)
+                # composite vehicles have been updated from producer_decision at this point
+                producer_market_classes = \
+                    calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehicles, producer_decision)
+
+                calc_market_data_from_sales(candidate_mfr_composite_vehicles, producer_decision)
 
                 if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
                     for mc in sorted(omega_globals.options.MarketClass.market_classes):
@@ -410,8 +414,8 @@ def calc_cross_subsidy_metrics(mcat, cross_subsidy_pair, producer_decision, cros
     """
     _cross_subsidy_options_and_response = dict()
 
-    _cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat] = 0
-    _cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat] = 0
+    _cross_subsidy_options_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat] = 0
+    _cross_subsidy_options_and_response['average_ALT_cross_subsidized_price_%s' % mcat] = 0
     _cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] = 0
 
     if mcat == '':
@@ -419,13 +423,13 @@ def calc_cross_subsidy_metrics(mcat, cross_subsidy_pair, producer_decision, cros
         cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat] = 1.0
 
     for mc in cross_subsidy_pair:
-        _cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat] += \
-            producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * \
+        _cross_subsidy_options_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat] += \
+            producer_decision['average_ALT_new_vehicle_mfr_cost_%s' % mc] * \
             cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mc].values / \
             cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat].values
 
-        _cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat] += \
-            cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mc].values * \
+        _cross_subsidy_options_and_response['average_ALT_cross_subsidized_price_%s' % mcat] += \
+            cross_subsidy_options_and_response['average_ALT_cross_subsidized_price_%s' % mc].values * \
             cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mc].values / \
             cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat].values
 
@@ -437,8 +441,8 @@ def calc_cross_subsidy_metrics(mcat, cross_subsidy_pair, producer_decision, cros
             0.5 * _cross_subsidy_options_and_response['abs_share_delta_%s' % mc]
 
     _cross_subsidy_options_and_response['pricing_price_ratio_delta_%s' % mcat] = \
-        abs(1 - _cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat] /
-            _cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat])
+        abs(1 - _cross_subsidy_options_and_response['average_ALT_cross_subsidized_price_%s' % mcat] /
+            _cross_subsidy_options_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat])
 
     # cross_subsidy_options_and_response[list(_cross_subsidy_options_and_response.keys())] = \
     #     _cross_subsidy_options_and_response.values()
@@ -479,13 +483,13 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     """
     from producer import compliance_search
 
-    producer_decision['average_new_vehicle_mfr_generalized_cost_initial'] = \
-        calc_new_vehicle_mfr_generalized_cost(producer_decision, producer_market_classes)
+    # producer_decision['average_new_vehicle_mfr_generalized_cost_initial'] = \
+    #     calc_new_vehicle_mfr_generalized_cost(producer_decision, producer_market_classes)
 
     producer_decision['context_new_vehicle_sales'] = producer_decision['total_sales']
 
-    sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
-                                            producer_decision['average_new_vehicle_mfr_generalized_cost_initial'])
+    # sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
+    #                                         producer_decision['average_new_vehicle_mfr_generalized_cost_initial'])
 
     cross_subsidy_options_and_response = pd.DataFrame()
 
@@ -505,21 +509,29 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                 max_error = error
                 cross_subsidy_options_and_response['max_share_delta_market_class'] = mcat
 
-    duplicate_columns = set.intersection(set(producer_decision.index), set(cross_subsidy_options_and_response.index))
-    producer_decision = producer_decision.drop(duplicate_columns)
-    producer_decision_and_response = pd.concat([producer_decision, cross_subsidy_options_and_response])
+    # combine producer_decision with cross_subsidy_options_and_response to create producer_decision_and_response
+    producer_decision_and_response = producer_decision.copy()
+    for k in cross_subsidy_options_and_response.keys():
+        producer_decision_and_response[k] = cross_subsidy_options_and_response[k]
 
     producer_decision_and_response['cross_subsidy_iteration_num'] = producer_consumer_iteration_num
 
-    calc_sales_and_cost_data_from_shares(calendar_year, compliance_id, producer_market_classes,
-                                         producer_decision_and_response)
+    # temporarily assign shares to sales to calculate new consumer-share-weighted market_class values:
+    for cv in candidate_mfr_composite_vehicles:
+        cv.initial_registered_count = producer_decision_and_response['consumer_abs_share_frac_' + cv.market_class_id + '.' + cv.alt_type] * cv.market_class_share_frac
 
+    calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehicles, producer_decision_and_response)
+
+    calc_sales_and_cost_data_from_consumer_abs_shares(calendar_year, compliance_id, producer_market_classes,
+                                                  producer_decision_and_response)
+
+    # distribute total sales to vehicle sales in producer decision and response
     compliance_search.create_production_options_from_shares(candidate_mfr_composite_vehicles,
                                                             producer_decision_and_response,
                                                             total_sales=
                                                             producer_decision_and_response['new_vehicle_sales'])
 
-    calc_market_data(candidate_mfr_composite_vehicles, producer_decision_and_response)
+    calc_market_data_from_sales(candidate_mfr_composite_vehicles, producer_decision_and_response)
 
     # the 0.01 factors in the below equation protect against divide by zero when/if standards are zero
     producer_decision_and_response['strategic_compliance_ratio'] = \
@@ -748,8 +760,8 @@ def calc_new_vehicle_mfr_generalized_cost(producer_decision, producer_market_cla
     return cost
 
 
-def calc_sales_and_cost_data_from_shares(calendar_year, compliance_id, producer_market_classes,
-                                         producer_decision_and_response):
+def calc_sales_and_cost_data_from_consumer_abs_shares(calendar_year, compliance_id, producer_market_classes,
+                                                      producer_decision_and_response):
     """
     Calculate sales and cost/price data.  Namely, the absolute share delta between producer and consumer
     absolute market shares, the share weighted average cross subsidized price by market class, the total share weighted 
@@ -767,9 +779,10 @@ def calc_sales_and_cost_data_from_shares(calendar_year, compliance_id, producer_
         Updates ``producer_decision_and_response`` columns
         
     """
-    producer_decision_and_response['average_cross_subsidized_price_total'] = 0
-    producer_decision_and_response['average_modified_cross_subsidized_price_total'] = 0
-    producer_decision_and_response['average_new_vehicle_mfr_cost'] = 0
+    producer_decision_and_response['average_ALT_cross_subsidized_price_total'] = 0
+    producer_decision_and_response['average_ALT_modified_cross_subsidized_price_total'] = 0
+    producer_decision_and_response['average_ALT_new_vehicle_mfr_cost'] = 0
+    producer_decision_and_response['average_ALT_new_vehicle_mfr_generalized_cost'] = 0
     producer_decision_and_response['average_new_vehicle_mfr_generalized_cost'] = 0
 
     consumer_share_total = 0
@@ -778,16 +791,20 @@ def calc_sales_and_cost_data_from_shares(calendar_year, compliance_id, producer_
         consumer_abs_share_frac = producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
         consumer_share_total += consumer_abs_share_frac
 
-        producer_decision_and_response['average_cross_subsidized_price_total'] += \
-            producer_decision_and_response['average_cross_subsidized_price_%s' % mc] * \
+        producer_decision_and_response['average_ALT_cross_subsidized_price_total'] += \
+            producer_decision_and_response['average_ALT_cross_subsidized_price_%s' % mc] * \
             consumer_abs_share_frac
 
-        producer_decision_and_response['average_modified_cross_subsidized_price_total'] += \
-            producer_decision_and_response['average_modified_cross_subsidized_price_%s' % mc] * \
+        producer_decision_and_response['average_ALT_modified_cross_subsidized_price_total'] += \
+            producer_decision_and_response['average_ALT_modified_cross_subsidized_price_%s' % mc] * \
             consumer_abs_share_frac
 
-        producer_decision_and_response['average_new_vehicle_mfr_cost'] += \
-            producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc] * \
+        producer_decision_and_response['average_ALT_new_vehicle_mfr_cost'] += \
+            producer_decision_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mc] * \
+            consumer_abs_share_frac
+
+        producer_decision_and_response['average_ALT_new_vehicle_mfr_generalized_cost'] += \
+            producer_decision_and_response['average_ALT_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] * \
             consumer_abs_share_frac
 
         producer_decision_and_response['average_new_vehicle_mfr_generalized_cost'] += \
@@ -795,9 +812,10 @@ def calc_sales_and_cost_data_from_shares(calendar_year, compliance_id, producer_
             consumer_abs_share_frac
 
     # normalize values
-    producer_decision_and_response['average_cross_subsidized_price_total'] /= consumer_share_total
-    producer_decision_and_response['average_modified_cross_subsidized_price_total'] /= consumer_share_total
-    producer_decision_and_response['average_new_vehicle_mfr_cost'] /= consumer_share_total
+    producer_decision_and_response['average_ALT_cross_subsidized_price_total'] /= consumer_share_total
+    producer_decision_and_response['average_ALT_modified_cross_subsidized_price_total'] /= consumer_share_total
+    producer_decision_and_response['average_ALT_new_vehicle_mfr_cost'] /= consumer_share_total
+    producer_decision_and_response['average_ALT_new_vehicle_mfr_generalized_cost'] /= consumer_share_total
     producer_decision_and_response['average_new_vehicle_mfr_generalized_cost'] /= consumer_share_total
 
     producer_decision_and_response['new_vehicle_sales'] = \
@@ -864,13 +882,13 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
 
         price_options_df = cartesian_prod(price_options_df, pd.DataFrame(multiplier_range, columns=[mcc]))
 
-        price_options_df['average_cross_subsidized_price_%s' % mc] = \
-            producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * price_options_df[mcc].values
+        price_options_df['average_ALT_cross_subsidized_price_%s' % mc] = \
+            producer_decision['average_ALT_new_vehicle_mfr_cost_%s' % mc] * price_options_df[mcc].values
 
         price_modification = PriceModifications.get_price_modification(calendar_year, mc)
 
-        price_options_df['average_modified_cross_subsidized_price_%s' % mc] = \
-            price_options_df['average_cross_subsidized_price_%s' % mc].values + price_modification
+        price_options_df['average_ALT_modified_cross_subsidized_price_%s' % mc] = \
+            price_options_df['average_ALT_cross_subsidized_price_%s' % mc].values + price_modification
 
         prev_multiplier_range[mcc] = multiplier_range
 
@@ -946,7 +964,7 @@ def tighten_multiplier_range(multiplier_column, prev_multiplier_ranges, producer
     return multiplier_range, search_collapsed
 
 
-def calc_market_data(candidate_mfr_composite_vehicles, producer_decision):
+def calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehicles, producer_decision):
     """
     Creates a dictionary of candidate vehicles binned by market class, calculates market class and market category
     data via ``calc_market_class_data()`` and ``calc_market_category_data()``
@@ -969,14 +987,13 @@ def calc_market_data(candidate_mfr_composite_vehicles, producer_decision):
     for new_veh in candidate_mfr_composite_vehicles:
         market_class_vehicle_dict[new_veh.market_class_id].append(new_veh)
 
-    calc_market_class_data(market_class_vehicle_dict, producer_decision)
+    calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict, producer_decision)
 
-    calc_market_category_data(producer_decision)
+    return [k for k in market_class_vehicle_dict.keys() if
+            market_class_vehicle_dict[k]]
 
-    return [k for k in market_class_vehicle_dict.keys() if market_class_vehicle_dict[k]] # list(market_class_vehicle_dict.keys())
 
-
-def calc_market_class_data(market_class_vehicle_dict, producer_decision):
+def calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict, producer_decision):
     """
     Calculate market class average CO2e g/mi, kWh/mi, manufacturer new vehicle cost and generalized cost, average fuel
     price, and sales.
@@ -992,50 +1009,37 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
     """
     # calculate sales-weighted values by market class
 
-    calc_producer_abs_share_frac = dict()
-    for mc in omega_globals.options.MarketClass.market_classes:
-        market_class_vehicles = market_class_vehicle_dict[mc]
-        calc_producer_abs_share_frac[mc] = False
-        if market_class_vehicles and 'producer_abs_share_frac_%s' % mc not in producer_decision:
-            # after create_share_sweeps() we need to calculate this, but we don't want to re-calculate it after the
-            # consumer response or it will short-circuit the producer-consumer iteration, since the consumer response
-            # distributes new sales and the new sales will calculate exactly to the consumer market shares...
-            producer_decision['producer_abs_share_frac_%s' % mc] = 0
-            calc_producer_abs_share_frac[mc] = True
+    weight_by = 'initial_registered_count'
 
     for mc in omega_globals.options.MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
 
-        # costs and other values the consumer is basing ICE/BEV decisions on should only be made based on the ALT
-        # vehicles which are comparable to each other, unless there aren't any, then use the NO_ALTs
-        if [mcv for mcv in market_class_vehicles if mcv.alt_type == 'ALT']:
-            market_class_vehicles = [mcv for mcv in market_class_vehicles if mcv.alt_type == 'ALT']
-
+        # calculate market class values based on all vehicles, ALT and no-ALT:
         if market_class_vehicles:
             producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'market_class_share_frac', 'onroad_direct_co2e_grams_per_mile')
+                weighted_value(market_class_vehicles, weight_by, 'onroad_direct_co2e_grams_per_mile')
 
             producer_decision['average_onroad_direct_kwh_pmi_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'market_class_share_frac', 'onroad_direct_kwh_per_mile')
+                weighted_value(market_class_vehicles, weight_by, 'onroad_direct_kwh_per_mile')
 
             producer_decision['average_new_vehicle_mfr_cost_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'market_class_share_frac', 'new_vehicle_mfr_cost_dollars')
+                weighted_value(market_class_vehicles, weight_by, 'new_vehicle_mfr_cost_dollars')
 
             producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'market_class_share_frac',
+                weighted_value(market_class_vehicles, weight_by,
                                'new_vehicle_mfr_generalized_cost_dollars')
 
             producer_decision['average_retail_fuel_price_dollars_per_unit_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'market_class_share_frac', 'retail_fuel_price_dollars_per_unit')
+                weighted_value(market_class_vehicles, weight_by, 'retail_fuel_price_dollars_per_unit')
 
             producer_decision['average_curbweight_lbs_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'market_class_share_frac', 'curbweight_lbs')
+                weighted_value(market_class_vehicles, weight_by, 'curbweight_lbs')
 
             producer_decision['average_rated_hp_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'market_class_share_frac', 'rated_hp')
+                weighted_value(market_class_vehicles, weight_by, 'rated_hp')
 
             producer_decision['average_footprint_ft2_%s' % mc] = \
-                weighted_value(market_class_vehicles, 'market_class_share_frac', 'footprint_ft2')
+                weighted_value(market_class_vehicles, weight_by, 'footprint_ft2')
 
             if 'ICE' in mc:
                 # TODO: should get 8887 from PolicyFuel?, but need calendar year (set in omega_globals so we don't have to pass it in??)
@@ -1058,6 +1062,85 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
             producer_decision['average_footprint_ft2_%s' % mc] = 0
             producer_decision['average_onroad_mpg_%s' % mc] = 0
 
+
+        # calculate ALT-only values needed by the consumer module:
+        # costs and other values the consumer is basing ICE/BEV decisions on should only be made based on the ALT
+        # vehicles which are comparable to each other, unless there aren't any, then use the NO_ALTs
+        if [mcv for mcv in market_class_vehicles if mcv.alt_type == 'ALT']:
+            market_class_vehicles = [mcv for mcv in market_class_vehicles if mcv.alt_type == 'ALT']
+
+        if market_class_vehicles:
+            producer_decision['average_ALT_onroad_direct_co2e_gpmi_%s' % mc] = \
+                weighted_value(market_class_vehicles, weight_by, 'onroad_direct_co2e_grams_per_mile')
+
+            producer_decision['average_ALT_onroad_direct_kwh_pmi_%s' % mc] = \
+                weighted_value(market_class_vehicles, weight_by, 'onroad_direct_kwh_per_mile')
+
+            producer_decision['average_ALT_retail_fuel_price_dollars_per_unit_%s' % mc] = \
+                weighted_value(market_class_vehicles, weight_by, 'retail_fuel_price_dollars_per_unit')
+
+            producer_decision['average_ALT_new_vehicle_mfr_cost_%s' % mc] = \
+                weighted_value(market_class_vehicles, weight_by, 'new_vehicle_mfr_cost_dollars')
+
+            producer_decision['average_ALT_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] = \
+                weighted_value(market_class_vehicles, weight_by,
+                               'new_vehicle_mfr_generalized_cost_dollars')
+        else:
+            producer_decision['average_ALT_onroad_direct_co2e_gpmi_%s' % mc] = 0
+            producer_decision['average_ALT_onroad_direct_kwh_pmi_%s' % mc] = 0
+            producer_decision['average_ALT_retail_fuel_price_dollars_per_unit_%s' % mc] = 0
+            producer_decision['average_ALT_new_vehicle_mfr_cost_%s' % mc] = 0
+            producer_decision['average_ALT_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] = 0
+
+
+def calc_market_data_from_sales(candidate_mfr_composite_vehicles, producer_decision):
+    """
+    Creates a dictionary of candidate vehicles binned by market class, calculates market class and market category
+    data via ``calc_market_class_data()`` and ``calc_market_category_data()``
+
+    Args:
+        candidate_mfr_composite_vehicles (list): list of candidate composite vehicles that minimize producer compliance cost
+        producer_decision (Series): Series that corresponds with candidate_mfr_composite_vehicles, has producer market
+            shares, costs, compliance data (Mg CO2e), may also contain consumer response
+
+    Returns:
+        updates producer_decision with calculated market data
+
+    See Also:
+        ``calc_market_class_data()``, ``calc_market_category_data()``
+
+    """
+    # group vehicles by market class
+    market_class_vehicle_dict = omega_globals.options.MarketClass.get_market_class_dict()
+    for new_veh in candidate_mfr_composite_vehicles:
+        market_class_vehicle_dict[new_veh.market_class_id].append(new_veh)
+
+    calc_market_class_sales_from_producer_decision(market_class_vehicle_dict, producer_decision)
+
+    calc_market_category_data_from_sales(producer_decision)
+
+
+def calc_market_class_sales_from_producer_decision(market_class_vehicle_dict, producer_decision):
+    """
+
+    Args:
+        market_class_vehicle_dict:
+        producer_decision:
+
+    Returns:
+
+    """
+    calc_producer_abs_share_frac_from_sales = dict()
+    for mc in omega_globals.options.MarketClass.market_classes:
+        market_class_vehicles = market_class_vehicle_dict[mc]
+        calc_producer_abs_share_frac_from_sales[mc] = False
+        if market_class_vehicles and 'producer_abs_share_frac_%s' % mc not in producer_decision:
+            # after create_share_sweeps() we need to calculate this, but we don't want to re-calculate it after the
+            # consumer response or it will short-circuit the producer-consumer iteration, since the consumer response
+            # distributes new sales and the new sales will calculate exactly to the consumer market shares...
+            producer_decision['producer_abs_share_frac_%s' % mc] = 0
+            calc_producer_abs_share_frac_from_sales[mc] = True
+
     # absolute shares and sales are based on all vehicles, whether ALT or not
     for mc in omega_globals.options.MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
@@ -1066,7 +1149,7 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
             for v in market_class_vehicles:
                 producer_decision['sales_%s' % mc] += producer_decision['veh_%s_sales' % v.vehicle_id]
 
-            if calc_producer_abs_share_frac[mc]:
+            if calc_producer_abs_share_frac_from_sales[mc]:
                 producer_decision['producer_abs_share_frac_%s' % mc] += \
                     producer_decision['sales_%s' % mc] / producer_decision['total_sales']
         else:
@@ -1074,7 +1157,7 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
             producer_decision['producer_abs_share_frac_%s' % mc] = 0
 
 
-def calc_market_category_data(producer_decision):
+def calc_market_category_data_from_sales(producer_decision):
     """
     Calculate market category average cost and generalized cost, average cross subsidized price, sales and producer
     absolute shares.
@@ -1087,13 +1170,13 @@ def calc_market_category_data(producer_decision):
         Nothing, updates ``producer_decsion`` with calculated market data
 
     """
-
     for mcat in omega_globals.options.MarketClass.market_categories:
         producer_decision['average_onroad_direct_co2e_gpmi_%s' % mcat] = 0
         producer_decision['average_onroad_direct_kwh_pmi_%s' % mcat] = 0
         producer_decision['average_new_vehicle_mfr_cost_%s' % mcat] = 0
         producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mcat] = 0
-        producer_decision['average_cross_subsidized_price_%s' % mcat] = 0
+        producer_decision['average_ALT_new_vehicle_mfr_cost_%s' % mcat] = 0
+        producer_decision['average_ALT_cross_subsidized_price_%s' % mcat] = 0
         producer_decision['average_curbweight_lbs_%s' % mcat] = 0
         producer_decision['average_rated_hp_%s' % mcat] = 0
         producer_decision['average_footprint_ft2_%s' % mcat] = 0
@@ -1117,9 +1200,13 @@ def calc_market_category_data(producer_decision):
                 producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mcat] += \
                     producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] * mc_sales
 
-                if 'average_cross_subsidized_price_%s' % mc in producer_decision:
-                    producer_decision['average_cross_subsidized_price_%s' % mcat] += \
-                        producer_decision['average_cross_subsidized_price_%s' % mc] * mc_sales
+                if 'average_ALT_new_vehicle_mfr_cost_%s' % mc in producer_decision:
+                    producer_decision['average_ALT_new_vehicle_mfr_cost_%s' % mcat] += \
+                        producer_decision['average_ALT_new_vehicle_mfr_cost_%s' % mc] * mc_sales
+
+                if 'average_ALT_cross_subsidized_price_%s' % mc in producer_decision:
+                    producer_decision['average_ALT_cross_subsidized_price_%s' % mcat] += \
+                        producer_decision['average_ALT_cross_subsidized_price_%s' % mc] * mc_sales
 
                 producer_decision['average_curbweight_lbs_%s' % mcat] += \
                     producer_decision['average_curbweight_lbs_%s' % mc] * mc_sales
@@ -1150,7 +1237,9 @@ def calc_market_category_data(producer_decision):
 
         producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mcat] /= mcat_sales
 
-        producer_decision['average_cross_subsidized_price_%s' % mcat] /= mcat_sales
+        producer_decision['average_ALT_new_vehicle_mfr_cost_%s' % mcat] /= mcat_sales
+
+        producer_decision['average_ALT_cross_subsidized_price_%s' % mcat] /= mcat_sales
 
         producer_decision['average_curbweight_lbs_%s' % mcat] /= mcat_sales
 
@@ -1175,8 +1264,8 @@ def detect_producer_consumer_convergence(producer_decision_and_response, produce
 
     """
     producer_decision_and_response['price_cost_ratio_total'] = \
-        (producer_decision_and_response['average_cross_subsidized_price_total'] /
-         producer_decision_and_response['average_new_vehicle_mfr_cost'])
+        (producer_decision_and_response['average_ALT_cross_subsidized_price_total'] /
+         producer_decision_and_response['average_ALT_new_vehicle_mfr_cost'])
 
     cross_subsidy_pricing_error = abs(1-producer_decision_and_response['price_cost_ratio_total'])
     converged = cross_subsidy_pricing_error <= omega_globals.options.producer_cross_subsidy_price_tolerance or \

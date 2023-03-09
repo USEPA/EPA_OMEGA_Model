@@ -213,7 +213,7 @@ try:
             self.kwh_per_mile_scale_years = [2020]
             self.kwh_per_mile_scale = [1.0]
 
-            self.redesign_interval_gain_years = [2020, 2029, 2030]
+            self.redesign_interval_gain_years = [2020, 2029, 2034]
             self.redesign_interval_gain = [1.0, 1.0, 0.0]
 
             self.manufacturer_gigawatthour_data = None
