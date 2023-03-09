@@ -96,7 +96,7 @@ class FuelPrice(OMEGABase):
 
         """
 
-        cache_key = (calendar_year, price_types, fuel_id)
+        cache_key = (calendar_year, str(price_types), fuel_id)
 
         if cache_key not in FuelPrice._data:
             if omega_globals.options.flat_context:
@@ -205,6 +205,10 @@ if __name__ == '__main__':
         from context.onroad_fuels import OnroadFuel
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=omega_globals.options.verbose)
+
+        from context.new_vehicle_market import NewVehicleMarket
+        init_fail += NewVehicleMarket.init_from_file(
+            omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)
 
         init_fail += FuelPrice.init_from_file(omega_globals.options.context_fuel_prices_file,
                                               verbose=omega_globals.options.verbose)
