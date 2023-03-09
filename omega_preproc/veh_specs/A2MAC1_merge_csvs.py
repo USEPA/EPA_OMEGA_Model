@@ -38,4 +38,4 @@ df_productdescriptions = df_productdescriptions[productdescriptionsfields]
 df_all = df_all.merge(df_productdescriptions,
                               how='left', on=['vehicle_yrmkmdl'])
 
-df_all.to_csv(os.path.join(outputdir, 'combined_components.csv')
+df_all.to_csv(os.path.join(outputdir, 'combined_components.csv'))
