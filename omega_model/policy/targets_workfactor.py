@@ -328,6 +328,11 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
+        omega_globals.options = OMEGASessionSettings()
+        omega_log.init_logfile()
+
+        init_fail = []
+
         from policy.incentives import Incentives
         init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
                                                verbose=omega_globals.options.verbose)

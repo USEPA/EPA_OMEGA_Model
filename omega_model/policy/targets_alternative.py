@@ -303,6 +303,7 @@ if __name__ == '__main__':
                 model_year = None
                 reg_class_id = None
                 initial_registered_count = None
+                cert_co2e_grams_per_mile = 150
 
                 def get_initial_registered_count(self):
                     return self.initial_registered_count
