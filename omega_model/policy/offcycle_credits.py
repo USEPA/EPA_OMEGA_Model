@@ -210,6 +210,9 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
+        from omega_model.omega import get_module
+        from policy.drive_cycles import DriveCycles
+
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
         omega_log.init_logfile()
@@ -223,6 +226,13 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
+        module_name = get_template_name(omega_globals.options.ice_vehicle_simulation_results_file)
+        omega_globals.options.CostCloud = get_module(module_name).CostCloud
+
+        # init drive cycles PRIOR to CostCloud since CostCloud needs the drive cycle names for validation
+        init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
+                                                verbose=omega_globals.options.verbose)
+
         init_fail += omega_globals.options.CostCloud.\
             init_cost_clouds_from_files(omega_globals.options.ice_vehicle_simulation_results_file,
                                         omega_globals.options.bev_vehicle_simulation_results_file,
@@ -233,16 +243,17 @@ if __name__ == '__main__':
                                                     verbose=omega_globals.options.verbose)
 
         if not init_fail:
+            # class dummyVehicle:
+            #     model_year = 2020
+            #     reg_class_id = 'car'
+            #     cost_curve_class = 'ice_MPW_LRL'
+            #     cost_cloud = omega_globals.options.CostCloud.get_cloud(self)
+            #
+            # vehicle = dummyVehicle()
+            #
+            # OffCycleCredits.calc_off_cycle_credits(vehicle.model_year, vehicle, vehicle.cost_cloud)
+            pass
 
-            class dummyVehicle:
-                model_year = 2020
-                reg_class_id = 'car'
-                cost_curve_class = 'ice_MPW_LRL'
-                cost_cloud = omega_globals.options.CostCloud.get_cloud(self)
-
-            vehicle = dummyVehicle()
-
-            OffCycleCredits.calc_off_cycle_credits(vehicle.model_year, vehicle, vehicle.cost_cloud)
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
