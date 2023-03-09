@@ -328,14 +328,27 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
+        import importlib
+
         omega_globals.options = OMEGASessionSettings()
         omega_log.init_logfile()
 
         init_fail = []
 
+        module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
+        omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+        init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
+            omega_globals.options.policy_reg_classes_file)
+
         from policy.incentives import Incentives
         init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
                                                verbose=omega_globals.options.verbose)
+
+        init_fail += WorkFactor.init_from_file(omega_globals.options.workfactor_definition_file,
+                                               verbose=omega_globals.options.verbose)
+
+        omega_globals.options.policy_targets_file = \
+            omega_globals.options.omega_model_path + '/test_inputs/ghg_standards_workfactor_hdp2.csv'
 
         init_fail += VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
                                                    verbose=omega_globals.options.verbose)
@@ -349,20 +362,25 @@ if __name__ == '__main__':
                 reg_class_id = None
                 footprint_ft2 = None
                 initial_registered_count = None
+                cert_fuel_id = "{'gasoline':1.0}"
+                curbweight_lbs = 5000
+                gvwr_lbs = 7500
+                gcwr_lbs = 1000
+                drive_system = 4
 
                 def get_initial_registered_count(self):
                     return self.initial_registered_count
 
             car_vehicle = dummyVehicle()
             car_vehicle.model_year = 2021
-            car_vehicle.reg_class_id = 'car'
+            car_vehicle.reg_class_id = 'mediumduty'
             car_vehicle.footprint_ft2 = 41
             car_vehicle.initial_registered_count = 1
             car_vehicle.fueling_class = 'BEV'
 
             truck_vehicle = dummyVehicle()
             truck_vehicle.model_year = 2021
-            truck_vehicle.reg_class_id = 'truck'
+            truck_vehicle.reg_class_id = 'mediumduty'
             truck_vehicle.footprint_ft2 = 41
             truck_vehicle.initial_registered_count = 1
             truck_vehicle.fueling_class = 'ICE'
