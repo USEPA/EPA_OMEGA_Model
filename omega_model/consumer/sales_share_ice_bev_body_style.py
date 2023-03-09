@@ -738,8 +738,8 @@ if __name__ == '__main__':
                 mcd['producer_abs_share_frac_non_hauling'] = [0.8, 0.85]
                 mcd['producer_abs_share_frac_hauling'] = [0.2, 0.15]
 
-            share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'consolidated_OEM', mcd, 'hauling',
-                                                  ['hauling.ICE', 'hauling.BEV'])
+            # share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'consolidated_OEM',
+            #                                       mcd, mcd, 'hauling', ['hauling.ICE', 'hauling.BEV'])
 
         else:
             print(init_fail)
