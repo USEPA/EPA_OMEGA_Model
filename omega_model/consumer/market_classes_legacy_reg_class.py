@@ -180,7 +180,7 @@ class MarketClass(OMEGABase, MarketClassBase):
 
 if __name__ == '__main__':
 
-    __name__ = 'consumer.market_classes_legacy_reg_class'
+    __name__ = '%s.%s' % (file_io.get_parent_foldername(__file__), file_io.get_filename(__file__))
 
     try:
         if '__file__' in locals():
@@ -209,7 +209,7 @@ if __name__ == '__main__':
 
         SQABase.metadata.create_all(omega_globals.engine)
 
-        omega_globals.options.market_classes_file = '../test_inputs/market_classes_legacy_reg_class.csv'
+        omega_globals.options.market_classes_file = 'omega_model/test_inputs/market_classes_legacy_reg_class.csv'
 
         init_fail += MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)

@@ -180,7 +180,7 @@ class MarketClass(OMEGABase, MarketClassBase):
 
 if __name__ == '__main__':
 
-    __name__ = 'consumer.market_classes_unibody'
+    __name__ = '%s.%s' % (file_io.get_parent_foldername(__file__), file_io.get_filename(__file__))
 
     try:
         if '__file__' in locals():
@@ -209,7 +209,7 @@ if __name__ == '__main__':
 
         SQABase.metadata.create_all(omega_globals.engine)
 
-        omega_globals.options.market_classes_file = '../test_inputs/market_classes.csv'
+        omega_globals.options.market_classes_file = 'omega_model/test_inputs/market_classes.csv'
 
         init_fail += MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)
@@ -218,15 +218,6 @@ if __name__ == '__main__':
             from common.omega_functions import print_dict
 
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
-
-            market_class_list = [
-                'hauling.ICE',
-                'hauling.BEV.bev300.base',
-                'hauling.BEV.bev300.sport',
-                'hauling.BEV.bev100',
-                'non_hauling.ICE',
-                'non_hauling.BEV',
-            ]
 
             market_class_list = [
                 'hauling.ICE',

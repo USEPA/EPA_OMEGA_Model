@@ -194,7 +194,7 @@ class MarketClass(OMEGABase, MarketClassBase):
 
 if __name__ == '__main__':
 
-    __name__ = 'consumer.market_classes_body_style'
+    __name__ = '%s.%s' % (file_io.get_parent_foldername(__file__), file_io.get_filename(__file__))
 
     try:
         if '__file__' in locals():

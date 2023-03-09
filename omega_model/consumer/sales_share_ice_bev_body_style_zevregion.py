@@ -556,6 +556,8 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
+        omega_globals.options.market_classes_file = 'omega_model/test_inputs/market_classes-body_style_zevregions.csv'
+
         # pull in market classes before initializing classes that check market class validity
         module_name = get_template_name(omega_globals.options.market_classes_file)
         omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
@@ -565,6 +567,8 @@ if __name__ == '__main__':
         from context.onroad_fuels import OnroadFuel  # needed for in-use fuel ID
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=omega_globals.options.verbose)
+
+        omega_globals.options.sales_share_file = 'omega_model/test_inputs/sales_share_params_ice_bev_zevregions.csv'
 
         init_fail += SalesShare.init_from_file(omega_globals.options.sales_share_file,
                                                verbose=omega_globals.options.verbose)
@@ -580,11 +584,12 @@ if __name__ == '__main__':
                 mcd['average_ALT_onroad_direct_kwh_pmi_%s' % mc] = [0, 0]
                 mcd['average_ALT_onroad_direct_co2e_gpmi_%s' % mc] = [125, 150]
                 mcd['average_ALT_retail_fuel_price_dollars_per_unit_%s' % mc] = [2.75, 3.25]
-                mcd['producer_abs_share_frac_non_hauling'] = [0.8, 0.85]
-                mcd['producer_abs_share_frac_hauling'] = [0.2, 0.15]
+                mcd['producer_abs_share_frac_sedan_wagon_r1nonzev'] = [0.8, 0.85]
+                mcd['producer_abs_share_frac_pickup_r1nonzev'] = [0.2, 0.15]
 
-            share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'consolidated_OEM', mcd, 'hauling',
-                                                  ['hauling.ICE', 'hauling.BEV'])
+            # share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'consolidated_OEM', mcd,
+            #                                       mcd, 'sedan_wagon_r1nonzev',
+            #                                       ['sedan_wagon_r1nonzev.ICE', 'sedan_wagon_r1nonzev.BEV'])
 
         else:
             print(init_fail)

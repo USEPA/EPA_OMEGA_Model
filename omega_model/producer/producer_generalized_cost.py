@@ -191,7 +191,7 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
 
 if __name__ == '__main__':
 
-    __name__ = 'producer.producer_generalized_cost'
+    __name__ = '%s.%s' % (file_io.get_parent_foldername(__file__), file_io.get_filename(__file__))
 
     try:
         if '__file__' in locals():
