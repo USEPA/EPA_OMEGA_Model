@@ -1514,7 +1514,7 @@ def init_omega(session_runtime_options):
                                               verbose=verbose_init)
 
         init_fail += BodyStyles.init_from_file(omega_globals.options.body_styles_file,
-                                                verbose=omega_globals.options.verbose)
+                                                verbose=verbose_init)
 
         NewVehicleMarket.init_context_new_vehicle_generalized_costs(
             omega_globals.options.context_new_vehicle_generalized_costs_file)
@@ -1529,7 +1529,7 @@ def init_omega(session_runtime_options):
                                                           verbose=verbose_init)
 
         init_fail += MassScaling.init_from_file(omega_globals.options.mass_scaling_file,
-                                                verbose=omega_globals.options.verbose)
+                                                verbose=verbose_init)
 
         init_fail += UpstreamMethods.init_from_file(omega_globals.options.fuel_upstream_methods_file,
                                                     verbose=verbose_init)
@@ -1541,7 +1541,7 @@ def init_omega(session_runtime_options):
                                                       verbose=verbose_init)
 
         init_fail += DriveCycleBallast.init_from_file(omega_globals.options.drive_cycle_ballast_file,
-                                                      verbose=omega_globals.options.verbose)
+                                                      verbose=verbose_init)
 
         init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
                                                verbose=verbose_init)
