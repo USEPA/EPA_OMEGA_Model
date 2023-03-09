@@ -208,17 +208,27 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
+        from omega_model.omega import get_module
+        from policy.drive_cycles import DriveCycles
+
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
         omega_log.init_logfile()
 
         init_fail = []
 
+        module_name = get_template_name(omega_globals.options.ice_vehicle_simulation_results_file)
+        omega_globals.options.CostCloud = get_module(module_name).CostCloud
+
+        # init drive cycles PRIOR to CostCloud since CostCloud needs the drive cycle names for validation
+        init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
+                                                verbose=omega_globals.options.verbose)
+
         init_fail += omega_globals.options.CostCloud.\
             init_cost_clouds_from_files(omega_globals.options.ice_vehicle_simulation_results_file,
                                         omega_globals.options.bev_vehicle_simulation_results_file,
                                         omega_globals.options.phev_vehicle_simulation_results_file,
-                                        verbose=true)
+                                        verbose=omega_globals.options.verbose)
 
         if not init_fail:
             pass

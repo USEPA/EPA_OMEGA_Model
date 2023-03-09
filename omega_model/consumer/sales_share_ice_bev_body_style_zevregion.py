@@ -556,7 +556,8 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
-        omega_globals.options.market_classes_file = 'omega_model/test_inputs/market_classes-body_style_zevregions.csv'
+        omega_globals.options.market_classes_file = \
+            omega_globals.options.omega_model_path + '/test_inputs/market_classes-body_style_zevregions.csv'
 
         # pull in market classes before initializing classes that check market class validity
         module_name = get_template_name(omega_globals.options.market_classes_file)
@@ -568,7 +569,8 @@ if __name__ == '__main__':
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=omega_globals.options.verbose)
 
-        omega_globals.options.sales_share_file = 'omega_model/test_inputs/sales_share_params_ice_bev_zevregions.csv'
+        omega_globals.options.sales_share_file = \
+            omega_globals.options.omega_model_path + '/test_inputs/sales_share_params_ice_bev_zevregions.csv'
 
         init_fail += SalesShare.init_from_file(omega_globals.options.sales_share_file,
                                                verbose=omega_globals.options.verbose)

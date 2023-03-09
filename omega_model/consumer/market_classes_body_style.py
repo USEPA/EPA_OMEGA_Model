@@ -233,15 +233,6 @@ if __name__ == '__main__':
 
             market_class_list = [
                 'hauling.ICE',
-                'hauling.BEV.bev300.base',
-                'hauling.BEV.bev300.sport',
-                'hauling.BEV.bev100',
-                'non_hauling.ICE',
-                'non_hauling.BEV',
-            ]
-
-            market_class_list = [
-                'hauling.ICE',
                 'hauling.BEV',
                 'non_hauling.ICE',
                 'non_hauling.BEV',
