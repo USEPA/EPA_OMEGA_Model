@@ -551,79 +551,79 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
-        import importlib
-
-        from omega_model.omega import init_user_definable_decomposition_attributes, get_module
-        from producer.manufacturers import Manufacturer
-        from producer.vehicles import VehicleFinal, DecompositionAttributes
-        from producer.vehicle_annual_data import VehicleAnnualData
-
-        omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
-        omega_log.init_logfile()
-
-        init_fail = []
-
-        # pull in reg classes before building database tables (declaring classes) that check reg class validity
-        module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
-        omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
-        init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
-            omega_globals.options.policy_reg_classes_file)
-        # override reg_classes from __init__.py:
-        importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
-
-        module_name = get_template_name(omega_globals.options.market_classes_file)
-        omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
-
-        from producer.manufacturers import Manufacturer
-        from producer.manufacturer_annual_data import ManufacturerAnnualData
-        from producer.vehicle_aggregation import VehicleAggregation
-        from producer.vehicles import VehicleFinal
-        from producer.vehicle_annual_data import VehicleAnnualData
-
-        module_name = get_template_name(omega_globals.options.offcycle_credits_file)
-        omega_globals.options.OffCycleCredits = get_module(module_name).OffCycleCredits
-
-        init_fail = init_user_definable_decomposition_attributes(omega_globals.options.verbose)
-
-        SQABase.metadata.create_all(omega_globals.engine)
-
-        init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
-                                                verbose=omega_globals.options.verbose)
-
-        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
-                                                          verbose=omega_globals.options.verbose)
-
-        init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
-                                                       verbose=verbose_init)
-
-        init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
-                                                 verbose=omega_globals.options.verbose)
-
-        # credit_bank = CreditBank('test_inputs/ghg_debits.csv', 'consolidated_OEM')
-        # credit_bank.update_credit_age(2020)
-        # credit_bank.handle_credit(2020, 'consolidated_OEM', 0.55)
-        # credit_bank.credit_bank.to_csv('../out/__dump/debit_bank.csv', index=False)
-        # credit_bank.transaction_log.to_csv('../out/__dump/debit_bank_transactions.csv', index=False)
-
-        credit_bank = CreditBank(
-            omega_globals.options.ghg_credit_params_file,
-            omega_globals.options.ghg_credits_file, 'consolidated_OEM')
-
-        import random
-
-        for year in range(2020, 2030):
-            print(year)
-            credit_bank.update_credit_age(year)
-            credit_bank.handle_credit(year, random.gauss(0, 1))
-
-        import common.file_io as file_io
-
-        # validate output folder
-        file_io.validate_folder(omega_globals.options.database_dump_folder)
-
-        credit_bank.credit_bank.to_csv(omega_globals.options.database_dump_folder + '/GHG_credit_balances.csv', index=False)
-        credit_bank.transaction_log.to_csv(omega_globals.options.database_dump_folder + '/GHG_credit_transactions.csv', index=False)
+        # import importlib
+        #
+        # from omega_model.omega import init_user_definable_decomposition_attributes, get_module
+        # from producer.manufacturers import Manufacturer
+        # from producer.vehicles import VehicleFinal, DecompositionAttributes
+        # from producer.vehicle_annual_data import VehicleAnnualData
+        #
+        # omega_globals.options = OMEGASessionSettings()
+        # init_omega_db(omega_globals.options.verbose)
+        # omega_log.init_logfile()
+        #
+        # init_fail = []
+        #
+        # # pull in reg classes before building database tables (declaring classes) that check reg class validity
+        # module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
+        # omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+        # init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
+        #     omega_globals.options.policy_reg_classes_file)
+        # # override reg_classes from __init__.py:
+        # importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
+        #
+        # module_name = get_template_name(omega_globals.options.market_classes_file)
+        # omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
+        #
+        # from producer.manufacturers import Manufacturer
+        # from producer.manufacturer_annual_data import ManufacturerAnnualData
+        # from producer.vehicle_aggregation import VehicleAggregation
+        # from producer.vehicles import VehicleFinal
+        # from producer.vehicle_annual_data import VehicleAnnualData
+        #
+        # module_name = get_template_name(omega_globals.options.offcycle_credits_file)
+        # omega_globals.options.OffCycleCredits = get_module(module_name).OffCycleCredits
+        #
+        # init_fail = init_user_definable_decomposition_attributes(omega_globals.options.verbose)
+        #
+        # SQABase.metadata.create_all(omega_globals.engine)
+        #
+        # init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
+        #                                         verbose=omega_globals.options.verbose)
+        #
+        # init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
+        #                                                   verbose=omega_globals.options.verbose)
+        #
+        # init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
+        #                                                verbose=verbose_init)
+        #
+        # init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+        #                                          verbose=omega_globals.options.verbose)
+        #
+        # # credit_bank = CreditBank('test_inputs/ghg_debits.csv', 'consolidated_OEM')
+        # # credit_bank.update_credit_age(2020)
+        # # credit_bank.handle_credit(2020, 'consolidated_OEM', 0.55)
+        # # credit_bank.credit_bank.to_csv('../out/__dump/debit_bank.csv', index=False)
+        # # credit_bank.transaction_log.to_csv('../out/__dump/debit_bank_transactions.csv', index=False)
+        #
+        # credit_bank = CreditBank(
+        #     omega_globals.options.ghg_credit_params_file,
+        #     omega_globals.options.ghg_credits_file, 'consolidated_OEM')
+        #
+        # import random
+        #
+        # for year in range(2020, 2030):
+        #     print(year)
+        #     credit_bank.update_credit_age(year)
+        #     credit_bank.handle_credit(year, random.gauss(0, 1))
+        #
+        # import common.file_io as file_io
+        #
+        # # validate output folder
+        # file_io.validate_folder(omega_globals.options.database_dump_folder)
+        #
+        # credit_bank.credit_bank.to_csv(omega_globals.options.database_dump_folder + '/GHG_credit_balances.csv', index=False)
+        # credit_bank.transaction_log.to_csv(omega_globals.options.database_dump_folder + '/GHG_credit_transactions.csv', index=False)
 
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
