@@ -248,7 +248,7 @@ try:
             self.SalesShare = None
             self.ProducerGeneralizedCost = None
             self.MarketClass = None
-            self.CostCoud = None
+            self.CostCloud = None
 
             self.notification_destination = None
             self.notification_email = None
