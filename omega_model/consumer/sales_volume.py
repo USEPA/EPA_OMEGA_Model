@@ -150,6 +150,12 @@ if __name__ == '__main__':
         from producer.manufacturers import Manufacturer  # needed for manufacturers table
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
         from context.new_vehicle_market import NewVehicleMarket
+        from context.mass_scaling import MassScaling
+        from context.body_styles import BodyStyles
+        from context.powertrain_cost import PowertrainCost
+        from context.glider_cost import GliderCost
+        from policy.drive_cycles import DriveCycles
+        from effects.ip_deflators import ImplictPriceDeflators
         from omega_model.omega import init_user_definable_decomposition_attributes, get_module
 
         module_name = get_template_name(omega_globals.options.policy_targets_file)
@@ -161,6 +167,12 @@ if __name__ == '__main__':
         module_name = get_template_name(omega_globals.options.offcycle_credits_file)
         omega_globals.options.OffCycleCredits = get_module(module_name).OffCycleCredits
 
+        module_name = get_template_name(omega_globals.options.ice_vehicle_simulation_results_file)
+        omega_globals.options.CostCloud = get_module(module_name).CostCloud
+
+        module_name = get_template_name(omega_globals.options.sales_share_file)
+        omega_globals.options.SalesShare = get_module(module_name).SalesShare
+
         init_fail += init_user_definable_decomposition_attributes(omega_globals.options.verbose)
 
         SQABase.metadata.create_all(omega_globals.engine)
@@ -170,6 +182,31 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file, verbose=omega_globals.options.verbose)
+
+        init_fail += omega_globals.options.SalesShare.init_from_file(omega_globals.options.sales_share_file,
+                                                                     verbose=omega_globals.options.verbose)
+
+        init_fail += BodyStyles.init_from_file(omega_globals.options.body_styles_file,
+                                                verbose=omega_globals.options.verbose)
+
+        init_fail += MassScaling.init_from_file(omega_globals.options.mass_scaling_file,
+                                                verbose=omega_globals.options.verbose)
+
+        init_fail += NewVehicleMarket.init_from_file(
+            omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)
+
+        init_fail += ImplictPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
+                                                          verbose=omega_globals.options.verbose)
+
+        init_fail += GliderCost.init_from_file(omega_globals.options.glider_cost_input_file,
+                                               verbose=omega_globals.options.verbose)
+
+        init_fail += PowertrainCost.init_from_file(omega_globals.options.powertrain_cost_input_file,
+                                                   verbose=omega_globals.options.verbose)
+
+        # init drive cycles PRIOR to CostCloud since CostCloud needs the drive cycle names for validation
+        init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
+                                                verbose=omega_globals.options.verbose)
 
         init_fail += omega_globals.options.CostCloud.\
             init_cost_clouds_from_files(omega_globals.options.ice_vehicle_simulation_results_file,
@@ -181,16 +218,13 @@ if __name__ == '__main__':
                                                                          verbose=omega_globals.options.verbose)
 
         init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
-                                                       verbose=verbose_init)
+                                                       verbose=omega_globals.options.verbose)
 
         init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
                                                  verbose=omega_globals.options.verbose)
 
-        init_fail += NewVehicleMarket.init_from_file(
-            omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)
-
         if not init_fail:
-            omega_globals.options.analysis_initial_year = VehicleFinal.get_max_model_year() + 1
+            omega_globals.options.analysis_initial_year = int(VehicleFinal.get_max_model_year() + 1)
 
             sales_demand = context_new_vehicle_sales(omega_globals.options.analysis_initial_year)
         else:
