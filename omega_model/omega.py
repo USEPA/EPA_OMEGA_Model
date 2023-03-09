@@ -145,7 +145,7 @@ def logwrite_shares_and_costs(calendar_year, producer_market_classes, share_conv
     omega_log.logwrite('')
 
     for mc in sorted(producer_market_classes):
-        omega_log.logwrite(('%d producer / consumer_abs_share_frac_%s' % (calendar_year, mc)).ljust(55) +
+        omega_log.logwrite(('%d producer / consumer_abs_share_frac_%s' % (calendar_year, mc)).ljust(70) +
                            '= %.6f / %.6f (DELTA:%.6f)' % (
                                producer_decision_and_response['producer_abs_share_frac_%s' % mc],
                                producer_decision_and_response['consumer_abs_share_frac_%s' % mc],
@@ -157,7 +157,7 @@ def logwrite_shares_and_costs(calendar_year, producer_market_classes, share_conv
 
     for mc in sorted(producer_market_classes):
         omega_log.logwrite(
-            ('cross subsidized price / cost ALT %s' % mc).ljust(50) + '$%d / $%d R:%f' % (
+            ('cross subsidized price / cost ALT %s' % mc).ljust(70) + '$%d / $%d R:%f' % (
                 producer_decision_and_response['average_ALT_cross_subsidized_price_%s' % mc],
                 producer_decision_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mc],
                 producer_decision_and_response['average_ALT_cross_subsidized_price_%s' % mc] /
@@ -168,7 +168,7 @@ def logwrite_shares_and_costs(calendar_year, producer_market_classes, share_conv
 
     for mc in sorted(producer_market_classes):
         omega_log.logwrite(
-            ('modified cross subsidized price / cost ALT %s' % mc).ljust(59) + '$%d / $%d R:%f' % (
+            ('modified cross subsidized price / cost ALT %s' % mc).ljust(70) + '$%d / $%d R:%f' % (
                 producer_decision_and_response['average_ALT_modified_cross_subsidized_price_%s' % mc],
                 producer_decision_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mc],
                 producer_decision_and_response['average_ALT_modified_cross_subsidized_price_%s' % mc] /
@@ -181,7 +181,7 @@ def logwrite_shares_and_costs(calendar_year, producer_market_classes, share_conv
         try:
             if producer_decision_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat] > 0:
                 omega_log.logwrite(
-                    ('cross subsidized price / cost ALT %s' % mcat).ljust(50) + '$%d / $%d R:%f' % (
+                    ('cross subsidized price / cost ALT %s' % mcat).ljust(70) + '$%d / $%d R:%f' % (
                         producer_decision_and_response['average_ALT_cross_subsidized_price_%s' % mcat],
                         producer_decision_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat],
                         producer_decision_and_response['average_ALT_cross_subsidized_price_%s' % mcat] /
@@ -191,7 +191,7 @@ def logwrite_shares_and_costs(calendar_year, producer_market_classes, share_conv
             pass
 
     omega_log.logwrite(
-        'cross subsidized price / cost ALT TOTAL'.ljust(50) + '$%d / $%d R:%f' % (
+        'cross subsidized price / cost ALT TOTAL'.ljust(70) + '$%d / $%d R:%f' % (
             producer_decision_and_response['average_ALT_cross_subsidized_price_total'],
             producer_decision_and_response['average_ALT_new_vehicle_mfr_cost'],
             producer_decision_and_response['average_ALT_cross_subsidized_price_total'] /
