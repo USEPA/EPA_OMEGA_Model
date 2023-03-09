@@ -365,6 +365,8 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
+        omega_globals.options.market_classes_file = '../test_inputs/market_classes.csv'
+
         # pull in market classes before initializing classes that check market class validity
         module_name = get_template_name(omega_globals.options.market_classes_file)
         omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
@@ -374,6 +376,8 @@ if __name__ == '__main__':
         from context.onroad_fuels import OnroadFuel  # needed for in-use fuel ID
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=omega_globals.options.verbose)
+
+        omega_globals.options.sales_share_file = '../test_inputs/sales_share_params.csv'
 
         init_fail += SalesShare.init_from_file(omega_globals.options.sales_share_file,
                                                verbose=omega_globals.options.verbose)
@@ -392,8 +396,8 @@ if __name__ == '__main__':
                 mcd['producer_abs_share_frac_non_hauling'] = [0.8, 0.85]
                 mcd['producer_abs_share_frac_hauling'] = [0.2, 0.15]
 
-            share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, mcd, 'hauling',
-                                                  ['hauling.ICE', 'hauling.BEV'])
+            share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'consolidated_OEM',
+                                                  mcd, mcd, 'hauling', ['hauling.ICE', 'hauling.BEV'])
 
         else:
             print(init_fail)
