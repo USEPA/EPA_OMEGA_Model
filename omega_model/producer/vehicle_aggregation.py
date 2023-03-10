@@ -474,17 +474,7 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
-        import importlib
-        from omega import init_user_definable_submodules
-
-        omega_globals.options = OMEGASessionSettings()
-
         init_fail = []
-        init_fail += init_user_definable_submodules()
-
-        # set up global variables:
-        init_omega_db(omega_globals.options.verbose)
-        omega_log.init_logfile()
 
         if not init_fail:
             pass
