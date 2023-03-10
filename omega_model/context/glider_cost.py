@@ -35,7 +35,7 @@ Sample Data Columns
 print('importing %s' % __file__)
 
 from omega_model import *
-from effects.general_functions import dollar_adjustment_factor
+from effects.ip_deflators import ImplictPriceDeflators
 
 _cache = dict()
 
@@ -197,7 +197,7 @@ class GliderCost(OMEGABase):
                                         'dollar_adjustment': 1}
 
                     if cost_info['dollar_basis'] > 0:
-                        adj_factor = dollar_adjustment_factor('ip_deflators', int(cost_info['dollar_basis']))
+                        adj_factor = ImplictPriceDeflators.dollar_adjustment_factor(int(cost_info['dollar_basis']))
                         _cache[cost_key]['dollar_adjustment'] = adj_factor
 
                     _cache[cost_key]['value'] = compile(str(cost_info['value']), '<string>', 'eval')

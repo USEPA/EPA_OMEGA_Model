@@ -84,6 +84,27 @@ class ImplictPriceDeflators(OMEGABase):
         return ImplictPriceDeflators._cache[cache_key]
 
     @staticmethod
+    def dollar_adjustment_factor(dollar_basis_input):
+        """
+
+        Args:
+            deflators (str): 'cpi_price_deflators' or 'ip_deflators' for consumer price index or implicit price deflators
+            dollar_basis_input (int): the dollar basis of the input value.
+
+        Returns:
+            The multiplicative factor that can be applied to a cost in dollar_basis_input to express that value in analysis_dollar_basis.
+
+        """
+        analysis_basis = omega_globals.options.analysis_dollar_basis
+
+        adj_factor_numerator = ImplictPriceDeflators.get_price_deflator(analysis_basis)
+        adj_factor_denominator = ImplictPriceDeflators.get_price_deflator(dollar_basis_input)
+
+        adj_factor = adj_factor_numerator / adj_factor_denominator
+
+        return adj_factor
+
+    @staticmethod
     def init_from_file(filename, verbose=False):
         """
 
