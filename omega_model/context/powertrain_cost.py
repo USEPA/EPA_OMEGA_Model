@@ -36,7 +36,7 @@ print('importing %s' % __file__)
 
 from common.omega_types import *
 from common.input_validation import *
-from effects.ip_deflators import ImplictPriceDeflators
+from context.ip_deflators import ImplictPriceDeflators
 
 _cache = dict()
 

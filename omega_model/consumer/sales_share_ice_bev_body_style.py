@@ -716,7 +716,7 @@ if __name__ == '__main__':
         from context.fuel_prices import FuelPrice
 
         from policy.drive_cycles import DriveCycles
-        from effects.ip_deflators import ImplictPriceDeflators
+        from context.ip_deflators import ImplictPriceDeflators
 
         from omega_model.omega import init_user_definable_decomposition_attributes, get_module
 

@@ -155,7 +155,7 @@ if __name__ == '__main__':
         from context.powertrain_cost import PowertrainCost
         from context.glider_cost import GliderCost
         from policy.drive_cycles import DriveCycles
-        from effects.ip_deflators import ImplictPriceDeflators
+        from context.ip_deflators import ImplictPriceDeflators
         from omega_model.omega import init_user_definable_decomposition_attributes, get_module
 
         module_name = get_template_name(omega_globals.options.policy_targets_file)

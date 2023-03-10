@@ -919,7 +919,6 @@ def tighten_multiplier_range(multiplier_column, prev_multiplier_ranges, producer
 
     """
 
-
     prev_multiplier = producer_decision_and_response[multiplier_column]
     prev_multiplier_range = prev_multiplier_ranges[multiplier_column]
     span_frac_gain = 6
@@ -1472,7 +1471,7 @@ def init_omega(session_runtime_options):
     from producer.vehicle_annual_data import VehicleAnnualData
     from producer import compliance_search
 
-    from effects.ip_deflators import ImplictPriceDeflators
+    from context.ip_deflators import ImplictPriceDeflators
 
     from consumer.sales_volume import init_sales_volume
 

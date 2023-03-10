@@ -35,7 +35,7 @@ Sample Data Columns
 print('importing %s' % __file__)
 
 from omega_model import *
-from effects.ip_deflators import ImplictPriceDeflators
+from context.ip_deflators import ImplictPriceDeflators
 
 _cache = dict()
 
