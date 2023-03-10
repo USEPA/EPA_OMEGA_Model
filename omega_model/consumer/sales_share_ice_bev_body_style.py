@@ -701,7 +701,23 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
+        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
+
+        from producer.manufacturers import Manufacturer
+        from producer.vehicle_aggregation import VehicleAggregation
+        from producer.vehicles import VehicleFinal, DecompositionAttributes
+
+        from context.mass_scaling import MassScaling
+        from context.body_styles import BodyStyles
+        from context.powertrain_cost import PowertrainCost
+        from context.glider_cost import GliderCost
+        from context.fuel_prices import FuelPrice
+
+        from policy.drive_cycles import DriveCycles
+        from effects.ip_deflators import ImplictPriceDeflators
+
+        from omega_model.omega import init_user_definable_decomposition_attributes, get_module
 
         init_fail = []
 
@@ -712,17 +728,75 @@ if __name__ == '__main__':
             omega_globals.options.policy_reg_classes_file)
 
         # pull in market classes before initializing classes that check market class validity
+        omega_globals.options.market_classes_file = \
+            omega_globals.options.omega_model_path + '/test_inputs/market_classes-body_style.csv'
+
         module_name = get_template_name(omega_globals.options.market_classes_file)
         omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
         init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                                       verbose=omega_globals.options.verbose)
 
+        module_name = get_template_name(omega_globals.options.offcycle_credits_file)
+        omega_globals.options.OffCycleCredits = get_module(module_name).OffCycleCredits
+
+        module_name = get_template_name(omega_globals.options.ice_vehicle_simulation_results_file)
+        omega_globals.options.CostCloud = get_module(module_name).CostCloud
+
+        module_name = get_template_name(omega_globals.options.sales_share_file)
+        omega_globals.options.SalesShare = get_module(module_name).SalesShare
+
+        init_fail += init_user_definable_decomposition_attributes(omega_globals.options.verbose)
+
+        SQABase.metadata.create_all(omega_globals.engine)
+
+        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
+                                                          verbose=omega_globals.options.verbose)
+
         from context.onroad_fuels import OnroadFuel  # needed for in-use fuel ID
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=omega_globals.options.verbose)
 
-        init_fail += SalesShare.init_from_file(omega_globals.options.sales_share_file,
+        init_fail += omega_globals.options.SalesShare.init_from_file(omega_globals.options.sales_share_file,
+                                                                     verbose=omega_globals.options.verbose)
+
+        init_fail += BodyStyles.init_from_file(omega_globals.options.body_styles_file,
+                                                verbose=omega_globals.options.verbose)
+
+        init_fail += MassScaling.init_from_file(omega_globals.options.mass_scaling_file,
+                                                verbose=omega_globals.options.verbose)
+
+        init_fail += NewVehicleMarket.init_from_file(
+            omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)
+
+        # must come after NewVehicleMarket and OnroadFuel init for input validation
+        init_fail += FuelPrice.init_from_file(omega_globals.options.context_fuel_prices_file,
+                                              verbose=omega_globals.options.verbose)
+
+        init_fail += ImplictPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
+                                                          verbose=omega_globals.options.verbose)
+
+        init_fail += GliderCost.init_from_file(omega_globals.options.glider_cost_input_file,
                                                verbose=omega_globals.options.verbose)
+
+        init_fail += PowertrainCost.init_from_file(omega_globals.options.powertrain_cost_input_file,
+                                                   verbose=omega_globals.options.verbose)
+
+        # init drive cycles PRIOR to CostCloud since CostCloud needs the drive cycle names for validation
+        init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
+                                                verbose=omega_globals.options.verbose)
+
+        init_fail += omega_globals.options.CostCloud.\
+            init_cost_clouds_from_files(omega_globals.options.ice_vehicle_simulation_results_file,
+                                        omega_globals.options.bev_vehicle_simulation_results_file,
+                                        omega_globals.options.phev_vehicle_simulation_results_file,
+                                        verbose=omega_globals.options.verbose)
+
+
+        init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
+                                                       verbose=omega_globals.options.verbose)
+
+        init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+                                                 verbose=omega_globals.options.verbose)
 
         if not init_fail:
             omega_globals.options.analysis_initial_year = 2021
@@ -732,14 +806,23 @@ if __name__ == '__main__':
             mcd = pd.DataFrame()
             for mc in omega_globals.options.MarketClass.market_classes:
                 mcd['average_ALT_modified_cross_subsidized_price_%s' % mc] = [35000, 25000]
-                mcd['average_ALT_onroad_direct_kwh_pmi_%s' % mc] = [0, 0]
+                mcd['average_ALT_onroad_direct_kwh_pmi_%s' % mc] = [.300, .300]
+                mcd['average_onroad_direct_kwh_pmi_%s' % mc] = [0.250, 0.250]
                 mcd['average_ALT_onroad_direct_co2e_gpmi_%s' % mc] = [125, 150]
+                mcd['average_onroad_direct_co2e_gpmi_%s' % mc] = [125, 150]
                 mcd['average_ALT_retail_fuel_price_dollars_per_unit_%s' % mc] = [2.75, 3.25]
-                mcd['producer_abs_share_frac_non_hauling'] = [0.8, 0.85]
-                mcd['producer_abs_share_frac_hauling'] = [0.2, 0.15]
+                mcd['producer_abs_share_frac_%s' % mc] = [1/len(omega_globals.options.MarketClass.market_classes),
+                                                          1/len(omega_globals.options.MarketClass.market_classes)]
+                mcd['average_rated_hp_%s' % mc] = [250, 175]
+                mcd['average_curbweight_lbs_%s' % mc] = [3500, 3750]
 
-            # share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'consolidated_OEM',
-            #                                       mcd, mcd, 'hauling', ['hauling.ICE', 'hauling.BEV'])
+            for mcat in omega_globals.options.MarketClass.market_categories:
+                mcd['average_new_vehicle_mfr_cost_%s' % mcat] = [35000, 25000]
+                mcd['average_footprint_ft2_%s' % mcat] = [45, 45]
+
+            share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'Ford',
+                                                  mcd.loc[0, :], mcd, 'sedan_wagon',
+                                                  ['sedan_wagon.ICE', 'sedan_wagon.BEV'])
 
         else:
             print(init_fail)
