@@ -90,7 +90,8 @@ if __name__ == "__main__":
             source_files = [fn for fn in os.listdir(source_folder) if '.py' in fn]
             for f in source_files:
 
-                console_file_pathname = test_omega2_output_folder + os.sep + os.path.split(source_folder)[1] + '_' + f.replace('.py', '') + '.txt'
+                console_file_pathname = test_omega2_output_folder + os.sep + os.path.split(source_folder)[1] + \
+                                        '_' + f.replace('.py', '') + '.txt'
 
                 if 'darwin' in sys.platform:
                     cmd_str = '%s; %s %s' % (pythonpathstr, pythoncommand, os.path.join(source_folder, f))
@@ -101,7 +102,9 @@ if __name__ == "__main__":
 
                 if f == 'omega_batch.py':
                     batch_patch = os.path.abspath('../omega_model/test_inputs/test_batch.csv')
-                    cmd_opts = '--batch_file %s --verbose --session_num 0 --analysis_final_year 2020' % batch_patch
+                    bundle_path = os.path.abspath(test_omega2_output_folder + os.sep + 'bundle')
+                    cmd_opts = '--batch_file %s --bundle_path %s --verbose --session_num 0 --analysis_final_year 2020'\
+                               % (batch_patch, bundle_path)
 
                 cmd_str = cmd_str + ' %s > %s' % (cmd_opts, console_file_pathname)
 
@@ -122,9 +125,11 @@ if __name__ == "__main__":
                 logwrite('%s %s' % (cmd_str, result_status))
 
                 if 'darwin' in sys.platform:
-                    os.system('mv %s %s/%s_%s' % (console_file_pathname, test_omega2_output_folder, result_status, os.path.split(source_folder)[1] + '_' + f.replace('.py', '') + '.txt'))
+                    os.system('mv %s %s/%s_%s' % (console_file_pathname, test_omega2_output_folder, result_status,
+                                                  os.path.split(source_folder)[1] + '_' + f.replace('.py', '') + '.txt'))
                 else:
-                    os.system('RENAME %s %s_%s' % (console_file_pathname, result_status, os.path.split(source_folder)[1] + '_' + f.replace('.py', '') + '.txt'))
+                    os.system('RENAME %s %s_%s' % (console_file_pathname, result_status, os.path.split(source_folder)[1]
+                                                   + '_' + f.replace('.py', '') + '.txt'))
 
                 logwrite('')
 
