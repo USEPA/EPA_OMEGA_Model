@@ -1472,7 +1472,6 @@ def init_omega(session_runtime_options):
     from producer.vehicle_annual_data import VehicleAnnualData
     from producer import compliance_search
 
-    from effects.cpi_price_deflators import CPIPriceDeflators
     from effects.ip_deflators import ImplictPriceDeflators
 
     from consumer.sales_volume import init_sales_volume
@@ -1563,9 +1562,6 @@ def init_omega(session_runtime_options):
         # must be after Manufacturer init for input validation
         init_fail += CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file,
                                                               verbose=verbose_init)
-
-        init_fail += CPIPriceDeflators.init_from_file(omega_globals.options.cpi_deflators_file,
-                                                      verbose=verbose_init)
 
         init_fail += ImplictPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
                                                           verbose=verbose_init)
