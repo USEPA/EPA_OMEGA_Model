@@ -1469,8 +1469,8 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         production_options['normalized_total_generalized_cost_dollars'] = 0
 
     production_options['producer_search_iteration'] = search_iteration
-    production_options['selected_production_option'] = False * 1  # create numeric bool
-    production_options['candidate_production_option'] = False * 1  # create numeric bool
+    production_options['selected_production_option'] = FALSE
+    production_options['candidate_production_option'] = FALSE
     production_options['strategic_compliance_error'] = abs(1 - production_options['strategic_compliance_ratio'].values)
 
     mini_df = pd.DataFrame()
@@ -1670,7 +1670,7 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         if 'producer_compliance_search' in omega_globals.options.verbose_log_modules:
             # log (some or all) production options cloud and tag selected points
             try:
-                production_options.loc[candidate_production_decisions.index, 'candidate_production_option'] = True * 1
+                production_options.loc[candidate_production_decisions.index, 'candidate_production_option'] = TRUE
             except:
                 # candidate may be from a prior iteration, index may not be available
                 pass

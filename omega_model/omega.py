@@ -224,7 +224,7 @@ def update_cross_subsidy_log_data(producer_decision_and_response, calendar_year,
     """
     producer_decision_and_response['calendar_year'] = calendar_year
     producer_decision_and_response['compliance_id'] = compliance_id
-    producer_decision_and_response['converged'] = converged
+    producer_decision_and_response['converged'] = converged * 1
     producer_decision_and_response['producer_consumer_iteration_num'] = producer_consumer_iteration_num
     producer_decision_and_response['compliant'] = compliant
     producer_decision_and_response['share_convergence_error'] = share_convergence_error

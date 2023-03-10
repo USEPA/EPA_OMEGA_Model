@@ -248,7 +248,7 @@ class SalesShare(OMEGABase, SalesShareBase):
         sales_share_denominator = 0
         sales_share_numerator = dict()
 
-        market_class_data['consumer_constrained_%s' % parent_market_class] = False
+        market_class_data['consumer_constrained_%s' % parent_market_class] = FALSE
 
         for pass_num in [0, 1]:
             for market_class_id in child_market_classes:
@@ -281,7 +281,7 @@ class SalesShare(OMEGABase, SalesShareBase):
                                                 max_constraints[share_name])
 
                     if all(demanded_share == max_constraints[share_name]):
-                        market_class_data['consumer_constrained_%s' % parent_market_class] = True
+                        market_class_data['consumer_constrained_%s' % parent_market_class] = TRUE
 
                     parent_share = market_class_data['consumer_abs_share_frac_%s' % parent_market_class].values
 
