@@ -1597,21 +1597,11 @@ def init_omega(session_runtime_options):
 
 def poolwait():
     return None
-    # from context.cost_clouds import CostCloud
-    # print('* %s *' % CostCloud.cost_curve_classes)
-    # CostCloud.get_cloud(2020, 'ice_MPW_LRL')
-    #
     # print('pooltest')
     # print('module name:', __name__)
     # print('parent process:', os.getppid())
     # print('process id:', os.getpid())
-    # print('engine id: ', id(omega_globals.engine))
-    # print('engine tables:', omega_globals.engine.table_names())
     # return 42
-
-
-# def callback(arg):
-#     print('callback')
 
 
 def error_callback(e):
