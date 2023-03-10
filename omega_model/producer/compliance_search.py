@@ -14,7 +14,7 @@ import time
 import pandas as pd
 import numpy as np
 
-from common import omega_globals, omega_log
+from common import omega_globals, omega_log, TRUE, FALSE
 
 from producer.vehicles import *
 from common.omega_functions import *

@@ -79,6 +79,7 @@ from omega_model import *
 from context.new_vehicle_market import NewVehicleMarket
 from context.fuel_prices import FuelPrice
 from common.omega_functions import sales_weight_average_dataframe
+from common import TRUE, FALSE
 
 import math
 

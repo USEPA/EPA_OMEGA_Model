@@ -64,9 +64,6 @@ try:
     legacy_reg_classes = OMEGAEnum(['car', 'truck', 'mediumduty'])
     fuel_units = OMEGAEnum(['gallon', 'kWh'])
 
-    FALSE = 0  #: use for boolean values as numeric
-    TRUE = 1  #: use for boolean values as numeric
-
     class OMEGASessionSettings(OMEGABase):
         """
         Define the settings required for a simulation session
