@@ -1311,7 +1311,7 @@ def get_module(module_name):
     return module
 
 
-def init_user_definable_submodules():
+def import_user_definable_submodules():
     """
     Import dynamic modules that are specified by the input file input template name and set the session runtime
     options appropriately.
@@ -1442,7 +1442,7 @@ def init_omega(session_runtime_options):
 
     init_omega_db(omega_globals.options.verbose)
 
-    init_fail += init_user_definable_submodules()
+    init_fail += import_user_definable_submodules()
 
     # import database modules to populate ORM metadata
     from context.onroad_fuels import OnroadFuel
