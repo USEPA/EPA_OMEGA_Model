@@ -522,6 +522,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
     calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehicles, producer_decision_and_response)
 
+    # updates producer_decision_and_response['new_vehicle_sales']:
     calc_sales_and_cost_data_from_consumer_abs_shares(calendar_year, compliance_id, producer_market_classes,
                                                   producer_decision_and_response)
 

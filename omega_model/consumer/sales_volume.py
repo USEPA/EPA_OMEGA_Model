@@ -113,7 +113,7 @@ def new_vehicle_sales_response(calendar_year, compliance_id, P):
         # M = -(Q0*E - Q0) / (P0/E - P0)  # slope of linear response
         # Q = Q0 + M * (P-P0)  # point-slope equation of a line
 
-        Q = 1 - (P - P0)/P * E
+        Q = 1 + E * (P - P0)/P0
 
         return Q/Q0
 
