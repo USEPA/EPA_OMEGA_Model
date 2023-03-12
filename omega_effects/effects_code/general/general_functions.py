@@ -1,5 +1,4 @@
 import pandas as pd
-from pathlib import PurePath
 import os
 import sys
 import time
@@ -129,37 +128,6 @@ def save_dict_return_df(dict_to_save, save_path, row_header=None, stamp=None, in
     df.to_csv(f'{save_path}_{stamp}.csv', index=index)
 
     return df
-
-
-def adjust_dollars(batch_settings, df, deflators, effects_log, *args):
-    """
-
-    Args:
-        df (DataFrame): values to be converted to a consistent dollar basis.
-        deflators (str): 'cpi_price_deflators' or 'ip_deflators' for consumer price index or implicit price deflators
-        args: The attributes to be converted to a consistent dollar basis.
-
-    Returns:
-        The passed DataFrame with args expressed in a consistent dollar basis.
-
-    """
-    analysis_dollar_basis = batch_settings.analysis_dollar_basis
-    if deflators == 'cpi_price_deflators':
-        deflators = batch_settings.cpi_deflators
-    else:
-        deflators = batch_settings.ip_deflators
-
-    basis_years = pd.Series(df.loc[df['dollar_basis'] > 0, 'dollar_basis']).unique()
-    # basis_years = np.unique(np.array(df.loc[df['dollar_basis'] > 0, 'dollar_basis']))
-    adj_factor_numerator = deflators.get_price_deflator(analysis_dollar_basis, effects_log)
-    df_return = df.copy()
-    for basis_year in basis_years:
-        adj_factor = adj_factor_numerator / deflators.get_price_deflator(basis_year, effects_log)
-        for arg in args:
-            df_return.loc[df_return['dollar_basis'] == basis_year, arg] = df_return[arg] * adj_factor
-            df_return.loc[df_return['dollar_basis'] == basis_year, 'dollar_basis'] = analysis_dollar_basis
-
-    return df_return
 
 
 def calc_rebound_effect(fuel_cpm_old, fuel_cpm_new, rebound_rate):

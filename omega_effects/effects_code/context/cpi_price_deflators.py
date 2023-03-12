@@ -100,7 +100,6 @@ class CPIPriceDeflators:
 
         """
         calendar_years = pd.Series(self._data.keys())
-        # calendar_years = np.array([*CPIPriceDeflators._data]) # np.array(list(CPIPriceDeflators._data.keys()))
         if len(calendar_years[calendar_years <= calendar_year]) > 0:
             year = max(calendar_years[calendar_years <= calendar_year])
 
@@ -108,4 +107,29 @@ class CPIPriceDeflators:
         else:
             effects_log.logwrite(f'Missing CPI price deflator for {calendar_year} or prior')
             sys.exit()
-            # raise Exception(f'Missing CPI price deflator for {calendar_year} or prior')
+
+    def adjust_dollars(self, batch_settings, df, effects_log, *args):
+        """
+
+        Args:
+            batch_settings: an instance of the BatchSettings class.
+            df (DataFrame): values to be converted to a consistent dollar basis.
+            effects_log: an instance of the EffectsLog class.
+            args (str or strs): The attributes to be converted to a consistent dollar basis.
+
+        Returns:
+            The passed DataFrame with args expressed in a consistent dollar basis.
+
+        """
+        analysis_dollar_basis = batch_settings.analysis_dollar_basis
+
+        basis_years = pd.Series(df.loc[df['dollar_basis'] > 0, 'dollar_basis']).unique()
+        adj_factor_numerator = self.get_price_deflator(analysis_dollar_basis, effects_log)
+        df_return = df.copy()
+        for basis_year in basis_years:
+            adj_factor = adj_factor_numerator / self.get_price_deflator(basis_year, effects_log)
+            for arg in args:
+                df_return.loc[df_return['dollar_basis'] == basis_year, arg] = df_return[arg] * adj_factor
+                df_return.loc[df_return['dollar_basis'] == basis_year, 'dollar_basis'] = analysis_dollar_basis
+
+        return df_return

@@ -109,10 +109,9 @@ class RefuelingCost:
             }
 
             if cost_info['dollar_basis'] > 0:
-                adj_factor \
-                    = batch_settings.ip_deflators.dollar_adjustment_factor(
-                    batch_settings, 'ip_deflators', int(cost_info['dollar_basis']), effects_log
-                )
+                adj_factor = \
+                    batch_settings.ip_deflators.dollar_adjustment_factor(
+                        batch_settings, int(cost_info['dollar_basis']), effects_log)
                 self._data[cost_key]['dollar_adjustment'] = adj_factor
 
             self._data[cost_key]['value'] = compile(cost_info['value'], '<string>', 'eval')

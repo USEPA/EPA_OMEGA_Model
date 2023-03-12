@@ -3,8 +3,8 @@ import sys
 from pathlib import Path
 
 from general.general_functions import read_input_file
-from effects.ip_deflators import ImplictPriceDeflators
-from effects.cpi_price_deflators import CPIPriceDeflators
+from omega_effects.effects_code.context.ip_deflators import ImplicitPriceDeflators
+from omega_effects.effects_code.context.cpi_price_deflators import CPIPriceDeflators
 from effects.cost_factors_criteria import CostFactorsCriteria
 from effects.cost_factors_scc import CostFactorsSCC
 from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
@@ -283,7 +283,7 @@ class BatchSettings:
         effects_log.logwrite('\nInitializing batch')
 
         try:
-            self.ip_deflators = ImplictPriceDeflators()
+            self.ip_deflators = ImplicitPriceDeflators()
             self.ip_deflators.init_from_file(self.ip_deflators_file, effects_log)
             self.inputs_filelist.append(self.ip_deflators_file)
 

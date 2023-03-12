@@ -48,7 +48,7 @@ from omega_effects.effects_code.general.input_validation import \
     validate_template_version_info, validate_template_column_names
 
 
-class ImplictPriceDeflators:
+class ImplicitPriceDeflators:
     """
     **Loads and provides access to implicit price deflators by calendar year.**
 
@@ -113,28 +113,50 @@ class ImplictPriceDeflators:
             else:
                 effects_log.logwrite(f'Missing implicit price deflator for {calendar_year} or prior')
                 sys.exit()
-                # raise Exception(f'Missing implicit price deflator for {calendar_year} or prior')
 
         return self._cache[cache_key]
 
-    def dollar_adjustment_factor(self, batch_settings, deflators, dollar_basis_input, effects_log):
+    def adjust_dollars(self, batch_settings, df, effects_log, *args):
         """
 
         Args:
-            deflators (str): 'cpi_price_deflators' or 'ip_deflators' for consumer price index or implicit price deflators
-            dollar_basis_input (int): the dollar basis of the input value.
+            batch_settings: an instance of the BatchSettings class.
+            df (DataFrame): values to be converted to a consistent dollar basis.
+            effects_log: an instance of the EffectsLog class.
+            args (str or strs): The attributes to be converted to a consistent dollar basis.
+
+        Returns:
+            The passed DataFrame with args expressed in a consistent dollar basis.
+
+        """
+        analysis_dollar_basis = batch_settings.analysis_dollar_basis
+
+        basis_years = pd.Series(df.loc[df['dollar_basis'] > 0, 'dollar_basis']).unique()
+        adj_factor_numerator = self.get_price_deflator(analysis_dollar_basis, effects_log)
+        df_return = df.copy()
+        for basis_year in basis_years:
+            adj_factor = adj_factor_numerator / self.get_price_deflator(basis_year, effects_log)
+            for arg in args:
+                df_return.loc[df_return['dollar_basis'] == basis_year, arg] = df_return[arg] * adj_factor
+                df_return.loc[df_return['dollar_basis'] == basis_year, 'dollar_basis'] = analysis_dollar_basis
+
+        return df_return
+
+    def dollar_adjustment_factor(self, batch_settings, dollar_basis_input, effects_log):
+        """
+
+        Args:
+            batch_settings: an instance of the BatchSettings class.
+            dollar_basis_input (int): the dollar basis of the cost to be adjusted.
+            effects_log: an instance of the EffectsLog class.
 
         Returns:
             The multiplicative factor that can be applied to a cost in dollar_basis_input to express that value in analysis_dollar_basis.
 
         """
         analysis_dollar_basis = batch_settings.analysis_dollar_basis
-        if deflators == 'cpi_price_deflators':
-            deflators = batch_settings.cpi_deflators
-        else:
-            deflators = batch_settings.ip_deflators
 
-        adj_factor_numerator = deflators.get_price_deflator(analysis_dollar_basis, effects_log)
-        adj_factor_denominator = deflators.get_price_deflator(dollar_basis_input, effects_log)
+        adj_factor_numerator = self.get_price_deflator(analysis_dollar_basis, effects_log)
+        adj_factor_denominator = self.get_price_deflator(dollar_basis_input, effects_log)
 
         return adj_factor_numerator / adj_factor_denominator

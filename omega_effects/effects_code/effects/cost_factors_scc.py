@@ -43,7 +43,6 @@ Data Column Name and Description
 from omega_effects.effects_code.general.general_functions import read_input_file
 from omega_effects.effects_code.general.input_validation import \
     validate_template_version_info, validate_template_column_names
-from omega_effects.effects_code.general.general_functions import adjust_dollars
 
 
 class CostFactorsSCC:
@@ -111,7 +110,7 @@ class CostFactorsSCC:
 
         cols_to_convert = [col for col in df.columns if 'USD_per_metricton' in col]
 
-        df = adjust_dollars(batch_settings, df, 'ip_deflators', effects_log, *cols_to_convert)
+        df = batch_settings.ip_deflators.adjust_dollars(batch_settings, df, effects_log, *cols_to_convert)
 
         self._data = df.set_index('calendar_year').to_dict(orient='index')
 

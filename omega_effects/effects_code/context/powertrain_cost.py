@@ -32,7 +32,6 @@ Sample Data Columns
 from omega_effects.effects_code.general.general_functions import read_input_file
 from omega_effects.effects_code.general.input_validation import \
     validate_template_version_info, validate_template_column_names
-from omega_effects.effects_code.general.general_functions import adjust_dollars
 
 
 class PowertrainCost:

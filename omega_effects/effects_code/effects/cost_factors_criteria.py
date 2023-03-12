@@ -49,7 +49,6 @@ import pandas as pd
 from omega_effects.effects_code.general.general_functions import read_input_file
 from omega_effects.effects_code.general.input_validation import \
     validate_template_version_info, validate_template_column_names
-from omega_effects.effects_code.general.general_functions import adjust_dollars
 
 
 class CostFactorsCriteria:
@@ -110,7 +109,7 @@ class CostFactorsCriteria:
 
             cols_to_convert = [col for col in df.columns if 'USD_per_uston' in col]
 
-            df = adjust_dollars(batch_settings, df, 'cpi_price_deflators', effects_log, *cols_to_convert)
+            df = batch_settings.cpi_deflators.adjust_dollars(batch_settings, df, effects_log, *cols_to_convert)
 
             key = pd.Series(zip(
                 df['calendar_year'],
