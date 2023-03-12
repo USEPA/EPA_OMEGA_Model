@@ -356,7 +356,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
             update_cross_subsidy_log_data(producer_decision_and_response, calendar_year, compliance_id, converged,
                                           producer_consumer_iteration_num, producer_compliant, share_convergence_error)
 
-            producer_decision_and_response['cross_subsidy_iteration_num'] = -1  # tag final result
+            producer_decision_and_response['cross_subsidy_iteration_num'] = -10  # tag final result
 
             iteration_log.append(producer_decision_and_response)
 
