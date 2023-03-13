@@ -368,8 +368,13 @@ def calc_period_consumer_view(batch_settings, input_df):
     df.insert(df.columns.get_loc('registered_count'), 'sales', df['registered_count'])
     df.loc[df['age'] != 0, 'sales'] = 0
 
-    # groupby model year, body_style, powertrain and fuel,
-    groupby_cols = ['session_policy', 'session_name', 'model_year', 'body_style', 'powertrain_type', 'in_use_fuel_id']
+    # groupby model year, body_style, powertrain and fuel
+    groupby_cols = ['session_policy', 'session_name', 'model_year', 'body_style', 'in_use_fuel_id']
+    include_powertrain = \
+        batch_settings.general_inputs_for_effects.get_value('include_powertrain_type_in_consumer_cost_view')
+    if include_powertrain == 1:
+        groupby_cols.append('powertrain_type')
+
     attributes.append('sales')
     return_df = df[[*groupby_cols, *attributes]]
     return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()

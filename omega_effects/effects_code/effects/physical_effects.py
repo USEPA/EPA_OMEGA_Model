@@ -245,7 +245,6 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
     Args:
         batch_settings: an instance of the BatchSettings class.
         session_settings: an instance of the SessionSettings class.
-        calendar_years: The years for which emission inventories and fuel consumptions will be calculated.
         safety_effects_dict: The dictionary generated via the safety_effects module.
 
     Returns:
