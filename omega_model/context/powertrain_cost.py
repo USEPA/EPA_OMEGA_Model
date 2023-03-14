@@ -106,6 +106,13 @@ class PowertrainCost(OMEGABase):
         else:
             if reg_class_id != 'mediumduty':
                 locals_dict.update({'CUMULATIVE_GWH': vehicle.global_cumulative_battery_GWh[model_year - 1]})
+                learning_pev_battery_scaling_factor = eval(_cache['PEV', 'battery_GWh_learning_curve']['value'],
+                                                           {'np': np}, locals_dict)
+                if learning_pev_battery_scaling_factor > 1:
+                    gwh = vehicle.global_cumulative_battery_GWh[model_year - 2]
+                    locals_dict.update({'CUMULATIVE_GWH': vehicle.global_cumulative_battery_GWh[model_year - 1] + gwh})
+                    learning_pev_battery_scaling_factor = eval(_cache['PEV', 'battery_GWh_learning_curve']['value'],
+                                                               {'np': np}, locals_dict)
             else:
                 cumulative_GWh_ld_dict = eval(_cache['PEV', 'cumulative_GWh_LD_noIRA']['value'], {'np': np}, locals_dict)
                 if model_year - 1 in cumulative_GWh_ld_dict['GWh']:
@@ -115,8 +122,8 @@ class PowertrainCost(OMEGABase):
                     year = max(yr for yr in cumulative_GWh_ld_dict['GWh'])
                     gwh = cumulative_GWh_ld_dict['GWh'][year]
                     locals_dict.update({'CUMULATIVE_GWH': vehicle.global_cumulative_battery_GWh[model_year - 1] + gwh})
-            learning_pev_battery_scaling_factor = eval(_cache['PEV', 'battery_GWh_learning_curve']['value'],
-                                                       {'np': np}, locals_dict)
+                learning_pev_battery_scaling_factor = eval(_cache['PEV', 'battery_GWh_learning_curve']['value'],
+                                                           {'np': np}, locals_dict)
 
         # markups and learning
         MARKUP_ICE = eval(_cache['ICE', 'markup']['value'], {'np': np}, locals_dict)
