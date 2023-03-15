@@ -483,13 +483,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     """
     from producer import compliance_search
 
-    # producer_decision['average_new_vehicle_mfr_generalized_cost_initial'] = \
-    #     calc_new_vehicle_mfr_generalized_cost(producer_decision, producer_market_classes)
-
     producer_decision['context_new_vehicle_sales'] = producer_decision['total_sales']
-
-    # sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
-    #                                         producer_decision['average_new_vehicle_mfr_generalized_cost_initial'])
 
     cross_subsidy_options_and_response = pd.DataFrame()
 
@@ -732,33 +726,6 @@ def update_cross_subsidy_pair_console_log(cross_subsidy_pair, share_convergence_
         else:
             omega_log.logwrite('** PRODUCER-CONSUMER CONVERGENCE FAIL %s CE:%f, CSPE:%f **' %
                                (' / '.join(cross_subsidy_pair), share_convergence_error, cross_subsidy_pricing_error))
-
-
-def calc_new_vehicle_mfr_generalized_cost(producer_decision, producer_market_classes):
-    """
-
-    Args:
-        producer_decision (Series): result of producer compliance search, *without* consumer response
-        producer_market_classes:
-
-    Returns:
-
-    """
-    average_new_vehicle_mfr_generalized_cost = 0
-    share_total = 0
-    for mc in producer_market_classes:
-        if 'producer_abs_share_frac_%s' % mc in producer_decision:
-            average_new_vehicle_mfr_generalized_cost += \
-                producer_decision['average_new_vehicle_mfr_generalized_cost_dollars_%s' % mc] * \
-                producer_decision['producer_abs_share_frac_%s' % mc]
-            share_total += producer_decision['producer_abs_share_frac_%s' % mc]
-
-    if share_total > 0:
-        cost = average_new_vehicle_mfr_generalized_cost / share_total
-    else:
-        cost = 0
-
-    return cost
 
 
 def calc_sales_and_cost_data_from_consumer_abs_shares(calendar_year, compliance_id, producer_market_classes,
