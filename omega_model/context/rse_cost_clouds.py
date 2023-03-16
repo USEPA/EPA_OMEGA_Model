@@ -343,7 +343,6 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         # convergence terms init
         convergence_tolerance = 0.01
-        vehicle_ballast = DriveCycleBallast.get_ballast_lbs(vehicle)
         battery_kwh = vehicle.battery_kwh  # for now...
 
         cloud_points = []  # build a list of dicts that will be dumped into the cloud at the end
@@ -405,6 +404,10 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 vehicle_curbweight_lbs = sum((vehicle.base_year_glider_non_structure_mass_lbs,
                                                              delta_glider_non_structure_mass_lbs,
                                                              powertrain_mass_lbs, structure_mass_lbs, battery_mass_lbs))
+
+                                vehicle.curbweight_lbs = vehicle_curbweight_lbs  # update curbweight in case it's needed by DriveCycleBallast (medium-duty)
+
+                                vehicle_ballast = DriveCycleBallast.get_ballast_lbs(vehicle)  # f(curbweight_lbs) for medium-duty
 
                                 rated_hp = vehicle_curbweight_lbs / vehicle.base_year_curbweight_lbs_to_hp
 

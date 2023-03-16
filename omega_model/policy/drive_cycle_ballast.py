@@ -99,7 +99,7 @@ class DriveCycleBallast(OMEGABase):
 
         cache_key = (vehicle.reg_class_id, vehicle.model_year)
 
-        if cache_key not in DriveCycleBallast._data:
+        if True or cache_key not in DriveCycleBallast._data:
 
             start_years = DriveCycleBallast._data[vehicle.reg_class_id]['start_year']
             if len(start_years[start_years <= vehicle.model_year]) > 0:
