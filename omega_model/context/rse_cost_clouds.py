@@ -401,18 +401,17 @@ class CostCloud(OMEGABase, CostCloudBase):
                                     MassScaling.calc_mass_terms(vehicle, structure_material, rated_hp,
                                                                 battery_kwh, footprint_ft2)
 
-                                vehicle_curbweight_lbs = sum((vehicle.base_year_glider_non_structure_mass_lbs,
+                                # update curbweight in case it's needed by DriveCycleBallast (medium-duty)
+                                vehicle.curbweight_lbs = sum((vehicle.base_year_glider_non_structure_mass_lbs,
                                                              delta_glider_non_structure_mass_lbs,
                                                              powertrain_mass_lbs, structure_mass_lbs, battery_mass_lbs))
 
-                                vehicle.curbweight_lbs = vehicle_curbweight_lbs  # update curbweight in case it's needed by DriveCycleBallast (medium-duty)
-
                                 vehicle_ballast = DriveCycleBallast.get_ballast_lbs(vehicle)  # f(curbweight_lbs) for medium-duty
 
-                                rated_hp = vehicle_curbweight_lbs / vehicle.base_year_curbweight_lbs_to_hp
+                                rated_hp = vehicle.curbweight_lbs / vehicle.base_year_curbweight_lbs_to_hp
 
                                 # set up RSE terms and run RSEs
-                                ETW = vehicle_curbweight_lbs + vehicle_ballast
+                                ETW = vehicle.curbweight_lbs + vehicle_ballast
 
                                 RLHP20 = rlhp20 / ETW
                                 RLHP60 = rlhp60 / ETW
@@ -441,7 +440,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                                             abs(1 - battery_kwh / prior_battery_kwh) < convergence_tolerance
 
                                 # print(rated_hp, prior_rated_hp, rated_hp / prior_rated_hp)
-                                # print(vehicle_curbweight_lbs, powertrain_mass_lbs, prior_powertrain_mass_lbs, powertrain_mass_lbs / prior_powertrain_mass_lbs)
+                                # print(vehicle.curbweight_lbs, powertrain_mass_lbs, prior_powertrain_mass_lbs, powertrain_mass_lbs / prior_powertrain_mass_lbs)
 
                                 prior_powertrain_mass_lbs = powertrain_mass_lbs
                                 prior_rated_hp = rated_hp
@@ -468,7 +467,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                             cloud_point['structure_mass_lbs'] = structure_mass_lbs
                             cloud_point['footprint_ft2'] = footprint_ft2
                             cloud_point['structure_material'] = structure_material
-                            cloud_point['curbweight_lbs'] = vehicle_curbweight_lbs
+                            cloud_point['curbweight_lbs'] = vehicle.curbweight_lbs
                             cloud_point['rated_hp'] = rated_hp
                             if vehicle.powertrain_type != 'BEV':
                                 # battery size and total motor/generator power come from RSEs for ICE/HEV
