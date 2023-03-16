@@ -663,8 +663,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         _cache.clear()
 
     producer_iteration_log = \
-        omega_log.IterationLog('%s%d_%d_producer_compliance_search.csv' % (
-            omega_globals.options.output_folder, calendar_year, producer_consumer_iteration_num))
+        omega_log.IterationLog('%s%d_%d_%s_producer_compliance_search.csv' % (
+            omega_globals.options.output_folder, calendar_year, producer_consumer_iteration_num, compliance_id))
 
     continue_search = True
     search_iteration = 0
