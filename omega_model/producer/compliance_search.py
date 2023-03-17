@@ -1537,7 +1537,7 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
                       lowest_cost_compliant_tech_share_option[cost_name].item())
 
                 non_compliant_tech_share_options['weighted_slope'] = \
-                    non_compliant_tech_share_options['strategic_compliance_ratio'].values * dy / dx
+                    non_compliant_tech_share_options['strategic_compliance_ratio'].values * dy / (dx + sys.float_info.epsilon)
 
                 most_strategic_non_compliant_tech_share_option = \
                     production_options.loc[[non_compliant_tech_share_options['weighted_slope'].idxmin()]]
@@ -1564,7 +1564,7 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
 
                     # cost cloud up-slopes from left to right, calculate slope relative to best non-compliant option
                     compliant_tech_share_options['weighted_slope'] = \
-                        compliant_tech_share_options['strategic_compliance_ratio'].values * dy / dx
+                        compliant_tech_share_options['strategic_compliance_ratio'].values * dy / (dx + sys.float_info.epsilon)
 
                     most_strategic_compliant_tech_share_option = \
                         production_options.loc[[compliant_tech_share_options['weighted_slope'].idxmax()]]
