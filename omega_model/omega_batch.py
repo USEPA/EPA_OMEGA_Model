@@ -1610,6 +1610,8 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 if __name__ == '__main__':
     import os, sys, time
     import argparse
+    import tkinter as tk
+    from tkinter import filedialog
 
     parser = argparse.ArgumentParser(description='Run OMEGA batch simulation')
     parser.add_argument('--no_validate', action='store_true', help='Skip validating batch file')
@@ -1619,6 +1621,7 @@ if __name__ == '__main__':
     parser.add_argument('--no_bundle', action='store_true',
                         help='Do NOT gather and copy all source files to bundle_path')
     parser.add_argument('--batch_file', type=str, help='Path to batch definition file')
+    parser.add_argument('--ui_batch_file', action='store_true', help='Select batch file from UI')
     parser.add_argument('--session_num', type=int, help='ID # of session to run from batch')
     parser.add_argument('--analysis_final_year', type=int, help='Override analysis final year')
     parser.add_argument('--calc_effects', type=str,
@@ -1645,9 +1648,6 @@ if __name__ == '__main__':
 
         try:
             if args.collate_bundle:
-                import tkinter as tk
-                from tkinter import filedialog
-
                 root = tk.Tk()
                 root.withdraw()
 
@@ -1688,6 +1688,12 @@ if __name__ == '__main__':
                     raise Exception('Unable to locate folder "%s"' % args.collate_bundle)
 
             else:
+                if args.ui_batch_file:
+                    root = tk.Tk()
+                    root.withdraw()
+
+                    args.batch_file = filedialog.askopenfilename()
+
                 run_omega_batch(no_validate=args.no_validate, no_sim=args.no_sim, bundle_path=args.bundle_path,
                             no_bundle=args.no_bundle, batch_file=args.batch_file, session_num=args.session_num,
                             verbose=args.verbose, timestamp=args.timestamp, show_figures=args.show_figures,
