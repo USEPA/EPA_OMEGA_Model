@@ -2,26 +2,26 @@ import pandas as pd
 import sys
 from pathlib import Path
 
-from general.general_functions import read_input_file
+from omega_effects.effects_code.general.general_functions import read_input_file
 from omega_effects.effects_code.context.ip_deflators import ImplicitPriceDeflators
 from omega_effects.effects_code.context.cpi_price_deflators import CPIPriceDeflators
-from effects.cost_factors_criteria import CostFactorsCriteria
-from effects.cost_factors_scc import CostFactorsSCC
-from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
-from effects.cost_factors_congestion_noise import CostFactorsCongestionNoise
-from effects.legacy_fleet import LegacyFleet
+from omega_effects.effects_code.effects.cost_factors_criteria import CostFactorsCriteria
+from omega_effects.effects_code.effects.cost_factors_scc import CostFactorsSCC
+from omega_effects.effects_code.effects.cost_factors_energysecurity import CostFactorsEnergySecurity
+from omega_effects.effects_code.effects.cost_factors_congestion_noise import CostFactorsCongestionNoise
+from omega_effects.effects_code.effects.legacy_fleet import LegacyFleet
 
-from consumer.annual_vmt_fixed_by_age import OnroadVMT
-from consumer.reregistration_fixed_by_age import Reregistration
+from omega_effects.effects_code.consumer.annual_vmt_fixed_by_age import OnroadVMT
+from omega_effects.effects_code.consumer.reregistration_fixed_by_age import Reregistration
 
-from context.fuel_prices import FuelPrice
-from context.context_stock_vmt import ContextStockVMT
-from context.onroad_fuels import OnroadFuel
-from context.maintenance_cost import MaintenanceCost
-from context.repair_cost import RepairCost
-from context.refueling_cost import RefuelingCost
+from omega_effects.effects_code.context.fuel_prices import FuelPrice
+from omega_effects.effects_code.context.context_stock_vmt import ContextStockVMT
+from omega_effects.effects_code.context.onroad_fuels import OnroadFuel
+from omega_effects.effects_code.context.maintenance_cost import MaintenanceCost
+from omega_effects.effects_code.context.repair_cost import RepairCost
+from omega_effects.effects_code.context.refueling_cost import RefuelingCost
 
-from general.general_inputs_for_effects import GeneralInputsForEffects
+from omega_effects.effects_code.general.general_inputs_for_effects import GeneralInputsForEffects
 
 
 class BatchSettings:

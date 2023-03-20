@@ -1,9 +1,9 @@
 Parameters,Entry,Notes
-Batch Settings File,D:\TSh\omega\effects\batch_files\batch_settings_effects_md.csv,"enter full path, including drive id"
+Batch Settings File,D:\TSh\omega\effects\batch_files\batch_settings_effects_md.csv,"enter full path including drive id and filename extension"
 Save Path,D:\TSh\omega\runs,"enter full path, including drive id but do not include unique run identifiers"
 Save Input Files,True,"enter True to copy over input files or False to save space and not do so"
 Save Context Fuel Cost per Mile File,False,"enter True or False and note that these files can be large especially in CSV format"
 Save Vehicle-Level Safety Effects Files,False,"enter True or False and note that these files can be large especially in CSV format"
-Save Vehicle-Level Physical Effects Files,False,"enter True or False, these files can be large, especially in CSV format"
-Save Vehicle-Level Cost Effects Files,False,"enter True or False, these files can be large, especially in CSV format"
-Format for Vehicle-Level Output Files,csv,"enter 'csv' for large Excel-readable files; 'parquet' for compressed files usable in Pandas"
+Save Vehicle-Level Physical Effects Files,False,"enter True or False - these files can be large especially in CSV format"
+Save Vehicle-Level Cost Effects Files,False,"enter True or False - these files can be large especially in CSV format"
+Format for Vehicle-Level Output Files,parquet,"enter 'csv' for large Excel-readable files 'parquet' for compressed files usable in Pandas"
