@@ -156,7 +156,7 @@ def logwrite(message, echo_console=True, terminator='\n'):
     Write message to logfile.
 
     Args:
-        message (str): message string to write
+        message (str or [strs]): message string or list of strings to write
         echo_console (bool): write message to console if True
         terminator (str): end of message terminator, default is newline (``\\n``)
 

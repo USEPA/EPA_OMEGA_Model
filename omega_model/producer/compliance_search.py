@@ -678,10 +678,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         composite_vehicles, pre_production_vehicles, market_class_tree, context_based_total_sales = \
             create_composite_vehicles(calendar_year, compliance_id)
 
-        # print('create_tech_sweeps')
         tech_sweeps = create_tech_sweeps(composite_vehicles, candidate_production_decisions, share_range)
 
-        # print('create_share_sweeps')
         share_sweeps = create_share_sweeps(calendar_year, market_class_tree,
                                            candidate_production_decisions, share_range,
                                            producer_decision_and_response, context_based_total_sales,
@@ -693,20 +691,10 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
         tech_and_share_sweeps = cartesian_prod(tech_sweeps, share_sweeps)
 
-        # if candidate_production_decisions is not None:
-        #     omega_log.logwrite('candidates %s, tech_shape %s, share_shape %s, tech_and_share_shape %s' %
-        #                    (len(candidate_production_decisions), tech_sweeps.shape,
-        #                     share_sweeps.shape, tech_and_share_sweeps.shape))
-        # else:
-        #     omega_log.logwrite('tech_shape %s, share_shape %s, tech_and_share_shape %s' %
-        #                    (tech_sweeps.shape,
-        #                     share_sweeps.shape, tech_and_share_sweeps.shape))
+        # CU
 
-        # print('starting create_production_options_from_shares...')
         production_options = create_production_options_from_shares(composite_vehicles, tech_and_share_sweeps,
                                                                    context_based_total_sales)
-
-        # print('done')
 
         # insert code to cull production options based on policy here #
 

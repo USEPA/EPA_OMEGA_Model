@@ -113,6 +113,7 @@ def logwrite_shares_and_costs(calendar_year, producer_market_classes, share_conv
 
     Args:
         calendar_year (int): calendar year of the data
+        producer_market_classes (list): list of producer market classes, e.g. ['hauling.ICE', 'hauling.BEV', ...]
         share_convergence_error (float): producer-consumer convergence error
         cross_subsidy_pricing_error (float): cross-subsidy pricing error
         producer_decision_and_response (Series): producer compliance search result with consumer share response
@@ -123,23 +124,35 @@ def logwrite_shares_and_costs(calendar_year, producer_market_classes, share_conv
 
         ::
 
-            2020 producer / consumer_abs_share_frac_hauling.BEV    = 0.0002 / 0.0033 (DELTA:0.003084)
-            2020 producer / consumer_abs_share_frac_hauling.ICE    = 0.1699 / 0.1668 (DELTA:0.003084)
-            2020 producer / consumer_abs_share_frac_non_hauling.BEV= 0.0008 / 0.0190 (DELTA:0.018211)
-            2020 producer / consumer_abs_share_frac_non_hauling.ICE= 0.8291 / 0.8109 (DELTA:0.018211)
+            2020 producer / consumer_abs_share_frac_cuv_suv_van.BEV               = 0.001934 / 0.004204 (DELTA:0.002269)
+            2020 producer / consumer_abs_share_frac_cuv_suv_van.ICE               = 0.560920 / 0.558651 (DELTA:0.002269)
+            2020 producer / consumer_abs_share_frac_pickup.BEV                    = 0.000000 / 0.001080 (DELTA:0.001080)
+            2020 producer / consumer_abs_share_frac_pickup.ICE                    = 0.141411 / 0.140331 (DELTA:0.001080)
+            2020 producer / consumer_abs_share_frac_sedan_wagon.BEV               = 0.009009 / 0.009009 (DELTA:0.000000)
+            2020 producer / consumer_abs_share_frac_sedan_wagon.ICE               = 0.286726 / 0.286726 (DELTA:0.000000)
 
-            cross subsidized price / cost hauling.BEV         $56595 / $53900 R:1.050000
-            cross subsidized price / cost hauling.ICE         $36656 / $36709 R:0.998562
-            cross subsidized price / cost non_hauling.BEV     $40763 / $38821 R:1.050000
-            cross subsidized price / cost non_hauling.ICE     $26512 / $26562 R:0.998125
+            cross subsidized price / cost ALT cuv_suv_van.BEV                     $59676 / $54251 R:1.100000
+            cross subsidized price / cost ALT cuv_suv_van.ICE                     $34655 / $34696 R:0.998822
+            cross subsidized price / cost ALT pickup.BEV                          $69475 / $63159 R:1.100000
+            cross subsidized price / cost ALT pickup.ICE                          $40640 / $40689 R:0.998805
+            cross subsidized price / cost ALT sedan_wagon.BEV                     $46913 / $46913 R:1.000000
+            cross subsidized price / cost ALT sedan_wagon.ICE                     $30698 / $30698 R:1.000000
 
-            cross subsidized price / cost BEV                 $43073 / $41022 R:1.050000
-            cross subsidized price / cost ICE                 $28243 / $28294 R:0.998222
-            cross subsidized price / cost hauling             $37037 / $37038 R:0.999994
-            cross subsidized price / cost non_hauling         $26839 / $26843 R:0.999847
-            cross subsidized price / cost TOTAL               $28574 / $28577 R:0.999879
+            modified cross subsidized price / cost ALT cuv_suv_van.BEV            $59676 / $54251 R:1.100000
+            modified cross subsidized price / cost ALT cuv_suv_van.ICE            $34655 / $34696 R:0.998822
+            modified cross subsidized price / cost ALT pickup.BEV                 $69475 / $63159 R:1.100000
+            modified cross subsidized price / cost ALT pickup.ICE                 $40640 / $40689 R:0.998805
+            modified cross subsidized price / cost ALT sedan_wagon.BEV            $46913 / $46913 R:1.000000
+            modified cross subsidized price / cost ALT sedan_wagon.ICE            $30698 / $30698 R:1.000000
 
-            2020_0_0  SCORE:0.000845, CE:0.018211, CSPE:0.000121
+            cross subsidized price / cost ALT BEV                                 $52371 / $50299 R:1.041208
+            cross subsidized price / cost ALT ICE                                 $34356 / $34386 R:0.999125
+            cross subsidized price / cost ALT cuv_suv_van                         $34842 / $34842 R:0.999999
+            cross subsidized price / cost ALT pickup                              $40861 / $40861 R:0.999999
+            cross subsidized price / cost ALT sedan_wagon                         $31192 / $31192 R:1.000000
+            cross subsidized price / cost ALT TOTAL                               $34613 / $34613 R:0.999999
+
+            2020_0_0  SCORE:0.000296, CE:0.002269, CSPE:0.000001
 
     """
     omega_log.logwrite('')
@@ -218,7 +231,7 @@ def update_cross_subsidy_log_data(producer_decision_and_response, calendar_year,
         compliance_id (str): manufacturer name, or 'consolidated_OEM'
         converged (bool): ``True`` if producer and consumer market shares are within tolerance
         producer_consumer_iteration_num (int): producer-consumer iteration number
-        compliant (bool): ``True`` if producer was able to find a compliant production option
+        compliant (bool or None): ``True`` if producer was able to find a compliant production option
         share_convergence_error (float): producer-consumer convergence error
 
     """
@@ -237,12 +250,16 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
     consolidating manufacturers, the compliance ID is 'consolidated_OEM', otherwise the compliance ID is the
     manufacturer name.
 
+    Args:
+        pass_num (int): the pass number, 0 = first, 1 = second, etc.
+        manufacturer_annual_data_table (None, or DataFrame): if provided, contains manufacturer-level data from the
+        first pass
+
     Returns:
          Iteration log dataframe, dict of credit bank information (iteration_log, credit_banks),
          updates omega database with final vehicle technology and market share data
 
     """
-
     from producer.vehicles import VehicleFinal
     from policy.credit_banking import CreditBank
     from producer import compliance_search
@@ -276,15 +293,16 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                     if c.model_year < omega_globals.options.analysis_initial_year:
                         # allow strategic under-compliance for historical credits
                         strategic_target_offset_Mg += \
-                            c.remaining_balance_Mg * (1 / max(1, c.remaining_years-1))
+                            c.remaining_balance_Mg * (1 / max(1, c.remaining_years - 1))
                     else:
                         # don't allow strategic under-compliance for analysis year credits
                         strategic_target_offset_Mg += \
-                            min(0, c.remaining_balance_Mg) * (1 / max(1, c.remaining_years-1))
+                            min(0, c.remaining_balance_Mg) * (1 / max(1, c.remaining_years - 1))
             else:
                 strategic_target_offset_Mg = \
                     manufacturer_annual_data_table[(manufacturer_annual_data_table['compliance_id'] == compliance_id) &
-                                                   (manufacturer_annual_data_table['model_year'] == calendar_year)]['strategic_offset'].item()
+                                                   (manufacturer_annual_data_table['model_year'] == calendar_year)][
+                        'strategic_offset'].item()
 
             producer_decision_and_response = None
             best_winning_combo_with_sales_response = None
@@ -296,7 +314,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                 # in order to hit the strategic offset we need to bypass the consumer a bit
                 # omega_globals.producer_shares_mode = omega_globals.pass_num == 1
                 omega_globals.producer_shares_mode = False
-            elif omega_globals.options.producer_shares_mode == True:
+            elif omega_globals.options.producer_shares_mode is True:
                 omega_globals.producer_shares_mode = True
 
             while iterate_producer_consumer:
@@ -306,7 +324,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, pre_production_vehicles, producer_decision, market_class_tree, \
-                producer_compliant, GWh_limit = \
+                    producer_compliant, GWh_limit = \
                     compliance_search.search_production_options(compliance_id, calendar_year,
                                                                 producer_decision_and_response,
                                                                 producer_consumer_iteration_num,
@@ -342,15 +360,17 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                 # decide whether to continue iterating or not
                 iterate_producer_consumer = omega_globals.options.iterate_producer_consumer \
                                             and producer_consumer_iteration_num < omega_globals.options.producer_consumer_max_iterations \
-                                            and (not converged or producer_decision_and_response['total_battery_GWh'] > GWh_limit)
+                                            and (not converged or producer_decision_and_response[
+                    'total_battery_GWh'] > GWh_limit)
 
                 if iterate_producer_consumer:
                     producer_consumer_iteration_num += 1
                 else:
                     if producer_consumer_iteration_num >= omega_globals.options.producer_consumer_max_iterations:
                         if 'p-c_max_iterations' in omega_globals.options.verbose_console_modules:
-                            omega_log.logwrite('PRODUCER-CONSUMER MAX ITERATIONS EXCEEDED, ROLLING BACK TO BEST ITERATION',
-                                           echo_console=True)
+                            omega_log.logwrite(
+                                'PRODUCER-CONSUMER MAX ITERATIONS EXCEEDED, ROLLING BACK TO BEST ITERATION',
+                                echo_console=True)
                         producer_decision_and_response = best_winning_combo_with_sales_response
 
             update_cross_subsidy_log_data(producer_decision_and_response, calendar_year, compliance_id, converged,
@@ -444,9 +464,7 @@ def calc_cross_subsidy_metrics(mcat, cross_subsidy_pair, producer_decision, cros
         abs(1 - _cross_subsidy_options_and_response['average_ALT_cross_subsidized_price_%s' % mcat] /
             _cross_subsidy_options_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat])
 
-    # cross_subsidy_options_and_response[list(_cross_subsidy_options_and_response.keys())] = \
-    #     _cross_subsidy_options_and_response.values()
-    # TODO: the above used to work... now it throws an error
+    # CU RV
     for k, v in _cross_subsidy_options_and_response.items():
         cross_subsidy_options_and_response[k] = v
 
@@ -498,7 +516,8 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     cross_subsidy_options_and_response['max_share_delta_market_class'] = None
     for mcat in market_class_tree:
         if 'abs_share_delta_%s' % mcat in cross_subsidy_options_and_response:
-            error = cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] / cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat]
+            error = cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] / \
+                    cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat]
             if error > max_error:
                 max_error = error
                 cross_subsidy_options_and_response['max_share_delta_market_class'] = mcat
@@ -512,13 +531,14 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
     # temporarily assign shares to sales to calculate new consumer-share-weighted market_class values:
     for cv in candidate_mfr_composite_vehicles:
-        cv.initial_registered_count = producer_decision_and_response['consumer_abs_share_frac_' + cv.market_class_id + '.' + cv.alt_type] * cv.market_class_share_frac
+        cv.initial_registered_count = producer_decision_and_response[
+                                          'consumer_abs_share_frac_' + cv.market_class_id + '.' + cv.alt_type] * cv.market_class_share_frac
 
     calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehicles, producer_decision_and_response)
 
     # updates producer_decision_and_response['new_vehicle_sales']:
     calc_sales_and_cost_data_from_consumer_abs_shares(calendar_year, compliance_id, producer_market_classes,
-                                                  producer_decision_and_response)
+                                                      producer_decision_and_response)
 
     # distribute total sales to vehicle sales in producer decision and response
     compliance_search.create_production_options_from_shares(candidate_mfr_composite_vehicles,
@@ -535,7 +555,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
     compliant = producer_decision_and_response['strategic_compliance_ratio'] <= 1.0 or \
                 abs(1 - producer_decision_and_response['strategic_compliance_ratio']) <= \
-                    omega_globals.options.producer_compliance_search_tolerance
+                omega_globals.options.producer_compliance_search_tolerance
 
     mcat_converged, share_convergence_error, cross_subsidy_pricing_error = \
         detect_producer_consumer_convergence(producer_decision_and_response, producer_market_classes)
@@ -566,13 +586,18 @@ def logwrite_cross_subsidy_results(calendar_year, producer_market_classes, cross
                                    producer_consumer_iteration_num, producer_decision_and_response,
                                    share_convergence_error):
     """
+    Write cross-subsidy data to the console / session log
 
     Args:
-        calendar_year:
-        cross_subsidy_pricing_error:
-        producer_consumer_iteration_num:
-        producer_decision_and_response:
-        share_convergence_error:
+        calendar_year (int): calendar year of the iteration
+        producer_market_classes (list): list of producer market classes, e.g. ['hauling.ICE', 'hauling.BEV', ...]
+        cross_subsidy_pricing_error (float): the cross subsidy pricing error
+        producer_consumer_iteration_num (int): producer-consumer iteration number
+        producer_decision_and_response (Series): producer decision and cross-subsidy iteration response data
+        share_convergence_error (float): producer-consumer share convergence error
+
+    Returns:
+        Nothing, updates console log and ``omega_globals.price_modification_data``
 
     """
     if 'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
@@ -595,19 +620,21 @@ def logwrite_cross_subsidy_results(calendar_year, producer_market_classes, cross
                                        echo_console=True)
                 else:
                     omega_log.logwrite(('FINAL  %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc],
-                               echo_console=True)
+                                       echo_console=True)
 
     if all(mc in producer_decision_and_response for mc in multiplier_columns):
         for mc, mc_mult in zip(sorted(producer_market_classes), producer_decision_and_response[multiplier_columns]):
             omega_globals.price_modification_data[mc] = dict()
             omega_globals.price_modification_data[mc]['market_class_multiplier'] = mc_mult
-            omega_globals.price_modification_data[mc]['market_class_price_modification'] = PriceModifications.get_price_modification(calendar_year, mc)
+            omega_globals.price_modification_data[mc][
+                'market_class_price_modification'] = PriceModifications.get_price_modification(calendar_year, mc)
     else:
         # no multipliers are generated when a market class tree has an only child (e.g. Tesla is BEV-only, no ICE)
         for mc in sorted(producer_market_classes):
             omega_globals.price_modification_data[mc] = dict()
             omega_globals.price_modification_data[mc]['market_class_multiplier'] = 1.0
-            omega_globals.price_modification_data[mc]['market_class_price_modification'] = PriceModifications.get_price_modification(calendar_year, mc)
+            omega_globals.price_modification_data[mc][
+                'market_class_price_modification'] = PriceModifications.get_price_modification(calendar_year, mc)
 
 
 def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pair, producer_decision,
@@ -654,7 +681,8 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pai
         # calculate score, weighted distance to the origin
         cross_subsidy_options_and_response['pricing_score'] = \
             ((1 - price_weight) * cross_subsidy_options_and_response['abs_share_delta_%s' % mcat].values ** 2 +
-             price_weight * cross_subsidy_options_and_response['pricing_price_ratio_delta_%s' % mcat].values ** 2) ** 0.5
+             price_weight * cross_subsidy_options_and_response[
+                 'pricing_price_ratio_delta_%s' % mcat].values ** 2) ** 0.5
 
         # select best score
         selected_cross_subsidy_index = cross_subsidy_options_and_response['pricing_score'].idxmin()
@@ -693,8 +721,8 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pai
         continue_search = continue_search and not mcat_converged
 
     if cross_subsidy_options_and_response['consumer_constrained_%s' % mcat] and \
-        'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
-            omega_log.logwrite('%%%%%% consumer %s shares constrained %%%%%%' % mcat)
+            'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
+        omega_log.logwrite('%%%%%% consumer %s shares constrained %%%%%%' % mcat)
 
     update_cross_subsidy_pair_console_log(cross_subsidy_pair, share_convergence_error, cross_subsidy_pricing_error,
                                           mcat_converged)
@@ -802,6 +830,7 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
     Args:
         calendar_year (int): calendar year of the iteration
         continue_search (bool): prior value of ``continue_search``, set to ``False`` if search collapses
+        mc_pair ([strs]):
         multiplier_columns ([strs]): list of cost multiplier columns,
             e.g. ['cost_multiplier_hauling.BEV', 'cost_multiplier_hauling.ICE', ...]
         prev_multiplier_range (dict): empty on first pass then contains a dict of previous multiplier ranges by market
@@ -937,7 +966,8 @@ def calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehic
     data via ``calc_market_class_data()`` and ``calc_market_category_data()``
 
     Args:
-        candidate_mfr_composite_vehicles (list): list of candidate composite vehicles that minimize producer compliance cost
+        candidate_mfr_composite_vehicles (list): list of candidate composite vehicles that minimize producer compliance
+            cost
         producer_decision (Series): Series that corresponds with candidate_mfr_composite_vehicles, has producer market
             shares, costs, compliance data (Mg CO2e), may also contain consumer response
 
@@ -963,7 +993,7 @@ def calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehic
 def calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict, producer_decision):
     """
     Calculate market class average CO2e g/mi, kWh/mi, manufacturer new vehicle cost and generalized cost, average fuel
-    price, and sales.
+    price, and other sales-weighted vehicle attributes such as footprint, curbweight, etc.
 
     Args:
         market_class_vehicle_dict (dict): candidate vehicles binned by market class
@@ -975,7 +1005,6 @@ def calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict,
 
     """
     # calculate sales-weighted values by market class
-
     weight_by = 'initial_registered_count'
 
     for mc in omega_globals.options.MarketClass.market_classes:
@@ -1009,7 +1038,6 @@ def calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict,
                 weighted_value(market_class_vehicles, weight_by, 'footprint_ft2')
 
             if 'ICE' in mc:
-                # TODO: should get 8887 from PolicyFuel?, but need calendar year (set in omega_globals so we don't have to pass it in??)
                 producer_decision['average_onroad_mpg_%s' % mc] = \
                     OnroadFuel.grams_co2e_per_gallon / \
                     producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc]
@@ -1028,7 +1056,6 @@ def calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict,
             producer_decision['average_rated_hp_%s' % mc] = 0
             producer_decision['average_footprint_ft2_%s' % mc] = 0
             producer_decision['average_onroad_mpg_%s' % mc] = 0
-
 
         # calculate ALT-only values needed by the consumer module:
         # costs and other values the consumer is basing ICE/BEV decisions on should only be made based on the ALT
@@ -1062,11 +1089,12 @@ def calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict,
 
 def calc_market_data_from_sales(candidate_mfr_composite_vehicles, producer_decision):
     """
-    Creates a dictionary of candidate vehicles binned by market class, calculates market class and market category
-    data via ``calc_market_class_data()`` and ``calc_market_category_data()``
+    Calculates market class and market category data via ``calc_market_class_sales_from_producer_decision()`` and
+    ``calc_market_category_data_from_sales()``
 
     Args:
-        candidate_mfr_composite_vehicles (list): list of candidate composite vehicles that minimize producer compliance cost
+        candidate_mfr_composite_vehicles (list): list of candidate composite vehicles that minimize producer compliance
+            cost
         producer_decision (Series): Series that corresponds with candidate_mfr_composite_vehicles, has producer market
             shares, costs, compliance data (Mg CO2e), may also contain consumer response
 
@@ -1089,12 +1117,15 @@ def calc_market_data_from_sales(candidate_mfr_composite_vehicles, producer_decis
 
 def calc_market_class_sales_from_producer_decision(market_class_vehicle_dict, producer_decision):
     """
+    Calculate market class sales from ``producer_decision`` composite vehicle sales.
 
     Args:
-        market_class_vehicle_dict:
-        producer_decision:
+        market_class_vehicle_dict (dict): candidate vehicles binned by market class
+        producer_decision (Series): Series that corresponds with candidate_mfr_composite_vehicles, has producer market
+            shares, costs, compliance data (Mg CO2e), may also contain consumer response
 
     Returns:
+        Nothing, updates market class values in ``producer_decision``
 
     """
     calc_producer_abs_share_frac_from_sales = dict()
@@ -1126,15 +1157,15 @@ def calc_market_class_sales_from_producer_decision(market_class_vehicle_dict, pr
 
 def calc_market_category_data_from_sales(producer_decision):
     """
-    Calculate market category average cost and generalized cost, average cross subsidized price, sales and producer
-    absolute shares.
+    Calculate market category average cost and generalized cost, average cross subsidized price, sales, producer
+    absolute shares and other sales-weighted market class attributes such as footprint, curbweight, etc.
 
     Args:
         producer_decision (Series): Series that corresponds with candidate_mfr_composite_vehicles, has producer market
             shares, costs, compliance data (Mg CO2e), may also contain consumer response
 
     Returns:
-        Nothing, updates ``producer_decsion`` with calculated market data
+        Nothing, updates ``producer_decsion`` with calculated market category data
 
     """
     for mcat in omega_globals.options.MarketClass.market_categories:
@@ -1227,14 +1258,14 @@ def detect_producer_consumer_convergence(producer_decision_and_response, produce
         producer_market_classes (list): list of producer market classes
 
     Returns:
-        tuple of convergence bool and convergence error, (converged, share_convergence_error)
+        tuple of convergence bool and share convergence error and cross subsidy pricing error
 
     """
     producer_decision_and_response['price_cost_ratio_total'] = \
         (producer_decision_and_response['average_ALT_cross_subsidized_price_total'] /
          producer_decision_and_response['average_ALT_new_vehicle_mfr_cost'])
 
-    cross_subsidy_pricing_error = abs(1-producer_decision_and_response['price_cost_ratio_total'])
+    cross_subsidy_pricing_error = abs(1 - producer_decision_and_response['price_cost_ratio_total'])
     converged = cross_subsidy_pricing_error <= omega_globals.options.producer_cross_subsidy_price_tolerance or \
                 omega_globals.producer_shares_mode
 
@@ -1243,8 +1274,9 @@ def detect_producer_consumer_convergence(producer_decision_and_response, produce
         if 'consumer_abs_share_frac_%s' % mc in producer_decision_and_response:
             share_convergence_error = \
                 max(share_convergence_error, abs(producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
-                                           producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
-            converged = converged and (share_convergence_error <= omega_globals.options.producer_consumer_convergence_tolerance)
+                                                 producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
+            converged = converged and (
+                        share_convergence_error <= omega_globals.options.producer_consumer_convergence_tolerance)
 
     return converged, share_convergence_error, cross_subsidy_pricing_error
 
@@ -1338,7 +1370,7 @@ def init_user_definable_decomposition_attributes(verbose_init):
     via the SQLAlchemy metadata.
 
     Args:
-        verbose_init (bool): if True enable additional init output to console
+        verbose_init (bool): if ``True`` enable additional init output to console
 
     Returns:
         List of template/input errors, else empty list on success
@@ -1363,10 +1395,11 @@ def init_user_definable_decomposition_attributes(verbose_init):
                                     verbose=verbose_init)
 
     init_fail += omega_globals.options.OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
-                                                verbose=verbose_init)
+                                                                      verbose=verbose_init)
 
     vehicle_columns = get_template_columns(omega_globals.options.vehicles_file)
-    VehicleFinal.dynamic_columns = list(set.difference(set(vehicle_columns), VehicleFinal.mandatory_input_template_columns))
+    VehicleFinal.dynamic_columns = list(
+        set.difference(set(vehicle_columns), VehicleFinal.mandatory_input_template_columns))
     for dc in VehicleFinal.dynamic_columns:
         VehicleFinal.dynamic_attributes.append(make_valid_python_identifier(dc))
 
@@ -1393,7 +1426,6 @@ def init_omega(session_runtime_options):
         List of template/input errors, else empty list on success
 
     """
-
     # set up global variables:
     omega_globals.options = session_runtime_options
 
@@ -1415,7 +1447,7 @@ def init_omega(session_runtime_options):
     from context.onroad_fuels import OnroadFuel
     from context.fuel_prices import FuelPrice
     from context.new_vehicle_market import NewVehicleMarket
-    from context.price_modifications import PriceModifications # needs market classes
+    from context.price_modifications import PriceModifications  # needs market classes
     from context.production_constraints import ProductionConstraints
     from context.mass_scaling import MassScaling
     from context.body_styles import BodyStyles
@@ -1463,8 +1495,9 @@ def init_omega(session_runtime_options):
         init_fail += omega_globals.options.SalesShare.init_from_file(omega_globals.options.sales_share_file,
                                                                      verbose=verbose_init)
 
-        init_fail += omega_globals.options.Reregistration.init_from_file(omega_globals.options.vehicle_reregistration_file,
-                                                                         verbose=verbose_init)
+        init_fail += omega_globals.options.Reregistration.init_from_file(
+            omega_globals.options.vehicle_reregistration_file,
+            verbose=verbose_init)
 
         init_fail += omega_globals.options.OnroadVMT.init_from_file(omega_globals.options.onroad_vmt_file,
                                                                     verbose=verbose_init)
@@ -1480,7 +1513,7 @@ def init_omega(session_runtime_options):
                                               verbose=verbose_init)
 
         init_fail += BodyStyles.init_from_file(omega_globals.options.body_styles_file,
-                                                verbose=verbose_init)
+                                               verbose=verbose_init)
 
         NewVehicleMarket.init_context_new_vehicle_generalized_costs(
             omega_globals.options.context_new_vehicle_generalized_costs_file)
@@ -1519,10 +1552,10 @@ def init_omega(session_runtime_options):
                                                verbose=verbose_init)
 
         init_fail += CreditBank.validate_ghg_credit_params_template(omega_globals.options.ghg_credit_params_file,
-                                                              verbose=verbose_init)
+                                                                    verbose=verbose_init)
 
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
-                                                                        verbose=verbose_init)
+                                                          verbose=verbose_init)
 
         init_fail += WorkFactor.init_from_file(omega_globals.options.workfactor_definition_file, verbose=verbose_init)
 
@@ -1562,16 +1595,26 @@ def init_omega(session_runtime_options):
     return init_fail
 
 
-def poolwait():
+def poolstart():
+    """
+    Placeholder for pool startup function
+
+    Returns:
+        ``None``
+
+    """
     return None
-    # print('pooltest')
-    # print('module name:', __name__)
-    # print('parent process:', os.getppid())
-    # print('process id:', os.getpid())
-    # return 42
+    # CU
 
 
 def error_callback(e):
+    """
+    Print multiprocess error callback to the console.
+
+    Args:
+        e (BaseException): exception info
+
+    """
     print('error_callback_%s' % __name__)
     print(e)
 
@@ -1603,11 +1646,7 @@ def run_omega(session_runtime_options, standalone_run=False):
         # no trading
         consolidate = [False]
 
-    last_pass = len(consolidate)-1
-
     output_folders = []
-
-    init_fail = None
 
     if session_runtime_options.notification_destination and session_runtime_options.notification_email \
             and session_runtime_options.notification_password:
@@ -1643,8 +1682,7 @@ def run_omega(session_runtime_options, standalone_run=False):
                 session_runtime_options.sales_share_calibration_file = \
                     'context_sales_share_calibration_%d.csv' % session_runtime_options.consolidate_manufacturers
 
-
-            session_runtime_options.output_folder = session_runtime_options.output_folder_base\
+            session_runtime_options.output_folder = session_runtime_options.output_folder_base \
                 .replace(session_runtime_options.output_folder_base,
                          '%sconsolidate_%d%s' % (session_runtime_options.output_folder_base,
                                                  session_runtime_options.consolidate_manufacturers, os.sep))
@@ -1677,9 +1715,9 @@ def run_omega(session_runtime_options, standalone_run=False):
 
                     results = []
                     for i in range(num_processes):
-                        results.append(omega_globals.pool.apply_async(func=omega.poolwait,
-                                                         callback=None,
-                                                         error_callback=omega.error_callback))
+                        results.append(omega_globals.pool.apply_async(func=omega.poolstart,
+                                                                      callback=None,
+                                                                      error_callback=omega.error_callback))
 
                     [r.get() for r in results]
 
@@ -1696,7 +1734,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
                 omega_globals.options.producer_consumer_max_iterations = \
                     max(omega_globals.options.producer_consumer_max_iterations,
-                        len(omega_globals.options.MarketClass.market_classes)/2 + 1)
+                        len(omega_globals.options.MarketClass.market_classes) / 2 + 1)
 
                 iteration_log, credit_banks = \
                     run_producer_consumer(omega_globals.pass_num, manufacturer_annual_data_table)
@@ -1705,7 +1743,7 @@ def run_omega(session_runtime_options, standalone_run=False):
                         and omega_globals.options.notification_password:
                     send_text(omega_globals.options.notification_destination,
                               '%s Pass %d Starting Post-processing...' % (
-                              omega_globals.options.session_unique_name, omega_globals.pass_num),
+                                  omega_globals.options.session_unique_name, omega_globals.pass_num),
                               omega_globals.options.notification_email, omega_globals.options.notification_password)
 
                 # postproc session
@@ -1776,7 +1814,8 @@ def run_omega(session_runtime_options, standalone_run=False):
                                                       4: 'input_template_name', 6: 'version_number', 7: 'notes:'})
 
             metadata_df.to_csv(
-                omega_globals.options.output_folder + f'{omega_globals.options.session_unique_name}_inputfile_metadata.csv', index=False, header=True)
+                omega_globals.options.output_folder + f'{omega_globals.options.session_unique_name}_inputfile_metadata.csv',
+                index=False, header=True)
 
             omega_log.end_logfile("\nSession Complete")
 
@@ -1784,10 +1823,10 @@ def run_omega(session_runtime_options, standalone_run=False):
                 os.system('snakeviz omega_profile.dmp')
 
             if omega_globals.options.notification_destination and omega_globals.options.notification_email \
-                and omega_globals.options.notification_password:
+                    and omega_globals.options.notification_password:
                 send_text(omega_globals.options.notification_destination,
                           '%s Pass %d Complete' % (omega_globals.options.session_unique_name, omega_globals.pass_num),
-                           omega_globals.options.notification_email, omega_globals.options.notification_password)
+                          omega_globals.options.notification_email, omega_globals.options.notification_password)
 
         # move appropriate outputs to base output folder
         file_io.move_folder_contents('%s%sconsolidate_%d' % (omega_globals.options.output_folder_base, os.sep,
@@ -1809,6 +1848,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 if __name__ == "__main__":
     try:
         import producer
+
         run_omega(OMEGASessionSettings(), standalone_run=True)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
