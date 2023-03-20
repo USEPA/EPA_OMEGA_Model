@@ -1634,8 +1634,7 @@ if __name__ == '__main__':
     parser.add_argument('--dispy_exclusive', action='store_true', help='Run exclusive job, do not share dispynodes')
     parser.add_argument('--dispy_scheduler', type=str, help='Override default dispy scheduler IP address',
                         default=None)
-    parser.add_argument('--collate_bundle', type=str, help='Find and collate summary files in the given bundle folder',
-                        default=None)
+    parser.add_argument('--collate_bundle', action='store_true', help='Find and collate summary files in a bundle folder')
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--local', action='store_true', help='Run only on local machine, no network nodes')
@@ -1646,6 +1645,14 @@ if __name__ == '__main__':
 
         try:
             if args.collate_bundle:
+                import tkinter as tk
+                from tkinter import filedialog
+
+                root = tk.Tk()
+                root.withdraw()
+
+                args.collate_bundle = filedialog.askdirectory()
+
                 print('\nCollating %s...\n' % args.collate_bundle)
                 if file_exists(get_absolute_path(args.collate_bundle)):
                     import pandas as pd
