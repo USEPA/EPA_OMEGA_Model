@@ -59,7 +59,7 @@ from omega_model import *
 
 class MassScaling(OMEGABase):
     """
-    **Load and provides routines to access mass scaling terms and equations. **
+    **Load and provides routines to access mass scaling terms and equations.**
 
     """
 
@@ -72,7 +72,8 @@ class MassScaling(OMEGABase):
     @staticmethod
     def calc_mass_terms(vehicle, structure_material, eng_rated_hp, battery_kwh, footprint_ft2):
         """
-            Calculate struture mass, battery mass and powertrain mass for the given vehicle
+        Calculate struture mass, battery mass and powertrain mass for the given vehicle
+
         Args:
             vehicle (Vehicle):
 
