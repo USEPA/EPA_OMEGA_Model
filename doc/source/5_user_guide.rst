@@ -22,26 +22,17 @@ Batch Input Files and Loaders
         Context Fuel Prices File, :any:`omega_model/context/fuel_prices.py<omega_model.context.fuel_prices>`
         Context New Vehicle Market File, :any:`omega_model/context/new_vehicle_market.py<omega_model.context.new_vehicle_market>`
         Manufacturers File, :any:`omega_model/producer/manufacturers.py<omega_model.producer.manufacturers>`
-        Market Classes File, ``user_definable`` e.g. :any:`omega_model/consumer/market_classes.py<omega_model.consumer.market_classes>`
+        Market Classes File, ``user_definable`` e.g. :any:`omega_model/consumer/market_classes.py<omega_model.consumer.market_classes_unibody>`
         Onroad Fuels File, :any:`omega_model/context/onroad_fuels.py<omega_model.context.onroad_fuels>`
         Onroad Vehicle Calculations File, :any:`omega_model/producer/vehicles.py<omega_model.producer.vehicles>`
         Onroad VMT File, ``user_definable`` e.g. :any:`omega_model/consumer/annual_vmt_fixed_by_age.py<omega_model.consumer.annual_vmt_fixed_by_age>`
         Producer Generalized Cost File, ``user_definable`` e.g. :any:`omega_model/producer/producer_generalized_cost.py<omega_model.producer.producer_generalized_cost>`
         Production Constraints File, :any:`omega_model/context/production_constraints.py<omega_model.context.production_constraints>`
-        Sales Share File, ``user_definable`` e.g. :any:`omega_model/consumer/sales_share.py<omega_model.consumer.sales_share>`
+        Sales Share File, ``user_definable`` e.g. :any:`omega_model/consumer/sales_share.py<omega_model.consumer.sales_share_ice_bev>`
         Vehicle Price Modifications File, :any:`omega_model/context/price_modifications.py<omega_model.context.price_modifications>`
         Vehicle Reregistration File, ``user_definable`` e.g. :any:`omega_model/consumer/reregistration_fixed_by_age.py<omega_model.consumer.reregistration_fixed_by_age>`
         Vehicle Simulation Results and Costs File, :any:`omega_model/context/cost_clouds.py<omega_model.context.cost_clouds>`
         Vehicles File, :any:`omega_model/producer/vehicles.py<omega_model.producer.vehicles>`
-        Context Criteria Cost Factors File, :any:`omega_model/effects/cost_factors_criteria.py<omega_model.effects.cost_factors_criteria>`
-        Context SCC Cost Factors File, :any:`omega_model/effects/cost_factors_scc.py<omega_model.effects.cost_factors_scc>`
-        Context Energy Security Cost Factors File, :any:`omega_model/effects/cost_factors_energysecurity.py<omega_model.effects.cost_factors_energysecurity>`
-        Context Congestion-Noise Cost Factors File, :any:`omega_model/effects/cost_factors_congestion_noise.py<omega_model.effects.cost_factors_congestion_noise>`
-        Context Powersector Emission Factors File, :any:`omega_model/effects/emission_factors_powersector.py<omega_model.effects.emission_factors_powersector>`
-        Context Refinery Emission Factors File, :any:`omega_model/effects/emission_factors_refinery.py<omega_model.effects.emission_factors_refinery>`
-        Context Vehicle Emission Factors File, :any:`omega_model/effects/emission_factors_vehicles.py<omega_model.effects.emission_factors_vehicles>`
-        Context Implicit Price Deflators File, :any:`omega_model/effects/ip_deflators.py<omega_model.effects.ip_deflators>`
-        Context Consumer Price Index File, :any:`omega_model/effects/cpi_price_deflators<omega_model.effects.cpi_price_deflators>`
         ,
         Session Policy Alternatives Settings,
         Drive Cycle Weights File, :any:`omega_model/policy/drive_cycle_weights.py<omega_model.policy.drive_cycle_weights>`
