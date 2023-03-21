@@ -6,25 +6,27 @@ from time import time
 from datetime import datetime
 
 import omega_effects.effects_code
-from set_paths import SetPaths
+from omega_effects.effects_code.set_paths import SetPaths
 
-from batch_settings import BatchSettings
-from session_settings import SessionSettings
+from omega_effects.effects_code.batch_settings import BatchSettings
+from omega_effects.effects_code.session_settings import SessionSettings
 
-from general.effects_log import EffectsLog
-from general.runtime_options import RuntimeOptions
-from general.general_functions import copy_files
-from general.file_id_and_save import add_id_to_csv, save_file
+from omega_effects.effects_code.general.effects_log import EffectsLog
+from omega_effects.effects_code.general.runtime_options import RuntimeOptions
+from omega_effects.effects_code.general.general_functions import copy_files
+from omega_effects.effects_code.general.file_id_and_save import add_id_to_csv, save_file
 
-from effects.vmt_adjustments import AdjustmentsVMT
-from effects.context_fuel_cost_per_mile import calc_fuel_cost_per_mile
-from effects.safety_effects import calc_safety_effects, calc_legacy_fleet_safety_effects, calc_annual_avg_safety_effects
-from effects.physical_effects import calc_physical_effects, calc_legacy_fleet_physical_effects, \
-    calc_annual_physical_effects, calc_period_consumer_physical_view
-from effects.cost_effects import calc_cost_effects, calc_annual_cost_effects, calc_period_consumer_view
-from effects.present_and_annualized_values import PVandEAV
-from effects.benefits import calc_benefits
-from effects.sum_social_effects import calc_social_effects
+from omega_effects.effects_code.effects.vmt_adjustments import AdjustmentsVMT
+from omega_effects.effects_code.effects.context_fuel_cost_per_mile import calc_fuel_cost_per_mile
+from omega_effects.effects_code.effects.safety_effects import calc_safety_effects, calc_legacy_fleet_safety_effects, \
+    calc_annual_avg_safety_effects
+from omega_effects.effects_code.effects.physical_effects import calc_physical_effects, \
+    calc_legacy_fleet_physical_effects, calc_annual_physical_effects, calc_period_consumer_physical_view
+from omega_effects.effects_code.effects.cost_effects import calc_cost_effects, calc_annual_cost_effects, \
+    calc_period_consumer_view
+from omega_effects.effects_code.effects.present_and_annualized_values import PVandEAV
+from omega_effects.effects_code.effects.benefits import calc_benefits
+from omega_effects.effects_code.effects.sum_social_effects import calc_social_effects
 
 
 def main():

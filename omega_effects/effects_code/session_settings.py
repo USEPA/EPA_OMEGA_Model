@@ -1,16 +1,16 @@
 import sys
 from pathlib import Path
 
-from effects.vehicles import Vehicles
-from effects.vehicle_annual_data import VehicleAnnualData
+from omega_effects.effects_code.effects.vehicles import Vehicles
+from omega_effects.effects_code.effects.vehicle_annual_data import VehicleAnnualData
 
-from effects.emission_rates_egu import EmissionRatesEGU
-from effects.emission_factors_refinery import EmissionFactorsRefinery
-from effects.emission_rates_refinery import EmissionRatesRefinery
-from effects.emission_rates_vehicles import EmissionRatesVehicles
-from effects.safety_values import SafetyValues
-from effects.fatality_rates import FatalityRates
-from context.powertrain_cost import PowertrainCost
+from omega_effects.effects_code.effects.emission_rates_egu import EmissionRatesEGU
+from omega_effects.effects_code.effects.emission_factors_refinery import EmissionFactorsRefinery
+from omega_effects.effects_code.effects.emission_rates_refinery import EmissionRatesRefinery
+from omega_effects.effects_code.effects.emission_rates_vehicles import EmissionRatesVehicles
+from omega_effects.effects_code.effects.safety_values import SafetyValues
+from omega_effects.effects_code.effects.fatality_rates import FatalityRates
+from omega_effects.effects_code.context.powertrain_cost import PowertrainCost
 
 
 class SessionSettings:

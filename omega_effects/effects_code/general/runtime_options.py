@@ -15,8 +15,8 @@ Sample Data Columns
         :widths: auto
 
         Parameter,Entry,Notes
-        Batch Settings File,C:\Directory\...\filename.csv,"enter full path, including drive id"
-        Save Path,C:\Directory\....\SubDirectory,"enter full path, including drive id but do not include unique run identifiers"
+        Batch Settings File,full path to file,"enter full path including drive id and filename extension"
+        Save Path,full path to save folder,"enter full path including drive id but do not include unique run identifiers"
         Large Effects File Save Format,parquet,"enter 'csv' for large Excel-readable files; 'parquet' for compressed files usable in Pandas"
 
 Data Column Name and Description

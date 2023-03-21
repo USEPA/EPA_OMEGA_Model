@@ -8,8 +8,7 @@ def calc_social_effects(costs_df, benefits_df, ghg_scope, calc_health_effects=Fa
         costs_df (DataFrame): the annual, present and equivalent annualized values.
         benefits_df (DataFrame): the annual, present and equivalent annualized values.
         ghg_scope (str): which GHG benefits to use in net benefits, i.e., 'global', 'domestic'
-        calc_health_effects (bool): pass True to use $/ton values to calculate health effects. If cost_factors_criteria.csv
-        contains benefit per ton values, calc_health_effects will be True; blank values will result in the default False.
+        calc_health_effects (bool): pass True to use $/ton values to calculate health effects. If cost_factors_criteria.csv contains benefit per ton values, calc_health_effects will be True; blank values will result in the default False.
 
     Returns:
         A summary effects DataFrame with additional columns summing costs and benefits.
