@@ -27,6 +27,7 @@ class ManufacturerAnnualData(SQABase):
     """
     # --- database table properties ---
     __tablename__ = 'manufacturer_annual_data'  # database table name
+    __table_args__ = {'extend_existing': True}  # fix sphinx-apidoc crash
     index = Column('index', Integer, primary_key=True)  #: database table index
     compliance_id = Column('compliance_id', Integer, ForeignKey('manufacturers.manufacturer_id'))  #: manufacturer id, e..g 'consolidated_OEM'
     model_year = Column(Numeric)  #: model year of the data
