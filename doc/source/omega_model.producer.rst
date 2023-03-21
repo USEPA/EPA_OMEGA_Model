@@ -49,6 +49,14 @@ omega\_model.producer.producer\_generalized\_cost module
    :undoc-members:
    :show-inheritance:
 
+omega\_model.producer.vehicle\_aggregation module
+-------------------------------------------------
+
+.. automodule:: omega_model.producer.vehicle_aggregation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_model.producer.vehicle\_annual\_data module
 --------------------------------------------------
 

@@ -4,7 +4,6 @@ Code Details
 .. toctree::
    :maxdepth: 4
 
+   omega_effects
    omega_gui
    omega_model
-   omega_preproc
-   test_omega2

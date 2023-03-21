@@ -41,6 +41,14 @@ omega\_model.common.omega\_dispy module
    :undoc-members:
    :show-inheritance:
 
+omega\_model.common.omega\_eval module
+--------------------------------------
+
+.. automodule:: omega_model.common.omega_eval
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_model.common.omega\_functions module
 -------------------------------------------
 

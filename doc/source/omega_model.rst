@@ -15,7 +15,6 @@ Subpackages
    omega_model.common
    omega_model.consumer
    omega_model.context
-   omega_model.effects
    omega_model.policy
    omega_model.producer
 
