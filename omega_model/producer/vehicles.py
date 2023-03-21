@@ -1195,7 +1195,7 @@ class VehicleFinal(SQABase, Vehicle):
     """
     # --- database table properties ---
     __tablename__ = 'vehicles'
-    __table_args__ = {'extend_existing': True}  # fix sphinx-apidoc crash
+    # __table_args__ = {'extend_existing': True}  # fix sphinx-apidoc crash
     vehicle_id = Column(Integer, primary_key=True)  #: unique vehicle ID, database table primary key
     from_vehicle_id = Column(String)  #: transferred vehicle ID from Vehicle object
     name = Column(String)  #: vehicle name
