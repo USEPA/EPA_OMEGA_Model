@@ -68,7 +68,7 @@ def validate_folder(dstfolder):
     """
     if not os.access(dstfolder, os.F_OK):
         try:
-            os.makedirs(dstfolder, exist_ok=True) # try create folder if necessary
+            os.makedirs(dstfolder, exist_ok=True)  # try create folder if necessary
         except:
             print("Couldn't access or create {}".format(dstfolder), file=sys.stderr)
             omega_log.logwrite("Error - Couldn't access or create {}".format(dstfolder))
@@ -137,8 +137,20 @@ def get_absolute_path(filename):
     return os.path.abspath(filename)
 
 
-def get_basename(filename):
-    return os.path.basename(filename)
+def get_basename(pathname):
+    """
+    Return the base name of pathname path. This is the second element of the pair returned by passing path to the
+    function split(). Note that the result of this function is different from the Unix basename program; where basename
+    for '/foo/bar/' returns 'bar', the basename() function returns an empty string ('').
+
+    Args:
+        pathname(str): the path to get the basename of
+
+    Returns:
+        The base name of pathname path.
+
+    """
+    return os.path.basename(pathname)
 
 
 def get_filename(filename):
@@ -193,10 +205,10 @@ def relocate_file(remote_path, local_filename):
     return get_filenameext(local_filename)
 
 
-def sysprint(str):
+def sysprint(msg):
     """
     Performs ECHO command of str in CMD window
 
-    :param str: string to echo
+    :param msg: string to echo
     """
-    os.system('echo {}'.format(str))
+    os.system('echo {}'.format(msg))

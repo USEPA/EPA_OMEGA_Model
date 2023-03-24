@@ -1109,7 +1109,7 @@ def validate_folder(batch_root, batch_name='', session_name=''):
         except:
             import traceback
 
-            print('Couldn''t access or create {"%s"}' % (dstfolder), file=sys.stderr)
+            print('Couldn''t access or create {"%s"}' % dstfolder, file=sys.stderr)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             raise Exception(traceback.format_exc())
 
@@ -1420,11 +1420,13 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                         if type(source_file_path) is str:
                             source_file_path = source_file_path.replace('\\', os.sep)
                             if is_absolute_path(source_file_path):
-                                if options.verbose: batch.batch_log.logwrite('validating %s=%s' % (i, source_file_path))
+                                if options.verbose:
+                                    batch.batch_log.logwrite('validating %s=%s' % (i, source_file_path))
                                 validate_file(source_file_path)
                             else:
-                                if options.verbose: batch.batch_log.logwrite(
-                                    'validating %s=%s' % (i, batch.batch_definition_path + source_file_path))
+                                if options.verbose:
+                                    batch.batch_log.logwrite('validating %s=%s' %
+                                                             (i, batch.batch_definition_path + source_file_path))
                                 validate_file(batch.batch_definition_path + source_file_path)
 
                 batch.batch_log.logwrite('Validating Session %d Parameters...' % s)
@@ -1533,8 +1535,9 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                             if is_absolute_path(source_file_path):
                                 # file_path is absolute path
                                 if options.verbose:
-                                    batch.batch_log.logwrite('relocating %s to %s' % (
-                                    source_file_path, options.session_path + get_filenameext(source_file_path)))
+                                    batch.batch_log.logwrite('relocating %s to %s' %
+                                                             (source_file_path, options.session_path +
+                                                              get_filenameext(source_file_path)))
                                 batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
                                     options.session_path + bundle_input_folder_name, source_file_path)
                             else:
@@ -1574,8 +1577,6 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                 dispy_session_list = dispy_session_list[1:]
 
                 if dispy_session_list:
-                    retry_count = dict()  # track retry attempts for terminated or abandoned jobs
-
                     dispycluster = DispyCluster(options)
                     dispycluster.find_nodes()
                     dispycluster.submit_sessions(batch, batch.name, options.bundle_path_root,

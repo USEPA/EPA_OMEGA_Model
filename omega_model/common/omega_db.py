@@ -27,7 +27,7 @@ from sqlalchemy import create_engine
 # noinspection PyUnresolvedReferences
 import sqlalchemy
 # noinspection PyUnresolvedReferences
-from sqlalchemy import MetaData, Table, Column, String, ForeignKey, Enum, Float, Numeric, Integer, func, Boolean
+from sqlalchemy import MetaData, Table, Column, String, ForeignKey, Enum, Float, Integer, func, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 # noinspection PyUnresolvedReferences
 from sqlalchemy.orm import relationship, Session
@@ -45,12 +45,44 @@ class _StringNumeric(types.TypeDecorator):
     cache_ok = True  # for SQLAlchemy >= 1.4 request caching
 
     def load_dialect_impl(self, dialect):
+        """
+        Get the SQL dialect implementation descriptor
+
+        Args:
+            dialect (SQLAlchemy Dialect):
+
+        Returns:
+            The implementation type descriptor of
+
+        """
         return dialect.type_descriptor(types.VARCHAR(100))
 
     def process_bind_param(self, value, dialect):
+        """
+        Generate string representation of ``value``.
+
+        Args:
+            value (numeric): the numeric value to be converted to a string
+            dialect: unused
+
+        Returns:
+            The string representation of ``value``.
+
+        """
         return str(value)
 
     def process_result_value(self, value, dialect):
+        """
+        Returns the ``Decimal`` value of ``value``.
+
+        Args:
+            value (str): the string to convert to ``Decimal``
+            dialect: unused
+
+        Returns:
+            The ``Decimal`` value of ``value``.
+
+        """
         return Decimal(value)
 
 

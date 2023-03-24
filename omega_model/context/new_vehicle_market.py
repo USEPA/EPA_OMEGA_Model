@@ -273,6 +273,8 @@ class NewVehicleMarket(OMEGABase):
             calendar_year (numeric): calendar year
             context_size_class (str): optional context size class, e.g. 'Small Crossover'
             context_reg_class (str): optional context reg class, e.g. 'car' or 'truck'
+            context_body_style (str): e.g. 'sedan_wagon'
+            value (str): the column name of the context value to sum
 
         Returns:
             new vehicle total sales or sales by context size class or by context size class and reg class
@@ -309,10 +311,10 @@ class NewVehicleMarket(OMEGABase):
 
         elif context_reg_class and not context_size_class:
             if (omega_globals.options.context_id, omega_globals.options.context_case_id, context_reg_class,
-                calendar_year) in NewVehicleMarket._data_by_rc[value]:
-                    return NewVehicleMarket._data_by_rc[value].loc[omega_globals.options.context_id,
-                                                    omega_globals.options.context_case_id,
-                                                    context_reg_class, calendar_year]
+                 calendar_year) in NewVehicleMarket._data_by_rc[value]:
+                return NewVehicleMarket._data_by_rc[value].loc[omega_globals.options.context_id,
+                                                omega_globals.options.context_case_id,
+                                                context_reg_class, calendar_year]
             else:
                 return 0
 
@@ -365,7 +367,7 @@ class NewVehicleMarket(OMEGABase):
             ''True'' if the given case ID name is valid, ''False'' otherwise
 
         """
-        return context_id in NewVehicleMarket.context_ids
+        return case_id in NewVehicleMarket.context_case_ids
 
     @staticmethod
     def get_context_size_class_mpg(size_class, reg_class_id, year, onroad=True):

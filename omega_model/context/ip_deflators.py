@@ -88,7 +88,6 @@ class ImplictPriceDeflators(OMEGABase):
         """
 
         Args:
-            deflators (str): 'cpi_price_deflators' or 'ip_deflators' for consumer price index or implicit price deflators
             dollar_basis_input (int): the dollar basis of the input value.
 
         Returns:
@@ -118,8 +117,6 @@ class ImplictPriceDeflators(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
-
         ImplictPriceDeflators._data.clear()
 
         ImplictPriceDeflators._cache.clear()

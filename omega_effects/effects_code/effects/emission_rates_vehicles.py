@@ -134,7 +134,7 @@ class EmissionRatesVehicles:
             sourcetype_name (str): the MOVES sourcetype name (e.g., 'passenger car', 'light commercial truck')
             reg_class_id (str): the regulatory class, e.g., 'car' or 'truck'
             in_use_fuel_id (str): the liquid fuel ID, e.g., 'pump gasoline'
-            age (int): the vehicle age
+            age (int): vehicle age in years
             rate_names: name of emission rate(s) to get
 
         Returns:

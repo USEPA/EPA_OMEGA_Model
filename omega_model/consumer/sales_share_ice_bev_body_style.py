@@ -83,6 +83,7 @@ from common import TRUE, FALSE
 
 import math
 
+
 class SalesShare(OMEGABase, SalesShareBase):
     """
     Loads and provides access to GCAM consumer response parameters.
@@ -440,7 +441,6 @@ class SalesShare(OMEGABase, SalesShareBase):
             for c in ['curbweight_lbs', 'rated_hp']:  # TODO: add 'onroad_mpg' ...
                 SalesShare._data['share_seed_data', base_year, rc, c] = base_year_reg_class_data[c][rc]
 
-
     @staticmethod
     def init_from_file(filename, verbose=False):
         """
@@ -604,7 +604,6 @@ if __name__ == '__main__':
                                         omega_globals.options.bev_vehicle_simulation_results_file,
                                         omega_globals.options.phev_vehicle_simulation_results_file,
                                         verbose=omega_globals.options.verbose)
-
 
         init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
                                                        verbose=omega_globals.options.verbose)

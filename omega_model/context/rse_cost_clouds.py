@@ -126,6 +126,18 @@ class CostCloud(OMEGABase, CostCloudBase):
 
     @staticmethod
     def init_from_ice_file(filename, powertrain_type='ICE', verbose=False):
+        """
+        Init ``CostCloud`` from ICE RSE data.
+
+        Args:
+            filename (str): the pathname of the file to load
+            powertrain_type (str): e.g. 'ICE'
+            verbose (bool): enhanced console output if ``True``
+
+        Returns:
+            list of encountered errors, if any
+
+        """
         if verbose:
             omega_log.logwrite('\nInitializing CostCloud from %s...' % filename)
         input_template_name = __name__
@@ -141,9 +153,6 @@ class CostCloud(OMEGABase, CostCloudBase):
                                                          verbose=verbose)
         if not template_errors:
             # read in the data portion of the input file
-            cost_clouds_template_info = pd.read_csv(filename, nrows=0)
-            temp = [item for item in cost_clouds_template_info]
-
             df = pd.read_csv(filename, skiprows=1)
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
@@ -190,7 +199,19 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         return template_errors
 
+    @staticmethod
     def init_from_bev_file(filename, verbose=False):
+        """
+        Init ``CostCloud`` from BEV RSE data.
+
+        Args:
+            filename (str): the pathname of the file to load
+            verbose (bool): enhanced console output if ``True``
+
+        Returns:
+            list of encountered errors, if any
+
+        """
         if verbose:
             omega_log.logwrite('\nInitializing CostCloud from %s...' % filename)
         input_template_name = __name__
@@ -205,9 +226,6 @@ class CostCloud(OMEGABase, CostCloudBase):
                                                          verbose=verbose)
         if not template_errors:
             # read in the data portion of the input file
-            cost_clouds_template_info = pd.read_csv(filename, nrows=0)
-            temp = [item for item in cost_clouds_template_info]
-
             df = pd.read_csv(filename, skiprows=1)
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
@@ -253,7 +271,19 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         return template_errors
 
+    @staticmethod
     def init_from_phev_file(filename, verbose=False):
+        """
+        Init ``CostCloud`` from PHEV RSE data.
+
+        Args:
+            filename (str): the pathname of the file to load
+            verbose (bool): enhanced console output if ``True``
+
+        Returns:
+            list of encountered errors, if any
+
+        """
         # they're the same for now, so why reinvent the wheel?!
         return CostCloud.init_from_ice_file(filename, powertrain_type='PHEV', verbose=verbose)
 
@@ -345,8 +375,9 @@ class CostCloud(OMEGABase, CostCloudBase):
         convergence_tolerance = 0.01
         battery_kwh = vehicle.battery_kwh  # for now...
 
-        cloud_points = []  # build a list of dicts that will be dumped into the cloud at the end
-                           # (faster than sequentially appending Series objects)
+        # build a list of dicts that will be dumped into the cloud at the end faster than sequentially
+        # appending Series objects)
+        cloud_points = []
 
         for ccc in cost_curve_classes:
             tech_flags = cost_curve_classes[ccc]['tech_flags'].to_dict()
@@ -384,7 +415,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                 for footprint_ft2 in vehicle_footprints:
                     for rlhp20 in rlhp20s:
                         for rlhp60 in rlhp60s:
-                            cloud_point = copy.copy(tech_flags) # cost_curve_classes[ccc]['tech_flags'].to_dict()
+                            cloud_point = copy.copy(tech_flags)  # cost_curve_classes[ccc]['tech_flags'].to_dict()
 
                             cloud_point['powertrain_type'] = vehicle.powertrain_type
 
@@ -397,7 +428,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                             while not converged:
                                 # rated hp sizing --------------------------------------------------------------- #
                                 structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, \
-                                delta_glider_non_structure_mass_lbs, usable_battery_capacity_norm = \
+                                 delta_glider_non_structure_mass_lbs, usable_battery_capacity_norm = \
                                     MassScaling.calc_mass_terms(vehicle, structure_material, rated_hp,
                                                                 battery_kwh, footprint_ft2)
 
@@ -456,8 +487,9 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 omega_globals.options.VehicleTargets.calc_target_co2e_Mg(v, sales_variants=1)
 
                             cloud_point['cert_co2e_Mg_per_vehicle'] = \
-                                omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(v, co2_gpmi_variants=
-                                cloud_point['cert_co2e_grams_per_mile'], sales_variants=1)
+                                omega_globals.options.VehicleTargets.\
+                                    calc_cert_co2e_Mg(v, co2_gpmi_variants=cloud_point['cert_co2e_grams_per_mile'],
+                                                      sales_variants=1)
 
                             cloud_point['credits_co2e_Mg_per_vehicle'] = \
                                 cloud_point['target_co2e_Mg_per_vehicle'] - cloud_point['cert_co2e_Mg_per_vehicle']
@@ -488,7 +520,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 cloud_point['delta_glider_non_structure_mass_lbs'] = delta_glider_non_structure_mass_lbs
                                 cloud_point['glider_non_structure_mass_lbs'] = \
                                     vehicle.base_year_glider_non_structure_mass_lbs + delta_glider_non_structure_mass_lbs
-                                cloud_point['battery_mass_lbs']= battery_mass_lbs
+                                cloud_point['battery_mass_lbs'] = battery_mass_lbs
                                 cloud_point['powertrain_mass_lbs'] = powertrain_mass_lbs
                                 cloud_point['etw_lbs'] = ETW
                                 cloud_point['vehicle_eng_rated_hp'] = vehicle.eng_rated_hp

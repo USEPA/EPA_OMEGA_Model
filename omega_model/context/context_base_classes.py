@@ -1,4 +1,9 @@
+"""
+    **Context base classes.**
 
+    Currently just ``CostCloudBase``.
+
+"""
 print('importing %s' % __file__)
 
 import inspect
@@ -6,7 +11,7 @@ import inspect
 from omega_model import *
 
 
-class CostCloudBase():
+class CostCloudBase:
     """
     **Loads and provides access to simulated vehicle data, provides methods to calculate and plot frontiers.**
 

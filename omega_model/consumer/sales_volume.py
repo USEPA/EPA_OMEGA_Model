@@ -89,7 +89,6 @@ def new_vehicle_sales_response(calendar_year, compliance_id, P):
         calendar_year (int): the calendar year to calculate sales in
         compliance_id (str): manufacturer name, or 'consolidated_OEM'
         P ($, [$]): a single price or a list/vector of prices
-        update_context_new_vehicle_generalized_cost (bool): update context new vehicle generalized cost (P0) if ``True``
 
     Returns:
         Relative new vehicle sales volume at each price, e.g. ``0.97``, ``1.03``, etc
@@ -119,6 +118,10 @@ def new_vehicle_sales_response(calendar_year, compliance_id, P):
 
 
 def init_sales_volume():
+    """
+    Initialize the module by clearing the cache.
+
+    """
     _cache.clear()
 
 

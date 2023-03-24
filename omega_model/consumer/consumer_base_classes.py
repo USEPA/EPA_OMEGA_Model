@@ -25,7 +25,7 @@ class ReregistrationBase:
         Args:
             model_year (int): the model year of the re-registration data
             market_class_id (str): market class id, e.g. 'hauling.ICE'
-            age (int): vehicle age
+            age (int): vehicle age in years
 
         Returns:
             Re-registered proportion [0..1]
@@ -252,7 +252,8 @@ class MarketClassBase:
 
         Args:
             market_class_dict (dict): dict of dicts of market classes
-            market_class_id (str): dot separated market class name e.g. 'hauling.BEV', possibly with reg class suffix e.g. 'non_hauling.ICE.car' depending on the market_class_dict
+            market_class_id (str): dot separated market class name e.g. 'hauling.BEV', possibly with reg class suffix
+                e.g. 'non_hauling.ICE.car' depending on the market_class_dict
             obj (object): object to place in a list in the appropriate leaf, as in a CompositeVehicle
 
         Returns:
@@ -350,7 +351,6 @@ class MarketClassBase:
         """
         raise Exception('**Attempt to call abstract method MarketClassBase.%s() without child class override**' %
                         inspect.currentframe().f_code.co_name)
-
 
     @staticmethod
     # override this method in the user-defined MarketClass

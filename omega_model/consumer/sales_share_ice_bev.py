@@ -306,7 +306,6 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         """
 
-
         SalesShare._data.clear()
         SalesShare._calibration_data.clear()
 

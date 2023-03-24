@@ -20,14 +20,7 @@ import os, sys
 if 'darwin' in sys.platform:
     os.environ['QT_MAC_WANTS_LAYER'] = '1'  # for pyqtgraph on MacOS
 
-# print('omega_model __init__.py path = %s' % os.path.abspath(__file__))
-# print('SYS Path = %s' % sys.path)
-
-# print(sys._MEIPASS)
-# path = os.path.dirname(os.path.abspath(__file__))
-# print(sys.path)
-# sys.path.insert(0, path)
-# print(sys.path)
+# CU
 
 import traceback
 

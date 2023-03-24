@@ -96,7 +96,17 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
 
     @staticmethod
     def get_cumulative_vmt(market_class_id, age):
+        """
+        Get the cumulative VMT for the given market class and age
 
+        Args:
+            market_class_id (str): market class id, e.g. 'hauling.ICE'
+            age (int): vehicle age in years
+
+        Returns:
+            The cumulative VMT for the given market class and age
+
+        """
         if (market_class_id, age) in OnroadVMT.cumulative_vmt:
             return OnroadVMT.cumulative_vmt[market_class_id, age]
         else:

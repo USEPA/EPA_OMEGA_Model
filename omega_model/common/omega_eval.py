@@ -1,6 +1,6 @@
 """
 
-**Code to handle runtime compilation of eval statemetns .**
+**Code to handle runtime compilation of eval statemetns.**
 
 ----
 
@@ -13,7 +13,7 @@ from common.omega_types import *
 
 class Eval(OMEGABase):
     """
-        ** Class to cache compiled eval statements and return their values. **
+        **Class to cache compiled eval statements and return their values.**
 
     """
     _compiled_source = dict()

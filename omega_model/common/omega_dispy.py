@@ -85,15 +85,18 @@ def restart_job(job):
         _retry_count[str(job.id)] = 0
 
     if _retry_count[str(job.id)] <= 10:
-        if dispy_debug: sysprint('#### Retrying job %s ####\n' % job_id_str)
+        if dispy_debug:
+            sysprint('#### Retrying job %s ####\n' % job_id_str)
         new_job = dispycluster.cluster.submit(job.id['batch_name'], job.id['batch_path'], job.id['batch_file'],
                                               job.id['session_num'], job.id['session_name'])
         if new_job is not None:
             new_job.id = job.id
             _retry_count[str(job.id)] += 1
-            if dispy_debug: sysprint('#### Terminated job restarted %s ####\n' % job_id_str)
+            if dispy_debug:
+                sysprint('#### Terminated job restarted %s ####\n' % job_id_str)
     else:  # too many retries, abandon job
-        if dispy_debug: sysprint('#### Cancelling job %s, too many retry attempts ####\n' % job_id_str)
+        if dispy_debug:
+            sysprint('#### Cancelling job %s, too many retry attempts ####\n' % job_id_str)
 
 
 def job_cb(job):  # gets called for: (DispyJob.Finished, DispyJob.Terminated, DispyJob.Abandoned)
@@ -118,20 +121,24 @@ def job_cb(job):  # gets called for: (DispyJob.Finished, DispyJob.Terminated, Di
     status = job.status
 
     if status == dispy.DispyJob.Finished:
-        if dispy_debug: sysprint('---- Job Finished %s: %s\n' % (job_id_str, job.result))
+        if dispy_debug:
+            sysprint('---- Job Finished %s: %s\n' % (job_id_str, job.result))
         # if job.result is False:
         #     restart_job(job)
 
     elif status == dispy.DispyJob.Terminated:
-        if dispy_debug: sysprint('---- Job Terminated %s job exeption = %s\n' % (str(job_id_str), str(job.exception)))
+        if dispy_debug:
+            sysprint('---- Job Terminated %s job exeption = %s\n' % (str(job_id_str), str(job.exception)))
         # restart_job(job)
 
     elif status == dispy.DispyJob.Abandoned:
-        if dispy_debug: sysprint('---- Job Abandoned %s : Exception %s\n' % (job_id_str, job.exception))
+        if dispy_debug:
+            sysprint('---- Job Abandoned %s : Exception %s\n' % (job_id_str, job.exception))
         # restart_job(job)
 
     else:
-        if dispy_debug: sysprint('*** uncaught job callback %s %s ***\n' % (job_id_str, status))
+        if dispy_debug:
+            sysprint('*** uncaught job callback %s %s ***\n' % (job_id_str, status))
 
     return
 
@@ -162,43 +169,53 @@ def status_cb(status, node, job):
         job_id_str = 'NONE'
 
     if status == dispy.DispyJob.Created:
-        if dispy_debug: sysprint('++++ Job Created, Job ID %s\n' % job_id_str)
+        if dispy_debug:
+            sysprint('++++ Job Created, Job ID %s\n' % job_id_str)
 
     elif status == dispy.DispyJob.Running:
-        if dispy_debug: sysprint('++++ Job Running, Job ID %s\n' % job_id_str)
+        if dispy_debug:
+            sysprint('++++ Job Running, Job ID %s\n' % job_id_str)
 
     elif status == dispy.DispyJob.Finished:
-        if dispy_debug: sysprint('++++ status_cb Job Finished %s: %s\n' % (job_id_str, job.result))
+        if dispy_debug:
+            sysprint('++++ status_cb Job Finished %s: %s\n' % (job_id_str, job.result))
         return
 
     elif status == dispy.DispyJob.Terminated:
-        if dispy_debug: sysprint('++++ status_cb Job Terminated %s\n' % job_id_str)
+        if dispy_debug:
+            sysprint('++++ status_cb Job Terminated %s\n' % job_id_str)
         return
 
     elif status == dispy.DispyJob.Cancelled:
-        if dispy_debug: sysprint('++++ Job Cancelled %s : Exception %s\n' % (job_id_str, job.exception))
+        if dispy_debug:
+            sysprint('++++ Job Cancelled %s : Exception %s\n' % (job_id_str, job.exception))
 
     elif status == dispy.DispyJob.Abandoned:
-        if dispy_debug: sysprint('++++ status_cb Job Abandoned %s : Exception %s\n' % (job_id_str, job.exception))
+        if dispy_debug:
+            sysprint('++++ status_cb Job Abandoned %s : Exception %s\n' % (job_id_str, job.exception))
         return
 
     elif status == dispy.DispyJob.ProvisionalResult:
         return
 
     elif status == dispy.DispyNode.Initialized:
-        if dispy_debug: sysprint('++++ Node %s with %s CPUs available\n' % (node.ip_addr, node.avail_cpus))
+        if dispy_debug:
+            sysprint('++++ Node %s with %s CPUs available\n' % (node.ip_addr, node.avail_cpus))
 
     elif status == dispy.DispyNode.Closed:
-        if dispy_debug: sysprint('++++ Node Closed %s *** \n' % node.ip_addr)
+        if dispy_debug:
+            sysprint('++++ Node Closed %s *** \n' % node.ip_addr)
 
     elif status == dispy.DispyNode.AvailInfo:
         # if dispy_debug: sysprint('++++ Node Available %s *** \n' % node.ip_addr)
         pass
     else:
         if node is not None:
-            if dispy_debug: sysprint('++++ uncaught node status %s %s ***\n' % (node.ip_addr, status))
+            if dispy_debug:
+                sysprint('++++ uncaught node status %s %s ***\n' % (node.ip_addr, status))
         else:
-            if dispy_debug: sysprint('++++ uncaught job status %s %s ***\n' % (job.id, status))
+            if dispy_debug:
+                sysprint('++++ uncaught job status %s %s ***\n' % (job.id, status))
     return
 
 
@@ -213,6 +230,7 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
         batch_file (str): path to the batch file being run
         session_num (int): the session number to be run
         session_name (str): the name of the session being run
+        calc_effects (str): type of effects to calc, if any
         retry_count (int): retry count of the session
 
     """
@@ -301,7 +319,8 @@ class DispyCluster(object):
         global dispycluster
         dispycluster = self
 
-    def get_ip_address(self):
+    @staticmethod
+    def get_ip_address():
         """
         Attempt to get "local" IP address(es)
         
@@ -325,7 +344,7 @@ class DispyCluster(object):
             try:
                 my_ip = socket.gethostbyname_ex(socket.gethostname())[2]
                 ip_found = True
-            except Exception as e:
+            except:
                 retries += 1
 
         if not my_ip.count('127.0.0.1'):
@@ -410,6 +429,7 @@ class DispyCluster(object):
             batch_path (str): the filesystem path to the bundle folder for the batch, e.g. '/Users/omega_user/bundle'
             batch_file (str): the filesystem path to the batch file to run (minus the '.csv' extension), e.g. '/Users/omega_user/bundle/2021_06_29_13_34_44_batch/2021_06_29_13_34_44_batch'
             session_list (iterable): a list or range of one or more sessions to run, by session number, e.g. range(1, 3)
+            calc_effects (str): the type of effects to calc, if any
 
         """
         import dispy, time, sys

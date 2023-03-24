@@ -158,7 +158,7 @@ class MarketClass(OMEGABase, MarketClassBase):
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
         if not template_errors:
-            validation_dict = {'fueling_class': ['ICE', 'BEV', 'PHEV'],  #TODO: fueling class / powertrain type class..?
+            validation_dict = {'fueling_class': ['ICE', 'BEV', 'PHEV'],  # RV
                                'ownership_class': ['private'],  # for now...
                                }
 

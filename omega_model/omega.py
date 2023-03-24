@@ -359,9 +359,10 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
                 # decide whether to continue iterating or not
                 iterate_producer_consumer = omega_globals.options.iterate_producer_consumer \
-                                            and producer_consumer_iteration_num < omega_globals.options.producer_consumer_max_iterations \
-                                            and (not converged or producer_decision_and_response[
-                    'total_battery_GWh'] > GWh_limit)
+                                            and producer_consumer_iteration_num < \
+                                            omega_globals.options.producer_consumer_max_iterations \
+                                            and (not converged or producer_decision_and_response['total_battery_GWh']
+                                                 > GWh_limit)
 
                 if iterate_producer_consumer:
                     producer_consumer_iteration_num += 1
@@ -532,7 +533,8 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     # temporarily assign shares to sales to calculate new consumer-share-weighted market_class values:
     for cv in candidate_mfr_composite_vehicles:
         cv.initial_registered_count = producer_decision_and_response[
-                                          'consumer_abs_share_frac_' + cv.market_class_id + '.' + cv.alt_type] * cv.market_class_share_frac
+                                          'consumer_abs_share_frac_' + cv.market_class_id + '.' + cv.alt_type] * \
+                                      cv.market_class_share_frac
 
     calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehicles, producer_decision_and_response)
 
@@ -541,10 +543,9 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                                                       producer_decision_and_response)
 
     # distribute total sales to vehicle sales in producer decision and response
-    compliance_search.create_production_options_from_shares(candidate_mfr_composite_vehicles,
-                                                            producer_decision_and_response,
-                                                            total_sales=
-                                                            producer_decision_and_response['new_vehicle_sales'])
+    compliance_search.create_production_options_from_shares(
+        candidate_mfr_composite_vehicles, producer_decision_and_response,
+        total_sales=producer_decision_and_response['new_vehicle_sales'])
 
     calc_market_data_from_sales(candidate_mfr_composite_vehicles, producer_decision_and_response)
 

@@ -41,34 +41,44 @@ from context.ip_deflators import ImplictPriceDeflators
 _cache = dict()
 
 
-def get_trans(x):
+def get_trans(pkg_info):
+    """
+    Get the transmission code for the given powertrain package.
+
+    Args:
+        pkg_info (Series): powertain package information
+
+    Returns:
+        The transmission code for the given data.
+
+    """
     trans = ''
     flags = 0
 
-    if x['trx10']:
+    if pkg_info['trx10']:
         trans = 'TRX10'
         flags += 1
-    elif x['trx11']:
+    elif pkg_info['trx11']:
         trans = 'TRX11'
         flags += 1
-    elif x['trx12']:
+    elif pkg_info['trx12']:
         trans = 'TRX12'
         flags += 1
-    elif x['trx21']:
+    elif pkg_info['trx21']:
         trans = 'TRX21'
         flags += 1
-    elif x['trx22']:
+    elif pkg_info['trx22']:
         trans = 'TRX22'
         flags += 1
-    elif x['ecvt']:
+    elif pkg_info['ecvt']:
         trans = 'TRXCV'
         flags += 1
 
     if flags == 0:
-        raise Exception('%s has no transmission tech flag' % x.vehicle_name)
+        raise Exception('%s has no transmission tech flag' % pkg_info.vehicle_name)
 
     if flags > 1:
-        raise Exception('%s has multiple transmission tech flags' % x.vehicle_name)
+        raise Exception('%s has multiple transmission tech flags' % pkg_info.vehicle_name)
 
     return trans
 
@@ -305,21 +315,17 @@ class PowertrainCost(OMEGABase):
             elif powertrain_type == 'MHEV':
                 obc_kw = 0
             elif powertrain_type == 'PHEV':
-                obc_kw = 1.9 # * np.ones_like(KWH)
+                obc_kw = 1.9
                 if KWH < 10:
                     obc_kw = 1.1
                 elif KWH < 7:
                     obc_kw = 0.7
-                # obc_kw[KWH < 10] = 1.1
-                # obc_kw[KWH < 7] = 0.7
             else:
-                obc_kw = 19 # * np.ones_like(KWH)
+                obc_kw = 19
                 if KWH < 100:
                     obc_kw = 11
                 elif KWH < 70:
                     obc_kw = 7
-                # obc_kw[KWH < 100] = 11
-                # obc_kw[KWH < 70] = 7
 
             dcdc_converter_kw = eval(_cache[powertrain_type, 'DCDC_converter_kW']['value'], {'np': np}, locals_dict)
 

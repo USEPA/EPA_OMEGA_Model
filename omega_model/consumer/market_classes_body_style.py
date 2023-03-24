@@ -93,7 +93,7 @@ class MarketClass(OMEGABase, MarketClassBase):
             else:
                 market_class_id = 'pickup.ICE'
         else:
-            1==1
+            Exception('Unable to assign market_class_id')
 
         return market_class_id
 
@@ -172,7 +172,7 @@ class MarketClass(OMEGABase, MarketClassBase):
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
         if not template_errors:
-            validation_dict = {'fueling_class': ['ICE', 'BEV', 'PHEV'],  #TODO: fueling class / powertrain type class..?
+            validation_dict = {'fueling_class': ['ICE', 'BEV', 'PHEV'],  # RV
                                'ownership_class': ['private'],  # for now...
                                }
 

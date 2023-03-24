@@ -83,11 +83,15 @@ class GliderCost(OMEGABase):
     @staticmethod
     def get_base_year_glider_non_structure_cost(vehicle, structure_mass_lbs, powertrain_cost):
         """
+        Calculate the base year glider non-structure cost.
 
         Args:
-            vehicle:
+            vehicle (Vehicle): the vehicle to calculate the glider non-structure cost for
+            structure_mass_lbs (float): vehicle structure mass in pounds
+            powertrain_cost (float): powertrain cost in dollars
 
         Returns:
+            Vehicle base year glider non-structure cost.
 
         """
         body_structure, learning_factor, markup = GliderCost.get_markups_and_learning(vehicle)

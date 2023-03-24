@@ -109,6 +109,7 @@ def fplothg(x, y, *args, reuse_figure=False, **kwargs):
         x: x-values of data to plot
         y: y-values of data to plot
         *args: optional positional arguments to pyplot.plot()
+        reuse_figure (bool): re-use figure window if ``True``
         **kwargs: optional keyword arguments to pyplot.plot()
 
     Returns:

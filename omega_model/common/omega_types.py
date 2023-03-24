@@ -109,7 +109,7 @@ class OMEGABase:
         s = self.__repr__() + '\n'
         attributes = sorted(list(self.__dict__.keys()))
         for k in attributes:
-            s = s + k  + ' = ' + str(self.__dict__[k]).replace('\n', ' ') + '\n'
+            s = s + k + ' = ' + str(self.__dict__[k]).replace('\n', ' ') + '\n'
         return s
 
 
@@ -160,7 +160,7 @@ class OMEGAEnum(OMEGABase):
         self.__dict = dict()
         for i, j in zip(self.__identifier_list, self.__value_list):
             exec("self.%s='%s'" % (i, j))
-            self.__dict[i]=j
+            self.__dict[i] = j
 
     def __iter__(self):
         """
@@ -230,7 +230,7 @@ if __name__ == "__main__":
         print(test_enum.values())
         print(test_enum.keys())
 
-        for k,v in test_enum.items():
+        for k, v in test_enum.items():
             print(k, v)
 
         print(test_enum['foo'])

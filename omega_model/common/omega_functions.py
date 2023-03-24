@@ -42,7 +42,7 @@ def get_ip_address():
         try:
             my_ip = socket.gethostbyname_ex(socket.gethostname())[2]
             ip_found = True
-        except Exception as e:
+        except:
             retries += 1
 
     if not my_ip.count('127.0.0.1'):
@@ -157,7 +157,8 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=True):
         cloud (DataFrame): a set of points to find the frontier of
         x_key (str): name of the column holding x-axis data
         y_key (str): name of the column holding y-axis data
-        allow_upslope (bool): allow U-shaped frontier
+        allow_upslope (bool): allow U-shaped frontier if ``True``
+        invert_x_axis (bool): invert x-axis if ``True``
 
     Returns:
         DataFrame containing the frontier points
@@ -221,15 +222,15 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=True):
                 cloud = cull_cloud(cloud, prior_x, x_key)
 
                 if not cloud.empty:
-                    calc_frontier_factor_down(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key)
+                    calc_frontier_factor_down(cloud, prior_x, prior_y, x_key, y_key)
                     min_frontier_factor = cloud['frontier_factor'].values.min()
 
                     if min_frontier_factor > 0 and allow_upslope:
-                        calc_frontier_factor_up(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key)
+                        calc_frontier_factor_up(cloud, prior_x, prior_y, x_key, y_key)
                         min_frontier_factor = cloud['frontier_factor'].values.min()
 
                 if not cloud.empty:
-                    idxmin = get_idxmin(cloud, idxmin, min_frontier_factor, x_key)
+                    idxmin = get_idxmin(cloud, min_frontier_factor, x_key)
 
                     if pd.notna(idxmin) and (allow_upslope or min_frontier_factor <= 0):
                         frontier_pts.append(cloud.loc[idxmin])
@@ -241,52 +242,106 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=True):
     else:
         frontier_df = cloud
 
-    # frontier_df['frontier_factor'] = 0
+    # CU
 
-    return frontier_df #.copy()
+    return frontier_df  # was frontier_df.copy()
 
 
-def get_idxmin(cloud, idxmin, min_frontier_factor, x_key):
+def get_idxmin(cloud, min_frontier_factor, x_key):
+    """
+    Return the index of the minimum value of the ``cloud`` ``frontier_factor``.
+
+    Args:
+        cloud (DataFrame): a set of points to find the frontier of
+        min_frontier_factor (float): the minimum value of the frontier_factor
+        x_key (str): ``cloud`` column name
+
+    Returns:
+        The index of the minimum value of the ``cloud`` ``frontier_factor``.
+
+    """
     if not np.isinf(min_frontier_factor):
         if len(cloud[cloud['frontier_factor'].values == min_frontier_factor]) > 1:
             # if multiple points with the same slope, take the one with the highest x-value
-            # idxmin = cloud[cloud['frontier_factor'].values == min_frontier_factor][x_key].idxmax()
+            # CU
             idxmin = cloud.index[np.argmax(cloud[cloud['frontier_factor'].values == min_frontier_factor][x_key].values)]
         else:
-            # idxmin = cloud['frontier_factor'].idxmin()
+            # CU
             idxmin = cloud.index[np.argmin(cloud['frontier_factor'])]
     else:
-        # idxmin = cloud['frontier_factor'].idxmax()
+        # CU
         idxmin = cloud.index[np.argmax(cloud['frontier_factor'].values)]
 
     return idxmin
 
 
-def calc_frontier_factor_up(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key):
+def calc_frontier_factor_up(cloud, prior_x, prior_y, x_key, y_key):
+    """
+    Calculate the frontier factor for an up-sloping cloud of points.
+
+    Args:
+        cloud (DataFrame): a set of points to find the frontier of
+        prior_x (float): x-axis value of prior frontier point
+        prior_y (float): y-axis value of prior frontier point
+        x_key (str): name of the column holding x-axis data
+        y_key (str): name of the column holding y-axis data
+
+    Returns:
+        Nothing, calculates ``frontier_factor`` column of ``cloud``.
+
+    """
     # frontier factor is different for up-slope (swap x & y and invert "y")
     cloud['frontier_factor'] = (prior_x - cloud[x_key].values) / (cloud[y_key].values - prior_y) \
                                ** omega_globals.options.cost_curve_frontier_affinity_factor
 
 
-def calc_frontier_factor_down(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key):
+def calc_frontier_factor_down(cloud, prior_x, prior_y, x_key, y_key):
+    """
+    Calculate the frontier factor for an down-sloping cloud of points.
+
+    Args:
+        cloud (DataFrame): a set of points to find the frontier of
+        prior_x (float): x-axis value of prior frontier point
+        prior_y (float): y-axis value of prior frontier point
+        x_key (str): name of the column holding x-axis data
+        y_key (str): name of the column holding y-axis data
+
+    Returns:
+        Nothing, calculates ``frontier_factor`` column of ``cloud``.
+
+    """
     cloud['frontier_factor'] = (cloud[y_key].values - prior_y) / (cloud[x_key].values - prior_x) \
                                ** omega_globals.options.cost_curve_frontier_affinity_factor
-    # find next frontier point (lowest slope), if there is one, and add to frontier list
 
 
 def cull_cloud(cloud, prior_x, x_key):
+    """
+    Remove points from a dataframe where the given column (``x_key``) is above a certain value (``prior_x``).
+
+    Args:
+        cloud (dataframe): the dataframe to cull
+        prior_x (float): the threshold value
+        x_key (str): cloud column name
+
+    Returns:
+        ``cloud`` with culled points removed
+
+    """
     cloud = cloud.loc[cloud[x_key].values > prior_x]  # .copy()
     return cloud
 
 
 def sum_dict(dict_in, include=None, exclude=None):
     """
-    Add up all terms in a dict
+    Add up all terms in a dict given the ``include`` and ``exclude`` constraints.
 
     Args:
         dict_in (numeric dict_like): the object with elements to sum
+        include (str): include term in sum if ``include`` in dict key
+        exclude (str): exclude term from some if ``exclude`` in dict key
 
     Returns:
+        Sum of terms in ``dict_in`` given the include and exclude constraints.
 
     """
     keys = sorted(dict_in.keys())
@@ -388,24 +443,26 @@ def print_list(list_in):
     print()
 
 
-def linspace(min, max, num_values):
+def linspace(min_val, max_val, num_values):
     """
     Create a list of num_values evenly spaced values between min and max.  Based on ``Matlab`` linspace command.
 
     Args:
-        min (numeric): the minimum value
-        max (numeric): the maximum value
+        min_val (numeric): the minimum value
+        max_val (numeric): the maximum value
         num_values (int): the total number of values to return
 
     Returns:
         A list of evenly spaced values between min and max
 
     """
-    ans = np.arange(min, max + (max-min) / (num_values-1), (max-min) / (num_values-1))
+    ans = np.arange(min_val, max_val + (max_val - min_val) / (num_values - 1), (max_val - min_val) / (num_values - 1))
     return ans[0:num_values]
 
 
 partition_dict = dict()
+
+
 def partition(column_names, num_levels=5, min_constraints=None, max_constraints=None, verbose=False):
     """
     Generate a dataframe with columns from ``column_names``, whose rows sum to 1.0 across the columns, following the
@@ -444,7 +501,7 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
 
         min_level_dict = dict()
         if min_constraints is None:
-            min_constraints=dict()
+            min_constraints = dict()
 
         if type(min_constraints) is float or type(min_constraints) is int:
             min_val = min_constraints
@@ -454,10 +511,9 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
 
         max_level_dict = dict()
         if max_constraints is None:
-            max_constraints=dict()
+            max_constraints = dict()
 
         if type(max_constraints) is float or type(max_constraints) is int:
-            max_val = max_constraints
             max_constraints = dict()
             for c in column_names:
                 max_level_dict[c] = max_constraints
@@ -513,9 +569,10 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
 
         # calculate values for the last column, honoring it's upper and lower limits
         last = column_names_sorted_by_span[-1]
-        x[last] = np.maximum(0, np.maximum(min_level_dict[last], np.minimum(max_level_dict[last], 1.0 - x.sum(axis=1, skipna=True))))
+        x[last] = np.maximum(0, np.maximum(min_level_dict[last],
+                                           np.minimum(max_level_dict[last], 1.0 - x.sum(axis=1, skipna=True))))
 
-        # drop duplicate rows:  TODO: figure out how to NOT generate duplicates?  Only happens if num_columns > 2... 3...?
+        # drop duplicate rows:  # RV
         x = x.drop_duplicates()
 
         # remove rows that don't add up to 1 and get rid of join column ('_')
@@ -590,7 +647,7 @@ def weighted_value(objects, weight_attribute, attribute, attribute_args=None):
     """
     weighted_sum = 0
     total = 0
-    equal_weight = all([o.__getattribute__(weight_attribute)==0 for o in objects])
+    equal_weight = all([o.__getattribute__(weight_attribute) == 0 for o in objects])
     for o in objects:
         if equal_weight:
             weight = 1
@@ -605,31 +662,7 @@ def weighted_value(objects, weight_attribute, attribute, attribute_args=None):
     return weighted_sum / total
 
 
-def _unweighted_value(obj, weighted_value, objects, weight_attribute, attribute):
-    """
-    Return the unweighted value of a single object, given a weighted value and all the objects that the weighted value
-    was created from
-
-    Args:
-        obj (object): the object to get the unweighted value for
-        weighted_value (numeric): the value to unweight
-        objects ([objs]): the list of source objects
-        weight_attribute (str): the name of the weight attribute, e.g. 'sales'
-        attribute (str): the name of the weighted attribute, e.g. vehicle CO2e g/mi
-
-    Returns:
-        The appopriate attribute value of the object
-
-    """
-    total = 0
-    weighted_sum = 0
-    for o in objects:
-        weight = o.__getattribute__(weight_attribute)
-        total = total + weight
-        if o is not obj:
-            weighted_sum = weighted_sum + o.__getattribute__(attribute) * weight
-
-    return (weighted_value * total - weighted_sum) / obj.__getattribute__(weight_attribute)
+# CU unweighted_value()
 
 
 def cartesian_prod(left_df, right_df):
@@ -649,48 +682,6 @@ def cartesian_prod(left_df, right_df):
         return right_df
     else:
         return pd.merge(left_df, right_df, how='cross')
-
-
-def _generate_nearby_shares(columns, combos, half_range_frac, num_steps, min_level=0.001, verbose=False):
-    """
-    Generate a partition of share values in the neighborhood of an initial set of share values.
-
-    Args:
-        columns ([strs]): list of values that represent shares in combo
-        combos (Series, DataFrame): typically a Series or Dataframe that contains the initial set of share values
-        half_range_frac (float): search "radius" [0..1], half the search range
-        num_steps (int): number of values to divide the search range into
-        min_level (numeric): specifies minimum share value (max will be 1-min_value), e.g. 0.001
-        verbose (bool): if ``True`` then partition dataframe is printed to the console
-
-    Returns:
-        Partition dataframe, with columns as specified, values near the initial values from combo.
-
-    """
-    dfs = []
-
-    for i in range(0, len(columns) - 1):
-        shares = np.array([])
-        for idx, combo in combos.iterrows():
-            k = columns[i]
-            val = combo[k]
-            min_val = np.maximum(0, val - half_range_frac)
-            max_val = np.minimum(1.0, val + half_range_frac)
-            shares = np.append(np.append(shares, np.minimum(1-min_level, np.maximum(min_level,
-                            np.linspace(min_val, max_val, num_steps)))), val) # create new share spread and include previous value
-        dfs.append(pd.DataFrame({k: unique(shares)}))
-
-    dfx = pd.DataFrame()
-    for df in dfs:
-        dfx = cartesian_prod(dfx, df)
-
-    dfx = dfx[dfx.sum(axis=1) <= 1]
-    dfx[columns[-1]] = 1 - dfx.sum(axis=1)
-
-    if verbose:
-        print(dfx)
-
-    return dfx
 
 
 def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_steps, min_constraints, max_constraints,
@@ -875,7 +866,7 @@ def HighwayFUF(miles):
     return ASTM_round(1-np.exp(-(
                         4.8e+00 * miles_norm +
                         1.3e+01 * miles_norm ** 2 +
-                        -6.5e+01* miles_norm ** 3 +
+                        -6.5e+01 * miles_norm ** 3 +
                         1.2e+02 * miles_norm ** 4 +
                         -1.0e+02 * miles_norm ** 5 +
                         3.1e+01 * miles_norm ** 6
@@ -986,9 +977,8 @@ if __name__ == '__main__':
         part = partition(['a', 'b'], verbose=True)
 
         # nearby shares test
-        share_combo = pd.DataFrame({'a':[0.5], 'b': [0.2], 'c': [0.3]})
+        share_combo = pd.DataFrame({'a': [0.5], 'b': [0.2], 'c': [0.3]})
         column_names = ['a', 'b', 'c']
-        dfx = _generate_nearby_shares(column_names, share_combo, half_range_frac=0.02, num_steps=5, min_level=0.001, verbose=True)
 
         dfx2 = partition(['BEV', 'ICE', 'NO_ALT_BEV', 'NO_ALT_ICE'],
                          min_constraints={'NO_ALT_BEV': 0.01},

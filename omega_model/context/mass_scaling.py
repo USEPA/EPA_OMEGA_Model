@@ -75,7 +75,11 @@ class MassScaling(OMEGABase):
         Calculate struture mass, battery mass and powertrain mass for the given vehicle
 
         Args:
-            vehicle (Vehicle):
+            vehicle (Vehicle): the vehicle to calculate mass terms for
+            structure_material (str): e.g. 'steel'
+            eng_rated_hp (float): engine rated horsepower
+            battery_kwh (float): battery pack size in kWh
+            footprint_ft2 (float): vehicle footpring in square feet
 
         Returns:
             tuple of structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs, \
@@ -195,6 +199,10 @@ if __name__ == '__main__':
 
         if not init_fail:
             class Vehicle(OMEGABase):
+                """
+                    Dummy Vehicle class
+
+                """
                 body_style = 'sedan'
                 base_year_footprint_ft2 = 20
                 footprint_ft2 = 22
@@ -214,6 +222,7 @@ if __name__ == '__main__':
                 MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp,
                                             veh.battery_kwh, veh.footprint_ft2)
             print(structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs)
+
             veh.base_year_powertrain_type = 'BEV'
             structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs,\
                 usable_battery_capacity_norm = \

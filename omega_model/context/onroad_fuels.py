@@ -108,7 +108,7 @@ class OnroadFuel(OMEGABase):
 
                 OnroadFuel._data[cache_key] = OnroadFuel._data[in_use_fuel_id, year][attribute]
             else:
-                raise Exception('Missing policy fuel values for %s, %d or prior' %(in_use_fuel_id, calendar_year))
+                raise Exception('Missing policy fuel values for %s, %d or prior' % (in_use_fuel_id, calendar_year))
 
         return OnroadFuel._data[cache_key]
 
@@ -126,8 +126,6 @@ class OnroadFuel(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
-
         OnroadFuel._data.clear()
 
         if verbose:

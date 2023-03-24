@@ -111,8 +111,6 @@ class PriceModifications(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
-
         PriceModifications._data = pd.DataFrame()
 
         PriceModifications._cache.clear()

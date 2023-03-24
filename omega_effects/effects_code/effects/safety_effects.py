@@ -32,7 +32,7 @@ def get_fatality_rate(session_settings, model_year, age):
     Args:
         session_settings: an instance of the SessionSettings class.
         model_year (int): the model year for which a fatality rate is needed.
-        age (int): the age of the vehicle.
+        age (int): vehicle age in years
 
     Returns:
         The average fatality rate for vehicles of a specific model year and age.

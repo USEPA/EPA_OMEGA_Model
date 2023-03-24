@@ -19,10 +19,11 @@ import consumer
 market_classes = []
 market_categories = []
 
-vehicle_data = None
+vehicle_data = []
 vehicle_annual_data = None
 mfr_cost_data = None
 mfr_market_share_results = None
+
 
 def run_postproc(iteration_log, credit_banks):
     """
@@ -101,9 +102,9 @@ def run_postproc(iteration_log, credit_banks):
                                                     compliance_id=manufacturer_id,
                                                     target_co2e_Mg=sum(mfr_data['target_co2e_megagrams']),
                                                     calendar_year_cert_co2e_Mg=sum(mfr_data['cert_co2e_megagrams']),
-                                                    manufacturer_vehicle_cost_dollars=
-                                                                    sum(mfr_data['new_vehicle_mfr_cost_dollars'] *
-                                                                        mfr_data['_initial_registered_count']),
+                                                    manufacturer_vehicle_cost_dollars=sum(
+                                                        mfr_data['new_vehicle_mfr_cost_dollars'] *
+                                                        mfr_data['_initial_registered_count']),
                                                     )
 
                 credit_banks[manufacturer_id] = None
@@ -125,8 +126,8 @@ def run_postproc(iteration_log, credit_banks):
                                                 compliance_id=manufacturer_id,
                                                 target_co2e_Mg=sum(mfr_data['target_co2e_megagrams']),
                                                 calendar_year_cert_co2e_Mg=sum(mfr_data['cert_co2e_megagrams']),
-                                                manufacturer_vehicle_cost_dollars=
-                                                sum(mfr_data['new_vehicle_mfr_cost_dollars'] *
+                                                manufacturer_vehicle_cost_dollars=sum(
+                                                    mfr_data['new_vehicle_mfr_cost_dollars'] *
                                                     mfr_data['_initial_registered_count']),
                                                 )
 
@@ -1423,7 +1424,7 @@ def plot_manufacturer_compliance(calendar_years, compliance_id, credit_history):
                     plt.scatter(t.model_year, calendar_year_cert_co2e_Mg_dict[t.model_year], s=80, facecolors='none',
                                 edgecolors='r')
             except:
-                1==1
+                pass
 
     fig.savefig(omega_globals.options.output_folder + '%s %s Cert Mg v Year.png' %
                 (omega_globals.options.session_unique_name, compliance_id))

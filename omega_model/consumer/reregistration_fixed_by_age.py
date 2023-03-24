@@ -73,7 +73,7 @@ class Reregistration(OMEGABase, ReregistrationBase):
         Args:
             model_year (int): the model year of the re-registration data
             market_class_id (str): market class id, e.g. 'hauling.ICE'
-            age (int): vehicle age
+            age (int): vehicle age in years
 
         Returns:
             Re-registered proportion [0..1]
