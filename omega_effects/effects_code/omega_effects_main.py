@@ -1,3 +1,13 @@
+"""
+
+**OMEGA effects main.**
+
+----
+
+**CODE**
+
+"""
+
 import sys
 import shutil
 import pandas as pd
@@ -30,7 +40,11 @@ from omega_effects.effects_code.effects.sum_social_effects import calc_social_ef
 
 
 def main():
+    """
 
+    Main effects code.
+
+    """
     set_paths = SetPaths()
     run_id = set_paths.run_id()
 

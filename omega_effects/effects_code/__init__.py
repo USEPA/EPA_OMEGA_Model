@@ -1,3 +1,12 @@
+"""
+
+**OMEGA effects code subpackage.**
+
+----
+
+**CODE**
+
+"""
 # Version number of the omega effects module, not the omega model
 
 __version__ = '0.6.0'

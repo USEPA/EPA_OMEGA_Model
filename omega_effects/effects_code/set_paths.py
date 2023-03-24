@@ -1,3 +1,13 @@
+"""
+
+**OMEGA file path handling.**
+
+----
+
+**CODE**
+
+"""
+
 from pathlib import Path
 import shutil
 
@@ -78,7 +88,8 @@ class SetPaths:
         run_folder_identifier = run_folder_identifier if run_folder_identifier != '' else 'omega_effects'
         return run_folder_identifier
 
-    def create_output_paths(self, runtime_options, batch_settings, start_time_readable, run_id):
+    @staticmethod
+    def create_output_paths(runtime_options, batch_settings, start_time_readable, run_id):
         """
 
         Parameters:

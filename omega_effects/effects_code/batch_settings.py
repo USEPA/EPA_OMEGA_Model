@@ -1,3 +1,13 @@
+"""
+
+**OMEGA effects batch settings.**
+
+----
+
+**CODE**
+
+"""
+
 import pandas as pd
 import sys
 from pathlib import Path
@@ -49,7 +59,7 @@ class BatchSettings:
         self.context_case = None
         self.vmt_rebound_rate_ice = None
         self.vmt_rebound_rate_bev = None
-        self.net_benefit_ghg_scope = 'global' # default value; change via batch file ('domestic' and 'both' are options)
+        self.net_benefit_ghg_scope = 'global'  # default value; change via batch file ('domestic' and 'both' are options)
 
         self.inputs_filelist = list()
         self.maintenance_costs_file = None

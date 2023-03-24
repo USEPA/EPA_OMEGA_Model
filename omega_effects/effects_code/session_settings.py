@@ -1,3 +1,13 @@
+"""
+
+**OMEGA effects session settings.**
+
+----
+
+**CODE**
+
+"""
+
 import sys
 from pathlib import Path
 
@@ -14,7 +24,11 @@ from omega_effects.effects_code.context.powertrain_cost import PowertrainCost
 
 
 class SessionSettings:
+    """
 
+    OMEGA effects SessionSettings class.
+
+    """
     def __init__(self):
         self.session_policy = None
         self.session_name = None
