@@ -1,5 +1,9 @@
 """
 
-    **OMEGA analysis context subpackage**
+**OMEGA analysis context subpackage**
+
+----
+
+**CODE**
 
 """

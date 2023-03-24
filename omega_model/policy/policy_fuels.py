@@ -101,7 +101,7 @@ class PolicyFuel(OMEGABase):
 
                 PolicyFuel._data[cache_key] = PolicyFuel._data[fuel_id, year][attribute]
             else:
-                raise Exception('Missing policy fuel values for %s, %d or prior' %(fuel_id, calendar_year))
+                raise Exception('Missing policy fuel values for %s, %d or prior' % (fuel_id, calendar_year))
 
         return PolicyFuel._data[cache_key]
 
@@ -119,8 +119,6 @@ class PolicyFuel(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
-
         PolicyFuel._data.clear()
 
         if verbose:

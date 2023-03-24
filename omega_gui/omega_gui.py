@@ -80,9 +80,15 @@ log_file_batch = "batch_logfile.txt"
 log_file_session_prefix = "o2log_"
 log_file_session_suffix = "_ReferencePolicy.txt"
 
+app = None
+form = None
+
 
 class Form(QObject):
+    """
+    The main GUI Qt object
 
+    """
     def __init__(self, ui_file, parent=None):
         """
         This function runs once during program start.
@@ -156,22 +162,19 @@ class Form(QObject):
         self.window.select_input_batch_file_button.setIcon(QIcon(input_batch_file_button_image))
         self.window.select_output_batch_directory_button.setIcon(QIcon(output_batch_directory_button_image))
         self.window.results_comment.setPlainText('Feature Under Development\nSee Batch Output Directory Session Folders for Outputs')
-        self.window.results_comment.setStyleSheet(development_stylesheet(""))
+        self.window.results_comment.setStyleSheet(development_stylesheet())
 
         # Load stylesheet for tab control
-        stylesheet = ""
-        stylesheet = tab_stylesheet(stylesheet)
+        stylesheet = tab_stylesheet()
         # stylesheet = test1(stylesheet)
         self.window.tab_select.setStyleSheet(stylesheet)
 
         # Load stylesheet for background
-        stylesheet = ""
-        stylesheet = background_stylesheet(stylesheet)
+        stylesheet = background_stylesheet()
         self.window.background_widget.setStyleSheet(stylesheet)
 
         # Load stylesheet for buttons
-        stylesheet = ""
-        stylesheet = button_stylesheet(stylesheet)
+        stylesheet = button_stylesheet()
         # self.window.clear_event_monitor_button.setStyleSheet(stylesheet)
         # self.window.open_configuration_file_button.setStyleSheet(stylesheet)
         # self.window.save_configuration_file_button.setStyleSheet(stylesheet)
@@ -184,8 +187,7 @@ class Form(QObject):
         self.window.multiprocessor_help_button.setStyleSheet(stylesheet)
 
         # Load stylesheet for text boxes
-        stylesheet = ""
-        stylesheet = textbox_stylesheet(stylesheet)
+        stylesheet = textbox_stylesheet()
         # stylesheet = "border: 1px solid; border-radius:10px; background-color: palette(base); "
         self.window.event_monitor_result.setStyleSheet(stylesheet)
         self.window.input_batch_file_1_result.setStyleSheet(stylesheet)
@@ -193,19 +195,16 @@ class Form(QObject):
         self.window.project_description.setStyleSheet(stylesheet)
 
         # Load stylesheet for list boxes
-        stylesheet = ""
-        stylesheet = listbox_stylesheet(stylesheet)
+        stylesheet = listbox_stylesheet()
         self.window.list_graphs_1.setStyleSheet(stylesheet)
         self.window.list_graphs_2.setStyleSheet(stylesheet)
 
         # Load stylesheet for logo buttons
-        stylesheet = ""
-        stylesheet = logo_button_stylesheet(stylesheet)
+        stylesheet = logo_button_stylesheet()
         self.window.epa_button.setStyleSheet(stylesheet)
 
         # Load stylesheet for labels
-        stylesheet = ""
-        stylesheet = label_stylesheet(stylesheet)
+        stylesheet = label_stylesheet()
         # self.window.configuration_file_1_label.setStyleSheet(stylesheet)
         self.window.input_batch_file_1_label.setStyleSheet(stylesheet)
         self.window.output_batch_directory_1_label.setStyleSheet(stylesheet)
@@ -218,8 +217,7 @@ class Form(QObject):
         self.window.intro_label.setStyleSheet(stylesheet)
 
         # Load stylesheet for checkboxes
-        stylesheet = ""
-        stylesheet = checkbox_stylesheet(stylesheet)
+        stylesheet = checkbox_stylesheet()
         self.window.multiprocessor_checkbox.setStyleSheet(stylesheet)
 
         # Timer start
@@ -274,12 +272,10 @@ class Form(QObject):
         # Get path of selected file
         temp2 = os.path.dirname(file_name)
         temp2 = os.path.normpath(temp2) + os.sep
-        # working_directory = temp2
+        # CU
         configuration_file = temp2 + temp1
         # Place path in gui
-        color = "green"
-        # self.window.configuration_file_1_result.setTextColor(QColor(color))
-        # self.window.configuration_file_1_result.setPlainText(os.path.basename(configuration_file))
+        # CU
         # Create python dictionary 'scenario' from YAML formatted configuration file
         filepath = configuration_file
         scenario = open_file_action(filepath)
@@ -338,8 +334,7 @@ class Form(QObject):
             output_batch_directory = item_value
             color = "green"
             self.window.output_batch_directory_1_result.setTextColor(QColor(color))
-            # path = pathlib.PurePath(output_batch_directory)
-            #self.window.output_batch_directory_1_result.setPlainText(os.path.basename(output_batch_directory))
+            # CU
             self.window.output_batch_directory_1_result.setPlainText(output_batch_directory)
             output_batch_directory_valid = True
         else:
@@ -347,7 +342,7 @@ class Form(QObject):
             output_batch_directory = item_value
             color = "red"
             self.window.output_batch_directory_1_result.setTextColor(QColor(color))
-            # self.window.output_batch_directory_1_result.setPlainText(os.path.basename(output_batch_directory))
+            # CU
             self.window.output_batch_directory_1_result.setPlainText(output_batch_directory)
             output_batch_directory_valid = False
             configuration_file_valid = False
@@ -367,7 +362,7 @@ class Form(QObject):
         self.window.project_description.setPlainText(str(item_value))
         self.wizard_logic()
         self.event_monitor(event_separator, "black", "")
-        # self.window.configuration_file_1_result.setToolTip(configuration_file)
+        # CU
         self.window.input_batch_file_1_result.setToolTip(os.path.basename(input_batch_file))
         self.window.output_batch_directory_1_result.setToolTip(os.path.basename(output_batch_directory))
 
@@ -401,12 +396,10 @@ class Form(QObject):
         # Get path of selected file
         temp2 = os.path.dirname(file_name)
         temp2 = os.path.normpath(temp2) + os.sep
-        # working_directory = temp2
+        # CU
         configuration_file = temp2 + temp1
         # Place path in gui
-        color = "green"
-        # self.window.configuration_file_1_result.setTextColor(QColor(color))
-        # self.window.configuration_file_1_result.setPlainText(os.path.basename(configuration_file))
+        # CU
         temp1 = "Configuration File Saved:\n    [" + configuration_file + "]"
         self.event_monitor(temp1, "green", 'dt')
         # Save text from Project Description window to dictionary
@@ -560,7 +553,8 @@ class Form(QObject):
     # def clear_wizard(self):
     # self.window.wizard_result.setPlainText("")
 
-    def launch_documentation(self):
+    @staticmethod
+    def launch_documentation():
         """
         Opens the OMEGA documentation website in browser.
 
@@ -574,7 +568,8 @@ class Form(QObject):
         else:
             os.system('open %s' % doc_link)
 
-    def launch_epa_website(self):
+    @staticmethod
+    def launch_epa_website():
         """
         Opens the EPA website in browser.
 
@@ -910,17 +905,17 @@ class Form(QObject):
         self.event_monitor(event_separator, "black", '')
         status_bar_message = "Status = Ready"
 
-        # elapsed_end = datetime.now()
-        elapsed_time1 = elapsed_end - elapsed_start
+        # CU
         elapsed_time1 = str(elapsed_time)
         elapsed_time1 = "Model Run Completed\n" + elapsed_time1[:-4] + "\nError Count = " + str(model_error_count)
         self.window.model_status_label.setText(elapsed_time1)
-        # self.window.model_status_label.setText("Model Run Completed")
+        # CU
         # Enable selected gui functions disabled during model run
         self.enable_gui_run_functions(1)
-        # self.load_plots_2()
+        # CU
 
-    def showbox(self, message_title, message):
+    @staticmethod
+    def showbox(message_title, message):
         """
         Displays a popup message box.
 
@@ -944,7 +939,8 @@ class Form(QObject):
         # Close the gui.
         self.window.close()
 
-    def closeprogram(self):
+    @staticmethod
+    def closeprogram():
         """
         Runs after the user closes the gui.
         Close any processes that are running outside the gui.
@@ -1145,6 +1141,10 @@ timer = multitimer.MultiTimer(interval=1, function=status_bar)
 
 
 def run_gui():
+    """
+    Run the OMEGA GUI.
+
+    """
     global app
     global form
 

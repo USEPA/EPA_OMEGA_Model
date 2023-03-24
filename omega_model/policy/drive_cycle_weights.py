@@ -126,9 +126,6 @@ class DriveCycleWeights(OMEGABase):
                 List of template/input errors, else empty list on success
 
         """
-
-
-
         DriveCycleWeights._data.clear()
 
         if verbose:
@@ -149,7 +146,7 @@ class DriveCycleWeights(OMEGABase):
 
         if not template_errors:
             validation_dict = {'share_id': ['cert'],
-                               'fueling_class': ['ICE', 'BEV', 'PHEV'],  #TODO: fueling class / powertrain type class..?
+                               'fueling_class': ['ICE', 'BEV', 'PHEV'],  # RV
                                }
 
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
@@ -178,7 +175,7 @@ class DriveCycleWeights(OMEGABase):
                                     DriveCycleWeights._data[fc] = dict()
                                 DriveCycleWeights._data[fc][calendar_year] = tree
 
-                DriveCycleWeights._data[fc]['start_year'] = np.array([*DriveCycleWeights._data[fc]]) # np.array(list(DriveCycleWeights._data[fc].keys()))
+                DriveCycleWeights._data[fc]['start_year'] = np.array([*DriveCycleWeights._data[fc]])  # CU
 
         return template_errors
 

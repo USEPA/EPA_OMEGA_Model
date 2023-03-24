@@ -103,6 +103,13 @@ class DecompositionAttributes(OMEGABase):
 
     @classmethod
     def init(cls):
+        """
+        Initialize DecompositionAttributes.
+
+        Returns:
+            Nothing, updates class data regarding available decomposition attibutes
+
+        """
         from policy.offcycle_credits import OffCycleCredits
         from policy.drive_cycles import DriveCycles
 
@@ -201,8 +208,6 @@ class DecompositionAttributes(OMEGABase):
             if index_column not in cost_curve_non_numeric_data:
                 cost_curve_non_numeric_data[index_column] = vehicle.cost_curve[
                     'veh_%s_%s' % (vehicle.vehicle_id, index_column)]
-
-                # cost_curve_non_numeric_data = cost_curve_non_numeric_data.reset_index()
                 cost_curve_non_numeric_data.reset_index(inplace=True)
 
             interp_index = np.interp(index_value,
@@ -218,9 +223,7 @@ class DecompositionAttributes(OMEGABase):
 
                 offset = interp_index - math.trunc(interp_index)
 
-                value = '%s (%.3f):%s (%.3f)' % (
-                    cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index)], 1 - offset,
-                    cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index) + 1], offset)
+                # CU RV for intermediate string values
 
                 if offset < 0.5:
                     value = cost_curve_non_numeric_data[attribute_name].iloc[math.trunc(interp_index)]
@@ -285,8 +288,6 @@ class VehicleOnroadCalculations(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
-
         if clear_cache:
             VehicleOnroadCalculations._cache = dict()
 
@@ -650,6 +651,7 @@ class CompositeVehicle(OMEGABase):
         Get new vehicle manufacturer cost from the composite cost curve for the provided cert CO2e g/mi value(s).
 
         Args:
+            attribute_name (str): the name of the attribute to query
             query_points (numeric list or Array): the values at which to query the cost curve
 
         Returns:
@@ -681,10 +683,30 @@ class CompositeVehicle(OMEGABase):
         return self.cost_curve[cost_curve_interp_key].values.min()
 
     def get_weighted_attribute(self, attribute_name):
+        """
+        Calculate the weighted value of the given attribute.
+
+        Args:
+            attribute_name (str): the name of the attribute to weight
+
+        Returns:
+            The weighted value of the given attribute.
+
+        """
         return weighted_value(self.vehicle_list, self.weight_by, attribute_name)
 
 
 def calc_vehicle_frontier(vehicle):
+    """
+    Calculate the cost cloud and the frontier of the cost cloud for the given vehilce.
+
+    Args:
+        vehicle (Vehicle): the vehicle to calculate a frontier for
+
+    Returns:
+        Returns ``vehicle`` with updated frontier
+
+    """
     cost_cloud = omega_globals.options.CostCloud.get_cloud(vehicle)
     vehicle.calc_cost_curve(cost_cloud)
     return vehicle
@@ -819,6 +841,7 @@ class Vehicle(OMEGABase):
         self.initial_registered_count = 0
         self.projected_sales = 0
         self.cost_curve = None
+        self.cost_curve_non_numeric_data = None
         self.unibody_structure = 1
         self.drive_system = 1
         self.dual_rear_wheel = 0
@@ -1181,7 +1204,13 @@ class Vehicle(OMEGABase):
 
     @property
     def fueling_class_reg_class_id(self):
-        #: combined fueling class and reg class string
+        """
+        Create string combining fueling class id and regulatory class id.
+
+        Returns:
+            String combining fueling class id and regulatory class id, e.g. 'ICE.car'
+
+        """
         return '%s.%s' % (self.fueling_class, self.reg_class_id)
 
 
@@ -1270,14 +1299,14 @@ class VehicleFinal(SQABase, Vehicle):
     mfr_base_year_share_data = dict()  #: dict of base year market shares by compliance ID and various categories, used to project future vehicle sales based on the context
 
     # these are used to validate vehicles.csv:
+    # mandatory input file columns, the rest can be optional numeric columns:
     mandatory_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id',
                                    'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id',
                                    'cert_fuel_id', 'sales', 'footprint_ft2', 'eng_rated_hp',
-                                   'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs', 'gvwr_lbs', 'gcwr_lbs',
-                                   'target_coef_a', 'target_coef_b', 'target_coef_c',
+                                   'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs', 'gvwr_lbs',
+                                   'gcwr_lbs', 'target_coef_a', 'target_coef_b', 'target_coef_c',
                                    'body_style', 'msrp_dollars', 'structure_material',
-                                   'prior_redesign_year', 'redesign_interval'}  #: mandatory input file columns, the rest can be optional numeric columns
-                                    # TODO: 'battery_kwh', 'motor_kw', 'charge_depleting_range_mi'
+                                   'prior_redesign_year', 'redesign_interval'}  # RV any other columns
 
     dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
     dynamic_attributes = []  #: list of dynamic attribute names, from dynamic_columns
@@ -1313,7 +1342,7 @@ class VehicleFinal(SQABase, Vehicle):
         omega_globals.session.flush()  # update vehicle_id, otherwise it's None
 
         VehicleAnnualData.update_registered_count(self,
-                                                  calendar_year=self.model_year,
+                                                  calendar_year=int(self.model_year),
                                                   registered_count=initial_registered_count)
 
     @staticmethod
@@ -1465,7 +1494,7 @@ class VehicleFinal(SQABase, Vehicle):
         for i in df.index:
             veh = VehicleFinal(
                 name=df.loc[i, 'vehicle_name'],
-                vehicle_id = i,
+                vehicle_id=i,
                 manufacturer_id=df.loc[i, 'manufacturer_id'],
                 model_year=df.loc[i, 'model_year'],
                 context_size_class=df.loc[i, 'context_size_class'],

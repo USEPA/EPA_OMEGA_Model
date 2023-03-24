@@ -153,8 +153,6 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
             List of template/input errors, else empty list on success
 
         """
-
-
         OffCycleCredits._data.clear()
 
         if verbose:

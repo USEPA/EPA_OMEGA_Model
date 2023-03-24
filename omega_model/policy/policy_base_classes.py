@@ -96,6 +96,7 @@ class VehicleTargetsBase:
         Args:
             reg_class_id (str): e.g. 'car','truck'
             model_year (numeric): model year
+            cert_fuel_id (str): certification fuel id, e.g. 'gasoline'
 
         Returns:
 

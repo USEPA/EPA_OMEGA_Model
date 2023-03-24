@@ -87,7 +87,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
     **Implements vehicle workfactor-based GHG targets (CO2e g/mi).**
 
     """
-    _cache = dict() # the input file target equations
+    _cache = dict()  # the input file target equations
     start_years = dict()
     _data = dict()  # private dict, workfactor-based GHG target by cert_fuel_id and start year
 
@@ -125,13 +125,15 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
     @staticmethod
     def calc_cert_useful_life_vmt(reg_class_id, model_year, cert_fuel_id):
         """
-        Calculate vehicle target CO2e g/mi.
+        Calculate the certification useful life vehicle miles travelled.
 
         Args:
-            vehicle (Vehicle): the vehicle to get the target for
+            reg_class_id (str): e.g. 'car', 'truck'
+            model_year (int): the model year to get useful life VMT for
+            cert_fuel_id (str): certification fuel id, e.g. 'gasoline'
 
         Returns:
-            Vehicle target CO2e in g/mi.
+            The certification useful life vehicle miles travelled.
 
         """
         cache_key = (reg_class_id, model_year, cert_fuel_id)
@@ -193,7 +195,6 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
 
         else:
             raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, {vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
-
 
     @staticmethod
     def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=1):
@@ -358,6 +359,10 @@ if __name__ == '__main__':
             omega_globals.options.VehicleTargets = VehicleTargets
 
             class dummyVehicle:
+                """
+                Dummy Vehicle class.
+
+                """
                 model_year = None
                 reg_class_id = None
                 footprint_ft2 = None
@@ -369,6 +374,12 @@ if __name__ == '__main__':
                 drive_system = 4
 
                 def get_initial_registered_count(self):
+                    """
+                    Get initial registered count
+
+                    Returns:
+                        Initial registered count
+                    """
                     return self.initial_registered_count
 
             car_vehicle = dummyVehicle()

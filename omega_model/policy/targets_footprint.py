@@ -209,7 +209,6 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             raise Exception('Missing GHG target parameters for %s, %d or prior'
                             % (vehicle.reg_class_id, vehicle.model_year))
 
-
     @staticmethod
     def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=1):
         """
@@ -273,8 +272,6 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             List of template/input errors, else empty list on success
 
         """
-
-
         VehicleTargets._data.clear()
 
         if verbose:
@@ -329,12 +326,22 @@ if __name__ == '__main__':
             omega_globals.options.VehicleTargets = VehicleTargets
 
             class dummyVehicle:
+                """
+                Dummy Vehicle class.
+
+                """
                 model_year = None
                 reg_class_id = None
                 footprint_ft2 = None
                 initial_registered_count = None
 
                 def get_initial_registered_count(self):
+                    """
+                    Get initial registered count
+
+                    Returns:
+                        Initial registered count
+                    """
                     return self.initial_registered_count
 
             car_vehicle = dummyVehicle()

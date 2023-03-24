@@ -65,6 +65,17 @@ class Manufacturer(SQABase, OMEGABase):
 
     @staticmethod
     def update_market_class_data(manufacturer_id, market_class_id):
+        """
+        Add the given market class id to the market class data for the given manufacturer.
+
+        Args:
+            manufacturer_id (str): e.g. 'consolidated_OEM'
+            market_class_id (str): e.g. 'hauling.ICE'
+
+        Returns:
+            Nothing, updates market_class_data
+
+        """
         if manufacturer_id not in market_class_data:
             market_class_data[manufacturer_id] = set()
 

@@ -72,7 +72,7 @@ class ManufacturerAnnualData(SQABase):
 
         """
         return sql_unpack_result(omega_globals.session.query(ManufacturerAnnualData.target_co2e_Mg)
-                                 .filter(ManufacturerAnnualData.compliance_id==compliance_id).all())
+                                 .filter(ManufacturerAnnualData.compliance_id == compliance_id).all())
 
     @staticmethod
     def get_calendar_year_cert_co2e_Mg(compliance_id):
@@ -87,7 +87,7 @@ class ManufacturerAnnualData(SQABase):
 
         """
         return sql_unpack_result(omega_globals.session.query(ManufacturerAnnualData.calendar_year_cert_co2e_Mg)
-                                 .filter(ManufacturerAnnualData.compliance_id==compliance_id).all())
+                                 .filter(ManufacturerAnnualData.compliance_id == compliance_id).all())
 
     @staticmethod
     def get_model_year_cert_co2e_Mg(compliance_id):
@@ -102,7 +102,7 @@ class ManufacturerAnnualData(SQABase):
 
         """
         return sql_unpack_result(omega_globals.session.query(ManufacturerAnnualData.model_year_cert_co2e_Mg)
-                                 .filter(ManufacturerAnnualData.compliance_id==compliance_id).all())
+                                 .filter(ManufacturerAnnualData.compliance_id == compliance_id).all())
 
     @staticmethod
     def get_total_cost_billions(compliance_id):
@@ -118,7 +118,7 @@ class ManufacturerAnnualData(SQABase):
         """
         return float(
             omega_globals.session.query(func.sum(ManufacturerAnnualData.manufacturer_vehicle_cost_dollars))
-                .filter(ManufacturerAnnualData.compliance_id==compliance_id).scalar()) / 1e9
+                .filter(ManufacturerAnnualData.compliance_id == compliance_id).scalar()) / 1e9
 
     @staticmethod
     def update_model_year_cert_co2e_Mg(model_year, compliance_id, transaction_amount_Mg):

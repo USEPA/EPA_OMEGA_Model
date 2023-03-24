@@ -102,8 +102,6 @@ class Incentives(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
-
         Incentives._data.clear()
 
         if verbose:
@@ -128,7 +126,7 @@ class Incentives(OMEGABase):
                 df = df.drop([c for c in df.columns if 'Unnamed' in c], axis='columns')
 
                 Incentives._data = df.to_dict(orient='index')
-                Incentives._data['start_year'] = np.array([*Incentives._data]) # np.array(list(Incentives._data.keys()))
+                Incentives._data['start_year'] = np.array([*Incentives._data])  # CU
 
         return template_errors
 
@@ -149,6 +147,10 @@ if __name__ == '__main__':
 
         if not init_fail:
             class dummyVehicle:
+                """
+                Dummy Vehicle class.
+
+                """
                 model_year = 2020
                 fueling_class = 'BEV'
 

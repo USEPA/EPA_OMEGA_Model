@@ -6,11 +6,10 @@ The color scheme is set to the standard EPA publication Pantone palette.
 """
 
 
-def tab_stylesheet(stylesheet):
+def tab_stylesheet():
     """
     Loads the stylesheet for the tab area of the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
     """
 
@@ -49,11 +48,10 @@ def tab_stylesheet(stylesheet):
     return stylesheet
 
 
-def background_stylesheet(stylesheet):
+def background_stylesheet():
     """
     Loads the stylesheet for the main window of the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
     """
 
@@ -66,11 +64,10 @@ def background_stylesheet(stylesheet):
     return stylesheet
 
 
-def button_stylesheet(stylesheet):
+def button_stylesheet():
     """
     Loads the stylesheet for buttons contained in the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
     """
 
@@ -95,11 +92,10 @@ def button_stylesheet(stylesheet):
     return stylesheet
 
 
-def development_stylesheet(stylesheet):
+def development_stylesheet():
     """
     Loads the stylesheet for buttons contained in the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
     """
 
@@ -112,11 +108,10 @@ def development_stylesheet(stylesheet):
     return stylesheet
 
 
-def logo_button_stylesheet(stylesheet):
+def logo_button_stylesheet():
     """
     Loads the stylesheet for logo buttons contained in the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
     """
 
@@ -147,11 +142,10 @@ def logo_button_stylesheet(stylesheet):
     return stylesheet
 
 
-def label_stylesheet(stylesheet):
+def label_stylesheet():
     """
     Loads the stylesheet for labels contained in the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
     """
 
@@ -161,11 +155,10 @@ def label_stylesheet(stylesheet):
     return stylesheet
 
 
-def checkbox_stylesheet(stylesheet):
+def checkbox_stylesheet():
     """
     Loads the stylesheet for checkboxes contained in the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
     """
 
@@ -174,11 +167,11 @@ def checkbox_stylesheet(stylesheet):
      """
     return stylesheet
 
-def textbox_stylesheet(stylesheet):
+
+def textbox_stylesheet():
     """
     Loads the stylesheet for textboxes contained in the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
     """
 
@@ -187,11 +180,11 @@ def textbox_stylesheet(stylesheet):
      """
     return stylesheet
 
-def listbox_stylesheet(stylesheet):
+
+def listbox_stylesheet():
     """
     Loads the stylesheet for listboxes contained in the gui.
 
-    :param stylesheet:
     :return: String containing stylesheet.
     """
 
@@ -201,7 +194,7 @@ def listbox_stylesheet(stylesheet):
     return stylesheet
 
 
-def test1(stylesheet):
+def test1():
     stylesheet = """
         QTabBar::tab { 
             background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
@@ -235,4 +228,3 @@ def test1(stylesheet):
             }
         """
     return stylesheet
-

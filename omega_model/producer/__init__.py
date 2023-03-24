@@ -1,1 +1,9 @@
-# OMEGA producer subpackage
+"""
+
+**OMEGA producer subpackage.**
+
+----
+
+**CODE**
+
+"""

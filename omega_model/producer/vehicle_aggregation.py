@@ -249,10 +249,6 @@ class VehicleAggregation(OMEGABase):
         #     ``DecompositionAttributes``
 
         """
-        template_errors = []
-
-        # DecompositionAttributes.init()   # offcycle_credits must be initalized first
-
         from producer.vehicles import Vehicle, VehicleFinal
         from context.new_vehicle_market import NewVehicleMarket
         from context.glider_cost import GliderCost
@@ -332,17 +328,18 @@ class VehicleAggregation(OMEGABase):
             df['glider_non_structure_mass_lbs'] = 0
 
             # fill in missing values
-            df['ground_clearance_in'] = df['ground_clearance_in'].fillna(6.6) # dummy value, sales-weighted
+            df['ground_clearance_in'] = df['ground_clearance_in'].fillna(6.6)  # RV
 
-            df['height_in'] = df['height_in'].fillna(62.4)  # dummy value, sales-weighted
+            df['height_in'] = df['height_in'].fillna(62.4)  # RV
 
             df['base_year_powertrain_type'] = df['electrification_class'].\
                 replace({'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'FCV'})
 
-            # TODO: FCV battery size = 2?? Mirai=1.8
+            # RV
             df['battery_kwh'] = df[['base_year_powertrain_type']].\
                 replace({'base_year_powertrain_type': {'HEV': 1, 'PHEV': 18, 'BEV': 60, 'FCV': 60, 'ICE': 0}})
 
+            # RV
             df['motor_kw'] = df[['base_year_powertrain_type']].\
                 replace({'base_year_powertrain_type': {'HEV': 20,
                                              'PHEV': 50,
@@ -350,7 +347,7 @@ class VehicleAggregation(OMEGABase):
                                              'FCV': 150 + (100 * (df['drive_system'] == 4)),
                                              'ICE': 0}})
 
-            # TODO: FCV range = 0??
+            # RV
             df['charge_depleting_range_mi'] = df[['base_year_powertrain_type']].\
                 replace({'base_year_powertrain_type': {'HEV': 0, 'PHEV': 50, 'BEV': 300, 'FCV': 300, 'ICE': 0}})
 

@@ -13,6 +13,7 @@ from omega_model import *
 
 _cache = dict()
 
+
 class VehicleAnnualData(OMEGABase):
     """
     **Stores and retrieves vehicle annual data, which includes age, registered count, vehicle miles travelled, etc.**
@@ -23,12 +24,39 @@ class VehicleAnnualData(OMEGABase):
 
     @staticmethod
     def create(calendar_year, vehicle_id, compliance_id, age, registered_count=0, annual_vmt=0, odometer=0, vmt=0):
+        """
+        Create a dict of the given values.
+
+        Args:
+            calendar_year (int): the calendar year
+            vehicle_id (int): the vehicle id number
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
+            age (int): vehicle age in years
+            registered_count (float): the registered count of the given vehicle
+            annual_vmt (float): annual vehicle miles travelled
+            odometer (float): the accumulate vehicle miles travelled of the given vehicle
+            vmt (float): vehicle miles travelled
+
+        Returns:
+            A dict of the given values.
+
+        """
         return {'calendar_year': calendar_year, 'compliance_id': compliance_id, 'vehicle_id': vehicle_id,
                 'age': age, 'registered_count': registered_count, 'annual_vmt': annual_vmt, 'odometer': odometer,
                 'vmt': vmt}
 
     @staticmethod
     def add_all(vad_list):
+        """
+        Add all vehicle annual data records to the class data set.
+
+        Args:
+            vad_list (list): list of vehicle annual data dicts
+
+        Returns:
+            Nothing, updates ``VehicleAnnualData._data``
+
+        """
         if type(vad_list) == list:
             for vad in vad_list:
                 VehicleAnnualData._data.append(vad)
@@ -75,10 +103,11 @@ class VehicleAnnualData(OMEGABase):
     @staticmethod
     def get_vehicle_annual_data(calendar_year, compliance_id=None, attributes=None):
         """
-        Get vehicle annual data for the given calendar year.
+        Get vehicle annual data for the given calendar year and compliance id, if applicable.
 
         Args:
             calendar_year (int): calendar to get data for
+            compliance_id (str): name of manufacturer, e.g. 'consolidated_OEM'
             attributes (str, [strs]): optional name of attribute(s) to retrieve instead of all data
 
         Returns:
@@ -118,7 +147,13 @@ class VehicleAnnualData(OMEGABase):
 
     @staticmethod
     def init_vehicle_annual_data():
+        """
+        Initialize the module by clear caches.
 
+        Returns:
+            Nothing, clears cached data.
+
+        """
         _cache.clear()
 
         VehicleAnnualData._data = []

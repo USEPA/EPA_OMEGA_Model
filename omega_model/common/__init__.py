@@ -1,6 +1,10 @@
 """
 
-OMEGA common functionality subpackage
+**OMEGA common functionality subpackage.**
+
+----
+
+**CODE**
 
 """
 

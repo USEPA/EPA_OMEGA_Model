@@ -40,6 +40,7 @@ class ProducerGeneralizedCostBase:
 
         Args:
             vehicle (Vehicle): the vehicle to calculate generalized costs for
+            cost_cloud (dataframe): the vehicle's cost cloud
             co2_name (str): CO2 column name, e.g. 'onroad_direct_co2e_grams_per_mile'
             kwh_name (str): kWh/mi column name, e.g. 'onroad_direct_kwh_per_mile'
             cost_name (str): vehicle cost column name, e.g. 'new_vehicle_mfr_cost_dollars'

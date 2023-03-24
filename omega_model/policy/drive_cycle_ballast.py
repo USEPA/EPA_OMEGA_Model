@@ -128,8 +128,6 @@ class DriveCycleBallast(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
-
         DriveCycleBallast._data.clear()
 
         if verbose:
@@ -187,6 +185,10 @@ if __name__ == '__main__':
 
         if not init_fail:
             class Vehicle:
+                """
+                Dummy Vehicle class.
+
+                """
                 model_year = 2020
                 reg_class_id = list(legacy_reg_classes)[0]
 

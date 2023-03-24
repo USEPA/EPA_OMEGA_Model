@@ -302,6 +302,17 @@ class CreditBank(OMEGABase):
         return new_credit_transaction
 
     def get_credit_param(self, model_year, param):
+        """
+        Get the given credit parameter for the given model year.
+
+        Args:
+            model_year (int): the model year
+            param (str): the name of the paramter to retrieve
+
+        Returns:
+            The given credit parameter for the given model year.
+
+        """
         start_years = self.credit_params.index
 
         model_year = max(start_years[start_years <= model_year])
@@ -502,9 +513,9 @@ class CreditBank(OMEGABase):
         # if credit is negative, see if there are any credits that can pay it
         elif new_credit['ending_balance_Mg'] < 0:
             debit = new_credit
-            credits = this_years_credits[this_years_credits['ending_balance_Mg'] >= 0]
-            if not credits.empty:
-                for _, credit in credits.iterrows():
+            available_credits = this_years_credits[this_years_credits['ending_balance_Mg'] >= 0]
+            if not available_credits.empty:
+                for _, credit in available_credits.iterrows():
                     if debit['ending_balance_Mg'] < 0:
                         if credit['ending_balance_Mg'] > 0:
                             self.pay_debit(credit, debit, this_years_credits)

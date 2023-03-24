@@ -1,1 +1,9 @@
-# OMEGA policy subpackage
+"""
+
+**OMEGA policy subpackage.**
+
+----
+
+**CODE**
+
+"""

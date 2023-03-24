@@ -117,8 +117,6 @@ class RequiredSalesShare(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
-
         RequiredSalesShare._data = pd.DataFrame()
 
         RequiredSalesShare._cache.clear()

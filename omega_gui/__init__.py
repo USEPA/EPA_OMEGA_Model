@@ -1,6 +1,10 @@
 """
 Variables shared across GUI submodules
 
+----
+
+**CODE**
+
 """
 
 import os

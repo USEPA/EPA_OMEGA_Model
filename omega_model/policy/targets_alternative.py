@@ -235,8 +235,6 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             List of template/input errors, else empty list on success
 
         """
-
-
         VehicleTargets._data.clear()
 
         if verbose:
@@ -280,8 +278,8 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
-
-        omega_globals.options.policy_targets_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + '../test_inputs/ghg_standards-alternative.csv'
+        omega_globals.options.policy_targets_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + \
+                                                    '../test_inputs/ghg_standards-alternative.csv'
         # init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
@@ -300,12 +298,22 @@ if __name__ == '__main__':
             omega_globals.options.VehicleTargets = VehicleTargets
 
             class dummyVehicle:
+                """
+                Dummy Vehicle class.
+
+                """
                 model_year = None
                 reg_class_id = None
                 initial_registered_count = None
                 cert_co2e_grams_per_mile = 150
 
                 def get_initial_registered_count(self):
+                    """
+                    Get initial registered count
+
+                    Returns:
+                        Initial registered count
+                    """
                     return self.initial_registered_count
 
             car_vehicle = dummyVehicle()
