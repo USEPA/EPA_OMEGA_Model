@@ -81,22 +81,6 @@ omega\_model.policy.regulatory\_classes module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.policy.regulatory\_classes\_demo\_alt0 module
-----------------------------------------------------------
-
-.. automodule:: omega_model.policy.regulatory_classes_demo_alt0
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-omega\_model.policy.regulatory\_classes\_demo\_alt1 module
-----------------------------------------------------------
-
-.. automodule:: omega_model.policy.regulatory_classes_demo_alt1
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 omega\_model.policy.required\_sales\_share module
 -------------------------------------------------
 

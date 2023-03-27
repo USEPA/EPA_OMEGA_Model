@@ -31,9 +31,9 @@ Sample Data Columns
         :widths: auto
 
         reg_class_id,description
-        car,“cars” as defined by the regulations
-        truck,“trucks” as defined by the regulations
-        mediumduty,"2b3" as defined by the regulations
+        car,'cars' as defined by the regulations
+        truck,'trucks' as defined by the regulations
+        mediumduty,'2b3' as defined by the regulations
 
 Data Column Name and Description
 

@@ -25,14 +25,6 @@ omega\_model.context.context\_base\_classes module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.context.cost\_clouds module
-----------------------------------------
-
-.. automodule:: omega_model.context.cost_clouds
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 omega\_model.context.fuel\_prices module
 ----------------------------------------
 

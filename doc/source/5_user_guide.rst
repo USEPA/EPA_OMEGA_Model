@@ -31,7 +31,7 @@ Batch Input Files and Loaders
         Sales Share File, ``user_definable`` e.g. :any:`omega_model/consumer/sales_share.py<omega_model.consumer.sales_share_ice_bev>`
         Vehicle Price Modifications File, :any:`omega_model/context/price_modifications.py<omega_model.context.price_modifications>`
         Vehicle Reregistration File, ``user_definable`` e.g. :any:`omega_model/consumer/reregistration_fixed_by_age.py<omega_model.consumer.reregistration_fixed_by_age>`
-        Vehicle Simulation Results and Costs File, :any:`omega_model/context/cost_clouds.py<omega_model.context.cost_clouds>`
+        Vehicle Simulation Results and Costs File, :any:`omega_model/context/cost_clouds.py<omega_model.context.rse_cost_clouds>`
         Vehicles File, :any:`omega_model/producer/vehicles.py<omega_model.producer.vehicles>`
         ,
         Session Policy Alternatives Settings,
