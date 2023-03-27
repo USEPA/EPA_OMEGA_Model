@@ -6,8 +6,7 @@
 
 **INPUT FILE FORMAT**
 
-The file format consists of a one-row template header followed by a one-row data header and subsequent data
-rows.
+The file format consists of a one-row header followed by subsequent data rows.
 
 The data represents OMEGA effects session settings.
 
