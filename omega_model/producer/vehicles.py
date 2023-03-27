@@ -1113,7 +1113,7 @@ class Vehicle(OMEGABase):
             cost_cloud (DataFrame): vehicle cost cloud
 
         Returns:
-            None, updates vehicle.cust_curve with vehicle tecnhology frontier / cost curve as a DataFrame.
+            None, updates vehicle.cost_curve with vehicle tecnhology frontier / cost curve as a DataFrame.
 
         """
 
