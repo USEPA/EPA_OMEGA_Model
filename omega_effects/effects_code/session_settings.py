@@ -59,62 +59,104 @@ Sample Data Rows
 Data Row Name and Description
 
 :batch_folder:
+    Pathname of the batch bundle folder to run effects on
 
 :Vehicles File Base Year:
+    The intended model year of the base year vehicles file, should be consistent with the OMEGA compliance run
 
 :Analysis Final Year:
+    The final effects year, should be <= the value used in the OMEGA compliance run
 
 :Cost Accrual:
+    The time of year when costs are assumed to accrue, ``end-of-year`` or ``beginning-of-year``
 
 :Discount Values to Year:
+    The year to which all monetized values in the cost effects outputs will be discounted
 
 :Analysis Dollar Basis:
+    The dollar valuation for all monetized values in the cost effects outputs, i.e., costs are expressed in "Dollar Basis" dollars
 
 :Batch Analysis Context Settings:
+    Decorator, not evaluated
 
-:Context Name:
+:Context Name *(str)*:
+    Context name, e.g. ``AEO2021``
 
 :VMT Rebound Rate ICE:
+    VMT rebound rate for internal combustion engines
 
 :VMT Rebound Rate BEV:
+    VMT rebound rate for battery-electric vehicles
 
-:SC-GHG in Net Benefits:
+:SC-GHG in Net Benefits *(str)*:
+    'global' or 'domestic' or 'both' (note that both global and domesitc benefits are calculated, this only impacts net benefits)
 
-:Maintenance Costs File:
+:Maintenance Costs File *(str)*:
+    The relative or absolute path to the maintenance cost inputs file,
+    loaded by ``context.maintenance_cost.MaintenanceCost``
 
-:Repair Costs File:
+:Repair Costs File *(str)*:
+    The relative or absolute path to the repair cost inputs file,
+    loaded by ``context.repair_cost.RepairCost``
 
-:Refueling Costs File:
+:Refueling Costs File *(str)*:
+    The relative or absolute path to the refueling cost inputs file,
+    loaded by ``context.refueling_cost.RefuelingCost``
 
-:General Inputs for Effects File:
+:General Inputs for Effects File *(str)*:
+    The relative or absolute path to the general inputs used for effects calculations,
+    loaded by ``general.general_inputs_for_effects.GeneralInputsForEffects``
 
-:Context Criteria Cost Factors File:
+:Context Criteria Cost Factors File *(str)*:
+    The relative or absolute path to the criteria pollutant costs file,
+    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
 
-:Context SCC Cost Factors File:
+:Context SCC Cost Factors File *(str)*:
+    The relative or absolute path to the social cost of carbon and carbon-equivalent pollutants file,
+    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
 
-:Context Energy Security Cost Factors File:
+:Context Energy Security Cost Factors File *(str)*:
+    The relative or absolute path to the energy security cost factors file,
+    loaded by ``effects.cost_factors_energysecurity.CostFactorsEnergySecurity``
 
-:Context Congestion-Noise Cost Factors File:
+:Context Congestion-Noise Cost Factors File *(str)*:
+    The relative or absolute path to the congestion and noise cost factors file,
+    loaded by ``effects.cost_factors_congestion_noise.CostFactorsCongestionNoise``
 
-:Context Legacy Fleet File:
+:Context Legacy Fleet File *(str)*:
+    The relative or absolute path to the legacy fleet file,
+    loaded by ``effects.legacy_fleet.LegacyFleet``
 
 **Context session settings.**
 
 :Context Stock and VMT File:
+    Context Stock and VMT File
 
 **Per-session settings.**
 
-:Context Powersector Emission Rates File:
+:Context Powersector Emission Rates File *(str)*:
+    The relative or absolute path to the power sector emission rates file,
+    loaded by ``effects.emission_rates_egu.EmissionRatesEGU``
 
 :Context Refinery Emission Rates File:
+    The relative or absolute path to the refinery emission Rates file,
+    loaded by ``effects.emission_rates_refinery.EmissionRatesRefinery``
 
-:Context Refinery Emission Factors File:
+:Context Refinery Emission Factors File *(str)*:
+    The relative or absolute path to the refinery emission factors file,
+    loaded by ``effects.emission_factors_refinery.EmissionFactorsRefinery``
 
-:Context Vehicle Emission Rates File:
+:Context Vehicle Emission Rates File *(str)*:
+    The relative or absolute path to the vehicle emission rates file,
+    loaded by ``effects.emission_rates_vehicles.EmissionRatesVehicles``
 
-:Context Safety Values File:
+:Context Safety Values File *(str)*:
+    The relative or absolute path to the safety values file,
+    loaded by ``effects.safety_values.SafetyValues``
 
-:Context Fatality Rates File:
+:Context Fatality Rates File *(str)*:
+    The relative or absolute path to the fatality rates file,
+    loaded by ``effects.fatality_rates.FatalityRates``
 
 ----
 
