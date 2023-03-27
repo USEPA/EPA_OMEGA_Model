@@ -4,6 +4,121 @@
 
 ----
 
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents OMEGA effects session settings.
+
+File Type
+    comma-separated values (CSV)
+
+Sample Header
+    .. csv-table::
+
+       parameter,session_policy,value,full_path
+
+Sample Data Rows
+    .. csv-table::
+        :widths: auto
+
+        Batch Settings,,,,
+        batch_folder,all,,omega/runs/2023_03_14_22_42_30_central_3alts_20230314,
+        Vehicles File Base Year,all,2021,,this should be consistent with the OMEGA compliance run
+        Analysis Final Year,all,2055,,this should be <= the value used in the OMEGA compliance run
+        Cost Accrual,all,end-of-year,,
+        Discount Values to Year,all,2027,,
+        Analysis Dollar Basis,all,2020,,
+        Batch Analysis Context Settings,,,,
+        Context Name,all,AEO2021,,
+        Context Case,all,Reference case,,
+        VMT Rebound Rate ICE,all,-0.1,,
+        VMT Rebound Rate BEV,all,0,,
+        SC-GHG in Net Benefits,all,both,,"enter 'global' or 'domestic' or 'both' (note that both global and domesitc benefits are calculated, this only impacts net benefits)"
+        Maintenance Costs File,all,,omega/inputs/master_all/effects/maintenance_cost.csv,
+        Repair Costs File,all,,omega/inputs/master_all/effects/repair_cost.csv,
+        Refueling Costs File,all,,omega/inputs/master_all/effects/refueling_cost.csv,
+        General Inputs for Effects File,all,,omega/inputs/master_all/effects/general_inputs_for_effects.csv,
+        Context Criteria Cost Factors File,all,,omega/inputs/master_all/effects/cost_factors_criteria.csv,
+        Context SCC Cost Factors File,all,,omega/inputs/master_all/effects/cost_factors_scc_global_domestic_2020.csv,
+        Context Energy Security Cost Factors File,all,,omega/inputs/master_all/effects/cost_factors_energysecurity.csv,
+        Context Congestion-Noise Cost Factors File,all,,omega/inputs/master_all/effects/cost_factors_congestion_noise.csv,
+        Context Legacy Fleet File,all,,omega/inputs/master_all/effects/legacy_fleet.csv,
+        blank,,,,
+        Session Name,context,SAFE,,
+        Context Stock and VMT File,context,,omega/inputs/master_all/effects/context_stock_vmt.csv,
+        blank0,,,,
+        Session Name,no_action,NTR,,
+        Context Powersector Emission Rates File,no_action,,omega/inputs/master_all/effects/emission_rates_egu.csv,
+        Context Refinery Emission Rates File,no_action,,omega/inputs/master_all/effects/emission_rates_refinery.csv,
+        Context Refinery Emission Factors File,no_action,,,
+        Context Vehicle Emission Rates File,no_action,,omega/inputs/master_all/effects/emission_rates_vehicles-no_gpf.csv,
+        Context Safety Values File,no_action,,omega/inputs/master_all/effects/safety_values.csv,
+        Context Fatality Rates File,no_action,,omega/inputs/master_all/effects/fatality_rates.csv,
+
+Data Row Name and Description
+
+:batch_folder:
+
+:Vehicles File Base Year:
+
+:Analysis Final Year:
+
+:Cost Accrual:
+
+:Discount Values to Year:
+
+:Analysis Dollar Basis:
+
+:Batch Analysis Context Settings:
+
+:Context Name:
+
+:VMT Rebound Rate ICE:
+
+:VMT Rebound Rate BEV:
+
+:SC-GHG in Net Benefits:
+
+:Maintenance Costs File:
+
+:Repair Costs File:
+
+:Refueling Costs File:
+
+:General Inputs for Effects File:
+
+:Context Criteria Cost Factors File:
+
+:Context SCC Cost Factors File:
+
+:Context Energy Security Cost Factors File:
+
+:Context Congestion-Noise Cost Factors File:
+
+:Context Legacy Fleet File:
+
+**Context session settings.**
+
+:Context Stock and VMT File:
+
+**Per-session settings.**
+
+:Context Powersector Emission Rates File:
+
+:Context Refinery Emission Rates File:
+
+:Context Refinery Emission Factors File:
+
+:Context Vehicle Emission Rates File:
+
+:Context Safety Values File:
+
+:Context Fatality Rates File:
+
+----
+
 **CODE**
 
 """
