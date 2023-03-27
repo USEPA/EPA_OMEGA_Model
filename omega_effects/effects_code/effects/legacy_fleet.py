@@ -14,7 +14,7 @@ The data represent the legacy fleet that ages out as new vehicles enter the flee
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,legacy_fleet,input_template_version:,0.1

@@ -17,7 +17,9 @@ File Type
     comma-separated values (CSV)
 
 Template Header
-       input_template_name:, ``[module_name]``, input_template_version:, 0.1
+    .. csv-table::
+
+        input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
 
 Sample Header
     .. csv-table::
@@ -28,9 +30,10 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        reg_class_id,description,,
-        car,“cars” as defined by the regulations,,
-        truck,“trucks” as defined by the regulations,,
+        reg_class_id,description
+        car,“cars” as defined by the regulations
+        truck,“trucks” as defined by the regulations
+        mediumduty,"2b3" as defined by the regulations
 
 Data Column Name and Description
 

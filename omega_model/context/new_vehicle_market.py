@@ -27,7 +27,7 @@ context cases.  Some size classes are represented in more than one regulatory cl
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,context_new_vehicle_market,input_template_version:,0.22

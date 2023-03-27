@@ -14,10 +14,10 @@ The data represents manufacturer names.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
-       input_template_name:,manufacturers,input_template_version:,0.0003
+       input_template_name:,manufacturers,input_template_version:,0.0003,description:,default
 
 Sample Data Columns
     .. csv-table::

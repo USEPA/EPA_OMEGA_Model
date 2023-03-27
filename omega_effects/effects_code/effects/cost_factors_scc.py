@@ -10,7 +10,7 @@ The data represents $/metric ton benefits estimates (i.e., Social Cost of GHG) a
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,cost_factors_scc,input_template_version:,0.2

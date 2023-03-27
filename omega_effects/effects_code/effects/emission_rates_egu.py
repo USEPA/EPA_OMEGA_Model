@@ -10,7 +10,7 @@ The data represents electricity generating unit emission rates by calendar year.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,emission_rates_egu,input_template_version:,0.2

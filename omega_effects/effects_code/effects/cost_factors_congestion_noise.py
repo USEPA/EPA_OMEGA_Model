@@ -10,7 +10,7 @@ The data represents $/mile cost estimates associated with congestion and noise a
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,cost_factors_congestion_noise,input_template_version:,0.1

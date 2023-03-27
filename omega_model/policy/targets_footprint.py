@@ -20,7 +20,9 @@ File Type
     comma-separated values (CSV)
 
 Template Header
-    input_template_name:, ``[module_name]``, input_template_version:, ``[template_version]``
+    .. csv-table::
+
+        input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
 
 Sample Header
     .. csv-table::

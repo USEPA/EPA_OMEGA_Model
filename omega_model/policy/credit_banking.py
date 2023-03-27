@@ -21,7 +21,7 @@ The data represents GHG credit parameters such as credit carry-forward and carry
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,ghg_credit_params,input_template_version:,0.2
@@ -31,7 +31,7 @@ Sample Data Columns
         :widths: auto
 
         start_model_year,credit_carryforward_years,credit_carryback_years
-        2020,5,3
+        2016,5,3
 
 Data Column Name and Description
 
@@ -56,7 +56,7 @@ The data represents GHG credits that are available to manufacturers in the compl
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,ghg_credit_history,input_template_version:,0.21

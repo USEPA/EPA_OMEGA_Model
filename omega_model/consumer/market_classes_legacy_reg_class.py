@@ -15,12 +15,12 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,0.32
+       input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
 
 Sample Header
     .. csv-table::
 
-       input_template_name:,consumer.market_classes,input_template_version:,0.32
+       input_template_name:,consumer.market_classes_legacy_reg_class,input_template_version:,0.32
 
 Sample Data Columns
     .. csv-table::

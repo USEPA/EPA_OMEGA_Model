@@ -15,14 +15,19 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,powertrain_cost,input_template_version:,0.1,``{optional_source_data_comment}``
+       input_template_name:,powertrain_cost,input_template_version:,``[template_version]``,``{optional_source_data_comment}``
+
+Sample Header
+    .. csv-table::
+
+       input_template_name:,powertrain_cost,input_template_version:,0.1,notes
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
         powertrain_type,item,value,quantity,dollar_basis,notes
-        BEV,battery_offset,{"dollars_per_kwh": {2023: -9, 2024: -18, 2025: -27, 2026: -36, 2027: -45, 2028: -45, 2029: -45, 2030: -33.75, 2031: -22.50, 2032: -11.25, 2033: -0}}
+        BEV,battery_offset,{"dollars_per_kwh": {2023: -9, 2024: -18, 2025: -27, 2026: -36, 2027: -45, 2028: -45, 2029: -45, 2030: -33.75, 2031: -22.50, 2032: -11.25, 2033: -0}},,,
 
 ----
 

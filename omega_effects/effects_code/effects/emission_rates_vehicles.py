@@ -10,7 +10,7 @@ The data represents tailpipe emission rates by model year, age, reg-class and fu
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,emission_rates_vehicles,input_template_version:,0.2

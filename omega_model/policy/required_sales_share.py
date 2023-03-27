@@ -17,18 +17,12 @@ to the market category, not absolute.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,required_sales_share,input_template_version:,0.2
 
 The data header consists of a ``start_year`` column followed by zero or more required sales share columns.
-
-Dynamic Data Header
-    .. csv-table::
-        :widths: auto
-
-        start_year, ``{market_class_id}:minimum_share``, ...
 
 Sample Data Columns
     .. csv-table::

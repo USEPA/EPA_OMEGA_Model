@@ -14,7 +14,7 @@ The data represent various inputs for use in maintenance cost calculations.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,maintenance_cost,input_template_version:,0.2

@@ -17,7 +17,7 @@ The data represents fuel property data for compliance purposes, by policy year.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,policy-fuels,input_template_version:,0.1

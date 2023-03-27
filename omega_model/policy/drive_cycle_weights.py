@@ -50,7 +50,7 @@ and fueling class.  For details on how the header is parsed into a tree, see ``c
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,share_tree,input_template_version:,0.3
@@ -64,8 +64,13 @@ Sample Data Columns
 
 Data Column Name and Description
     :start_year:
+        The earliest model year that drive cycle weighting applies to
+
     :share_id:
+        The type of the drive cycle weighting, e.g. 'cert'
+
     :fueling_class:
+        The fueling class (general powertrain type) that the drive cycle weighting applies to, e.g. 'ICE', 'PHEV', etc
 
 ----
 

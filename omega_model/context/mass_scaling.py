@@ -16,7 +16,7 @@ The data represents vehicle mass scaling equations as a function of user-definab
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,mass_scaling,input_template_version:,0.1

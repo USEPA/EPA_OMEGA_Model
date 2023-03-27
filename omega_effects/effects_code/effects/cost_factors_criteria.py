@@ -11,7 +11,7 @@ be left blank to avoid calculating health effects (criteria air pollution effect
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,cost_factors_criteria,input_template_version:,0.4

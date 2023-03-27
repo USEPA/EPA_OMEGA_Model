@@ -20,10 +20,10 @@ The data represents the "gap" between on-cycle and onroad GHG performance.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
-       input_template_name:,onroad_vehicle_calculations,input_template_version:,0.21
+       input_template_name:,onroad_vehicle_calculations,input_template_version:,0.22,notes:,20221028a FTP US06 for w no gap for onroad and 2cycle w BEV 0.75 adjust for battery sizing
 
 The data header consists of a ``drive_cycle_weight_year`` column followed by calculation columns.
 
@@ -37,13 +37,16 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        drive_cycle_weight_year,fueling_class:BEV:/:cert_direct_kwh_per_mile->onroad_direct_kwh_per_mile,fueling_class:ICE:/:cert_direct_co2e_grams_per_mile->onroad_direct_co2e_grams_per_mile
-        2020,0.7,0.8
+        onroad_drive_cycle_weight_year,battery_sizing_drive_cycle_weight_year,fueling_class:BEV:/:nominal_onroad_direct_kwh_per_mile->battery_sizing_onroad_direct_kwh_per_mile,fueling_class:BEV:/:nominal_onroad_direct_kwh_per_mile->onroad_direct_kwh_per_mile,fueling_class:ICE:/:nominal_onroad_direct_co2e_grams_per_mile->onroad_direct_co2e_grams_per_mile
+        0,2012,0.75,1,1
 
 Data Column Name and Description
 
-:drive_cycle_weight_year:
+:onroad_drive_cycle_weight_year:
     Year to use for cert drive cycle weight calculations
+
+:battery_sizing_drive_cycle_weight_year:
+    Year to use for battery sizing drive cycle weight calculations
 
 **Optional Columns**
 

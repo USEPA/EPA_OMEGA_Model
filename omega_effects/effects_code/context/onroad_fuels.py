@@ -20,7 +20,7 @@ The data represents fuel property data for on-road/in-use purposes.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,onroad-fuels,input_template_version:,0.1

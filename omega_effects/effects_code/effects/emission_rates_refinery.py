@@ -10,7 +10,7 @@ The data represents refinery emission rate curves.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,emission_rates_refinery,input_template_version:,0.1

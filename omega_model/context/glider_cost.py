@@ -12,19 +12,35 @@ rows.  The template header uses a dynamic format.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
-       input_template_name:,glider_cost,input_template_version:,0.1,``{optional_source_data_comment}``
+       input_template_name:,glider_cost,input_template_version:,0.11,notes:,20220719 structure costs for aluminum BIW aligned with FEV Venza and Silverado teardowns
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        body_style,item,material,value,dollar_basis,notes
-        sedan,unibody_structure,aluminum,(2.55) * structure_mass_lbs * MARKUP,2020,
-        sedan,unibody_structure,steel,(1.8) * structure_mass_lbs * MARKUP,2020,
-        cuv_suv,unibody_structure,aluminum,(2.65) * structure_mass_lbs * MARKUP,2020,
+        body_style,item,material,value,dollar_basis
+        sedan,unibody_structure,steel,(1.5 * structure_mass_lbs + 1500) * markup,2020
+        sedan,unibody_structure,aluminum,(3.4 * structure_mass_lbs + 1500) * markup,2020
+        cuv_suv,unibody_structure,aluminum,(3.4 * structure_mass_lbs + 1700) * markup,2020
+
+Data Column Name and Description
+    :body_style:
+        Vehicle body style, e.g. 'sedan', 'ALL', etc
+
+    :item:
+        Name of the glider cost parameter, e.g. 'unibody_structure', 'learning_rate', etc
+
+    :material:
+        Parameter material type, e.g. 'steel', 'aluminum', etc
+
+    :value:
+        The parameter cost value or equation to be evaulated
+
+    :dollar_basis:
+        The dollar basis year for the cost value, e.g. ``2020``
 
 ----
 

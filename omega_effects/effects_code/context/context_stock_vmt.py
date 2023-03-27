@@ -14,7 +14,7 @@ The data represents stock vmt by context case, case id and calendar year.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,context_stock_vmt,input_template_version:,0.1

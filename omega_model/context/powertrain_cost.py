@@ -12,7 +12,7 @@ rows.  The template header uses a dynamic format.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,powertrain_cost,input_template_version:,0.1,``{optional_source_data_comment}``
@@ -22,9 +22,28 @@ Sample Data Columns
         :widths: auto
 
         powertrain_type,item,value,quantity,dollar_basis,notes
-        ICE,dollars_per_cylinder,((-28.814) * CYL + 726.27) * CYL * MARKUP_ICE,,2019,
-        ICE,dollars_per_liter,((400) * LITERS) * MARKUP_ICE,,2019,
-        ICE,gdi,((43.237) * CYL + 97.35) * MARKUP_ICE,,2019,
+        ALL,dollars_per_cylinder,((-28.814) * CYL + 726.27) * CYL * MARKUP_ICE,,2019,
+        ALL,dollars_per_liter,((400) * LITERS) * MARKUP_ICE,,2019,
+        ALL,gdi,((43.237) * CYL + 97.35) * MARKUP_ICE,,2019,
+
+Data Column Name and Description
+    :powertrain_type:
+        Vehicle powertrain type, e.g. 'ICE', 'PHEV', etc
+
+    :item:
+        The name of the powertrain component associated with the cost value
+
+    :value:
+        The component cost value or equation to be evaulated
+
+    :quantity:
+        Component quantity per vehicle, if applicable
+
+    :dollar_basis:
+        The dollar basis year for the cost value, e.g. ``2020``
+
+    :notes:
+        Optional notes related to the data row
 
 ----
 

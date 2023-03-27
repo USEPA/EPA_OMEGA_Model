@@ -10,7 +10,7 @@ The data represents $/gallon cost estimates associated with energy security.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,cost_factors_energysecurity,input_template_version:,0.2

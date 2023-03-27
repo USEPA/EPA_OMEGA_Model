@@ -19,11 +19,6 @@ Shares are relative to the market category, not absolute.
 File Type
     comma-separated values (CSV)
 
-Template Header
-    .. csv-table::
-
-       input_template_name:,production_constraints,input_template_version:,0.2
-
 The data header consists of a ``start_year`` column followed by zero or more production constraint columns.
 
 Dynamic Data Header
@@ -31,6 +26,11 @@ Dynamic Data Header
         :widths: auto
 
         start_year, ``{market_class_id}:{minimum_share or maximum_share}``, ...
+
+Sample Header
+    .. csv-table::
+
+       input_template_name:,production_constraints,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::

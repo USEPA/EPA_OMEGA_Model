@@ -19,7 +19,9 @@ File Type
     comma-separated values (CSV)
 
 Template Header
-    input_template_name:, ``[module_name]``, input_template_version:, ``[template_version]``
+    .. csv-table::
+
+        input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
 
 Sample Header
     .. csv-table::
@@ -31,9 +33,9 @@ Sample Data Columns
         :widths: auto
 
         reg_class_id,start_year,cert_fuel_id,useful_life_miles,co2_gram_per_mile
-        mediumduty,2020,{'gasoline':1.0},120000,0.0440 * work_factor + 339
-        mediumduty,2021,{'gasoline':1.0},120000,0.0429 * work_factor + 331
-        mediumduty,2022,{'gasoline':1.0},120000,0.0418 * work_factor + 322
+        mediumduty,2020,{'gasoline':1.0},120000,0.0440 * workfactor + 339
+        mediumduty,2021,{'gasoline':1.0},120000,0.0429 * workfactor + 331
+        mediumduty,2022,{'gasoline':1.0},120000,0.0418 * workfactor + 322
 
 Data Column Name and Description
 

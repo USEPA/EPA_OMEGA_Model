@@ -10,7 +10,7 @@ The data represent safety values associated with mass reduction in the fleet.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,safety_values,input_template_version:,0.1

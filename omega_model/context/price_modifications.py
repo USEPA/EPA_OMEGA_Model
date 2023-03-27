@@ -16,7 +16,7 @@ The data represents price modifications by market class ID and start year.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,vehicle_price_modifications,input_template_version:,0.2

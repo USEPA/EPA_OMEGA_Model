@@ -16,7 +16,7 @@ The data represents production multiplier incentives as a function of vehicle at
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,production_multipliers,input_template_version:,0.21

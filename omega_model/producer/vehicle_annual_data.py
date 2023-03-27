@@ -1,5 +1,8 @@
 """
 
+**Vehicle annual data module.**
+
+Routines to store and retrieve vehicle annual data, which includes age, registered count, vehicle miles travelled, etc.
 
 ----
 

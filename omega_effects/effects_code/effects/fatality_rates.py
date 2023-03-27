@@ -10,7 +10,7 @@ The data represent fatality rates (fatalities per billion miles) for the fleet.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,fatality_rates,input_template_version:,0.1

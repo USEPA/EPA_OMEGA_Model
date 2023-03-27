@@ -17,7 +17,7 @@ The data represent the work factor calculation based on drive system (e.g., 2wd,
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,workfactor_definition,input_template_version:,0.1

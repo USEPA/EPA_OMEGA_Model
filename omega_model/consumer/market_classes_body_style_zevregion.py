@@ -15,25 +15,25 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,0.32
+       input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
 
 Sample Header
     .. csv-table::
 
-       input_template_name:,consumer.market_classes,input_template_version:,0.32
+       input_template_name:,consumer.market_classes_body_style_zevregion,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
         market_class_id,fueling_class,ownership_class
-        non_hauling.BEV,BEV,private
-        hauling.ICE,ICE,private
+        sedan_wagon_r1nonzev.BEV,BEV,private
+        cuv_suv_van_r2zev.ICE,ICE,private
 
 Data Column Name and Description
 
 :market_class_id:
-    Vehicle market class ID, e.g. 'hauling.ICE'
+    Vehicle market class ID, e.g. 'sedan_wagon_r1nonzev.ICE'
 
 :fueling_class:
     Market class fueling class, e.g. 'BEV', 'ICE'

@@ -16,7 +16,7 @@ The data represents fuel prices by context case, fuel type, and calendar year.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,context_fuel_prices,input_template_version:,0.2

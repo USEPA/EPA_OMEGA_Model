@@ -16,7 +16,7 @@ The data represents body style names and a brief description.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,body_styles,input_template_version:,0.1

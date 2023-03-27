@@ -16,7 +16,7 @@ The data represents the price deflator by calendar year.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,context_implicit_price_deflators,input_template_version:,0.22

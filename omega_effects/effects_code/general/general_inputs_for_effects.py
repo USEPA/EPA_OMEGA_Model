@@ -14,7 +14,7 @@ The data represent various general for use in effects calculations.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,general_inputs_for_effects,input_template_version:,0.1

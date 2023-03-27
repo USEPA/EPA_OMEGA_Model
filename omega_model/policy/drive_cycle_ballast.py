@@ -1,70 +1,41 @@
 """
 
-**Implements a portion of the GCAM model related to the relative shares of ICE and BEV vehicles as a function
-of relative generalized costs and assumptions about consumer acceptance over time (the S-shaped adoption curve).**
-
-Relative shares are converted to absolute shares for use in the producer compliance search.
+**Drive cycle ballast module.**
 
 **INPUT FILE FORMAT**
 
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
-rows.  The template header uses a dynamic format.
+rows.
 
-The data represents GCAM consumer model input parameters.
+The data represents the additional weight present during certification drive cycle testing, in pounds.
 
 File Type
     comma-separated values (CSV)
 
-Template Header
-    .. csv-table::
-
-       input_template_name:,``[module_name]``,input_template_version:,0.12
-
 Sample Header
     .. csv-table::
 
-       input_template_name:,consumer.sales_share,input_template_version:,0.12
+       input_template_name:,drive_cycle_ballast,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        market_class_id,start_year,annual_vmt,payback_years,price_amortization_period,share_weight,discount_rate,o_m_costs,average_occupancy,logit_exponent_mu
-        hauling.BEV,2020,12000,5,5,0.142,0.1,1600,1.58,-8
-        hauling.BEV,2021,12000,5,5,0.142,0.1,1600,1.58,-8
-        hauling.BEV,2022,12000,5,5,0.168,0.1,1600,1.58,-8
+        start_year,reg_class_id,ballast_lbs,
+        1974,car,300,
+        1974,truck,300,
+        1974,mediumduty,(vehicle.gvwr_lbs + vehicle.curbweight_lbs)/2,
 
 Data Column Name and Description
-
-:market_class_id:
-    Vehicle market class ID, e.g. 'hauling.ICE'
 
 :start_year:
     Start year of parameters, parameters apply until the next available start year
 
-:annual_vmt:
-    Vehicle miles travelled per year
+:reg_class_id:
+    Name of the regulatory class, e.g. 'car', 'truck', etc
 
-:payback_years:
-    Payback period, in years
-
-:price_amortization_period:
-    Price amorization period, in years
-
-:share_weight:
-    Share weight [0..1]
-
-:discount_rate:
-    Discount rate [0..1]
-
-:o_m_costs:
-    Operating and maintenance costs, dollars per year
-
-:average_occupancy:
-    Average vehicle occupancy, number of people
-
-:logit_exponent_mu:
-    Logit exponent, mu
+:ballast_lbs:
+    The drive cycle test weight ballast in pounds, scalar value or expression to be evaluated
 
 ----
 

@@ -16,7 +16,7 @@ The data represents the calculation method(s) to apply by start year.
 File Type
     comma-separated values (CSV)
 
-Template Header
+Sample Header
     .. csv-table::
 
        input_template_name:,policy_fuel_upstream_methods,input_template_version:,0.2
