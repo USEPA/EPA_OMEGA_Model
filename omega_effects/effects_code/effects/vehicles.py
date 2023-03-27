@@ -1,9 +1,22 @@
+"""
+
+**OMEGA effects vehicles module.**
+
+----
+
+**CODE**
+
+"""
+
 from omega_effects.effects_code.general.general_functions import read_input_file
 from omega_effects.effects_code.consumer import deregionalizer
 
 
 class Vehicles:
+    """
+    Vehicles class definition.
 
+    """
     def __init__(self):
         self._dict = dict()
 
@@ -30,7 +43,17 @@ class Vehicles:
         self._dict = df.to_dict('index')
 
     def get_vehicle_attributes(self, vehicle_id, *attribute_names):
+        """
+        Get vehicle attributes by vehicle id and attribute name(s).
 
+        Args:
+            vehicle_id: the vehicle id
+            *attribute_names: attributes to retrieve
+
+        Returns:
+            Vehicle attributes by vehicle id and attribute name(s).
+
+        """
         attribute_list = list()
         for attribute_name in attribute_names:
             attribute_list.append(self._dict[vehicle_id][attribute_name])
@@ -38,5 +61,3 @@ class Vehicles:
             return attribute_list[0]
 
         return attribute_list
-
-

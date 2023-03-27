@@ -1,3 +1,13 @@
+"""
+
+**OMEGA effects file id and save module.**
+
+----
+
+**CODE**
+
+"""
+
 import pandas as pd
 from csv import reader, writer
 
@@ -59,7 +69,7 @@ def add_id_to_csv(filepath, output_file_id_info):
         lines = list(rd)
         lines.insert(0, output_file_id_info)
 
-    with open(filepath, 'w',newline='') as write_file:
+    with open(filepath, 'w', newline='') as write_file:
         wt = writer(write_file)
         wt.writerows(lines)
 

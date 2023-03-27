@@ -1,3 +1,13 @@
+"""
+
+**OMEGA effects input validation module.**
+
+----
+
+**CODE**
+
+"""
+
 import sys
 
 

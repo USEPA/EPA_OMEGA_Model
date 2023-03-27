@@ -156,9 +156,9 @@ class MaintenanceCost:
         # determine the max odometer included in the input table
         max_series = input_df[[col for col in input_df.columns if 'miles' in col]].max()
         max_value = 0
-        for max in max_series:
-            if max > max_value:
-                max_value = int(max)
+        for val in max_series:
+            if val > max_value:
+                max_value = int(val)
 
         # generate curve coefficients for each of the veh_types in a for loop and store in maint_cost_curve_dict
         for veh_type in veh_types:
@@ -207,8 +207,10 @@ class MaintenanceCost:
 
         return maint_cost_curve_dict
 
-    def calc_maintenance_cost_per_mile(self, input_dict):
+    @staticmethod
+    def calc_maintenance_cost_per_mile(input_dict):
         """
+        Calc maintenance cost per mile.
 
         Args:
             input_dict: Dictionary of the maintenance cost inputs.
@@ -229,7 +231,7 @@ class MaintenanceCost:
             cost_per_event = input_dict[key]['dollars_per_event']
             for veh_type in veh_types:
                 miles_per_event = input_dict[key][f'miles_per_event_{veh_type}']
-                try: # protect against divide by zero
+                try:  # protect against divide by zero
                     input_dict[key].update({f'dollars_per_mile_{veh_type}': cost_per_event / miles_per_event})
                 finally:
                     input_dict[key].update({f'dollars_per_mile_{veh_type}': 0})

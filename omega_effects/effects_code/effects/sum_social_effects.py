@@ -1,3 +1,13 @@
+"""
+
+**OMEGA effects social effects module.**
+
+----
+
+**CODE**
+
+"""
+
 import pandas as pd
 
 

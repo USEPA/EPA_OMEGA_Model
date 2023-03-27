@@ -120,4 +120,3 @@ class SafetyValues:
         change_above = self._data[body_style]['change_per_100_lbs_at_or_above_threshold']
 
         return threshold, change_below, change_above
-

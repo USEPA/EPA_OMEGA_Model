@@ -89,14 +89,17 @@ from omega_effects.effects_code.general.input_validation import \
 
 
 class LegacyFleet:
+    """
+    Legacy fleet class definition.
 
+    """
     def __init__(self):
         """
         Loads and provides access to legacy fleet data by model year and age.
 
         """
         self._data = dict()  # private dict, the legacy_fleet_file data
-        self._legacy_fleet = dict() # the built legacy fleet for the analysis
+        self._legacy_fleet = dict()  # the built legacy fleet for the analysis
         self.adjusted_legacy_fleet = dict()
         self.legacy_fleet_calendar_year_max = 0
         self.legacy_fleet_vehicle_id_start = pow(10, 6)

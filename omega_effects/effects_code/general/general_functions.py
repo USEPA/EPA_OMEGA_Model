@@ -1,3 +1,13 @@
+"""
+
+**OMEGA effects general functions module.**
+
+----
+
+**CODE**
+
+"""
+
 import pandas as pd
 import os
 import sys
@@ -43,7 +53,6 @@ def read_input_file(path, effects_log, usecols=None, index_col=None, skiprows=No
     Parameters:
         path: Path to the specified file.\n
         effects_log: object; an object of the EffectsLog class.
-        logfile_name: Path object; the tool logfile name.
         usecols: List; the columns to use in the returned DataFrame.\n
         index_col: int; the column to use as the index column of the returned DataFrame.\n
         skiprows: int; the number of rows to skip when reading the file.\n

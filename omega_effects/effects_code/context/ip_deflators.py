@@ -94,6 +94,7 @@ class ImplicitPriceDeflators:
 
         Args:
             calendar_year (int): the calendar year to get the function for
+            effects_log: an instance of the EffectsLog class.
 
         Returns:
             The implicit price deflator for the given calendar year.

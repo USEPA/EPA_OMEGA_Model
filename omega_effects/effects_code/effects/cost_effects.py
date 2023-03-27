@@ -77,7 +77,7 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
         if onroad_direct_co2e_grams_per_mile or onroad_direct_kwh_per_mile:
             flag = 1
 
-            mfr_cost_dollars  = purchase_price_dollars = purchase_credit_dollars = battery_cost_dollars = 0
+            mfr_cost_dollars = purchase_price_dollars = purchase_credit_dollars = battery_cost_dollars = 0
             avg_mfr_cost = avg_purchase_price = avg_purchase_credit = battery_cost_dollars_per_kwh = 0
             fuel_retail_cost_dollars = 0
             fuel_pretax_cost_dollars = 0

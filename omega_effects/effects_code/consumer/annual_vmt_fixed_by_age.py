@@ -140,7 +140,17 @@ class OnroadVMT:
         return self._data[cache_key]
 
     def get_cumulative_vmt(self, market_class_id, age):
+        """
+        Get cumulative VMT for the given market class id and age.
 
+        Args:
+            market_class_id (str): market class id, e.g. 'hauling.ICE'
+            age (int): vehicle age in years
+
+        Returns:
+            Cumulative VMT for the given market class id and age.
+
+        """
         if (market_class_id, age) in self.cumulative_vmt:
             return self.cumulative_vmt[market_class_id, age]
         else:

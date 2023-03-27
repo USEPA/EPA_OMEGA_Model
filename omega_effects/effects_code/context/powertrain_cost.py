@@ -96,9 +96,11 @@ class PowertrainCost:
 
     def get_battery_tax_offset(self, year, battery_kwh):
         """
+        Get battery tax offset.
 
         Args:
             year (int): year for which battery tax credit is needed.
+            battery_kwh (float): battery pack capacity in kWh
 
         Returns:
             The battery tax offset (dollars per kWh credit) for the given year.

@@ -1,3 +1,13 @@
+"""
+
+**OMEGA effects discounting module.**
+
+----
+
+**CODE**
+
+"""
+
 
 def calc_discounted_value(value, rate, calendar_year, discount_to_year, discount_offset):
     """
@@ -25,6 +35,7 @@ def discount_values(batch_settings, dict_of_values):
     calculation to a given year and point within that year.
 
     Parameters:
+        batch_settings: omega effects batch settings object
         dict_of_values: A dictionary of values to be discounted with keys consisting of vehicle_id, calendar_year, age and discount rate.\n
 
     Returns:

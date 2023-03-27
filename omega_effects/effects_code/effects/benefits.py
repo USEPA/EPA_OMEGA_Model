@@ -1,3 +1,13 @@
+"""
+
+**OMEGA effects benefits module.**
+
+----
+
+**CODE**
+
+"""
+
 import pandas as pd
 
 
@@ -526,7 +536,7 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 'sox_total_ustons': - cap_tons_dict['sox_total_ustons'],
                 'nmog_vehicle_ustons': - cap_tons_dict['nmog_vehicle_ustons'],
                 'voc_upstream_ustons': - cap_tons_dict['voc_upstream_ustons'],
-                'nmog_and_voc_total_ustons':- cap_tons_dict['nmog_and_voc_total_ustons'],
+                'nmog_and_voc_total_ustons': - cap_tons_dict['nmog_and_voc_total_ustons'],
                 'co_vehicle_ustons': - cap_tons_dict['co_vehicle_ustons'],
                 'co_upstream_ustons': - cap_tons_dict['co_upstream_ustons'],
                 'co_total_ustons': - cap_tons_dict['co_total_ustons'],

@@ -144,6 +144,6 @@ class OnroadFuel:
 
                 self._data[cache_key] = self._data[in_use_fuel_id, year][attribute]
             else:
-                raise Exception('Missing policy fuel values for %s, %d or prior' %(in_use_fuel_id, calendar_year))
+                raise Exception('Missing policy fuel values for %s, %d or prior' % (in_use_fuel_id, calendar_year))
 
         return self._data[cache_key]

@@ -1,3 +1,13 @@
+"""
+
+**OMEGA effects vehicle annual data module.**
+
+----
+
+**CODE**
+
+"""
+
 import pandas as pd
 
 from omega_effects.effects_code.general.general_functions import read_input_file
@@ -5,7 +15,10 @@ from omega_effects.effects_code.general.general_functions import calc_rebound_ef
 
 
 class VehicleAnnualData:
+    """
+    Vehicle annual data class definition
 
+    """
     def __init__(self):
         self._dict = dict()
         self.vad_adjusted = dict()
@@ -34,15 +47,44 @@ class VehicleAnnualData:
         self._dict = df.to_dict('index')
 
     def get_vehicle_annual_data_by_calendar_year(self, calendar_year):
+        """
+        Get vehicle annual data by calendar year.
 
+        Args:
+            calendar_year (int): the calendar year to retrieve data for
+
+        Returns:
+            Vehicle annual data for the given calendar year.
+
+        """
         return [v for k, v in self._dict.items() if k[1] == calendar_year]
 
     def get_adjusted_vehicle_annual_data_by_calendar_year(self, calendar_year):
+        """
+        Get adjusted vehicle annual data by calendar year.
 
+        Args:
+            calendar_year (int): the calendar year to retrieve data for
+
+        Returns:
+            Adjusted vehicle annual data for the given calendar year.
+
+        """
         return [v for k, v in self.vad_adjusted.items() if k[1] == calendar_year]
 
     def get_vehicle_annual_data_by_vehicle_id(self, calendar_year, vehicle_id, *attribute_names):
+        """
+        Get vehicle annual data by vehicle id.
 
+        Args:
+            calendar_year (int): the calendar year to retrieve data for
+            vehicle_id: vehicle id
+            *attribute_names: the attribute names to retrieve
+
+        Returns:
+            Vehicle annual data by vehicle id.
+
+        """
         attribute_list = list()
         for attribute_name in attribute_names:
             attribute_list.append(self._dict[(vehicle_id, calendar_year)][attribute_name])

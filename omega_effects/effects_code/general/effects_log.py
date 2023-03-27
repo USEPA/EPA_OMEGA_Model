@@ -1,8 +1,21 @@
+"""
+
+**OMEGA effects logging module.**
+
+----
+
+**CODE**
+
+"""
+
 import logging
 
 
 class EffectsLog:
+    """
+    Effects log class definition.
 
+    """
     def __init__(self):
         self.logfile_name = None
         self.file_name = 'effects_messages.log'

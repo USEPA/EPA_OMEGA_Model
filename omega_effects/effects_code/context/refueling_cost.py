@@ -99,9 +99,9 @@ class RefuelingCost:
         for cost_key in cost_keys:
 
             self._data[cost_key] = dict()
-            type, item = cost_key
+            vehicle_type, item = cost_key
 
-            cost_info = df[(df['type'] == type) & (df['item'] == item)].iloc[0]
+            cost_info = df[(df['type'] == vehicle_type) & (df['item'] == item)].iloc[0]
 
             self._data[cost_key] = {
                 'value': dict(),
@@ -116,12 +116,12 @@ class RefuelingCost:
 
             self._data[cost_key]['value'] = compile(cost_info['value'], '<string>', 'eval')
 
-    def calc_bev_refueling_cost_per_mile(self, type, range):
+    def calc_bev_refueling_cost_per_mile(self, vehicle_type, bev_range):
         """
 
         Args:
-            type (str): The type of vehicle, e.g., 'car', 'suv', 'truck'.
-            range (int): The range (miles) of the BEV on a full charge.
+            vehicle_type (str): The type of vehicle, e.g., 'car', 'suv', 'truck'.
+            bev_range (int): The range (miles) of the BEV on a full charge.
 
         Returns:
             The refueling cost per mile for the given veh_type.
@@ -129,29 +129,29 @@ class RefuelingCost:
         """
         locals_dict = locals()
 
-        if range <= 200:
+        if bev_range <= 200:
             charge_rate = eval(self._data['under_200', 'miles_per_hour_charge_rate']['value'], {}, locals_dict)
         else:
             charge_rate = eval(self._data['over_201', 'miles_per_hour_charge_rate']['value'], {}, locals_dict)
 
-        charge_frequency = eval(self._data[type, 'miles_to_mid_trip_charge']['value'], {}, locals_dict)
-        share_charged = eval(self._data[type, 'share_of_miles_charged_mid_trip']['value'], {}, locals_dict)
+        charge_frequency = eval(self._data[vehicle_type, 'miles_to_mid_trip_charge']['value'], {}, locals_dict)
+        share_charged = eval(self._data[vehicle_type, 'share_of_miles_charged_mid_trip']['value'], {}, locals_dict)
 
-        travel_value = eval(self._data[type, 'dollars_per_hour_travel_time']['value'], {}, locals_dict)
-        adj_factor = self._data[type, 'dollars_per_hour_travel_time']['dollar_adjustment']
+        travel_value = eval(self._data[vehicle_type, 'dollars_per_hour_travel_time']['value'], {}, locals_dict)
+        adj_factor = self._data[vehicle_type, 'dollars_per_hour_travel_time']['dollar_adjustment']
         travel_value = travel_value * adj_factor
 
-        fixed_time = eval(self._data[type, 'fixed_refueling_minutes']['value'], {}, locals_dict)
+        fixed_time = eval(self._data[vehicle_type, 'fixed_refueling_minutes']['value'], {}, locals_dict)
 
         refueling_cost_per_mile = ((fixed_time / 60) / charge_frequency + (share_charged / charge_rate)) * travel_value
 
         return refueling_cost_per_mile
 
-    def calc_liquid_refueling_cost_per_gallon(self, type):
+    def calc_liquid_refueling_cost_per_gallon(self, vehicle_type):
         """
 
         Args:
-            type (str): The type of vehicle, e.g., 'car', 'suv', 'truck'.
+            vehicle_type (str): The type of vehicle, e.g., 'car', 'suv', 'truck'.
 
         Returns:
             The refueling cost per mile for the given veh_type.
@@ -160,14 +160,14 @@ class RefuelingCost:
         locals_dict = locals()
 
         refuel_rate = eval(self._data['all', 'gallons_per_minute_refuel_rate']['value'], {}, locals_dict)
-        refuel_share = eval(self._data[type, 'tank_gallons_share_refueled']['value'], {}, locals_dict)
-        tank_gallons = eval(self._data[type, 'tank_gallons']['value'], {}, locals_dict)
+        refuel_share = eval(self._data[vehicle_type, 'tank_gallons_share_refueled']['value'], {}, locals_dict)
+        tank_gallons = eval(self._data[vehicle_type, 'tank_gallons']['value'], {}, locals_dict)
 
-        travel_value = eval(self._data[type, 'dollars_per_hour_travel_time']['value'], {}, locals_dict)
-        adj_factor = self._data[type, 'dollars_per_hour_travel_time']['dollar_adjustment']
+        travel_value = eval(self._data[vehicle_type, 'dollars_per_hour_travel_time']['value'], {}, locals_dict)
+        adj_factor = self._data[vehicle_type, 'dollars_per_hour_travel_time']['dollar_adjustment']
         travel_value = travel_value * adj_factor
 
-        fixed_time = eval(self._data[type, 'fixed_refueling_minutes']['value'], {}, locals_dict)
+        fixed_time = eval(self._data[vehicle_type, 'fixed_refueling_minutes']['value'], {}, locals_dict)
 
         scaler = eval(self._data['all', 'liquid_refueling_share_included']['value'], {}, locals_dict)
 

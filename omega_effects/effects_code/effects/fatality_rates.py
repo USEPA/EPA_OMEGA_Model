@@ -105,6 +105,7 @@ class FatalityRates:
 
         Args:
             model_year (int): the model year for which a fatality rate is needed.
+            age (age): vehicle age in years
 
         Returns:
             The average fatality rate for vehicles of a specific model year and age.

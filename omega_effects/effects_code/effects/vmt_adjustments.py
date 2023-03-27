@@ -11,7 +11,10 @@ file.
 
 
 class AdjustmentsVMT:
+    """
+    Adjustments VMT class definition.
 
+    """
     def __init__(self):
         self.dict = dict()
 

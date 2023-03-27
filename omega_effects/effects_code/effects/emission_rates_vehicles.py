@@ -72,7 +72,7 @@ class EmissionRatesVehicles:
 
     """
     def __init__(self):
-        self._data = dict() # private dict, emission factors vehicles by model year, age, legacy reg class ID and in-use fuel ID
+        self._data = dict()  # private dict, emission factors vehicles by model year, age, legacy reg class ID and in-use fuel ID
         self._cache = dict()
         self.startyear_min = 0
 

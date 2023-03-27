@@ -60,9 +60,9 @@ def calc_fuel_cost_per_mile(batch_settings, session_settings):
                     = session_settings.vehicles.get_vehicle_attributes(vehicle_id, *vehicle_attribute_list)
 
             base_year_vehicle_id, name, model_year, base_year_reg_class_id, reg_class_id, size_class, in_use_fuel_id, \
-            market_class_id, fueling_class, base_year_powertrain_type, body_style, \
-            onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
-                = vehicle_info_dict[vehicle_id]
+                market_class_id, fueling_class, base_year_powertrain_type, body_style, \
+                onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
+                    = vehicle_info_dict[vehicle_id]
 
             if model_year >= calendar_years[0]:
 
@@ -77,7 +77,7 @@ def calc_fuel_cost_per_mile(batch_settings, session_settings):
                     if fuel == 'US electricity' and onroad_direct_kwh_per_mile:
                         retail_price_e \
                             = batch_settings.context_fuel_prices.get_fuel_prices(
-                            batch_settings, calendar_year, 'retail_dollars_per_unit', fuel)
+                                batch_settings, calendar_year, 'retail_dollars_per_unit', fuel)
                         onroad_kwh_per_mile += onroad_direct_kwh_per_mile
                         fuel_cpm += onroad_kwh_per_mile * retail_price_e
 

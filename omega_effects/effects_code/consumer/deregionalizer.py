@@ -1,3 +1,14 @@
+"""
+
+**OMEGA effects code de-regionalizer module.**
+
+Used with 'zev' and 'nonzev' market classes.
+
+----
+
+**CODE**
+
+"""
 
 
 def remove_region_entries(df, attribute, attribute_values_to_remove, string_for_removal, *args):

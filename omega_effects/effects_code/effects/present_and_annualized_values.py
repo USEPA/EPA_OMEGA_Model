@@ -1,10 +1,23 @@
+"""
+
+**OMEGA effects present and annualized values module.**
+
+----
+
+**CODE**
+
+"""
+
 import pandas as pd
 
 from omega_effects.effects_code.effects.discounting import discount_values
 
 
 class PVandEAV:
+    """
+    PV and EAV class definition.
 
+    """
     def __init__(self):
         self.calendar_years = None
         self.discount_to_year = None
@@ -50,8 +63,18 @@ class PVandEAV:
 
         return annlzd_value
 
-    def set_fueling_class(self, fuel_id):
+    @staticmethod
+    def set_fueling_class(fuel_id):
+        """
+        Set fueling class based on the provided fuel id.
 
+        Args:
+            fuel_id (str): e.g. 'electricity'
+
+        Returns:
+            ``'BEV'`` or ``'ICE'`` depending on the fuel id.
+
+        """
         if 'electricity' in fuel_id:
             return 'BEV'
         else:
@@ -62,7 +85,7 @@ class PVandEAV:
 
         Args:
             batch_settings: an instance of the BatchSettings class.
-            input_df: A DataFrame containing annual discounted values to be summed for present values in each calendar year.
+            df: A DataFrame containing annual discounted values to be summed for present values in each calendar year.
             args: A list of monetized attributes (strings) to be summed.
 
         Returns:
@@ -248,15 +271,15 @@ class PVandEAV:
                                     arg_annualized_value = calcs_dict[key][arg]
                                 else:
                                     key = (
-                                    session_policy, session_name, calendar_year, 'PresentValue', social_discrate, rc_id,
-                                    fuel_id)
+                                        session_policy, session_name, calendar_year, 'PresentValue', social_discrate, rc_id,
+                                        fuel_id)
                                     arg_present_value = calcs_dict[key][arg]
                                     arg_annualized_value = \
                                         self.calc_annualized_value(arg_present_value, emission_discrate, periods,
                                                                    self.annualized_offset)
 
                                 key = (
-                                session_policy, session_name, calendar_year, series, social_discrate, rc_id, fuel_id)
+                                    session_policy, session_name, calendar_year, series, social_discrate, rc_id, fuel_id)
                                 annualized_values_dict[key][arg] = arg_annualized_value
 
                 emission_discrate = 0.03
