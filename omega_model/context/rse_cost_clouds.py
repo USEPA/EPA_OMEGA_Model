@@ -467,7 +467,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         for ccc in cost_curve_classes:
             tech_flags = cost_curve_classes[ccc]['tech_flags'].to_dict()
-            # TODO: we need to deal with these properly, right now they are automatic in the powertrain cost...
+            # RV
             tech_flags['ac_leakage'] = 1
             tech_flags['ac_efficiency'] = 1
 
@@ -483,7 +483,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                 rated_hp = vehicle.motor_kw * 1.34102
             elif vehicle.ice:
                 rated_hp = vehicle.eng_rated_hp
-            else:  # TODO: HEVs / PHEVs... what to do about sizing...?
+            else:  # RV
                 rated_hp = vehicle.eng_rated_hp + vehicle.motor_kw * 1.34102
 
             if vehicle.bev:
@@ -652,11 +652,6 @@ class CostCloud(OMEGABase, CostCloudBase):
             with open(omega_globals.options.output_folder + '%d_cost_clouds_%s_%s.csv' %
                       (vehicle.model_year, vehicle.compliance_id, vehicle.base_year_powertrain_type), 'a') as f:
                 cost_cloud.to_csv(f, mode='a', header=not f.tell(), columns=sorted(cost_cloud.columns), index=False)
-
-            # TODO: if we want to have one file with everything, we need to deal with the fact that the columns are different otherwise it's no good combining them
-            # with open(omega_globals.options.output_folder + '%d_cost_clouds_all.csv' %
-            #           vehicle.model_year, 'a') as f:
-            #     cost_cloud.to_csv(f, mode='a', header=not f.tell(), columns=sorted(cost_cloud.columns), index=False)
 
         # clear all tech flags
         for tf in CostCloud.tech_flags:

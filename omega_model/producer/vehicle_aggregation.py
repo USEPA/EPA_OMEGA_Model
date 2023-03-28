@@ -420,7 +420,7 @@ class VehicleAggregation(OMEGABase):
                 veh.body_style = row['body_style']
 
                 if veh.base_year_powertrain_type == 'FCV':
-                    veh.base_year_powertrain_type = 'BEV'  # TODO: for costing purposes, for now
+                    veh.base_year_powertrain_type = 'BEV'  # RV
 
                 veh.base_year_reg_class_id = row['reg_class_id']
                 veh.base_year_cert_fuel_id = row['cert_fuel_id']
@@ -493,7 +493,7 @@ class VehicleAggregation(OMEGABase):
 
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
 
-            agg_df['rated_hp'] = agg_df['eng_rated_hp']  # TODO: we need to figure out this 'engine' rated hp biz
+            agg_df['rated_hp'] = agg_df['eng_rated_hp']  # RV
 
             omega_globals.options.vehicles_df = agg_df
 

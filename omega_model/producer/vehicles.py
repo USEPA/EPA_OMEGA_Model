@@ -1280,7 +1280,7 @@ class VehicleFinal(SQABase, Vehicle):
     base_year_gcwr_lbs = Column(Float)
     base_year_cert_fuel_id = Column(String)
 
-    # TODO: non-numeric attributes that >could< change based on interpolating the frontier...:
+    # non-numeric attributes that could change based on interpolating the frontier:
     cost_curve_class = Column(String)  #: ALPHA modeling result class
     structure_material = Column(String)  #: vehicle body structure material, e.g. 'steel'
     # numeric attributes that can change based on interpolating the frontier:
@@ -1288,7 +1288,7 @@ class VehicleFinal(SQABase, Vehicle):
     motor_kw = Column(Float)  #: vehicle propulsion motor(s) total power, kW
     curbweight_lbs = Column(Float)  #: vehicle curbweight, pounds
     footprint_ft2 = Column(Float)  #: vehicle footprint, square feet
-    # TODO: maybe: ?? does rated_hp -> eng_rated_hp?
+    # RV
     eng_rated_hp = Column(Float)  #: engine rated horsepower
     workfactor = Column(Float)
     gvwr_lbs = Column(Float)
@@ -1557,10 +1557,10 @@ class VehicleFinal(SQABase, Vehicle):
             # update initial registered count >after< setting compliance id, it's required for vehicle annual data
             veh.initial_registered_count = df.loc[i, 'sales']
 
-            # TODO: what are we doing about fuel cell vehicles...?
+            # RV
             if veh.base_year_powertrain_type in ['BEV', 'FCV']:
                 if veh.base_year_powertrain_type == 'FCV':
-                    # TODO: MAP FCV to BEV for now
+                    # RV
                     veh.in_use_fuel_id = "{'US electricity':1.0}"
                     veh.cert_fuel_id = "{'electricity':1.0}"
                     veh.base_year_powertrain_type = 'BEV'
@@ -1569,14 +1569,14 @@ class VehicleFinal(SQABase, Vehicle):
                 veh.fueling_class = 'ICE'
 
             veh.cert_direct_oncycle_co2e_grams_per_mile = df.loc[i, 'cert_direct_oncycle_co2e_grams_per_mile']
-            veh.cert_direct_co2e_grams_per_mile = veh.cert_direct_oncycle_co2e_grams_per_mile  # TODO: minus any credits??
+            veh.cert_direct_co2e_grams_per_mile = veh.cert_direct_oncycle_co2e_grams_per_mile
 
             veh.cert_co2e_grams_per_mile = None
-            veh.cert_direct_kwh_per_mile = df.loc[i, 'cert_direct_oncycle_kwh_per_mile']  # TODO: veh.cert_direct_oncycle_kwh_per_mile?
+            veh.cert_direct_kwh_per_mile = df.loc[i, 'cert_direct_oncycle_kwh_per_mile']  # RV
             veh.onroad_direct_co2e_grams_per_mile = 0
             veh.onroad_direct_kwh_per_mile = 0
 
-            # TODO: we need to figure out how we want to do this for real
+            # RV
             if veh.base_year_powertrain_type in ['BEV', 'FCV']:
                 rated_hp = veh.motor_kw * 1.34102
             elif electrification_class in ['HEV', 'PHEV']:
@@ -1675,12 +1675,12 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.bev = 1
                     alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
                     alt_veh.cert_fuel_id = "{'electricity':1.0}"
-                    alt_veh.battery_kwh = 60  # TODO: do we need this?  it gets set in the cloud search
-                    alt_veh.motor_kw = 150 + 100 * (v.drive_system == 4)  # TODO: where does power come from?
+                    alt_veh.battery_kwh = 60  # RV
+                    alt_veh.motor_kw = 150 + 100 * (v.drive_system == 4)  # RV
                     if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
                         alt_veh.charge_depleting_range_mi = 150
                     else:
-                        alt_veh.charge_depleting_range_mi = 300  # TODO: where does 300 come from?
+                        alt_veh.charge_depleting_range_mi = 300  # RV
                     alt_veh.eng_rated_hp = 0
                     alt_veh.eng_cyls_num = 0
                     alt_veh.eng_disp_liters = 0
@@ -1693,7 +1693,7 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.ice = 1
                     alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
                     alt_veh.cert_fuel_id = "{'gasoline':1.0}"
-                    alt_veh.eng_rated_hp = v.motor_kw * 1.34102  # TODO: where does power come from?
+                    alt_veh.eng_rated_hp = v.motor_kw * 1.34102  # RV
                     alt_veh.motor_kw = 0
                     alt_veh.charge_depleting_range_mi = 0
                     alt_veh.battery_kwh = 0

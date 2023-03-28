@@ -276,8 +276,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
                     demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator
 
-                    # constrain relative (and by extension, absolute) shares
-                    # TODO: only for context session....??
+                    # constrain relative (and by extension, absolute) shares RV
                     share_name = market_class_id.replace(parent_market_class + '.', '')
                     demanded_share = np.minimum(np.maximum(min_constraints[share_name], demanded_share),
                                                 max_constraints[share_name])
@@ -625,7 +624,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         # for rc in legacy_reg_classes:
         for rc in base_year_vehicles_df.reg_class_id.unique():
-            for c in ['curbweight_lbs', 'rated_hp']:  # TODO: add 'onroad_mpg' ...
+            for c in ['curbweight_lbs', 'rated_hp']:
                 SalesShare._data['share_seed_data', base_year, rc, c] = base_year_reg_class_data[c][rc]
 
     @staticmethod
