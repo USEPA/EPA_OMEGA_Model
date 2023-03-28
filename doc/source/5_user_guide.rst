@@ -40,7 +40,7 @@ Batch Input Files and Loaders
         Body Styles File, :any:`omega_model/producer/vehicles.py<omega_model.context.body_styles>`
         Mass Scaling File, :any:`omega_model/producer/vehicles.py<omega_model.context.mass_scaling>`
         Workfactor Definition File, :any:`omega_model/producer/vehicles.py<omega_model.policy.workfactor_definition>`
-
+        ,
         Session Policy Alternatives Settings,
         Drive Cycle Weights File, :any:`omega_model/policy/drive_cycle_weights.py<omega_model.policy.drive_cycle_weights>`
         Drive Cycle Ballast File, :any:`omega_model/producer/vehicles.py<omega_model.policy.drive_cycle_ballast>`
@@ -54,7 +54,7 @@ Batch Input Files and Loaders
         Production Multipliers File, :any:`omega_model/policy/incentives.py<omega_model.policy.incentives>`
         Regulatory Classes File, ``user_definable`` e.g. :any:`omega_model/policy/regulatory_classes.py<omega_model.policy.regulatory_classes>`
         Required Sales Share File, :any:`omega_model/policy/required_sales_share.py<omega_model.policy.required_sales_share>`
-
+        ,
         Session Postproc Settings,
         Context Implicit Price Deflators File, :any:`omega_model/producer/vehicles.py<omega_model.context.ip_deflators>`
 
