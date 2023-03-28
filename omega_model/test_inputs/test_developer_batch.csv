@@ -53,7 +53,6 @@ Required Sales Share File,String,required_sales_share-body_style.csv,required_sa
 ,,,
 Session Postproc Settings,,,
 Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implicit_price_deflators.csv
-Context Consumer Price Index File,String,cpi_price_deflators.csv,cpi_price_deflators.csv
 ,,,
 Developer Settings,,,
 Num Market Share Options,"#, …",5,5

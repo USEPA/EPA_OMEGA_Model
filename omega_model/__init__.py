@@ -157,9 +157,7 @@ try:
 
             self.allow_ice_of_bev = False
 
-            # effects modeling files
             self.ip_deflators_file = path + 'test_inputs/implicit_price_deflators.csv'
-            self.cpi_deflators_file = path + 'test_inputs/cpi_price_deflators.csv'
 
             self.start_time = 0
             self.end_time = 0

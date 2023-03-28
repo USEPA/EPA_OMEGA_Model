@@ -86,7 +86,6 @@ Sample Data Columns
         ,,,
         Session Postproc Settings,,,
         Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implicit_price_deflators.csv
-        Context Consumer Price Index File,String,cpi_price_deflators.csv,cpi_price_deflators.csv
 
 The first column defines the parameter name, the second column is a type-hint and does not get evaluated.  Subsequent
 columns contain the data to define batch settings and session settings.
@@ -200,7 +199,7 @@ Data Row Name and Description
 
 :Vehicles File *(str)*:
     The relative or absolute path to the vehicles (base year fleet) file,
-    loaded by ``producer.vehicles.VehicleFinal``
+    loaded by ``producer.vehicle_aggregation``
 
 :Powertrain Cost File *(str)*:
     The relative or absolute path to the powertrain cost file,
@@ -295,11 +294,7 @@ Data Row Name and Description
 
 :Context Implicit Price Deflators File *(str)*:
     The relative or absolute path to the implicit price deflators file,
-    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
-
-:Context Consumer Price Index File *(str)*:
-    The relative or absolute path to the consumer price index file,
-    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
+    loaded by ``context.ip_deflators``
 
 ----
 
@@ -707,7 +702,6 @@ class OMEGABatchObject(OMEGABase):
 
         # read postproc settings
         self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
-        self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
 
     def num_sessions(self):
         """
@@ -851,7 +845,6 @@ class OMEGASessionObject(OMEGABase):
 
         # read postproc settings
         self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
-        self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
 
         # read policy settings
         self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')
