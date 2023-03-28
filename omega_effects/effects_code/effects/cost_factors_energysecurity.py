@@ -13,16 +13,19 @@ File Type
 Sample Header
     .. csv-table::
 
-       input_template_name:,cost_factors_energysecurity,input_template_version:,0.2
+       input_template_name:,cost_factors_energysecurity,input_template_version:,0.3
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        calendar_year,dollar_basis,dollars_per_bbl,oil_import_reduction_as_percent_of_total_oil_demand_reduction
-        2020,2020,3.21703991758471,0.91
+        calendar_year,dollar_basis,dollars_per_bbl,oil_import_reduction_as_percent_of_total_oil_demand_reduction,,
+        2020,2020,3.217039918,0.907,,
+        2021,2020,3.143206215,0.907,,
+        2022,2020,3.269778277,0.907,,
 
 Data Column Name and Description
+
     :calendar_year:
         The calendar year for which $/barrel values are applicable.
 

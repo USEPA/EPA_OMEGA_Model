@@ -13,17 +13,18 @@ File Type
 Sample Header
     .. csv-table::
 
-       input_template_name:,emission_rates_egu,input_template_version:,0.2
+       input_template_name:,emission_rates_egu,input_template_version:,0.3
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        case,rate_name,independent_variable,initial_year,last_year,equation_rate_id,kwh_demand_metric,equation_kwh
-        low_bound,pm25_grams_per_kwh,(calendar_year - 2020),2020,2050,((-0.00024125 * (calendar_year - 2020)) + 0.024254),kWh_consumption,((8086100000.0 * (calendar_year - 2020)) + 4221420000.0)
-        high_bev,pm25_grams_per_kwh,(calendar_year - 2020),2020,2050,((-0.00050552 * (calendar_year - 2020)) + 0.02351),kWh_consumption,((30020900000.0 * (calendar_year - 2020)) + 0)
+        case,rate_name,independent_variable,initial_year,last_year,slope_rate,intercept_rate,ind_variable_data,rate_data,equation_rate_id,kwh_demand_metric,slope_kwh_demand_metric,intercept_kwh_demand_metric,kwh_data_demand_metric,equation_kwh_demand_metric,kwh_consumption_metric,slope_kwh_consumption_metric,intercept_kwh_consumption_metric,kwh_data_consumption_metric,equation_kwh_consumption_metric
+        low_bound,pm25_grams_per_kwh,(calendar_year - 2020),2020,2050,-4.42E-04,1.62E-02,"[0, 8, 10, 15, 20, 25, 30]","[0.01494498147830424, 0.014937349424, 0.012776816502783726, 0.008389652283529411, 0.006341793721119133, 0.0046182596672268905, 0.0037604966545031057]",((-0.00044234 * (calendar_year - 2020)) + 0.01622),kWh_generation_us,82260700000,3.90E+12,"[4010000000000.0, 4500000000000.0, 4670000000000.0, 5100000000000.0, 5540000000000.0, 5950000000000.0, 6440000000000.0]",((82260700000.0 * (calendar_year - 2020)) + 3903690000000.0),kWh_consumption_low_bound,13975600000,27523300000,"[70919328891.0, 79544639445.0, 136559000000.0, 252000000000.0, 338000000000.0, 396000000000.0, 429000000000.0]",((13975600000.0 * (calendar_year - 2020)) + 27523300000.0)
+        high_bev,nox_grams_per_kwh,(calendar_year - 2020),2020,2050,-0.0030975,0.09796,"[0, 8, 10, 15, 20, 25, 30]","[0.09102244389027432, 0.09, 0.07292110874200426, 0.040115163147792704, 0.026701570680628273, 0.01715210355987055, 0.013273542600896861]",((-0.0030975 * (calendar_year - 2020)) + 0.09796),kWh_generation_us,92384200000,3.86E+12,"[4010000000000.0, 4500000000000.0, 4690000000000.0, 5210000000000.0, 5730000000000.0, 6180000000000.0, 6690000000000.0]",((92384200000.0 * (calendar_year - 2020)) + 3861790000000.0),kWh_consumption_low_bound,13971900000,27643400000,"[70919328891.0, 79544639445.0, 137000000000.0, 252000000000.0, 338000000000.0, 396000000000.0, 429000000000.0]",((13971900000.0 * (calendar_year - 2020)) + 27643400000.0)
 
 Data Column Name and Description
+
     :case:
         The Integrated Planning Model electricity demand case.
 
@@ -39,17 +40,37 @@ Data Column Name and Description
     :last_year:
         The last calendar year from which the rate regression curves were generated.
 
+    :slope_rate:
+
+    :intercept_rate:
+
+    :ind_variable_data:
+
+    :rate_data:
+
     :equation_rate_id:
         The emission rate equation used to calculate an emission rate at the given independent variable.
 
     :kwh_demand_metric:
         The kwh demand metric used in generating regressions (e.g., consumption or generation).
 
-    :equation_kwh:
-        The kilowatt-hour demand equation used to calculate kwh demand in the specified case; the demands calculated using
-        the kwh equations are used, along with the OMEGA kwh demand value to interpolate appropriate emission rates for
-        the given OMEGA session.
+    :slope_kwh_demand_metric:
 
+    :intercept_kwh_demand_metric:
+
+    :kwh_data_demand_metric:
+
+    :equation_kwh_demand_metric:
+
+    :kwh_consumption_metric:
+
+    :slope_kwh_consumption_metric:
+
+    :intercept_kwh_consumption_metric:
+
+    :kwh_data_consumption_metric:
+
+    :equation_kwh_consumption_metric:
 
 ----
 

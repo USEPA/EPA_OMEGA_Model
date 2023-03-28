@@ -25,9 +25,9 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        calendar_year,price_deflator,,
-        2001,79.79,,
-        2002,81.052,,
+        calendar_year,price_deflator
+        2001,79.783
+        2002,81.026
 
 Data Column Name and Description
 

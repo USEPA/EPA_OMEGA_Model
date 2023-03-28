@@ -24,6 +24,7 @@ Sample Data Columns
         2021,2018,14.5258,50.6221,75.4487,150.5725,672.6103,1487.1167,1949.7824,3916.5329,5806.1046,18290.1717,26876.1028,48014.0752
 
 Data Column Name and Description
+
     :calendar_year:
         The calendar year for which specific cost factors are applicable.
 

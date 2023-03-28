@@ -110,7 +110,7 @@ Data Column Name and Description
         = 1 if powertrain package includes cooled exhaust gas recirculation, = 0 otherwise
 
     :atk2:
-        = 1 if powertrain package includes an advanced Atkinson cycle engine, = 0 otherwise
+        = 1 if powertrain package includes an high geometric compression ratio Atkinson cycle engine, = 0 otherwise
 
     :gdi:
         = 1 if powertrain package includes a gasoline direct injection engine, = 0 otherwise

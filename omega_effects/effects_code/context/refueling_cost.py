@@ -17,32 +17,31 @@ File Type
 Sample Header
     .. csv-table::
 
-       input_template_name:,refueling_cost,input_template_version:,0.1
+       input_template_name:,refueling_cost,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        Several of the entries for BEVs are curves according to the equation (Ax^2 +Bx + C), where the capital letters are the entries in the worksheet and x is generally range.
-
-        item,x_squared_factor,x_factor,constant,dollar_basis
-        miles_to_mid_trip_charge_car,0.18,-64.4,7840
-        miles_to_mid_trip_charge_suv,0.125,-45.5,5900
-        miles_to_mid_trip_charge_truck,0.135,-49.9,6290
+        type,item,value,dollar_basis
+        car,miles_to_mid_trip_charge,7840 + -64.4 * range + 0.18 * range ** 2,
+        truck,miles_to_mid_trip_charge,6290 + -49.9 * range + 0.135 * range ** 2,
+        suv,share_of_miles_charged_mid_trip,0.241 + -0.001 * range + 0.000001 * range ** 2,
+        truck,fixed_refueling_minutes,3.5,
 
 Data Column Name and Description
 
+:type:
+    The vehicle type, e.g. 'car', 'suv', etc
+
 :item:
-    The refueling cost curve attribute name.
+    The refueling cost curve attribute name
 
-:x_squared_factor:
-    The attribute value.
+:value:
+    Scalar value or expression to be evaluated for cost
 
-:x_factor:
-    The attribute value.
-
-:constant:
-    The attribute value.
+:dollar_basis:
+    The dollar basis year for the cost value, e.g. ``2020``
 
 **CODE**
 

@@ -24,6 +24,7 @@ Sample Data Columns
         truck,2018,0.056598428,0.000940863
 
 Data Column Name and Description
+
     :reg_class_id:
         Vehicle regulatory class at the time of certification, e.g. 'car','truck'.  Reg class definitions may differ
         across years within the simulation based on policy changes. ``reg_class_id`` can be considered a 'historical'
@@ -38,7 +39,6 @@ Data Column Name and Description
 
     :noise_cost_dollars_per_mile:
         The cost per vehicle mile traveled associated with noise.
-
 
 ----
 

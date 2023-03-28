@@ -20,9 +20,11 @@ Sample Data Columns
         :widths: auto
 
         calendar_year,in_use_fuel_id,co_grams_per_gallon,voc_grams_per_gallon,nox_grams_per_gallon,sox_grams_per_gallon,pm25_grams_per_gallon,co2_grams_per_gallon,ch4_grams_per_gallon,n2o_grams_per_gallon,acetaldehyde_grams_per_gallon,acrolein_grams_per_gallon,benzene_grams_per_gallon,butadiene13_grams_per_gallon,formaldehyde_grams_per_gallon
-        2017,pump gasoline,7.154547169,24.70656765,15.02737679,10.97287624,1.077573535,20321.29509,129.3687687,2.633447789,0.004753979,0.000652611,0.096633686,0.001043598,0.035749195
+        2020,pump gasoline,1.128898081,3.06203807,1.996433162,0.899893394,0.180495842,2230.928291,13.54451668,0.261304447,0,0,0,0,0
+        2025,pump gasoline,1.109204097,3.057991622,1.931017137,0.866292147,0.176239451,2160.939751,13.33194308,0.260634919,0,0,0,0,0
 
 Data Column Name and Description
+
     :calendar_year:
         The calendar year for which $/gallon values are applicable.
 

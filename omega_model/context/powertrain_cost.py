@@ -25,8 +25,10 @@ Sample Data Columns
         ALL,dollars_per_cylinder,((-28.814) * CYL + 726.27) * CYL * MARKUP_ICE,,2019,
         ALL,dollars_per_liter,((400) * LITERS) * MARKUP_ICE,,2019,
         ALL,gdi,((43.237) * CYL + 97.35) * MARKUP_ICE,,2019,
+        BEV,battery_offset,{"dollars_per_kwh": {2023: -9, 2024: -18, 2025: -27, 2026: -36, 2027: -45, 2028: -45, 2029: -45, 2030: -33.75, 2031: -22.50, 2032: -11.25, 2033: -0}},,,
 
 Data Column Name and Description
+
     :powertrain_type:
         Vehicle powertrain type, e.g. 'ICE', 'PHEV', etc
 

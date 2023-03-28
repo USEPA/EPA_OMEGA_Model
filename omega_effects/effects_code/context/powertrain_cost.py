@@ -12,22 +12,40 @@ rows.  The template header uses a dynamic format.
 File Type
     comma-separated values (CSV)
 
-Template Header
-    .. csv-table::
-
-       input_template_name:,powertrain_cost,input_template_version:,``[template_version]``,``{optional_source_data_comment}``
-
 Sample Header
     .. csv-table::
 
-       input_template_name:,powertrain_cost,input_template_version:,0.1,notes
+       input_template_name:,powertrain_cost,input_template_version:,0.1,``{optional_source_data_comment}``
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
         powertrain_type,item,value,quantity,dollar_basis,notes
+        ALL,dollars_per_cylinder,((-28.814) * CYL + 726.27) * CYL * MARKUP_ICE,,2019,
+        ALL,dollars_per_liter,((400) * LITERS) * MARKUP_ICE,,2019,
+        ALL,gdi,((43.237) * CYL + 97.35) * MARKUP_ICE,,2019,
         BEV,battery_offset,{"dollars_per_kwh": {2023: -9, 2024: -18, 2025: -27, 2026: -36, 2027: -45, 2028: -45, 2029: -45, 2030: -33.75, 2031: -22.50, 2032: -11.25, 2033: -0}},,,
+
+Data Column Name and Description
+
+    :powertrain_type:
+        Vehicle powertrain type, e.g. 'ICE', 'PHEV', etc
+
+    :item:
+        The name of the powertrain component associated with the cost value
+
+    :value:
+        The component cost value or equation to be evaulated
+
+    :quantity:
+        Component quantity per vehicle, if applicable
+
+    :dollar_basis:
+        The dollar basis year for the cost value, e.g. ``2020``
+
+    :notes:
+        Optional notes related to the data row
 
 ----
 

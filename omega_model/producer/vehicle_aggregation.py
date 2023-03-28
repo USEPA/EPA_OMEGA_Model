@@ -97,13 +97,13 @@ Data Column Name and Description
        Gross Combined Weight Rating (pounds)
 
     :target_coef_a:
-       Coast down target A coeffient (lbf)
+       Coast down target A coefficient (lbf)
 
     :target_coef_b:
-       Coast down target B coeffient (lbf/mph)
+       Coast down target B coefficient (lbf/mph)
 
     :target_coef_c:
-       Coast down target C coeffient (lbf/mph**2)
+       Coast down target C coefficient (lbf/mph**2)
 
     :body_style:
         Vehicle body style; sedan, cuv_suv, pickup
@@ -193,7 +193,7 @@ Data Column Name and Description
         Technology flag for an advanced high gear count transmission or equivalent (1 = Equipped, 0 = Not equipped)
 
     :ecvt:
-        Technology flag for n powersplit-type hybrid vehicle transmission (1 = Equipped, 0 = Not equipped)
+        Technology flag for a powersplit-type hybrid vehicle transmission (1 = Equipped, 0 = Not equipped)
 
     **OPTIONAL COLUMNS**
         These columns become object attributes that may be used to determine vehicle regulatory class
