@@ -323,7 +323,7 @@ class VehicleAggregation(OMEGABase):
                                                   "{'US electricity':1.0}"],
                                'cert_fuel_id': ["{'gasoline':1.0}", "{'diesel':1.0}", "{'hydrogen':1.0}",
                                                 "{'electricity':1.0}"],
-                               'drive_system': [2, 4],  # for now, anyway... 1,2,3??
+                               'drive_system': [2, 4],  # RV
                                'dual_rear_wheel': [0, 1],
                                'high_eff_alternator': [0, 1],
                                'start_stop': [0, 1],

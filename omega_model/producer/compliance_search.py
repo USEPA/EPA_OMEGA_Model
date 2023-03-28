@@ -571,7 +571,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                 sales_share_df = pd.DataFrame()
         else:
             # I'm not even sure if we need to do this... if we're setting absolute shares at the leaves...
-            # but I guess it adds some tracking info to the dataframe which might be useful for debugging?
+            # but I guess it adds some tracking info to the dataframe which might be useful for debugging
             sales_share_dict = dict()
             for c, scn in zip(children, abs_share_column_names):
                 sales_share_dict[scn] = [_cache['mcat_data_%d' % calendar_year][c]['abs_share']]

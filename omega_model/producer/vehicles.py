@@ -406,7 +406,7 @@ class CompositeVehicle(OMEGABase):
         self.name = 'composite vehicle (%s)' % vehicle_id
         self.weight_by = weight_by
 
-        self.model_year = self.vehicle_list[0].model_year  # calendar_year?
+        self.model_year = self.vehicle_list[0].model_year  # RV
         self.reg_class_id = self.vehicle_list[0].reg_class_id
         self.fueling_class = self.vehicle_list[0].fueling_class
         self.market_class_id = self.vehicle_list[0].market_class_id
