@@ -306,7 +306,7 @@ Data Column Name and Description
     Technology flag for an advanced transmission (1 = Equipped, 0 = Not equipped)
 
 :structure_cost:
-    The vehicle's structure cost (dollars)
+    The vehicle's structure cost (dollars).  Structure = body-in-white + closures
 
 :trx21:
     Technology flag for a high gear count transmission or equivalent (1 = Equipped, 0 = Not equipped)

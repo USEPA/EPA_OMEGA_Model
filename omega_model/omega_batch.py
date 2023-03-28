@@ -31,61 +31,62 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        Parameter,Type,Value
-        Batch Settings,,
-        Batch Name,String,test_batch
-        Analysis Final Year,#,2030
-        Credit Market Efficiency,#,1.0
-        Analysis Dollar Basis,#,2020
-        ,,
-        Batch Analysis Context Settings,,
-        Context Name,String,AEO2021
-        Context Case,String,Reference case
-        Context Fuel Prices File,String,context_fuel_prices.csv
-        Context New Vehicle Market File,String,context_new_vehicle_market.csv
-        Manufacturers File,String,manufacturers.csv
-        Market Classes File,String,market_classes.csv
-        New Vehicle Price Elasticity of Demand,#,-0.4
-        Onroad Fuels File,String,onroad_fuels.csv
-        Onroad Vehicle Calculations File,String,onroad_vehicle_calculations.csv
-        Onroad VMT File,String,annual_vmt_fixed_by_age.csv
-        Producer Cross Subsidy Multiplier Max,#,1.1
-        Producer Cross Subsidy Multiplier Min,#,0.9
-        Producer Generalized Cost File,String,producer_generalized_cost.csv
-        Production Constraints File,String,production_constraints.csv
-        Sales Share File,String,sales_share_params.csv
-        Vehicle Price Modifications File,String,vehicle_price_modifications.csv
-        Vehicle Reregistration File,String,reregistration_fixed_by_age.csv
-        ICE Vehicle Simulation Results File,String,simulated_vehicles_ice.csv
-        BEV Vehicle Simulation Results File,String,simulated_vehicles_bev.csv
-        PHEV Vehicle Simulation Results File,String,simulated_vehicles_phev.csv
-        Vehicles File,String,vehicles.csv
-        Powertrain Cost File,String,powertrain_cost.csv
-        Glider Cost File,String,glider_cost.csv
-        Body Styles File,String,body_styles.csv
-        Mass Scaling File,String,mass_scaling.csv
-        ,,
-        Session Settings,,
-        Enable Session,TRUE / FALSE,TRUE
-        Session Name,String,NoActionPolicy
-        ,,
-        Session Policy Alternatives Settings,,
-        Drive Cycle Weights File,String,drive_cycle_weights.csv
-        Drive Cycles File,String,drive_cycles.csv
-        GHG Credit Params File,String,ghg_credit_params.csv
-        GHG Credits File,String,ghg_credits.csv
-        GHG Standards File,String,ghg_standards-footprint.csv
-        Off-Cycle Credits File,String,offcycle_credits.csv
-        Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv
-        Policy Fuels File,String,policy_fuels.csv
-        Production Multipliers File,String,production_multipliers.csv
-        Regulatory Classes File,String,regulatory_classes.csv
-        Required Sales Share File,String,required_sales_share.csv
-        Workfactor Definition File,String,workfactor_definition.csv
-        ,,
-        Session Postproc Settings,,
-        Context Implicit Price Deflators File,String,implicit_price_deflators.csv
-        Context Consumer Price Index File,String,cpi_price_deflators.csv
+        Parameter,Type,Value,
+        Batch Settings,,,
+        Batch Name,String,test_batch,
+        Analysis Final Year,#,2021,
+        Analysis Dollar Basis,#,2020,
+        ,,,
+        Batch Analysis Context Settings,,,
+        Context Name,String,AEO2021,
+        Context Case,String,Reference case,
+        Credit Market Efficiency,#,1,
+        Context Fuel Prices File,String,context_fuel_prices.csv,
+        Context New Vehicle Market File,String,context_new_vehicle_market-body_style.csv,
+        Manufacturers File,String,manufacturers.csv,
+        Market Classes File,String,market_classes-body_style.csv,
+        New Vehicle Price Elasticity of Demand,#,-0.4,
+        Onroad Fuels File,String,onroad_fuels.csv,
+        Onroad Vehicle Calculations File,String,onroad_vehicle_calculations.csv,
+        Onroad VMT File,String,annual_vmt_fixed_by_age-body_style.csv,
+        Producer Cross Subsidy Multiplier Max,#,1.1,
+        Producer Cross Subsidy Multiplier Min,#,0.9,
+        Producer Generalized Cost File,String,producer_generalized_cost-body_style.csv,
+        Production Constraints File,String,production_constraints-body_style.csv,
+        Sales Share File,String,sales_share_params_ice_bev_body_style.csv,
+        Vehicle Price Modifications File,String,vehicle_price_modifications-body_style.csv,
+        Vehicle Reregistration File,String,reregistration_fixed_by_age-body_style.csv,
+        ICE Vehicle Simulation Results File,String,simulated_vehicles_rse_ice.csv,
+        BEV Vehicle Simulation Results File,String,simulated_vehicles_rse_bev.csv,
+        PHEV Vehicle Simulation Results File,String,simulated_vehicles_rse_phev.csv,
+        Vehicles File,String,vehicles.csv,
+        Powertrain Cost File,String,powertrain_cost.csv,
+        Glider Cost File,String,glider_cost.csv,
+        Body Styles File,String,body_styles.csv,
+        Mass Scaling File,String,mass_scaling.csv,
+        Workfactor Definition File,String,workfactor_definition.csv,
+        ,,,
+        Session Settings,,,
+        Enable Session,TRUE / FALSE,TRUE,TRUE
+        Session Name,String,NoActionPolicy,ActionAlternative
+        ,,,
+        Session Policy Alternatives Settings,,,
+        Drive Cycle Weights File,String,drive_cycle_weights_5545.csv,drive_cycle_weights_5545.csv
+        Drive Cycle Ballast File,String,drive_cycle_ballast.csv,drive_cycle_ballast.csv
+        Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
+        GHG Credit Params File,String,ghg_credit_params.csv,ghg_credit_params.csv
+        GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
+        GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-alternative.csv
+        Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
+        Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv,policy_fuel_upstream_methods.csv
+        Policy Fuels File,String,policy_fuels.csv,policy_fuels.csv
+        Production Multipliers File,String,production_multipliers.csv,production_multipliers.csv
+        Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
+        Required Sales Share File,String,required_sales_share-body_style.csv,required_sales_share-body_style.csv
+        ,,,
+        Session Postproc Settings,,,
+        Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implicit_price_deflators.csv
+        Context Consumer Price Index File,String,cpi_price_deflators.csv,cpi_price_deflators.csv
 
 The first column defines the parameter name, the second column is a type-hint and does not get evaluated.  Subsequent
 columns contain the data to define batch settings and session settings.
@@ -104,11 +105,10 @@ Data Row Name and Description
 :Analysis Final Year *(int)*:
     Analysis Final Year, e.g. ``2050``
 
-:Credit Market Efficiency *(float)*:
-    0.0 = no trading between manufacturers, 1.0 = perfect trading, 0..1 = variable trading
-
 :Analysis Dollar Basis:
     The dollar valuation for all monetized values in the cost effects outputs, i.e., costs are expressed in "Dollar Basis" dollars
+
+----
 
 :Batch Analysis Context Settings:
     Decorator, not evaluated
@@ -118,6 +118,9 @@ Data Row Name and Description
 
 :Context Case *(str)*:
     Context case name, e.g. ``Reference case``
+
+:Credit Market Efficiency *(float)*:
+    The "credit market efficiency", [0..1].  1 = perfect ghg credit trading, 0 = no ghg credit trading
 
 :Context Fuel Prices File *(str)*:
     The relative or absolute path to the context fuel prices file,
@@ -183,16 +186,16 @@ Data Row Name and Description
     loaded dynamically by the ``Reregistration`` class defined in the module specified by the file header,
     e.g. ``consumer.reregistration_fixed_by_age``
 
-:ICE Simulation Results and Costs File *(str)*:
-    The relative or absolute path to the ICE vehicle simulation results and costs file,
+:ICE Vehicle Simulation Results File *(str)*:
+    The relative or absolute path to the ICE vehicle simulation results file,
     loaded by user-definable CostCloud class
 
-:BEV Simulation Results and Costs File *(str)*:
-    The relative or absolute path to the BEV vehicle simulation results and costs file,
+:BEV Vehicle Simulation Results File *(str)*:
+    The relative or absolute path to the BEV vehicle simulation results file,
     loaded by user-definable CostCloud class
 
-:PHEV Simulation Results and Costs File *(str)*:
-    The relative or absolute path to the PHEV vehicle simulation results and costs file,
+:PHEV Vehicle Simulation Results File *(str)*:
+    The relative or absolute path to the PHEV vehicle simulation results file,
     loaded by user-definable CostCloud class
 
 :Vehicles File *(str)*:
@@ -218,14 +221,6 @@ Data Row Name and Description
 :Workfactor Definition File *(str)*:
     The relative or absolute path to the workfactor definition file,
     loaded by ``policy.workfactor_definition.WorkFactor``
-
-:Context Implicit Price Deflators File *(str)*:
-    The relative or absolute path to the implicit price deflators file,
-    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
-
-:Context Consumer Price Index File *(str)*:
-    The relative or absolute path to the consumer price index file,
-    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
 
 ----
 
@@ -254,6 +249,10 @@ Data Row Name and Description
 :Drive Cycles File *(str)*:
     The relative or absolute path to the drive cycles file,
     loaded by ``policy.drive_cycles.DriveCycles``
+
+:GHG Credit Params File *(str)*:
+    The relative or absolute path to the GHG credit parameters file,
+    loaded by ``policy.credit_banking.CreditBank``
 
 :GHG Credits File *(str)*:
     The relative or absolute path to the GHG credits file,
@@ -291,94 +290,25 @@ Data Row Name and Description
 
 ----
 
-**DEVELOPER SETTINGS**
-
-These settings are primarily for debugging or code development, if not provided by the user then default values will be
-applied.
-
-:Developer Settings:
+:Session Postproc Settings:
     Decorator, not evaluated
 
-:Cost Curve Frontier Affinity Factor *(float, ...)*:
-    Determines how closely the frontier hews to the source points of the cost cloud, typically ``0.75``
-    Supports multiple comma-separated values
+:Context Implicit Price Deflators File *(str)*:
+    The relative or absolute path to the implicit price deflators file,
+    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
 
-:Flat Context *(TRUE or FALSE)*:
-    If TRUE then all context values will come from a fixed year
+:Context Consumer Price Index File *(str)*:
+    The relative or absolute path to the consumer price index file,
+    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
 
-:Flat Context Year *(int)*:
-    The fixed year when using flat context, default value is ``2020``
+----
 
-:Iterate Producer-Consumer *(TRUE or FALSE, ...)*:
-    If ``TRUE`` then multiple producer-consumer tech and market share convergence iterations are enabled
-    Supports multiple comma-separated values
+**DEVELOPER SETTINGS**
 
-:Log Consumer Iteration Years *(['all'] or [int(s)])*:
-    List of year(s) to log producer-consumer market share iteration, default value is ``2050``, which writes the log
-    file in the year 2050 and contains all prior years
-
-:Log Producer Decision and Response Years *(['all'] or [int(s)])*:
-    List of year(s) to log producer decision and consumer response data (costs, market shares and tech decision).
-    Default value is ``[]``
-
-:Log Producer Compliance Search Years *(['all'] or [int(s)])*:
-    List of year(s) to log detailed producer iteration data, including composite vehicle cost curves and compliance
-    search data (cost clouds).  Default value is ``[]``
-
-:Num Market Share Options *(int, ...)*:
-    Number of market share options to generate as part of the producer compliance search, typically ``5``.
-    Supports multiple comma-separated values
-
-:Num Tech Options per BEV Vehicle *(int, ...)*:
-    Number of tech options to generate for BEV vehicles as part of the producer compliance search, typically ``1``
-    Supports multiple comma-separated values
-
-:Num Tech Options per ICE Vehicle *(int, ...)*:
-    Number of tech options to generate for ICE vehicles as part of the producer compliance search, typically ``5``
-    Supports multiple comma-separated values
-
-:Producer Compliance Search Convergence Factor *(float)*:
-    Determines the search progression of tech options and market shares, used in
-    ``producer.compliance_search.create_tech_and_share_sweeps()`` and
-    ``producer.compliance_search.search_production_options()``.  Default value is ``0.33``
-
-:Producer Compliance Search Min Share Range *(float)*:
-    Used in ``producer.compliance_search.search_production_options()``, minimum share range limit, stops compliance
-    search when below.
-    Default value is ``1e-4``
-
-:Producer Compliance Search Tolerance *(float)*:
-    Used in ``producer.compliance_search.search_production_options()``, used to determine accuracy of compliance
-    outcome relative to the targeted CO2e Mg, default value is ``1e-6``
-
-:Producer Cross Subsidy Price Tolerance *(float)*:
-    Used in ``omega_model.detect_convergence()``, applied to the total average cost accuracy, default value is ``1e-4``
-
-:Producer-Consumer Convergence Tolerance *(float)*:
-    Used in ``omega_model.detect_convergence()``, compared with the convergence error.  Default is ``1e-3``
-
-:Producer-Consumer Max Iterations *(int)*:
-    Maximum number of market share iterations between the producer and consumer.  Recommended minimum is ``2``
-
-:Run Profiler *(TRUE or FALSE)*:
-    If TRUE then the model with run with profiling enabled.  See ``omega_model.run_omega()``
-
-:Slice Tech Combo Tables *(TRUE or FALSE)*:
-    If ``TRUE`` then partial clouds are saved as part of debugging the producer search convergence
-
-:Verbose Log Modules *([strs])*:
-    List of modules to activate detailed logfile output, may contain ``'database'``, ``'producer_compliance_search'``,
-        ``'cv_cost_curves'``, ``'v_cost_curves'``. Default value is ``[]``
-
-:Verbose Console Modules *([strs])*:
-    List of modules to activate detailed console output, may contain ``'producer_compliance_search'``,
-                                            ``'p-c_shares_and_costs'``, ``'p-c_max_iterations'``,
-                                            ``'cross_subsidy_search'``, ``'cross_subsidy_multipliers'``,
-                                            ``'cross_subsidy_convergence'``. Default value is ``[]``
-
-:Verbose Output *(TRUE or FALSE, ...)*:
-    Enables detailed console and logfile output if ``TRUE``
-    Supports multiple comma-separated values
+Developer settings can be specified by defining a row in the format ``settings.attribute_name`` where ``attribute_name``
+is an attribute of the OMEGASessionSettings class.  In fact, all the default rows could be specified as 'developer'
+settings as well.  Use caution when using developer settings, as there are no guardrails to their use and
+inappropriate settings may create unexpected behavior.
 
 """
 
