@@ -998,12 +998,12 @@ class Vehicle(OMEGABase):
         drive_cycle_weight_year = VehicleOnroadCalculations.battery_sizing_drive_cycle_weight_year
 
         kwh_per_mile_scale = np.interp(self.model_year, omega_globals.options.kwh_per_mile_scale_years,
-                                      omega_globals.options.kwh_per_mile_scale)
+                                       omega_globals.options.kwh_per_mile_scale)
 
         cloud['battery_sizing_onroad_direct_kwh_per_mile'] = 0
         cloud['nominal_onroad_direct_kwh_per_mile'] = kwh_per_mile_scale * \
-            DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(drive_cycle_weight_year,
-                                                                    self.fueling_class, cloud)
+                                                      DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(drive_cycle_weight_year,
+                                                                                                              self.fueling_class, cloud)
 
         # calc onroad_direct values
         VehicleOnroadCalculations.perform_onroad_calculations(self, cloud)
@@ -1096,8 +1096,7 @@ class Vehicle(OMEGABase):
 
         return cloud
 
-    def calc_cost_curve(self, cost_cloud):
-        """
+    """
         Create a frontier ("cost curve") from a vehicle's cloud of simulated vehicle points ("cost cloud") based
         on the current policy and vehicle attributes.  The cost values are a function of the producer generalized cost
         and the CO2e values are a function of the simulated vehicle data and the policy.
@@ -1116,6 +1115,7 @@ class Vehicle(OMEGABase):
             None, updates vehicle.cost_curve with vehicle tecnhology frontier / cost curve as a DataFrame.
 
         """
+    def calc_cost_curve(self, cost_cloud):
 
         # cull cost_cloud points here, based on producer constraints or whatever #
 
@@ -1227,7 +1227,7 @@ class VehicleFinal(SQABase, Vehicle):
     """
     # --- database table properties ---
     __tablename__ = 'vehicles'
-    # __table_args__ = {'extend_existing': True}  # fix sphinx-apidoc crash
+    __table_args__ = {'extend_existing': True}  # fix sphinx-apidoc crash
     vehicle_id = Column(Integer, primary_key=True)  #: unique vehicle ID, database table primary key
     from_vehicle_id = Column(String)  #: transferred vehicle ID from Vehicle object
     name = Column(String)  #: vehicle name
