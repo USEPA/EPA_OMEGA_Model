@@ -1,0 +1,885 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>main_window</class>
+ <widget class="QMainWindow" name="main_window">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1121</width>
+    <height>787</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTabWidget" name="tab_select">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>1101</width>
+      <height>401</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string/>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="tabPosition">
+     <enum>QTabWidget::North</enum>
+    </property>
+    <property name="tabShape">
+     <enum>QTabWidget::Triangular</enum>
+    </property>
+    <property name="currentIndex">
+     <number>1</number>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="tabBarAutoHide">
+     <bool>false</bool>
+    </property>
+    <widget class="QWidget" name="intro_tab">
+     <attribute name="title">
+      <string>Intro</string>
+     </attribute>
+     <widget class="QLabel" name="intro_text_1">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>22</y>
+        <width>751</width>
+        <height>431</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="intro_label">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>20</y>
+        <width>1041</width>
+        <height>341</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;The OMEGA model has been developed by EPA to evaluate policies for reducing greenhouse gas (GHG) emissions from light duty vehicles. Like the prior releases, this latest version is intended primarily to be used as a tool to support regulatory development by providing estimates of the effects of policy alternatives under consideration. These effects include the costs associated with emissions-reducing technologies and the monetized effects normally included in a societal benefit-cost analysis, as well as physical effects that include emissions quantities, fuel consumption, and vehicle stock and usage. In developing this OMEGA version 2.0, our goal was to improve modularity, transparency, and flexibility so that stakeholders can more easily review the model, conduct independent analyses, and potentially adapt the model to meet their own needs.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;For more details, see the following links:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/USEPA/EPA_OMEGA_Model/tree/2.1.0&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#ffffff;&quot;&gt;Source Code&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://omega2.readthedocs.io/en/2.1.0/&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#ffffff;&quot;&gt;Documentation&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="openExternalLinks">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="run_model_tab">
+     <attribute name="title">
+      <string>Run Model</string>
+     </attribute>
+     <widget class="QLabel" name="input_batch_file_1_label">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>581</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Input Batch File</string>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="input_batch_file_1_result">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>41</y>
+        <width>1079</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Load Input Batch File</string>
+      </property>
+      <property name="placeholderText">
+       <string>Load Input Batch File ...</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="output_batch_directory_1_label">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>110</y>
+        <width>531</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Output Batch Directory</string>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="output_batch_directory_1_result">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>141</y>
+        <width>1079</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Select Output Batch Directory</string>
+      </property>
+      <property name="placeholderText">
+       <string>Select Output Batch Directory ...</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="select_output_batch_directory_button">
+      <property name="geometry">
+       <rect>
+        <x>1041</x>
+        <y>144</y>
+        <width>45</width>
+        <height>45</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>24</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Selects a new OMEGA Output Batch Directory</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>35</width>
+        <height>35</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="select_input_batch_file_button">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>1041</x>
+        <y>44</y>
+        <width>45</width>
+        <height>45</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>24</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Selects a new OMEGA Input Batch File</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>35</width>
+        <height>35</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="project_description">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>240</y>
+        <width>1079</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Project Description is user free formatted text providing a description of the project and any other useful information</string>
+      </property>
+      <property name="placeholderText">
+       <string>Enter Project Description ...</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="project_description_1_label">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>210</y>
+        <width>531</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Project Description</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="run_model_button">
+      <property name="geometry">
+       <rect>
+        <x>12</x>
+        <y>304</y>
+        <width>70</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Run OMEGA Model</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>70</width>
+        <height>51</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QLabel" name="model_status_label">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>295</y>
+        <width>261</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Model Status</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="results_tab">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <attribute name="title">
+      <string>Results</string>
+     </attribute>
+     <widget class="QListWidget" name="list_graphs_1">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>220</y>
+        <width>501</width>
+        <height>141</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="available_plots_1_label_2">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>190</y>
+        <width>481</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Available Plots</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="open_plot_2">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>220</y>
+        <width>71</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Plots the selected parameters</string>
+      </property>
+      <property name="text">
+       <string>Plot</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="list_graphs_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>501</width>
+        <height>141</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="available_plots_1_label_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>10</y>
+        <width>471</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Available Scenarios</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="select_plot_2">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>80</y>
+        <width>211</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Selects previous model run for plotting</string>
+      </property>
+      <property name="text">
+       <string>Select Previous Run</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="select_plot_3">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>40</y>
+        <width>211</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Selects current model run for plotting</string>
+      </property>
+      <property name="text">
+       <string>Select Current Run</string>
+      </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="results_comment">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>15</y>
+        <width>1061</width>
+        <height>336</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>30</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Feature Under Development</string>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <zorder>list_graphs_1</zorder>
+     <zorder>available_plots_1_label_2</zorder>
+     <zorder>open_plot_2</zorder>
+     <zorder>list_graphs_2</zorder>
+     <zorder>available_plots_1_label_3</zorder>
+     <zorder>select_plot_3</zorder>
+     <zorder>select_plot_2</zorder>
+     <zorder>results_comment</zorder>
+    </widget>
+    <widget class="QWidget" name="options_tab">
+     <attribute name="title">
+      <string>Options</string>
+     </attribute>
+     <widget class="QCheckBox" name="multiprocessor_checkbox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>9</y>
+        <width>221</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>OMEGA Multiprocessor Selection</string>
+      </property>
+      <property name="text">
+       <string>Enable Multiprocessor</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="multiprocessor_help_button">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>10</y>
+        <width>211</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Displays Help for Multiprocessor Mode</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string>Multiprocessor Help</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="main_title_1_label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>15</y>
+      <width>166</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>22</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>OMEGA</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="event_monitor_result">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>510</y>
+      <width>1101</width>
+      <height>211</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Consolas</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Event Monitor records ongoing program events</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="event_monitor_label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>480</y>
+      <width>191</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Event Monitor records ongoing program events</string>
+    </property>
+    <property name="text">
+     <string>Event Monitor</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="background_widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>-1</x>
+      <y>9</y>
+      <width>1131</width>
+      <height>731</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string/>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <widget class="QPushButton" name="epa_button">
+     <property name="geometry">
+      <rect>
+       <x>1030</x>
+       <y>7</y>
+       <width>80</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Open EPA Website</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>80</width>
+       <height>80</height>
+      </size>
+     </property>
+    </widget>
+   </widget>
+   <zorder>background_widget</zorder>
+   <zorder>main_title_1_label</zorder>
+   <zorder>event_monitor_result</zorder>
+   <zorder>event_monitor_label</zorder>
+   <zorder>tab_select</zorder>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1121</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuMenu1">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="action_new_file"/>
+    <addaction name="action_open_configuration_file"/>
+    <addaction name="action_save_configuration_file"/>
+    <addaction name="separator"/>
+    <addaction name="action_select_input_batch_file"/>
+    <addaction name="action_select_output_batch_directory"/>
+    <addaction name="separator"/>
+    <addaction name="action_exit"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="toolTip">
+     <string/>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>false</bool>
+    </property>
+    <addaction name="action_about_omega"/>
+    <addaction name="action_documentation"/>
+   </widget>
+   <widget class="QMenu" name="menuRun">
+    <property name="title">
+     <string>Run</string>
+    </property>
+    <addaction name="action_run_model"/>
+   </widget>
+   <addaction name="menuMenu1"/>
+   <addaction name="menuRun"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <action name="action_open_configuration_file">
+   <property name="text">
+    <string>Open Configuration File</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+  </action>
+  <action name="action_save_configuration_file">
+   <property name="text">
+    <string>Save Configuration File</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+  </action>
+  <action name="action_select_input_batch_file">
+   <property name="text">
+    <string>Select Input Batch File</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+  </action>
+  <action name="action_new_file">
+   <property name="text">
+    <string>New...</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+  </action>
+  <action name="action_about_omega">
+   <property name="text">
+    <string>About OMEGA</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+  </action>
+  <action name="action_exit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+  </action>
+  <action name="action_select_output_batch_directory">
+   <property name="text">
+    <string>Select Output Batch Directory</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+  </action>
+  <action name="action_run_model">
+   <property name="text">
+    <string>Run Model</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+  </action>
+  <action name="action_documentation">
+   <property name="text">
+    <string>Documentation</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
