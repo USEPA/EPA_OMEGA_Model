@@ -1,0 +1,50 @@
+Correction Index,Correction Type,Column Name Change?,Column Name,MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTPRINT_DIVISION_CD,FOOTPRINT_CARLINE_NM,FOOTPRINT_CARLINE_CD,FOOTPRINT_INDEX,Old Value,New Value,Numeric (y/n)
+1,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2019,3094,"Maserati North America, Inc.",MAX,MASERATI,1,GRANTURISMO CONVERTIBLE,25,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+2,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2019,3094,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE V8,30,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+3,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2019,3094,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE SQ4 V6,33,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+4,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2019,3094,"Maserati North America, Inc.",MAX,MASERATI,1,Ghibli V6 SQ4 AWD,35,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+5,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2019,3094,"Maserati North America, Inc.",MAX,MASERATI,1,Ghibli V6 Rear Wheel Drive (RWD),36,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+6,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2019,3094,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE S,37,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+7,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2019,3094,"Maserati North America, Inc.",MAX,MASERATI,1,Ghibli  S RWD,38,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+8,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2019,3079,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE S,40,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+9,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2019,3079,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE,41,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+10,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2019,3079,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE GTS,45,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+11,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2019,3079,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE Trofeo,46,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+12,Replace,n,CAFE_ID,2019,3094,"Maserati North America, Inc.",MAX,MASERATI,1,GRANTURISMO CONVERTIBLE,25,1,3094,2919,y
+13,Replace,n,CAFE_ID,2019,3094,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE V8,30,1,3094,2919,y
+14,Replace,n,CAFE_ID,2019,3094,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE SQ4 V6,33,1,3094,2919,y
+15,Replace,n,CAFE_ID,2019,3094,"Maserati North America, Inc.",MAX,MASERATI,1,Ghibli V6 SQ4 AWD,35,1,3094,2919,y
+16,Replace,n,CAFE_ID,2019,3094,"Maserati North America, Inc.",MAX,MASERATI,1,Ghibli V6 Rear Wheel Drive (RWD),36,1,3094,2919,y
+17,Replace,n,CAFE_ID,2019,3094,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE S,37,1,3094,2919,y
+18,Replace,n,CAFE_ID,2019,3094,"Maserati North America, Inc.",MAX,MASERATI,1,Ghibli  S RWD,38,1,3094,2919,y
+19,Replace,n,CAFE_ID,2019,3079,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE S,40,1,3079,2910,y
+20,Replace,n,CAFE_ID,2019,3079,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE,41,1,3079,2910,y
+21,Replace,n,CAFE_ID,2019,3079,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE GTS,45,1,3079,2910,y
+22,Replace,n,CAFE_ID,2019,3079,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE Trofeo,46,1,3079,2910,y
+23,Replace,n,"['FOOTPRINT_MFR_NM', 'FOOTPRINT_MFR_CD', 'FOOTPRINT_DIVISION_NM']",2019,2868,SUBARU TECNICA INTERNATIONAL INC.,MAX,SUBARU TECNICA INTERNATIONAL,1,S209,200,1,"['SUBARU TECNICA INTERNATIONAL INC.', 'SUB', 'SUBARU TECNICA INTERNATIONAL']","['Subaru Corporation', 'FJX', 'Subaru']",n
+24,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2020,3408,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE GTS,30,2,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+25,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2020,3408,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE S Q4,33,2,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+26,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2020,3408,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI S Q4,35,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+27,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2020,3408,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI,36,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+28,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2020,3408,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE S,37,2,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+29,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2020,3408,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI S,38,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+30,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2020,3410,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE S,40,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+31,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2020,3410,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE,41,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+32,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2020,3410,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE GTS,45,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+33,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2020,3410,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE TROFEO,46,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+34,Replace,n,CAFE_ID,2020,3408,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE GTS,30,2,3408,3316,y
+35,Replace,n,CAFE_ID,2020,3408,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE S Q4,33,2,3408,3316,y
+36,Replace,n,CAFE_ID,2020,3408,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI S Q4,35,1,3408,3316,y
+37,Replace,n,CAFE_ID,2020,3408,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI,36,1,3408,3316,y
+38,Replace,n,CAFE_ID,2020,3408,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE S,37,2,3408,3316,y
+39,Replace,n,CAFE_ID,2020,3408,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI S,38,1,3408,3316,y
+40,Replace,n,CAFE_ID,2020,3410,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE S,40,1,3410,3318,y
+41,Replace,n,CAFE_ID,2020,3410,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE,41,1,3410,3318,y
+42,Replace,n,CAFE_ID,2020,3410,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE GTS,45,1,3410,3318,y
+43,Replace,n,CAFE_ID,2020,3410,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE TROFEO,46,1,3410,3318,y
+44,Replace,n,"['FOOTPRINT_MFR_NM', 'FOOTPRINT_MFR_CD']",2020,3355,Toyota Motor Corporation,TYX,TOYOTA,5,Supra 3.0,268,1,"['BMW', 'BMX']","['Toyota Motor Corporation', 'TYX']",n
+45,Replace,n,FOOTPRINT_CARLINE_NM,2020,3523,Porsche AG,PRX,Porsche,1,Cayenne Coupé,403,1,Cayenne Coupé,Cayenne Coupe,n
+46,Replace,n,FOOTPRINT_CARLINE_NM,2020,3523,Porsche AG,PRX,Porsche,1,Cayenne S Coupé,413,1,Cayenne S Coupé,Cayenne S Coupe,n
+47,Replace,n,FOOTPRINT_CARLINE_NM,2020,3523,Porsche AG,PRX,Porsche,1,Cayenne Turbo Coupé,423,1,Cayenne Turbo Coupé,Cayenne Turbo Coupe,n
+48,Replace,n,FOOTPRINT_CARLINE_NM,2020,3523,Porsche AG,PRX,Porsche,1,Cayenne e-Hybrid Coupé,442,1,Cayenne e-Hybrid Coupé,Cayenne e-Hybrid Coupe,n
+49,Replace,n,FOOTPRINT_CARLINE_NM,2020,3523,Porsche AG,PRX,Porsche,1,Cayenne Turbo S e-Hybrid Coupé,452,1,Cayenne Turbo S e-Hybrid Coupé,Cayenne Turbo S e-Hybrid Coupe,n
