@@ -301,13 +301,15 @@ class VehicleOnroadCalculations(OMEGABase):
         input_template_version = 0.22
         input_template_columns = {'onroad_drive_cycle_weight_year', 'battery_sizing_drive_cycle_weight_year'}
 
-        template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+                                                         verbose=verbose)
 
         if not template_errors:
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
             if not template_errors:
                 VehicleOnroadCalculations.onroad_drive_cycle_weight_year = \
@@ -399,9 +401,7 @@ class CompositeVehicle(OMEGABase):
             'base_year_market_share'
 
         """
-        self.vehicle_list = vehicles_list  # copy.deepcopy(vehicle_list)
-        # self.name = 'composite vehicle (%s.%s)' % (self.vehicle_list[0].market_class_id, self.vehicle_list[0].reg_class_id)
-
+        self.vehicle_list = vehicles_list  # CU
         self.vehicle_id = vehicle_id
         self.name = 'composite vehicle (%s)' % vehicle_id
         self.weight_by = weight_by
@@ -413,8 +413,8 @@ class CompositeVehicle(OMEGABase):
         self.alt_type = ''  # 'ALT' / 'NO_ALT'
 
         # weighted values are applied to the source vehicles by interpolating the composite cost curve after production
-        # decisions are applied to composite vehicles, then those values are re-calculated for the composite vehicle based
-        # on the relative share weights of the source vehicles.  See ``decompose()``
+        # decisions are applied to composite vehicles, then those values are re-calculated for the composite vehicle
+        # based on the relative share weights of the source vehicles.  See ``decompose()``
         # Composite vehicle weighted values are used to calculate market class/category sales-weighted average values
         # used by the ``omega_globals.options.SalesShare`` module to determine market shares
         self.weighted_values = ['credits_co2e_Mg_per_vehicle',
@@ -455,7 +455,7 @@ class CompositeVehicle(OMEGABase):
             plot_cost_curve = ((omega_globals.options.log_vehicle_cloud_years == 'all') or
                               (self.model_year in omega_globals.options.log_vehicle_cloud_years)) and \
                               'v_cloud_plots' in omega_globals.options.verbose_log_modules
-            # and any([v.name in omega_globals.options.plot_and_log_vehicles for v in self.vehicle_list])
+            # CU
             self.cost_curve = self.calc_composite_cost_curve(plot=plot_cost_curve)
 
         self.tech_option_iteration_num = 0
@@ -558,7 +558,8 @@ class CompositeVehicle(OMEGABase):
             ax1.legend(fontsize='medium', bbox_to_anchor=(1.04, 0), loc="lower left",
                        borderaxespad=0)
 
-            figname = '%s%s_%s_cost_curve_decomposition.png' % (omega_globals.options.output_folder, self.model_year, ax1.get_title())
+            figname = '%s%s_%s_cost_curve_decomposition.png' % (omega_globals.options.output_folder, self.model_year,
+                                                                ax1.get_title())
             figname = figname.replace('(', '_').replace(')', '_').replace('.', '_').replace(' ', '_')\
                 .replace('__', '_').replace('_png', '.png')
             fig.savefig(figname, bbox_inches='tight')
@@ -612,17 +613,14 @@ class CompositeVehicle(OMEGABase):
             drop_columns = [c for c in composite_frontier_df.columns if c.endswith('_y') or c.endswith('_x') or
                             c.endswith('_market_share')] + ['_']
 
-            # composite_frontier_df = composite_frontier_df.drop(drop_columns, axis=1, errors='ignore')
-            # composite_frontier_df = composite_frontier_df.columns.drop(drop_columns, errors='ignore')
-
             # calculate new sales-weighted frontier
             composite_frontier_df = calc_frontier(composite_frontier_df, cost_curve_interp_key,
                                                   'new_vehicle_mfr_generalized_cost_dollars',
                                                   allow_upslope=True)
 
-            # composite_frontier_df = composite_frontier_df.drop(['frontier_factor'], axis=1, errors='ignore')
-            composite_frontier_df = composite_frontier_df.drop(drop_columns + ['frontier_factor'], axis=1, errors='ignore')
-            # composite_frontier_df = composite_frontier_df[composite_frontier_df.columns.drop(drop_columns + ['frontier_factor'], errors='ignore')]
+            # CU
+            composite_frontier_df = \
+                composite_frontier_df.drop(drop_columns + ['frontier_factor'], axis=1, errors='ignore')
 
             if plot:
                 if v.name in omega_globals.options.plot_and_log_vehicles:
@@ -642,7 +640,8 @@ class CompositeVehicle(OMEGABase):
 
             ax1.legend(fontsize='medium', bbox_to_anchor=(1.04, 0), loc="lower left", borderaxespad=0)
 
-            figname = '%s%s_%s_cost_curve_composition.png' % (omega_globals.options.output_folder, self.model_year, ax1.get_title())
+            figname = '%s%s_%s_cost_curve_composition.png' % (omega_globals.options.output_folder, self.model_year,
+                                                              ax1.get_title())
             figname = figname.replace('(', '_').replace(')', '_').replace('.', '_').replace(' ', '_')\
                 .replace('__', '_').replace('_png', '.png')
             fig.savefig(figname, bbox_inches='tight')
@@ -731,7 +730,8 @@ def is_up_for_redesign(vehicle):
                   omega_globals.options.redesign_interval_gain_years,
                   omega_globals.options.redesign_interval_gain)
 
-    return vehicle.model_year - int(vehicle.prior_redesign_year) >= int(vehicle.redesign_interval) * redesign_interval_gain
+    return vehicle.model_year - int(vehicle.prior_redesign_year) >= \
+        int(vehicle.redesign_interval) * redesign_interval_gain
 
 
 def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
@@ -801,8 +801,8 @@ class Vehicle(OMEGABase):
     """
     **Implements "candidate" or "working" vehicles for use during the producer compliance search.**
 
-    ``Vehicle`` objects are initialized from ``VehicleFinal`` objects and then appropriate attributes are transferred from
-    ``Vehicle`` objects to ``VehicleFinal`` objects at the conclusion of the producer search and producer-consumer
+    ``Vehicle`` objects are initialized from ``VehicleFinal`` objects and then appropriate attributes are transferred
+    from ``Vehicle`` objects to ``VehicleFinal`` objects at the conclusion of the producer search and producer-consumer
     iteration.
 
     Each ``Vehicle`` object has a unique ``cost_curve`` (and potentially ``cost_cloud``) that tracks multiple aspects
@@ -1002,8 +1002,8 @@ class Vehicle(OMEGABase):
 
         cloud['battery_sizing_onroad_direct_kwh_per_mile'] = 0
         cloud['nominal_onroad_direct_kwh_per_mile'] = kwh_per_mile_scale * \
-                                                      DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(drive_cycle_weight_year,
-                                                                                                              self.fueling_class, cloud)
+                                                      DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(
+                                                          drive_cycle_weight_year, self.fueling_class, cloud)
 
         # calc onroad_direct values
         VehicleOnroadCalculations.perform_onroad_calculations(self, cloud)
@@ -1134,9 +1134,7 @@ class Vehicle(OMEGABase):
             cost_curve = calc_frontier(cost_cloud, cost_curve_interp_key,
                                        'new_vehicle_mfr_generalized_cost_dollars', allow_upslope=allow_upslope)
 
-        # import common
-        # self.cost_curve_class = self.name
-        # common.omega_functions.plot_frontier(cost_cloud, self.cost_curve_class + '\nallow_upslope=%s, frontier_affinity_factor=%s' % (allow_upslope, omega_globals.options.cost_curve_frontier_affinity_factor), cost_curve, 'cert_co2e_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
+        # CU
 
         # rename generic columns to vehicle-specific columns
         cost_curve = DecompositionAttributes.rename_decomposition_columns(self, cost_curve)
@@ -1194,12 +1192,14 @@ class Vehicle(OMEGABase):
                 cost_cloud.loc[cost_curve.index, 'frontier'] = True
 
                 filename = '%s%d_%s_%s_cost_cloud.csv' % (omega_globals.options.output_folder, self.model_year,
-                                                          self.name.replace(' ', '_').replace(':', '-'), self.vehicle_id)
+                                                          self.name.replace(' ', '_').replace(':', '-'),
+                                                          self.vehicle_id)
                 cost_cloud.to_csv(filename, columns=sorted(cost_cloud.columns), index=False)
 
             if 'v_cost_curves' in omega_globals.options.verbose_log_modules:
                 filename = '%s%d_%s_%s_cost_curve.csv' % (omega_globals.options.output_folder, self.model_year,
-                                                          self.name.replace(' ', '_').replace(':', '-'), self.vehicle_id)
+                                                          self.name.replace(' ', '_').replace(':', '-'),
+                                                          self.vehicle_id)
                 cc = pd.merge(cost_curve, self.cost_curve_non_numeric_data, left_index=True, right_index=True)
                 cc.to_csv(filename, columns=sorted(cc.columns), index=False)
 
@@ -1446,11 +1446,11 @@ class VehicleFinal(SQABase, Vehicle):
                               'base_year_reg_class_id', 'base_year_market_share', 'base_year_vehicle_id',
                               'curbweight_lbs', 'base_year_glider_non_structure_mass_lbs', 'base_year_cert_fuel_id',
                               'base_year_glider_non_structure_cost_dollars',
-                              'footprint_ft2', 'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'drive_system', 'dual_rear_wheel',
-                              'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
+                              'footprint_ft2', 'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'drive_system',
+                              'dual_rear_wheel', 'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
                               'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c',
-                              'prior_redesign_year', 'redesign_interval',
-                              'workfactor', 'gvwr_lbs', 'gcwr_lbs', 'base_year_workfactor', 'base_year_gvwr_lbs', 'base_year_gcwr_lbs'] \
+                              'prior_redesign_year', 'redesign_interval', 'workfactor', 'gvwr_lbs', 'gcwr_lbs',
+                              'base_year_workfactor', 'base_year_gvwr_lbs', 'base_year_gcwr_lbs'] \
                               + VehicleFinal.dynamic_attributes
 
         # model year and registered count are required to make a full-blown VehicleFinal object, compliance_id
@@ -1615,9 +1615,11 @@ class VehicleFinal(SQABase, Vehicle):
 
             # update base year sales data by context size class (used for specifically for sales projections)
             if veh.context_size_class not in NewVehicleMarket.base_year_context_size_class_sales:
-                NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] = veh.initial_registered_count
+                NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] = \
+                    veh.initial_registered_count
             else:
-                NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] += veh.initial_registered_count
+                NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] += \
+                    veh.initial_registered_count
 
             key = veh.compliance_id + '_' + veh.context_size_class
             if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
@@ -1770,7 +1772,8 @@ class VehicleFinal(SQABase, Vehicle):
         Also initializes decomposition attributes.
 
         Args:
-            vehicle_onroad_calculations_file (str): the name of the vehicle onroad calculations (vehicle attribute calculations) file
+            vehicle_onroad_calculations_file (str): the name of the vehicle onroad calculations
+                (vehicle attribute calculations) file
             verbose (bool): enable additional console and logfile output if True
 
         Returns:

@@ -388,8 +388,8 @@ class VehicleAggregation(OMEGABase):
                 replace({'base_year_powertrain_type': {'HEV': 0, 'PHEV': 50, 'BEV': 300, 'FCV': 300, 'ICE': 0}})
 
             # need to determine vehicle trans / techs
-            df['engine_cylinders'] = df['eng_cyls_num']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
-            df['engine_displacement_L'] = df['eng_disp_liters']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
+            df['engine_cylinders'] = df['eng_cyls_num']  # RV
+            df['engine_displacement_L'] = df['eng_disp_liters']  # RV
 
             import time
             start_time = time.time()
@@ -433,12 +433,6 @@ class VehicleAggregation(OMEGABase):
 
                 powertrain_cost = sum(PowertrainCost.calc_cost(veh, row, veh.base_year_powertrain_type))
 
-                # powertrain_costs = PowertrainCost.calc_cost(veh, pd.DataFrame([row]))  # includes battery cost
-                # powertrain_cost_terms = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
-                #                          'electrified_driveline_cost']
-                # for i, ct in enumerate(powertrain_cost_terms):
-                #     df.loc[idx, ct] = float(powertrain_costs[i])
-
                 # calc glider cost
                 veh.structure_material = row['structure_material']
                 veh.height_in = row['height_in']
@@ -462,18 +456,15 @@ class VehicleAggregation(OMEGABase):
                 workfactor = 0
                 if row['reg_class_id'] == 'mediumduty':
                     model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system \
-                        = row['model_year'], row['curbweight_lbs'], row['gvwr_lbs'], row['gcwr_lbs'], row['drive_system']
-                    workfactor = WorkFactor.calc_workfactor(model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system)
+                        = row['model_year'], row['curbweight_lbs'], row['gvwr_lbs'], row['gcwr_lbs'], \
+                        row['drive_system']
+                    workfactor = \
+                        WorkFactor.calc_workfactor(model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system)
                 df.at[idx, 'workfactor'] = workfactor
                 veh.gvwr_lbs = row['gvwr_lbs']
                 veh.gcwr_lbs = row['gcwr_lbs']
                 veh.base_year_gvwr_lbs = row['gvwr_lbs']
                 veh.base_year_gcwr_lbs = row['gcwr_lbs']
-
-                # glider_costs = GliderCost.calc_cost(veh, pd.DataFrame([row]))  # includes structure_cost and glider_non_structure_cost
-                # glider_cost_terms = ['structure_cost', 'glider_non_structure_cost']
-                # for i, ct in enumerate(glider_cost_terms):
-                #     df.loc[idx, ct] = [gc[i] for gc in glider_costs]
 
             df['glider_non_structure_mass_lbs'] = df['curbweight_lbs'] - df['powertrain_mass_lbs'] \
                                                   - df['structure_mass_lbs'] - df['battery_mass_lbs']

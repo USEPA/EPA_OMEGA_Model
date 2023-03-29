@@ -107,13 +107,15 @@ class Manufacturer(SQABase, OMEGABase):
         input_template_version = 0.0003
         input_template_columns = {'manufacturer_id'}
 
-        template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+                                                         verbose=verbose)
 
         if not template_errors:
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
             if not template_errors:
                 obj_list = []
@@ -128,12 +130,7 @@ class Manufacturer(SQABase, OMEGABase):
 
                 Manufacturer.manufacturers = list(df['manufacturer_id'].unique())
 
-                # template_errors = CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file, verbose)
-                #
-                # if not template_errors:
-                #     initial_credit_bank[manufacturer_id] = CreditBank(omega_globals.options.ghg_credit_params_file,
-                #                                                       omega_globals.options.ghg_credits_file,
-                #                                                       manufacturer_id)
+                # RV
 
         return template_errors
 

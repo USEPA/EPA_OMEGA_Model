@@ -51,13 +51,14 @@ class ManufacturerAnnualData(SQABase):
             manufacturer_vehicle_cost_dollars (numeric): total manufacturer vehicle cost (sum of vehicle sales X vehicle cost)
 
         """
-        omega_globals.session.add(ManufacturerAnnualData(compliance_id=compliance_id,
-                                                         model_year=model_year,
-                                                         target_co2e_Mg=target_co2e_Mg,
-                                                         calendar_year_cert_co2e_Mg=calendar_year_cert_co2e_Mg,
-                                                         model_year_cert_co2e_Mg=calendar_year_cert_co2e_Mg,  # to start with
-                                                         manufacturer_vehicle_cost_dollars=manufacturer_vehicle_cost_dollars,
-                                                         ))
+        omega_globals.session.add(
+            ManufacturerAnnualData(compliance_id=compliance_id,
+                                   model_year=model_year,
+                                   target_co2e_Mg=target_co2e_Mg,
+                                   calendar_year_cert_co2e_Mg=calendar_year_cert_co2e_Mg,
+                                   model_year_cert_co2e_Mg=calendar_year_cert_co2e_Mg,  # to start with
+                                   manufacturer_vehicle_cost_dollars=manufacturer_vehicle_cost_dollars,
+                                   ))
         omega_globals.session.flush()
 
     @staticmethod
@@ -128,7 +129,8 @@ class ManufacturerAnnualData(SQABase):
         Args:
             model_year (numeric): the model year of the transaction
             compliance_id (str): manufacturer name, or 'consolidated_OEM'
-            transaction_amount_Mg (numeric): the transaction amount, may be positive (receiving credits) or negative (transferring credits)
+            transaction_amount_Mg (numeric): the transaction amount, may be positive (receiving credits) or negative
+                (transferring credits)
 
         """
         mad = omega_globals.session.query(ManufacturerAnnualData)\

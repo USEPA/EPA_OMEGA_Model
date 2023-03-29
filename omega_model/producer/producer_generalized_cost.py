@@ -67,7 +67,8 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
 
         Args:
             market_class_id (str): market class id, e.g. 'hauling.ICE'
-            attribute_types (str, [strs]): name or list of generalized cost attribute(s), e.g. ``['producer_generalized_cost_fuel_years', 'producer_generalized_cost_annual_vmt']``
+            attribute_types (str, [strs]): name or list of generalized cost attribute(s), e.g.
+                ``['producer_generalized_cost_fuel_years', 'producer_generalized_cost_annual_vmt']``
 
         Returns:
             The requested generalized cost attributes.
@@ -76,7 +77,8 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
         cache_key = (market_class_id, attribute_types)
 
         if cache_key not in ProducerGeneralizedCost._data:
-            ProducerGeneralizedCost._data[cache_key] = [ProducerGeneralizedCost._data[market_class_id][attr] for attr in attribute_types]
+            ProducerGeneralizedCost._data[cache_key] = \
+                [ProducerGeneralizedCost._data[market_class_id][attr] for attr in attribute_types]
 
         return ProducerGeneralizedCost._data[cache_key]
 

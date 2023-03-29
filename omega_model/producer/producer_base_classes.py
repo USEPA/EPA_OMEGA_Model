@@ -23,14 +23,15 @@ class ProducerGeneralizedCostBase:
 
         Args:
             market_class_id (str): market class id, e.g. 'hauling.ICE'
-            attribute_types (str, [strs]): name or list of generalized cost attribute(s), e.g. ``['producer_generalized_cost_fuel_years', 'producer_generalized_cost_annual_vmt']``
+            attribute_types (str, [strs]): name or list of generalized cost attribute(s), e.g.
+                ``['producer_generalized_cost_fuel_years', 'producer_generalized_cost_annual_vmt']``
 
         Returns:
             The requested generalized cost attributes.
 
         """
-        raise Exception('**Attempt to call abstract method ProducerGeneralizedCostBase.%s() without child class override**' %
-                        inspect.currentframe().f_code.co_name)
+        raise Exception('**Attempt to call abstract method ProducerGeneralizedCostBase.%s() '
+                        'without child class override**' % inspect.currentframe().f_code.co_name)
 
     @staticmethod
     def calc_generalized_cost(vehicle, cost_cloud, co2_name, kwh_name, cost_name):
@@ -49,8 +50,8 @@ class ProducerGeneralizedCostBase:
             The vehicle's cost cloud with generalized cost column, e.g. 'new_vehicle_mfr_generalized_cost_dollars'
 
         """
-        raise Exception('**Attempt to call abstract method ProducerGeneralizedCostBase.%s() without child class override**' %
-                        inspect.currentframe().f_code.co_name)
+        raise Exception('**Attempt to call abstract method ProducerGeneralizedCostBase.%s() '
+                        'without child class override**' % inspect.currentframe().f_code.co_name)
 
     @staticmethod
     def init_from_file(filename, verbose=False):
