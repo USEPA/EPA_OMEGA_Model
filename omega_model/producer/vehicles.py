@@ -349,7 +349,7 @@ class VehicleOnroadCalculations(OMEGABase):
                 select_attribute, select_value, operator, action = calc.split(':')
                 if vehicle.__getattribute__(select_attribute) == select_value:
                     attribute_source, attribute_target = action.split('->')
-                    # print('vehicle.%s = vehicle.%s %s %s' % (attribute_target, attribute_source, operator, value))
+
                     if cost_cloud is not None:
                         cost_cloud[attribute_target] = \
                             Eval.eval("cost_cloud['%s'] %s %s" % (attribute_source, operator, value),

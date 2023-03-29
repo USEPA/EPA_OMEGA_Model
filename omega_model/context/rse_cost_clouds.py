@@ -419,10 +419,6 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         """
 
-        # start_time = time.time()
-
-        # print('Generating Cost Cloud for %s' % vehicle.name)
-
         vehicle_rlhp20 = \
             calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b, vehicle.base_year_target_coef_c, 20)
 
@@ -556,9 +552,6 @@ class CostCloud(OMEGABase, CostCloudBase):
                                     converged = converged and \
                                             abs(1 - battery_kwh / prior_battery_kwh) < convergence_tolerance
 
-                                # print(rated_hp, prior_rated_hp, rated_hp / prior_rated_hp)
-                                # print(vehicle.curbweight_lbs, powertrain_mass_lbs, prior_powertrain_mass_lbs, powertrain_mass_lbs / prior_powertrain_mass_lbs)
-
                                 prior_powertrain_mass_lbs = powertrain_mass_lbs
                                 prior_rated_hp = rated_hp
                                 prior_battery_kwh = battery_kwh
@@ -643,9 +636,6 @@ class CostCloud(OMEGABase, CostCloudBase):
         cost_cloud = omega_globals.options.ProducerGeneralizedCost.\
             calc_generalized_cost(vehicle, cost_cloud, 'onroad_direct_co2e_grams_per_mile',
                                   'onroad_direct_kwh_per_mile', 'new_vehicle_mfr_cost_dollars')
-
-        # print('done %.2f %d' % ((time.time() - start_time), search_iterations))
-        # print('done %.2f' % (time.time() - start_time))
 
         if vehicle.model_year in omega_globals.options.log_vehicle_cloud_years or \
                 omega_globals.options.log_vehicle_cloud_years == 'all':

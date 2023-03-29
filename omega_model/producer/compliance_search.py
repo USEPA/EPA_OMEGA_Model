@@ -353,13 +353,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                 if k in max_constraints:
                                     max_constraints.pop(k)
 
-                            # print('min_constraints')
-                            # print_dict(min_constraints)
-                            # print('max_constraints')
-                            # print_dict(max_constraints)
-                            #
-                            # for nmc in node_market_classes:
-                            #     print('cost_multiplier_%s' % nmc, consumer_response['cost_multiplier_%s' % nmc])
+                            # CU RV
 
                             consumer_node_abs_share = consumer_response['consumer_abs_share_frac_%s' % node_name]
 
@@ -975,12 +969,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
                 myp_dict['myp_%s' % new_veh.base_year_vehicle_id] = new_veh.model_year_prevalence
                 myp_dict['ps_%s' % new_veh.base_year_vehicle_id] = new_veh.projected_sales
 
-        # for v in manufacturer_vehicles:
-        #     print('%80s %20s %10s %20s %10f %10d' % (
-        #         v.name, v.market_class_id, v.reg_class_id, v.context_size_class, v.model_year_prevalence,
-        #         v.projected_sales))
-        #
-        # print('\nEND manufacturer_vehicles ##################################\n')
+        # CU
 
         # np.sum([new_veh.model_year_prevalence for new_veh in manufacturer_vehicles]) == 1.0 at this point,
         # np.sum([new_veh.projected_sales for new_veh in manufacturer_vehicles]) = context_based_total_sales
@@ -989,36 +978,12 @@ def create_composite_vehicles(calendar_year, compliance_id):
             v.model_year_prevalence = myp_dict['myp_%s' % v.base_year_vehicle_id]
             v.projected_sales = myp_dict['ps_%s' % v.base_year_vehicle_id]
 
-        # for v in manufacturer_vehicles:
-        #     print('%80s %20s %10s %20s %10f %10d' % (
-        #         v.name, v.market_class_id, v.reg_class_id, v.context_size_class, v.model_year_prevalence,
-        #         v.projected_sales))
-        #
-        # print('\nEND manufacturer_vehicles ##################################\n')
-        #
-        # for v in non_covered_vehs:
-        #     print('%80s %20s %10s %20s %10f %10d' % (
-        #         v.name, v.market_class_id, v.reg_class_id, v.context_size_class, v.model_year_prevalence,
-        #         v.projected_sales))
-        #
-        # print('\nEND non_covered_vehs ##################################\n')
+        # CU
 
         # sum([v.model_year_prevalence for v in manufacturer_vehicles]) >= 1.0 and that's ok
         # sum([v.model_year_prevalence for v in byp_vehs]) == 1.0 and alt vehicles get the myp of their respective base vehicles
 
-        # # group by market class (base year products) just to double check total prevalence for debugging
-        # mct = dict()
-        # for mc in omega_globals.options.MarketClass.market_classes:
-        #     mct[mc] = []
-        # for new_veh in manufacturer_vehicles:
-        #     if new_veh.base_year_product:
-        #         mct[new_veh.market_class_id].append(new_veh)
-        #
-        # mc_sum = 0
-        # for k in mct:
-        #     print(k, sum([v.model_year_prevalence for v in mct[k]]))
-        #     mc_sum += sum([v.model_year_prevalence for v in mct[k]])
-        # print('total %f' % mc_sum)
+        # CU RV
 
         # sales by market category, ALT / NO_ALT
         _cache['mcat_data_%d' % calendar_year] = dict()
@@ -1042,7 +1007,6 @@ def create_composite_vehicles(calendar_year, compliance_id):
                             _cache['mcat_data_%d' % calendar_year][mcat]['ALT_abs_share'] += new_veh_abs_share
                             _cache['mcat_data_%d' % calendar_year][mcat]['sales'] += new_veh.projected_sales
                             _cache['mcat_data_%d' % calendar_year][mcat]['abs_share'] += new_veh_abs_share
-        # print_dict(_cache['mcat_data_%d' % calendar_year])
 
         # group by market class / reg class
         mctrc = {'ALT_sales': 0, 'NO_ALT_sales': 0}

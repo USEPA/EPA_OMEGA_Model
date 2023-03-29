@@ -1481,7 +1481,6 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
         remote_batchfile = batch.name + '.csv'
         batch.dataframe.to_csv(remote_batchfile)
 
-        # print("Batch name = " + batch.name)
         batch.batch_log.logwrite("Batch name = " + batch.name)
 
         if options.session_num is None:
