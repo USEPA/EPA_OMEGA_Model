@@ -2,7 +2,7 @@
 
 Top-level includes/definitions for the OMEGA model
 
-Defines class OMEGARuntimeOptions which control an individual simulation session
+Defines class OMEGASessionSettings which control an individual simulation session
 
 
 ----
@@ -64,15 +64,14 @@ try:
         """
         def __init__(self):
             """
-            Create an OMEGARuntimeOptions object with default settings used for testing and development.
+            Create an OMEGASessionSettings object with default settings used for testing and development.
 
-            The primary way to create an OMEGARuntimeOptions object is via the batch process.
+            The primary way to create an OMEGASessionSettings object is via the batch process.
 
             See Also:
                 omega_batch.py
 
             """
-
             import time
 
             path = os.path.dirname(os.path.abspath(__file__)) + os.sep

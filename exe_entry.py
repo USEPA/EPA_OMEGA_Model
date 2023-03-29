@@ -20,5 +20,5 @@ import omega_gui.omega_gui
 # fix for for pyinstaller multiprocessing issue
 multiprocessing.freeze_support()
 
-# omega_model.run_omega(omega_model.OMEGARuntimeOptions(), standalone_run=True)
+# omega_model.run_omega(omega_model.OMEGASessionSettings(), standalone_run=True)
 omega_gui.omega_gui.run_gui()
