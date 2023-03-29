@@ -1332,12 +1332,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 
                 # automatically validate files and folders based on parameter naming convention
                 for i in batch.dataframe.index:
-                    # if options.verbose and (str(i).endswith(' Folder Name') or str(i).endswith(' File')):
-                    #     batch.batch_log.logwrite('validating %s=%s' % (i, session.read_parameter(i)))
-                    # elif str(i).endswith(' Folder Name'):
-                    #     validate_folder(session.read_parameter(i))
-                    # elif str(i).endswith(' File'):
-                    #     validate_file(session.read_parameter(i))
+                    # CU RV
                     if str(i).endswith(' File'):
                         source_file_path = session.read_parameter(i)
                         if type(source_file_path) is str:
@@ -1359,7 +1354,6 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 
         if not options.no_bundle:
             # copy files to network_batch_path
-
             batch.batch_log.logwrite('Bundling Source Files and Requirements...')
             v = sys.version_info
             if getattr(sys, 'frozen', False):
@@ -1437,13 +1431,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 
                     # automatically rename and relocate source files
                     for i in batch.dataframe.index:
-                        # if str(i).endswith(' Folder Name'):
-                        #     if options.verbose:
-                        #         batch.batch_log.logwrite('renaming %s to %s' % (batch.dataframe.loc[i][session.num],
-                        #                                      session.name + os.sep + batch.dataframe.loc[i][
-                        #                                          session.num]))
-                        #     batch.dataframe.loc[i][session.num] = \
-                        #         session.name + os.sep + batch.dataframe.loc[i][session.num]
+                        # CU RV
                         if str(i).endswith(' File') or (str(i).startswith('settings.') and str(i).endswith('_file')):
                             source_file_path = batch.dataframe.loc[i][session.num]
 

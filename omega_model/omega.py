@@ -391,10 +391,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                 omega_globals.cumulative_battery_GWh['total'] += production_battery_gigawatthours
                 omega_globals.cumulative_battery_GWh[calendar_year] = omega_globals.cumulative_battery_GWh['total']
 
-            credit_banks[compliance_id].handle_credit(calendar_year, total_credits_co2e_megagrams)
-
-            # credit_banks[compliance_id].handle_credit(calendar_year,
-            #                                          producer_decision_and_response['total_credits_co2e_megagrams'])
+            credit_banks[compliance_id].handle_credit(calendar_year, total_credits_co2e_megagrams) # CU RV
 
             omega_globals.options.SalesShare.store_producer_decision_and_response(producer_decision_and_response)
 
@@ -677,7 +674,7 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pai
 
         calc_cross_subsidy_metrics(mcat, cross_subsidy_pair, producer_decision, cross_subsidy_options_and_response)
 
-        price_weight = 0.925  # 1-0.925
+        price_weight = 0.925
 
         # calculate score, weighted distance to the origin
         cross_subsidy_options_and_response['pricing_score'] = \
@@ -951,7 +948,7 @@ def tighten_multiplier_range(multiplier_column, prev_multiplier_ranges, producer
         np.linspace(min_val, max_val, omega_globals.options.consumer_pricing_num_options),
         prev_multiplier))
 
-    # search_collapsed = search_collapsed and ((len(multiplier_range) == 2) or ((max_val / min_val - 1) <= 1e-3))
+    # CU RV
     search_collapsed = search_collapsed and ((len(multiplier_range) == 2) or (max_val - min_val <= 1e-4))
     if 'cross_subsidy_search' in omega_globals.options.verbose_console_modules:
         mr_str = str(['%.8f' % m for m in multiplier_range]).replace("'", '')
@@ -987,8 +984,7 @@ def calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehic
 
     calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict, producer_decision)
 
-    return [k for k in market_class_vehicle_dict.keys() if
-            market_class_vehicle_dict[k]]
+    return [k for k in market_class_vehicle_dict.keys() if market_class_vehicle_dict[k]]
 
 
 def calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict, producer_decision):
