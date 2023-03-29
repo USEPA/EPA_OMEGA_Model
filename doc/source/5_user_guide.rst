@@ -87,7 +87,7 @@ Typical Command Line Usage
     usage: omega_batch.py
             [-h] [--bundle_path BUNDLE_PATH] [--batch_file BATCH_FILE]
             [--session_num SESSION_NUM] [--analysis_final_year ANALYSIS_FINAL_YEAR]
-            [--calc_effects CALC_EFFECTS] [--verbose] [--show_figures]
+            [--verbose] [--show_figures]
 
     Run OMEGA batch simulation
 
@@ -105,10 +105,6 @@ Typical Command Line Usage
 
       --analysis_final_year ANALYSIS_FINAL_YEAR
                             Override analysis final year
-
-      --calc_effects CALC_EFFECTS
-                            Type of effects calcs to run: "None", "Physical",
-                            or "Physical and Costs"
 
       --verbose             Enable verbose omega_batch messages
 
