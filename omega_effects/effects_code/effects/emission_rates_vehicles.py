@@ -23,7 +23,6 @@ Sample Data Columns
         1995,passenger car,car,non_hauling.ICE,pump gasoline,pm25_exhaust_grams_per_mile,age,0.000020575,0.02556,"[22, 30]","[0.02601255162083171, 0.026177151337127946]",((2.0575e-05 * age) + 0.02556)
         1995,passenger car,car,non_hauling.ICE,pump gasoline,nmog_exhaust_grams_per_mile,age,-0.00059478,0.77323,"[22, 30]","[0.7601447516760625, 0.7553865333609487]",((-0.00059478 * age) + 0.77323)
 
-
 Data Column Name and Description
     :start_year:
         The model year to which the rate applies; model years not shown will apply the start_year rate less than or equal
@@ -51,15 +50,19 @@ Data Column Name and Description
         The independent variable used in calculating the emission rate (e.g., age).
 
     :slope:
+        The slope of the linear fit to the emission rate input data.
 
     :intercept:
+        The intercept of the linear fit to the emission rate input data.
 
     :ind_variable_data:
+        Input data for the independent variable used to generate the emission rate curve where data represent the age associated with the corresponding input data.
 
     :rate_data:
+        The emission rate data used to generate the emission rate curve.
 
     :equation:
-        The emission rate equation used to calculate an emission rate at the given age (or other independent variable).
+        The linear fit emission rate equation used to calculate an emission rate at the given independent variable.
 
 ----
 

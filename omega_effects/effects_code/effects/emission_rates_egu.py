@@ -41,36 +41,49 @@ Data Column Name and Description
         The last calendar year from which the rate regression curves were generated.
 
     :slope_rate:
+        The slope of the linear fit to the emission rate input data.
 
     :intercept_rate:
+        The intercept of the linear fit to the emission rate input data.
 
     :ind_variable_data:
+        Input data for the independent variable used to generate the emission rate curve where data are years from the initial_year.
 
     :rate_data:
+        The emission rate data used to generate the emission rate curve.
 
     :equation_rate_id:
-        The emission rate equation used to calculate an emission rate at the given independent variable.
+        The linear fit emission rate equation used to calculate an emission rate at the given independent variable.
 
     :kwh_demand_metric:
-        The kwh demand metric used in generating regressions (e.g., consumption or generation).
+        The kwh demand metric used in generating a corresponding energy rate regression (e.g., consumption or generation).
 
     :slope_kwh_demand_metric:
+        The slope of the linear fit to the energy demand rate input data.
 
     :intercept_kwh_demand_metric:
+        The intercept of the linear fit to the energy demand rate input data.
 
     :kwh_data_demand_metric:
+        The energy demand rate data used to generate the energy rate curve.
 
     :equation_kwh_demand_metric:
+        The linear fit energy rate equation used to calculate an energy demand rate at the given independent variable.
 
     :kwh_consumption_metric:
+        The kwh consumption metric used in generating a corresponding energy rate regression (e.g., consumption or generation).
 
     :slope_kwh_consumption_metric:
+        The slope of the linear fit to the energy consumption rate input data.
 
     :intercept_kwh_consumption_metric:
+        The intercept of the linear fit to the energy consumption rate input data.
 
     :kwh_data_consumption_metric:
+        The energy consumption rate data used to generate the energy rate curve.
 
     :equation_kwh_consumption_metric:
+        The linear fit energy rate equation used to calculate an energy consumption rate at the given independent variable.
 
 ----
 

@@ -19,13 +19,11 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        rate_name	independent_variable	last_year	slope_rate	intercept_rate	equation_rate_id
-        pm25_grams_per_gallon	(calendar_year - 2016)	2055	-2.58E-04	1.47E-01	((-0.000257743900872186 * (calendar_year - 2016)) + 0.147171057586721)
-        nox_grams_per_gallon	(calendar_year - 2016)	2055	-0.002233801	0.57763691	((-0.00223380056415021 * (calendar_year - 2016)) + 0.577636910469321)
-        sox_grams_per_gallon	(calendar_year - 2016)	2055	-0.00030085	0.221705126	((-0.000300850396789525 * (calendar_year - 2016)) + 0.221705126043959)
-        voc_grams_per_gallon	(calendar_year - 2016)	2055	-2.19E-03	5.00E-01	((-0.00219248448866068 * (calendar_year - 2016)) + 0.500358765360277)
-
-
+        rate_name,independent_variable,last_year,slope_rate,intercept_rate,equation_rate_id
+        pm25_grams_per_gallon,(calendar_year - 2016),2055,-2.58E-04,1.47E-01,((-0.000257743900872186 * (calendar_year - 2016)) + 0.147171057586721)
+        nox_grams_per_gallon,(calendar_year - 2016),2055,-0.002233801,0.57763691,((-0.00223380056415021 * (calendar_year - 2016)) + 0.577636910469321)
+        sox_grams_per_gallon,(calendar_year - 2016),2055,-0.00030085,0.221705126,((-0.000300850396789525 * (calendar_year - 2016)) + 0.221705126043959)
+        voc_grams_per_gallon,(calendar_year - 2016),2055,-2.19E-03,5.00E-01,((-0.00219248448866068 * (calendar_year - 2016)) + 0.500358765360277)
 
 Data Column Name and Description
     :rate_name:
@@ -37,8 +35,14 @@ Data Column Name and Description
     :last_year:
         The last calendar year from which the rate regression curves were generated.
 
+    :slope_rate:
+        The slope of the linear fit to the emission rate input data.
+
+    :intercept_rate:
+        The intercept of the linear fit to the emission rate input data.
+
     :equation_rate_id:
-        The emission rate equation used to calculate an emission rate at the given independent variable.
+        The linear fit emission rate equation used to calculate an emission rate at the given independent variable.
 
 ----
 
