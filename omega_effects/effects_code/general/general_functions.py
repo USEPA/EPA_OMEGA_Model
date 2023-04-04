@@ -47,7 +47,8 @@ def get_file_datetime(filepath):
     return file_datetime
 
 
-def read_input_file(path, effects_log, usecols=None, index_col=None, skiprows=None, skip_blank_lines=True, reset_index=False):
+def read_input_file(path, effects_log, usecols=None, index_col=None, skiprows=None, skip_blank_lines=True,
+                    reset_index=False):
     """
 
     Parameters:
