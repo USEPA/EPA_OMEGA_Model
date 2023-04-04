@@ -47,10 +47,6 @@ Data Column Name and Description
 
 **CODE**
 
-non_structure_glider_mass_lbs	vehicle.model_year == analysis_intial_year	vehicle.curbweight_lbs – powertrain_mass_lbs – structure_mass_lbs – battery_mass_lbs
-curb_weight_lbs	vehicle.model_year >= analysis_intial_year	powertrain_mass_lbs + structure_mass_lbs + structure_mass_lbs + non_structure_glider_mass_lbs
-
-
 """
 
 print('importing %s' % __file__)
