@@ -36,8 +36,8 @@ Data Column Name and Description
         Zero or more dynamic columns with the format
         ``{attribute_name}:{attribute_value}``
 
-        Unspecified vehicle attribute-value pairs will have a production multiplier of 1.0, so only non-1.0 multipliers need
-        to be specified here.
+        Unspecified vehicle attribute-value pairs will have a production multiplier of 1.0, so only non-1.0
+        multipliers need to be specified here.
 
         Example:
             ``fueling_class:BEV`` => ``if vehicle.fueling_class == 'BEV' then apply production multiplier``
@@ -119,7 +119,8 @@ class Incentives(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
             if not template_errors:
                 df = df.set_index('start_year')

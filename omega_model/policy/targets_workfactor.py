@@ -112,15 +112,19 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             workfactor = 0
             if vehicle.reg_class_id == 'mediumduty':
                 model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system \
-                    = vehicle.model_year, vehicle.curbweight_lbs, vehicle.gvwr_lbs, vehicle.gcwr_lbs, vehicle.drive_system
+                    = vehicle.model_year, vehicle.curbweight_lbs, vehicle.gvwr_lbs, vehicle.gcwr_lbs, \
+                    vehicle.drive_system
                 workfactor = WorkFactor.calc_workfactor(model_year, curbweight_lbs, gvwr_lbs, gcwr_lbs, drive_system)
 
             vehicle.workfactor = workfactor
             year = max([yr for yr in start_years if yr <= vehicle.model_year])
-            target = eval(VehicleTargets._cache[(vehicle.reg_class_id, year, vehicle.cert_fuel_id)]['co2_gram_per_mile'], locals())
+            target = \
+                eval(VehicleTargets._cache[(vehicle.reg_class_id, year, vehicle.cert_fuel_id)]['co2_gram_per_mile'],
+                     locals())
 
         else:
-            raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, {vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
+            raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, '
+                            f'{vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
 
         return target
 
@@ -150,7 +154,8 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
 
             useful_life = VehicleTargets._cache[(reg_class_id, year, cert_fuel_id)]['useful_life_miles']
         else:
-            raise Exception(f'Missing GHG CO2e g/mi target parameters for {reg_class_id}, {model_year}, {cert_fuel_id} or prior')
+            raise Exception(f'Missing GHG CO2e g/mi target parameters for {reg_class_id}, '
+                            f'{model_year}, {cert_fuel_id} or prior')
 
         return useful_life
 
@@ -196,7 +201,8 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             return co2_gpmi * vehicle.lifetime_VMT * sales / pow(10, 6)
 
         else:
-            raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, {vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
+            raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, '
+                            f'{vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
 
     @staticmethod
     def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=1):
@@ -245,7 +251,8 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             # return co2_gpmi * vehicle.lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
             return co2_gpmi * vehicle.lifetime_VMT * sales / pow(10, 6)
         else:
-            raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, {vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
+            raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, '
+                            f'{vehicle.model_year}, {vehicle.cert_fuel_id} or prior')
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -285,7 +292,8 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             # validate columns
@@ -399,18 +407,27 @@ if __name__ == '__main__':
             truck_vehicle.fueling_class = 'ICE'
 
             car_target_co2e_gpmi = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(car_vehicle)
+
             car_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(car_vehicle)
-            car_certs_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle,
-                                                                                     co2_gpmi_variants=[0, 50, 100, 150])
-            car_certs_sales_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle,
-                                                                                           co2_gpmi_variants=[0, 50, 100, 150],
-                                                                                           sales_variants=[1, 2, 3, 4])
+
+            car_certs_co2e_Mg = \
+                omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle, co2_gpmi_variants=[0, 50, 100, 150])
+
+            car_certs_sales_co2e_Mg = \
+                omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle,
+                                                                       co2_gpmi_variants=[0, 50, 100, 150],
+                                                                       sales_variants=[1, 2, 3, 4])
 
             truck_target_co2e_gpmi = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(truck_vehicle)
+
             truck_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(truck_vehicle)
-            truck_certs_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150])
-            truck_certs_sales_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150],
-                                                                                             sales_variants=[1, 2, 3, 4])
+
+            truck_certs_co2e_Mg = \
+                omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150])
+
+            truck_certs_sales_co2e_Mg = \
+                omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150],
+                                                                       sales_variants=[1, 2, 3, 4])
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())

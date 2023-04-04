@@ -147,7 +147,8 @@ class DriveCycleWeights(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             validation_dict = {'share_id': ['cert'],
@@ -164,7 +165,8 @@ class DriveCycleWeights(OMEGABase):
                 for calendar_year in df['start_year']:
                     data = df.loc[(df['start_year'] == calendar_year) & (df['fueling_class'] == fc)]
                     if not data.empty:
-                        tree = WeightedTree(df.loc[(df['start_year'] == calendar_year) & (df['fueling_class'] == fc)], verbose)
+                        tree = WeightedTree(df.loc[(df['start_year'] == calendar_year) & (df['fueling_class'] == fc)],
+                                            verbose=verbose)
                         weight_errors += tree.validate_weights()
                         if weight_errors:
                             template_errors = ['weight error %s: %s' %
@@ -194,9 +196,12 @@ class DriveCycleWeights(OMEGABase):
         Args:
             calendar_year (numeric): calendar year to calculated weighted value in
             fueling_class (str): e.g. 'ICE', 'BEV', etc
-            cycle_values (DataFrame): contains cycle values to be weighted (e.g. the simulated vehicles input data with results (columns) for each drive cycle phase)
-            node_id (str): name of tree node at which to calculated weighted value, e.g. 'cs_cert_direct_oncycle_co2e_grams_per_mile'
-            weighted (bool): if True, return weighted value at node (node value * weight), else return node value (e.g. cycle result)
+            cycle_values (DataFrame): contains cycle values to be weighted (e.g. the simulated vehicles input
+                data with results (columns) for each drive cycle phase)
+            node_id (str): name of tree node at which to calculated weighted value,
+                e.g. 'cs_cert_direct_oncycle_co2e_grams_per_mile'
+            weighted (bool): if True, return weighted value at node (node value * weight),
+                else return node value (e.g. cycle result)
 
         Returns:
             A pandas ``Series`` object of the weighted results
@@ -225,7 +230,8 @@ class DriveCycleWeights(OMEGABase):
         Args:
             calendar_year (numeric): calendar year to calculated weighted value in
             fueling_class (str): e.g. 'ICE', 'BEV', etc
-            cycle_values (DataFrame): contains cycle values to be weighted (e.g. the simulated vehicles input data with results (columns) for each drive cycle phase)
+            cycle_values (DataFrame): contains cycle values to be weighted
+                (e.g. the simulated vehicles input data with results (columns) for each drive cycle phase)
 
         Returns:
             A pandas ``Series`` object of the weighted results
@@ -242,14 +248,16 @@ class DriveCycleWeights(OMEGABase):
         Args:
             calendar_year (numeric): calendar year to calculated weighted value in
             fueling_class (str): e.g. 'ICE', 'BEV', etc
-            cycle_values (DataFrame): contains cycle values to be weighted (e.g. the simulated vehicles input data with results (columns) for each drive cycle phase)
+            cycle_values (DataFrame): contains cycle values to be weighted
+                (e.g. the simulated vehicles input data with results (columns) for each drive cycle phase)
 
         Returns:
             A pandas ``Series`` object of the weighted results
 
         """
-        cd_cert_direct_oncycle_kwh_per_mile = DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
-                                                     'cd_cert_direct_oncycle_kwh_per_mile', weighted=False)
+        cd_cert_direct_oncycle_kwh_per_mile = \
+            DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
+                                                  'cd_cert_direct_oncycle_kwh_per_mile', weighted=False)
 
         kwh_per_mile_scale = np.interp(calendar_year, omega_globals.options.kwh_per_mile_scale_years,
                                       omega_globals.options.kwh_per_mile_scale)
