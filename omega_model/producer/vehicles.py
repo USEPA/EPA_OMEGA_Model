@@ -1116,7 +1116,16 @@ class Vehicle(OMEGABase):
 
         """
     def calc_cost_curve(self, cost_cloud):
+        """
+        Calculate vehicle cost curve from cost cloud.
 
+        Args:
+            cost_cloud (dataframe): cloud of costed powertrain variants
+
+        Returns:
+            Nothing, updates vehicle ``cost_curve`` attribute
+
+        """
         # cull cost_cloud points here, based on producer constraints or whatever #
 
         # calculate frontier from updated cloud
