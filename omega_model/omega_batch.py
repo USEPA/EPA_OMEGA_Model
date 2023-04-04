@@ -1390,8 +1390,8 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                 if '.csv' in options.batch_file:
                     expanded_batch.dataframe.to_csv(os.path.dirname(options.batch_file) + os.sep + expanded_batch.name)
                 else:
-                    expanded_batch.dataframe.to_excel(os.path.dirname(options.batch_file) + os.sep + expanded_batch.name,
-                                                      "Sessions")
+                    expanded_batch.dataframe.to_excel(os.path.dirname(options.batch_file) + os.sep +
+                                                      expanded_batch.name, "Sessions")
 
             if options.session_num is None:
                 if not batch.sessions[0].settings.use_prerun_context_outputs:
@@ -1449,16 +1449,19 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                                     batch.batch_log.logwrite('relocating %s to %s' %
                                                              (source_file_path, options.session_path +
                                                               get_filenameext(source_file_path)))
-                                batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
-                                    options.session_path + bundle_input_folder_name, source_file_path)
+                                batch.dataframe.loc[i][session.num] = \
+                                    session.name + os.sep + bundle_input_folder_name + os.sep + \
+                                    relocate_file(options.session_path + bundle_input_folder_name, source_file_path)
                             else:
                                 # file_path is relative path
                                 if options.verbose:
                                     batch.batch_log.logwrite('relocating %s to %s' % (
                                         batch.batch_definition_path + source_file_path,
                                         options.session_path + bundle_input_folder_name))
-                                batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
-                                    options.session_path + bundle_input_folder_name, batch.batch_definition_path + source_file_path)
+                                batch.dataframe.loc[i][session.num] = \
+                                    session.name + os.sep + bundle_input_folder_name + os.sep + \
+                                    relocate_file(options.session_path + bundle_input_folder_name,
+                                                  batch.batch_definition_path + source_file_path)
 
         import time
 
@@ -1506,7 +1509,8 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                 for idx, s_index in enumerate(session_list):
                     if not batch.sessions[s_index].result or options.dispy:
                         if not (s_index == 0 and batch.sessions[s_index].settings.use_prerun_context_outputs):
-                            batch.batch_log.logwrite("\nPost-Processing Session %d (%s):" % (s_index, batch.sessions[s_index].name))
+                            batch.batch_log.logwrite("\nPost-Processing Session %d (%s):" %
+                                                     (s_index, batch.sessions[s_index].name))
                             session_summary_filename = options.batch_path + '_' \
                                                        + batch.sessions[s_index].settings.output_folder_base \
                                                        + batch.sessions[s_index].settings.session_unique_name \
@@ -1548,7 +1552,8 @@ if __name__ == '__main__':
     parser.add_argument('--dispy_exclusive', action='store_true', help='Run exclusive job, do not share dispynodes')
     parser.add_argument('--dispy_scheduler', type=str, help='Override default dispy scheduler IP address',
                         default=None)
-    parser.add_argument('--collate_bundle', action='store_true', help='Find and collate summary files in a bundle folder')
+    parser.add_argument('--collate_bundle', action='store_true',
+                        help='Find and collate summary files in a bundle folder')
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--local', action='store_true', help='Run only on local machine, no network nodes')
