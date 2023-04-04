@@ -47,7 +47,8 @@ Data Column Name and Description
         The intercept of the linear fit to the emission rate input data.
 
     :ind_variable_data:
-        Input data for the independent variable used to generate the emission rate curve where data are years from the initial_year.
+        Input data for the independent variable used to generate the emission rate curve
+        where data are years from the initial_year.
 
     :rate_data:
         The emission rate data used to generate the emission rate curve.
@@ -56,7 +57,8 @@ Data Column Name and Description
         The linear fit emission rate equation used to calculate an emission rate at the given independent variable.
 
     :kwh_demand_metric:
-        The kwh demand metric used in generating a corresponding energy rate regression (e.g., consumption or generation).
+        The kwh demand metric used in generating a corresponding energy rate regression
+        (e.g., consumption or generation).
 
     :slope_kwh_demand_metric:
         The slope of the linear fit to the energy demand rate input data.
@@ -71,7 +73,8 @@ Data Column Name and Description
         The linear fit energy rate equation used to calculate an energy demand rate at the given independent variable.
 
     :kwh_consumption_metric:
-        The kwh consumption metric used in generating a corresponding energy rate regression (e.g., consumption or generation).
+        The kwh consumption metric used in generating a corresponding energy rate regression
+        (e.g., consumption or generation).
 
     :slope_kwh_consumption_metric:
         The slope of the linear fit to the energy consumption rate input data.
@@ -83,7 +86,8 @@ Data Column Name and Description
         The energy consumption rate data used to generate the energy rate curve.
 
     :equation_kwh_consumption_metric:
-        The linear fit energy rate equation used to calculate an energy consumption rate at the given independent variable.
+        The linear fit energy rate equation used to calculate an energy consumption rate at the
+        given independent variable.
 
 ----
 
@@ -215,7 +219,8 @@ class EmissionRatesEGU:
                 rate_high = eval(self._data['high_bev', rate_name]['equation_rate_id'], {}, locals_dict)
 
                 # interpolate the rate for kwh_demand
-                rate = rate_low - (kwh_demand_low - kwh_session) * (rate_low - rate_high) / (kwh_demand_low - kwh_demand_high)
+                rate = (rate_low - (kwh_demand_low - kwh_session) * (rate_low - rate_high) /
+                       (kwh_demand_low - kwh_demand_high))
 
                 if rate <= 0:
                     rate = self._cache[calendar_year - 1][idx]

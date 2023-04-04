@@ -33,7 +33,8 @@ Data Column Name and Description
         ``class context_fuel_prices.ContextFuelPrices``
 
     :co_grams_per_gallon:
-        The refinery emission factors follow the structure pollutant_units where units are grams per gallon of liquid fuel.
+        The refinery emission factors follow the structure pollutant_units where units are grams per
+        gallon of liquid fuel.
 
 ----
 

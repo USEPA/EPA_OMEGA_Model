@@ -31,21 +31,25 @@ def calc_discounted_value(value, rate, calendar_year, discount_to_year, discount
 
 
 def discount_values(batch_settings, dict_of_values):
-    """The discount function determines metrics appropriate for discounting (those contained in dict_of_values) and does the discounting
-    calculation to a given year and point within that year.
+    """
+    The discount function determines metrics appropriate for discounting (those contained in dict_of_values) and
+    does the discounting calculation to a given year and point within that year.
 
     Parameters:
         batch_settings: omega effects batch settings object
-        dict_of_values: A dictionary of values to be discounted with keys consisting of vehicle_id, calendar_year, age and discount rate.\n
+        dict_of_values: A dictionary of values to be discounted with keys consisting of vehicle_id, calendar_year,
+            age and discount rate.\n
 
     Returns:
-        The passed dictionary with new key, value pairs where keys stipulate the discount rate and monetized values are discounted at their internally consistent discount rate.
+        The passed dictionary with new key, value pairs where keys stipulate the discount rate and monetized values
+        are discounted at their internally consistent discount rate.
 
     Note:
-        Important input settings for discounting of monetized values are the "Discount Values to Year" and "Cost Accrual" settings.
-        The year to which to discount monetized values is set by the "Discount Values to Year" entry of the input settings.
-        The "Cost Accrual" input setting should be set to 'beginning-of-year' or 'end-of-year', where beginning-of-year represents costs
-        accruing at time t=0 within the year, and end-of-year represents costs accruing at the end of the year.
+        Important input settings for discounting of monetized values are the "Discount Values to Year" and
+        "Cost Accrual" settings. The year to which to discount monetized values is set by the "Discount Values to Year"
+        entry of the input settings. The "Cost Accrual" input setting should be set to 'beginning-of-year' or
+        'end-of-year', where beginning-of-year represents costs accruing at time t=0 within the year, and end-of-year
+        represents costs accruing at the end of the year.
 
         Values that occur prior to the "Discount Values to Year" input setting will not be discounted.
 
@@ -93,35 +97,40 @@ def discount_values(batch_settings, dict_of_values):
             for arg in monetized_non_emission_args:
                 arg_value = dict_of_values[key][arg]
                 discounted_value = \
-                    calc_discounted_value(arg_value, social_discrate, calendar_year, discount_to_year, discount_offset)
+                    calc_discounted_value(arg_value, social_discrate, calendar_year, discount_to_year,
+                                          discount_offset)
                 rate_dict.update({arg: discounted_value})
 
             emission_discrate = 0.05
             for arg in monetized_args_dr5:
                 arg_value = dict_of_values[key][arg]
                 discounted_value = \
-                    calc_discounted_value(arg_value, emission_discrate, calendar_year, discount_to_year, discount_offset)
+                    calc_discounted_value(arg_value, emission_discrate, calendar_year, discount_to_year,
+                                          discount_offset)
                 rate_dict.update({arg: discounted_value})
 
             emission_discrate = 0.03
             for arg in monetized_args_dr3:
                 arg_value = dict_of_values[key][arg]
                 discounted_value = \
-                    calc_discounted_value(arg_value, emission_discrate, calendar_year, discount_to_year, discount_offset)
+                    calc_discounted_value(arg_value, emission_discrate, calendar_year, discount_to_year,
+                                          discount_offset)
                 rate_dict.update({arg: discounted_value})
 
             emission_discrate = 0.025
             for arg in monetized_args_dr25:
                 arg_value = dict_of_values[key][arg]
                 discounted_value = \
-                    calc_discounted_value(arg_value, emission_discrate, calendar_year, discount_to_year, discount_offset)
+                    calc_discounted_value(arg_value, emission_discrate, calendar_year, discount_to_year,
+                                          discount_offset)
                 rate_dict.update({arg: discounted_value})
 
             emission_discrate = 0.07
             for arg in monetized_args_dr7:
                 arg_value = dict_of_values[key][arg]
                 discounted_value = \
-                    calc_discounted_value(arg_value, emission_discrate, calendar_year, discount_to_year, discount_offset)
+                    calc_discounted_value(arg_value, emission_discrate, calendar_year, discount_to_year,
+                                          discount_offset)
                 rate_dict.update({arg: discounted_value})
 
             update_dict[

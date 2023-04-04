@@ -5,7 +5,8 @@
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
-The data represents tailpipe emission rates by model year, age, reg-class and fuel type as estimated by EPA's MOVES model.
+The data represents tailpipe emission rates by model year, age, reg-class and fuel type as estimated by
+EPA's MOVES model.
 
 File Type
     comma-separated values (CSV)
@@ -25,8 +26,8 @@ Sample Data Columns
 
 Data Column Name and Description
     :start_year:
-        The model year to which the rate applies; model years not shown will apply the start_year rate less than or equal
-        to the model year.
+        The model year to which the rate applies; model years not shown will apply the start_year rate
+        less than or equal to the model year.
 
     :sourcetype_name:
         The MOVES sourcetype name (e.g., passenger car, passenger truck, light-commercial truck, etc.).
@@ -56,7 +57,8 @@ Data Column Name and Description
         The intercept of the linear fit to the emission rate input data.
 
     :ind_variable_data:
-        Input data for the independent variable used to generate the emission rate curve where data represent the age associated with the corresponding input data.
+        Input data for the independent variable used to generate the emission rate curve where data represent the age
+        associated with the corresponding input data.
 
     :rate_data:
         The emission rate data used to generate the emission rate curve.

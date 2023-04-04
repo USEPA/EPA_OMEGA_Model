@@ -26,7 +26,8 @@ class AdjustmentsVMT:
             session_settings: an instance of the SessionSettings class.
 
         Returns:
-            Nothing, but it creates a dictionary of adjusted VMT values by calendar year for use in effects calculations.
+            Nothing, but it creates a dictionary of adjusted VMT values by calendar year
+            for use in effects calculations.
 
         """
         calendar_years = batch_settings.calendar_years
@@ -39,7 +40,8 @@ class AdjustmentsVMT:
             calendar_year_vmt \
                 = sum(vad['vmt'] for vad in vads if (vad['calendar_year'] - vad['age']) >= calendar_years[0])
             calendar_year_stock \
-                = sum(vad['registered_count'] for vad in vads if (vad['calendar_year'] - vad['age']) >= calendar_years[0])
+                = sum(vad['registered_count']
+                      for vad in vads if (vad['calendar_year'] - vad['age']) >= calendar_years[0])
 
             # next sum the vmt and registered count for this calendar year's legacy fleet
             calendar_year_legacy_fleet =\

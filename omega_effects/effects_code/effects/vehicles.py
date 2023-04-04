@@ -222,7 +222,8 @@ Data Column Name and Description
 
 :cert_co2e_grams_per_mile:
     The vehicle's certification co2e emissions (grams per mile), including offcycle credits, etc.
-    ``cert_co2e_grams_per_miles = cert_direct_co2e_grams_per_mile + cert_indirect_co2e_grams_per_mile - cert_indirect_offcycle_co2e_grams_per_mile``
+    ``cert_co2e_grams_per_miles = cert_direct_co2e_grams_per_mile + cert_indirect_co2e_grams_per_mile -
+    cert_indirect_offcycle_co2e_grams_per_mile``
 
 :new_vehicle_mfr_generalized_cost_dollars:
     The vehicle's manufacturer generalized cost (dollars).
@@ -236,7 +237,8 @@ Data Column Name and Description
 
 :cert_direct_co2e_grams_per_mile:
     The vehicle's direct (i.e. tailpipe) certification co2e emissions (grams per mile)
-    ``cert_direct_co2e_grams_per_mile = cert_direct_oncycle_co2e_grams_per_mile - cert_direct_offcycle_co2e_grams_per_mile``
+    ``cert_direct_co2e_grams_per_mile = cert_direct_oncycle_co2e_grams_per_mile -
+    cert_direct_offcycle_co2e_grams_per_mile``
 
 :cert_direct_kwh_per_mile:
     The vehicle's direct (i.e. in-vehicle) certification energy consumption (kilowatt-hours per mile),
@@ -261,7 +263,8 @@ Data Column Name and Description
     The vehicle's direct (i.e. tailpipe) off-cycle (credits) co2e emissions (grams per mile)
 
 :cert_indirect_offcycle_co2e_grams_per_mile:
-    The vehicle's indirect (i.e. non-tailpipe) off-cycle (credits) co2e emissions (grams per mile), e.g. AC leakage credits
+    The vehicle's indirect (i.e. non-tailpipe) off-cycle (credits) co2e emissions (grams per mile),
+    e.g. AC leakage credits
 
 :high_eff_alternator:
     Technology flag for high efficiency alternator (1 = Equipped, 0 = Not equipped)
@@ -300,7 +303,8 @@ Data Column Name and Description
     Technology flag for a hybrid truck (1 = Equipped, 0 = Not equipped)
 
 :deac_pd:
-    Technology flag for cylinder deactivation, discrete operation of partial number of cylinders (1 = Equipped, 0 = Not equipped)
+    Technology flag for cylinder deactivation, discrete operation of partial number of cylinders
+    (1 = Equipped, 0 = Not equipped)
 
 :trx12:
     Technology flag for an advanced transmission (1 = Equipped, 0 = Not equipped)
@@ -316,10 +320,12 @@ Data Column Name and Description
 
 :driveline_cost:
     The vehicle's driveline cost (dollars)
-    ``driveline_cost = trans_cost + high_eff_alt_cost + start_stop_cost + ac_leakage_cost + ac_efficiency_cost + lv_battery_cost + hvac_cost``
+    ``driveline_cost = trans_cost + high_eff_alt_cost + start_stop_cost + ac_leakage_cost + ac_efficiency_cost
+    + lv_battery_cost + hvac_cost``
 
 :deac_fc:
-    Technology flag for cylinder deactivation, continuosly variable operation of full number of cylinders (1 = Equipped, 0 = Not equipped)
+    Technology flag for cylinder deactivation, continuosly variable operation of full number of cylinders
+    (1 = Equipped, 0 = Not equipped)
 
 :cegr:
     Technology flag for cooled exhaust gas recirculation (1 = Equipped, 0 = Not equipped)
@@ -329,7 +335,10 @@ Data Column Name and Description
 
 :electrified_driveline_cost:
     The vehicle's electrified driveline cost (dollars)
-    ``electrified_driveline_cost = inverter_cost + induction_inverter_cost + obc_and_dcdc_converter_cost + hv_orange_cables_cost + single_speed_gearbox_cost + powertrain_cooling_loop_cost + charging_cord_kit_cost + dc_fast_charge_circuitry_cost + power_management_and_distribution_cost + brake_sensors_actuators_cost + additional_pair_of_half_shafts_cost``
+    ``electrified_driveline_cost = inverter_cost + induction_inverter_cost + obc_and_dcdc_converter_cost
+    + hv_orange_cables_cost + single_speed_gearbox_cost + powertrain_cooling_loop_cost + charging_cord_kit_cost +
+    dc_fast_charge_circuitry_cost + power_management_and_distribution_cost + brake_sensors_actuators_cost +
+    additional_pair_of_half_shafts_cost``
 
 :glider_non_structure_cost:
     The vehicle's glider non-structure cost (dollars)

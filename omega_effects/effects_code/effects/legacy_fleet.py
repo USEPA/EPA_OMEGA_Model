@@ -111,7 +111,8 @@ class LegacyFleet:
 
         Args:
             filepath: the Path object to the file.
-            vehicles_base_year (int): the model year of the input fleet - the legacy fleet calendar year will be adjusted
+            vehicles_base_year (int): the model year of the input fleet - the legacy fleet
+                calendar year will be adjusted
             if necessary for consistency with the analysis.
             effects_log: an instance of the EffectsLog class.
 

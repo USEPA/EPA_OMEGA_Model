@@ -322,7 +322,8 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                     pm25_Pope_7, sox_Pope_7, nox_Pope_7 = get_cap_cf(batch_settings, calendar_year, source_id)
 
                 pm25_tons, sox_tons, nox_tons = \
-                    cap_tons_dict['pm25_vehicle_ustons'], cap_tons_dict['sox_vehicle_ustons'], cap_tons_dict['nox_vehicle_ustons']
+                    cap_tons_dict['pm25_vehicle_ustons'], cap_tons_dict['sox_vehicle_ustons'], \
+                        cap_tons_dict['nox_vehicle_ustons']
                 pm25_veh_Wu_3_benefit_dollars = pm25_tons * pm25_Wu_3
                 sox_veh_Wu_3_benefit_dollars = sox_tons * sox_Wu_3
                 nox_veh_Wu_3_benefit_dollars = nox_tons * nox_Wu_3
