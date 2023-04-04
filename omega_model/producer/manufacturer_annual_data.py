@@ -47,8 +47,10 @@ class ManufacturerAnnualData(SQABase):
             model_year (numeric): the compliance model year
             compliance_id (str): manufacturer name, or 'consolidated_OEM'
             target_co2e_Mg (numeric): target CO2e Mg for the model year
-            calendar_year_cert_co2e_Mg (numeric): initial compliance state (CO2e Mg) of the vehicles produced in the model year
-            manufacturer_vehicle_cost_dollars (numeric): total manufacturer vehicle cost (sum of vehicle sales X vehicle cost)
+            calendar_year_cert_co2e_Mg (numeric): initial compliance state (CO2e Mg) of the vehicles
+                produced in the model year
+            manufacturer_vehicle_cost_dollars (numeric): total manufacturer vehicle cost
+                (sum of vehicle sales X vehicle cost)
 
         """
         omega_globals.session.add(

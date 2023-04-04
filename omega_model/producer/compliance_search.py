@@ -375,7 +375,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                             multiplier = consumer_response['cost_multiplier_%s' % nmc]
                                             if ((multiplier >= 0.99 *
                                                  omega_globals.options.consumer_pricing_multiplier_max or
-                                                 multiplier <= 1.01 * omega_globals.options.consumer_pricing_multiplier_min)
+                                                 multiplier <= 1.01 *
+                                                 omega_globals.options.consumer_pricing_multiplier_min)
                                                 and (consumer_response['max_share_delta_market_class'] == node_name or
                                                      consumer_response['max_share_delta_market_class'] is None)) or \
                                                     (multiplier == 1.0 and
@@ -399,7 +400,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                                             (consumer_response[k.replace('producer', 'consumer')] /
                                                              consumer_node_abs_share)
                                                         max_constraints[k] = min_constraints[k]
-                                        else:  # no cross-subsidy, non-full-line manufacturer, possible epsilon discrepancy
+                                        else:
+                                            # no cross-subsidy, non-full-line manufacturer, possible epsilon discrepancy
                                             locked_consumer_shares = True
                                             max_constraints = min_constraints
 
@@ -811,7 +813,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
             search_iteration += 1
 
-            continue_search = (share_range > omega_globals.options.producer_compliance_search_min_share_range) # RV
+            continue_search = (share_range > omega_globals.options.producer_compliance_search_min_share_range)  # RV
 
     if producer_compliance_possible is not None:
         if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
@@ -1435,10 +1437,13 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
 
     cost_name = 'total_generalized_cost_dollars'
 
-    if production_options['total_generalized_cost_dollars'].max() != production_options['total_generalized_cost_dollars'].min():
+    if production_options['total_generalized_cost_dollars'].max() != \
+            production_options['total_generalized_cost_dollars'].min():
         production_options['normalized_total_generalized_cost_dollars'] = \
-            ((production_options['total_generalized_cost_dollars'] - production_options['total_generalized_cost_dollars'].min()) /
-             (production_options['total_generalized_cost_dollars'].max() - production_options['total_generalized_cost_dollars'].min()))
+            ((production_options['total_generalized_cost_dollars'] -
+              production_options['total_generalized_cost_dollars'].min()) /
+             (production_options['total_generalized_cost_dollars'].max() -
+              production_options['total_generalized_cost_dollars'].min()))
     else:
         production_options['normalized_total_generalized_cost_dollars'] = 0
 
@@ -1453,7 +1458,8 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
     mini_df['total_cost_dollars'] = production_options['total_cost_dollars']
     mini_df['total_generalized_cost_dollars'] = production_options['total_generalized_cost_dollars']
     mini_df['strategic_compliance_ratio'] = production_options['strategic_compliance_ratio']
-    mini_df['normalized_total_generalized_cost_dollars'] = production_options['normalized_total_generalized_cost_dollars']
+    mini_df['normalized_total_generalized_cost_dollars'] = \
+        production_options['normalized_total_generalized_cost_dollars']
 
     if search_iteration == 0:
         prior_most_strategic_compliant_tech_share_option = None

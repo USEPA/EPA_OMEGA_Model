@@ -145,10 +145,12 @@ Data Column Name and Description
         Technology flag for battery electric vehicle (1 = Equipped, 0 = Not equipped)
 
     :deac_pd:
-        Technology flag for cylinder deactivation, discrete operation of partial number of cylinders (1 = Equipped, 0 = Not equipped)
+        Technology flag for cylinder deactivation, discrete operation of partial number of cylinders
+        (1 = Equipped, 0 = Not equipped)
 
     :deac_fc:
-        Technology flag for cylinder deactivation, continuosly variable operation of full number of cylinders (1 = Equipped, 0 = Not equipped)
+        Technology flag for cylinder deactivation, continuosly variable operation of full number of cylinders
+        (1 = Equipped, 0 = Not equipped)
 
     :cegr:
         Technology flag for cooled exhaust gas recirculation (1 = Equipped, 0 = Not equipped)
