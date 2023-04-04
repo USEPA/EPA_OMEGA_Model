@@ -167,10 +167,10 @@ Data Column Name and Description
     :turb11:
         Technology flag for turbocharged engine, 18-21bar 1st generation (1 = Equipped, 0 = Not equipped)
 
-    :gas_fuel
+    :gas_fuel:
         Technology flag for gasoline-fueled engine (1 = Equipped, 0 = Not equipped)
 
-    :diesel_fuel
+    :diesel_fuel:
         Technology flag for diesel-fueled engine (1 = Equipped, 0 = Not equipped)
 
     :awd:
