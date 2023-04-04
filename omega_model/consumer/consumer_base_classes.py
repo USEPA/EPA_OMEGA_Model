@@ -202,7 +202,8 @@ class MarketClassBase:
         Args:
             market_class_list ([strs]): list of dot-separted market class names e.g. ['hauling.BEV', 'hauling.ICE'] etc
             market_class_dict (dict, dict of dicts): recursive input and also the output data structure
-            by_reg_class (bool): if true then leaves are lists in reg class dicts, otherwise leaves are lists by market segment
+            by_reg_class (bool): if true then leaves are lists in reg class dicts,
+                otherwise leaves are lists by market segment
 
         Returns:
             Market class tree represented as a dict or dict of dicts, with an empty list at each leaf.
@@ -237,7 +238,8 @@ class MarketClassBase:
             else:
                 if prefix in market_class_dict:
                     # update existing dictionary
-                    MarketClassBase.parse_market_classes(suffix, market_class_dict=market_class_dict[prefix], by_reg_class=by_reg_class)
+                    MarketClassBase.parse_market_classes(suffix, market_class_dict=market_class_dict[prefix],
+                                                         by_reg_class=by_reg_class)
                 else:
                     # new entry, create dictionary
                     market_class_dict[prefix] = MarketClassBase.parse_market_classes(suffix, by_reg_class=by_reg_class)
@@ -247,8 +249,8 @@ class MarketClassBase:
     @staticmethod
     def populate_market_classes(market_class_dict, market_class_id, obj):
         """
-        Populate the leaves of a market class tree implemented as a dict (or dict of dicts) where the keys represent market
-        categories and the leaves are lists of objects grouped by market class.
+        Populate the leaves of a market class tree implemented as a dict (or dict of dicts) where the keys
+        represent market categories and the leaves are lists of objects grouped by market class.
 
         Args:
             market_class_dict (dict): dict of dicts of market classes

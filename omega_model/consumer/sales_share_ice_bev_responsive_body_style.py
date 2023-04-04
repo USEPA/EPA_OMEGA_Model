@@ -329,33 +329,75 @@ class SalesShare(OMEGABase, SalesShareBase):
         y_hat_prior = SalesShare._data['y_hat_%s_%s' % (body_style, calendar_year - 1)]
         price = producer_decision['average_new_vehicle_mfr_cost_%s' % body_style]
         footprint = producer_decision['average_footprint_ft2_%s' % body_style]
-        gasoline_dollars_per_gallon = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'pump gasoline')
-        electricity_dollars_per_kwh = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'US electricity')
-        carbon_intensity_gasoline = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline', 'direct_co2e_grams_per_unit')
-        gasoline_cpm = gasoline_dollars_per_gallon * producer_decision['average_onroad_direct_co2e_gpmi_%s' % body_style + '.ICE'] / carbon_intensity_gasoline
-        electricity_cpm = electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_%s' % body_style + '.ICE']
+        gasoline_dollars_per_gallon = \
+            FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'pump gasoline')
+        electricity_dollars_per_kwh = \
+            FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'US electricity')
+        carbon_intensity_gasoline = \
+            OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline', 'direct_co2e_grams_per_unit')
+        gasoline_cpm = \
+            gasoline_dollars_per_gallon * \
+            producer_decision['average_onroad_direct_co2e_gpmi_%s' % body_style + '.ICE'] / carbon_intensity_gasoline
+        electricity_cpm = \
+            electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_%s' % body_style + '.ICE']
         cpm = gasoline_cpm + electricity_cpm  # only includes ICE vehicle cpm, consistent with original regression
-        hpwt = producer_decision['average_rated_hp_%s' % body_style + '.ICE'] / producer_decision['average_curbweight_lbs_%s' % body_style + '.ICE']  # ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
 
-        gasoline_cpm_sedan_wagon = gasoline_dollars_per_gallon * producer_decision['average_onroad_direct_co2e_gpmi_sedan_wagon.ICE'] / carbon_intensity_gasoline
-        electricity_cpm_sedan_wagon = electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_sedan_wagon.ICE']
-        cpm_sedan_wagon = gasoline_cpm_sedan_wagon + electricity_cpm_sedan_wagon  # only includes ICE vehicle cpm, consistent with original regression
-        hpwt_sedan_wagon = producer_decision['average_rated_hp_sedan_wagon.ICE'] / producer_decision['average_curbweight_lbs_sedan_wagon.ICE']  # ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
+        # hpwt ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
+        hpwt = producer_decision['average_rated_hp_%s' % body_style + '.ICE'] / \
+               producer_decision['average_curbweight_lbs_%s' % body_style + '.ICE']
 
-        gasoline_cpm_cuv_suv_van = gasoline_dollars_per_gallon * producer_decision['average_onroad_direct_co2e_gpmi_cuv_suv_van.ICE'] / carbon_intensity_gasoline
-        electricity_cpm_cuv_suv_van = electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_cuv_suv_van.ICE']
-        cpm_cuv_suv_van = gasoline_cpm_cuv_suv_van + electricity_cpm_cuv_suv_van  # only includes ICE vehicle cpm, consistent with original regression
-        hpwt_cuv_suv_van = producer_decision['average_rated_hp_cuv_suv_van.ICE'] / producer_decision['average_curbweight_lbs_cuv_suv_van.ICE']  # ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
+        gasoline_cpm_sedan_wagon = \
+            gasoline_dollars_per_gallon * \
+            producer_decision['average_onroad_direct_co2e_gpmi_sedan_wagon.ICE'] / carbon_intensity_gasoline
+        electricity_cpm_sedan_wagon = \
+            electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_sedan_wagon.ICE']
 
-        gasoline_cpm_pickup = gasoline_dollars_per_gallon * producer_decision['average_onroad_direct_co2e_gpmi_pickup.ICE'] / carbon_intensity_gasoline
-        electricity_cpm_pickup = electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_pickup.ICE']
-        cpm_pickup = gasoline_cpm_pickup + electricity_cpm_pickup  # only includes ICE vehicle cpm, consistent with original regression
-        hpwt_pickup = producer_decision['average_rated_hp_pickup.ICE'] / producer_decision['average_curbweight_lbs_pickup.ICE']  # ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
+        # cpm_sedan_wagon only includes ICE vehicle cpm, consistent with original regression
+        cpm_sedan_wagon = gasoline_cpm_sedan_wagon + electricity_cpm_sedan_wagon
+        # hpwt_sedan_wagon ICE only. BEV hp values would be needed for meaningful
+        # power-to-weight values over all vehicles
+        hpwt_sedan_wagon = producer_decision['average_rated_hp_sedan_wagon.ICE'] / \
+                           producer_decision['average_curbweight_lbs_sedan_wagon.ICE']
 
-        geometric_mean_price = np.exp(np.average([math.log(producer_decision['average_new_vehicle_mfr_cost_sedan_wagon']), math.log(producer_decision['average_new_vehicle_mfr_cost_cuv_suv_van']), math.log(producer_decision['average_new_vehicle_mfr_cost_pickup'])]))
-        geometric_mean_footprint = np.exp(np.average([math.log(producer_decision['average_footprint_ft2_sedan_wagon']), math.log(producer_decision['average_footprint_ft2_cuv_suv_van']), math.log(producer_decision['average_footprint_ft2_pickup'])]))
-        geometric_mean_cpm = np.exp(np.average([math.log(cpm_sedan_wagon), math.log(cpm_cuv_suv_van), math.log(cpm_pickup)]))
-        geometric_mean_hpwt = np.exp(np.average([math.log(hpwt_sedan_wagon), math.log(hpwt_cuv_suv_van), math.log(hpwt_pickup)]))
+        gasoline_cpm_cuv_suv_van = \
+            gasoline_dollars_per_gallon * \
+            producer_decision['average_onroad_direct_co2e_gpmi_cuv_suv_van.ICE'] / carbon_intensity_gasoline
+        electricity_cpm_cuv_suv_van = \
+            electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_cuv_suv_van.ICE']
+        # cpm_cuv_suv_van only includes ICE vehicle cpm, consistent with original regression
+        cpm_cuv_suv_van = gasoline_cpm_cuv_suv_van + electricity_cpm_cuv_suv_van
+        # hpwt_cuv_suv_van ICE only. BEV hp values would be needed for
+        # meaningful power-to-weight values over all vehicles
+        hpwt_cuv_suv_van = \
+            producer_decision['average_rated_hp_cuv_suv_van.ICE'] / \
+            producer_decision['average_curbweight_lbs_cuv_suv_van.ICE']
+
+        gasoline_cpm_pickup = \
+            gasoline_dollars_per_gallon * \
+            producer_decision['average_onroad_direct_co2e_gpmi_pickup.ICE'] / carbon_intensity_gasoline
+        electricity_cpm_pickup = \
+            electricity_dollars_per_kwh * producer_decision['average_onroad_direct_kwh_pmi_pickup.ICE']
+        # cpm_pickup only includes ICE vehicle cpm, consistent with original regression
+        cpm_pickup = gasoline_cpm_pickup + electricity_cpm_pickup
+        # hpwt_pickup ICE only. BEV hp values would be needed for meaningful power-to-weight values over all vehicles
+        hpwt_pickup = \
+            producer_decision['average_rated_hp_pickup.ICE'] / \
+            producer_decision['average_curbweight_lbs_pickup.ICE']
+
+        geometric_mean_price = \
+            np.exp(np.average([math.log(producer_decision['average_new_vehicle_mfr_cost_sedan_wagon']),
+                               math.log(producer_decision['average_new_vehicle_mfr_cost_cuv_suv_van']),
+                               math.log(producer_decision['average_new_vehicle_mfr_cost_pickup'])]))
+
+        geometric_mean_footprint = \
+            np.exp(np.average([math.log(producer_decision['average_footprint_ft2_sedan_wagon']),
+                               math.log(producer_decision['average_footprint_ft2_cuv_suv_van']),
+                               math.log(producer_decision['average_footprint_ft2_pickup'])]))
+        geometric_mean_cpm = \
+            np.exp(np.average([math.log(cpm_sedan_wagon), math.log(cpm_cuv_suv_van), math.log(cpm_pickup)]))
+
+        geometric_mean_hpwt = \
+            np.exp(np.average([math.log(hpwt_sedan_wagon), math.log(hpwt_cuv_suv_van), math.log(hpwt_pickup)]))
 
         y_hat = (dfs_coeffs.Constant +
                  dfs_coeffs.Xprice * math.log(price / geometric_mean_price) +
@@ -520,9 +562,14 @@ class SalesShare(OMEGABase, SalesShareBase):
             else:
                 SalesShare._calibration_data[calibration_key][calendar_year] = 0
 
-        analysis_sedan_wagon_share *= SalesShare._calibration_data['%s_sedan_wagon_calibration' % compliance_id][calendar_year]
-        analysis_cuv_suv_van_share *= SalesShare._calibration_data['%s_cuv_suv_van_calibration' % compliance_id][calendar_year]
-        analysis_pickup_share *= SalesShare._calibration_data['%s_pickup_calibration' % compliance_id][calendar_year]
+        analysis_sedan_wagon_share *= \
+            SalesShare._calibration_data['%s_sedan_wagon_calibration' % compliance_id][calendar_year]
+
+        analysis_cuv_suv_van_share *= \
+            SalesShare._calibration_data['%s_cuv_suv_van_calibration' % compliance_id][calendar_year]
+
+        analysis_pickup_share *= \
+            SalesShare._calibration_data['%s_pickup_calibration' % compliance_id][calendar_year]
 
         total_corrected_share = analysis_sedan_wagon_share + analysis_cuv_suv_van_share + analysis_pickup_share
 
@@ -573,7 +620,8 @@ class SalesShare(OMEGABase, SalesShareBase):
 
                 for alt in ['ALT', 'NO_ALT']:
                     only_child = mc_pair[0] + '.' + alt
-                    market_class_data['consumer_share_frac_%s' % only_child] = 1.0 * max_constraints['producer_abs_share_frac_%s' % only_child]
+                    market_class_data['consumer_share_frac_%s' % only_child] = \
+                        1.0 * max_constraints['producer_abs_share_frac_%s' % only_child]
                     market_class_data['consumer_abs_share_frac_%s' % only_child] = \
                         parent_share * max_constraints['producer_abs_share_frac_%s' % only_child]
 
@@ -666,7 +714,8 @@ class SalesShare(OMEGABase, SalesShareBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             validation_dict = {'market_class_id': omega_globals.options.MarketClass.market_classes}

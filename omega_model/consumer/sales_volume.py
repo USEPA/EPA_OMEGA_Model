@@ -184,7 +184,8 @@ if __name__ == '__main__':
                                                           verbose=omega_globals.options.verbose)
         init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)
-        init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file, verbose=omega_globals.options.verbose)
+        init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
+                                               verbose=omega_globals.options.verbose)
 
         init_fail += omega_globals.options.SalesShare.init_from_file(omega_globals.options.sales_share_file,
                                                                      verbose=omega_globals.options.verbose)
