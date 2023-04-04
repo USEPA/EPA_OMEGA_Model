@@ -199,8 +199,10 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=True):
             x_sign = 1
 
         # normalize data (helps with up-slope frontier)
-        cloud['y_norm'] = (cloud[y_key].values - cloud[y_key].values.min()) / (cloud[y_key].values.max() - cloud[y_key].values.min())
-        cloud['x_norm'] = x_sign * (cloud[x_key].values - cloud[x_key].values.min()) / (cloud[x_key].values.max() - cloud[x_key].values.min())
+        cloud['y_norm'] = ((cloud[y_key].values - cloud[y_key].values.min()) /
+                          (cloud[y_key].values.max() - cloud[y_key].values.min()))
+        cloud['x_norm'] = x_sign * ((cloud[x_key].values - cloud[x_key].values.min()) /
+                          (cloud[x_key].values.max() - cloud[x_key].values.min()))
 
         x_key = 'x_norm'
         y_key = 'y_norm'
@@ -773,8 +775,9 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
                 if min_val == max_val:
                     shares = np.append(shares, ASTM_round(val, machine_resolution))
                 else:
+                    # create new share spread and include previous value
                     shares = np.append(np.append(shares, np.linspace(min_val, max_val, num_steps)),
-                                       ASTM_round(val, machine_resolution))  # create new share spread and include previous value
+                                       ASTM_round(val, machine_resolution))
             dfs.append(pd.DataFrame({k: np.unique(shares)}))
 
         dfx = pd.DataFrame()
@@ -782,7 +785,7 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
             dfx = cartesian_prod(dfx, df)
 
         dfx = dfx[dfx.sum(axis=1).values <= 1]
-        dfx.loc[:, columns[-1]] = np.maximum(0.0, 1 - dfx.sum(axis=1).values)  # using ".loc" in combination with dfx2 prevents errors
+        dfx.loc[:, columns[-1]] = np.maximum(0.0, 1 - dfx.sum(axis=1).values)
 
         if dfx.empty:
             raise Exception('empty partition!! :(')
