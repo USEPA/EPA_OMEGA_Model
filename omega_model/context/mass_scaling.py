@@ -11,7 +11,8 @@ Mass scaling equations are defined by a mass term, a condition expression and eq
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
-The data represents vehicle mass scaling equations as a function of user-definable vehicle attributes or other conditions
+The data represents vehicle mass scaling equations as a function of user-definable vehicle attributes
+or other conditions
 
 File Type
     comma-separated values (CSV)

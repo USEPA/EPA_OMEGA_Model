@@ -91,7 +91,8 @@ class ImplictPriceDeflators(OMEGABase):
             dollar_basis_input (int): the dollar basis of the input value.
 
         Returns:
-            The multiplicative factor that can be applied to a cost in dollar_basis_input to express that value in analysis_dollar_basis.
+            The multiplicative factor that can be applied to a cost in dollar_basis_input to express that
+            value in analysis_dollar_basis.
 
         """
         analysis_basis = omega_globals.options.analysis_dollar_basis
@@ -135,7 +136,8 @@ class ImplictPriceDeflators(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
             if not template_errors:
                 ImplictPriceDeflators._data = df.set_index('calendar_year').to_dict(orient='index')
