@@ -228,11 +228,12 @@ class CostCloud(OMEGABase, CostCloudBase):
             omega_log.logwrite('\nInitializing CostCloud from %s...' % filename)
         input_template_name = __name__
         input_template_version = 0.21
+        # TODO: move phev flag to phev rse only when it gets its own init:
         input_template_columns = {'cost_curve_class', 'engine_displacement_L', 'engine_cylinders', 'hev_motor_kw',
                                   'hev_batt_kwh', 'unibody', 'high_eff_alternator', 'start_stop', 'mhev', 'hev',
-                                  'hev_truck', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11', 'gas_fuel',
-                                  'diesel_fuel', 'awd', 'fwd', 'trx10', 'trx11', 'trx12', 'trx21', 'trx22', 'ecvt',
-                                  'ice', 'fcv', 'phev'}  # TODO: move phev flag to phev rse only when it gets its own init
+                                  'hev_truck', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11',
+                                  'gas_fuel', 'diesel_fuel', 'awd', 'fwd', 'trx10', 'trx11', 'trx12', 'trx21', 'trx22',
+                                  'ecvt', 'ice', 'fcv', 'phev'}
 
         # input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -252,7 +253,8 @@ class CostCloud(OMEGABase, CostCloudBase):
                 template_errors.append('Invalid drive cycle column in %s' % filename)
 
             if not template_errors:
-                # RSE columns are the drive cycle columns + the displacement, cylinder count, hev motor kW and hev battery kWh columns
+                # RSE columns are the drive cycle columns + the displacement, cylinder count,
+                # hev motor kW and hev battery kWh columns
                 rse_columns = drive_cycle_columns
                 rse_columns.update(['engine_displacement_L', 'engine_cylinders', 'hev_motor_kw', 'hev_batt_kwh'])
 
@@ -267,10 +269,12 @@ class CostCloud(OMEGABase, CostCloudBase):
                 # for each cost curve class
                 for cost_curve_class in cost_curve_classes:
                     class_cloud = df[df['cost_curve_class'] == cost_curve_class].iloc[0]
-                    _cache[powertrain_type][cost_curve_class] = {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
+                    _cache[powertrain_type][cost_curve_class] = \
+                        {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
 
                     for c in rse_columns:
-                        _cache[powertrain_type][cost_curve_class]['rse'][c] = compile(str(class_cloud[c]), '<string>', 'eval')
+                        _cache[powertrain_type][cost_curve_class]['rse'][c] = \
+                            compile(str(class_cloud[c]), '<string>', 'eval')
 
                     rse_tuple = (sorted(rse_columns), tuple(class_cloud[sorted(rse_columns)]))
 
@@ -339,10 +343,12 @@ class CostCloud(OMEGABase, CostCloudBase):
                 # for each cost curve class
                 for cost_curve_class in cost_curve_classes:
                     class_cloud = df[df['cost_curve_class'] == cost_curve_class].iloc[0]
-                    _cache[powertrain_type][cost_curve_class] = {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
+                    _cache[powertrain_type][cost_curve_class] = \
+                        {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
 
                     for c in rse_columns:
-                        _cache[powertrain_type][cost_curve_class]['rse'][c] = compile(str(class_cloud[c]), '<string>', 'eval')
+                        _cache[powertrain_type][cost_curve_class]['rse'][c] = \
+                            compile(str(class_cloud[c]), '<string>', 'eval')
 
                     rse_tuple = (sorted(rse_columns), tuple(class_cloud[sorted(rse_columns)]))
 
@@ -420,10 +426,12 @@ class CostCloud(OMEGABase, CostCloudBase):
         """
 
         vehicle_rlhp20 = \
-            calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b, vehicle.base_year_target_coef_c, 20)
+            calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b,
+                             vehicle.base_year_target_coef_c, 20)
 
         vehicle_rlhp60 = \
-            calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b, vehicle.base_year_target_coef_c, 60)
+            calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b,
+                             vehicle.base_year_target_coef_c, 60)
 
         if is_up_for_redesign(vehicle):
             # sweep vehicle params
@@ -435,9 +443,10 @@ class CostCloud(OMEGABase, CostCloudBase):
                                  vehicle_rlhp60,
                                  vehicle_rlhp60 * omega_globals.options.rlhp60_max_scaler))
 
-            vehicle_footprints = np.unique((vehicle.base_year_footprint_ft2 * omega_globals.options.footprint_min_scaler,
-                                  vehicle.base_year_footprint_ft2,
-                                  vehicle.base_year_footprint_ft2 * omega_globals.options.footprint_max_scaler))
+            vehicle_footprints = \
+                np.unique((vehicle.base_year_footprint_ft2 * omega_globals.options.footprint_min_scaler,
+                           vehicle.base_year_footprint_ft2,
+                           vehicle.base_year_footprint_ft2 * omega_globals.options.footprint_max_scaler))
 
             structure_materials = MassScaling.structure_materials
 
@@ -519,7 +528,8 @@ class CostCloud(OMEGABase, CostCloudBase):
                                                              delta_glider_non_structure_mass_lbs,
                                                              powertrain_mass_lbs, structure_mass_lbs, battery_mass_lbs))
 
-                                vehicle_ballast = DriveCycleBallast.get_ballast_lbs(vehicle)  # f(curbweight_lbs) for medium-duty
+                                # vehicle ballast is f(curbweight_lbs) for medium-duty:
+                                vehicle_ballast = DriveCycleBallast.get_ballast_lbs(vehicle)
 
                                 rated_hp = vehicle.curbweight_lbs / vehicle.base_year_curbweight_lbs_to_hp
 
@@ -596,9 +606,11 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 cloud_point['vehicle_base_year_id'] = vehicle.base_year_vehicle_id
                                 cloud_point['vehicle_name'] = vehicle.name
                                 cloud_point['model_year'] = vehicle.model_year
-                                cloud_point['delta_glider_non_structure_mass_lbs'] = delta_glider_non_structure_mass_lbs
+                                cloud_point['delta_glider_non_structure_mass_lbs'] = \
+                                    delta_glider_non_structure_mass_lbs
                                 cloud_point['glider_non_structure_mass_lbs'] = \
-                                    vehicle.base_year_glider_non_structure_mass_lbs + delta_glider_non_structure_mass_lbs
+                                    vehicle.base_year_glider_non_structure_mass_lbs + \
+                                    delta_glider_non_structure_mass_lbs
                                 cloud_point['battery_mass_lbs'] = battery_mass_lbs
                                 cloud_point['powertrain_mass_lbs'] = powertrain_mass_lbs
                                 cloud_point['etw_lbs'] = ETW
@@ -608,8 +620,9 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 cloud_point['rlhp60'] = rlhp60
 
                             # add powertrain costs
-                            powertrain_costs = PowertrainCost.calc_cost(vehicle, cloud_point,
-                                                                       cloud_point['powertrain_type'])  # includes battery cost
+                            powertrain_costs = \
+                                PowertrainCost.calc_cost(vehicle, cloud_point,
+                                                         cloud_point['powertrain_type'])  # includes battery cost
                             powertrain_cost_terms = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
                                                      'electrified_driveline_cost']
                             for idx, ct in enumerate(powertrain_cost_terms):
@@ -619,7 +632,8 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         cost_cloud = pd.DataFrame(cloud_points)
 
-        glider_costs = GliderCost.calc_cost(vehicle, cost_cloud)  # includes structure_cost and glider_non_structure_cost
+        glider_costs = \
+            GliderCost.calc_cost(vehicle, cost_cloud)  # includes structure_cost and glider_non_structure_cost
 
         glider_cost_terms = ['structure_cost', 'glider_non_structure_cost']
         for idx, ct in enumerate(glider_cost_terms):
