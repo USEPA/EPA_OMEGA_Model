@@ -1,6 +1,6 @@
 """
 
-**Routines to powertrain cost.**
+**Routines to calculate powertrain cost.**
 
 ----
 
