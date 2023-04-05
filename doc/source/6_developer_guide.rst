@@ -126,19 +126,10 @@ Will produce output such as:
     Running OMEGA Demo:  Year=2021  Iteration=0
     Running OMEGA Demo:  Year=2021  Iteration=1
 
-    Calculating tech volumes and shares
-    Saving out/OMEGA Demo_tech_tracking.csv
-
-    Calculating physical effects
-
-    Calculating cost effects
-
-    Discounting costs
-    Saving out/OMEGA Demo_cost_effects.csv
-    Saving out/OMEGA Demo_physical_effects.csv
+    ...
 
     Session ended at 2021-10-18 16:27:10
-    Session elapsed time 17.47 seconds
+    Session elapsed time xxx.yy seconds
 
 The primary use case for running ``omega.py`` directly is just to confirm the installation or perhaps when it's simpler to debug code without the overhead of the batch process.
 
