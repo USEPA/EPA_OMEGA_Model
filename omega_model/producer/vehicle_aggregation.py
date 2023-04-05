@@ -293,7 +293,7 @@ class VehicleAggregation(OMEGABase):
         from context.powertrain_cost import PowertrainCost
         from policy.workfactor_definition import WorkFactor
 
-        omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
+        # omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
 
         input_template_name = 'vehicles'
         input_template_version = 0.49
@@ -395,7 +395,7 @@ class VehicleAggregation(OMEGABase):
 
             import time
             start_time = time.time()
-            print('starting iterrows')
+            # print('starting iterrows')
 
             df['base_year_footprint_ft2'] = df['footprint_ft2']
 
@@ -471,7 +471,7 @@ class VehicleAggregation(OMEGABase):
             df['glider_non_structure_mass_lbs'] = df['curbweight_lbs'] - df['powertrain_mass_lbs'] \
                                                   - df['structure_mass_lbs'] - df['battery_mass_lbs']
 
-            print('done %.2f' % (time.time() - start_time))
+            # print('done %.2f' % (time.time() - start_time))
 
             df.to_csv(omega_globals.options.output_folder + 'costed_vehicles.csv')
 

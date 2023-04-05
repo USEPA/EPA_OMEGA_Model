@@ -518,7 +518,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                         round_constraints(max_constraints)
 
                         if locked_consumer_shares:
-                            print('%s locked consumer shares' % node_name)
+                            # print('%s locked consumer shares' % node_name)
                             node_partition = pd.DataFrame.from_dict([min_constraints])
                         else:
                             node_partition = partition(abs_share_column_names,
@@ -924,7 +924,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
             for new_veh in manufacturer_vehicles:
                 calc_vehicle_frontier(new_veh)
 
-        print('Created manufacturer_vehicles %.20f' % (time.time() - start_time))
+        # print('Created manufacturer_vehicles %.20f' % (time.time() - start_time))
 
         alt_vehs = [new_veh for new_veh in manufacturer_vehicles if not new_veh.base_year_product]
         byp_vehs = [new_veh for new_veh in manufacturer_vehicles if new_veh.base_year_product]
@@ -1071,7 +1071,8 @@ def create_composite_vehicles(calendar_year, compliance_id):
             for mc, rc, alt, _ in mcrc_priority_list:
                 composite_vehicles.append(calc_composite_vehicle(mc, rc, alt, mctrc))
 
-        print('Composite Vehicles Elapsed Time %f' % (time.time() - start_time))
+        # print('Composite Vehicles Elapsed Time %f' % (time.time() - start_time))
+
         # get empty market class tree
         market_class_tree = omega_globals.options.MarketClass.get_market_class_tree()
 

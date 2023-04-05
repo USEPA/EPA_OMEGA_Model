@@ -1719,7 +1719,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
                     [r.get() for r in results]
 
-                    print('Elapsed init time = %f' % (time.time() - start_time))
+                    # print('Elapsed init time = %f' % (time.time() - start_time))
 
                 omega_log.logwrite("Running %s:" % omega_globals.options.session_unique_name)
 
