@@ -107,29 +107,23 @@ Will produce output such as:
 
     ...
 
-    Initializing OMEGA Demo:
+    Initializing OMEGA Quick Test:
     importing XYZ.py
 
     ...
 
-    Running OMEGA Demo:
+    Running OMEGA Quick Test:
 
-    Running OMEGA Demo: Manufacturer=OEM_B
-    Running OMEGA Demo:  Year=2020  Iteration=0
-    Running OMEGA Demo:  Year=2020  Iteration=1
-    Running OMEGA Demo:  Year=2021  Iteration=0
-    Running OMEGA Demo:  Year=2021  Iteration=1
+    Running OMEGA Quick Test Pass 0: Manufacturer=consolidated_OEM
+    Running OMEGA Quick Test:  Year=2020  Iteration=0 consolidated_OEM
+    Running OMEGA Quick Test:  Year=2020  Iteration=1 consolidated_OEM
+    Running OMEGA Quick Test:  Year=2020  Iteration=2 consolidated_OEM
+    Running OMEGA Quick Test:  Year=2021  Iteration=0 consolidated_OEM
+    Running OMEGA Quick Test:  Year=2021  Iteration=1 consolidated_OEM
+    Running OMEGA Quick Test:  Year=2021  Iteration=2 consolidated_OEM
 
-    Running OMEGA Demo: Manufacturer=OEM_A
-    Running OMEGA Demo:  Year=2020  Iteration=0
-    Running OMEGA Demo:  Year=2020  Iteration=1
-    Running OMEGA Demo:  Year=2021  Iteration=0
-    Running OMEGA Demo:  Year=2021  Iteration=1
-
-    ...
-
-    Session ended at 2021-10-18 16:27:10
-    Session elapsed time xxx.yy seconds
+    Session ended at 2023-04-05 11:38:00
+    Session elapsed time 120.56 seconds
 
 The primary use case for running ``omega.py`` directly is just to confirm the installation or perhaps when it's simpler to debug code without the overhead of the batch process.
 
