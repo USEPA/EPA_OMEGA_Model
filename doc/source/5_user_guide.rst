@@ -106,7 +106,7 @@ Typical Command Line Usage (not all available command-line options shown)
                             Path to batch definition file
 
       --ui_batch_file
-                            Select batch file from UI
+                            Select batch file from dialog box
 
       --session_num SESSION_NUM
                             ID # of session to run from batch

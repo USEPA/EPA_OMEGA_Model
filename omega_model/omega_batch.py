@@ -1536,7 +1536,7 @@ if __name__ == '__main__':
     parser.add_argument('--no_bundle', action='store_true',
                         help='Do NOT gather and copy all source files to bundle_path')
     parser.add_argument('--batch_file', type=str, help='Path to batch definition file')
-    parser.add_argument('--ui_batch_file', action='store_true', help='Select batch file from UI')
+    parser.add_argument('--ui_batch_file', action='store_true', help='Select batch file from dialog box')
     parser.add_argument('--session_num', type=int, help='ID # of session to run from batch')
     parser.add_argument('--analysis_final_year', type=int, help='Override analysis final year')
     parser.add_argument('--calc_effects', type=str,
