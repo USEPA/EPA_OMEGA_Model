@@ -127,7 +127,7 @@ class RefuelingCost:
 
         """
         locals_dict = locals()
-
+        locals_dict['range'] = bev_range
         if bev_range <= 200:
             charge_rate = eval(self._data['under_200', 'miles_per_hour_charge_rate']['value'], {}, locals_dict)
         else:
