@@ -285,7 +285,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
             credit_banks[compliance_id].update_credit_age(calendar_year)
 
-            if manufacturer_annual_data_table is None:
+            if manufacturer_annual_data_table is None or omega_globals.options.credit_market_efficiency == 0.0:
                 # strategy: use credits and pay debits over their remaining lifetime, instead of all at once:
                 strategic_target_offset_Mg = 0
                 current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
