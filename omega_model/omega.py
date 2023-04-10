@@ -290,8 +290,8 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                 strategic_target_offset_Mg = 0
                 current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
                 for c in current_credits + current_debits:
-                    if c.model_year < omega_globals.options.analysis_initial_year:
-                        # allow strategic under-compliance for historical credits
+                    if c.model_year < omega_globals.options.analysis_initial_year and omega_globals.options.credit_market_efficiency != 0.0:
+                        # allow strategic under-compliance for historical credits if CME != 0.0
                         strategic_target_offset_Mg += \
                             c.remaining_balance_Mg * (1 / max(1, c.remaining_years - 1))
                     else:
