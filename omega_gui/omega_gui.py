@@ -130,11 +130,11 @@ class Form(QObject):
         self.window.action_documentation.triggered.connect(self.launch_documentation)
         self.window.epa_button.clicked.connect(self.launch_epa_website)
         self.window.action_about_omega.triggered.connect(self.launch_about)
-        self.window.multiprocessor_help_button.clicked.connect(self.launch_about_multiprocessor)
-        self.window.multiprocessor_checkbox.clicked.connect(self.multiprocessor_mode)
-        self.window.open_plot_2.clicked.connect(self.open_plot_2)
-        self.window.select_plot_2.clicked.connect(self.select_plot_2)
-        self.window.select_plot_3.clicked.connect(self.select_plot_3)
+        # self.window.multiprocessor_help_button.clicked.connect(self.launch_about_multiprocessor)
+        # self.window.multiprocessor_checkbox.clicked.connect(self.multiprocessor_mode)
+        # self.window.open_plot_2.clicked.connect(self.open_plot_2)
+        # self.window.select_plot_2.clicked.connect(self.select_plot_2)
+        # self.window.select_plot_3.clicked.connect(self.select_plot_3)
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
         # Show gui
@@ -161,9 +161,9 @@ class Form(QObject):
         # self.enable_run_button(False)
         self.window.select_input_batch_file_button.setIcon(QIcon(input_batch_file_button_image))
         self.window.select_output_batch_directory_button.setIcon(QIcon(output_batch_directory_button_image))
-        self.window.results_comment.setPlainText('Feature Under Development\n'
-                                                 'See Batch Output Directory Session Folders for Outputs')
-        self.window.results_comment.setStyleSheet(development_stylesheet())
+        # self.window.results_comment.setPlainText('Feature Under Development\n'
+        #                                          'See Batch Output Directory Session Folders for Outputs')
+        # self.window.results_comment.setStyleSheet(development_stylesheet())
 
         # Load stylesheet for tab control
         stylesheet = tab_stylesheet()
@@ -182,10 +182,10 @@ class Form(QObject):
         self.window.select_input_batch_file_button.setStyleSheet(stylesheet)
         self.window.select_output_batch_directory_button.setStyleSheet(stylesheet)
         self.window.run_model_button.setStyleSheet(stylesheet)
-        self.window.open_plot_2.setStyleSheet(stylesheet)
-        self.window.select_plot_2.setStyleSheet(stylesheet)
-        self.window.select_plot_3.setStyleSheet(stylesheet)
-        self.window.multiprocessor_help_button.setStyleSheet(stylesheet)
+        # self.window.open_plot_2.setStyleSheet(stylesheet)
+        # self.window.select_plot_2.setStyleSheet(stylesheet)
+        # self.window.select_plot_3.setStyleSheet(stylesheet)
+        # self.window.multiprocessor_help_button.setStyleSheet(stylesheet)
 
         # Load stylesheet for text boxes
         stylesheet = textbox_stylesheet()
@@ -197,8 +197,8 @@ class Form(QObject):
 
         # Load stylesheet for list boxes
         stylesheet = listbox_stylesheet()
-        self.window.list_graphs_1.setStyleSheet(stylesheet)
-        self.window.list_graphs_2.setStyleSheet(stylesheet)
+        # self.window.list_graphs_1.setStyleSheet(stylesheet)
+        # self.window.list_graphs_2.setStyleSheet(stylesheet)
 
         # Load stylesheet for logo buttons
         stylesheet = logo_button_stylesheet()
@@ -213,13 +213,13 @@ class Form(QObject):
         self.window.main_title_1_label.setStyleSheet(stylesheet)
         self.window.event_monitor_label.setStyleSheet(stylesheet)
         self.window.model_status_label.setStyleSheet(stylesheet)
-        self.window.available_plots_1_label_2.setStyleSheet(stylesheet)
-        self.window.available_plots_1_label_3.setStyleSheet(stylesheet)
+        # self.window.available_plots_1_label_2.setStyleSheet(stylesheet)
+        # self.window.available_plots_1_label_3.setStyleSheet(stylesheet)
         self.window.intro_label.setStyleSheet(stylesheet)
 
         # Load stylesheet for checkboxes
         stylesheet = checkbox_stylesheet()
-        self.window.multiprocessor_checkbox.setStyleSheet(stylesheet)
+        # self.window.multiprocessor_checkbox.setStyleSheet(stylesheet)
 
         # Timer start
         timer.start()
@@ -688,7 +688,7 @@ class Form(QObject):
                 "----------"
             self.event_monitor(message, 'black', '')
         else:
-            self.window.multiprocessor_checkbox.setEnabled(0)  # Disable multiprocessor checkbox if not running
+            # self.window.multiprocessor_checkbox.setEnabled(0)  # Disable multiprocessor checkbox if not running
             message = "Multiprocessor Mode Not Available\n" \
                 "----------"
             self.event_monitor(message, 'black', '')
@@ -713,7 +713,7 @@ class Form(QObject):
         self.window.setWindowTitle("EPA OMEGA Model     Version: " + omega2_version)
 
         self.window.model_status_label.setText("Model Idle")
-        self.window.select_plot_3.setEnabled(0)
+        # self.window.select_plot_3.setEnabled(0)
 
     def clear_entries(self):
         """
