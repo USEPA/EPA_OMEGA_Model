@@ -1,0 +1,5 @@
+input_template_name:,body_styles,input_template_version:,0.1
+body_style_id,description,,
+sedan,Non-pickup / non-crossover / non-sport-utility vehicle,,
+pickup,Pickup truck / body-on-frame vehicle,,
+cuv_suv,Crossover / sport-utility vehicle,,

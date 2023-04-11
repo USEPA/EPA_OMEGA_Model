@@ -1,0 +1,8 @@
+input_template_name:,producer.producer_generalized_cost,input_template_version:,0.1
+market_class_id,fuel_years,annual_vmt,
+sedan_wagon.ICE,5,15000,
+sedan_wagon.BEV,5,15000,
+cuv_suv_van.ICE,5,15000,
+cuv_suv_van.BEV,5,15000,
+pickup.ICE,5,15000,
+pickup.BEV,5,15000,

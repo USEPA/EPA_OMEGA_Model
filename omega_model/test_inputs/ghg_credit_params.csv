@@ -1,0 +1,3 @@
+input_template_name:,ghg_credit_params,input_template_version:,0.2
+start_model_year,credit_carryforward_years,credit_carryback_years,
+2016,5,3,

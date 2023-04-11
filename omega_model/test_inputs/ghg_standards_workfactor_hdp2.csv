@@ -1,0 +1,26 @@
+input_template_name:,policy.targets_workfactor,input_template_version:,0.1,
+reg_class_id,start_year,cert_fuel_id,useful_life_miles,co2_gram_per_mile
+mediumduty,2020,{'gasoline':1.0},120000,0.0440 * workfactor + 339
+mediumduty,2021,{'gasoline':1.0},120000,0.0429 * workfactor + 331
+mediumduty,2022,{'gasoline':1.0},120000,0.0418 * workfactor + 322
+mediumduty,2023,{'gasoline':1.0},120000,0.0408 * workfactor + 314
+mediumduty,2024,{'gasoline':1.0},120000,0.0398 * workfactor + 306
+mediumduty,2025,{'gasoline':1.0},120000,0.0388 * workfactor + 299
+mediumduty,2026,{'gasoline':1.0},120000,0.0378 * workfactor + 291
+mediumduty,2027,{'gasoline':1.0},120000,0.0369 * workfactor + 284
+mediumduty,2020,{'diesel':1.0},120000,0.0416 * workfactor + 320
+mediumduty,2021,{'diesel':1.0},120000,0.0406 * workfactor + 312
+mediumduty,2022,{'diesel':1.0},120000,0.0395 * workfactor + 304
+mediumduty,2023,{'diesel':1.0},120000,0.0386 * workfactor + 297
+mediumduty,2024,{'diesel':1.0},120000,0.0376 * workfactor + 289
+mediumduty,2025,{'diesel':1.0},120000,0.0367 * workfactor + 282
+mediumduty,2026,{'diesel':1.0},120000,0.0357 * workfactor + 275
+mediumduty,2027,{'diesel':1.0},120000,0.0348 * workfactor + 268
+mediumduty,2020,{'electricity':1.0},120000,0.0416 * workfactor + 320
+mediumduty,2021,{'electricity':1.0},120000,0.0406 * workfactor + 312
+mediumduty,2022,{'electricity':1.0},120000,0.0395 * workfactor + 304
+mediumduty,2023,{'electricity':1.0},120000,0.0386 * workfactor + 297
+mediumduty,2024,{'electricity':1.0},120000,0.0376 * workfactor + 289
+mediumduty,2025,{'electricity':1.0},120000,0.0367 * workfactor + 282
+mediumduty,2026,{'electricity':1.0},120000,0.0357 * workfactor + 275
+mediumduty,2027,{'electricity':1.0},120000,0.0348 * workfactor + 268

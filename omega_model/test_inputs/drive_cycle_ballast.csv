@@ -1,0 +1,5 @@
+input_template_name:,drive_cycle_ballast,input_template_version:,0.1
+start_year,reg_class_id,ballast_lbs,
+1974,car,300,
+1974,truck,300,
+1974,mediumduty,(vehicle.gvwr_lbs + vehicle.curbweight_lbs)/2,

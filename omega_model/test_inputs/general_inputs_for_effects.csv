@@ -1,0 +1,13 @@
+input_template_name:,general_inputs_for_effects,input_template_version:,0.1
+item,value,notes,
+kwh_us_annual,3.80E+12, 3802 terrawatt hours electricity consumption in US in 2020 (https://www.eia.gov/energyexplained/electricity/use-of-electricity.php),
+gal_per_bbl,42,gallons per barrel of oil,
+gallons_of_gasoline_us_annual,1.24E+11,"123.73 billion gallons in 2020 (https://www.eia.gov/tools/faqs/faq.php?id=23&t=10#:~:text=In%202020%2C%20about%20123.73%20billion,8.05%20million%20barrels%20per%20day).)",
+bbl_oil_us_annual,6660000000,6.66 billion BBL oil consumption in US in 2020 (https://www.eia.gov/tools/faqs/faq.php?id=33&t=6),
+year_for_compares,2020,,
+e0_in_retail_gasoline,0.9,,
+e0_energy_density_ratio,0.880697154,114200/129670; ratio of E0 to crude oil energy density (BTU/gal) according to GREET 2017,
+diesel_energy_density_ratio,0.998,129488/129670 ratio of diesel to crude oil energy density (BTU/gal) see NTR parameters file,
+grams_per_us_ton,907185,,
+grams_per_metric_ton,1000000,,
+fuel_reduction_leading_to_reduced_domestic_refining,0.07,,

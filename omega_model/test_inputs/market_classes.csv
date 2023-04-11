@@ -1,0 +1,6 @@
+input_template_name:,consumer.market_classes_unibody,input_template_version:,0.32
+market_class_id,fueling_class,ownership_class,
+non_hauling.BEV,BEV,private,
+hauling.BEV,BEV,private,
+non_hauling.ICE,ICE,private,
+hauling.ICE,ICE,private,
