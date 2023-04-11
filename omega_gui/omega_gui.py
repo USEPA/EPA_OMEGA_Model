@@ -698,12 +698,12 @@ class Form(QObject):
             self.window.multiprocessor_checkbox.setEnabled(1)  # Enable multiprocessor checkbox if running
             message = "Multiprocessor Mode Available\n" \
                 "----------"
-            self.event_monitor(message, 'black', '')
+            # self.event_monitor(message, 'black', '')
         else:
             # self.window.multiprocessor_checkbox.setEnabled(0)  # Disable multiprocessor checkbox if not running
             message = "Multiprocessor Mode Not Available\n" \
                 "----------"
-            self.event_monitor(message, 'black', '')
+            # self.event_monitor(message, 'black', '')
 
         # Prime the wizard
         # self.clear_wizard()
