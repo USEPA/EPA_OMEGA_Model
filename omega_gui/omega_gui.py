@@ -130,6 +130,7 @@ class Form(QObject):
         self.window.action_documentation.triggered.connect(self.launch_documentation)
         self.window.epa_button.clicked.connect(self.launch_epa_website)
         self.window.action_about_omega.triggered.connect(self.launch_about)
+        self.window.action_omega_support.triggered.connect(self.launch_support)
         # self.window.multiprocessor_help_button.clicked.connect(self.launch_about_multiprocessor)
         # self.window.multiprocessor_checkbox.clicked.connect(self.multiprocessor_mode)
         # self.window.open_plot_2.clicked.connect(self.open_plot_2)
@@ -596,6 +597,17 @@ class Form(QObject):
         message = "OMEGA Code Version = " + omega2_version
         self.showbox(message_title, message)
 
+    def launch_support(self):
+        """
+        Displays the OMEGA support email address in a popup box.
+
+        :return:
+        """
+
+        message_title = "OMEGA Support"
+        message = "Contact omega_support@epa.gov if you have questions about setting up and running the OMEGA model."
+        self.showbox(message_title, message)
+
     def launch_about_multiprocessor(self):
         """
         Displays help for multiprocessor in a popup box.
@@ -686,12 +698,12 @@ class Form(QObject):
             self.window.multiprocessor_checkbox.setEnabled(1)  # Enable multiprocessor checkbox if running
             message = "Multiprocessor Mode Available\n" \
                 "----------"
-            self.event_monitor(message, 'black', '')
+            # self.event_monitor(message, 'black', '')
         else:
             # self.window.multiprocessor_checkbox.setEnabled(0)  # Disable multiprocessor checkbox if not running
             message = "Multiprocessor Mode Not Available\n" \
                 "----------"
-            self.event_monitor(message, 'black', '')
+            # self.event_monitor(message, 'black', '')
 
         # Prime the wizard
         # self.clear_wizard()
