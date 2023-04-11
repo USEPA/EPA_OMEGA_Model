@@ -98,8 +98,8 @@ def calc_cross_subsidy_options_and_response(calendar_year, market_class_tree, co
             cross_subsidy_options_and_response, iteration_log = \
                 calc_cross_subsidy_options_and_response(calendar_year, market_class_tree[child], compliance_id,
                                                         producer_decision, cross_subsidy_options_and_response,
-                                                        producer_consumer_iteration_num, iteration_log, node_name=child,
-                                                        verbose=verbose)
+                                                        producer_consumer_iteration_num, iteration_log,
+                                                        node_name=child, verbose=verbose)
 
     return cross_subsidy_options_and_response, iteration_log
 
@@ -285,15 +285,16 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
             credit_banks[compliance_id].update_credit_age(calendar_year)
 
-            if manufacturer_annual_data_table is None:
+            if manufacturer_annual_data_table is None or omega_globals.options.credit_market_efficiency == 0.0:
                 # strategy: use credits and pay debits over their remaining lifetime, instead of all at once:
                 strategic_target_offset_Mg = 0
                 current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
                 for c in current_credits + current_debits:
                     if c.model_year < omega_globals.options.analysis_initial_year:
                         # allow strategic under-compliance for historical credits
-                        strategic_target_offset_Mg += \
-                            c.remaining_balance_Mg * (1 / max(1, c.remaining_years - 1))
+                        if c.remaining_balance_Mg < 0 or omega_globals.options.credit_market_efficiency != 0.0:
+                            strategic_target_offset_Mg += \
+                                c.remaining_balance_Mg * (1 / max(1, c.remaining_years - 1))
                     else:
                         # don't allow strategic under-compliance for analysis year credits
                         strategic_target_offset_Mg += \
@@ -391,7 +392,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                 omega_globals.cumulative_battery_GWh['total'] += production_battery_gigawatthours
                 omega_globals.cumulative_battery_GWh[calendar_year] = omega_globals.cumulative_battery_GWh['total']
 
-            credit_banks[compliance_id].handle_credit(calendar_year, total_credits_co2e_megagrams) # CU RV
+            credit_banks[compliance_id].handle_credit(calendar_year, total_credits_co2e_megagrams)  # CU RV
 
             omega_globals.options.SalesShare.store_producer_decision_and_response(producer_decision_and_response)
 
@@ -1297,7 +1298,8 @@ def get_module(module_name):
     else:
         module_relpath = str.rsplit(module_name, '.', maxsplit=1)[0].replace('.', os.sep)
         module_suffix = str.split(module_name, '.')[1]
-        module_path = omega_globals.options.omega_model_path + os.sep + module_relpath + os.sep + '%s.py' % module_suffix
+        module_path = \
+            omega_globals.options.omega_model_path + os.sep + module_relpath + os.sep + '%s.py' % module_suffix
 
         spec = importlib.util.spec_from_file_location(module_name, module_path)
         module = importlib.util.module_from_spec(spec)
@@ -1718,7 +1720,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
                     [r.get() for r in results]
 
-                    print('Elapsed init time = %f' % (time.time() - start_time))
+                    # print('Elapsed init time = %f' % (time.time() - start_time))
 
                 omega_log.logwrite("Running %s:" % omega_globals.options.session_unique_name)
 
@@ -1811,8 +1813,8 @@ def run_omega(session_runtime_options, standalone_run=False):
                                                       4: 'input_template_name', 6: 'version_number', 7: 'notes:'})
 
             metadata_df.to_csv(
-                omega_globals.options.output_folder + f'{omega_globals.options.session_unique_name}_inputfile_metadata.csv',
-                index=False, header=True)
+                omega_globals.options.output_folder +
+                f'{omega_globals.options.session_unique_name}_inputfile_metadata.csv', index=False, header=True)
 
             omega_log.end_logfile("\nSession Complete")
 

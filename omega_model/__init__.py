@@ -152,7 +152,9 @@ try:
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
             self.calc_effects = 'No'  # options are 'No', 'Physical' and 'Physical and Costs' as strings
-            self.analysis_dollar_basis = 2020  # Note that the implicit_price_deflator.csv input file must contain data for this entry.
+
+            # Note that the implicit_price_deflator.csv input file must contain data for this entry:
+            self.analysis_dollar_basis = 2020
 
             self.allow_ice_of_bev = False
 
@@ -179,7 +181,8 @@ try:
             self.rlhp60_min_scaler = 1.0
             self.rlhp60_max_scaler = 1.0
             self.producer_voluntary_overcompliance = False  # disable voc by default
-            self.producer_voluntary_overcompliance_min_benefit_frac = 0.01  # minimum benefit of overcompliance, as a fraction of compliance cost
+            # minimum benefit of overcompliance, as a fraction of compliance cost:
+            self.producer_voluntary_overcompliance_min_benefit_frac = 0.01
             self.producer_voluntary_overcompliance_min_strategic_compliance_ratio = 0.9999  # minimal voc by default
             self.producer_price_modification_scaler = 0.0
             self.producer_footprint_wtp = 200
@@ -190,6 +193,7 @@ try:
             self.producer_compliance_search_tolerance = 1e-6
             self.producer_compliance_search_multipoint = True  # disable for zevregion batches
             self.producer_cross_subsidy_price_tolerance = 5e-3
+            self.producer_strategic_compliance_buffer = 0.0
             self.run_profiler = False
             self.multiprocessing = True and not self.run_profiler and not getattr(sys, 'frozen', False)
             self.non_context_session_process_scaler = 1
@@ -213,17 +217,24 @@ try:
                                         'effects_']
 
             # list of modules to allow verbose console output, or empty to disable
-            self.verbose_console_modules = ['producer_compliance_search',
-                                            'p-c_shares_and_costs', 'p-c_max_iterations_',
-                                            'cross_subsidy_search_', 'cross_subsidy_multipliers',
+            self.verbose_console_modules = ['producer_compliance_search_',
+                                            'p-c_shares_and_costs_', 'p-c_max_iterations_',
+                                            'cross_subsidy_search_', 'cross_subsidy_multipliers_',
                                             'cross_subsidy_convergence_']
 
             self.verbose_postproc = ['iteration_']
 
-            self.log_vehicle_cloud_years = []  # = 'all' or list of years to log, empty list to disable logging
-            self.log_producer_compliance_search_years = []  # = 'all' or list of years to log, empty list to disable logging
-            self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
-            self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging
+            # = 'all' or list of years to log, empty list to disable logging:
+            self.log_vehicle_cloud_years = []
+
+            # = 'all' or list of years to log, empty list to disable logging:
+            self.log_producer_compliance_search_years = []
+
+            # = 'all' or list of years to log, empty list to disable logging:
+            self.log_consumer_iteration_years = [2050]
+
+            # = 'all' or list of years to log, empty list to disable logging:
+            self.log_producer_decision_and_response_years = []
 
             # list of vehicles to plot in log_producer_compliance_search_years:
             self.plot_and_log_vehicles = []  # ['ICE Large Van truck minivan 4WD']

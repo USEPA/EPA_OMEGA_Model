@@ -379,255 +379,255 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="results_tab">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <attribute name="title">
-      <string>Results</string>
-     </attribute>
-     <widget class="QListWidget" name="list_graphs_1">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>220</y>
-        <width>501</width>
-        <height>141</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="available_plots_1_label_2">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>190</y>
-        <width>481</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Available Plots</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="open_plot_2">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>530</x>
-        <y>220</y>
-        <width>71</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Plots the selected parameters</string>
-      </property>
-      <property name="text">
-       <string>Plot</string>
-      </property>
-     </widget>
-     <widget class="QListWidget" name="list_graphs_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>40</y>
-        <width>501</width>
-        <height>141</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="available_plots_1_label_3">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>10</y>
-        <width>471</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Available Scenarios</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="select_plot_2">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>530</x>
-        <y>80</y>
-        <width>211</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Selects previous model run for plotting</string>
-      </property>
-      <property name="text">
-       <string>Select Previous Run</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="select_plot_3">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>530</x>
-        <y>40</y>
-        <width>211</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Selects current model run for plotting</string>
-      </property>
-      <property name="text">
-       <string>Select Current Run</string>
-      </property>
-      <property name="autoDefault">
-       <bool>false</bool>
-      </property>
-      <property name="flat">
-       <bool>false</bool>
-      </property>
-     </widget>
-     <widget class="QTextEdit" name="results_comment">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>15</y>
-        <width>1061</width>
-        <height>336</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>30</pointsize>
-        <weight>75</weight>
-        <italic>true</italic>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Feature Under Development</string>
-      </property>
-      <property name="autoFillBackground">
-       <bool>false</bool>
-      </property>
-     </widget>
-     <zorder>list_graphs_1</zorder>
-     <zorder>available_plots_1_label_2</zorder>
-     <zorder>open_plot_2</zorder>
-     <zorder>list_graphs_2</zorder>
-     <zorder>available_plots_1_label_3</zorder>
-     <zorder>select_plot_3</zorder>
-     <zorder>select_plot_2</zorder>
-     <zorder>results_comment</zorder>
-    </widget>
-    <widget class="QWidget" name="options_tab">
-     <attribute name="title">
-      <string>Options</string>
-     </attribute>
-     <widget class="QCheckBox" name="multiprocessor_checkbox">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>9</y>
-        <width>221</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>OMEGA Multiprocessor Selection</string>
-      </property>
-      <property name="text">
-       <string>Enable Multiprocessor</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="multiprocessor_help_button">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>10</y>
-        <width>211</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Displays Help for Multiprocessor Mode</string>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="text">
-       <string>Multiprocessor Help</string>
-      </property>
-     </widget>
-    </widget>
+<!--    <widget class="QWidget" name="results_tab">-->
+<!--     <property name="enabled">-->
+<!--      <bool>true</bool>-->
+<!--     </property>-->
+<!--     <attribute name="title">-->
+<!--      <string>Results</string>-->
+<!--     </attribute>-->
+<!--     <widget class="QListWidget" name="list_graphs_1">-->
+<!--      <property name="geometry">-->
+<!--       <rect>-->
+<!--        <x>10</x>-->
+<!--        <y>220</y>-->
+<!--        <width>501</width>-->
+<!--        <height>141</height>-->
+<!--       </rect>-->
+<!--      </property>-->
+<!--     </widget>-->
+<!--     <widget class="QLabel" name="available_plots_1_label_2">-->
+<!--      <property name="geometry">-->
+<!--       <rect>-->
+<!--        <x>20</x>-->
+<!--        <y>190</y>-->
+<!--        <width>481</width>-->
+<!--        <height>31</height>-->
+<!--       </rect>-->
+<!--      </property>-->
+<!--      <property name="font">-->
+<!--       <font>-->
+<!--        <family>Arial</family>-->
+<!--        <pointsize>12</pointsize>-->
+<!--        <weight>50</weight>-->
+<!--        <bold>false</bold>-->
+<!--       </font>-->
+<!--      </property>-->
+<!--      <property name="text">-->
+<!--       <string>Available Plots</string>-->
+<!--      </property>-->
+<!--     </widget>-->
+<!--     <widget class="QPushButton" name="open_plot_2">-->
+<!--      <property name="enabled">-->
+<!--       <bool>false</bool>-->
+<!--      </property>-->
+<!--      <property name="geometry">-->
+<!--       <rect>-->
+<!--        <x>530</x>-->
+<!--        <y>220</y>-->
+<!--        <width>71</width>-->
+<!--        <height>31</height>-->
+<!--       </rect>-->
+<!--      </property>-->
+<!--      <property name="font">-->
+<!--       <font>-->
+<!--        <family>Arial</family>-->
+<!--        <pointsize>12</pointsize>-->
+<!--        <weight>50</weight>-->
+<!--        <bold>false</bold>-->
+<!--       </font>-->
+<!--      </property>-->
+<!--      <property name="toolTip">-->
+<!--       <string>Plots the selected parameters</string>-->
+<!--      </property>-->
+<!--      <property name="text">-->
+<!--       <string>Plot</string>-->
+<!--      </property>-->
+<!--     </widget>-->
+<!--     <widget class="QListWidget" name="list_graphs_2">-->
+<!--      <property name="geometry">-->
+<!--       <rect>-->
+<!--        <x>10</x>-->
+<!--        <y>40</y>-->
+<!--        <width>501</width>-->
+<!--        <height>141</height>-->
+<!--       </rect>-->
+<!--      </property>-->
+<!--     </widget>-->
+<!--     <widget class="QLabel" name="available_plots_1_label_3">-->
+<!--      <property name="geometry">-->
+<!--       <rect>-->
+<!--        <x>20</x>-->
+<!--        <y>10</y>-->
+<!--        <width>471</width>-->
+<!--        <height>31</height>-->
+<!--       </rect>-->
+<!--      </property>-->
+<!--      <property name="font">-->
+<!--       <font>-->
+<!--        <family>Arial</family>-->
+<!--        <pointsize>12</pointsize>-->
+<!--        <weight>50</weight>-->
+<!--        <bold>false</bold>-->
+<!--       </font>-->
+<!--      </property>-->
+<!--      <property name="text">-->
+<!--       <string>Available Scenarios</string>-->
+<!--      </property>-->
+<!--     </widget>-->
+<!--     <widget class="QPushButton" name="select_plot_2">-->
+<!--      <property name="enabled">-->
+<!--       <bool>false</bool>-->
+<!--      </property>-->
+<!--      <property name="geometry">-->
+<!--       <rect>-->
+<!--        <x>530</x>-->
+<!--        <y>80</y>-->
+<!--        <width>211</width>-->
+<!--        <height>31</height>-->
+<!--       </rect>-->
+<!--      </property>-->
+<!--      <property name="font">-->
+<!--       <font>-->
+<!--        <family>Arial</family>-->
+<!--        <pointsize>12</pointsize>-->
+<!--        <weight>50</weight>-->
+<!--        <bold>false</bold>-->
+<!--       </font>-->
+<!--      </property>-->
+<!--      <property name="toolTip">-->
+<!--       <string>Selects previous model run for plotting</string>-->
+<!--      </property>-->
+<!--      <property name="text">-->
+<!--       <string>Select Previous Run</string>-->
+<!--      </property>-->
+<!--     </widget>-->
+<!--     <widget class="QPushButton" name="select_plot_3">-->
+<!--      <property name="enabled">-->
+<!--       <bool>false</bool>-->
+<!--      </property>-->
+<!--      <property name="geometry">-->
+<!--       <rect>-->
+<!--        <x>530</x>-->
+<!--        <y>40</y>-->
+<!--        <width>211</width>-->
+<!--        <height>31</height>-->
+<!--       </rect>-->
+<!--      </property>-->
+<!--      <property name="font">-->
+<!--       <font>-->
+<!--        <family>Arial</family>-->
+<!--        <pointsize>12</pointsize>-->
+<!--        <weight>50</weight>-->
+<!--        <bold>false</bold>-->
+<!--       </font>-->
+<!--      </property>-->
+<!--      <property name="toolTip">-->
+<!--       <string>Selects current model run for plotting</string>-->
+<!--      </property>-->
+<!--      <property name="text">-->
+<!--       <string>Select Current Run</string>-->
+<!--      </property>-->
+<!--      <property name="autoDefault">-->
+<!--       <bool>false</bool>-->
+<!--      </property>-->
+<!--      <property name="flat">-->
+<!--       <bool>false</bool>-->
+<!--      </property>-->
+<!--     </widget>-->
+<!--     <widget class="QTextEdit" name="results_comment">-->
+<!--      <property name="enabled">-->
+<!--       <bool>true</bool>-->
+<!--      </property>-->
+<!--      <property name="geometry">-->
+<!--       <rect>-->
+<!--        <x>20</x>-->
+<!--        <y>15</y>-->
+<!--        <width>1061</width>-->
+<!--        <height>336</height>-->
+<!--       </rect>-->
+<!--      </property>-->
+<!--      <property name="font">-->
+<!--       <font>-->
+<!--        <family>Arial</family>-->
+<!--        <pointsize>30</pointsize>-->
+<!--        <weight>75</weight>-->
+<!--        <italic>true</italic>-->
+<!--        <bold>true</bold>-->
+<!--       </font>-->
+<!--      </property>-->
+<!--      <property name="toolTip">-->
+<!--       <string>Feature Under Development</string>-->
+<!--      </property>-->
+<!--      <property name="autoFillBackground">-->
+<!--       <bool>false</bool>-->
+<!--      </property>-->
+<!--     </widget>-->
+<!--     <zorder>list_graphs_1</zorder>-->
+<!--     <zorder>available_plots_1_label_2</zorder>-->
+<!--     <zorder>open_plot_2</zorder>-->
+<!--     <zorder>list_graphs_2</zorder>-->
+<!--     <zorder>available_plots_1_label_3</zorder>-->
+<!--     <zorder>select_plot_3</zorder>-->
+<!--     <zorder>select_plot_2</zorder>-->
+<!--     <zorder>results_comment</zorder>-->
+<!--    </widget>-->
+<!--    <widget class="QWidget" name="options_tab">-->
+<!--     <attribute name="title">-->
+<!--      <string>Options</string>-->
+<!--     </attribute>-->
+<!--     <widget class="QCheckBox" name="multiprocessor_checkbox">-->
+<!--      <property name="geometry">-->
+<!--       <rect>-->
+<!--        <x>10</x>-->
+<!--        <y>9</y>-->
+<!--        <width>221</width>-->
+<!--        <height>31</height>-->
+<!--       </rect>-->
+<!--      </property>-->
+<!--      <property name="font">-->
+<!--       <font>-->
+<!--        <family>Arial</family>-->
+<!--        <pointsize>12</pointsize>-->
+<!--        <weight>50</weight>-->
+<!--        <bold>false</bold>-->
+<!--       </font>-->
+<!--      </property>-->
+<!--      <property name="toolTip">-->
+<!--       <string>OMEGA Multiprocessor Selection</string>-->
+<!--      </property>-->
+<!--      <property name="text">-->
+<!--       <string>Enable Multiprocessor</string>-->
+<!--      </property>-->
+<!--     </widget>-->
+<!--     <widget class="QPushButton" name="multiprocessor_help_button">-->
+<!--      <property name="geometry">-->
+<!--       <rect>-->
+<!--        <x>240</x>-->
+<!--        <y>10</y>-->
+<!--        <width>211</width>-->
+<!--        <height>31</height>-->
+<!--       </rect>-->
+<!--      </property>-->
+<!--      <property name="font">-->
+<!--       <font>-->
+<!--        <family>Arial</family>-->
+<!--        <pointsize>12</pointsize>-->
+<!--        <weight>50</weight>-->
+<!--        <bold>false</bold>-->
+<!--       </font>-->
+<!--      </property>-->
+<!--      <property name="toolTip">-->
+<!--       <string>Displays Help for Multiprocessor Mode</string>-->
+<!--      </property>-->
+<!--      <property name="styleSheet">-->
+<!--       <string notr="true"/>-->
+<!--      </property>-->
+<!--      <property name="text">-->
+<!--       <string>Multiprocessor Help</string>-->
+<!--      </property>-->
+<!--     </widget>-->
+<!--    </widget>-->
    </widget>
    <widget class="QLabel" name="main_title_1_label">
     <property name="geometry">

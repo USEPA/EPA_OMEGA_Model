@@ -35,14 +35,14 @@ After downloading the source code (via ``.zip`` file or cloning the repository),
 
     **The currently recommended Python version is** `Python 3.8.10 <https://python.org/downloads/release/python-3810/>`_ **.**
 
-    M1 Mac users should install `the Intel version of Python 3.8.10 <https://www.python.org/ftp/python/3.8.10/python-3.8.10-macosx10.9.pkg>`_ which runs under Rosetta, it prevents compatiblity issues with packages that haven't been updated to run natively, then follow the Simple Install directions.
+    Mx (ARM) Mac users should install `the Intel version of Python 3.8.10 <https://www.python.org/ftp/python/3.8.10/python-3.8.10-macosx10.9.pkg>`_ if they are interested in GUI development due to the PySide2 requirment.  Otherwise the `ARM-native version of Python 3.9.13 <https://www.python.org/ftp/python/3.9.13/python-3.9.13-macosx10.9.pkg>`_ is recommended, it runs much faster and it supports all other required packages.
 
 Python
 ++++++
 
 The latest versions of Python are available at https://www.python.org/downloads/
 
-OMEGA has been developed with Python versions 3.7.1 (the minimum required version) thru 3.9.6 and has not been tested with version 3.10 or higher.  If you already have Python installed, there is probably no reason to update to a newer version unless one of the required packages is not compatible with your Python version and hardware platform.
+OMEGA has been developed with Python versions 3.7.1 (the minimum required version) thru 3.9.13 and has not been tested with version 3.10 or higher.  If you already have Python installed, there is probably no reason to update to a newer version unless one of the required packages is not compatible with your Python version and hardware platform.
 
 The recommended practice is to run the source code in a virtual environment, which may be set up manually or via the IDE.  The virtual environment isolates the installation of OMEGA-required Python packages from whatever packages may have already been installed at the system level.  This allows a 'clean' installation that can guarantee no known conflicts between packages.
 
@@ -64,7 +64,7 @@ The simplest way to install the packages is to use ``pip``, the package installe
 ``conda`` / ``pip`` Install
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Many of the most popular Python packages include pre-compiled versions that are intended for specific hardware.  However, depending on your development environment (ARM-based Mac, for example) it may be useful (or necessary) to get some of the pre-compiled packages from other sources, such as `Anaconda <https://anaconda.org>`_ / `Conda <https://docs.conda.io/en/latest/>`_.  A lightweight ``conda`` install is available via `miniforge <https://github.com/conda-forge/miniforge>`_.  The full `Anaconda <https://anaconda.org>`_ installation is quite large, so if it is not already installed then it is recommended to use something like `miniforge <https://github.com/conda-forge/miniforge>`_ instead.
+Many of the most popular Python packages include pre-compiled versions that are intended for specific hardware.  However, depending on your development environment (ARM-based Mac, for example) it may be useful (or necessary) to get some of the pre-compiled packages from other sources, such as `Anaconda <https://anaconda.org>`_ / `Conda <https://docs.conda.io/en/latest/>`_.  A lightweight ``conda`` install is available via `miniforge <https://github.com/conda-forge/miniforge>`_.  The full `Anaconda <https://anaconda.org>`_ installation is quite large, so if it is not already installed then it is recommended to use something like ``miniforge`` instead.
 
 This more advanced installation method has two steps
 
@@ -107,38 +107,23 @@ Will produce output such as:
 
     ...
 
-    Initializing OMEGA Demo:
+    Initializing OMEGA Quick Test:
     importing XYZ.py
 
     ...
 
-    Running OMEGA Demo:
+    Running OMEGA Quick Test:
 
-    Running OMEGA Demo: Manufacturer=OEM_B
-    Running OMEGA Demo:  Year=2020  Iteration=0
-    Running OMEGA Demo:  Year=2020  Iteration=1
-    Running OMEGA Demo:  Year=2021  Iteration=0
-    Running OMEGA Demo:  Year=2021  Iteration=1
+    Running OMEGA Quick Test Pass 0: Manufacturer=consolidated_OEM
+    Running OMEGA Quick Test:  Year=2020  Iteration=0 consolidated_OEM
+    Running OMEGA Quick Test:  Year=2020  Iteration=1 consolidated_OEM
+    Running OMEGA Quick Test:  Year=2020  Iteration=2 consolidated_OEM
+    Running OMEGA Quick Test:  Year=2021  Iteration=0 consolidated_OEM
+    Running OMEGA Quick Test:  Year=2021  Iteration=1 consolidated_OEM
+    Running OMEGA Quick Test:  Year=2021  Iteration=2 consolidated_OEM
 
-    Running OMEGA Demo: Manufacturer=OEM_A
-    Running OMEGA Demo:  Year=2020  Iteration=0
-    Running OMEGA Demo:  Year=2020  Iteration=1
-    Running OMEGA Demo:  Year=2021  Iteration=0
-    Running OMEGA Demo:  Year=2021  Iteration=1
-
-    Calculating tech volumes and shares
-    Saving out/OMEGA Demo_tech_tracking.csv
-
-    Calculating physical effects
-
-    Calculating cost effects
-
-    Discounting costs
-    Saving out/OMEGA Demo_cost_effects.csv
-    Saving out/OMEGA Demo_physical_effects.csv
-
-    Session ended at 2021-10-18 16:27:10
-    Session elapsed time 17.47 seconds
+    Session ended at 2023-04-05 11:38:00
+    Session elapsed time 120.56 seconds
 
 The primary use case for running ``omega.py`` directly is just to confirm the installation or perhaps when it's simpler to debug code without the overhead of the batch process.
 

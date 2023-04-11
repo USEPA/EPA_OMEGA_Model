@@ -34,8 +34,8 @@ Data Column Name and Description
         The name of the context source, e.g. 'AEO2020', 'AEO2021', etc
 
     :dollar_basis:
-        The dollar basis of the fuel prices in the given AEO version. Note that this dollar basis is converted in-code to
-        'analysis_dollar_basis' using the implicit_price_deflators input file.
+        The dollar basis of the fuel prices in the given AEO version. Note that this dollar basis is
+        converted in-code to 'analysis_dollar_basis' using the implicit_price_deflators input file.
 
     :case_id:
         The name of the case within the context, e.g. 'Reference Case', 'High oil price', etc
@@ -102,7 +102,8 @@ class FuelPrice(OMEGABase):
             if omega_globals.options.flat_context:
                 calendar_year = omega_globals.options.flat_context_year
             else:
-                calendar_year = max(FuelPrice._data['min_calendar_year'], min(calendar_year, FuelPrice._data['max_calendar_year']))
+                calendar_year = max(FuelPrice._data['min_calendar_year'],
+                                    min(calendar_year, FuelPrice._data['max_calendar_year']))
 
             if type(price_types) is not list:
                 price_types = [price_types]
@@ -153,7 +154,8 @@ class FuelPrice(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             from context.new_vehicle_market import NewVehicleMarket
@@ -168,7 +170,8 @@ class FuelPrice(OMEGABase):
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
-            df = df.loc[(df['context_id'] == omega_globals.options.context_id) & (df['case_id'] == omega_globals.options.context_case_id), :]
+            df = df.loc[(df['context_id'] == omega_globals.options.context_id) &
+                        (df['case_id'] == omega_globals.options.context_case_id), :]
             aeo_dollar_basis = df['dollar_basis'].mean()
             cols_to_convert = [col for col in df.columns if 'dollars_per_unit' in col]
 

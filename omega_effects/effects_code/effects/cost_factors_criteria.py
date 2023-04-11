@@ -38,7 +38,8 @@ Data Column Name and Description
         The source of the pollutant, whether it be a gasoline car or an EGU or refinery.
 
     :pm25_low_3.0_USD_per_uston:
-        The structure for all cost factors is pollutant_study_discount-rate_units, where study refers to the low or high valuation and units are in US dollars per US ton.
+        The structure for all cost factors is pollutant_study_discount-rate_units, where study refers to the low or
+        high valuation and units are in US dollars per US ton.
 
 ----
 

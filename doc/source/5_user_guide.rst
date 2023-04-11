@@ -76,16 +76,21 @@ OMEGA Batch Command Line Interface
 
     >>python omega_model/omega_batch.py --bundle_path path/to/my/bundle_folder --batch_file path/to/my/batch_file.csv
 
+    or
+
+    >>python omega_model/omega_batch.py --bundle_path path/to/my/bundle_folder --ui_batch_file
+
+
 In fact, the GUI can be thought of as a wrapper to a command line call to ``omega_batch.py``.  The paths supplied to the GUI fill in the ``--bundle_path`` and ``--batch_file`` arguments.
 
-Typical Command Line Usage
+Typical Command Line Usage (not all available command-line options shown)
 
 .. highlight:: none
 
 ::
 
     usage: omega_batch.py
-            [-h] [--bundle_path BUNDLE_PATH] [--batch_file BATCH_FILE]
+            [-h] [--bundle_path BUNDLE_PATH] [--batch_file BATCH_FILE]  [--ui_batch_file]
             [--session_num SESSION_NUM] [--analysis_final_year ANALYSIS_FINAL_YEAR]
             [--verbose] [--show_figures]
 
@@ -99,6 +104,9 @@ Typical Command Line Usage
 
       --batch_file BATCH_FILE
                             Path to batch definition file
+
+      --ui_batch_file
+                            Select batch file from dialog box
 
       --session_num SESSION_NUM
                             ID # of session to run from batch
@@ -126,13 +134,13 @@ Selecting Sessions to Run
     Sessions can be enabled or disabled within the batch file by setting the ``Enable Session`` field to ``TRUE`` or ``FALSE``, respectively.  Alternatively, the ``--session_num`` argument can be passed to ``omega_batch``.  The reference session is session number ``0``.  The reference session cannot be disabled, regardless of the ``Enable Session`` field value, as it generates reference vehicle prices that the other sessions require in order to calculate overall vehicle sales.
 
 Understanding the Batch Process
-    The first step in the batch process is to copy the complete source code to the bundle folder (in the ``omega_model`` directory) and to create subfolders for each active session.  Within each session folder will be an ``in`` folder (and an ``out`` folder will be created when the session runs).  The bundle folder contains the original batch definition file as well as a timestamped batch definition file that is actually run.  The timestamped file has the original batch settings with new session input file paths relative to the bundle.  The bundle folder contains a ``requirements.txt`` file for reference.  When running from source code the requirements file indicates the version of Python used to run the batch and contains the list of installed Python packages and their versions at the time, e.g. ``python_3_8_10_requirements.txt``.  When running from the executable the contents of the ``GUI_requirements.txt`` file indicates the version number of the GUI.
+    The first step in the batch process is to copy the complete source code to the ``bundle`` folder (in the ``omega_model`` directory, or as specified by the user via the ``--bundle_path`` argument) and to create subfolders for each active session.  Within each session folder will be an ``in`` folder (and an ``out`` folder will be created when the session runs).  The bundle folder contains the original batch definition file as well as a timestamped batch definition file that is actually run.  The timestamped file has the original batch settings with new session input file paths relative to the bundle.  The bundle folder contains a ``requirements.txt`` file for reference.  When running from source code the requirements file indicates the version of Python used to run the batch and contains the list of installed Python packages and their versions at the time, e.g. ``python_3_8_10_requirements.txt``.  When running from the executable the contents of the ``GUI_requirements.txt`` file indicates the version number of the GUI.
 
     The batch itself and each session will have a log file indicating the progress and success or failure of the process.  The batch log file is named ``batch_logfile.txt`` and exists at the top of the bundle folder.  Session logs have the prefix ``o2log_`` and are located in each session's ``out`` folder.
 
     If a session completes successfully, the session folder is renamed and prepended with an underscore, ``_``.  Failed session folders are prepended with ``#FAIL_``.  In this way the session status can be monitored by observing the folder names as the batch runs.
 
-    Since the bundle folder contains the source code and all inputs for every session it is possible to re-run a batch, or part of a batch, at a later time and reproduce the results if desired.  To do so, remove any session folder prefixes and use ``omega_batch.py`` to re-run the timestamped batch file, while supplying the advanced ``--no_bundle`` and ``--no_validate`` arguments, since the batch has already been bundled.  As in:
+    Since the bundle folder contains the source code and all inputs for every session it is possible to re-run a batch, or part of a batch, at a later time and reproduce the results if desired.  To do so, remove any session folder prefixes and use ``omega_batch.py`` to re-run the timestamped batch file, while supplying the ``--no_bundle`` and ``--no_validate`` arguments, since the batch has already been bundled.  As in:
 
 ::
 

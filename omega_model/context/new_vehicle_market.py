@@ -5,14 +5,15 @@
 Market data includes total sales as well as sales by context size class (e.g. 'Small Crossover')
 
 This module also saves new vehicle generalized costs (based in part on OMEGA tech costs)
-from the reference session corresponding to the analysis context.  The reference session vehicle sales (new vehicle market)
-will follow the analysis context sales, but prices/generalized costs within OMEGA will be different from prices within the
-context due to differences in costing approaches, etc.  By saving the sales-weighted new vehicle generalized costs from
-the reference session, subsequent sessions (with higher, lower, or the same costs) will have an internally consistent
-(lower, higher or the same, respectively) overall sales response.  Whether the vehicle generalized costs file will be
-loaded from a file or created from scratch is controlled by the batch process.  Generally speaking, best practice is to
-always auto-generate the new vehicle generalized costs file from the reference session to guarantee consistency with the
-simulated vehicles file costs and all other factors affecting generalized cost (such as fuel prices, cost years, etc).
+from the reference session corresponding to the analysis context.  The reference session vehicle sales
+(new vehicle market) will follow the analysis context sales, but prices/generalized costs within OMEGA will be
+different from prices within the context due to differences in costing approaches, etc.  By saving the sales-weighted
+new vehicle generalized costs from the reference session, subsequent sessions (with higher, lower, or the same costs)
+will have an internally consistent (lower, higher or the same, respectively) overall sales response.
+Whether the vehicle generalized costs file will be loaded from a file or created from scratch is controlled by the
+batch process.  Generally speaking, best practice is to always auto-generate the new vehicle generalized costs file
+from the reference session to guarantee consistency with the simulated vehicles file costs and all other factors
+affecting generalized cost (such as fuel prices, cost years, etc).
 
 ----
 
@@ -150,8 +151,8 @@ class NewVehicleMarket(OMEGABase):
     @classmethod
     def init_context_new_vehicle_generalized_costs(cls, filename):
         """
-        Load context new vehicle prices from file or clear _context_new_vehicle_generalized_costs and start from scratch.
-        Clears _session_new_vehicle_generalized_costs.
+        Load context new vehicle prices from file or clear _context_new_vehicle_generalized_costs
+        and start from scratch. Clears _session_new_vehicle_generalized_costs.
 
         Args:
             filename (str): name of file to load new vehicle generalized costs from if not generating a new one
@@ -300,7 +301,8 @@ class NewVehicleMarket(OMEGABase):
                     context_size_class, context_reg_class, calendar_year) in NewVehicleMarket._data_by_csc_rc:
                 return np.sum(NewVehicleMarket._data_by_csc_rc[omega_globals.options.context_id,
                                                         omega_globals.options.context_case_id,
-                                                        context_size_class, context_reg_class, calendar_year]['sales'].values)
+                                                        context_size_class, context_reg_class,
+                calendar_year]['sales'].values)
             else:
                 return 0
 
@@ -392,7 +394,6 @@ class NewVehicleMarket(OMEGABase):
         else:
             return NewVehicleMarket._data[(size_class, 'truck', year)][arg]
 
-
     @staticmethod
     def init_from_file(filename, verbose=False):
         """
@@ -421,8 +422,9 @@ class NewVehicleMarket(OMEGABase):
 
         input_template_name = 'context_new_vehicle_market'
         input_template_version = 0.22
-        input_template_columns = {'context_id', 'dollar_basis',	'case_id', 'context_size_class', 'body_style', 'calendar_year', 'reg_class_id',
-                                  'sales_share_of_body_style', 'sales_share_of_regclass', 'sales_share_of_total', 'sales', 'weight_lbs',
+        input_template_columns = {'context_id', 'dollar_basis',	'case_id', 'context_size_class', 'body_style',
+                                  'calendar_year', 'reg_class_id', 'sales_share_of_body_style',
+                                  'sales_share_of_regclass', 'sales_share_of_total', 'sales', 'weight_lbs',
                                   'horsepower', 'horsepower_to_weight_ratio', 'mpg_conventional',
                                   'mpg_conventional_onroad', 'mpg_alternative', 'mpg_alternative_onroad',
                                   'onroad_to_cycle_mpg_ratio', 'ice_price_dollars', 'bev_price_dollars'}
@@ -434,7 +436,8 @@ class NewVehicleMarket(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             validation_dict = {'reg_class_id': list(legacy_reg_classes)}
@@ -443,12 +446,22 @@ class NewVehicleMarket(OMEGABase):
 
         if not template_errors:
             from producer.vehicle_aggregation import sales_weight_average_dataframe
-            NewVehicleMarket._data_by_rc = df.groupby(['context_id', 'case_id', 'reg_class_id', 'calendar_year']).apply(sales_weight_average_dataframe)
+            NewVehicleMarket._data_by_rc = \
+                df.groupby(['context_id', 'case_id', 'reg_class_id', 'calendar_year']).\
+                    apply(sales_weight_average_dataframe)
 
-            NewVehicleMarket._data_by_csc_rc = df.set_index(['context_id', 'case_id', 'context_size_class', 'reg_class_id', 'calendar_year']).sort_index().to_dict(orient='series')
-            NewVehicleMarket._data_by_csc = df.set_index(['context_id', 'case_id', 'context_size_class', 'calendar_year']).sort_index().to_dict(orient='series')
-            NewVehicleMarket._data_by_bs = df.set_index(['context_id', 'case_id', 'body_style', 'calendar_year']).sort_index().to_dict(orient='series')
-            NewVehicleMarket._data_by_total = df.set_index(['context_id', 'case_id', 'calendar_year']).sort_index().to_dict(orient='series')
+            NewVehicleMarket._data_by_csc_rc = \
+                df.set_index(['context_id', 'case_id', 'context_size_class', 'reg_class_id', 'calendar_year']).\
+                    sort_index().to_dict(orient='series')
+            NewVehicleMarket._data_by_csc = \
+                df.set_index(['context_id', 'case_id', 'context_size_class', 'calendar_year']).\
+                    sort_index().to_dict(orient='series')
+            NewVehicleMarket._data_by_bs = \
+                df.set_index(['context_id', 'case_id', 'body_style', 'calendar_year']).\
+                    sort_index().to_dict(orient='series')
+            NewVehicleMarket._data_by_total = \
+                df.set_index(['context_id', 'case_id', 'calendar_year']).\
+                    sort_index().to_dict(orient='series')
             NewVehicleMarket.context_size_classes = df['context_size_class'].unique().tolist()
             NewVehicleMarket.context_ids = df['context_id'].unique().tolist()
             NewVehicleMarket.context_case_ids = df['case_id'].unique().tolist()

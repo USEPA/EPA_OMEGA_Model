@@ -11,7 +11,8 @@ Mass scaling equations are defined by a mass term, a condition expression and eq
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
-The data represents vehicle mass scaling equations as a function of user-definable vehicle attributes or other conditions
+The data represents vehicle mass scaling equations as a function of user-definable vehicle attributes
+or other conditions
 
 File Type
     comma-separated values (CSV)
@@ -45,10 +46,6 @@ Data Column Name and Description
 ----
 
 **CODE**
-
-non_structure_glider_mass_lbs	vehicle.model_year == analysis_intial_year	vehicle.curbweight_lbs – powertrain_mass_lbs – structure_mass_lbs – battery_mass_lbs
-curb_weight_lbs	vehicle.model_year >= analysis_intial_year	powertrain_mass_lbs + structure_mass_lbs + structure_mass_lbs + non_structure_glider_mass_lbs
-
 
 """
 
@@ -154,7 +151,8 @@ class MassScaling(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             validation_dict = {'mass_term': ['structure_materials', 'null_structure_mass_lbs', 'structure_mass_lbs',

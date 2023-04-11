@@ -136,7 +136,8 @@ class PolicyFuel(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             validation_dict = {'unit': ['gallon', 'kWh']}
@@ -164,7 +165,8 @@ if __name__ == '__main__':
         omega_log.init_logfile()
 
         init_fail = []
-        init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file, verbose=omega_globals.options.verbose)
+        init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file,
+                                               verbose=omega_globals.options.verbose)
 
         if not init_fail:
             print(PolicyFuel.get_fuel_attribute(2020, 'gasoline', 'direct_co2e_grams_per_unit'))

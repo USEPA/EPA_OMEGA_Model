@@ -90,8 +90,9 @@ class PriceModifications(OMEGABase):
 
                 mod_key = '%s:%s' % (market_class_id, price_modification_str)
                 if mod_key in PriceModifications._data:
-                    price_modification = PriceModifications._data['%s:%s' % (market_class_id, price_modification_str)].loc[
-                        PriceModifications._data['start_year'] == calendar_year].item()
+                    price_modification = \
+                        (PriceModifications._data['%s:%s' % (market_class_id, price_modification_str)].
+                         loc[PriceModifications._data['start_year'] == calendar_year].item())
 
             PriceModifications._cache[cache_key] = price_modification
 
@@ -129,7 +130,8 @@ class PriceModifications(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
             if not template_errors:
 

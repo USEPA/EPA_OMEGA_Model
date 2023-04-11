@@ -170,8 +170,8 @@ def calc_safety_effects(batch_settings, session_settings):
                     = session_settings.vehicles.get_vehicle_attributes(vehicle_id, *vehicle_attribute_list)
 
             base_year_vehicle_id, mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, size_class, \
-                in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, footprint, workfactor, body_style, \
-                base_year_curbweight_lbs, curbweight_lbs, \
+                in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, footprint, workfactor, \
+                body_style, base_year_curbweight_lbs, curbweight_lbs, \
                 onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
                 = vehicle_info_dict[vehicle_id]
 
@@ -288,7 +288,8 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
         if 'BEV' in market_class_id:
             fueling_class = base_year_powertrain_type = 'BEV'
 
-        threshold_lbs, change_per_100lbs_below, change_per_100lbs_above = get_safety_values(session_settings, body_style)
+        threshold_lbs, change_per_100lbs_below, change_per_100lbs_above = \
+            get_safety_values(session_settings, body_style)
 
         vehicle_safety_dict = dict()
 
@@ -355,8 +356,8 @@ def set_legacy_fleet_name(market_class_id):
         market_class_id: the legacy fleet market class id
 
     Returns:
-        A name for the vehicle primarily for use in cost_effects, repair cost calculations which looks for 'car' or 'Pickup' in the
-        name attribute
+        A name for the vehicle primarily for use in cost_effects, repair cost calculations which looks for
+        'car' or 'Pickup' in the name attribute
 
     """
     if 'sedan' in market_class_id:

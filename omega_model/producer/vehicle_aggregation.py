@@ -145,10 +145,12 @@ Data Column Name and Description
         Technology flag for battery electric vehicle (1 = Equipped, 0 = Not equipped)
 
     :deac_pd:
-        Technology flag for cylinder deactivation, discrete operation of partial number of cylinders (1 = Equipped, 0 = Not equipped)
+        Technology flag for cylinder deactivation, discrete operation of partial number of cylinders
+        (1 = Equipped, 0 = Not equipped)
 
     :deac_fc:
-        Technology flag for cylinder deactivation, continuosly variable operation of full number of cylinders (1 = Equipped, 0 = Not equipped)
+        Technology flag for cylinder deactivation, continuosly variable operation of full number of cylinders
+        (1 = Equipped, 0 = Not equipped)
 
     :cegr:
         Technology flag for cooled exhaust gas recirculation (1 = Equipped, 0 = Not equipped)
@@ -165,10 +167,10 @@ Data Column Name and Description
     :turb11:
         Technology flag for turbocharged engine, 18-21bar 1st generation (1 = Equipped, 0 = Not equipped)
 
-    :gas_fuel
+    :gas_fuel:
         Technology flag for gasoline-fueled engine (1 = Equipped, 0 = Not equipped)
 
-    :diesel_fuel
+    :diesel_fuel:
         Technology flag for diesel-fueled engine (1 = Equipped, 0 = Not equipped)
 
     :awd:
@@ -291,7 +293,7 @@ class VehicleAggregation(OMEGABase):
         from context.powertrain_cost import PowertrainCost
         from policy.workfactor_definition import WorkFactor
 
-        omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
+        # omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
 
         input_template_name = 'vehicles'
         input_template_version = 0.49
@@ -393,7 +395,7 @@ class VehicleAggregation(OMEGABase):
 
             import time
             start_time = time.time()
-            print('starting iterrows')
+            # print('starting iterrows')
 
             df['base_year_footprint_ft2'] = df['footprint_ft2']
 
@@ -469,7 +471,7 @@ class VehicleAggregation(OMEGABase):
             df['glider_non_structure_mass_lbs'] = df['curbweight_lbs'] - df['powertrain_mass_lbs'] \
                                                   - df['structure_mass_lbs'] - df['battery_mass_lbs']
 
-            print('done %.2f' % (time.time() - start_time))
+            # print('done %.2f' % (time.time() - start_time))
 
             df.to_csv(omega_globals.options.output_folder + 'costed_vehicles.csv')
 

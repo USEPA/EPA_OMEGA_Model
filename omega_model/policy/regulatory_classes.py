@@ -109,7 +109,8 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
             if not template_errors:
                 RegulatoryClasses._data = df.set_index('reg_class_id').to_dict(orient='index')
@@ -139,8 +140,9 @@ if __name__ == '__main__':
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
 
-        init_fail += omega_globals.options.RegulatoryClasses.init_from_file(omega_globals.options.policy_reg_classes_file,
-                                                                            verbose=omega_globals.options.verbose)
+        init_fail += \
+            omega_globals.options.RegulatoryClasses.init_from_file(omega_globals.options.policy_reg_classes_file,
+                                                                   verbose=omega_globals.options.verbose)
 
         if not init_fail:
             print(omega_globals.options.RegulatoryClasses.reg_classes)

@@ -1,6 +1,6 @@
 """
 
-**Routines to glider cost.**
+**Routines to calculate glider cost.**
 
 ----
 

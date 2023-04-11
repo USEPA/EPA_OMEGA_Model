@@ -135,10 +135,12 @@ class MaintenanceCost:
         """
 
         Args:
-            input_df: DataFrame reflecting the maintenance_cost_inputs.csv file with costs updated to analysis_basis_dollars.
+            input_df: DataFrame reflecting the maintenance_cost_inputs.csv file
+                with costs updated to analysis_basis_dollars.
 
         Returns:
-            A dictionary of maintenance cost curve coefficients (slope with intercept=0) having keys of 'ICE', 'HEV', 'PHEV', 'BEV'.
+            A dictionary of maintenance cost curve coefficients (slope with intercept=0)
+                having keys of 'ICE', 'HEV', 'PHEV', 'BEV'.
 
         Notes:
             Dividing the cumulative_cost by miles gives a constant cost/mile for every mile. However, costs/mile should
@@ -166,10 +168,12 @@ class MaintenanceCost:
             df.insert(0, 'miles', pd.Series(range(0, max_value + 1, 100)))
             intervals = input_df[f'miles_per_event_{veh_type}'].dropna().unique()
             for interval in intervals:
-                cost_at_interval = input_df.loc[input_df[f'miles_per_event_{veh_type}'] == interval, 'dollars_per_event'].sum()
+                cost_at_interval = \
+                    input_df.loc[input_df[f'miles_per_event_{veh_type}'] == interval, 'dollars_per_event'].sum()
                 df.insert(1, f'cost_for_{int(interval)}', 0)
 
-                # determine miles for all events in this interval series (%1=0 divides by 1 and looks for a remainder of 0)
+                # determine miles for all events in this interval series
+                # (%1=0 divides by 1 and looks for a remainder of 0)
                 events = [odo[1] for odo in df['miles'].items() if odo[1] != 0 and odo[1] / interval % 1 == 0]
 
                 for event in events:
@@ -216,8 +220,8 @@ class MaintenanceCost:
             input_dict: Dictionary of the maintenance cost inputs.
 
         Returns:
-            The input_dict with the total maintenance cost per mile added; this cost per mile would be a constant for all
-            miles.
+            The input_dict with the total maintenance cost per mile added; this cost per mile would be a
+            constant for all miles.
 
         Notes:
             This method is not being used currently in favor of the calc_maintenance_cost_per_mile_curve method within

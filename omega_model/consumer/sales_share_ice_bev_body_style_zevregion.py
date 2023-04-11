@@ -418,7 +418,8 @@ class SalesShare(OMEGABase, SalesShareBase):
 
                 for alt in ['ALT', 'NO_ALT']:
                     only_child = mc_pair[0] + '.' + alt
-                    market_class_data['consumer_share_frac_%s' % only_child] = 1.0 * max_constraints['producer_abs_share_frac_%s' % only_child]
+                    market_class_data['consumer_share_frac_%s' % only_child] = \
+                        1.0 * max_constraints['producer_abs_share_frac_%s' % only_child]
                     market_class_data['consumer_abs_share_frac_%s' % only_child] = \
                         parent_share * max_constraints['producer_abs_share_frac_%s' % only_child]
 
@@ -511,7 +512,8 @@ class SalesShare(OMEGABase, SalesShareBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             validation_dict = {'market_class_id': omega_globals.options.MarketClass.market_classes}

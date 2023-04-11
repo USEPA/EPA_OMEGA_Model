@@ -60,9 +60,11 @@ class MarketClass(OMEGABase, MarketClassBase):
 
     _data = dict()
 
-    market_categories = ['ICE', 'BEV', 'sedan_wagon_r1nonzev', 'cuv_suv_van_r1nonzev', 'pickup_r1nonzev', 'sedan_wagon_r2zev', 'cuv_suv_van_r2zev', 'pickup_r2zev']  #: overall market categories
+    market_categories = ['ICE', 'BEV', 'sedan_wagon_r1nonzev', 'cuv_suv_van_r1nonzev', 'pickup_r1nonzev',
+                         'sedan_wagon_r2zev', 'cuv_suv_van_r2zev', 'pickup_r2zev']  #: overall market categories
     responsive_market_categories = ['ICE', 'BEV']  #: market categories that have consumer response (i.e. price -> sales)
-    non_responsive_market_categories = ['sedan_wagon_r1nonzev', 'cuv_suv_van_r1nonzev', 'pickup_r1nonzev', 'sedan_wagon_r2zev', 'cuv_suv_van_r2zev', 'pickup_r2zev']  #: market categories that do not have consumer response
+    non_responsive_market_categories = ['sedan_wagon_r1nonzev', 'cuv_suv_van_r1nonzev', 'pickup_r1nonzev',
+                                        'sedan_wagon_r2zev', 'cuv_suv_van_r2zev', 'pickup_r2zev']  #: market categories that do not have consumer response
 
     linked_market_classes = {'sedan_wagon_r2zev.ICE': 'sedan_wagon_r1nonzev.ICE',
                              'cuv_suv_van_r2zev.ICE': 'cuv_suv_van_r1nonzev.ICE',
@@ -194,7 +196,8 @@ class MarketClass(OMEGABase, MarketClassBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             validation_dict = {'fueling_class': ['ICE', 'BEV', 'PHEV'],  # RV

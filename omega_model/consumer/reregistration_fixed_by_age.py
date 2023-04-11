@@ -91,7 +91,8 @@ class Reregistration(OMEGABase, ReregistrationBase):
                 Reregistration._data[cache_key] = 0
             elif len(start_years[start_years <= model_year]) > 0:
                 year = max(start_years[start_years <= model_year])
-                Reregistration._data[cache_key] = Reregistration._data[market_class_id, age, year]['reregistered_proportion']
+                Reregistration._data[cache_key] = \
+                    Reregistration._data[market_class_id, age, year]['reregistered_proportion']
             else:
                 raise Exception('Missing registration fixed by age parameters for %s, %d or prior' %
                                 (market_class_id, calendar_year))
@@ -127,7 +128,8 @@ class Reregistration(OMEGABase, ReregistrationBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             validation_dict = {'market_class_id': omega_globals.options.MarketClass.market_classes}

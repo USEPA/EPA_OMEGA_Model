@@ -63,12 +63,14 @@ Data Column Name and Description
     Group name of the offcycle credit, in case of limits within a group of credits (work in progress)
 
 :credit_destination:
-    Name of the vehicle CO2e attribute to apply the credit to, e.g. ``cert_direct_offcycle_co2e_grams_per_mile``, ``cert_indirect_offcycle_co2e_grams_per_mile``
+    Name of the vehicle CO2e attribute to apply the credit to, e.g. ``cert_direct_offcycle_co2e_grams_per_mile``,
+    ``cert_indirect_offcycle_co2e_grams_per_mile``
 
 **Optional Columns**
 
 :``reg_class_id:{reg_class_id}``:
-    The value of the credits.  Credits are specified as positive numbers and are subtracted from the cert results to determine a compliance result
+    The value of the credits.  Credits are specified as positive numbers and are subtracted from the cert results
+    to determine a compliance result
 
 **CODE**
 
@@ -169,7 +171,8 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             validation_dict = {'credit_name': ['start_stop', 'high_eff_alternator', 'ac_leakage', 'ac_efficiency'],

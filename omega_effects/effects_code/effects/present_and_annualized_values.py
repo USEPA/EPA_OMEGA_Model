@@ -221,7 +221,8 @@ class PVandEAV:
                     for rc_id in self.reg_class_ids:
                         for fuel_id in self.in_use_fuel_ids:
                             annualized_values_dict.update({
-                                (session_policy, session_name, calendar_year, series, social_discrate, rc_id, fuel_id): {
+                                (session_policy, session_name, calendar_year, series, social_discrate, rc_id, fuel_id):
+                                    {
                                     'session_policy': session_policy,
                                     'session_name': session_name,
                                     'calendar_year': calendar_year,
@@ -229,7 +230,7 @@ class PVandEAV:
                                     'discount_rate': social_discrate,
                                     'reg_class_id': rc_id,
                                     'in_use_fuel_id': fuel_id,
-                                }
+                                    }
                             }
                             )
 
@@ -245,15 +246,19 @@ class PVandEAV:
                                 periods = calendar_year - self.discount_to_year + self.discount_offset
                                 if periods < 1:
                                     key = \
-                                        (session_policy, session_name, calendar_year, 'AnnualValue', social_discrate, rc_id, fuel_id)
+                                        (session_policy, session_name, calendar_year, 'AnnualValue',
+                                         social_discrate, rc_id, fuel_id)
                                     arg_annualized_value = calcs_dict[key][arg]
                                 else:
-                                    key = (session_policy, session_name, calendar_year, 'PresentValue', social_discrate, rc_id, fuel_id)
+                                    key = (session_policy, session_name, calendar_year, 'PresentValue',
+                                           social_discrate, rc_id, fuel_id)
                                     arg_present_value = calcs_dict[key][arg]
                                     arg_annualized_value = \
-                                        self.calc_annualized_value(arg_present_value, social_discrate, periods, self.annualized_offset)
+                                        self.calc_annualized_value(arg_present_value,
+                                                                   social_discrate, periods, self.annualized_offset)
 
-                                key = (session_policy, session_name, calendar_year, series, social_discrate, rc_id, fuel_id)
+                                key = (session_policy, session_name, calendar_year, series,
+                                       social_discrate, rc_id, fuel_id)
                                 annualized_values_dict[key][arg] = arg_annualized_value
                                 annualized_values_dict[key]['periods'] = periods
                                 annualized_values_dict[key]['fueling_class'] = fueling_class
@@ -271,7 +276,8 @@ class PVandEAV:
                                     arg_annualized_value = calcs_dict[key][arg]
                                 else:
                                     key = (
-                                        session_policy, session_name, calendar_year, 'PresentValue', social_discrate, rc_id,
+                                        session_policy, session_name, calendar_year, 'PresentValue',
+                                        social_discrate, rc_id,
                                         fuel_id)
                                     arg_present_value = calcs_dict[key][arg]
                                     arg_annualized_value = \
@@ -279,7 +285,8 @@ class PVandEAV:
                                                                    self.annualized_offset)
 
                                 key = (
-                                    session_policy, session_name, calendar_year, series, social_discrate, rc_id, fuel_id)
+                                    session_policy, session_name, calendar_year, series,
+                                    social_discrate, rc_id, fuel_id)
                                 annualized_values_dict[key][arg] = arg_annualized_value
 
                 emission_discrate = 0.03

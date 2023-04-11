@@ -87,8 +87,8 @@ def calc_fuel_cost_per_mile(batch_settings, session_settings):
                         refuel_efficiency \
                             = batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
                         co2_emissions_grams_per_unit \
-                            = batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel,
-                                                                             'direct_co2e_grams_per_unit') / refuel_efficiency
+                            = batch_settings.onroad_fuels.get_fuel_attribute(
+                                calendar_year, fuel, 'direct_co2e_grams_per_unit') / refuel_efficiency
                         onroad_gallons_per_mile += onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
                         onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
                         fuel_cpm += onroad_gallons_per_mile * retail_price_l

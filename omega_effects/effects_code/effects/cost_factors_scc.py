@@ -33,7 +33,8 @@ Data Column Name and Description
         implicit_price_deflators input file.
 
     :co2_global_5.0_USD_per_metricton:
-        The structure for all cost factors is pollutant_scope_discount-rate_units, where scope is global or domestic and units are in US dollars per metric ton.
+        The structure for all cost factors is pollutant_scope_discount-rate_units, where scope is global or domestic
+        and units are in US dollars per metric ton.
 
 
 ----

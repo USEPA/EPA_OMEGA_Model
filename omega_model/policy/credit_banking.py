@@ -553,8 +553,10 @@ class CreditBank(OMEGABase):
         self.transaction_log = pd.concat([self.transaction_log, t])
         this_years_credits.loc[credit.name] = credit  # update credit
         this_years_credits.loc[debit.name] = debit  # update debit
-        ManufacturerAnnualData.update_model_year_cert_co2e_Mg(debit['model_year'], debit['compliance_id'], -transaction_amount_Mg)
-        ManufacturerAnnualData.update_model_year_cert_co2e_Mg(credit['model_year'], credit['compliance_id'], +transaction_amount_Mg)
+        ManufacturerAnnualData.update_model_year_cert_co2e_Mg(debit['model_year'], debit['compliance_id'],
+                                                              -transaction_amount_Mg)
+        ManufacturerAnnualData.update_model_year_cert_co2e_Mg(credit['model_year'], credit['compliance_id'],
+                                                              +transaction_amount_Mg)
 
 
 if __name__ == '__main__':

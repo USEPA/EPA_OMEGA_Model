@@ -363,7 +363,7 @@ class DispyCluster(object):
         self.master_ip = self.get_ip_address()
         print('Master IP = %s' % self.master_ip)
         if not self.options.local and (self.options.dispy_ping or self.options.network):
-            self.desired_node_list = []  # ['204.47.184.69', '204.47.184.60', '204.47.184.72', '204.47.184.63', '204.47.184.59']
+            self.desired_node_list = []
         elif self.options.local:
             self.desired_node_list = self.master_ip  # for local run
         else:
@@ -427,7 +427,8 @@ class DispyCluster(object):
             batch (OMEGABatchObject): the batch object, see ``omega_batch.py``
             batch_name (str): the name of the batch, e.g. '2021_06_29_13_34_44_multiple_session_batch'
             batch_path (str): the filesystem path to the bundle folder for the batch, e.g. '/Users/omega_user/bundle'
-            batch_file (str): the filesystem path to the batch file to run (minus the '.csv' extension), e.g. '/Users/omega_user/bundle/2021_06_29_13_34_44_batch/2021_06_29_13_34_44_batch'
+            batch_file (str): the filesystem path to the batch file to run (minus the '.csv' extension),
+                e.g. '/Users/omega_user/bundle/2021_06_29_13_34_44_batch/2021_06_29_13_34_44_batch'
             session_list (iterable): a list or range of one or more sessions to run, by session number, e.g. range(1, 3)
             calc_effects (str): the type of effects to calc, if any
 
