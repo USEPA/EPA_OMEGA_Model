@@ -193,6 +193,7 @@ try:
             self.producer_compliance_search_tolerance = 1e-6
             self.producer_compliance_search_multipoint = True  # disable for zevregion batches
             self.producer_cross_subsidy_price_tolerance = 5e-3
+            self.producer_strategic_compliance_buffer = 0.0
             self.run_profiler = False
             self.multiprocessing = True and not self.run_profiler and not getattr(sys, 'frozen', False)
             self.non_context_session_process_scaler = 1

@@ -745,15 +745,19 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         if producer_compliance_possible is not None:
             production_options['share_range'] = share_range
 
+            buffered_strategic_target_offset_Mg = strategic_target_offset_Mg - \
+                production_options['total_target_co2e_megagrams'] * \
+                omega_globals.options.producer_strategic_compliance_buffer
+
             production_options['strategic_compliance_ratio'] = \
-                (production_options['total_cert_co2e_megagrams'] - strategic_target_offset_Mg) / \
+                (production_options['total_cert_co2e_megagrams'] - buffered_strategic_target_offset_Mg) / \
                 np.maximum(1, production_options['total_target_co2e_megagrams'])
 
-            production_options['strategic_target_offset_Mg'] = strategic_target_offset_Mg
+            production_options['strategic_target_offset_Mg'] = buffered_strategic_target_offset_Mg
 
             candidate_production_decisions, compliance_possible = \
                 select_candidate_manufacturing_decisions(production_options, calendar_year, search_iteration,
-                                                         producer_iteration_log, strategic_target_offset_Mg)
+                                                         producer_iteration_log, buffered_strategic_target_offset_Mg)
 
             producer_compliance_possible |= compliance_possible
 
