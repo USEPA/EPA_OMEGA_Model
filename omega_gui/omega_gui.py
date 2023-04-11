@@ -80,9 +80,6 @@ log_file_batch = "batch_logfile.txt"
 log_file_session_prefix = "o2log_"
 log_file_session_suffix = "_ReferencePolicy.txt"
 
-app = None
-form = None
-
 
 class Form(QObject):
     """
