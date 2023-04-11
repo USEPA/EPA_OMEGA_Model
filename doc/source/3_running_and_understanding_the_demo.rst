@@ -38,10 +38,6 @@ Description of the 'Run Model' tab elements:
 *  Element 1 - Tab Selection
     Tabs to select areas of the GUI.
 
-::
-
-    Note: The 'Results' tab is not currently active.
-
 *  Element 2 - Input Batch File
     Allows the user to select the Input Batch File.  The Input Batch File is a standard OMEGA input file that describes the complete parameters for a model run.  The Input Batch File may be selected from the file menu or the "..." button within the element field.  When the Input Batch File is selected, the complete path will be displayed.  Hovering the cursor over the complete path will display just the base file name.
 
@@ -85,43 +81,6 @@ If a model run configuration was previously saved, the configuration may be relo
 
     Configuration File Loaded
 
-Set Model Run Options
-+++++++++++++++++++++
-Selecting the 'Options' tab will show a display similar to :numref:`ug_label11` below.
-
-.. _ug_label11:
-.. figure:: _static/gui_figures/gui_options_page.jpg
-    :align: center
-
-    GUI Options Tab Display
-
-The OMEGA model can be optionally configured to utilize multiple system processors for true multitasking that significantly reduces model completion time. Checking the 'Enable Multiprocessor' box instructs OMEGA to use multiprocessor mode. The 'Multiprocessor Help' button provides additional information.
-
-The Event Monitor will indicate multiprocessor availability during GUI launch as shown in :numref:`ug_label1` above.
-
-To use the Multiprocessor mode, a batch file customized to the configuration
-of this computer must be executed before the GUI is launched.
-
-Example Multiprocessor Batch File:
-
-::
-
-    ECHO OFF
-
-    REM set BASEPATH to the python install on your machine that has dispy installed
-    set BASEPATH=C:\dev\GitHub\EPA_OMEGA_Model\venv\
-
-    REM location of python.exe (in Scripts path for venvs, else in basepath for straight install):
-    set PYTHONPATH=%BASEPATH%Scripts\
-
-    REM location of dispy package:
-    set DISPYPATH=%BASEPATH%Lib\site-packages\dispy\
-
-    REM how many cpus to serve (e.g. number of cores minus one)
-    set NUM_CPUS=7
-
-    ECHO ON
-    "%PYTHONPATH%python" "%DISPYPATH%dispynode.py" --clean --cpus=%NUM_CPUS% --client_shutdown --ping_interval=15 --daemon --zombie_interval=1
 
 .. _ug_run_the_model:
 
