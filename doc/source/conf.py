@@ -20,8 +20,10 @@ sys.path.insert(0, os.path.join(path, '..', '..'))  # picks up the top-level pac
 
 # -- Project information -----------------------------------------------------
 
+import datetime
+
 project = 'OMEGA'
-copyright = '2021, US EPA'
+copyright = '%s, US EPA' % datetime.datetime.now().strftime('%Y')
 author = 'US EPA'
 
 # The full version, including alpha/beta/rc tags
@@ -63,6 +65,10 @@ html_theme = 'sphinx_rtd_theme'
 html_logo = path + '/_static/OMEGA_logo_transparent.png'
 numfig = True
 todo_include_todos = True
+
+html_title = '%s %s Documentation (rev. % s)' % (project, release, datetime.datetime.now().strftime('%-m/%-d/%Y'))
+
+html_last_updated_fmt = '%-m/%-d/%Y'
 
 html_theme_options = {
     'navigation_depth': 5,
