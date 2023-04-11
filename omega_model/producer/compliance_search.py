@@ -268,7 +268,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
     if node_name == '' and share_range == 1.0 and consumer_response is not None and \
             consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']:
-        omega_log.logwrite('%%%%%% Production Constraints Violated, Modifying Constraints %%%%%%')
+        # omega_log.logwrite('%%%%%% Production Constraints Violated, Modifying Constraints %%%%%%')
 
         if consumer_response['total_ALT_battery_GWh'] > 0:
             constraint_ratio = max(0, 0.99 * ((consumer_response['battery_GWh_limit'] -
@@ -277,13 +277,13 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
         else:
             constraint_ratio = 0
 
-        omega_log.logwrite('*** constraint ratio %f, %f, %f, %f, %f->%f' %
-              (constraint_ratio,
-               consumer_response['battery_GWh_limit'],
-               consumer_response['total_battery_GWh'],
-               consumer_response['total_NO_ALT_battery_GWh'],
-               consumer_response['total_ALT_battery_GWh'],
-               consumer_response['total_ALT_battery_GWh'] * constraint_ratio))
+        # omega_log.logwrite('*** constraint ratio %f, %f, %f, %f, %f->%f' %
+        #       (constraint_ratio,
+        #        consumer_response['battery_GWh_limit'],
+        #        consumer_response['total_battery_GWh'],
+        #        consumer_response['total_NO_ALT_battery_GWh'],
+        #        consumer_response['total_ALT_battery_GWh'],
+        #        consumer_response['total_ALT_battery_GWh'] * constraint_ratio))
 
     responsive_children = [s in omega_globals.options.MarketClass.responsive_market_categories for s in children if
                            market_class_dict[s]]
@@ -325,8 +325,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
                         if consumer_response is not None and \
                                 consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']:
-                            omega_log.logwrite("consumer_response['total_battery_GWh'] > "
-                                               "consumer_response['battery_GWh_limit']")
+                            # omega_log.logwrite("consumer_response['total_battery_GWh'] > "
+                            #                    "consumer_response['battery_GWh_limit']")
                             # adjust constraints
                             if consumer_response['total_ALT_battery_GWh'] > 0:
                                 constraint_ratio = max(0, 0.99 * ((consumer_response['battery_GWh_limit'] -
@@ -347,9 +347,9 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                     max_constraints.pop(k)
 
                         elif consumer_response is not None:
-                            if 'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
-                                print("consumer_response['total_battery_GWh'] <= "
-                                      "consumer_response['battery_GWh_limit']")
+                            # if 'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
+                            #     print("consumer_response['total_battery_GWh'] <= "
+                            #           "consumer_response['battery_GWh_limit']")
                             node_market_classes = [node_name + '.' + c for c in children]
 
                             # pop non-partition keys
@@ -726,11 +726,11 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             production_options[production_options['total_battery_GWh'] <= battery_GWh_limit].copy()
 
         if valid_production_options.empty:
-            omega_log.logwrite('%%%%%% Production Constraints Violated ... limit: %f, min / max: %f / %f %%%%%%' %
-                               (battery_GWh_limit,
-                                production_options['total_battery_GWh'].min(),
-                                production_options['total_battery_GWh'].max())
-                               )
+            # omega_log.logwrite('%%%%%% Production Constraints Violated ... limit: %f, min / max: %f / %f %%%%%%' %
+            #                    (battery_GWh_limit,
+            #                     production_options['total_battery_GWh'].min(),
+            #                     production_options['total_battery_GWh'].max())
+            #                    )
             # take the closest one(s), see how that goes...
             valid_production_options = \
                 production_options[production_options['total_battery_GWh'] ==
