@@ -332,8 +332,8 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                                                                 strategic_target_offset_Mg,
                                                                 prior_producer_decision_and_response)
 
-                if producer_compliant is None:
-                    omega_log.logwrite('%%%%%% Production Constraints Violated ... %%%%%%')
+                # if producer_compliant is None:
+                #     omega_log.logwrite('%%%%%% Production Constraints Violated ... %%%%%%')
 
                 # composite vehicles have been updated from producer_decision at this point
                 producer_market_classes = \
