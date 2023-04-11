@@ -24,7 +24,7 @@ import datetime
 
 project = 'OMEGA'
 copyright = '%s, US EPA, revised %s' % \
-            (datetime.datetime.now().strftime('%Y'), datetime.datetime.now().strftime('%-m/%d/%Y'))
+            (datetime.datetime.now().strftime('%Y'), datetime.datetime.now().strftime('%-m/%-d/%Y'))
 author = 'US EPA'
 
 # The full version, including alpha/beta/rc tags
@@ -67,7 +67,7 @@ html_logo = path + '/_static/OMEGA_logo_transparent.png'
 numfig = True
 todo_include_todos = True
 
-html_title = '%s %s Documentation (rev. % s)' % (project, release, datetime.datetime.now().strftime('%-m/%d/%Y'))
+html_title = '%s %s Documentation (rev. % s)' % (project, release, datetime.datetime.now().strftime('%-m/%-d/%Y'))
 
 html_theme_options = {
     'navigation_depth': 5,
