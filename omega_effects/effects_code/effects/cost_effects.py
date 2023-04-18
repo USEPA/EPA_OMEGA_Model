@@ -10,6 +10,8 @@ omega_effects module and other functions here are called from within the calc_co
 """
 import pandas as pd
 
+from omega_effects.effects_code.effects.discounting import discount_model_year_values
+
 
 def get_congestion_noise_cf(batch_settings, reg_class_id):
     """
@@ -358,6 +360,11 @@ def calc_period_consumer_view(batch_settings, input_df):
     # now create a sales column for use in some of the 'per vehicle' calcs below
     df.insert(df.columns.get_loc('registered_count'), 'sales', df['registered_count'])
     df.loc[df['age'] != 0, 'sales'] = 0
+
+    discounted_df = discount_model_year_values(df)
+
+    df = pd.concat([df, discounted_df], axis=0, ignore_index=True)
+    df.reset_index(inplace=True, drop=True)
 
     # groupby model year, body_style, powertrain and fuel
     groupby_cols = ['session_policy', 'session_name', 'discount_rate', 'model_year', 'body_style', 'in_use_fuel_id']

@@ -206,7 +206,7 @@ def main():
             = pd.concat([annual_cost_effects_df, session_annual_cost_effects_df], axis=0, ignore_index=True)
         annual_cost_effects_df.reset_index(inplace=True, drop=True)
 
-        # for use in consumer calcs, create a my_lifetime_cost_effects_df of undiscounted lifetime costs
+        # for use in consumer calcs, create a my_lifetime_cost_effects_df of lifetime costs
         my_lifetime_cost_effects_df = pd.concat([my_lifetime_cost_effects_df, session_my_period_cost_effects_df],
                                                 axis=0, ignore_index=True)
         my_lifetime_cost_effects_df.reset_index(inplace=True, drop=True)

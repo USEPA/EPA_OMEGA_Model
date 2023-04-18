@@ -7,6 +7,7 @@
 **CODE**
 
 """
+import pandas as pd
 
 
 class Discounting:
@@ -22,69 +23,6 @@ class Discounting:
         self.all_monetized_args = []
         self.monetized_non_emission_args = []
         self.rate_list_dict = {}
-
-    @staticmethod
-    def discount_value(arg_value, rate, year, discount_to, cost_accrual):
-        """
-
-        Parameters:
-            arg_value (float): the value to be discounted.
-            rate (float): the discount rate to use.
-            year (int): the calendar year associated with arg_value.
-            discount_to (int): the calendar year to which to discount the value.
-            cost_accrual (str): set via the general_inputs file to indicate whether costs occur at the start or end of
-            the year.
-
-        Returns:
-            A single value representing arg_value discounted to year discount_to at rate.
-
-        """
-        # no discounting of values that occur prior to "discount_to_year"; exponent controls for that
-        if 'start' in cost_accrual:
-            exponent = max(0, year - discount_to)
-        else:
-            exponent = max(0, year - discount_to + 1)
-
-        return arg_value / (1 + rate) ** exponent
-
-    @staticmethod
-    def annualize_value(present_value, rate, periods, cost_accrual):
-        """
-
-        Parameters:
-            present_value (float): the present value to be annualized.
-            rate (float): the discount rate to use.
-            periods (int): the number of periods over which to annualize present_value.
-            cost_accrual (str): set via the general_inputs file to indicate whether costs occur at the start or end of
-            the year.
-
-        Returns:
-            A single annualized value of present_value discounted at rate over periods number of year_ids.
-
-        """
-        if 'start' in cost_accrual:
-            return present_value * rate * (1 + rate) ** periods \
-                   / ((1 + rate) ** (periods + 1) - 1)
-        else:
-            return present_value * rate * (1 + rate) ** periods \
-                   / ((1 + rate) ** periods - 1)
-
-    @staticmethod
-    def set_fueling_class(fuel_id):
-        """
-        Set fueling class based on the provided fuel id.
-
-        Args:
-            fuel_id (str): e.g. 'electricity'
-
-        Returns:
-            ``'BEV'`` or ``'ICE'`` depending on the fuel id.
-
-        """
-        if 'electricity' in fuel_id:
-            return 'BEV'
-        else:
-            return 'ICE'
 
     def discount_annual_values(self, batch_settings, annual_values_df):
         """
@@ -158,15 +96,14 @@ class Discounting:
                 for arg in self.monetized_non_emission_args:
                     arg_value = v[arg]
                     discounted_value = \
-                        self.discount_value(arg_value, social_discrate, calendar_year, discount_to_year, cost_accrual)
+                        discount_value(arg_value, social_discrate, calendar_year, discount_to_year, cost_accrual)
                     rate_dict.update({arg: discounted_value})
 
                 for emission_discrate, arg_list in self.rate_list_dict.items():
                     for arg in arg_list:
                         arg_value = v[arg]
                         discounted_value = \
-                            self.discount_value(arg_value, emission_discrate, calendar_year, discount_to_year,
-                                                cost_accrual)
+                            discount_value(arg_value, emission_discrate, calendar_year, discount_to_year, cost_accrual)
                         rate_dict.update({arg: discounted_value})
 
                 update_dict[(session_policy, calendar_year, reg_class_id, fuel_id, social_discrate, series)] = rate_dict
@@ -240,11 +177,128 @@ class Discounting:
 
                 for arg in self.monetized_non_emission_args:
                     present_value = v[arg]
-                    annualized_value = self.annualize_value(present_value, discount_rate, periods, cost_accrual)
+                    annualized_value = annualize_value(present_value, discount_rate, periods, cost_accrual)
                     self.eav_dict[eav_dict_key][arg] = annualized_value
 
                 for emission_discrate, arg_list in self.rate_list_dict.items():
                     for arg in arg_list:
                         present_value = v[arg]
-                        annualized_value = self.annualize_value(present_value, emission_discrate, periods, cost_accrual)
+                        annualized_value = annualize_value(present_value, emission_discrate, periods, cost_accrual)
                         self.eav_dict[eav_dict_key][arg] = annualized_value
+
+def discount_model_year_values(model_year_df):
+    """
+    The discount function determines attributes appropriate for discounting and does the discounting calculation to
+    the first year of any given model year.
+
+    Parameters:
+        model_year_df: A DataFrame of values to be discounted.
+
+    Returns:
+        A DataFrame providing discounted model year values where monetized values are discounted to the first year
+        of the model year.
+
+    """
+    dict_of_values = model_year_df.to_dict(orient='index')
+    cost_accrual = 'end-of-year'  # hard coded here for model year discounting
+
+    # establish and distinguish attributes
+    nested_dict = [v for v in dict_of_values.values()][0]
+    my_monetized_args = [k for k, v in nested_dict.items() if '_dollars' in k and 'avg' not in k]
+    non_discounted_args = [arg for arg in my_monetized_args
+                           if 'vehicle' in arg
+                           or 'purchase' in arg
+                           or 'battery' in arg]
+    discounted_args = [arg for arg in my_monetized_args if arg not in non_discounted_args]
+    id_args = [k for k, v in nested_dict.items() if '_dollars' not in k]
+
+    discounted_my_dict = {}
+    for v in dict_of_values.values():
+
+        vehicle_id, calendar_year, model_year = v['vehicle_id'], v['calendar_year'], v['model_year']
+
+        for social_discrate in Discounting().social_discrates:
+            rate_dict = {}
+            for arg in id_args:
+                if arg == 'discount_rate':
+                    arg_value = social_discrate
+                else:
+                    arg_value = v[arg]
+                rate_dict.update({arg: arg_value})
+
+            for arg in non_discounted_args:
+                arg_value = v[arg]
+                rate_dict.update({arg: arg_value})
+
+            for arg in discounted_args:
+                arg_value = v[arg]
+                discounted_value = \
+                    discount_value(arg_value, social_discrate, calendar_year, model_year, cost_accrual)
+                rate_dict.update({arg: discounted_value})
+
+            discounted_my_dict[(vehicle_id, calendar_year, social_discrate)] = rate_dict
+
+    return pd.DataFrame.from_dict(discounted_my_dict, orient='index')
+
+
+def discount_value(arg_value, rate, year, discount_to, cost_accrual):
+    """
+
+    Parameters:
+        arg_value (float): the value to be discounted.
+        rate (float): the discount rate to use.
+        year (int): the calendar year associated with arg_value.
+        discount_to (int): the calendar year to which to discount the value.
+        cost_accrual (str): set via the general_inputs file to indicate whether costs occur at the start or end of
+        the year.
+
+    Returns:
+        A single value representing arg_value discounted to year discount_to at rate.
+
+    """
+    # no discounting of values that occur prior to "discount_to_year"; exponent controls for that
+    if 'start' in cost_accrual:
+        exponent = max(0, year - discount_to)
+    else:
+        exponent = max(0, year - discount_to + 1)
+
+    return arg_value / (1 + rate) ** exponent
+
+
+def annualize_value(present_value, rate, periods, cost_accrual):
+    """
+
+    Parameters:
+        present_value (float): the present value to be annualized.
+        rate (float): the discount rate to use.
+        periods (int): the number of periods over which to annualize present_value.
+        cost_accrual (str): set via the general_inputs file to indicate whether costs occur at the start or end of
+        the year.
+
+    Returns:
+        A single annualized value of present_value discounted at rate over periods number of year_ids.
+
+    """
+    if 'start' in cost_accrual:
+        return present_value * rate * (1 + rate) ** periods \
+               / ((1 + rate) ** (periods + 1) - 1)
+    else:
+        return present_value * rate * (1 + rate) ** periods \
+               / ((1 + rate) ** periods - 1)
+
+
+def set_fueling_class(fuel_id):
+    """
+    Set fueling class based on the provided fuel id.
+
+    Args:
+        fuel_id (str): e.g. 'electricity'
+
+    Returns:
+        ``'BEV'`` or ``'ICE'`` depending on the fuel id.
+
+    """
+    if 'electricity' in fuel_id:
+        return 'BEV'
+    else:
+        return 'ICE'
