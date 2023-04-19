@@ -186,6 +186,7 @@ class Discounting:
                         annualized_value = annualize_value(present_value, emission_discrate, periods, cost_accrual)
                         self.eav_dict[eav_dict_key][arg] = annualized_value
 
+
 def discount_model_year_values(model_year_df):
     """
     The discount function determines attributes appropriate for discounting and does the discounting calculation to
