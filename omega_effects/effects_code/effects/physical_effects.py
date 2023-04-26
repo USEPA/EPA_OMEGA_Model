@@ -18,11 +18,11 @@ def get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg
 
     Args:
         session_settings: an instance of the SessionSettings class.
-        model_year: The model year of the specific vehicle.
-        sourcetype_name: The MOVES sourcetype name (e.g., 'passenger car', 'passenger truck', 'light commercial truck')
-        reg_class_id: The regulatory class ID of the vehicle.
-        fuel: The fuel ID (i.e., pump gasoline, pump diesel)
-        ind_var_value: The independent variable value, e.g., age or odometer
+        model_year (int): The model year of the specific vehicle.
+        sourcetype_name (str): The MOVES sourcetype name (e.g., 'passenger car', 'passenger truck', 'light commercial truck')
+        reg_class_id (str): The regulatory class ID of the vehicle.
+        fuel (str): The fuel ID (i.e., pump gasoline, pump diesel)
+        ind_var_value (str): The independent variable value, e.g., age or odometer
 
     Returns:
         A list of emission rates for the given model year vehicle in a given calendar year.
@@ -101,14 +101,13 @@ def get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg
     return rates
 
 
-def get_egu_emission_rate(session_settings, calendar_year, kwh_consumption, kwh_generation):
+def get_egu_emission_rate(session_settings, calendar_year, kwh_consumption):
     """
 
     Args:
         session_settings: an instance of the SessionSettings class.
-        calendar_year: The calendar year for which egu emission rates are needed.
-        kwh_consumption: The energy consumed by the fleet measured at the wall or charger outlet
-        kwh_generation: The energy generated to satisfy the kwh_consumption value (not used)
+        calendar_year (int): The calendar year for which egu emission rates are needed.
+        kwh_consumption (float): The energy consumed by the fleet measured at the wall or charger outlet
 
     Returns:
         A list of EGU emission rates for the given calendar year.
@@ -137,7 +136,7 @@ def get_refinery_emission_rate(session_settings, calendar_year):
 
     Args:
         session_settings: an instance of the SessionSettings class.
-        calendar_year: The calendar year for which a refinery emission factors are needed.
+        calendar_year (int): The calendar year for which a refinery emission factors are needed.
 
     Returns:
         A list of refinery emission rates as specified in the emission_rates list for the given calendar year.
@@ -158,8 +157,8 @@ def get_refinery_ef(session_settings, calendar_year, fuel):
 
     Args:
         session_settings: an instance of the SessionSettings class.
-        calendar_year: The calendar year for which a refinery emission factors are needed.
-        fuel: The fuel ID for which refinery emission factors are needed (i.e., pump_gasoline, pump_diesel).
+        calendar_year (int): The calendar year for which a refinery emission factors are needed.
+        fuel (str): The fuel ID for which refinery emission factors are needed (i.e., pump_gasoline, pump_diesel).
 
     Returns:
         A list of refinery emission factors as specified in the emission_factors list for the given calendar year
@@ -190,7 +189,7 @@ def get_energysecurity_cf(batch_settings, calendar_year):
 
     Args:
         batch_settings: an instance of the BatchSettings class.
-        calendar_year: The calendar year for which energy security related factors are needed.
+        calendar_year (int): The calendar year for which energy security related factors are needed.
 
     Returns:
         A list of cost factors as specified in the cost_factors list for the given calendar year.
@@ -211,7 +210,7 @@ def get_inputs_for_effects(batch_settings, arg=None):
 
     Args:
         batch_settings: an instance of the BatchSettings class.
-        arg: The attribute for which an attribute value is needed.
+        arg (str): The attribute for which an attribute value is needed.
 
     Returns:
         A list of necessary input values for use in calculating effects; use index=[0] if passing a single attribute.
@@ -228,12 +227,8 @@ def get_inputs_for_effects(batch_settings, arg=None):
             'e0_energy_density_ratio',
             'diesel_energy_density_ratio',
             'fuel_reduction_leading_to_reduced_domestic_refining',
-            # 'gallons_of_gasoline_us_annual',
-            # 'bbl_oil_us_annual',
-            # 'kwh_us_annual',
-            # 'year_for_compares',
         ]
-        values = list()
+        values = []
         for arg in args:
             values.append(batch_settings.general_inputs_for_effects.get_value(arg))
 
@@ -276,24 +271,20 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
     grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, \
         diesel_energy_density_ratio, fuel_reduction_leading_to_reduced_domestic_refining \
         = get_inputs_for_effects(batch_settings)
-    # gallons_of_gasoline_us_annual, bbl_oil_us_annual, kwh_us_annual, year_for_compares = \
-    #  get_inputs_for_effects(*input_attributes_list)
-    # year_for_compares = int(year_for_compares)
 
-    physical_effects_dict = dict()
-    vehicle_info_dict = dict()
+    physical_effects_dict = {}
+    vehicle_info_dict = {}
     calendar_years = batch_settings.calendar_years
     for calendar_year in calendar_years:
 
         vads = session_settings.vehicle_annual_data.get_adjusted_vehicle_annual_data_by_calendar_year(calendar_year)
 
         # UPDATE physical effects data
-        calendar_year_effects_dict = dict()
+        calendar_year_effects_dict = {}
 
         # first a loop to determine kwh demand for this calendar year
         fuel_consumption_kWh_annual = fuel_generation_kWh_annual = 0
         for vad in vads:
-            # if vad['registered_count'] >= 1:
 
             # need vehicle info once for each vehicle, not every calendar year for each vehicle
             vehicle_id = int(vad['vehicle_id'])
@@ -312,24 +303,19 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
             fuel_dict = eval(in_use_fuel_id)
             for fuel, fuel_share in fuel_dict.items():
                 if fuel == 'US electricity' and onroad_direct_kwh_per_mile:
-                    # refuel_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
                     transmission_efficiency \
                         = batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'transmission_efficiency')
 
-                    safety_effects_key = (vehicle_id, calendar_year, age)
-                    vmt = safety_effects_dict[safety_effects_key]['vmt']
+                    vmt = safety_effects_dict[(vehicle_id, calendar_year)]['vmt']
                     vmt_electricity = vmt * fuel_share
                     fuel_consumption_kWh_annual += vmt_electricity * onroad_direct_kwh_per_mile
-                    fuel_generation_kWh_annual = fuel_consumption_kWh_annual / transmission_efficiency
 
         # upstream EGU emission rates for this calendar year to apply to electric fuel operation
         voc_egu_rate, co_egu_rate, nox_egu_rate, pm25_egu_rate, sox_egu_rate, \
             co2_egu_rate, ch4_egu_rate, n2o_egu_rate, hcl_egu_rate, hg_egu_rate \
-            = get_egu_emission_rate(session_settings, calendar_year, fuel_consumption_kWh_annual,
-                                    fuel_generation_kWh_annual)
+            = get_egu_emission_rate(session_settings, calendar_year, fuel_consumption_kWh_annual)
 
         for vad in vads:
-            # if vad['registered_count'] >= 1 and (vad['calendar_year'] - vad['age']) >= calendar_years[0]:
 
             vehicle_id = int(vad['vehicle_id'])
             age = int(vad['age'])
@@ -349,8 +335,7 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
             if model_year >= calendar_years[0]:
 
                 # get vmt and session fatalities from safety_effects_dict
-                safety_effects_key = (vehicle_id, calendar_year, age)
-                safety = safety_effects_dict[safety_effects_key]
+                safety = safety_effects_dict[(vehicle_id, calendar_year)]
                 session_fatalities, vmt, annual_vmt, odometer, calendar_year_vmt_adj, vmt_rebound, annual_vmt_rebound, \
                     size_class \
                     = safety['session_fatalities'], \
@@ -374,8 +359,7 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                     print('Improper sourcetype_name for vehicle emission rates.')
 
                 # need vehicle effects for each vehicle and for each calendar year since they change year-over-year
-                vehicle_effects_dict = dict()
-                flag = None
+                vehicle_effects_dict = {}
                 if target_co2e_grams_per_mile is not None:
 
                     liquid_fuel = None
@@ -620,14 +604,6 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                     oil_bbl = fuel_consumption_gallons * pure_share * energy_density_ratio / gal_per_bbl
                     imported_oil_bbl = oil_bbl * get_energysecurity_cf(batch_settings, calendar_year)
                     imported_oil_bbl_per_day = imported_oil_bbl / 365
-                    # share_of_us_annual_gasoline = fuel_consumption_gallons / gallons_of_gasoline_us_annual
-                    # share_of_us_annual_oil = oil_bbl / bbl_oil_us_annual
-
-                    # calc kwh and comparisons to year_for_compares
-                    # share_of_us_annual_kwh = fuel_generation_kWh / kwh_us_annual
-
-                    if vmt_liquid_fuel > 0 or vmt_electricity > 0:
-                        flag = 1
 
                     vehicle_effects_dict.update({
                         'session_policy': session_settings.session_policy,
@@ -667,10 +643,7 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                         'fuel_consumption_kWh': fuel_consumption_kWh,
                         'fuel_generation_kWh': fuel_generation_kWh,
 
-                        # f'share_of_{year_for_compares}_US_gasoline': share_of_us_annual_gasoline,
-                        # f'share_of_{year_for_compares}_US_kWh': share_of_us_annual_kwh,
                         'barrels_of_oil': oil_bbl,
-                        # f'share_of_{year_for_compares}_US_oil': share_of_us_annual_oil,
                         'barrels_of_imported_oil': imported_oil_bbl,
                         'barrels_of_imported_oil_per_day': imported_oil_bbl_per_day,
 
@@ -735,9 +708,8 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                         'n2o_total_metrictons': n2o_total_metrictons,
                     }
                     )
-                if flag:
-                    key = (vehicle_id, calendar_year, age)
-                    calendar_year_effects_dict[key] = vehicle_effects_dict
+
+                    calendar_year_effects_dict[(vehicle_id, calendar_year)] = vehicle_effects_dict
 
         physical_effects_dict.update(calendar_year_effects_dict)
 
@@ -758,19 +730,6 @@ def calc_annual_physical_effects(batch_settings, input_df):
     grams_per_metric_ton = get_inputs_for_effects(batch_settings, arg='grams_per_metric_ton')
     calendar_years = batch_settings.calendar_years
 
-    d = dict()
-    num = 0
-    for calendar_year in calendar_years:
-        d[num] = {
-            'calendar_year': calendar_year,
-            'transmission_efficiency': batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, 'US electricity',
-                                                                                      'transmission_efficiency')
-        }
-        num += 1
-
-    # elec_trans_efficiency = pd.DataFrame(d).transpose()
-    elec_trans_efficiency = pd.DataFrame.from_dict(d, orient='index')
-
     attributes = [col for col in input_df.columns if ('vmt' in col or 'vmt_' in col) and '_vmt' not in col]
     additional_attributes = ['count', 'consumption', 'generation', 'barrels', 'tons', 'fatalit', 'battery_kwh']
     for additional_attribute in additional_attributes:
@@ -782,7 +741,6 @@ def calc_annual_physical_effects(batch_settings, input_df):
     groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id']
     return_df = input_df[[*groupby_cols, *attributes]]
     return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
-    return_df = return_df.merge(elec_trans_efficiency, on='calendar_year', how='left')
 
     return_df.insert(return_df.columns.get_loc('in_use_fuel_id') + 1,
                      'fueling_class',
@@ -796,8 +754,7 @@ def calc_annual_physical_effects(batch_settings, input_df):
 
     return_df.insert(return_df.columns.get_loc('fuel_generation_kWh') + 1,
                      'onroad_direct_kwh_per_mile',
-                     return_df['fuel_consumption_kWh'] * return_df['transmission_efficiency'] /
-                     return_df['vmt_electricity'])
+                     return_df['fuel_consumption_kWh'] / return_df['vmt_electricity'])
 
     return_df.insert(return_df.columns.get_loc('fuel_generation_kWh') + 1,
                      'onroad_direct_co2e_grams_per_mile',
@@ -806,8 +763,6 @@ def calc_annual_physical_effects(batch_settings, input_df):
     attributes += ['onroad_gallons_per_mile',
                    'onroad_direct_kwh_per_mile',
                    'onroad_direct_co2e_grams_per_mile']
-
-    return_df.drop(columns='transmission_efficiency', inplace=True)
 
     return return_df
 
@@ -835,16 +790,15 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
         diesel_energy_density_ratio, fuel_reduction_leading_to_reduced_domestic_refining \
         = get_inputs_for_effects(batch_settings)
 
-    physical_effects_dict = dict()
+    physical_effects_dict = {}
     for key, nested_dict in batch_settings.legacy_fleet.adjusted_legacy_fleet.items():
 
-        vehicle_effects_dict = dict()
+        vehicle_effects_dict = {}
 
-        vehicle_id, calendar_year, age = key
+        vehicle_id, calendar_year, age = nested_dict['vehicle_id'], nested_dict['calendar_year'], nested_dict['age']
 
         # get vmt and session fatalities from safety_effects_dict
-        safety_effects_key = (vehicle_id, calendar_year, age)
-        safety = legacy_fleet_safety_effects_dict[safety_effects_key]
+        safety = legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year)]
         session_fatalities, vmt, annual_vmt, odometer, calendar_year_vmt_adj, vmt_rebound, annual_vmt_rebound, \
             size_class, body_style \
             = safety['session_fatalities'], \
@@ -872,8 +826,6 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             onroad_gallons_per_mile = 0
 
         onroad_kwh_per_mile = kwh_per_mile / 0.7
-
-        safety_dict_key = (vehicle_id, calendar_year, age)
 
         nmog_exh_ustons = nmog_evap_ustons = nmog_veh_ustons = 0
         co_exh_ustons = co_veh_ustons = 0
@@ -944,7 +896,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                 # the energy consumption and generation values do not matter here, so set to 0
                 voc_egu_rate, co_egu_rate, nox_egu_rate, pm25_egu_rate, sox_egu_rate, co2_egu_rate, ch4_egu_rate, \
                     n2o_egu_rate, hcl_egu_rate, hg_egu_rate \
-                    = get_egu_emission_rate(session_settings, calendar_year, 0, 0)
+                    = get_egu_emission_rate(session_settings, calendar_year, 0)
 
             elif 'gasoline' in fuel:
                 vmt_liquid_fuel = vmt
@@ -961,9 +913,6 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                         = get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg_class_id, fuel,
                                                     ind_var_value)
 
-                # voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co2_ref_rate, ch4_ref_rate, n2o_ref_rate \
-                #     = get_refinery_ef(session_settings, calendar_year, fuel)
-
                 energy_density_ratio, pure_share = e0_energy_density_ratio, e0_share
 
             elif 'diesel' in fuel:
@@ -977,9 +926,6 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                     butadiene13_exh_rate, pah15_exh_rate \
                         = get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg_class_id, fuel,
                                                     ind_var_value)
-
-                # voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co2_ref_rate, ch4_ref_rate, n2o_ref_rate \
-                #     = get_refinery_ef(session_settings, calendar_year, fuel)
 
                 energy_density_ratio, pure_share = diesel_energy_density_ratio, 1
 
@@ -1098,19 +1044,14 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
         oil_bbl = fuel_consumption_gallons * pure_share * energy_density_ratio / gal_per_bbl
         imported_oil_bbl = oil_bbl * get_energysecurity_cf(batch_settings, calendar_year)
         imported_oil_bbl_per_day = imported_oil_bbl / 365
-        # share_of_us_annual_gasoline = fuel_consumption_gallons / gallons_of_gasoline_us_annual
-        # share_of_us_annual_oil = oil_bbl / bbl_oil_us_annual
-
-        # calc kwh and comparisons to year_for_compares
-        # share_of_us_annual_kwh = fuel_generation_kWh / kwh_us_annual
 
         vehicle_effects_dict.update({
             'session_policy': session_settings.session_policy,
             'session_name': session_settings.session_name,
             'vehicle_id': vehicle_id,
             'base_year_vehicle_id': vehicle_id,
-            'manufacturer_id': legacy_fleet_safety_effects_dict[safety_dict_key]['manufacturer_id'],
-            'name': legacy_fleet_safety_effects_dict[safety_dict_key]['name'],
+            'manufacturer_id': legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year)]['manufacturer_id'],
+            'name': legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year)]['name'],
             'calendar_year': calendar_year,
             'model_year': model_year,
             'age': age,
@@ -1119,12 +1060,12 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'context_size_class': size_class,
             'in_use_fuel_id': in_use_fuel_id,
             'market_class_id': market_class_id,
-            'fueling_class': legacy_fleet_safety_effects_dict[safety_dict_key]['fueling_class'],
-            'base_year_powertrain_type': legacy_fleet_safety_effects_dict[safety_dict_key]['base_year_powertrain_type'],
-            'body_style': legacy_fleet_safety_effects_dict[safety_dict_key]['body_style'],
+            'fueling_class': legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year)]['fueling_class'],
+            'base_year_powertrain_type': legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year)]['base_year_powertrain_type'],
+            'body_style': legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year)]['body_style'],
             'footprint_ft2': 0,
             'workfactor': 0,
-            'registered_count': legacy_fleet_safety_effects_dict[safety_dict_key]['registered_count'],
+            'registered_count': legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year)]['registered_count'],
             'context_vmt_adjustment': calendar_year_vmt_adj,
             'annual_vmt': annual_vmt,
             'odometer': odometer,
@@ -1142,10 +1083,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'fuel_consumption_kWh': fuel_consumption_kWh,
             'fuel_generation_kWh': fuel_generation_kWh,
 
-            # f'share_of_{year_for_compares}_US_gasoline': share_of_us_annual_gasoline,
-            # f'share_of_{year_for_compares}_US_kWh': share_of_us_annual_kwh,
             'barrels_of_oil': oil_bbl,
-            # f'share_of_{year_for_compares}_US_oil': share_of_us_annual_oil,
             'barrels_of_imported_oil': imported_oil_bbl,
             'barrels_of_imported_oil_per_day': imported_oil_bbl_per_day,
 
@@ -1210,8 +1148,8 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'n2o_total_metrictons': n2o_total_metrictons,
         }
         )
-        key = (vehicle_id, calendar_year, age)
-        physical_effects_dict[key] = vehicle_effects_dict
+
+        physical_effects_dict[(vehicle_id, calendar_year)] = vehicle_effects_dict
 
     return physical_effects_dict
 

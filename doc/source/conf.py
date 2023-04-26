@@ -23,8 +23,7 @@ sys.path.insert(0, os.path.join(path, '..', '..'))  # picks up the top-level pac
 import datetime
 
 project = 'OMEGA'
-copyright = '%s, US EPA, revised %s' % \
-            (datetime.datetime.now().strftime('%Y'), datetime.datetime.now().strftime('%-m/%-d/%Y'))
+copyright = '%s, US EPA' % datetime.datetime.now().strftime('%Y')
 author = 'US EPA'
 
 # The full version, including alpha/beta/rc tags
@@ -68,6 +67,8 @@ numfig = True
 todo_include_todos = True
 
 html_title = '%s %s Documentation (rev. % s)' % (project, release, datetime.datetime.now().strftime('%-m/%-d/%Y'))
+
+html_last_updated_fmt = '%-m/%-d/%Y'
 
 html_theme_options = {
     'navigation_depth': 5,

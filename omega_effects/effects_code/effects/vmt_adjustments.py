@@ -16,7 +16,7 @@ class AdjustmentsVMT:
 
     """
     def __init__(self):
-        self.dict = dict()
+        self.dict = {}
 
     def calc_vmt_adjustments(self, batch_settings, session_settings):
         """
@@ -44,8 +44,8 @@ class AdjustmentsVMT:
                       for vad in vads if (vad['calendar_year'] - vad['age']) >= calendar_years[0])
 
             # next sum the vmt and registered count for this calendar year's legacy fleet
-            calendar_year_legacy_fleet =\
-                [v for k, v in batch_settings.legacy_fleet._legacy_fleet.items() if k[1] == calendar_year]
+            calendar_year_legacy_fleet = \
+                [v for v in batch_settings.legacy_fleet._legacy_fleet.values() if v['calendar_year'] == calendar_year]
             calendar_year_legacy_fleet_vmt = sum(v['vmt'] for v in calendar_year_legacy_fleet)
             calendar_year_legacy_fleet_stock = sum(v['registered_count'] for v in calendar_year_legacy_fleet)
 
