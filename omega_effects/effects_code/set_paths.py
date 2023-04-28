@@ -89,11 +89,11 @@ class SetPaths:
         return run_folder_identifier
 
     @staticmethod
-    def create_output_paths(runtime_options, batch_name, start_time_readable, run_id):
+    def create_output_paths(path_name, batch_name, start_time_readable, run_id):
         """
 
         Parameters:
-            runtime_options: an instance of the RuntimeOptions class.
+            path_name: save path set via batch settings file.
             batch_name (str): the batch name set via the runtime options input file.
             start_time_readable (str): the start time of the run, in text readable format.\n
             run_id (str): the run ID entered by the user or the default value if the user does not provide an ID.
@@ -102,8 +102,8 @@ class SetPaths:
             Output paths into which to save outputs of the given run.
 
         """
-        runtime_options.path_outputs.mkdir(exist_ok=True)
-        path_of_output_batch_folder = runtime_options.path_outputs / batch_name
+        path_name.mkdir(exist_ok=True)
+        path_of_output_batch_folder = path_name / batch_name
         path_of_output_batch_folder.mkdir(exist_ok=True)
         path_of_run_folder = path_of_output_batch_folder / f'{start_time_readable}_{run_id}'
         path_of_run_folder.mkdir(exist_ok=False)

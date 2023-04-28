@@ -21,7 +21,6 @@ from omega_effects.effects_code.batch_settings import BatchSettings
 from omega_effects.effects_code.session_settings import SessionSettings
 
 from omega_effects.effects_code.general.effects_log import EffectsLog
-from omega_effects.effects_code.general.runtime_options import RuntimeOptions
 from omega_effects.effects_code.general.general_functions import copy_files
 from omega_effects.effects_code.general.file_id_and_save import add_id_to_csv, save_file
 
@@ -52,21 +51,23 @@ def main():
     start_time = time()
     start_time_readable = datetime.now().strftime('%Y%m%d_%H%M%S')
 
-    runtime_options = RuntimeOptions()
-    runtime_options.init_from_file(batch_settings_file)
+    # runtime_options = RuntimeOptions()
+    # runtime_options.init_from_file(batch_settings_file)
 
     batch_settings = BatchSettings()
     batch_settings.init_from_file(batch_settings_file)
     batch_settings.get_batch_folder_and_name()
 
     path_of_run_folder, path_of_code_folder = \
-        set_paths.create_output_paths(runtime_options, batch_settings.batch_name, start_time_readable, run_id)
+        set_paths.create_output_paths(
+            batch_settings.path_outputs, batch_settings.batch_name, start_time_readable, run_id
+        )
 
     effects_log = EffectsLog()
     effects_log.init_logfile(path_of_run_folder)
     effects_log.logwrite(f'\nEPA OMEGA Model Effects Module started at {start_time_readable}\n')
 
-    runtime_options.get_runtime_options(effects_log)
+    batch_settings.get_runtime_options(effects_log)
     batch_settings.get_batch_settings(effects_log)
     batch_settings.init_batch_classes(effects_log)
 
@@ -81,7 +82,7 @@ def main():
     # context fuel cost per mile and vmt adjustments ___________________________________________________________________
     session_settings = SessionSettings()
     session_settings.get_context_session_settings(batch_settings, effects_log)
-    if runtime_options.save_input_files:
+    if batch_settings.save_input_files:
         copy_files(session_settings.inputs_filelist, path_of_run_folder / 'context_inputs')
 
     effects_log.logwrite('\nCalculating context vmt adjustments and context fuel cost per mile')
@@ -89,11 +90,11 @@ def main():
     vmt_adjustments_context.calc_vmt_adjustments(batch_settings, session_settings)
 
     context_fuel_cpm_dict = calc_fuel_cost_per_mile(batch_settings, session_settings)
-    if runtime_options.save_context_fuel_cost_per_mile_file:
+    if batch_settings.save_context_fuel_cost_per_mile_file:
         effects_log.logwrite(f'Saving context fuel cost per mile file')
         context_fuel_cpm_df = pd.DataFrame.from_dict(context_fuel_cpm_dict, orient='index').reset_index(drop=True)
         save_file(session_settings, context_fuel_cpm_df, path_of_run_folder, 'context_fuel_cost_per_mile',
-                  effects_log, extension=runtime_options.file_format)
+                  effects_log, extension=batch_settings.file_format)
 
     # loop thru sessions to calc safety effects, physical effects, cost effects for each _______________________________
     annual_safety_effects_df = pd.DataFrame()
@@ -108,7 +109,7 @@ def main():
         session_settings = SessionSettings()
         session_settings.get_session_settings(batch_settings, session_num, effects_log)
         session_name = session_settings.session_name
-        if runtime_options.save_input_files:
+        if batch_settings.save_input_files:
             copy_files(session_settings.inputs_filelist, path_of_run_folder / f'{session_name}_inputs')
 
         # vmt adjustments to vehicle annual data _______________________________________________________________________
@@ -135,10 +136,10 @@ def main():
         session_safety_effects_df = \
             pd.DataFrame.from_dict(session_safety_effects_dict, orient='index').reset_index(drop=True)
 
-        if runtime_options.save_vehicle_safety_effects_files:
+        if batch_settings.save_vehicle_safety_effects_files:
             effects_log.logwrite(f'Saving safety effects file for {session_name}')
             save_file(session_settings, session_safety_effects_df, path_of_run_folder, 'safety_effects',
-                      effects_log, extension=runtime_options.file_format)
+                      effects_log, extension=batch_settings.file_format)
 
         effects_log.logwrite(f'\nCalculating annual safety effects for {session_name}')
         session_annual_safety_effects_df = calc_annual_avg_safety_effects(session_safety_effects_df)
@@ -162,10 +163,10 @@ def main():
         session_physical_effects_df = \
             pd.DataFrame.from_dict(session_physical_effects_dict, orient='index').reset_index(drop=True)
 
-        if runtime_options.save_vehicle_physical_effects_files:
+        if batch_settings.save_vehicle_physical_effects_files:
             effects_log.logwrite(f'Saving physical effects file for {session_name}')
             save_file(session_settings, session_physical_effects_df, path_of_run_folder, 'physical_effects', effects_log,
-                      extension=runtime_options.file_format)
+                      extension=batch_settings.file_format)
 
         effects_log.logwrite(f'\nCalculating annual physical effects for {session_name}')
         session_annual_physical_effects_df = calc_annual_physical_effects(batch_settings, session_physical_effects_df)
@@ -193,10 +194,10 @@ def main():
 
         session_cost_effects_df = pd.DataFrame.from_dict(session_cost_effects_dict, orient='index').reset_index(drop=True)
 
-        if runtime_options.save_vehicle_cost_effects_files:
+        if batch_settings.save_vehicle_cost_effects_files:
             effects_log.logwrite(f'Saving cost effects file for {session_name}')
             save_file(session_settings, session_cost_effects_df, path_of_run_folder, 'cost_effects', effects_log,
-                      extension=runtime_options.file_format)
+                      extension=batch_settings.file_format)
 
         effects_log.logwrite(f'\nCalculating annual costs effects for {session_name}')
         session_annual_cost_effects_df = calc_annual_cost_effects(session_cost_effects_df)
@@ -331,7 +332,7 @@ def main():
     shutil.copy2(batch_settings_file, path_of_run_folder)
     set_paths.copy_code_to_destination(path_of_code_folder)
 
-    if runtime_options.save_input_files:
+    if batch_settings.save_input_files:
         copy_files(batch_settings.inputs_filelist, path_of_run_folder / 'batch_inputs')
 
     elapsed_runtime = round(time() - start_time, 2)
