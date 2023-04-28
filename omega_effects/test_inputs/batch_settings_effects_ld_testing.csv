@@ -1,5 +1,6 @@
 parameter,session_policy,value,full_path,notes
 RUNTIME OPTIONS,,,,
+Run ID,all,,,enter a run identifier (in value column) for your output folder name or blank for default (default is omega_effects)
 Save Path,all,,C:\omega\effects,"enter full path, including drive id but do not include unique run identifiers"
 Save Input Files,all,TRUE,,enter True to copy over input files or False to save space and not do so
 Save Context Fuel Cost per Mile File,all,FALSE,,enter True or False and note that these files can be large especially in CSV format

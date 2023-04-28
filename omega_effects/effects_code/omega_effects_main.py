@@ -45,27 +45,24 @@ def main():
 
     """
     set_paths = SetPaths()
-    run_id = set_paths.run_id()
     batch_settings_file = set_paths.path_of_batch_settings_csv()
 
     start_time = time()
     start_time_readable = datetime.now().strftime('%Y%m%d_%H%M%S')
 
-    # runtime_options = RuntimeOptions()
-    # runtime_options.init_from_file(batch_settings_file)
-
     batch_settings = BatchSettings()
     batch_settings.init_from_file(batch_settings_file)
     batch_settings.get_batch_folder_and_name()
+    batch_settings.get_run_id()
 
     path_of_run_folder, path_of_code_folder = \
         set_paths.create_output_paths(
-            batch_settings.path_outputs, batch_settings.batch_name, start_time_readable, run_id
+            batch_settings.path_outputs, batch_settings.batch_name, start_time_readable, batch_settings.run_id
         )
 
     effects_log = EffectsLog()
     effects_log.init_logfile(path_of_run_folder)
-    effects_log.logwrite(f'\nEPA OMEGA Model Effects Module started at {start_time_readable}\n')
+    effects_log.logwrite(f'EPA OMEGA Model Effects Module started at {start_time_readable}\n')
 
     batch_settings.get_runtime_options(effects_log)
     batch_settings.get_batch_settings(effects_log)
@@ -311,7 +308,8 @@ def main():
     my_lifetime_cost_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', index=False)
 
     # add identifying info to CSV files ________________________________________________________________________________
-    output_file_id_info = [f'Batch Name: {batch_settings.batch_name}', f'Effects Run: {start_time_readable}_{run_id}']
+    output_file_id_info = \
+        [f'Batch Name: {batch_settings.batch_name}', f'Effects Run: {start_time_readable}_{batch_settings.run_id}']
 
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv', output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv', output_file_id_info)

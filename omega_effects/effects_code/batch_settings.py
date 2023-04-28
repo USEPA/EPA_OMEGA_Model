@@ -47,6 +47,7 @@ class BatchSettings:
         self.batch_program = None
         self.batch_folder = None
         self.batch_name = None
+        self.run_id = 'omega_effects'
 
         # runtime options set via batch settings file
         self.file_format = None
@@ -185,9 +186,25 @@ class BatchSettings:
         return attribute_value
 
     def get_batch_folder_and_name(self):
+        """
 
+        Returns:
+            Nothing, but it sets the batch folder full path (as a string) and sets the batch name.
+
+        """
         self.batch_folder = self.get_attribute_value(('batch_folder', 'all'), 'full_path')
         self.batch_name = Path(self.batch_folder).name
+
+    def get_run_id(self):
+        """
+
+        Returns:
+            Nothing, but sets the run_id to the user entry, if provided, otherwise use default value.
+
+        """
+        run_id = self.get_attribute_value(('Run ID', 'all'), 'value')
+        if run_id != '':
+            self.run_id = run_id
 
     def get_batch_settings(self, effects_log):
         """
@@ -434,33 +451,37 @@ class BatchSettings:
             creates a dictionary and other attributes specified in the class __init__.
 
         """
+        effects_log.logwrite(f'Run ID is {self.run_id}')
+        effects_log.logwrite(f'Batch folder is {self.batch_folder}')
+        effects_log.logwrite(f'Batch name is {self.batch_name}')
+
         string_id = 'Save Context Fuel Cost per Mile File'
         self.save_context_fuel_cost_per_mile_file = self._dict[(string_id, 'all')]['value']
         if self.save_context_fuel_cost_per_mile_file in self.true_false_dict:
             self.save_context_fuel_cost_per_mile_file = self.true_false_dict[self.save_context_fuel_cost_per_mile_file]
             effects_log.logwrite(
-                f'{string_id} is {self.save_context_fuel_cost_per_mile_file}\n')
+                f'{string_id} is {self.save_context_fuel_cost_per_mile_file}')
 
         string_id = 'Save Vehicle-Level Safety Effects Files'
         self.save_vehicle_safety_effects_files = self._dict[(string_id, 'all')]['value']
         if self.save_vehicle_safety_effects_files in self.true_false_dict:
             self.save_vehicle_safety_effects_files = self.true_false_dict[self.save_vehicle_safety_effects_files]
             effects_log.logwrite(
-                f'{string_id} is {self.save_vehicle_safety_effects_files}\n')
+                f'{string_id} is {self.save_vehicle_safety_effects_files}')
 
         string_id = 'Save Vehicle-Level Physical Effects Files'
         self.save_vehicle_physical_effects_files = self._dict[(string_id, 'all')]['value']
         if self.save_vehicle_physical_effects_files in self.true_false_dict:
             self.save_vehicle_physical_effects_files = self.true_false_dict[self.save_vehicle_physical_effects_files]
             effects_log.logwrite(
-                f'{string_id} is {self.save_vehicle_physical_effects_files}\n')
+                f'{string_id} is {self.save_vehicle_physical_effects_files}')
 
         string_id = 'Save Vehicle-Level Cost Effects Files'
         self.save_vehicle_cost_effects_files = self._dict[(string_id, 'all')]['value']
         if self.save_vehicle_cost_effects_files in self.true_false_dict:
             self.save_vehicle_cost_effects_files = self.true_false_dict[self.save_vehicle_cost_effects_files]
             effects_log.logwrite(
-                f'{string_id} is {self.save_vehicle_cost_effects_files}\n')
+                f'{string_id} is {self.save_vehicle_cost_effects_files}')
 
         try:
             # protect against NaN or empty string
@@ -469,7 +490,7 @@ class BatchSettings:
             if self.save_vehicle_safety_effects_files \
                     or self.save_vehicle_physical_effects_files \
                     or self.save_vehicle_cost_effects_files:
-                effects_log.logwrite(f'{string_id} is {self.file_format}\n')
+                effects_log.logwrite(f'{string_id} is {self.file_format}')
         except Exception as e:
             effects_log.logwrite(
                 '\nVehicle-Level Output File Save Format in RUNTIME OPTIONS must be "csv" or "parquet"')
@@ -486,4 +507,4 @@ class BatchSettings:
         self.save_input_files = self._dict[(string_id, 'all')]['value']
         if self.save_input_files in self.true_false_dict:
             self.save_input_files = self.true_false_dict[self.save_input_files]
-            effects_log.logwrite(f'{string_id} is {self.save_input_files}\n')
+            effects_log.logwrite(f'{string_id} is {self.save_input_files}')
