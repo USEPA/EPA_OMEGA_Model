@@ -21,7 +21,7 @@ def save_file(session_settings, df, save_folder, file_id, effects_log, extension
         save_folder: a Path instance for the save folder.
         file_id (str): file identifier to be included in the saved filename.
         effects_log: an instance of the EffectsLog class.
-        extension (str): entered in runtime_options.csv (either 'csv' or 'parquet' with 'parquet' the default)
+        extension (str): entered in batch settings file (either 'csv' or 'parquet' with 'parquet' the default)
 
     Returns:
         The passed dict_to_save as a DataFrame while also saving that DataFrame to the save_folder.
