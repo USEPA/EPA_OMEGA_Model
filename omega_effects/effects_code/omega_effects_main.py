@@ -262,6 +262,33 @@ def main():
             calc_social_effects(discounted_costs_df, discounted_benefits_df, 'domestic',
                                 calc_health_effects=batch_settings.criteria_cost_factors.calc_health_effects)
 
+    # sort DataFrames that contain discounting _________________________________________________________________________
+    arg_sort_list = [
+        'session_policy',
+        'session_name',
+        'series',
+        'discount_rate',
+        'calendar_year',
+        'reg_class_id',
+        'in_use_fuel_id'
+    ]
+    discounted_costs_df = discounted_costs_df.sort_values(by=arg_sort_list)
+    discounted_benefits_df = discounted_benefits_df.sort_values(by=arg_sort_list)
+    if social_effects_global_df is not None:
+        social_effects_global_df = social_effects_global_df.sort_values(by=arg_sort_list)
+    if social_effects_domestic_df is not None:
+        social_effects_domestic_df = social_effects_domestic_df.sort_values(by=arg_sort_list)
+
+    arg_sort_list = [
+        'session_policy',
+        'session_name',
+        'discount_rate',
+        'model_year',
+        'body_style',
+        'in_use_fuel_id'
+    ]
+    my_lifetime_cost_effects_df = my_lifetime_cost_effects_df.sort_values(by=arg_sort_list)
+
     # save files to CSV ________________________________________________________________________________________________
     annual_safety_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv',
                                     index=False)
@@ -272,10 +299,10 @@ def main():
         index=False)
     discounted_costs_df.to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv', index=False)
     discounted_benefits_df.to_csv(path_of_run_folder / f'{start_time_readable}_benefits_annual.csv', index=False)
-    if batch_settings.net_benefit_ghg_scope in ['global', 'both']:
+    if social_effects_global_df is not None:
         social_effects_global_df.to_csv(
             path_of_run_folder / f'{start_time_readable}_social_effects_global_ghg_annual.csv', index=False)
-    if batch_settings.net_benefit_ghg_scope in ['domestic', 'both']:
+    if social_effects_domestic_df is not None:
         social_effects_domestic_df.to_csv(
             path_of_run_folder / f'{start_time_readable}_social_effects_domestic_ghg_annual.csv', index=False)
     my_lifetime_physical_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv',
