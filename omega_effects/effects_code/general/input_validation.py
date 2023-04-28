@@ -11,7 +11,7 @@
 import sys
 
 
-def validate_template_version_info(df, input_template_name, input_template_version, effects_log):
+def validate_template_version_info(df, input_template_name, input_template_version, effects_log=None):
     """
 
     Args:
@@ -24,17 +24,18 @@ def validate_template_version_info(df, input_template_name, input_template_versi
         Checks input template header for necessary data.
 
     """
-
     for item in [input_template_name, input_template_version]:
         try:
             item in df.columns
         except Exception as e:
-            effects_log.logwrite(e)
-            sys.exit()
-    effects_log.logwrite('Template version info is valid.')
+            if effects_log:
+                effects_log.logwrite(e)
+                sys.exit()
+    if effects_log:
+        effects_log.logwrite('Template version info is valid.')
 
 
-def validate_template_column_names(filepath, df, column_names, effects_log):
+def validate_template_column_names(filepath, df, column_names, effects_log=None):
     """
     Args:
         filepath: the Path object to the file.
@@ -50,4 +51,5 @@ def validate_template_column_names(filepath, df, column_names, effects_log):
         if column_name in df.columns:
             pass
         else:
-            effects_log.logwrite(f'Missing required {column_name} in {filepath}')
+            if effects_log:
+                effects_log.logwrite(f'Missing required {column_name} in {filepath}')

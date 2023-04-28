@@ -2,12 +2,12 @@
 
 **OMEGA effects main.**
 
+pyinstaller omega_effects_main.py --clean --console --onefile --name omega_effects_20230427 --workpath D:\omega_effects_exe --distpath D:\omega_effects_exe
 ----
 
 **CODE**
 
 """
-
 import sys
 import shutil
 import pandas as pd
@@ -15,7 +15,6 @@ import pandas as pd
 from time import time
 from datetime import datetime
 
-import omega_effects.effects_code
 from omega_effects.effects_code.set_paths import SetPaths
 
 from omega_effects.effects_code.batch_settings import BatchSettings
@@ -48,24 +47,28 @@ def main():
     """
     set_paths = SetPaths()
     run_id = set_paths.run_id()
+    batch_settings_file = set_paths.path_of_batch_settings_csv()
 
-    effects_log = EffectsLog()
-    effects_log.init_logfile(set_paths.path_module)
     start_time = time()
     start_time_readable = datetime.now().strftime('%Y%m%d_%H%M%S')
 
-    version = omega_effects.effects_code.__version__
-
-    effects_log.logwrite(f'\nEPA OMEGA Model Effects Module version {version} started at {start_time_readable}\n')
-
     runtime_options = RuntimeOptions()
-    runtime_options.init_from_file(set_paths.path_module / 'runtime_options.csv', effects_log)
+    runtime_options.init_from_file(batch_settings_file)
 
     batch_settings = BatchSettings()
-    batch_settings.init_from_file(runtime_options.batch_settings_file, effects_log)
+    batch_settings.init_from_file(batch_settings_file)
+    batch_settings.get_batch_folder_and_name()
 
     path_of_run_folder, path_of_code_folder = \
-        set_paths.create_output_paths(runtime_options, batch_settings, start_time_readable, run_id)
+        set_paths.create_output_paths(runtime_options, batch_settings.batch_name, start_time_readable, run_id)
+
+    effects_log = EffectsLog()
+    effects_log.init_logfile(path_of_run_folder)
+    effects_log.logwrite(f'\nEPA OMEGA Model Effects Module started at {start_time_readable}\n')
+
+    runtime_options.get_runtime_options(effects_log)
+    batch_settings.get_batch_settings(effects_log)
+    batch_settings.init_batch_classes(effects_log)
 
     # build legacy fleet which is used for the entire batch ____________________________________________________________
     effects_log.logwrite('\nBuilding legacy fleet for the batch')
@@ -298,9 +301,7 @@ def main():
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv', output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', output_file_id_info)
 
-    shutil.copy2(
-        runtime_options.batch_settings_file, path_of_run_folder / f'{runtime_options.batch_settings_file_name}'
-    )
+    shutil.copy2(batch_settings_file, path_of_run_folder)
     set_paths.copy_code_to_destination(path_of_code_folder)
 
     if runtime_options.save_input_files:
@@ -313,8 +314,6 @@ def main():
 
     effects_log.logwrite(
         message=f'\n{datetime.now().strftime("%Y%m%d_%H%M%S")}: Output files have been saved to {path_of_run_folder}')
-    shutil.copy2(effects_log.logfile_name, path_of_run_folder / effects_log.file_name)
-    shutil.copy2(set_paths.path_module / 'runtime_options.csv', path_of_run_folder / 'runtime_options.csv')
 
 
 if __name__ == '__main__':

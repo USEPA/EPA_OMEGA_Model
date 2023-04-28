@@ -11,7 +11,12 @@ import pandas as pd
 
 
 class Discounting:
+    """
 
+    The Discounting class discounts annual values, sums those to calculate present values and annualizes those present
+    values for equivalent annualized values.
+
+    """
     def __init__(self):
 
         self.social_discrates = [0.03, 0.07]

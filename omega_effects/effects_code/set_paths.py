@@ -10,6 +10,8 @@
 
 from pathlib import Path
 import shutil
+import tkinter as tk
+from tkinter import filedialog
 
 
 class SetPaths:
@@ -22,8 +24,6 @@ class SetPaths:
         self.path_code = Path(__file__).parent
         self.path_module = self.path_code.parent
         self.path_project = self.path_module.parent
-        # self.path_inputs = None
-        # self.path_outputs = self.path_project / 'outputs'
 
     def files_in_code_folder(self):
         """
@@ -89,12 +89,12 @@ class SetPaths:
         return run_folder_identifier
 
     @staticmethod
-    def create_output_paths(runtime_options, batch_settings, start_time_readable, run_id):
+    def create_output_paths(runtime_options, batch_name, start_time_readable, run_id):
         """
 
         Parameters:
             runtime_options: an instance of the RuntimeOptions class.
-            batch_settings: an instance of the BatchSettings class.
+            batch_name (str): the batch name set via the runtime options input file.
             start_time_readable (str): the start time of the run, in text readable format.\n
             run_id (str): the run ID entered by the user or the default value if the user does not provide an ID.
 
@@ -103,7 +103,7 @@ class SetPaths:
 
         """
         runtime_options.path_outputs.mkdir(exist_ok=True)
-        path_of_output_batch_folder = runtime_options.path_outputs / batch_settings.batch_name
+        path_of_output_batch_folder = runtime_options.path_outputs / batch_name
         path_of_output_batch_folder.mkdir(exist_ok=True)
         path_of_run_folder = path_of_output_batch_folder / f'{start_time_readable}_{run_id}'
         path_of_run_folder.mkdir(exist_ok=False)
@@ -111,3 +111,49 @@ class SetPaths:
         path_of_code_folder.mkdir(exist_ok=False)
 
         return path_of_run_folder, path_of_code_folder
+
+    @staticmethod
+    def path_to_runtime_options_csv():
+        """
+
+        Returns:
+            A console prompt to enter a run identifier; entering "test" sends outputs to a test folder; if left blank a
+            default name is used.
+
+        Note:
+            This method allows for a user-interactive identifier (name) for the given run.
+
+        """
+        # set full path to the batch settings file
+        root = tk.Tk()
+        root.attributes("-topmost", True)
+        root.withdraw()
+
+        path_identifier = filedialog.askopenfilename(title='Select the runtime options CSV file')
+
+        path_of_csv = Path(path_identifier)
+        path_to_csv = path_of_csv.parent
+
+        return path_of_csv, path_to_csv
+
+    @staticmethod
+    def path_of_batch_settings_csv():
+        """
+
+        Returns:
+            An open-file dialog to select the batch settings file to use.
+
+        Note:
+            This method allows for a user-interactive identifier (name) for the given run.
+
+        """
+        # set full path to the batch settings file
+        root = tk.Tk()
+        root.attributes("-topmost", True)
+        root.withdraw()
+
+        path_identifier = filedialog.askopenfilename(title='Select the batch settings CSV file')
+
+        path_of_csv = Path(path_identifier)
+
+        return path_of_csv

@@ -47,7 +47,7 @@ def get_file_datetime(filepath):
     return file_datetime
 
 
-def read_input_file(path, effects_log, usecols=None, index_col=None, skiprows=None, skip_blank_lines=True,
+def read_input_file(path, effects_log=None, usecols=None, index_col=None, skiprows=None, skip_blank_lines=True,
                     reset_index=False):
     """
 
@@ -66,7 +66,8 @@ def read_input_file(path, effects_log, usecols=None, index_col=None, skiprows=No
     """
     if path.is_file():
         file_datetime = get_file_datetime(path)
-        effects_log.logwrite(message=f'File {path}...found. Version {file_datetime}.')
+        if effects_log:
+            effects_log.logwrite(message=f'File {path}...found. Version {file_datetime}.')
         if reset_index:
             return pd.read_csv(path,
                                usecols=usecols,
@@ -84,8 +85,9 @@ def read_input_file(path, effects_log, usecols=None, index_col=None, skiprows=No
                                on_bad_lines='skip',
                                )
     else:
-        effects_log.logwrite(message=f'File {path}......  *** NOT FOUND ***. '
-                                     f'\nSet the input folder path in the batch_settings.csv.')
+        if effects_log:
+            effects_log.logwrite(message=f'File {path}......  *** NOT FOUND ***. '
+                                         f'\nSet the input folder path in the batch_settings.csv.')
         sys.exit()
 
 

@@ -38,6 +38,7 @@ Data Column Name and Description
 """
 from pathlib import Path
 import sys
+import pandas as pd
 
 from omega_effects.effects_code.general.general_functions import read_input_file
 from omega_effects.effects_code.general.input_validation import validate_template_column_names
@@ -81,95 +82,98 @@ class RuntimeOptions:
             'n': False,
         })
 
-    def init_from_file(self, filepath, effects_log):
+    def init_from_file(self, filepath):
         """
 
         Parameters:
             filepath: Path to the specified file.
-            effects_log: object; an object of the ToolLog class.
 
         Returns:
-            Reads file at filepath; converts monetized values to analysis dollars (if applicable); creates a dictionary
-            and other attributes specified in the class __init__.
+            Reads file at filepath; converts monetized values to analysis dollars (if applicable).
 
         """
         # don't forget to update the module docstring with changes here
         input_template_columns = [
-            'Parameters',
-            'Entry',
+            'parameter',
+            'value',
+            'full_path'
         ]
-        df = read_input_file(filepath, effects_log)
-        validate_template_column_names(filepath, df, input_template_columns, effects_log)
+        df = read_input_file(filepath, usecols=lambda x: 'notes' not in x)
 
-        df.set_index('Parameters', inplace=True)
+        validate_template_column_names(filepath, df, input_template_columns)
+
+        key = pd.Series(zip(
+            df['parameter'],
+            df['session_policy']
+        ))
+        df.set_index(key, inplace=True)
 
         self._dict = df.to_dict('index')
 
-        input_file_path_string = self._dict['Batch Settings File']['Entry']
-
-        self.batch_settings_file = Path(input_file_path_string)
-
-        save_path_string = self._dict['Save Path']['Entry']
+        save_path_string = self._dict[('Save Path', 'all')]['full_path']
 
         self.path_outputs = Path(save_path_string)
 
+    def get_runtime_options(self, effects_log):
+        """
+
+        Parameters:
+            effects_log: object; an object of the ToolLog class.
+
+        Returns:
+            creates a dictionary and other attributes specified in the class __init__.
+
+        """
         string_id = 'Save Context Fuel Cost per Mile File'
-        self.save_context_fuel_cost_per_mile_file = self._dict[string_id]['Entry']
+        self.save_context_fuel_cost_per_mile_file = self._dict[(string_id, 'all')]['value']
         if self.save_context_fuel_cost_per_mile_file in self.true_false_dict:
             self.save_context_fuel_cost_per_mile_file = self.true_false_dict[self.save_context_fuel_cost_per_mile_file]
             effects_log.logwrite(
                 f'{string_id} is {self.save_context_fuel_cost_per_mile_file}\n')
 
         string_id = 'Save Vehicle-Level Safety Effects Files'
-        self.save_vehicle_safety_effects_files = self._dict[string_id]['Entry']
+        self.save_vehicle_safety_effects_files = self._dict[(string_id, 'all')]['value']
         if self.save_vehicle_safety_effects_files in self.true_false_dict:
             self.save_vehicle_safety_effects_files = self.true_false_dict[self.save_vehicle_safety_effects_files]
             effects_log.logwrite(
                 f'{string_id} is {self.save_vehicle_safety_effects_files}\n')
 
         string_id = 'Save Vehicle-Level Physical Effects Files'
-        self.save_vehicle_physical_effects_files = self._dict[string_id]['Entry']
+        self.save_vehicle_physical_effects_files = self._dict[(string_id, 'all')]['value']
         if self.save_vehicle_physical_effects_files in self.true_false_dict:
             self.save_vehicle_physical_effects_files = self.true_false_dict[self.save_vehicle_physical_effects_files]
             effects_log.logwrite(
                 f'{string_id} is {self.save_vehicle_physical_effects_files}\n')
 
         string_id = 'Save Vehicle-Level Cost Effects Files'
-        self.save_vehicle_cost_effects_files = self._dict[string_id]['Entry']
+        self.save_vehicle_cost_effects_files = self._dict[(string_id, 'all')]['value']
         if self.save_vehicle_cost_effects_files in self.true_false_dict:
             self.save_vehicle_cost_effects_files = self.true_false_dict[self.save_vehicle_cost_effects_files]
             effects_log.logwrite(
                 f'{string_id} is {self.save_vehicle_cost_effects_files}\n')
 
         try:
-            self.batch_settings_file_name = self.batch_settings_file.name
-        except Exception as e:
-            effects_log.logwrite('\nBatch Settings File must be provided in runtime_settings.csv')
-            effects_log.logwrite(e)
-            sys.exit()
-
-        try:
             # protect against NaN or empty string
             string_id = 'Format for Vehicle-Level Output Files'
-            self.file_format = self._dict[string_id]['Entry'].lower()
+            self.file_format = self._dict[(string_id, 'all')]['value'].lower()
             if self.save_vehicle_safety_effects_files \
                     or self.save_vehicle_physical_effects_files \
                     or self.save_vehicle_cost_effects_files:
                 effects_log.logwrite(f'{string_id} is {self.file_format}\n')
         except Exception as e:
             effects_log.logwrite(
-                '\nVehicle-Level Output File Save Format in runtime_settings.csv must be "csv" or "parquet"')
+                '\nVehicle-Level Output File Save Format in RUNTIME OPTIONS must be "csv" or "parquet"')
             effects_log.logwrite(e)
             sys.exit()
 
         if self.file_format not in ['csv', 'parquet']:
             # protect against improper save format
             effects_log.logwrite(
-                '\nVehicle-Level Output File Save Format in runtime_settings.csv must be "csv" or "parquet"')
+                '\nVehicle-Level Output File Save Format in RUNTIME OPTIONS must be "csv" or "parquet"')
             sys.exit()
 
         string_id = 'Save Input Files'
-        self.save_input_files = self._dict[string_id]['Entry']
+        self.save_input_files = self._dict[(string_id, 'all')]['value']
         if self.save_input_files in self.true_false_dict:
             self.save_input_files = self.true_false_dict[self.save_input_files]
             effects_log.logwrite(f'{string_id} is {self.save_input_files}\n')

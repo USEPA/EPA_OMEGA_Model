@@ -32,6 +32,7 @@ from omega_effects.effects_code.context.repair_cost import RepairCost
 from omega_effects.effects_code.context.refueling_cost import RefuelingCost
 
 from omega_effects.effects_code.general.general_inputs_for_effects import GeneralInputsForEffects
+from omega_effects.effects_code.general.input_validation import validate_template_column_names
 
 
 class BatchSettings:
@@ -112,15 +113,22 @@ class BatchSettings:
             'None': None,
         })
 
-    def init_from_file(self, filepath, effects_log):
+    def init_from_file(self, filepath):
         """
 
         Args:
             filepath: the Path object to the file.
-            effects_log: an instance of the EffectsLog class.
 
         """
-        df = read_input_file(filepath, effects_log, usecols=lambda x: 'Type' not in x)
+        input_template_columns = [
+            'parameter',
+            'session_policy',
+            'value',
+            'full_path'
+        ]
+        df = read_input_file(filepath, usecols=lambda x: 'notes' not in x)
+
+        validate_template_column_names(filepath, df, input_template_columns)
 
         self.batch_df = df.copy()
 
@@ -131,10 +139,6 @@ class BatchSettings:
         df.set_index(key, inplace=True)
 
         self._dict = df.to_dict('index')
-
-        self.get_batch_settings(effects_log)
-
-        self.init_batch_classes(effects_log)
 
     def get_attribute_value(self, key, attribute_name):
         """
@@ -156,6 +160,11 @@ class BatchSettings:
 
         return attribute_value
 
+    def get_batch_folder_and_name(self):
+
+        self.batch_folder = self.get_attribute_value(('batch_folder', 'all'), 'full_path')
+        self.batch_name = Path(self.batch_folder).name
+
     def get_batch_settings(self, effects_log):
         """
 
@@ -166,9 +175,6 @@ class BatchSettings:
              Nothing, but it sets the class attributes included in the class init.
 
         """
-        self.batch_folder = self.get_attribute_value(('batch_folder', 'all'), 'full_path')
-        self.batch_name = Path(self.batch_folder).name
-
         self.vehicles_base_year \
             = pd.to_numeric(self.get_attribute_value(('Vehicles File Base Year', 'all'), 'value'))
         self.analysis_initial_year = self.vehicles_base_year + 1
