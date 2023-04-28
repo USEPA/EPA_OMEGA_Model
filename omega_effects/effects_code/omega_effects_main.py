@@ -68,6 +68,12 @@ def main():
     batch_settings.get_batch_settings(effects_log)
     batch_settings.init_batch_classes(effects_log)
 
+    shutil.copy2(batch_settings_file, path_of_run_folder)
+    set_paths.copy_code_to_destination(path_of_code_folder)
+
+    if batch_settings.save_input_files:
+        copy_files(batch_settings.inputs_filelist, path_of_run_folder / 'batch_inputs')
+
     # build legacy fleet which is used for the entire batch ____________________________________________________________
     effects_log.logwrite('\nBuilding legacy fleet for the batch')
     try:
@@ -326,12 +332,6 @@ def main():
                       output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv', output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', output_file_id_info)
-
-    shutil.copy2(batch_settings_file, path_of_run_folder)
-    set_paths.copy_code_to_destination(path_of_code_folder)
-
-    if batch_settings.save_input_files:
-        copy_files(batch_settings.inputs_filelist, path_of_run_folder / 'batch_inputs')
 
     elapsed_runtime = round(time() - start_time, 2)
     elapsed_runtime_minutes = round(elapsed_runtime / 60, 2)
