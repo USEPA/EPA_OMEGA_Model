@@ -5,7 +5,7 @@ cd ..
 REM build executable
 
 pynstaller omega_effects/omega_effects_main.py ^
-  --name omega-effects-mac.command ^
+  --name omega-effects-win.command ^
   --paths omega_effects ^
   --noconfirm ^
   --onefile
