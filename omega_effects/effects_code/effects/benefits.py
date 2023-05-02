@@ -7,7 +7,6 @@
 **CODE**
 
 """
-
 import pandas as pd
 
 
@@ -135,16 +134,16 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
     annual_cost_effects_df.set_index(keys, inplace=True)
     cost_effects_dict = annual_cost_effects_df.to_dict('index')
 
-    benefits_dict = dict()
-    delta_physical_effects_dict = dict()
+    benefits_dict = {}
+    delta_physical_effects_dict = {}
     for key in physical_effects_dict:
         
         session_policy, calendar_year, reg_class_id, in_use_fuel_id = key
         fueling_class = physical_effects_dict[key]['fueling_class']
 
         flag = None
-        benefits_dict_for_key = dict()
-        physical_effects_dict_for_key = dict()
+        benefits_dict_for_key = {}
+        physical_effects_dict_for_key = {}
         if session_policy != 'no_action':
             flag = 1
             no_action_key = ('no_action', calendar_year, reg_class_id, in_use_fuel_id)
@@ -160,7 +159,7 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
             for fuel, fuel_share in fuel_dict.items():
                 fuel, fuel_share = fuel, fuel_share
 
-            oper_attrs_dict = dict()
+            oper_attrs_dict = {}
             oper_attrs_list = [
                 'vmt',
                 'vmt_rebound',
@@ -170,7 +169,7 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 'fuel_consumption_gallons',
             ]
             for oper_attr in oper_attrs_list:
-                oper_attrs_dict[oper_attr] = physical_na[oper_attr] - physical_a[oper_attr]            
+                oper_attrs_dict[oper_attr] = physical_na[oper_attr] - physical_a[oper_attr]
     
             # energy security benefits
             oil_barrels = physical_na['barrels_of_oil'] - physical_a['barrels_of_oil']
@@ -186,17 +185,8 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
             # calc drive value as drive_value_cost in action less drive_value_cost in no_action
             drive_value_benefit_dollars = cost_a['drive_value_cost_dollars'] - cost_na['drive_value_cost_dollars']
                 
-            # climate effects
-            # get scc cost factors
-            co2_global_5, co2_global_3, co2_global_25, co2_global_395, \
-                ch4_global_5, ch4_global_3, ch4_global_25, ch4_global_395, \
-                n2o_global_5, n2o_global_3, n2o_global_25, n2o_global_395, \
-                co2_domestic_5, co2_domestic_3, co2_domestic_25, co2_domestic_395, \
-                ch4_domestic_5, ch4_domestic_3, ch4_domestic_25, ch4_domestic_395, \
-                n2o_domestic_5, n2o_domestic_3, n2o_domestic_25, n2o_domestic_395 \
-                = get_scc_cf(batch_settings, calendar_year)
-            
-            ghg_tons_dict = dict()
+            # climate inventories
+            ghg_tons_dict = {}
             ghg_list = [
                 'co2_vehicle_metrictons',
                 'co2_upstream_metrictons',
@@ -212,6 +202,15 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 ghg_tons_dict[ghg] = physical_na[ghg] - physical_a[ghg]
     
             # calculate climate benefits
+            # get scc cost factors
+            co2_global_5, co2_global_3, co2_global_25, co2_global_395, \
+                ch4_global_5, ch4_global_3, ch4_global_25, ch4_global_395, \
+                n2o_global_5, n2o_global_3, n2o_global_25, n2o_global_395, \
+                co2_domestic_5, co2_domestic_3, co2_domestic_25, co2_domestic_395, \
+                ch4_domestic_5, ch4_domestic_3, ch4_domestic_25, ch4_domestic_395, \
+                n2o_domestic_5, n2o_domestic_3, n2o_domestic_25, n2o_domestic_395 \
+                = get_scc_cf(batch_settings, calendar_year)
+
             co2_tons = ghg_tons_dict['co2_total_metrictons']
             co2_global_5_benefit_dollars = co2_tons * co2_global_5
             co2_global_3_benefit_dollars = co2_tons * co2_global_3
@@ -268,8 +267,8 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                                              + ch4_domestic_395_benefit_dollars \
                                              + n2o_domestic_395_benefit_dollars
             
-            # toxics
-            toxics_tons_dict = dict()
+            # toxics inventories
+            toxics_tons_dict = {}
             toxics_list = [
                 'acetaldehyde_vehicle_ustons',
                 'acrolein_vehicle_ustons',
@@ -289,31 +288,54 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
             for toxic in toxics_list:
                 toxics_tons_dict[toxic] = physical_na[toxic] - physical_a[toxic]
                 
-            # criteria air pollutant (cap) benefits
-            cap_tons_dict = dict()
+            # criteria air pollutant (cap) inventories
+            cap_tons_dict = {}
+            cap_list = [
+                'pm25_vehicle_ustons',
+                'pm25_upstream_ustons',
+                'pm25_total_ustons',
+                'nox_vehicle_ustons',
+                'nox_upstream_ustons',
+                'nox_total_ustons',
+                'sox_vehicle_ustons',
+                'sox_upstream_ustons',
+                'sox_total_ustons',
+                'nmog_vehicle_ustons',
+                'voc_upstream_ustons',
+                'nmog_and_voc_total_ustons',
+                'co_vehicle_ustons',
+                'co_upstream_ustons',
+                'co_total_ustons',
+            ]
+            for cap in cap_list:
+                cap_tons_dict[cap] = physical_na[cap] - physical_a[cap]
+
+            # if calc_health_effects:
+            #
+            #     # criteria air pollutant (cap) tons
+            #     cap_list = [
+            #         'pm25_vehicle_ustons',
+            #         'pm25_upstream_ustons',
+            #         'pm25_total_ustons',
+            #         'nox_vehicle_ustons',
+            #         'nox_upstream_ustons',
+            #         'nox_total_ustons',
+            #         'sox_vehicle_ustons',
+            #         'sox_upstream_ustons',
+            #         'sox_total_ustons',
+            #         'nmog_vehicle_ustons',
+            #         'voc_upstream_ustons',
+            #         'nmog_and_voc_total_ustons',
+            #         'co_vehicle_ustons',
+            #         'co_upstream_ustons',
+            #         'co_total_ustons',
+            #     ]
+            #     for cap in cap_list:
+            #         cap_tons_dict[cap] = physical_na[cap] - physical_a[cap]
+
+            # calculate cap benefits, if applicable
             if calc_health_effects:
 
-                # criteria air pollutant (cap) tons
-                cap_list = [
-                    'pm25_vehicle_ustons',
-                    'pm25_upstream_ustons',
-                    'pm25_total_ustons',
-                    'nox_vehicle_ustons',
-                    'nox_upstream_ustons',
-                    'nox_total_ustons',
-                    'sox_vehicle_ustons',
-                    'sox_upstream_ustons',
-                    'sox_total_ustons',
-                    'nmog_vehicle_ustons',
-                    'voc_upstream_ustons',
-                    'nmog_and_voc_total_ustons',
-                    'co_vehicle_ustons',
-                    'co_upstream_ustons',
-                    'co_total_ustons',
-                ]
-                for cap in cap_list:
-                    cap_tons_dict[cap] = physical_na[cap] - physical_a[cap]
-                
                 # get vehicle cap cost factors
                 source_id = f'{reg_class_id} {fuel}'
                 pm25_Wu_3, sox_Wu_3, nox_Wu_3, \
@@ -409,7 +431,6 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 'session_name': cost_a['session_name'],
                 'discount_rate': 0,
                 'series': 'AnnualValue',
-                'periods': 1,
                 'calendar_year': calendar_year,
                 'reg_class_id': reg_class_id,
                 'in_use_fuel_id': in_use_fuel_id,

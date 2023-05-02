@@ -81,8 +81,6 @@ Data Column Name and Description
 **CODE**
 
 """
-import pandas as pd
-
 from omega_effects.effects_code.general.general_functions import read_input_file
 from omega_effects.effects_code.general.input_validation import \
     validate_template_version_info, validate_template_column_names
@@ -98,9 +96,9 @@ class LegacyFleet:
         Loads and provides access to legacy fleet data by model year and age.
 
         """
-        self._data = dict()  # private dict, the legacy_fleet_file data
-        self._legacy_fleet = dict()  # the built legacy fleet for the analysis
-        self.adjusted_legacy_fleet = dict()
+        self._data = {}  # private dict, the legacy_fleet_file data
+        self._legacy_fleet = {}  # the built legacy fleet for the analysis
+        self.adjusted_legacy_fleet = {}
         self.legacy_fleet_calendar_year_max = 0
         self.legacy_fleet_vehicle_id_start = pow(10, 6)
 
@@ -111,9 +109,8 @@ class LegacyFleet:
 
         Args:
             filepath: the Path object to the file.
-            vehicles_base_year (int): the model year of the input fleet - the legacy fleet
-                calendar year will be adjusted
-            if necessary for consistency with the analysis.
+            vehicles_base_year (int): the model year of the input fleet - the legacy fleet calendar year will be
+            adjusted if necessary for consistency with the analysis.
             effects_log: an instance of the EffectsLog class.
 
         Returns:
@@ -157,48 +154,26 @@ class LegacyFleet:
         df['calendar_year'] = vehicles_base_year
         df['model_year'] = df['calendar_year'] - df['age']
 
-        key = pd.Series(zip(
-            df['age'],
-            df['calendar_year'],
-            df['reg_class_id'],
-            df['market_class_id'],
-            df['in_use_fuel_id'],
-        ))
         # add attributes that are populated in build_legacy_fleet_for_analysis
         df.insert(0, 'vehicle_id', self.legacy_fleet_vehicle_id_start)
         df.insert(len(df.columns), 'annual_vmt', 0)
         df.insert(len(df.columns), 'odometer', 0)
         df.insert(len(df.columns), 'vmt', 0)
-        self._data = df.set_index(key).to_dict(orient='index')
+        self._data = df.to_dict(orient='index')
 
-    def get_legacy_fleet_data(self, key, *args):
-        """
-
-        Args:
-            key (tuple): the LegacyFleet._legacy_fleet key
-            args (str, strs): name of attributes for which attribute values are sought
-
-        Returns:
-            A list of values associated with the key for each arg passed
-
-        """
-        return_values = list()
-        for arg in args:
-            return_values.append(self._legacy_fleet[key][arg])
-
-        return return_values
-
-    def update_legacy_fleet(self, key, update_dict):
+    def update_legacy_fleet(self, vehicle_id, calendar_year, update_dict):
         """
 
         Parameters:
-            key: tuple; the LegacyFleet._legacy_fleet dict key
-            update_dict: Dictionary; represents the attribute-value pairs to be updated
+            vehicle_id (int): the vehicle_id.
+            calendar_year (int): the calendar year.
+            update_dict: Dictionary; represents the attribute-value pairs to be updated.
 
         Returns:
             Nothing, but updates the object dictionary with update_dict
 
         """
+        key = (vehicle_id, calendar_year)
         if key in self._legacy_fleet:
             for attribute_name, attribute_value in update_dict.items():
                 self._legacy_fleet[key][attribute_name] = attribute_value
@@ -218,38 +193,69 @@ class LegacyFleet:
             Nothing, but it builds and updates the instance dictionary.
 
         """
-
         vehicle_id_increment = 0
         for calendar_year in batch_settings.calendar_years:
 
-            for key, nested_dict in self._data.items():
+            for k, v in self._data.items():
 
-                last_age, last_calendar_year, reg_class_id, market_class_id, fuel_id = key
-                model_year = nested_dict['model_year']
+                last_age, last_calendar_year, model_year = v['age'], v['calendar_year'], v['model_year']
+                reg_class_id, market_class_id, fuel_id = v['reg_class_id'], v['market_class_id'], v['in_use_fuel_id']
                 new_age = calendar_year - model_year
 
                 reregistered_proportion \
                     = batch_settings.reregistration.get_reregistered_proportion(model_year, market_class_id, new_age)
-                new_registered_count = nested_dict['registered_count'] * reregistered_proportion
+                new_registered_count = v['registered_count'] * reregistered_proportion
                 if new_registered_count == 0 or new_age == 0:
                     pass
 
                 else:
                     vehicle_id_increment += 1
                     annual_vmt = batch_settings.onroad_vmt.get_vmt(calendar_year, market_class_id, new_age)
-                    if nested_dict['vehicle_id'] == self.legacy_fleet_vehicle_id_start:
-                        self._data[key].update({'vehicle_id': nested_dict['vehicle_id'] + vehicle_id_increment})
+                    if v['vehicle_id'] == self.legacy_fleet_vehicle_id_start:
+                        self._data[k].update({'vehicle_id': v['vehicle_id'] + vehicle_id_increment})
 
-                    update_dict = nested_dict.copy()
+                    update_dict = v.copy()
                     update_dict['age'] = new_age
                     update_dict['calendar_year'] = calendar_year
                     update_dict['registered_count'] = new_registered_count
                     update_dict['annual_vmt'] = annual_vmt
                     update_dict['odometer'] = batch_settings.onroad_vmt.get_cumulative_vmt(market_class_id, new_age)
                     update_dict['vmt'] = new_registered_count * annual_vmt
-                    new_key = (update_dict['vehicle_id'], calendar_year, new_age)
-                    self.update_legacy_fleet(new_key, update_dict)
+
+                    self.update_legacy_fleet(update_dict['vehicle_id'], calendar_year, update_dict)
                     self.legacy_fleet_calendar_year_max = max(self.legacy_fleet_calendar_year_max, calendar_year)
+
+    def get_legacy_fleet_price(self, vehicle_id, calendar_year):
+        """
+
+        Args:
+            vehicle_id (int): the vehicle id.
+            calendar_year (int): the calendar year.
+
+        Returns:
+
+        """
+        price = [v['transaction_price_dollars'] for v in self._legacy_fleet.values()
+                 if v['vehicle_id'] == vehicle_id
+                 and v['calendar_year'] == calendar_year][0]
+
+        return price
+
+    def get_adjusted_legacy_fleet_odometer(self, vehicle_id, calendar_year):
+        """
+
+        Args:
+            vehicle_id (int): the vehicle_id number.
+            calendar_year (int): the calendar year for which the vehicle's odometer value is sought.
+
+        Returns:
+
+        """
+        odometer = [v['odometer'] for v in self.adjusted_legacy_fleet.values()
+                    if v['vehicle_id'] == vehicle_id
+                    and v['calendar_year'] == calendar_year][0]
+
+        return odometer
 
     def adjust_legacy_fleet_stock_and_vmt(self, batch_settings, vmt_adjustments_session):
         """
@@ -266,35 +272,34 @@ class LegacyFleet:
             There is no rebound VMT calculated for the legacy fleet.
 
         """
-        self.adjusted_legacy_fleet = dict()
+        self.adjusted_legacy_fleet = {}
 
         calendar_years = batch_settings.calendar_years
 
-        for key, nested_dict in self._legacy_fleet.items():
+        for v in self._legacy_fleet.values():
 
-            vehicle_id, calendar_year, age = key
-
-            registered_count = nested_dict['registered_count']
+            vehicle_id, calendar_year, age = v['vehicle_id'], v['calendar_year'], v['age']
+            registered_count = v['registered_count']
 
             # adjust vmt and legacy fleet stock
             calendar_year_vmt_adj = vmt_adjustments_session.get_vmt_adjustment(calendar_year)
-            vmt_adjusted = nested_dict['vmt'] * calendar_year_vmt_adj
+            vmt_adjusted = v['vmt'] * calendar_year_vmt_adj
 
             calendar_year_stock_adj = vmt_adjustments_session.get_stock_adjustment(calendar_year)
             stock_adjusted = registered_count * calendar_year_stock_adj
 
             annual_vmt_adjusted = vmt_adjusted / stock_adjusted
 
-            if nested_dict['calendar_year'] == calendar_years[0]:
-                annual_vmt = nested_dict['annual_vmt']
-                odometer = nested_dict['odometer']
+            if v['calendar_year'] == calendar_years[0]:
+                annual_vmt = v['annual_vmt']
+                odometer = v['odometer']
                 odometer_adjusted = odometer - annual_vmt + annual_vmt_adjusted
             else:
-                odometer_last_year \
-                    = self.adjusted_legacy_fleet[(vehicle_id, calendar_year - 1, age - 1)]['odometer']
+                odometer_last_year = self.get_adjusted_legacy_fleet_odometer(vehicle_id, calendar_year - 1)
                 odometer_adjusted = odometer_last_year + annual_vmt_adjusted
 
             update_dict = {
+                'vehicle_id': vehicle_id,
                 'age': age,
                 'calendar_year': calendar_year,
                 'registered_count': stock_adjusted,
@@ -302,52 +307,12 @@ class LegacyFleet:
                 'annual_vmt': annual_vmt_adjusted,
                 'odometer': odometer_adjusted,
                 'vmt': vmt_adjusted,
-                'market_class_id': nested_dict['market_class_id'],
-                'reg_class_id': nested_dict['reg_class_id'],
-                'in_use_fuel_id': nested_dict['in_use_fuel_id'],
-                'body_style': nested_dict['body_style'],
-                'curbweight_lbs': nested_dict['curbweight_lbs'],
-                'miles_per_gallon': nested_dict['miles_per_gallon'],
-                'kwh_per_mile': nested_dict['kwh_per_mile'],
+                'market_class_id': v['market_class_id'],
+                'reg_class_id': v['reg_class_id'],
+                'in_use_fuel_id': v['in_use_fuel_id'],
+                'body_style': v['body_style'],
+                'curbweight_lbs': v['curbweight_lbs'],
+                'miles_per_gallon': v['miles_per_gallon'],
+                'kwh_per_mile': v['kwh_per_mile'],
             }
-            self.adjusted_legacy_fleet[key] = update_dict
-
-            # else:
-            #     legacy_fleet_extra_vehicles = \
-            #         [k for k, v in self.adjusted_legacy_fleet.items() if k[1] == (calendar_year - 1)]
-            #
-            #     for key in legacy_fleet_extra_vehicles:
-            #         vehicle_id, last_calendar_year, age_last_year = key
-            #
-            #         registered_count = self.adjusted_legacy_fleet[key]['registered_count']
-            #
-            #         # adjust vmt and legacy fleet stock
-            #         calendar_year_vmt_adj = vmt_adjustments_session.get_vmt_adjustment(calendar_year)
-            #         vmt_adjusted = self.adjusted_legacy_fleet[key]['vmt'] * calendar_year_vmt_adj
-            #
-            #         calendar_year_stock_adj = vmt_adjustments_session.get_stock_adjustment(calendar_year)
-            #         stock_adjusted = registered_count * calendar_year_stock_adj
-            #
-            #         annual_vmt_adjusted = 0
-            #         if stock_adjusted != 0:
-            #             annual_vmt_adjusted = vmt_adjusted / stock_adjusted
-            #
-            #         odometer_last_year = self.adjusted_legacy_fleet[key]['odometer']
-            #         odometer_adjusted = odometer_last_year + annual_vmt_adjusted
-            #
-            #         update_dict = {
-            #             'age': age_last_year + 1,
-            #             'calendar_year': calendar_year,
-            #             'registered_count': stock_adjusted,
-            #             'context_vmt_adjustment': calendar_year_vmt_adj,
-            #             'annual_vmt': annual_vmt_adjusted,
-            #             'odometer': odometer_adjusted,
-            #             'vmt': vmt_adjusted,
-            #             'market_class_id': self.adjusted_legacy_fleet[key]['market_class_id'],
-            #             'reg_class_id': self.adjusted_legacy_fleet[key]['reg_class_id'],
-            #             'in_use_fuel_id': self.adjusted_legacy_fleet[key]['in_use_fuel_id'],
-            #             'body_style': self.adjusted_legacy_fleet[key]['body_style'],
-            #             'curbweight_lbs': self.adjusted_legacy_fleet[key]['curbweight_lbs'],
-            #         }
-            #         key = vehicle_id, calendar_year, age_last_year + 1
-            #         self.adjusted_legacy_fleet[key] = update_dict
+            self.adjusted_legacy_fleet[(vehicle_id, calendar_year)] = update_dict

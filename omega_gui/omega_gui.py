@@ -824,7 +824,7 @@ class Form(QObject):
             # Update model run time
             elapsed_end = datetime.now()
             elapsed_time = elapsed_end - elapsed_start
-            elapsed_time = sec_to_hours(elapsed_time.seconds)
+            elapsed_time = sec_to_hours(elapsed_time.seconds + elapsed_time.days * 86400)
             # elapsed_time = str(elapsed_time)
             # elapsed_time = "Model Running\n" + elapsed_time[:-7]
             elapsed_time = "Model Running\n" + elapsed_time[:-4] + "\nError Count = " + str(model_error_count)

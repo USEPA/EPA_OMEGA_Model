@@ -34,7 +34,8 @@ from omega_effects.effects_code.effects.physical_effects import calc_physical_ef
     calc_legacy_fleet_physical_effects, calc_annual_physical_effects, calc_period_consumer_physical_view
 from omega_effects.effects_code.effects.cost_effects import calc_cost_effects, calc_annual_cost_effects, \
     calc_period_consumer_view
-from omega_effects.effects_code.effects.present_and_annualized_values import PVandEAV
+
+from omega_effects.effects_code.effects.discounting import Discounting
 from omega_effects.effects_code.effects.benefits import calc_benefits
 from omega_effects.effects_code.effects.sum_social_effects import calc_social_effects
 
@@ -136,7 +137,7 @@ def main():
             save_file(session_settings, session_safety_effects_df, path_of_run_folder, 'safety_effects',
                       effects_log, extension=runtime_options.file_format)
 
-        effects_log.logwrite(f'\nCalculating safety effects summary for {session_name}')
+        effects_log.logwrite(f'\nCalculating annual safety effects for {session_name}')
         session_annual_safety_effects_df = calc_annual_avg_safety_effects(session_safety_effects_df)
 
         # create an annual_safety_effects_df
@@ -183,7 +184,7 @@ def main():
 
         # cost effects _________________________________________________________________________________________________
         effects_log.logwrite(f'\nCalculating cost effects for {session_name}')
-        session_cost_effects_dict = dict()
+        session_cost_effects_dict = {}
         session_cost_effects_dict.update(
             calc_cost_effects(batch_settings, session_settings, session_physical_effects_dict, context_fuel_cpm_dict))
 
@@ -205,17 +206,24 @@ def main():
             = pd.concat([annual_cost_effects_df, session_annual_cost_effects_df], axis=0, ignore_index=True)
         annual_cost_effects_df.reset_index(inplace=True, drop=True)
 
-        # for use in consumer calcs, create a my_lifetime_cost_effects_df of undiscounted lifetime costs
+        # for use in consumer calcs, create a my_lifetime_cost_effects_df of lifetime costs
         my_lifetime_cost_effects_df = pd.concat([my_lifetime_cost_effects_df, session_my_period_cost_effects_df],
                                                 axis=0, ignore_index=True)
         my_lifetime_cost_effects_df.reset_index(inplace=True, drop=True)
 
-    effects_log.logwrite('\nCalculating present and annualized costs for the batch')
-    pv_and_eav_costs_dict = PVandEAV().calc_present_and_annualized_values(batch_settings, annual_cost_effects_df)
-    pv_and_eav_costs_df = pd.DataFrame.from_dict(pv_and_eav_costs_dict, orient='index')
+    # discount annual costs ____________________________________________________________________________________________
+    effects_log.logwrite('\nCalculating discounted annual costs, PVs and EAVs for the batch')
+    discounted_costs = Discounting()
+    discounted_costs.discount_annual_values(batch_settings, annual_cost_effects_df)
+    discounted_costs.calc_present_values(batch_settings)
+    discounted_costs.calc_annualized_values(batch_settings)
+    discounted_costs_dict = \
+        {**discounted_costs.annual_values_dict, **discounted_costs.pv_dict, **discounted_costs.eav_dict}
 
-    # benefits _________________________________________________________________________________________________________
-    effects_log.logwrite(f'\nCalculating benefits for the batch')
+    discounted_costs_df = pd.DataFrame.from_dict(discounted_costs_dict, orient='index')
+
+    # calculate annual benefits and annual physical effects deltas _____________________________________________________
+    effects_log.logwrite(f'\nCalculating annual benefits for the batch')
     benefits_dict, delta_physical_effects_dict = \
         calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effects_df,
                       calc_health_effects=batch_settings.criteria_cost_factors.calc_health_effects)
@@ -223,9 +231,19 @@ def main():
     annual_benefits_df = pd.DataFrame.from_dict(benefits_dict, orient='index')
     annual_benefits_df.reset_index(inplace=True, drop=True)
 
-    effects_log.logwrite('\nCalculating present and annualized benefits for the batch')
-    pv_and_eav_benefits_dict = PVandEAV().calc_present_and_annualized_values(batch_settings, annual_benefits_df)
-    pv_and_eav_benefits_df = pd.DataFrame.from_dict(pv_and_eav_benefits_dict, orient='index')
+    annual_physical_effects_deltas_df = pd.DataFrame.from_dict(delta_physical_effects_dict, orient='index')
+    annual_physical_effects_deltas_df.reset_index(inplace=True, drop=True)
+
+    # discount annual benefits _________________________________________________________________________________________
+    effects_log.logwrite('\nCalculating discounted annual benefits, PVs and EAVs for the batch')
+    discounted_benefits = Discounting()
+    discounted_benefits.discount_annual_values(batch_settings, annual_benefits_df)
+    discounted_benefits.calc_present_values(batch_settings)
+    discounted_benefits.calc_annualized_values(batch_settings)
+    discounted_benefits_dict = \
+        {**discounted_benefits.annual_values_dict, **discounted_benefits.pv_dict, **discounted_benefits.eav_dict}
+
+    discounted_benefits_df = pd.DataFrame.from_dict(discounted_benefits_dict, orient='index')
 
     # summarize costs, benefits and net benefits _______________________________________________________________________
     effects_log.logwrite('\nSummarizing social effects and calculating net benefits')
@@ -233,16 +251,13 @@ def main():
 
     if batch_settings.net_benefit_ghg_scope in ['global', 'both']:
         social_effects_global_df = \
-            calc_social_effects(pv_and_eav_costs_df, pv_and_eav_benefits_df, 'global',
+            calc_social_effects(discounted_costs_df, discounted_benefits_df, 'global',
                                 calc_health_effects=batch_settings.criteria_cost_factors.calc_health_effects)
 
     if batch_settings.net_benefit_ghg_scope in ['domestic', 'both']:
         social_effects_domestic_df = \
-            calc_social_effects(pv_and_eav_costs_df, pv_and_eav_benefits_df, 'domestic',
+            calc_social_effects(discounted_costs_df, discounted_benefits_df, 'domestic',
                                 calc_health_effects=batch_settings.criteria_cost_factors.calc_health_effects)
-
-    annual_physical_effects_deltas_df = pd.DataFrame.from_dict(delta_physical_effects_dict, orient='index')
-    annual_physical_effects_deltas_df.reset_index(inplace=True, drop=True)
 
     # save files to CSV ________________________________________________________________________________________________
     annual_safety_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv',
@@ -252,8 +267,8 @@ def main():
     annual_physical_effects_deltas_df.to_csv(
         path_of_run_folder / f'{start_time_readable}_physical_effects_annual_action_minus_no_action.csv',
         index=False)
-    pv_and_eav_costs_df.to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv', index=False)
-    pv_and_eav_benefits_df.to_csv(path_of_run_folder / f'{start_time_readable}_benefits_annual.csv', index=False)
+    discounted_costs_df.to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv', index=False)
+    discounted_benefits_df.to_csv(path_of_run_folder / f'{start_time_readable}_benefits_annual.csv', index=False)
     if batch_settings.net_benefit_ghg_scope in ['global', 'both']:
         social_effects_global_df.to_csv(
             path_of_run_folder / f'{start_time_readable}_social_effects_global_ghg_annual.csv', index=False)
@@ -283,7 +298,9 @@ def main():
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv', output_file_id_info)
     add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', output_file_id_info)
 
-    shutil.copy2(runtime_options.batch_settings_file, path_of_run_folder / f'{runtime_options.batch_settings_file_name}')
+    shutil.copy2(
+        runtime_options.batch_settings_file, path_of_run_folder / f'{runtime_options.batch_settings_file_name}'
+    )
     set_paths.copy_code_to_destination(path_of_code_folder)
 
     if runtime_options.save_input_files:

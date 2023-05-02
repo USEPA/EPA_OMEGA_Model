@@ -149,18 +149,18 @@ def calc_safety_effects(batch_settings, session_settings):
         'onroad_direct_kwh_per_mile',
     ]
 
-    safety_effects_dict = dict()
-    vehicle_info_dict = dict()
+    safety_effects_dict = {}
+    vehicle_info_dict = {}
 
     calendar_years = batch_settings.calendar_years
     for calendar_year in calendar_years:
 
         vads = session_settings.vehicle_annual_data.get_adjusted_vehicle_annual_data_by_calendar_year(calendar_year)
 
-        calendar_year_safety_dict = dict()
+        calendar_year_safety_dict = {}
         for vad in vads:
 
-            vehicle_safety_dict = dict()
+            vehicle_safety_dict = {}
 
             # need vehicle info once for each vehicle, not every calendar year for each vehicle
             vehicle_id = int(vad['vehicle_id'])
@@ -246,8 +246,7 @@ def calc_safety_effects(batch_settings, session_settings):
                 }
                 )
 
-                key = (int(vehicle_id), int(calendar_year), int(age))
-                calendar_year_safety_dict[key] = vehicle_safety_dict
+                calendar_year_safety_dict[int(vehicle_id), int(calendar_year)] = vehicle_safety_dict
 
         safety_effects_dict.update(calendar_year_safety_dict)
 
@@ -270,10 +269,10 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
     """
     mfr_id = 'legacy_fleet'
 
-    legacy_fleet_safety_effects_dict = dict()
+    legacy_fleet_safety_effects_dict = {}
     for key, nested_dict in batch_settings.legacy_fleet.adjusted_legacy_fleet.items():
 
-        vehicle_id, calendar_year, age = key
+        vehicle_id, calendar_year, age = nested_dict['vehicle_id'], nested_dict['calendar_year'], nested_dict['age']
 
         model_year = calendar_year - age
         market_class_id = nested_dict['market_class_id']
@@ -291,7 +290,7 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
         threshold_lbs, change_per_100lbs_below, change_per_100lbs_above = \
             get_safety_values(session_settings, body_style)
 
-        vehicle_safety_dict = dict()
+        vehicle_safety_dict = {}
 
         fatality_rate_base = get_fatality_rate(session_settings, model_year, age)
 
@@ -342,9 +341,7 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
         }
         )
 
-        key = (int(vehicle_id), int(calendar_year), int(age))
-
-        legacy_fleet_safety_effects_dict[key] = vehicle_safety_dict
+        legacy_fleet_safety_effects_dict[int(vehicle_id), int(calendar_year)] = vehicle_safety_dict
 
     return legacy_fleet_safety_effects_dict
 
