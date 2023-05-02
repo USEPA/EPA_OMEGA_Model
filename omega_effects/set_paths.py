@@ -143,7 +143,7 @@ class SetPaths:
             An open-file dialog to select the batch settings file to use.
 
         Note:
-            This method allows for a user-interactive identifier (name) for the given run.
+            This method allows for a user-interactive means of selecting the desired batch settings file.
 
         """
         # set full path to the batch settings file

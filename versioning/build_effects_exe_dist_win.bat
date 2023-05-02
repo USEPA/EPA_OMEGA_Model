@@ -4,7 +4,7 @@ cd ..
 
 REM build executable
 
-pynstaller omega_effects/omega_effects_main.py ^
+pyinstaller omega_effects/omega_effects_main.py ^
   --name OMEGA-effects-2.1.0-win.exe ^
   --paths omega_effects ^
   --noconfirm ^
