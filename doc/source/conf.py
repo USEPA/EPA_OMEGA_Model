@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.join(path, '..', '..', 'omega_effects'))  # picks up 
 sys.path.insert(0, os.path.join(path, '..', '..', 'omega_model'))  # picks up omega_model sub-packages
 sys.path.insert(0, os.path.join(path, '..', '..', 'omega_gui'))  # picks up omega_model sub-packages
 sys.path.insert(0, os.path.join(path, '..', '..'))  # picks up the top-level packages
+print('path = %s' % path)
 
 # -- Project information -----------------------------------------------------
 
@@ -63,7 +64,9 @@ exclude_patterns = ['*setup*', '*exe_entry*']
 #
 html_theme = 'sphinx_rtd_theme'
 html_css_files = [path + '/_static/omega_rtd_theme.css']
+print('html_css_files = %s' % html_css_files)
 html_logo = path + '/_static/OMEGA_logo_transparent.png'
+print('html_logo = %s' % html_logo)
 numfig = True
 todo_include_todos = True
 
