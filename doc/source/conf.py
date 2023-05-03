@@ -64,6 +64,7 @@ exclude_patterns = ['*setup*', '*exe_entry*']
 #
 html_theme = 'sphinx_rtd_theme'
 html_css_files = [path + '/_static/omega_rtd_theme.css']
+html_style = path + '/_static/omega_rtd_theme.css'
 print('html_css_files = %s' % html_css_files)
 html_logo = path + '/_static/OMEGA_logo_transparent.png'
 print('html_logo = %s' % html_logo)
