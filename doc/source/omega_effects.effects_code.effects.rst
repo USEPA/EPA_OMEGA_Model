@@ -129,14 +129,6 @@ omega\_effects.effects\_code.effects.physical\_effects module
    :undoc-members:
    :show-inheritance:
 
-omega\_effects.effects\_code.effects.present\_and\_annualized\_values module
-----------------------------------------------------------------------------
-
-.. automodule:: omega_effects.effects_code.effects.present_and_annualized_values
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 omega\_effects.effects\_code.effects.safety\_effects module
 -----------------------------------------------------------
 
