@@ -62,8 +62,6 @@ exclude_patterns = ['*setup*', '*exe_entry*']
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
-html_css_files = [path + '/_static/omega_rtd_theme.css']
-html_style = path + '/_static/omega_rtd_theme.css'
 html_logo = path + '/_static/OMEGA_logo_transparent.png'
 numfig = True
 todo_include_todos = True
