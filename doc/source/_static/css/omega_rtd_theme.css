@@ -5,3 +5,11 @@
     color: #2785C6;
     overflow-wrap:normal
 }
+
+
+.rst-content table.docutils td, .rst-content table.docutils th, .rst-content table.field-list td, .rst-content table.field-list th, .wy-table td, .wy-table th {
+    font-size: 90%;
+    margin: 0;
+    overflow: visible;
+    padding: 5px 10px;
+}
