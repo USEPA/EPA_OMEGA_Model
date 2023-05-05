@@ -1,0 +1,7 @@
+@import 'theme.css';
+
+.rst-content code.xref, .rst-content tt.xref, a .rst-content code, a .rst-content tt {
+    font-weight: 700;
+    color: #2785C6;
+    overflow-wrap:normal
+}
