@@ -2,7 +2,6 @@
 
 **OMEGA effects main.**
 
-pyinstaller omega_effects\omega_effects_main.py --clean --console --onefile --name omega-effects-20230428-win --workpath D:\omega_effects_exe --distpath D:\omega_effects_exe
 ----
 
 **CODE**
