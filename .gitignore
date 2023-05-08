@@ -141,6 +141,3 @@ composer.lock
 /omega_model/bundle/
 context_new_vehicle_prices.csv
 *.fig
-/doc/source/omega_effects*.rst
-/doc/source/omega_model*.rst
-/doc/source/omega_gui*.rst
