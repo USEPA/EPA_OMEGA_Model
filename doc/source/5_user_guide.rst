@@ -3,6 +3,8 @@
 User Guide
 ==========
 
+OMEGA Model
+^^^^^^^^^^^
 The primary input to OMEGA is the batch definition file which contains rows for each user input required to define a simulation session or group of sessions.
 
 The line-by-line documentation of the batch definition file is available at :any:`omega_model/omega_batch.py<omega_model.omega_batch>` and won't be repeated here.
@@ -145,4 +147,160 @@ Understanding the Batch Process
 ::
 
     >>python path/to/my/bundle_folder/omega_model/omega_batch.py --batch_file path/to/my/bundle_folder/YYYY_MM_DD_hh_mm_ss_batch.csv --no_bundle --no_validate
+
+OMEGA Effects
+^^^^^^^^^^^^^
+The primary inputs to the OMEGA effects calculator are the OMEGA Model's vehicles and vehicle annual data output files for
+sessions of interest. For the Effects calculator to find these necessary OMEGA Model output files, the user must provide to the
+Effects calculator the path where they can be found. This is done via the "batch_settings_effects" input file. Assuming the user has run the OMEGA
+Model and has the bundled results saved to an accessible directory, then the batch_settings_effects file should provide the full system
+path to that directory.
+
+Importantly, the batch_settings_effects file must also provide a session name associated with each session for which effects
+are to be calculated. The session name must be consistent with the session name used in the OMEGA Model run. These session names
+also need to include a context session name, a no action session name and at least one action session name. These are needed
+to calculate the effects properly since the context session serves to calculate fleet vehicle miles traveled (VMT) and fleet fuel costs per
+mile from which any VMT rebound effects in subsequent sessions can be calculated.
+
+The OMEGA effects calculator will look for several necessary files within "in" folder of the context session folder contained within the
+bundled OMEGA Model results (i.e., the user need not specify these files in the batch_settings_effects file). In particular, the OMEGA
+effects calculator will look for and find the context fuel prices, price deflator files used to adjust all monetized values into a common
+valuation, an onroad fuels file, an onroad vehicle calculations file, an annual VMT file, and a reregistration file.
+
+In addition to the context session, a no action and action session are required because some of the effects calculations are meant
+to calculate impacts of a policy action relative to a no action, or business as usual, policy. In particular, the benefits
+calculations can only be done by first calculating physical effects of the action policy relative to the no action
+policy since benefits do not exist, within OMEGA, absent a policy change.
+
+The other inputs to the OMEGA effects calculator are those associated with: vehicle, EGU and refinery emission rates; cost factors, or $/ton, factors
+associated with criteria air pollutants, GHG emissions, energy security impacts, crashes, congestion, noise, vehicle repair, vehicle
+maintenance, fuel prices, etc. All of these input files must be provided by the user via the batch_settings_effects file.
+
+Below is a table describing the entries needed in the batch_settings_effects file. User entries are to be made in the
+``value`` or ``full_path`` columns of the batch_settings_effects file.
+
+Batch Input Files and Loaders
+    .. csv-table::
+        :header-rows: 1
+        :stub-columns: 1
+
+        parameter,session_policy,description
+        RUNTIME OPTIONS,,
+        Run ID,all,enter ``value`` for the run identifier for your output folder name or blank for default (default is omega_effects)
+        Save Path,all,enter ``full path`` of the *folder* to which to save results but do not include unique run identifiers
+        Save Input Files,all,enter ``value`` as True to save input files to your results folder or False to save space and not do so
+        Save Context Fuel Cost per Mile File,all,enter ``value`` as True or False and note that these files can be large especially in CSV format
+        Save Vehicle-Level Safety Effects Files,all,enter ``value`` as True or False and note that these files can be large especially in CSV format
+        Save Vehicle-Level Physical Effects Files,all,enter ``value`` as True or False and note that these files can be large especially in CSV format
+        Save Vehicle-Level Cost Effects Files,all,enter ``value`` as True or False and note that these files can be large especially in CSV format
+        Format for Vehicle-Level Output Files,all,enter ``value`` as 'csv' for large Excel-readable files or 'parquet' for compressed files usable in Pandas
+        BATCH SETTINGS,,
+        batch_folder,all,enter ``full_path`` of the *folder* containing OMEGA Model run results
+        Vehicles File Base Year,all,enter ``value`` consistent with the OMEGA Model run
+        Analysis Final Year,all,enter ``value`` <= the value used in the OMEGA Model run
+        Cost Accrual,all,enter ``value`` as start-of-year or end-of-year - this entry impacts the discounting of costs and benefits
+        Discount Values to Year,all,enter ``value`` to which costs and benefits will be discounted
+        Analysis Dollar Basis,all,enter ``value`` consistent with the OMEGA Model run
+        Batch Analysis Context Settings,,
+        Context Name,all,enter ``value`` of the AEO report (e.g. AEO2021) used in the OMEGA Model run
+        Context Case,all,enter ``value`` of the AEO case (e.g. Reference case) used in the OMEGA Model run
+        VMT Rebound Rate ICE,all,enter ``value`` for ICE rebound (e.g. -0.1)
+        VMT Rebound Rate BEV,all,enter ``value`` for BEV rebound
+        SC-GHG in Net Benefits,all,enter ``value`` as 'global' or 'domestic' or 'both' (note that both global and domestic benefits are calculated, this only impacts net benefits)"
+        Maintenance Costs File,all,enter ``full_path`` of maintenance costs file in CSV format
+        Repair Costs File,all,enter ``full_path`` of repair costs file in CSV format
+        Refueling Costs File,all,enter ``full_path`` of refueling costs file in CSV format (i.e. the cost of time spent refueling)
+        General Inputs for Effects File,all,enter ``full_path`` of general inputs for effects file in CSV format
+        Context Criteria Cost Factors File,all,enter ``full_path`` of criteria air pollutant $/ton factors file in CSV format
+        Context SCC Cost Factors File,all,enter ``full_path`` of social cost of GHG $/ton factors file in CSV format
+        Context Energy Security Cost Factors File,all,enter ``full_path`` of energy security $/barrel file in CSV format
+        Context Congestion-Noise Cost Factors File,all,enter ``full_path`` of crashes & congestion & noise costs file in CSV format
+        Context Legacy Fleet File,all,enter ``full_path`` of legacy fleet file in CSV format
+        ,,
+        Session Name,context,enter ``value`` of the context session name (e.g. SAFE or HDP2_noIRA)
+        Context Stock and VMT File,context,enter ``full_path`` of stock and VMT file file in CSV format
+        ,,
+        Session Name,no_action,enter ``value`` of the no action session name (e.g. NTR or HDP2)
+        Context Powersector Emission Rates File,no_action,enter ``full_path`` of EGU emission rates file in CSV format
+        Context Refinery Emission Rates File,no_action,enter ``full_path`` of refinery emission rates file in CSV format
+        Context Refinery Emission Factors File,no_action,leave blank - use is not recommended
+        Context Vehicle Emission Rates File,no_action,enter ``full_path`` of vehicle emission rates file in CSV format
+        Context Safety Values File,no_action,enter ``full_path`` of safety values file in CSV format
+        Context Fatality Rates File,no_action,enter ``full_path`` of fatality rates file in CSV format
+        ,,
+        Session Name,action_1,enter ``value`` of the first action or policy session name (e.g. Proposal)
+        Context Powersector Emission Rates File,action_1,enter ``full_path`` which may be the same as used for the no action session
+        Context Refinery Emission Rates File,action_1,enter ``full_path`` which may be the same as used for the no action session
+        Context Refinery Emission Factors File,action_1,enter ``full_path`` which may be the same as used for the no action session
+        Context Vehicle Emission Rates File,action_1,enter ``full_path`` which may be the same as used for the no action session
+        Context Safety Values File,action_1,enter ``full_path`` which may be the same as used for the no action session
+        Context Fatality Rates File,action_1,enter ``full_path`` which may be the same as used for the no action session
+
+Runtime Options
+---------------
+The effects results will be saved to a folder specified in the save_path ``full_path`` entry (e.g. "c:/omega/effects"). In that save_path folder,
+a folder will be auto generated and will have the same name as the OMEGA Model batch for which effects are being calculated.
+Within that batch folder, a run results folder will be auto generated whose name will consist of a date and timestamp associated with
+the time of the OMEGA effects calculator run along with the run ID to assist in keeping track of different runs and ensuring that nothing is
+overwritten by future runs. As a result, you might find your results saved to a folder named something like
+"c:/omega/effects/ld_omega_model_batch/20230504_090000_omega_effects" for a run done on May 4, 2023, at 9:00AM.
+
+Note that some effects output files may or may not be desired. The effects are calculated for every vehicle in the fleet in every
+year up to and including the Analysis Final Year ``value``. If you run through 2055, this becomes a large number of vehicles and
+the vehicle-level output files can become very large (0.5 GB to 1 GB per file). Depending on your machine, you may have trouble
+viewing those files let alone conducting analyses of the results (e.g., in Excel or OpenOffice). Saving of these large output files
+can be avoided by setting the "Save Vehicle-Level" file ``value`` to False. Alternatively, the use can generate those files in
+parquet format, which is a compressed file format, to save space. Parquet files are readable by Python's Pandas library but cannot
+be opened directly in a spreadsheet application. Instructions for reading saved parquet files in Pandas are included in the save_file function
+of :any:`/omega_effects/general/file_id_and_save.py<omega_effects.general.file_id_and_save>`.
+
+Batch Analysis Context Settings
+-------------------------------
+The files specified in the Batch Analysis Context Settings section of the batch_settings_effects file are meant to apply to all
+sessions in the batch.
+
+Session Settings
+----------------
+Any session can be run in the OMEGA Effects calculator provided those sessions exist in the batch_folder. A ``value`` for
+the session name must be provided. A session can be ignored by setting the Session Name ``value`` to None. A Context Session Name
+must be provided and no session meant to be included can have a session name of None.
+
+Emission Rates Files
+--------------------
+Note that an action session may require a different emission rate input file than that used for the no action session for, say,
+vehicle emission rates in the event that the policy impacts vehicle emission rates.
+
+Running the OMEGA Effects Executable
+------------------------------------
+1)	The OMEGA Effects code, input files and output files can be found on the OMEGA webpage at this link https://www3.epa.gov/otaq/ld/lmdv-nprm-effects-docket.zip
+
+2)	The OMEGA Effects are not part of the OMEGA Model executable file. The OMEGA Effects can be run using the Python code included in the OMEGA repository at https://github.com/USEPA/EPA_OMEGA_Model or the Python code included in the zip file linked above.
+
+3)	Alternatively, the OMEGA Effects can be run using a separate executable file (recommended).
+
+4)	These instructions assume that the executable file is being used to generate the OMEGA Effects.
+
+5)	Place the executable file in your preferred location on your local machine.
+
+6)	Place the associated “effects_inputs” folder and its contents in your preferred location on your local machine. This folder is available on request to omega_support@epa.gov.
+
+7)	In the effects_inputs folder, find 2 batch settings files: one for light-duty (batch_settings_effects_ld.csv) and one for medium-duty (batch_settings_effects_md.csv).
+
+8)	In cell B3 of the batch settings file, enter a run ID if desired (e.g., NPRM, test, etc.). This run ID will be included as part of the output folder name. The default value is omega_effects.
+
+9)	In cell D4, enter the path of the save folder (e.g., "C:/omega/effects"). The output folder will be saved to this folder. The output folder will be named using other entries in the batch file and the run ID set in step 8.
+
+10)	Other options in Column B can be set to TRUE or FALSE, but please read the notes associated with each.
+
+11)	In cell D12 of the batch settings file, enter the full path to the folder that contains your OMEGA compliance run results. This is important since the OMEGA Effects will look to this folder to find the needed vehicles.csv and vehicle_annual_data.csv files generated for each session in your OMEGA compliance run.
+
+12)	Most values in column C can be left as is. There must be a context session name in cell C34. If your context session name is different, then set cell C34 accordingly. The same is true of subsequent session names in column C. If you do not want your effects outputs to include a session that exists in your OMEGA compliance run folder, simply set the session name to None.
+
+13)	Remaining entries in Column D should then point to the “effects_inputs” folder on your local machine. Filenames can probably be left as is unless you are using files with different names.
+
+14)	After setting up the batch settings file, be sure to save it as a CSV file (not Excel).
+
+15)	Double click the executable file.
+
+16)	The executable should launch. Be patient. After several seconds, a file dialog window should open asking for the batch settings file. Navigate to the batch settings file you saved in step 14, select it, and click open. The executable should now run using the settings in your batch settings file.
 

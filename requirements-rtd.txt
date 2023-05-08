@@ -20,6 +20,7 @@ fastparquet
 
 # for readthedocs:
 sphinx-rtd-theme>=1.0.0,<=2.0.0
+requests==2.29.0  # fix failing builds 5/5/2023
 
 # for dispy parallel processing:
 dispy==4.15.2
