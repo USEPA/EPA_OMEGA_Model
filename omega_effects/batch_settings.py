@@ -255,7 +255,8 @@ class BatchSettings:
         self.context_session_name = self.get_attribute_value(('Session Name', 'context'), 'value')
         path_context_in = self.batch_folder / f'_{self.context_session_name}' / 'in'
 
-        self.context_stock_and_vmt_file = self.get_attribute_value(('Context Stock and VMT File', 'context'), 'full_path')
+        self.context_stock_and_vmt_file = \
+            self.get_attribute_value(('Context Stock and VMT File', 'context'), 'full_path')
 
         find_string = None
         try:
