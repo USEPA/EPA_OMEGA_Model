@@ -289,7 +289,7 @@ class SessionSettings:
             find_string = 'powertrain_cost'
             self.powertrain_cost_file = self.find_file(path_session_in, find_string)
         except FileNotFoundError:
-            effects_log(f'{path_session_in} does not contain a {find_string} file.')
+            effects_log.logwrite(f'{path_session_in} does not contain a {find_string} file.')
             sys.exit()
 
         self.init_session_classes(self.session_name, effects_log)
