@@ -165,9 +165,16 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 if battery_kwh > 0:
                     battery_cost_dollars_per_kwh = battery_cost_dollars / battery_kwh
 
+                powertrain_type = None
                 if bev_flag == 1:
+                    powertrain_type = 'BEV'
+                elif phev_flag == 1:
+                    powertrain_type = 'PHEV'
+                if powertrain_type:
                     battery_credit_dollars = \
-                        session_settings.powertrain_cost.get_battery_tax_offset(model_year, battery_kwh)
+                        session_settings.powertrain_cost.get_battery_tax_offset(
+                            model_year, battery_kwh, powertrain_type
+                        )
 
             # fuel costs
             fuel_dict = eval(in_use_fuel_id)
