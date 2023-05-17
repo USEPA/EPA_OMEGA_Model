@@ -552,9 +552,13 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                                     cloud_point = vehicle.calc_battery_sizing_onroad_direct_kWh_per_mile(cloud_point)
 
-                                    battery_kwh = vehicle.charge_depleting_range_mi * \
-                                              cloud_point['battery_sizing_onroad_direct_kwh_per_mile'] / \
-                                              usable_battery_capacity_norm
+                                    if vehicle.powertrain_type == 'PHEV' and \
+                                            omega_globals.options.use_rse_phev_battery_kwh:
+                                        battery_kwh = cloud_point['hev_batt_kwh']
+                                    else:
+                                        battery_kwh = vehicle.charge_depleting_range_mi * \
+                                                      cloud_point['battery_sizing_onroad_direct_kwh_per_mile'] / \
+                                                      usable_battery_capacity_norm
 
                                 # determine convergence ------------------------------------------------------------- #
                                 converged = abs(

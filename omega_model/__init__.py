@@ -158,6 +158,7 @@ try:
             self.analysis_dollar_basis = 2020
 
             self.allow_ice_of_bev = False
+            self.use_rse_phev_battery_kwh = False
 
             self.ip_deflators_file = path + 'test_inputs/implicit_price_deflators.csv'
 
