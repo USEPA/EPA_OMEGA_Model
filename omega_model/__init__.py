@@ -134,13 +134,13 @@ try:
             self.workfactor_definition_file = path + 'test_inputs/workfactor_definition.csv'
 
             self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market-body_style.csv'
-            self.market_classes_file = path + 'test_inputs/market_classes-body_style.csv'
+            self.market_classes_file = path + 'test_inputs/market_classes_ice_bev_phev-body_style.csv'
             self.producer_generalized_cost_file = path + 'test_inputs/producer_generalized_cost-body_style.csv'
             self.production_constraints_file = path + 'test_inputs/production_constraints-body_style.csv'
-            self.vehicle_reregistration_file = path + 'test_inputs/reregistration_fixed_by_age-body_style.csv'
-            self.sales_share_file = path + 'test_inputs/sales_share_params_ice_bev_body_style.csv'
+            self.vehicle_reregistration_file = path + 'test_inputs/reregistration_fixed_by_age_ice_bev_phev-body_style.csv'
+            self.sales_share_file = path + 'test_inputs/sales_share_params_ice_bev_phev_body_style.csv'
             self.required_sales_share_file = path + 'test_inputs/required_sales_share-body_style.csv'
-            self.onroad_vmt_file = path + 'test_inputs/annual_vmt_fixed_by_age-body_style.csv'
+            self.onroad_vmt_file = path + 'test_inputs/annual_vmt_fixed_by_age_ice_bev_phev-body_style.csv'
             self.vehicle_price_modifications_file = path + 'test_inputs/vehicle_price_modifications-body_style.csv'
 
             self.offcycle_credits_file = path + 'test_inputs/offcycle_credits.csv'
@@ -166,7 +166,7 @@ try:
 
             # developer settings
             self.producer_market_category_ramp_limit = 0.2
-            self.producer_shares_mode = 'auto'
+            self.producer_shares_mode = True  # 'auto'
             self.producer_num_market_share_options = 3
             self.producer_num_tech_options_per_ice_vehicle = 3
             self.producer_num_tech_options_per_bev_vehicle = 1
@@ -196,7 +196,7 @@ try:
             self.producer_cross_subsidy_price_tolerance = 5e-3
             self.producer_strategic_compliance_buffer = 0.0
             self.run_profiler = False
-            self.multiprocessing = True and not self.run_profiler and not getattr(sys, 'frozen', False)
+            self.multiprocessing = False and not self.run_profiler and not getattr(sys, 'frozen', False)
             self.non_context_session_process_scaler = 1
             self.flat_context = False
             self.flat_context_year = 2021
@@ -208,18 +208,18 @@ try:
             self.kwh_per_mile_scale = [1.0]
 
             self.redesign_interval_gain_years = [2020, 2029, 2034]
-            self.redesign_interval_gain = [1.0, 1.0, 0.0]
+            self.redesign_interval_gain = [1.0*0, 1.0*0, 0.0]
 
             self.manufacturer_gigawatthour_data = None
 
             # list of modules to allow verbose log files, or empty to disable:
             self.verbose_log_modules = ['database_', 'producer_compliance_search', 'cross_subsidy_search_',
-                                        'cv_cost_curves_', 'v_cost_curves_', 'v_cost_clouds_', 'v_cloud_plots_',
+                                        'cv_cost_curves', 'v_cost_curves', 'v_cost_clouds', 'v_cloud_plots',
                                         'effects_']
 
             # list of modules to allow verbose console output, or empty to disable
             self.verbose_console_modules = ['producer_compliance_search_',
-                                            'p-c_shares_and_costs_', 'p-c_max_iterations_',
+                                            'p-c_shares_and_costs', 'p-c_max_iterations_',
                                             'cross_subsidy_search_', 'cross_subsidy_multipliers_',
                                             'cross_subsidy_convergence_']
 

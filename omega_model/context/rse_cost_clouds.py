@@ -576,8 +576,12 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 # battery size and total motor/generator power come from RSEs for ICE/HEV
                                 cloud_point['battery_kwh'] = cloud_point['hev_batt_kwh']
                                 cloud_point['motor_kw'] = cloud_point['hev_motor_kw']
+                            elif vehicle.powertrain_type == 'PHEV':
+                                # PHEV battery size and motor power determined by vehicle and iterative range calculation
+                                cloud_point['battery_kwh'] = battery_kwh
+                                cloud_point['motor_kw'] = cloud_point['hev_motor_kw']
                             else:
-                                # battery size and motor power determined by vehicle and iterative range calculation
+                                # BEV battery size and motor power determined by vehicle and iterative range calculation
                                 cloud_point['battery_kwh'] = battery_kwh
                                 cloud_point['motor_kw'] = rated_hp / 1.34102
 
