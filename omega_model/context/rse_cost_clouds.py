@@ -488,7 +488,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                 rated_hp = vehicle.motor_kw * 1.34102
             elif vehicle.ice:
                 rated_hp = vehicle.eng_rated_hp
-            else:  # RV
+            else:  # PHEV, MHEV, HEV RV
                 rated_hp = vehicle.eng_rated_hp + vehicle.motor_kw * 1.34102
 
             if vehicle.bev:
@@ -546,7 +546,10 @@ class CostCloud(OMEGABase, CostCloudBase):
                                                                   'HP_ETW': HP_ETW})))
 
                                 # battery sizing -------------------------------------------------------------------- #
-                                if vehicle.powertrain_type == 'BEV':  # TODO: or 'PHEV'
+                                if vehicle.powertrain_type == 'BEV' or vehicle.powertrain_type == 'PHEV':
+                                    cloud_point['battery_kwh'] = battery_kwh
+                                    cloud_point['usable_battery_capacity_norm'] = usable_battery_capacity_norm
+
                                     cloud_point = vehicle.calc_battery_sizing_onroad_direct_kWh_per_mile(cloud_point)
 
                                     battery_kwh = vehicle.charge_depleting_range_mi * \
@@ -558,7 +561,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                                     1 - powertrain_mass_lbs / prior_powertrain_mass_lbs) <= convergence_tolerance and \
                                             abs(1 - rated_hp / prior_rated_hp) <= convergence_tolerance
 
-                                if vehicle.powertrain_type == 'BEV':
+                                if vehicle.powertrain_type == 'BEV' or vehicle.powertrain_type == 'PHEV':
                                     converged = converged and \
                                             abs(1 - battery_kwh / prior_battery_kwh) < convergence_tolerance
 
@@ -568,7 +571,17 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                                 # ------------------------------------------------------------------------------------#
 
-                            cloud_point = vehicle.calc_cert_values(cloud_point)
+                            # update battery and motor data prior to calc_cert_values (for PHEV, primarily)
+                            if vehicle.powertrain_type != 'BEV' and vehicle.powertrain_type != 'PHEV':
+                                # battery size and total motor/generator power come from RSEs for ICE/HEV
+                                cloud_point['battery_kwh'] = cloud_point['hev_batt_kwh']
+                                cloud_point['motor_kw'] = cloud_point['hev_motor_kw']
+                            else:
+                                # battery size and motor power determined by vehicle and iterative range calculation
+                                cloud_point['battery_kwh'] = battery_kwh
+                                cloud_point['motor_kw'] = rated_hp / 1.34102
+
+                            cloud_point = vehicle.calc_cert_and_onroad_values(cloud_point)
 
                             v = copy.copy(vehicle)
                             v.footprint_ft2 = footprint_ft2
@@ -590,18 +603,10 @@ class CostCloud(OMEGABase, CostCloudBase):
                             cloud_point['structure_material'] = structure_material
                             cloud_point['curbweight_lbs'] = vehicle.curbweight_lbs
                             cloud_point['rated_hp'] = rated_hp
-                            if vehicle.powertrain_type != 'BEV':
-                                # battery size and total motor/generator power come from RSEs for ICE/HEV
-                                cloud_point['battery_kwh'] = cloud_point['hev_batt_kwh']
-                                cloud_point['motor_kw'] = cloud_point['hev_motor_kw']
-                            else:
-                                # battery size and motor power determined by vehicle and iterative range calculation
-                                cloud_point['battery_kwh'] = battery_kwh
-                                cloud_point['motor_kw'] = rated_hp / 1.34102
 
                             # informative data for troubleshooting:
-                            if vehicle.model_year in omega_globals.options.log_vehicle_cloud_years or \
-                                    omega_globals.options.log_vehicle_cloud_years == 'all':
+                            if omega_globals.options.log_vehicle_cloud_years == 'all' or \
+                                    vehicle.model_year in omega_globals.options.log_vehicle_cloud_years:
                                 cloud_point['vehicle_id'] = vehicle.vehicle_id
                                 cloud_point['vehicle_base_year_id'] = vehicle.base_year_vehicle_id
                                 cloud_point['vehicle_name'] = vehicle.name
@@ -651,8 +656,8 @@ class CostCloud(OMEGABase, CostCloudBase):
             calc_generalized_cost(vehicle, cost_cloud, 'onroad_direct_co2e_grams_per_mile',
                                   'onroad_direct_kwh_per_mile', 'new_vehicle_mfr_cost_dollars')
 
-        if vehicle.model_year in omega_globals.options.log_vehicle_cloud_years or \
-                omega_globals.options.log_vehicle_cloud_years == 'all':
+        if omega_globals.options.log_vehicle_cloud_years == 'all' or \
+                vehicle.model_year in omega_globals.options.log_vehicle_cloud_years:
             with open(omega_globals.options.output_folder + '%d_cost_clouds_%s_%s.csv' %
                       (vehicle.model_year, vehicle.compliance_id, vehicle.base_year_powertrain_type), 'a') as f:
                 cost_cloud.to_csv(f, mode='a', header=not f.tell(), columns=sorted(cost_cloud.columns), index=False)

@@ -101,6 +101,7 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
         """
         from context.price_modifications import PriceModifications
         from context.onroad_fuels import OnroadFuel
+        from context.fuel_prices import FuelPrice
 
         producer_generalized_cost_fuel_years, producer_generalized_cost_annual_vmt = \
             ProducerGeneralizedCost. \
@@ -129,10 +130,10 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
                  producer_generalized_cost_fuel_years)
 
         if any(vehicle_direct_kwh_per_mile > 0):
-            electric_generalized_fuel_cost = (vehicle_direct_kwh_per_mile *
-                                              vehicle.retail_fuel_price_dollars_per_unit(vehicle.model_year) *
-                                              producer_generalized_cost_annual_vmt *
-                                              producer_generalized_cost_fuel_years)
+            electric_generalized_fuel_cost = \
+                (vehicle_direct_kwh_per_mile *
+                 FuelPrice.get_fuel_prices(vehicle.model_year, 'retail_dollars_per_unit', 'US electricity') *
+                 producer_generalized_cost_annual_vmt * producer_generalized_cost_fuel_years)
 
         delta_footprint_ft2 = cost_cloud['footprint_ft2'] - vehicle.base_year_footprint_ft2
         footprint_wtp = delta_footprint_ft2 * omega_globals.options.producer_footprint_wtp

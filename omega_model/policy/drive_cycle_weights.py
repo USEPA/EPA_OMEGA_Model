@@ -151,8 +151,8 @@ class DriveCycleWeights(OMEGABase):
                                                              verbose=verbose)
 
         if not template_errors:
-            validation_dict = {'share_id': ['cert'],
-                               'fueling_class': ['ICE', 'BEV', 'PHEV'],  # RV
+            validation_dict = {'share_id': ['onroad', 'cert'],
+                               'fueling_class': fueling_classes,
                                }
 
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
@@ -207,7 +207,7 @@ class DriveCycleWeights(OMEGABase):
             A pandas ``Series`` object of the weighted results
 
         """
-        cache_key = calendar_year, fueling_class
+        cache_key = calendar_year, fueling_class, node_id, weighted
 
         if cache_key not in DriveCycleWeights._data:
 
@@ -237,11 +237,56 @@ class DriveCycleWeights(OMEGABase):
             A pandas ``Series`` object of the weighted results
 
         """
-        return DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
-                                                     'cs_cert_direct_oncycle_co2e_grams_per_mile', weighted=False)
+        if fueling_class == 'PHEV':
+            ftp_cd_uf, hwfet_cd_uf, us06_uf = \
+                DriveCycleWeights.calc_phev_utility_factors(calendar_year, cycle_values)
+
+            phev_cycle_values = cycle_values.copy()
+
+            cd_ftp_1_co2e_grams_per_mile = cycle_values['cd_ftp_1:cert_direct_oncycle_co2e_grams_per_mile']
+            cd_ftp_2_co2e_grams_per_mile = cycle_values['cd_ftp_2:cert_direct_oncycle_co2e_grams_per_mile']
+            cd_ftp_3_co2e_grams_per_mile = cycle_values['cd_ftp_3:cert_direct_oncycle_co2e_grams_per_mile']
+            cd_ftp_4_co2e_grams_per_mile = cycle_values['cd_ftp_4:cert_direct_oncycle_co2e_grams_per_mile']
+            cd_hwfet_co2e_grams_per_mile = cycle_values['cd_hwfet:cert_direct_oncycle_co2e_grams_per_mile']
+            cd_us06_1_co2e_grams_per_mile = cycle_values['cd_us06_1:cert_direct_oncycle_co2e_grams_per_mile']
+            cd_us06_2_co2e_grams_per_mile = cycle_values['cd_us06_2:cert_direct_oncycle_co2e_grams_per_mile']
+
+            cs_ftp_1_co2e_grams_per_mile = cycle_values['cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile']
+            cs_ftp_2_co2e_grams_per_mile = cycle_values['cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile']
+            cs_ftp_3_co2e_grams_per_mile = cycle_values['cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile']
+            cs_ftp_4_co2e_grams_per_mile = cycle_values['cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile']
+            cs_hwfet_co2e_grams_per_mile = cycle_values['cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile']
+            cs_us06_1_co2e_grams_per_mile = cycle_values['cs_us06_1:cert_direct_oncycle_co2e_grams_per_mile']
+            cs_us06_2_co2e_grams_per_mile = cycle_values['cs_us06_2:cert_direct_oncycle_co2e_grams_per_mile']
+
+            phev_cycle_values['cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile'] = \
+                ftp_cd_uf * cd_ftp_1_co2e_grams_per_mile + (1 - ftp_cd_uf) * cs_ftp_1_co2e_grams_per_mile
+            phev_cycle_values['cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile'] = \
+                ftp_cd_uf * cd_ftp_2_co2e_grams_per_mile + (1 - ftp_cd_uf) * cs_ftp_2_co2e_grams_per_mile
+            phev_cycle_values['cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile'] = \
+                ftp_cd_uf * cd_ftp_3_co2e_grams_per_mile + (1 - ftp_cd_uf) * cs_ftp_3_co2e_grams_per_mile
+            phev_cycle_values['cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile'] = \
+                ftp_cd_uf * cd_ftp_4_co2e_grams_per_mile + (1 - ftp_cd_uf) * cs_ftp_4_co2e_grams_per_mile
+            phev_cycle_values['cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile'] = \
+                hwfet_cd_uf * cd_hwfet_co2e_grams_per_mile + (1 - hwfet_cd_uf) * cs_hwfet_co2e_grams_per_mile
+            phev_cycle_values['cs_us06_1:cert_direct_oncycle_co2e_grams_per_mile'] = \
+                us06_uf * cd_us06_1_co2e_grams_per_mile + (1 - us06_uf) * cs_us06_1_co2e_grams_per_mile
+            phev_cycle_values['cs_us06_2:cert_direct_oncycle_co2e_grams_per_mile'] = \
+                us06_uf * cd_us06_2_co2e_grams_per_mile + (1 - us06_uf) * cs_us06_2_co2e_grams_per_mile
+
+            cs_cert_direct_oncycle_co2e_grams_per_mile = \
+                DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, phev_cycle_values,
+                                                      'cs_cert_direct_oncycle_co2e_grams_per_mile', weighted=False)
+
+        else:
+            cs_cert_direct_oncycle_co2e_grams_per_mile = \
+                DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
+                                                         'cs_cert_direct_oncycle_co2e_grams_per_mile', weighted=False)
+
+        return cs_cert_direct_oncycle_co2e_grams_per_mile
 
     @staticmethod
-    def calc_cert_direct_oncycle_kwh_per_mile(calendar_year, fueling_class, cycle_values):
+    def calc_cert_direct_oncycle_kwh_per_mile(calendar_year, fueling_class, cycle_values, charge_depleting_only=False):
         """
         Calculate cert direct on-cycle kWh/mi
 
@@ -250,19 +295,107 @@ class DriveCycleWeights(OMEGABase):
             fueling_class (str): e.g. 'ICE', 'BEV', etc
             cycle_values (DataFrame): contains cycle values to be weighted
                 (e.g. the simulated vehicles input data with results (columns) for each drive cycle phase)
+            charge_depleting_only (Boolean): ``True`` if calculating charge-depleting kWh/mi, not cert
 
         Returns:
             A pandas ``Series`` object of the weighted results
 
         """
-        cd_cert_direct_oncycle_kwh_per_mile = \
-            DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
+        if fueling_class == 'PHEV':
+            ftp_cd_uf, hwfet_cd_uf, us06_uf = DriveCycleWeights.calc_phev_utility_factors(calendar_year, cycle_values)
+
+            if charge_depleting_only:
+                cert_direct_oncycle_kwh_per_mile = \
+                    (DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
+                                                          'cd_cert_direct_oncycle_kwh_per_mile', weighted=False) /
+                     cycle_values['usable_battery_capacity_norm'])
+
+            else:
+                phev_cycle_values = cycle_values.copy()
+
+                cd_ftp_1_kwh_per_mile = cycle_values['cd_ftp_1:cert_direct_oncycle_kwh_per_mile']
+                cd_ftp_2_kwh_per_mile = cycle_values['cd_ftp_2:cert_direct_oncycle_kwh_per_mile']
+                cd_ftp_3_kwh_per_mile = cycle_values['cd_ftp_3:cert_direct_oncycle_kwh_per_mile']
+                cd_ftp_4_kwh_per_mile = cycle_values['cd_ftp_4:cert_direct_oncycle_kwh_per_mile']
+                cd_hwfet_kwh_per_mile = cycle_values['cd_hwfet:cert_direct_oncycle_kwh_per_mile']
+                cd_us06_1_kwh_per_mile = cycle_values['cd_us06_1:cert_direct_oncycle_kwh_per_mile']
+                cd_us06_2_kwh_per_mile = cycle_values['cd_us06_2:cert_direct_oncycle_kwh_per_mile']
+
+                cs_ftp_1_kwh_per_mile = cycle_values['cs_ftp_1:cert_direct_oncycle_kwh_per_mile']
+                cs_ftp_2_kwh_per_mile = cycle_values['cs_ftp_2:cert_direct_oncycle_kwh_per_mile']
+                cs_ftp_3_kwh_per_mile = cycle_values['cs_ftp_3:cert_direct_oncycle_kwh_per_mile']
+                cs_ftp_4_kwh_per_mile = cycle_values['cs_ftp_4:cert_direct_oncycle_kwh_per_mile']
+                cs_hwfet_kwh_per_mile = cycle_values['cs_hwfet:cert_direct_oncycle_kwh_per_mile']
+                cs_us06_1_kwh_per_mile = cycle_values['cs_us06_1:cert_direct_oncycle_kwh_per_mile']
+                cs_us06_2_kwh_per_mile = cycle_values['cs_us06_2:cert_direct_oncycle_kwh_per_mile']
+
+                phev_cycle_values['cs_ftp_1:cert_direct_oncycle_kwh_per_mile'] = \
+                    ftp_cd_uf * cd_ftp_1_kwh_per_mile + (1 - ftp_cd_uf) * cs_ftp_1_kwh_per_mile
+                phev_cycle_values['cs_ftp_2:cert_direct_oncycle_kwh_per_mile'] = \
+                    ftp_cd_uf * cd_ftp_2_kwh_per_mile + (1 - ftp_cd_uf) * cs_ftp_2_kwh_per_mile
+                phev_cycle_values['cs_ftp_3:cert_direct_oncycle_kwh_per_mile'] = \
+                    ftp_cd_uf * cd_ftp_3_kwh_per_mile + (1 - ftp_cd_uf) * cs_ftp_3_kwh_per_mile
+                phev_cycle_values['cs_ftp_4:cert_direct_oncycle_kwh_per_mile'] = \
+                    ftp_cd_uf * cd_ftp_4_kwh_per_mile + (1 - ftp_cd_uf) * cs_ftp_4_kwh_per_mile
+                phev_cycle_values['cs_hwfet:cert_direct_oncycle_kwh_per_mile'] = \
+                    hwfet_cd_uf * cd_hwfet_kwh_per_mile + (1 - hwfet_cd_uf) * cs_hwfet_kwh_per_mile
+                phev_cycle_values['cs_us06_1:cert_direct_oncycle_kwh_per_mile'] = \
+                    us06_uf * cd_us06_1_kwh_per_mile + (1 - us06_uf) * cs_us06_1_kwh_per_mile
+                phev_cycle_values['cs_us06_2:cert_direct_oncycle_kwh_per_mile'] = \
+                    us06_uf * cd_us06_2_kwh_per_mile + (1 - us06_uf) * cs_us06_2_kwh_per_mile
+
+                cert_direct_oncycle_kwh_per_mile = \
+                    DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, phev_cycle_values,
+                                                          'cs_cert_direct_oncycle_kwh_per_mile', weighted=False)
+        else:
+            cert_direct_oncycle_kwh_per_mile = \
+                DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
                                                   'cd_cert_direct_oncycle_kwh_per_mile', weighted=False)
 
         kwh_per_mile_scale = np.interp(calendar_year, omega_globals.options.kwh_per_mile_scale_years,
                                       omega_globals.options.kwh_per_mile_scale)
 
-        return cd_cert_direct_oncycle_kwh_per_mile * kwh_per_mile_scale
+        return cert_direct_oncycle_kwh_per_mile * kwh_per_mile_scale
+
+    @staticmethod
+    def calc_phev_utility_factors(calendar_year, cycle_values):
+        """
+
+        Args:
+            calendar_year:
+            cycle_values:
+
+        Returns:
+
+        """
+        phev_batt_kwh = cycle_values['battery_kwh']
+        usable_battery_capacity_norm = cycle_values['usable_battery_capacity_norm']
+        phev_cd_battery_kwh = phev_batt_kwh * usable_battery_capacity_norm ** 2
+
+        cd_ftp_kwh_per_mile = \
+            DriveCycleWeights.calc_weighted_value(calendar_year, 'PHEV', cycle_values, 'cd_ftp_kwh', weighted=False)
+
+        cd_hwfet_kwh_per_mile = cycle_values['cd_hwfet:cert_direct_oncycle_kwh_per_mile']
+
+        cd_us06_1_kwh_per_mile = cycle_values['cd_us06_1:cert_direct_oncycle_kwh_per_mile']
+        cd_us06_2_kwh_per_mile = cycle_values['cd_us06_2:cert_direct_oncycle_kwh_per_mile']
+
+        cd_us06_kwh_per_mile = \
+            1.772 / 8.007 * cd_us06_1_kwh_per_mile + 6.235 / 8.007 * cd_us06_2_kwh_per_mile
+
+        cd_ftp_range_miles = phev_cd_battery_kwh / cd_ftp_kwh_per_mile
+
+        cd_hwfet_range_miles = phev_cd_battery_kwh / cd_hwfet_kwh_per_mile
+
+        cd_us06_range_miles = phev_cd_battery_kwh / cd_us06_kwh_per_mile
+
+        ftp_cd_uf = CityFUF(cd_ftp_range_miles)
+
+        hwfet_cd_uf = HighwayFUF(cd_hwfet_range_miles)
+
+        us06_uf = HighwayFUF(cd_us06_range_miles)
+
+        return ftp_cd_uf, hwfet_cd_uf, us06_uf
 
 
 if __name__ == '__main__':

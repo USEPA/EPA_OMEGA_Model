@@ -526,7 +526,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                       min_constraints=min_constraints, max_constraints=max_constraints)
 
                         if abs(1-sum_dict(node_partition.iloc[0])) > 1e-6:
-                            print('*** bad_partition! ***')
+                            print('*** %s bad_partition! ***' % node_name)
                             print('min_constraints')
                             print_dict(min_constraints)
                             print('max_constraints')

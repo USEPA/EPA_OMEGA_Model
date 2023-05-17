@@ -155,6 +155,7 @@ class WeightedTree(OMEGABase):
             if None in child_node_weights:
                 child_node_weights.remove(None)
             if any(child_node_weights):
+                child_node_weights = [cnw for cnw in child_node_weights if cnw]  # only validate non-None weights
                 if abs(1-sum(child_node_weights)) > sys.float_info.epsilon:
                     tree_errors.append('weight error at %s' % node_id)
 
@@ -183,7 +184,7 @@ class WeightedTree(OMEGABase):
                     eq_str = "%.20f * results['%s']" % (tree.get_node(node_id).data.weight, node_id)
                     return wv, eq_str
                 else:
-                    return 0, ''
+                    return 0, '0'
             except:
                 raise Exception(
                     '*** Missing drive cycle "%s" in input to WeightedTree.calc_node_weighted_value() ***' %
@@ -191,7 +192,7 @@ class WeightedTree(OMEGABase):
         else:
             n = tree.get_node(node_id)
             n.data.value = 0
-            if n.data.weight != 1:
+            if n.data.weight != 1 and n.data.weight is not None:
                 eq_str = '%.20f * (' % n.data.weight
             else:
                 eq_str = '('

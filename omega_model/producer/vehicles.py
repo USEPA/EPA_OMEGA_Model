@@ -1003,16 +1003,18 @@ class Vehicle(OMEGABase):
         cloud['battery_sizing_onroad_direct_kwh_per_mile'] = 0
         cloud['nominal_onroad_direct_kwh_per_mile'] = kwh_per_mile_scale * \
                                                       DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(
-                                                          drive_cycle_weight_year, self.fueling_class, cloud)
+                                                          drive_cycle_weight_year, self.fueling_class, cloud,
+                                                          charge_depleting_only=True)
+
+        cloud['nominal_onroad_direct_co2e_grams_per_mile'] = 0  # needed for PHEV even though not needed for this calc
+
 
         # calc onroad_direct values
         VehicleOnroadCalculations.perform_onroad_calculations(self, cloud)
 
-        cloud['battery_sizing_onroad_direct_kwh_per_mile'] = cloud['battery_sizing_onroad_direct_kwh_per_mile']
-
         return cloud
 
-    def calc_cert_values(self, cloud):
+    def calc_cert_and_onroad_values(self, cloud):
         """
 
         Args:
@@ -1574,6 +1576,8 @@ class VehicleFinal(SQABase, Vehicle):
                     veh.cert_fuel_id = "{'electricity':1.0}"
                     veh.base_year_powertrain_type = 'BEV'
                 veh.fueling_class = 'BEV'
+            elif veh.base_year_powertrain_type == 'PHEV':
+                veh.fueling_class = 'PHEV'
             else:
                 veh.fueling_class = 'ICE'
 
@@ -1605,8 +1609,7 @@ class VehicleFinal(SQABase, Vehicle):
             vehicles_list.append(veh)
 
             # assign user-definable market class
-            veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
-            veh.manufacturer.update_market_class_data(veh.compliance_id, veh.market_class_id)
+            VehicleFinal.assign_vehicle_market_class_ID(veh)
 
             non_responsive_market_category = \
                 omega_globals.options.MarketClass.get_non_responsive_market_category(veh.market_class_id)
@@ -1671,13 +1674,12 @@ class VehicleFinal(SQABase, Vehicle):
         # fleet
         for v in vehicles_list:
             v.base_year_market_share = v.initial_registered_count / vehicle_shares_dict['total']
+            # print(v.name, v.base_year_powertrain_type, v.fueling_class)
 
-            if v.fueling_class != 'BEV' or omega_globals.options.allow_ice_of_bev:
-                alt_veh = v.clone_vehicle(v)  # create alternative powertrain clone of vehicle
-                alt_veh.in_production = is_up_for_redesign(alt_veh)
-                alt_veh.base_year_product = False
-
-                if v.fueling_class == 'ICE':
+            if v.base_year_powertrain_type != 'BEV' or omega_globals.options.allow_ice_of_bev:
+                if v.base_year_powertrain_type == 'ICE':
+                    # create BEV of ICE
+                    alt_veh = VehicleFinal.create_vehicle_clone(v)
                     alt_veh.fueling_class = 'BEV'
                     alt_veh.base_year_powertrain_type = 'BEV'
                     alt_veh.name = 'BEV of ' + v.name
@@ -1695,7 +1697,32 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.eng_rated_hp = 0
                     alt_veh.eng_cyls_num = 0
                     alt_veh.eng_disp_liters = 0
-                else:
+                    VehicleFinal.assign_vehicle_market_class_ID(alt_veh)
+
+                    # create PHEV of ICE
+                    alt_veh = VehicleFinal.create_vehicle_clone(v)
+                    alt_veh.fueling_class = 'PHEV'
+                    alt_veh.base_year_powertrain_type = 'PHEV'
+                    alt_veh.name = 'PHEV of ' + v.name
+                    for tf in omega_globals.options.CostCloud.tech_flags:
+                        alt_veh.__setattr__(tf, None)
+                    alt_veh.phev = 1
+                    alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
+                    alt_veh.cert_fuel_id = "{'gasoline':1.0}"
+                    alt_veh.battery_kwh = 18  # RV
+                    alt_veh.motor_kw = 50  # RV
+                    if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
+                        alt_veh.charge_depleting_range_mi = 25  # RV
+                    else:
+                        alt_veh.charge_depleting_range_mi = 50  # RV
+                    alt_veh.eng_rated_hp = v.eng_rated_hp
+                    alt_veh.eng_cyls_num = v.eng_cyls_num
+                    alt_veh.eng_disp_liters = v.eng_disp_liters
+                    VehicleFinal.assign_vehicle_market_class_ID(alt_veh)
+
+                elif v.base_year_powertrain_type == 'BEV':
+                    # create ICE of BEV
+                    alt_veh = VehicleFinal.create_vehicle_clone(v)
                     alt_veh.fueling_class = 'ICE'
                     alt_veh.base_year_powertrain_type = 'ICE'
                     alt_veh.name = 'ICE of ' + v.name
@@ -1710,13 +1737,7 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.battery_kwh = 0
                     alt_veh.eng_cyls_num = None
                     alt_veh.eng_disp_liters = None
-
-                alt_veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(alt_veh)
-                v.manufacturer.update_market_class_data(v.compliance_id, alt_veh.market_class_id)
-
-                alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
-                alt_veh.cert_direct_co2e_grams_per_mile = 0
-                alt_veh.cert_direct_kwh_per_mile = 0
+                    VehicleFinal.assign_vehicle_market_class_ID(alt_veh)
 
         for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
             for csc in NewVehicleMarket.context_size_class_info_by_nrmc[nrmc]:
@@ -1773,6 +1794,43 @@ class VehicleFinal(SQABase, Vehicle):
             print_dict(NewVehicleMarket.base_year_context_size_class_sales)
             print_dict(NewVehicleMarket.base_year_other_sales)
             print_dict(VehicleFinal.mfr_base_year_share_data)
+
+    @staticmethod
+    def assign_vehicle_market_class_ID(vehicle):
+        """
+        Assign market class ID to the given vehicle and update manufacturer market class data.
+
+        Args:
+            vehicle (VehicleFinal): the vehicle to assign a market class ID to
+
+        Returns:
+            Nothing, updates vehicle market class ID and manufacturer market class data
+
+        """
+        vehicle.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(vehicle)
+        vehicle.manufacturer.update_market_class_data(vehicle.compliance_id, vehicle.market_class_id)
+
+    @staticmethod
+    def create_vehicle_clone(vehicle):
+        """
+        Create vehicle clone.
+
+        Args:
+            vehicle (VehicleFinal): the vehicle to clone
+
+        Returns:
+            Cloned vehicle
+
+        """
+        alt_veh = vehicle.clone_vehicle(vehicle)  # create alternative powertrain clone of vehicle
+        alt_veh.in_production = is_up_for_redesign(alt_veh)
+        alt_veh.base_year_product = False
+
+        alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
+        alt_veh.cert_direct_co2e_grams_per_mile = 0
+        alt_veh.cert_direct_kwh_per_mile = 0
+
+        return alt_veh
 
     @staticmethod
     def init_from_file(vehicle_onroad_calculations_file, verbose=False):

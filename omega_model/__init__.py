@@ -52,7 +52,7 @@ try:
     # --- OMEGA2 global constants ---
 
     # enumerated values
-    fueling_classes = OMEGAEnum(['BEV', 'ICE'])
+    fueling_classes = OMEGAEnum(['ICE', 'BEV', 'PHEV'])
     ownership_classes = OMEGAEnum(['shared', 'private'])
     legacy_reg_classes = OMEGAEnum(['car', 'truck', 'mediumduty'])
     fuel_units = OMEGAEnum(['gallon', 'kWh'])

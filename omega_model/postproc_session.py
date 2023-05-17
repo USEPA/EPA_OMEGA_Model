@@ -84,7 +84,7 @@ def run_postproc(iteration_log, credit_banks):
 
     manufacturer_ids = sorted(vehicles_table['manufacturer_id'].unique())
 
-    if omega_globals.manufacturer_aggregation and omega_globals.options.consolidate_manufacturers:
+    if omega_globals.manufacturer_aggregation and omega_globals.options.consolidate_manufacturers and len(manufacturer_ids) > 1:
         # create individual OEM annual data from production vehicle data
         from producer.manufacturer_annual_data import ManufacturerAnnualData
         from producer.vehicle_aggregation import aggregation_columns

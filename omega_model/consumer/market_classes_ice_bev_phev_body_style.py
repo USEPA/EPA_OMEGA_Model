@@ -20,20 +20,20 @@ Template Header
 Sample Header
     .. csv-table::
 
-       input_template_name:,consumer.market_classes_unibody,input_template_version:,0.32
+       input_template_name:,consumer.market_classes_body_style,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
         market_class_id,fueling_class,ownership_class
-        non_hauling.BEV,BEV,private
-        hauling.ICE,ICE,private
+        sedan_wagon.BEV,BEV,private
+        cuv_suv_van.ICE,ICE,private
 
 Data Column Name and Description
 
 :market_class_id:
-    Vehicle market class ID, e.g. 'hauling.ICE'
+    Vehicle market class ID, e.g. 'sedan_wagon.ICE'
 
 :fueling_class:
     Market class fueling class, e.g. 'BEV', 'ICE'
@@ -60,9 +60,9 @@ class MarketClass(OMEGABase, MarketClassBase):
 
     _data = dict()
 
-    market_categories = ['ICE', 'BEV', 'hauling', 'non_hauling']  #: overall market categories
-    responsive_market_categories = ['ICE', 'BEV']  #: market categories that have consumer response (i.e. price -> sales)
-    non_responsive_market_categories = ['hauling', 'non_hauling']  #: market categories that do not have consumer response
+    market_categories = ['ICE', 'BEV', 'PHEV', 'sedan_wagon', 'cuv_suv_van', 'pickup']  #: overall market categories
+    responsive_market_categories = ['ICE', 'BEV', 'PHEV']  #: market categories that have consumer response (i.e. price -> sales)
+    non_responsive_market_categories = ['sedan_wagon', 'cuv_suv_van', 'pickup']  #: market categories that do not have consumer response
 
     @staticmethod
     def get_vehicle_market_class(vehicle):
@@ -76,14 +76,33 @@ class MarketClass(OMEGABase, MarketClassBase):
             The vehicle's market class ID based on vehicle characteristics.
 
         """
-        if vehicle.unibody_structure == 0 and vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
-            market_class_id = 'hauling.BEV'
-        elif vehicle.unibody_structure == 0 and vehicle.base_year_powertrain_type not in ['BEV', 'FCV']:
-            market_class_id = 'hauling.ICE'
-        elif vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
-            market_class_id = 'non_hauling.BEV'
+
+        if vehicle.body_style == 'sedan':
+            if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
+                market_class_id = 'sedan_wagon.BEV'
+            elif vehicle.base_year_powertrain_type == 'PHEV':
+                market_class_id = 'sedan_wagon.PHEV'
+            else:
+                market_class_id = 'sedan_wagon.ICE'
+
+        elif vehicle.body_style == 'cuv_suv':
+            if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
+                market_class_id = 'cuv_suv_van.BEV'
+            elif vehicle.base_year_powertrain_type == 'PHEV':
+                market_class_id = 'cuv_suv_van.PHEV'
+            else:
+                market_class_id = 'cuv_suv_van.ICE'
+        elif vehicle.body_style == 'pickup':
+
+            if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
+                market_class_id = 'pickup.BEV'
+            elif vehicle.base_year_powertrain_type == 'PHEV':
+                market_class_id = 'pickup.PHEV'
+            else:
+                market_class_id = 'pickup.ICE'
+
         else:
-            market_class_id = 'non_hauling.ICE'
+            Exception('Unable to assign market_class_id')
 
         return market_class_id
 
@@ -99,10 +118,14 @@ class MarketClass(OMEGABase, MarketClassBase):
             The non-responsive market category of the given market class ID
 
         """
-        if 'non_hauling' in market_class_id.split('.'):
-            return 'non_hauling'
+        if 'sedan_wagon' in market_class_id.split('.'):
+            return 'sedan_wagon'
+        elif 'cuv_suv_van' in market_class_id.split('.'):
+            return 'cuv_suv_van'
+        elif 'pickup' in market_class_id.split('.'):
+            return 'pickup'
         else:
-            return 'hauling'
+            return ''
 
     @staticmethod
     def validate_market_class_id(market_class_id):
@@ -145,7 +168,7 @@ class MarketClass(OMEGABase, MarketClassBase):
         MarketClassBase._market_class_tree_dict_rc = dict()  # empty set market class tree dict with reg class leaves accessed by get_market_class_tree(by_reg_class=True)
 
         input_template_name = __name__
-        input_template_version = 0.32
+        input_template_version = 0.1
         input_template_columns = {'market_class_id', 'fueling_class', 'ownership_class'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -210,9 +233,6 @@ if __name__ == '__main__':
 
         SQABase.metadata.create_all(omega_globals.engine)
 
-        omega_globals.options.market_classes_file = \
-            omega_globals.options.omega_model_path + '/test_inputs/market_classes.csv'
-
         init_fail += MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)
 
@@ -236,16 +256,16 @@ if __name__ == '__main__':
 
             MarketClass.populate_market_classes(market_class_dict, 'hauling.ICE.ALT', 'F150')
             MarketClass.populate_market_classes(market_class_dict, 'hauling.ICE.NO_ALT', 'Silverado')
-            MarketClass.populate_market_classes(market_class_dict, 'hauling.BEV.NO_ALT', 'Cybertruck')
-            MarketClass.populate_market_classes(market_class_dict, 'non_hauling.ICE.ALT', '240Z')
-            MarketClass.populate_market_classes(market_class_dict, 'non_hauling.BEV.NO_ALT', 'Tesla3')
+            MarketClass.populate_market_classes(market_class_dict, 'hauling.BEV.ALT', 'Cybertruck')
+            MarketClass.populate_market_classes(market_class_dict, 'non_hauling.ICE.NO_ALT', '240Z')
+            MarketClass.populate_market_classes(market_class_dict, 'non_hauling.BEV.ALT', 'Tesla3')
             MarketClass.populate_market_classes(market_class_dict, 'non_hauling.BEV.NO_ALT', 'TeslaS')
             print_dict(market_class_dict)
 
             MarketClass.populate_market_classes(market_class_dict_rc, 'hauling.ICE.truck.ALT', 'F150')
-            MarketClass.populate_market_classes(market_class_dict_rc, 'hauling.ICE.truck.ALT', 'Silverado')
-            MarketClass.populate_market_classes(market_class_dict_rc, 'hauling.BEV.truck.NO_ALT', 'Cybertruck')
-            MarketClass.populate_market_classes(market_class_dict_rc, 'non_hauling.ICE.car.ALT', '240Z')
+            MarketClass.populate_market_classes(market_class_dict_rc, 'hauling.ICE.truck.NO_ALT', 'Silverado')
+            MarketClass.populate_market_classes(market_class_dict_rc, 'hauling.BEV.truck.ALT', 'Cybertruck')
+            MarketClass.populate_market_classes(market_class_dict_rc, 'non_hauling.ICE.car.NO_ALT', '240Z')
             MarketClass.populate_market_classes(market_class_dict_rc, 'non_hauling.ICE.car.ALT', 'Sentra')
             MarketClass.populate_market_classes(market_class_dict_rc, 'non_hauling.BEV.car.NO_ALT', 'Tesla3')
             print_dict(market_class_dict_rc)

@@ -173,7 +173,7 @@ class MarketClass(OMEGABase, MarketClassBase):
                                                              verbose=verbose)
 
         if not template_errors:
-            validation_dict = {'fueling_class': ['ICE', 'BEV', 'PHEV'],  # RV
+            validation_dict = {'fueling_class': fueling_classes,
                                'ownership_class': ['private'],  # for now...
                                }
 

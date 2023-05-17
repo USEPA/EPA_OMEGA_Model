@@ -810,11 +810,17 @@ def ASTM_round(var, precision=0):
         var rounded using ASTM method with precision decimal places in result
 
     """
+
+    if type(var) is list:
+        var = np.array(var)
+
     scaled_var = var * (10 ** precision)
 
     z = np.remainder(scaled_var, 2)
 
-    if type(z) == pd.core.series.Series:
+    if type(z) is pd.core.series.Series or type(z) is np.ndarray:
+        if type(z) is np.ndarray:
+            z = pd.Series(z)
         z.loc[z != 0.5] = 0
     else:
         if abs(z) != 0.5:
@@ -825,19 +831,49 @@ def ASTM_round(var, precision=0):
     return rounded_number
 
 
-def CityFUF(miles):
+def LabelFUF(miles, miles_denom=400):
+    """
+    Calculate "label" PHEV fleet utility factor, from SAEJ2841 SEP2010.
+    https://www.sae.org/standards/content/j2841_201009/
+
+    Args:
+        miles: distance travelled in charge-depleting driving, scalar or pandas Series
+        miles_denom: distance normalizing denominator in miles
+
+    Returns:
+        Utility factor from SAEJ2841 SEP2010, Table 2 (Multi-day utility factor Fit)
+
+    """
+    miles_norm = miles/miles_denom
+
+    return ASTM_round(1-np.exp(-(
+                        1.31e+01 * miles_norm +
+                        -1.87e+01 * miles_norm ** 2 +
+                        5.22e+00 * miles_norm ** 3 +
+                        8.15e+00 * miles_norm ** 4 +
+                        3.53e+00 * miles_norm ** 5 +
+                        -1.34e+00 * miles_norm ** 6 +
+                        -4.01e+00 * miles_norm ** 7 +
+                        -3.90e+00 * miles_norm ** 8 +
+                        -1.15e+00 * miles_norm ** 9 +
+                        3.88e+00 * miles_norm ** 10
+    )), 3)
+
+
+def CityFUF(miles, miles_denom=399):
     """
     Calculate "city" PHEV fleet utility factor, from SAEJ2841 SEP2010.
     https://www.sae.org/standards/content/j2841_201009/
 
     Args:
-        miles: distance travelled in "city" driving, scalar or pandas Series
+        miles: distance travelled in "city" charge-depleting driving, scalar or pandas Series
+        miles_denom: distance normalizing denominator in miles
 
     Returns:
         City utility factor from SAEJ2841 SEP2010, Table 5 (55/45 city/highway split)
 
     """
-    miles_norm = miles/399
+    miles_norm = miles/miles_denom
 
     return ASTM_round(1-np.exp(-(
                         1.486e+01 * miles_norm +
@@ -852,19 +888,20 @@ def CityFUF(miles):
     )), 3)
 
 
-def HighwayFUF(miles):
+def HighwayFUF(miles, miles_denom=399):
     """
     Calculate "highway" PHEV fleet utility factor, from SAEJ2841 SEP2010.
     https://www.sae.org/standards/content/j2841_201009/
 
     Args:
-        miles: distance travelled in "highway" driving, scalar or pandas Series
+        miles: distance travelled in "highway" charge-depleting driving, scalar or pandas Series
+        miles_denom: distance normalizing denominator in miles
 
     Returns:
         Highway utility factor from SAEJ2841 SEP2010, Table 5 (55/45 city/highway split)
 
     """
-    miles_norm = miles/399
+    miles_norm = miles/miles_denom
 
     return ASTM_round(1-np.exp(-(
                         4.8e+00 * miles_norm +
@@ -873,6 +910,31 @@ def HighwayFUF(miles):
                         1.2e+02 * miles_norm ** 4 +
                         -1.0e+02 * miles_norm ** 5 +
                         3.1e+01 * miles_norm ** 6
+    )), 3)
+
+
+def FUF(miles, miles_denom=399):
+    """
+    Calculate PHEV fleet utility factor, from SAEJ2841 SEP2010.
+    https://www.sae.org/standards/content/j2841_201009/
+
+    Args:
+        miles: distance travelled in charge-depleting driving, scalar or pandas Series
+        miles_denom: distance normalizing denominator in miles
+
+    Returns:
+        Fleet Utility Factor from SAEJ2841 SEP2010, Table 2
+
+    """
+    miles_norm = miles/miles_denom
+
+    return ASTM_round(1-np.exp(-(
+                        10.52 * miles_norm +
+                        -7.282 * miles_norm ** 2 +
+                        -26.37 * miles_norm ** 3 +
+                        79.08 * miles_norm ** 4 +
+                        -77.36 * miles_norm ** 5 +
+                        26.07 * miles_norm ** 6
     )), 3)
 
 

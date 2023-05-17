@@ -185,8 +185,10 @@ class SalesShare(OMEGABase, SalesShareBase):
 
                     annual_o_m_costs = gcam_data_cy['o_m_costs']
 
-                    # TODO: will eventually need utility factor for PHEVs here
-                    fuel_cost_per_VMT = fuel_cost * average_kwh_pmi / recharge_efficiency
+                    fuel_cost_per_VMT = \
+                        FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'US electricity') * \
+                        average_kwh_pmi / recharge_efficiency
+
                     fuel_cost_per_VMT += fuel_cost * average_co2e_gpmi / carbon_intensity_gasoline / refuel_efficiency
 
                     # consumer_generalized_cost_dollars = total_capital_costs
