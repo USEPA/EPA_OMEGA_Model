@@ -79,6 +79,7 @@ Sample Data Columns
         GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-alternative.csv
         Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
         Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv,policy_fuel_upstream_methods.csv
+        Policy Utility Factor Methods File,String,policy_utility_factor_methods.csv,policy_utility_factor_methods.csv
         Policy Fuels File,String,policy_fuels.csv,policy_fuels.csv
         Production Multipliers File,String,production_multipliers.csv,production_multipliers.csv
         Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
@@ -269,6 +270,10 @@ Data Row Name and Description
 :Policy Fuel Upstream Methods File *(str)*:
     The relative or absolute path to the policy fuel upstream methods file,
     loaded by ``policy.upstream_methods.UpstreamMethods``
+
+:Policy Utility Factor Methods File *(str)*:
+    The relative or absolute path to the policy utility factor methods file,
+    loaded by ``policy.utility_factor_methods.UtilityFactorMethods``
 
 :Policy Fuels File *(str)*:
     The relative or absolute path to the policy fuels file,
@@ -855,6 +860,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.policy_targets_file = self.read_parameter('GHG Standards File')
         self.settings.offcycle_credits_file = self.read_parameter('Off-Cycle Credits File')
         self.settings.fuel_upstream_methods_file = self.read_parameter('Policy Fuel Upstream Methods File')
+        self.settings.utility_factor_methods_file = self.read_parameter('Policy Utility Factor Methods File')
         self.settings.policy_fuels_file = self.read_parameter('Policy Fuels File')
         self.settings.production_multipliers_file = self.read_parameter('Production Multipliers File')
         self.settings.policy_reg_classes_file = self.read_parameter('Regulatory Classes File')
