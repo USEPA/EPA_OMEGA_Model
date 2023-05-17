@@ -368,6 +368,8 @@ class DriveCycleWeights(OMEGABase):
         Returns:
 
         """
+        from policy.utility_factors import UtilityFactorMethods
+
         phev_batt_kwh = cycle_values['battery_kwh']
         usable_battery_capacity_norm = cycle_values['usable_battery_capacity_norm']
         phev_cd_battery_kwh = phev_batt_kwh * usable_battery_capacity_norm ** 2
@@ -389,11 +391,11 @@ class DriveCycleWeights(OMEGABase):
 
         cd_us06_range_miles = phev_cd_battery_kwh / cd_us06_kwh_per_mile
 
-        ftp_cd_uf = CityFUF(cd_ftp_range_miles)
+        ftp_cd_uf = UtilityFactorMethods.calc_city_utility_factor(calendar_year, cd_ftp_range_miles)
 
-        hwfet_cd_uf = HighwayFUF(cd_hwfet_range_miles)
+        hwfet_cd_uf = UtilityFactorMethods.calc_highway_utility_factor(calendar_year, cd_hwfet_range_miles)
 
-        us06_uf = HighwayFUF(cd_us06_range_miles)
+        us06_uf = UtilityFactorMethods.calc_highway_utility_factor(calendar_year, cd_us06_range_miles)
 
         return ftp_cd_uf, hwfet_cd_uf, us06_uf
 

@@ -104,7 +104,8 @@ try:
             self.sales_share_calibration_file = None
             self.generate_context_calibration_files = True
             self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
-            self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods.csv'
+            self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods_zero.csv'
+            self.utility_factor_methods_file = path + 'test_inputs/policy_utility_factor_methods.csv'
             self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
             self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights_5545.csv'
             self.drive_cycle_ballast_file = path + 'test_inputs/drive_cycle_ballast.csv'

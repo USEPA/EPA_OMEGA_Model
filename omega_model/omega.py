@@ -1453,6 +1453,7 @@ def init_omega(session_runtime_options):
     from context.glider_cost import GliderCost
 
     from policy.upstream_methods import UpstreamMethods
+    from policy.utility_factors import UtilityFactorMethods
     from policy.required_sales_share import RequiredSalesShare
     from policy.drive_cycles import DriveCycles
     from policy.drive_cycle_weights import DriveCycleWeights
@@ -1529,6 +1530,9 @@ def init_omega(session_runtime_options):
                                                 verbose=verbose_init)
 
         init_fail += UpstreamMethods.init_from_file(omega_globals.options.fuel_upstream_methods_file,
+                                                    verbose=verbose_init)
+
+        init_fail += UtilityFactorMethods.init_from_file(omega_globals.options.utility_factor_methods_file,
                                                     verbose=verbose_init)
 
         init_fail += RequiredSalesShare.init_from_file(omega_globals.options.required_sales_share_file,
