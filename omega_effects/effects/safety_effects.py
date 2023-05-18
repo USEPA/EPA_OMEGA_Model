@@ -286,6 +286,8 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
         fueling_class = base_year_powertrain_type = 'ICE'
         if 'BEV' in market_class_id:
             fueling_class = base_year_powertrain_type = 'BEV'
+        elif 'PHEV' in market_class_id:
+            fueling_class = base_year_powertrain_type = 'PHEV'
 
         threshold_lbs, change_per_100lbs_below, change_per_100lbs_above = \
             get_safety_values(session_settings, body_style)
@@ -395,24 +397,36 @@ def calc_annual_avg_safety_effects(input_df):
         s = pd.Series(input_df['registered_count'] * input_df[attribute], name=f'wtd_avg_{attribute}')
         temp_df = pd.concat([temp_df, s], axis=1)
 
-    cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id',
-            'registered_count', 'base_fatalities', 'session_fatalities']
+    mediumduty = None
+    if 'medium' in [item for item in input_df['reg_class_id']]:
+        mediumduty = 1
+        cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id', 'fueling_class',
+                'registered_count', 'base_fatalities', 'session_fatalities'
+                ]
+    else:
+        cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'fueling_class',
+                'registered_count', 'base_fatalities', 'session_fatalities'
+                ]
     for attribute in attributes:
         cols.append(attribute)
     df = input_df[cols]
     df = pd.concat([df, temp_df], axis=1)
 
     # groupby calendar year, regclass and fuel
-    groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id']
+    if mediumduty:
+        groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id']
+    else:
+        groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'fueling_class']
+
     return_df = df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
 
     for attribute in wtd_attributes:
         return_df[attribute] = return_df[attribute] / return_df['registered_count']
 
-    return_df.insert(return_df.columns.get_loc('in_use_fuel_id') + 1,
-                     'fueling_class',
-                     '')
-    return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
-    return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
+    # return_df.insert(return_df.columns.get_loc('in_use_fuel_id') + 1,
+    #                  'fueling_class',
+    #                  '')
+    # return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
+    # return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
 
     return return_df

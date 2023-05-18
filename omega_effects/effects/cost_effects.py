@@ -170,7 +170,7 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                     powertrain_type = 'BEV'
                 elif phev_flag == 1:
                     powertrain_type = 'PHEV'
-                if powertrain_type:
+                if powertrain_type and battery_kwh > 7:
                     battery_credit_dollars = \
                         session_settings.powertrain_cost.get_battery_tax_offset(
                             model_year, battery_kwh, powertrain_type
