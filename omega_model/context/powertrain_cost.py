@@ -382,7 +382,7 @@ class PowertrainCost(OMEGABase):
                 battery_cost = eval(_cache[powertrain_type, 'battery']['value'], {'np': np}, locals_dict) \
                                * adj_factor * learning_pev_battery_scaling_factor
 
-            if powertrain_type == 'BEV':
+            if powertrain_type in ['BEV', 'PHEV'] and KWH >= 7:
                 battery_offset_dict = eval(_cache[powertrain_type, 'battery_offset']['value'], {'np': np}, locals_dict)
                 battery_offset_min_year = min(battery_offset_dict['dollars_per_kwh'].keys())
                 battery_offset_max_year = max(battery_offset_dict['dollars_per_kwh'].keys())
