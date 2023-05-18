@@ -218,7 +218,7 @@ class PowertrainCost(OMEGABase):
                 gasoline_flag = 0
 
             CYL = pkg_info['engine_cylinders']
-            LITERS = pkg_info['engine_displacement_L']
+            LITERS = pkg_info['engine_displacement_liters']
 
             locals_dict = locals()
 

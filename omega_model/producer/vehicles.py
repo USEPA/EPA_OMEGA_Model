@@ -754,7 +754,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'cost_curve_class', 'reg_class_id', 'in_use_fuel_id',
                        'cert_fuel_id', 'market_class_id', 'lifetime_VMT',
                        'context_size_class',
-                       'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs', 'eng_rated_hp',
+                       'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs', 'base_year_eng_rated_hp',
                        'footprint_ft2',
                        'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c', 'body_style',
                        'structure_material', 'base_year_powertrain_type', 'base_year_reg_class_id',
@@ -850,7 +850,7 @@ class Vehicle(OMEGABase):
         self.dual_rear_wheel = 0
         self.curbweight_lbs = 0
         self.footprint_ft2 = 0
-        self.eng_rated_hp = 0
+        self.base_year_eng_rated_hp = 0
         self.base_year_target_coef_a = 0
         self.base_year_target_coef_b = 0
         self.base_year_target_coef_c = 0
@@ -1300,7 +1300,7 @@ class VehicleFinal(SQABase, Vehicle):
     curbweight_lbs = Column(Float)  #: vehicle curbweight, pounds
     footprint_ft2 = Column(Float)  #: vehicle footprint, square feet
     # RV
-    eng_rated_hp = Column(Float)  #: engine rated horsepower
+    base_year_eng_rated_hp = Column(Float)  #: engine rated horsepower
     workfactor = Column(Float)
     gvwr_lbs = Column(Float)
     gcwr_lbs = Column(Float)
@@ -1520,7 +1520,7 @@ class VehicleFinal(SQABase, Vehicle):
                 dual_rear_wheel=df.loc[i, 'dual_rear_wheel'],
                 curbweight_lbs=df.loc[i, 'curbweight_lbs'],
                 footprint_ft2=df.loc[i, 'footprint_ft2'],
-                eng_rated_hp=df.loc[i, 'eng_rated_hp'],
+                base_year_eng_rated_hp=df.loc[i, 'eng_rated_hp'],
                 base_year_target_coef_a=df.loc[i, 'target_coef_a'],
                 base_year_target_coef_b=df.loc[i, 'target_coef_b'],
                 base_year_target_coef_c=df.loc[i, 'target_coef_c'],
@@ -1593,9 +1593,9 @@ class VehicleFinal(SQABase, Vehicle):
             if veh.base_year_powertrain_type in ['BEV', 'FCV']:
                 rated_hp = veh.motor_kw * 1.34102
             elif electrification_class in ['HEV', 'PHEV']:
-                rated_hp = veh.eng_rated_hp + veh.motor_kw * 1.34102
+                rated_hp = veh.base_year_eng_rated_hp + veh.motor_kw * 1.34102
             else:
-                rated_hp = veh.eng_rated_hp
+                rated_hp = veh.base_year_eng_rated_hp
 
             veh.base_year_curbweight_lbs_to_hp = veh.curbweight_lbs / rated_hp
 
@@ -1694,9 +1694,9 @@ class VehicleFinal(SQABase, Vehicle):
                         alt_veh.charge_depleting_range_mi = 150
                     else:
                         alt_veh.charge_depleting_range_mi = 300  # RV
-                    alt_veh.eng_rated_hp = 0
-                    alt_veh.eng_cyls_num = 0
-                    alt_veh.eng_disp_liters = 0
+                    alt_veh.base_year_eng_rated_hp = 0
+                    alt_veh.engine_cylinders = 0
+                    alt_veh.engine_displacement_liters = 0
                     VehicleFinal.assign_vehicle_market_class_ID(alt_veh)
 
                     # create PHEV of ICE
@@ -1715,9 +1715,9 @@ class VehicleFinal(SQABase, Vehicle):
                         alt_veh.charge_depleting_range_mi = 25  # RV
                     else:
                         alt_veh.charge_depleting_range_mi = 50  # RV
-                    alt_veh.eng_rated_hp = v.eng_rated_hp
-                    alt_veh.eng_cyls_num = v.eng_cyls_num
-                    alt_veh.eng_disp_liters = v.eng_disp_liters
+                    alt_veh.base_year_eng_rated_hp = v.base_year_eng_rated_hp
+                    alt_veh.engine_cylinders = v.engine_cylinders
+                    alt_veh.engine_displacement_liters = v.engine_displacement_liters
                     VehicleFinal.assign_vehicle_market_class_ID(alt_veh)
 
                 elif v.base_year_powertrain_type == 'BEV':
@@ -1731,12 +1731,12 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.ice = 1
                     alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
                     alt_veh.cert_fuel_id = "{'gasoline':1.0}"
-                    alt_veh.eng_rated_hp = v.motor_kw * 1.34102  # RV
+                    alt_veh.base_year_eng_rated_hp = v.motor_kw * 1.34102  # RV
                     alt_veh.motor_kw = 0
                     alt_veh.charge_depleting_range_mi = 0
                     alt_veh.battery_kwh = 0
-                    alt_veh.eng_cyls_num = None
-                    alt_veh.eng_disp_liters = None
+                    alt_veh.engine_cylinders = None
+                    alt_veh.engine_displacement_liters = None
                     VehicleFinal.assign_vehicle_market_class_ID(alt_veh)
 
         for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:

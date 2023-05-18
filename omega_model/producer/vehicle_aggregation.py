@@ -27,7 +27,7 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        vehicle_name,manufacturer_id,model_year,reg_class_id,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs,unibody_structure,body_style,structure_material,prior_redesign_year,redesign_interval,drive_system,alvw_lbs,gvwr_lbs,gcwr_lbs,curbweight_lbs,dual_rear_wheel,long_bed_8ft,eng_cyls_num,eng_disp_liters,high_eff_alternator,start_stop,ice,hev,phev,bev,fcv,deac_pd,deac_fc,cegr,atk2,gdi,turb12,turb11,gas_fuel,diesel_fuel,awd,fwd,trx10,trx11,trx12,trx21,trx22,ecvt,target_coef_a,target_coef_b,target_coef_c
+        vehicle_name,manufacturer_id,model_year,reg_class_id,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs,unibody_structure,body_style,structure_material,prior_redesign_year,redesign_interval,drive_system,alvw_lbs,gvwr_lbs,gcwr_lbs,curbweight_lbs,dual_rear_wheel,long_bed_8ft,engine_cylinders,engine_displacement_liters,high_eff_alternator,start_stop,ice,hev,phev,bev,fcv,deac_pd,deac_fc,cegr,atk2,gdi,turb12,turb11,gas_fuel,diesel_fuel,awd,fwd,trx10,trx11,trx12,trx21,trx22,ecvt,target_coef_a,target_coef_b,target_coef_c
         DB11 V12,Aston Martin Lagonda,2019,car,Minicompact,N,TDS_TRX22_SS0,{'pump gasoline':1.0},{'gasoline':1.0},118,,,50,600,14.6,4500,186,77.26666667,50.53333333,3.5,110.4,81,311230,4,,,1,sedan,steel,2014,5,2,,,,3933,0,,12,5.2,0,0,1,0,0,0,0,1,0,0,0,0,1,0,1,0,,,,,,,,,40.94,0.0169,0.0271
         Grand Cherokee 4X4,FCA,2019,truck,Large Crossover,N,GDI_TRX22_SS1,{'pump gasoline':1.0},{'gasoline':1.0},155936,,,51.1,295,17.2,5000,189.8,76.5,68.82,8.6,114.71,140.5,43538.5,5,,,1,cuv_suv,steel,2014,5,4,5662.35,6500,,4824.7,0,,6,3.6,0,1,1,0,0,0,0,0,0,1,0,0,0,0,1,0,,,,,,,,,51.46511874,-0.260687329,0.036235437
 
@@ -120,10 +120,10 @@ Data Column Name and Description
     :redesign_interval:
         The vehicle's redesign interval, in years
 
-    :eng_cyls_num:
+    :engine_cylinders:
         Number of engine cylinders
 
-    :eng_disp_liters:
+    :engine_displacement_liters:
         Engine displacement (liters)
 
     :high_eff_alternator:
@@ -390,8 +390,8 @@ class VehicleAggregation(OMEGABase):
                 replace({'base_year_powertrain_type': {'HEV': 0, 'PHEV': 50, 'BEV': 300, 'FCV': 300, 'ICE': 0}})
 
             # need to determine vehicle trans / techs
-            df['engine_cylinders'] = df['eng_cyls_num']  # RV
-            df['engine_displacement_L'] = df['eng_disp_liters']  # RV
+            df['engine_cylinders'] = df['engine_cylinders']  # RV
+            df['engine_displacement_liters'] = df['engine_displacement_liters']  # RV
 
             import time
             start_time = time.time()
