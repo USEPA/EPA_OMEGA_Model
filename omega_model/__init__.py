@@ -115,7 +115,7 @@ try:
             self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_bev.csv'
             self.phev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_phev.csv'
 
-            self.powertrain_cost_input_file = path + 'test_inputs/powertrain_cost.csv'
+            self.powertrain_cost_input_file = path + 'test_inputs/powertrain_cost_with_phev_battery_credit.csv'
             self.glider_cost_input_file = path + 'test_inputs/glider_cost.csv'
             self.body_styles_file = path + 'test_inputs/body_styles.csv'
             self.mass_scaling_file = path + 'test_inputs/mass_scaling.csv'
