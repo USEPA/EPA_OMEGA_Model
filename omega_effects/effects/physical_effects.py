@@ -293,6 +293,7 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
         fuel_consumption_kWh_annual = fuel_generation_kWh_annual = 0
         for vad in vads:
 
+            # this loops thru vehicles this calendar year to get kWh consumption this calendar year
             # need vehicle info once for each vehicle, not every calendar year for each vehicle
             vehicle_id = int(vad['vehicle_id'])
             age = int(vad['age'])
@@ -328,14 +329,19 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
 
         for vad in vads:
 
+            # this loops thru vehicles this calendar year to calc physical effects for this calendar year
+
             vehicle_id = int(vad['vehicle_id'])
             age = int(vad['age'])
 
             base_year_vehicle_id, mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, \
                 market_class_id, fueling_class, base_year_powertrain_type, footprint, workfactor, \
                 target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile, body_style, \
-                battery_kwh_per_veh \
-                    = vehicle_info_dict[vehicle_id]
+                battery_kwh_per_veh = \
+                vehicle_info_dict[vehicle_id]
+
+            fuel_dict = eval(in_use_fuel_id)
+            fuel = [item for item in fuel_dict.keys()][0]
 
             # for physical effects, we want battery kwh implemented on new vehicles (age=0)
             if age == 0:
@@ -376,8 +382,8 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                     # liquid_fuel = None
                     # electric_fuel = None
 
-                    # vmt_liquid_fuel = vmt_electricity \
-                    vmt = onroad_gallons_per_mile = fuel_consumption_gallons = onroad_miles_per_gallon \
+                    vmt_liquid_fuel = vmt_electricity = 0
+                    onroad_gallons_per_mile = fuel_consumption_gallons = onroad_miles_per_gallon \
                         = fuel_generation_kWh = fuel_consumption_kWh = 0
 
                     nmog_exh_ustons = nmog_evap_ustons = nmog_veh_ustons = 0
@@ -438,9 +444,16 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                     # calc fuel consumption and get emission rates
                     if onroad_direct_kwh_per_mile:
                         fuel_consumption_kWh += vmt * onroad_direct_kwh_per_mile
+                        transmission_efficiency = \
+                            batch_settings.onroad_fuels.get_fuel_attribute(
+                                calendar_year, fuel, 'transmission_efficiency'
+                            )
+                        fuel_generation_kWh = fuel_consumption_kWh / transmission_efficiency
 
                         if fueling_class == 'BEV':
-                            fuel = 'US electricity'
+                            # fuel_dict = eval(in_use_fuel_id)
+                            # fuel = [item for item in fuel_dict.keys()][0]
+                            # fuel = 'US electricity'
                             pm25_brakewear_rate_e, pm25_tirewear_rate_e = \
                                 get_vehicle_emission_rate(
                                     session_settings, model_year, sourcetype_name, base_year_reg_class_id,
@@ -460,9 +473,9 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                             #             session_settings, model_year, sourcetype_name, base_year_reg_class_id,
                             #             fuel, ind_var_value)
 
-                    elif onroad_direct_co2e_grams_per_mile:
-                        fuel_dict = eval(in_use_fuel_id)
-                        fuel = [item for item in fuel_dict.keys()][0]
+                    if onroad_direct_co2e_grams_per_mile:
+                        # fuel_dict = eval(in_use_fuel_id)
+                        # fuel = [item for item in fuel_dict.keys()][0]
                         co2_emissions_grams_per_unit = \
                             batch_settings.onroad_fuels.get_fuel_attribute(
                                 calendar_year, fuel, 'direct_co2e_grams_per_unit'
@@ -479,7 +492,7 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                         #         vmt_liquid_fuel * onroad_gallons_per_mile / transmission_efficiency
                         #     onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
 
-                        if fuel == 'pump gasoline':
+                        if 'gasoline' in fuel:
                             pm25_brakewear_rate_l, pm25_tirewear_rate_l, pm25_exh_rate, \
                                 nmog_exh_rate, nmog_permeation_rate, nmog_venting_rate, nmog_leaks_rate, \
                                 nmog_refuel_disp_rate, nmog_refuel_spill_rate, co_exh_rate, nox_exh_rate, \
@@ -497,7 +510,7 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
 
                             energy_density_ratio, pure_share = e0_energy_density_ratio, e0_share
 
-                        elif fuel == 'pump diesel':
+                        elif 'diesel' in fuel:
                             pm25_brakewear_rate_l, pm25_tirewear_rate_l, pm25_exh_rate, \
                                 nmog_exh_rate, nmog_refuel_spill_rate, co_exh_rate, nox_exh_rate, \
                                 sox_exh_rate, ch4_exh_rate, n2o_exh_rate, acetaldehyde_exh_rate, \
@@ -586,30 +599,63 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                     # calc upstream emissions for both liquid and electric fuel operation
                     kwhs, gallons = fuel_generation_kWh, fuel_consumption_gallons
                     ref_factor = fuel_reduction_leading_to_reduced_domestic_refining
-                    voc_upstream_ustons = \
-                        (kwhs * voc_egu_rate + gallons * voc_ref_rate * ref_factor) / grams_per_us_ton
-                    co_upstream_ustons = \
-                        (kwhs * co_egu_rate + gallons * co_ref_rate * ref_factor) / grams_per_us_ton
-                    nox_upstream_ustons = \
-                        (kwhs * nox_egu_rate + gallons * nox_ref_rate * ref_factor) / grams_per_us_ton
-                    pm25_upstream_ustons = \
-                        (kwhs * pm25_egu_rate + gallons * pm25_ref_rate * ref_factor) / grams_per_us_ton
-                    sox_upstream_ustons = \
-                        (kwhs * sox_egu_rate + gallons * sox_ref_rate * ref_factor) / grams_per_us_ton
-                    hcl_upstream_ustons = (kwhs * hcl_egu_rate) / grams_per_us_ton
-                    hg_upstream_ustons = (kwhs * hg_egu_rate) / grams_per_us_ton
+                    
+                    voc_refinery_ustons = gallons * voc_ref_rate * ref_factor / grams_per_us_ton
+                    co_refinery_ustons = gallons * co_ref_rate * ref_factor / grams_per_us_ton
+                    nox_refinery_ustons = gallons * nox_ref_rate * ref_factor / grams_per_us_ton
+                    pm25_refinery_ustons = gallons * pm25_ref_rate * ref_factor / grams_per_us_ton
+                    sox_refinery_ustons = gallons * sox_ref_rate * ref_factor / grams_per_us_ton
+                    
+                    voc_egu_ustons = kwhs * voc_egu_rate / grams_per_us_ton
+                    co_egu_ustons = kwhs * co_egu_rate / grams_per_us_ton
+                    nox_egu_ustons = kwhs * nox_egu_rate / grams_per_us_ton
+                    pm25_egu_ustons = kwhs * pm25_egu_rate / grams_per_us_ton
+                    sox_egu_ustons = kwhs * sox_egu_rate / grams_per_us_ton
+                    hcl_egu_ustons = kwhs * hcl_egu_rate / grams_per_us_ton
+                    hg_egu_ustons = kwhs * hg_egu_rate / grams_per_us_ton
+
+                    voc_upstream_ustons = voc_refinery_ustons + voc_egu_ustons
+                    co_upstream_ustons = co_refinery_ustons + co_egu_ustons
+                    nox_upstream_ustons = nox_refinery_ustons + nox_egu_ustons
+                    pm25_upstream_ustons = pm25_refinery_ustons + pm25_egu_ustons
+                    sox_upstream_ustons = sox_refinery_ustons + sox_egu_ustons
+                    
+                    co2_refinery_metrictons = gallons * co2_ref_rate * ref_factor / grams_per_metric_ton
+                    ch4_refinery_metrictons = gallons * ch4_ref_rate * ref_factor / grams_per_metric_ton
+                    n2o_refinery_metrictons = gallons * n2o_ref_rate * ref_factor / grams_per_metric_ton
+                    
+                    co2_egu_metrictons = kwhs * co2_egu_rate /grams_per_metric_ton
+                    ch4_egu_metrictons = kwhs * ch4_egu_rate / grams_per_metric_ton
+                    n2o_egu_metrictons = kwhs * n2o_egu_rate / grams_per_metric_ton
+                    
+                    co2_upstream_metrictons = co2_refinery_metrictons + co2_egu_metrictons
+                    ch4_upstream_metrictons = ch4_refinery_metrictons + ch4_egu_metrictons
+                    n2o_upstream_metrictons = n2o_refinery_metrictons + n2o_egu_metrictons
+                    
+                    # voc_upstream_ustons = \
+                    #     (kwhs * voc_egu_rate + gallons * voc_ref_rate * ref_factor) / grams_per_us_ton
+                    # co_upstream_ustons = \
+                    #     (kwhs * co_egu_rate + gallons * co_ref_rate * ref_factor) / grams_per_us_ton
+                    # nox_upstream_ustons = \
+                    #     (kwhs * nox_egu_rate + gallons * nox_ref_rate * ref_factor) / grams_per_us_ton
+                    # pm25_upstream_ustons = \
+                    #     (kwhs * pm25_egu_rate + gallons * pm25_ref_rate * ref_factor) / grams_per_us_ton
+                    # sox_upstream_ustons = \
+                    #     (kwhs * sox_egu_rate + gallons * sox_ref_rate * ref_factor) / grams_per_us_ton
+                    # hcl_upstream_ustons = (kwhs * hcl_egu_rate) / grams_per_us_ton
+                    # hg_upstream_ustons = (kwhs * hg_egu_rate) / grams_per_us_ton
                     # benzene_upstream_ustons = (kwhs * benzene_ps + gallons * benzene_ref) / grams_per_us_ton
                     # butadiene13_upstream_ustons = (kwhs * butadiene13_ps + gallons * butadiene13_ref) / grams_per_us_ton
                     # formaldehyde_upstream_ustons = (kwhs * formaldehyde_ps + gallons * formaldehyde_ref) / grams_per_us_ton
                     # acetaldehyde_upstream_ustons = (kwhs * acetaldehyde_ps + gallons * acetaldehyde_ref) / grams_per_us_ton
                     # acrolein_upstream_ustons = (kwhs * acrolein_ps + gallons * acrolein_ref) / grams_per_us_ton
 
-                    co2_upstream_metrictons = \
-                        (kwhs * co2_egu_rate + gallons * co2_ref_rate * ref_factor) / grams_per_metric_ton
-                    ch4_upstream_metrictons = \
-                        (kwhs * ch4_egu_rate + gallons * ch4_ref_rate * ref_factor) / grams_per_metric_ton
-                    n2o_upstream_metrictons = \
-                        (kwhs * n2o_egu_rate + gallons * n2o_ref_rate * ref_factor) / grams_per_metric_ton
+                    # co2_upstream_metrictons = \
+                    #     (kwhs * co2_egu_rate + gallons * co2_ref_rate * ref_factor) / grams_per_metric_ton
+                    # ch4_upstream_metrictons = \
+                    #     (kwhs * ch4_egu_rate + gallons * ch4_ref_rate * ref_factor) / grams_per_metric_ton
+                    # n2o_upstream_metrictons = \
+                    #     (kwhs * n2o_egu_rate + gallons * n2o_ref_rate * ref_factor) / grams_per_metric_ton
 
                     # sum vehicle and upstream into totals
                     voc_total_ustons = voc_upstream_ustons  # + voc_tailpipe_ustons
@@ -662,9 +708,10 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                         'vmt': vmt,
                         'annual_vmt_rebound': annual_vmt_rebound,
                         'vmt_rebound': vmt_rebound,
-                        'vmt_liquid_fuel': 0,
-                        'vmt_electricity': 0,
+                        'vmt_liquid_fuel': vmt_liquid_fuel,
+                        'vmt_electricity': vmt_electricity,
                         'battery_kwh': battery_kwh,  # note: this is kwh/veh * registered_count
+                        'battery_kwh_per_veh': battery_kwh_per_veh,  # this is kwh/veh - used for battery tax credit
                         'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,
                         'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
                         'onroad_gallons_per_mile': onroad_gallons_per_mile,
@@ -707,14 +754,34 @@ def calc_physical_effects(batch_settings, session_settings, safety_effects_dict)
                         'ch4_vehicle_metrictons': ch4_veh_metrictons,
                         'n2o_vehicle_metrictons': n2o_veh_metrictons,
                         'co2_vehicle_metrictons': co2_veh_metrictons,
+                        
+                        'voc_refinery_ustons': voc_refinery_ustons,
+                        'co_refinery_ustons': co_refinery_ustons,
+                        'nox_refinery_ustons': nox_refinery_ustons,
+                        'pm25_refinery_ustons': pm25_refinery_ustons,
+                        'sox_refinery_ustons': sox_refinery_ustons,
+                        
+                        'voc_egu_ustons': voc_egu_ustons,
+                        'co_egu_ustons': co_egu_ustons,
+                        'nox_egu_ustons': nox_egu_ustons,
+                        'pm25_egu_ustons': pm25_egu_ustons,
+                        'sox_egu_ustons': sox_egu_ustons,
+                        'hcl_egu_ustons': hcl_egu_ustons,
+                        'hg_egu_ustons': hg_egu_ustons,
 
                         'voc_upstream_ustons': voc_upstream_ustons,
                         'co_upstream_ustons': co_upstream_ustons,
                         'nox_upstream_ustons': nox_upstream_ustons,
                         'pm25_upstream_ustons': pm25_upstream_ustons,
                         'sox_upstream_ustons': sox_upstream_ustons,
-                        'hcl_upstream_ustons': hcl_upstream_ustons,
-                        'hg_upstream_ustons': hg_upstream_ustons,
+                        
+                        'ch4_refinery_metrictons': ch4_refinery_metrictons,
+                        'n2o_refinery_metrictons': n2o_refinery_metrictons,
+                        'co2_refinery_metrictons': co2_refinery_metrictons,
+                        
+                        'ch4_egu_metrictons': ch4_egu_metrictons,
+                        'n2o_egu_metrictons': n2o_egu_metrictons,
+                        'co2_egu_metrictons': co2_egu_metrictons,
 
                         'ch4_upstream_metrictons': ch4_upstream_metrictons,
                         'n2o_upstream_metrictons': n2o_upstream_metrictons,
@@ -771,31 +838,39 @@ def calc_annual_physical_effects(batch_settings, input_df):
                 attributes.append(col)
 
     # groupby calendar year, regclass and fuel
-    groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id']
+    # if 'medium' in [item for item in input_df['reg_class_id']]:
+    #     groupby_cols = \
+    #         ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id', 'fueling_class']
+    # else:
+    #     groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'fueling_class']
+    groupby_cols = [
+        'session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id', 'fueling_class'
+    ]
     return_df = input_df[[*groupby_cols, *attributes]]
     return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
 
-    return_df.insert(return_df.columns.get_loc('in_use_fuel_id') + 1,
-                     'fueling_class',
-                     '')
-    return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
-    return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
+    # return_df.insert(return_df.columns.get_loc('in_use_fuel_id') + 1,
+    #                  'fueling_class',
+    #                  '')
+    # return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
+    # return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
 
     return_df.insert(return_df.columns.get_loc('fuel_generation_kWh') + 1,
                      'onroad_gallons_per_mile',
-                     return_df['fuel_consumption_gallons'] / return_df['vmt_liquid_fuel'])
+                     return_df['fuel_consumption_gallons'] / return_df['vmt'])
 
     return_df.insert(return_df.columns.get_loc('fuel_generation_kWh') + 1,
                      'onroad_direct_kwh_per_mile',
-                     return_df['fuel_consumption_kWh'] / return_df['vmt_electricity'])
+                     return_df['fuel_consumption_kWh'] / return_df['vmt'])
 
     return_df.insert(return_df.columns.get_loc('fuel_generation_kWh') + 1,
                      'onroad_direct_co2e_grams_per_mile',
-                     return_df['co2_vehicle_metrictons'] * grams_per_metric_ton / return_df['vmt_liquid_fuel'])
+                     return_df['co2_vehicle_metrictons'] * grams_per_metric_ton / return_df['vmt'])
 
-    attributes += ['onroad_gallons_per_mile',
-                   'onroad_direct_kwh_per_mile',
-                   'onroad_direct_co2e_grams_per_mile']
+    return_df['battery_kwh_per_veh'] = return_df['battery_kwh'] / return_df['registered_count']
+    # attributes += ['onroad_gallons_per_mile',
+    #                'onroad_direct_kwh_per_mile',
+    #                'onroad_direct_co2e_grams_per_mile']
 
     return return_df
 
@@ -823,6 +898,8 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
         diesel_energy_density_ratio, fuel_reduction_leading_to_reduced_domestic_refining \
         = get_inputs_for_effects(batch_settings)
 
+    sourcetype_name = None
+
     physical_effects_dict = {}
     for key, nested_dict in batch_settings.legacy_fleet.adjusted_legacy_fleet.items():
 
@@ -833,16 +910,23 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
         # get vmt and session fatalities from safety_effects_dict
         safety = legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year)]
         session_fatalities, vmt, annual_vmt, odometer, calendar_year_vmt_adj, vmt_rebound, annual_vmt_rebound, \
-            size_class, body_style \
-            = safety['session_fatalities'], \
-            safety['vmt'], \
-            safety['annual_vmt'], \
-            safety['odometer'], \
-            safety['context_vmt_adjustment'], \
-            safety['vmt_rebound'], \
-            safety['annual_vmt_rebound'], \
-            safety['context_size_class'], \
-            safety['body_style']
+            size_class, body_style = \
+            safety['session_fatalities'], \
+                safety['vmt'], \
+                safety['annual_vmt'], \
+                safety['odometer'], \
+                safety['context_vmt_adjustment'], \
+                safety['vmt_rebound'], \
+                safety['annual_vmt_rebound'], \
+                safety['context_size_class'], \
+                safety['body_style']
+        manufacturer_id, name, fueling_class, base_year_powertrain_type, body_style, registered_count = \
+            safety['manufacturer_id'], \
+                safety['name'], \
+                safety['fueling_class'], \
+                safety['base_year_powertrain_type'], \
+                safety['body_style'], \
+                safety['registered_count']
 
         model_year = calendar_year - age
         reg_class_id = nested_dict['reg_class_id']
@@ -859,6 +943,8 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             onroad_gallons_per_mile = 0
 
         onroad_kwh_per_mile = kwh_per_mile / 0.7
+        fuel_dict = eval(in_use_fuel_id)
+        fuel = [item for item in fuel_dict.keys()][0]
 
         nmog_exh_ustons = nmog_evap_ustons = nmog_veh_ustons = 0
         co_exh_ustons = co_veh_ustons = 0
@@ -881,7 +967,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
         voc_upstream_ustons = co_upstream_ustons = nox_upstream_ustons = pm25_upstream_ustons = 0
         sox_upstream_ustons = hcl_upstream_ustons = hg_upstream_ustons = 0
 
-        pm25_brakewear_rate = pm25_tirewear_rate = 0
+        pm25_brakewear_rate_e = pm25_tirewear_rate_e = pm25_brakewear_rate_l = pm25_tirewear_rate_l = 0
         pm25_exh_rate = co_exh_rate = nox_exh_rate = sox_exh_rate = ch4_exh_rate = n2o_exh_rate = 0
         nmog_exh_rate = nmog_permeation_rate = nmog_venting_rate = 0
         nmog_leaks_rate = nmog_refuel_disp_rate = nmog_refuel_spill_rate = 0
@@ -906,9 +992,9 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
         elif reg_class_id == 'truck':
             sourcetype_name = 'passenger truck'
         elif reg_class_id == 'mediumduty' and 'cuv' in body_style:
-            sourcetype_name = 'passenger truck'
+            sourcetype_name = 'passenger truck'  # TODO is this right?
         elif reg_class_id == 'mediumduty' and 'pickup' in body_style:
-            sourcetype_name = 'light commercial truck'
+            sourcetype_name = 'light commercial truck'  # TODO is this right?
         else:
             print('Improper sourcetype_name for vehicle emission rates.')
 
@@ -917,12 +1003,11 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
         if veh_rates_by == 'odometer':
             ind_var_value = pd.to_numeric(odometer)
 
-        fuel_dict = eval(in_use_fuel_id)
-        for fuel, fuel_share in fuel_dict.items():
+        if onroad_kwh_per_mile:
 
-            if 'electric' in fuel:
-                vmt_electricity = vmt
-                pm25_brakewear_rate, pm25_tirewear_rate \
+            if fueling_class == 'BEV':
+                # fuel = 'US electricity'
+                pm25_brakewear_rate_e, pm25_tirewear_rate_e \
                     = get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg_class_id, fuel,
                                                 ind_var_value)
 
@@ -931,9 +1016,26 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                     n2o_egu_rate, hcl_egu_rate, hg_egu_rate \
                     = get_egu_emission_rate(session_settings, calendar_year, 0)
 
-            elif 'gasoline' in fuel:
-                vmt_liquid_fuel = vmt
-                pm25_brakewear_rate, pm25_tirewear_rate, pm25_exh_rate, \
+        # fuel_dict = eval(in_use_fuel_id)
+        # for fuel, fuel_share in fuel_dict.items():
+        #
+        #     if 'electric' in fuel:
+        #         vmt_electricity = vmt
+        #         pm25_brakewear_rate, pm25_tirewear_rate \
+        #             = get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg_class_id, fuel,
+        #                                         ind_var_value)
+        #
+        #         # the energy consumption and generation values do not matter here, so set to 0
+        #         voc_egu_rate, co_egu_rate, nox_egu_rate, pm25_egu_rate, sox_egu_rate, co2_egu_rate, ch4_egu_rate, \
+        #             n2o_egu_rate, hcl_egu_rate, hg_egu_rate \
+        #             = get_egu_emission_rate(session_settings, calendar_year, 0)
+
+        if onroad_co2_grams_per_mile:
+            # fuel_dict = eval(in_use_fuel_id)
+            # fuel = [item for item in fuel_dict.keys()][0]
+
+            if 'gasoline' in fuel:
+                pm25_brakewear_rate_l, pm25_tirewear_rate_l, pm25_exh_rate, \
                     nmog_exh_rate, nmog_permeation_rate, nmog_venting_rate, nmog_leaks_rate, \
                     nmog_refuel_disp_rate, nmog_refuel_spill_rate, co_exh_rate, nox_exh_rate, \
                     sox_exh_rate, ch4_exh_rate, n2o_exh_rate, acetaldehyde_exh_rate, acrolein_exh_rate, \
@@ -943,25 +1045,57 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                     ethylbenzene_leaks_rate, ethylbenzene_refuel_disp_rate, ethylbenzene_refuel_spill_rate, \
                     formaldehyde_exh_rate, naphthalene_exh_rate, \
                     butadiene13_exh_rate, pah15_exh_rate \
-                        = get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg_class_id, fuel,
-                                                    ind_var_value)
+                    = get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg_class_id, fuel,
+                                                ind_var_value)
 
                 energy_density_ratio, pure_share = e0_energy_density_ratio, e0_share
 
             elif 'diesel' in fuel:
-                vmt_liquid_fuel = vmt
-                pm25_brakewear_rate, pm25_tirewear_rate, pm25_exh_rate, \
+                pm25_brakewear_rate_l, pm25_tirewear_rate_l, pm25_exh_rate, \
                     nmog_exh_rate, nmog_refuel_spill_rate, co_exh_rate, nox_exh_rate, \
                     sox_exh_rate, ch4_exh_rate, n2o_exh_rate, acetaldehyde_exh_rate, acrolein_exh_rate, \
                     benzene_exh_rate, benzene_refuel_spill_rate, \
                     ethylbenzene_exh_rate, ethylbenzene_refuel_spill_rate, \
                     formaldehyde_exh_rate, naphthalene_exh_rate, naphthalene_refuel_spill_rate, \
                     butadiene13_exh_rate, pah15_exh_rate \
-                        = get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg_class_id, fuel,
-                                                    ind_var_value)
+                    = get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg_class_id, fuel,
+                                                ind_var_value)
 
                 energy_density_ratio, pure_share = diesel_energy_density_ratio, 1
 
+
+            # if 'gasoline' in fuel:
+            #     vmt_liquid_fuel = vmt
+            #     pm25_brakewear_rate, pm25_tirewear_rate, pm25_exh_rate, \
+            #         nmog_exh_rate, nmog_permeation_rate, nmog_venting_rate, nmog_leaks_rate, \
+            #         nmog_refuel_disp_rate, nmog_refuel_spill_rate, co_exh_rate, nox_exh_rate, \
+            #         sox_exh_rate, ch4_exh_rate, n2o_exh_rate, acetaldehyde_exh_rate, acrolein_exh_rate, \
+            #         benzene_exh_rate, benzene_permeation_rate, benzene_venting_rate, benzene_leaks_rate, \
+            #         benzene_refuel_disp_rate, benzene_refuel_spill_rate, \
+            #         ethylbenzene_exh_rate, ethylbenzene_permeation_rate, ethylbenzene_venting_rate, \
+            #         ethylbenzene_leaks_rate, ethylbenzene_refuel_disp_rate, ethylbenzene_refuel_spill_rate, \
+            #         formaldehyde_exh_rate, naphthalene_exh_rate, \
+            #         butadiene13_exh_rate, pah15_exh_rate \
+            #             = get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg_class_id, fuel,
+            #                                         ind_var_value)
+            #
+            #     energy_density_ratio, pure_share = e0_energy_density_ratio, e0_share
+
+            # elif 'diesel' in fuel:
+            #     vmt_liquid_fuel = vmt
+            #     pm25_brakewear_rate, pm25_tirewear_rate, pm25_exh_rate, \
+            #         nmog_exh_rate, nmog_refuel_spill_rate, co_exh_rate, nox_exh_rate, \
+            #         sox_exh_rate, ch4_exh_rate, n2o_exh_rate, acetaldehyde_exh_rate, acrolein_exh_rate, \
+            #         benzene_exh_rate, benzene_refuel_spill_rate, \
+            #         ethylbenzene_exh_rate, ethylbenzene_refuel_spill_rate, \
+            #         formaldehyde_exh_rate, naphthalene_exh_rate, naphthalene_refuel_spill_rate, \
+            #         butadiene13_exh_rate, pah15_exh_rate \
+            #             = get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg_class_id, fuel,
+            #                                         ind_var_value)
+            #
+            #     energy_density_ratio, pure_share = diesel_energy_density_ratio, 1
+
+                # upstream refinery emission factors for liquid fuel operation
             if session_settings.emission_factors_refinery:
                 voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, \
                     co2_ref_rate, ch4_ref_rate, n2o_ref_rate \
@@ -970,15 +1104,15 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                 voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate = \
                     get_refinery_emission_rate(session_settings, calendar_year)
 
-            transmission_efficiency \
-                = batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'transmission_efficiency')
+        transmission_efficiency = \
+            batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, 'US electricity', 'transmission_efficiency')
 
         fuel_consumption_kWh = vmt * onroad_kwh_per_mile
         fuel_generation_kWh = fuel_consumption_kWh / transmission_efficiency
         fuel_consumption_gallons = vmt * onroad_gallons_per_mile
 
         # calc exhaust and evaporative emissions for liquid fuel operation
-        factor = vmt_liquid_fuel / grams_per_us_ton
+        factor = vmt / grams_per_us_ton
         pm25_exh_ustons += pm25_exh_rate * factor
         nmog_exh_ustons += nmog_exh_rate * factor
         co_exh_ustons += co_exh_rate * factor
@@ -1011,7 +1145,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                                          ethylbenzene_refuel_spill_rate]) * factor
         naphthalene_evap_ustons += naphthalene_refuel_spill_rate * factor
 
-        factor = vmt_liquid_fuel / grams_per_metric_ton
+        factor = vmt / grams_per_metric_ton
         ch4_veh_metrictons += ch4_exh_rate * factor
         n2o_veh_metrictons += n2o_exh_rate * factor
         co2_veh_metrictons += onroad_co2_grams_per_mile * factor
@@ -1031,28 +1165,61 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
         pah15_veh_ustons = pah15_exh_ustons
 
         # other vehicle emissions
-        pm25_brakewear_ustons += vmt * pm25_brakewear_rate / grams_per_us_ton
-        pm25_tirewear_ustons += vmt * pm25_tirewear_rate / grams_per_us_ton
+        pm25_brakewear_ustons += vmt * (pm25_brakewear_rate_e + pm25_brakewear_rate_l) / grams_per_us_ton
+        pm25_tirewear_ustons += vmt * (pm25_tirewear_rate_e + pm25_tirewear_rate_l) / grams_per_us_ton
 
         pm25_veh_ustons = pm25_exh_ustons + pm25_brakewear_ustons + pm25_tirewear_ustons
 
         # calc upstream emissions for both liquid and electric fuel operation
         kwhs, gallons = fuel_generation_kWh, fuel_consumption_gallons
         ref_factor = fuel_reduction_leading_to_reduced_domestic_refining
-        voc_upstream_ustons = (kwhs * voc_egu_rate + gallons * voc_ref_rate * ref_factor) / grams_per_us_ton
-        co_upstream_ustons = (kwhs * co_egu_rate + gallons * co_ref_rate * ref_factor) / grams_per_us_ton
-        nox_upstream_ustons = (kwhs * nox_egu_rate + gallons * nox_ref_rate * ref_factor) / grams_per_us_ton
-        pm25_upstream_ustons = (kwhs * pm25_egu_rate + gallons * pm25_ref_rate * ref_factor) / grams_per_us_ton
-        sox_upstream_ustons = (kwhs * sox_egu_rate + gallons * sox_ref_rate * ref_factor) / grams_per_us_ton
+
+        voc_refinery_ustons = gallons * voc_ref_rate * ref_factor / grams_per_us_ton
+        co_refinery_ustons = gallons * co_ref_rate * ref_factor / grams_per_us_ton
+        nox_refinery_ustons = gallons * nox_ref_rate * ref_factor / grams_per_us_ton
+        pm25_refinery_ustons = gallons * pm25_ref_rate * ref_factor / grams_per_us_ton
+        sox_refinery_ustons = gallons * sox_ref_rate * ref_factor / grams_per_us_ton
+
+        voc_egu_ustons = kwhs * voc_egu_rate / grams_per_us_ton
+        co_egu_ustons = kwhs * co_egu_rate / grams_per_us_ton
+        nox_egu_ustons = kwhs * nox_egu_rate / grams_per_us_ton
+        pm25_egu_ustons = kwhs * pm25_egu_rate / grams_per_us_ton
+        sox_egu_ustons = kwhs * sox_egu_rate / grams_per_us_ton
+        hcl_egu_ustons = kwhs * hcl_egu_rate / grams_per_us_ton
+        hg_egu_ustons = kwhs * hg_egu_rate / grams_per_us_ton
+
+        voc_upstream_ustons = voc_refinery_ustons + voc_egu_ustons
+        co_upstream_ustons = co_refinery_ustons + co_egu_ustons
+        nox_upstream_ustons = nox_refinery_ustons + nox_egu_ustons
+        pm25_upstream_ustons = pm25_refinery_ustons + pm25_egu_ustons
+        sox_upstream_ustons = sox_refinery_ustons + sox_egu_ustons
+
+        co2_refinery_metrictons = gallons * co2_ref_rate * ref_factor / grams_per_metric_ton
+        ch4_refinery_metrictons = gallons * ch4_ref_rate * ref_factor / grams_per_metric_ton
+        n2o_refinery_metrictons = gallons * n2o_ref_rate * ref_factor / grams_per_metric_ton
+
+        co2_egu_metrictons = kwhs * co2_egu_rate / grams_per_metric_ton
+        ch4_egu_metrictons = kwhs * ch4_egu_rate / grams_per_metric_ton
+        n2o_egu_metrictons = kwhs * n2o_egu_rate / grams_per_metric_ton
+
+        co2_upstream_metrictons = co2_refinery_metrictons + co2_egu_metrictons
+        ch4_upstream_metrictons = ch4_refinery_metrictons + ch4_egu_metrictons
+        n2o_upstream_metrictons = n2o_refinery_metrictons + n2o_egu_metrictons
+
+        # voc_upstream_ustons = (kwhs * voc_egu_rate + gallons * voc_ref_rate * ref_factor) / grams_per_us_ton
+        # co_upstream_ustons = (kwhs * co_egu_rate + gallons * co_ref_rate * ref_factor) / grams_per_us_ton
+        # nox_upstream_ustons = (kwhs * nox_egu_rate + gallons * nox_ref_rate * ref_factor) / grams_per_us_ton
+        # pm25_upstream_ustons = (kwhs * pm25_egu_rate + gallons * pm25_ref_rate * ref_factor) / grams_per_us_ton
+        # sox_upstream_ustons = (kwhs * sox_egu_rate + gallons * sox_ref_rate * ref_factor) / grams_per_us_ton
         # benzene_upstream_ustons = (kwhs * benzene_ps + gallons * benzene_ref) / grams_per_us_ton
         # butadiene13_upstream_ustons = (kwhs * butadiene13_ps + gallons * butadiene13_ref) / grams_per_us_ton
         # formaldehyde_upstream_ustons = (kwhs * formaldehyde_ps + gallons * formaldehyde_ref) / grams_per_us_ton
         # acetaldehyde_upstream_ustons = (kwhs * acetaldehyde_ps + gallons * acetaldehyde_ref) / grams_per_us_ton
         # acrolein_upstream_ustons = (kwhs * acrolein_ps + gallons * acrolein_ref) / grams_per_us_ton
 
-        co2_upstream_metrictons = (kwhs * co2_egu_rate + gallons * co2_ref_rate * ref_factor) / grams_per_metric_ton
-        ch4_upstream_metrictons = (kwhs * ch4_egu_rate + gallons * ch4_ref_rate * ref_factor) / grams_per_metric_ton
-        n2o_upstream_metrictons = (kwhs * n2o_egu_rate + gallons * n2o_ref_rate * ref_factor) / grams_per_metric_ton
+        # co2_upstream_metrictons = (kwhs * co2_egu_rate + gallons * co2_ref_rate * ref_factor) / grams_per_metric_ton
+        # ch4_upstream_metrictons = (kwhs * ch4_egu_rate + gallons * ch4_ref_rate * ref_factor) / grams_per_metric_ton
+        # n2o_upstream_metrictons = (kwhs * n2o_egu_rate + gallons * n2o_ref_rate * ref_factor) / grams_per_metric_ton
 
         # sum vehicle and upstream into totals
         voc_total_ustons = voc_upstream_ustons  # + voc_tailpipe_ustons
@@ -1083,8 +1250,8 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'session_name': session_settings.session_name,
             'vehicle_id': vehicle_id,
             'base_year_vehicle_id': vehicle_id,
-            'manufacturer_id': legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year)]['manufacturer_id'],
-            'name': legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year)]['name'],
+            'manufacturer_id': manufacturer_id,
+            'name': name,
             'calendar_year': calendar_year,
             'model_year': model_year,
             'age': age,
@@ -1093,12 +1260,12 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'context_size_class': size_class,
             'in_use_fuel_id': in_use_fuel_id,
             'market_class_id': market_class_id,
-            'fueling_class': legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year)]['fueling_class'],
-            'base_year_powertrain_type': legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year)]['base_year_powertrain_type'],
-            'body_style': legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year)]['body_style'],
+            'fueling_class': fueling_class,
+            'base_year_powertrain_type': base_year_powertrain_type,
+            'body_style': body_style,
             'footprint_ft2': 0,
             'workfactor': 0,
-            'registered_count': legacy_fleet_safety_effects_dict[(vehicle_id, calendar_year)]['registered_count'],
+            'registered_count': registered_count,
             'context_vmt_adjustment': calendar_year_vmt_adj,
             'annual_vmt': annual_vmt,
             'odometer': odometer,
@@ -1108,6 +1275,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'vmt_liquid_fuel': vmt_liquid_fuel,
             'vmt_electricity': vmt_electricity,
             'battery_kwh': 0,  # only care about this for age==0 vehicles which there are none in the legacy fleet
+            'battery_kwh_per_veh': 0,  # used for battery tax credits, which legacy fleet vehicles cannot receive
             'onroad_direct_co2e_grams_per_mile': onroad_co2_grams_per_mile,
             'onroad_direct_kwh_per_mile': onroad_kwh_per_mile,
             'onroad_gallons_per_mile': onroad_gallons_per_mile,
@@ -1151,13 +1319,33 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'n2o_vehicle_metrictons': n2o_veh_metrictons,
             'co2_vehicle_metrictons': co2_veh_metrictons,
 
+            'voc_refinery_ustons': voc_refinery_ustons,
+            'co_refinery_ustons': co_refinery_ustons,
+            'nox_refinery_ustons': nox_refinery_ustons,
+            'pm25_refinery_ustons': pm25_refinery_ustons,
+            'sox_refinery_ustons': sox_refinery_ustons,
+
+            'voc_egu_ustons': voc_egu_ustons,
+            'co_egu_ustons': co_egu_ustons,
+            'nox_egu_ustons': nox_egu_ustons,
+            'pm25_egu_ustons': pm25_egu_ustons,
+            'sox_egu_ustons': sox_egu_ustons,
+            'hcl_egu_ustons': hcl_egu_ustons,
+            'hg_egu_ustons': hg_egu_ustons,
+
             'voc_upstream_ustons': voc_upstream_ustons,
             'co_upstream_ustons': co_upstream_ustons,
             'nox_upstream_ustons': nox_upstream_ustons,
             'pm25_upstream_ustons': pm25_upstream_ustons,
             'sox_upstream_ustons': sox_upstream_ustons,
-            'hcl_upstream_ustons': hcl_upstream_ustons,
-            'hg_upstream_ustons': hg_upstream_ustons,
+
+            'ch4_refinery_metrictons': ch4_refinery_metrictons,
+            'n2o_refinery_metrictons': n2o_refinery_metrictons,
+            'co2_refinery_metrictons': co2_refinery_metrictons,
+
+            'ch4_egu_metrictons': ch4_egu_metrictons,
+            'n2o_egu_metrictons': n2o_egu_metrictons,
+            'co2_egu_metrictons': co2_egu_metrictons,
 
             'ch4_upstream_metrictons': ch4_upstream_metrictons,
             'n2o_upstream_metrictons': n2o_upstream_metrictons,
@@ -1218,19 +1406,25 @@ def calc_period_consumer_physical_view(batch_settings, input_df):
     df.insert(df.columns.get_loc('registered_count'), 'sales', df['registered_count'])
     df.loc[df['age'] != 0, 'sales'] = 0
 
-    # groupby model year, body_style and fuel,
-    groupby_cols = ['session_policy', 'session_name', 'model_year', 'body_style', 'in_use_fuel_id']
+    # groupby model year, body_style and fuel
+    # mediumduty = None
+    if 'medium' in [item for item in input_df['reg_class_id']]:
+        # mediumduty = 1
+        groupby_cols = ['session_policy', 'session_name', 'model_year', 'body_style', 'in_use_fuel_id']
+    else:
+        groupby_cols = ['session_policy', 'session_name', 'model_year', 'body_style', 'fueling_class']
+
     attributes.append('sales')
     return_df = df[[*groupby_cols, *attributes]]
     return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
 
-    return_df.insert(
-        return_df.columns.get_loc('in_use_fuel_id') + 1,
-        'fueling_class',
-        '')
-
-    return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
-    return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
+    # if mediumduty:
+    #     return_df.insert(
+    #         return_df.columns.get_loc('in_use_fuel_id') + 1,
+    #         'fueling_class',
+    #         '')
+    #     return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
+    #     return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
 
     return_df.insert(return_df.columns.get_loc('model_year') + 1, 'periods', 0)
     return_df.insert(return_df.columns.get_loc('model_year') + 1, 'series', 'PeriodValue')

@@ -116,11 +116,16 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
         effects for each action session relative to the no_action session.
 
     """
+    # fuel_arg = 'fueling_class'
+    # if 'medium' in [item for item in annual_physical_effects_df['reg_class_id']]:
+    #     fuel_arg = 'in_use_fuel_id'
+
     keys = pd.Series(zip(
         annual_physical_effects_df['session_policy'],
         annual_physical_effects_df['calendar_year'],
         annual_physical_effects_df['reg_class_id'],
         annual_physical_effects_df['in_use_fuel_id'],
+        annual_physical_effects_df['fueling_class']
     ))
     annual_physical_effects_df.set_index(keys, inplace=True)
     physical_effects_dict = annual_physical_effects_df.to_dict('index')
@@ -130,6 +135,7 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
         annual_cost_effects_df['calendar_year'],
         annual_cost_effects_df['reg_class_id'],
         annual_cost_effects_df['in_use_fuel_id'],
+        annual_cost_effects_df['fueling_class']
     ))
     annual_cost_effects_df.set_index(keys, inplace=True)
     cost_effects_dict = annual_cost_effects_df.to_dict('index')
@@ -138,26 +144,31 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
     delta_physical_effects_dict = {}
     for key in physical_effects_dict:
         
-        session_policy, calendar_year, reg_class_id, in_use_fuel_id = key
-        fueling_class = physical_effects_dict[key]['fueling_class']
+        session_policy, calendar_year, reg_class_id, in_use_fuel_id, fueling_class = key
+        # fueling_class = physical_effects_dict[key]['fueling_class']
 
         flag = None
         benefits_dict_for_key = {}
         physical_effects_dict_for_key = {}
         if session_policy != 'no_action':
             flag = 1
-            no_action_key = ('no_action', calendar_year, reg_class_id, in_use_fuel_id)
+            no_action_key = ('no_action', calendar_year, reg_class_id, in_use_fuel_id, fueling_class)
             physical_na = physical_effects_dict[no_action_key]
             physical_a = physical_effects_dict[key]
             cost_na = cost_effects_dict[no_action_key]
             cost_a = cost_effects_dict[key]
             
             energy_security_benefit_dollars = drive_value_benefit_dollars = 0
+            pm25_up_Wu_3_benefit_dollars = sox_up_Wu_3_benefit_dollars = nox_up_Wu_3_benefit_dollars = 0
+            pm25_up_Wu_7_benefit_dollars = sox_up_Wu_7_benefit_dollars = nox_up_Wu_7_benefit_dollars = 0
+            pm25_up_Pope_3_benefit_dollars = sox_up_Pope_3_benefit_dollars = nox_up_Pope_3_benefit_dollars = 0
+            pm25_up_Pope_7_benefit_dollars = sox_up_Pope_7_benefit_dollars = nox_up_Pope_7_benefit_dollars =0
     
             fuel_dict = eval(in_use_fuel_id)
-            fuel = None
-            for fuel, fuel_share in fuel_dict.items():
-                fuel, fuel_share = fuel, fuel_share
+            fuel = [item for item in fuel_dict.keys()][0]
+            # fuel = None
+            # for fuel, fuel_share in fuel_dict.items():
+            #     fuel, fuel_share = fuel, fuel_share
 
             oper_attrs_dict = {}
             oper_attrs_list = [
@@ -177,10 +188,11 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
             imported_oil_bbl_per_day = physical_na['barrels_of_imported_oil_per_day'] \
                                        - physical_a['barrels_of_imported_oil_per_day']
             energy_security_cf = get_energysecurity_cf(batch_settings, calendar_year)
-            if fuel == 'US electricity':
-                pass
-            elif fuel != 'US electricity':
-                energy_security_benefit_dollars += imported_oil_bbl * energy_security_cf
+            energy_security_benefit_dollars += imported_oil_bbl * energy_security_cf
+            # if fuel == 'US electricity':
+            #     pass
+            # elif fuel != 'US electricity':
+            #     energy_security_benefit_dollars += imported_oil_bbl * energy_security_cf
     
             # calc drive value as drive_value_cost in action less drive_value_cost in no_action
             drive_value_benefit_dollars = cost_a['drive_value_cost_dollars'] - cost_na['drive_value_cost_dollars']
@@ -189,12 +201,18 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
             ghg_tons_dict = {}
             ghg_list = [
                 'co2_vehicle_metrictons',
+                'co2_refinery_metrictons',
+                'co2_egu_metrictons',
                 'co2_upstream_metrictons',
                 'co2_total_metrictons',
                 'ch4_vehicle_metrictons',
+                'ch4_refinery_metrictons',
+                'ch4_egu_metrictons',
                 'ch4_upstream_metrictons',
                 'ch4_total_metrictons',
                 'n2o_vehicle_metrictons',
+                'n2o_refinery_metrictons',
+                'n2o_egu_metrictons',
                 'n2o_upstream_metrictons',
                 'n2o_total_metrictons',
             ]
@@ -292,46 +310,33 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
             cap_tons_dict = {}
             cap_list = [
                 'pm25_vehicle_ustons',
+                'pm25_refinery_ustons',
+                'pm25_egu_ustons',
                 'pm25_upstream_ustons',
                 'pm25_total_ustons',
                 'nox_vehicle_ustons',
+                'nox_refinery_ustons',
+                'nox_egu_ustons',
                 'nox_upstream_ustons',
                 'nox_total_ustons',
                 'sox_vehicle_ustons',
+                'sox_refinery_ustons',
+                'sox_egu_ustons',
                 'sox_upstream_ustons',
                 'sox_total_ustons',
                 'nmog_vehicle_ustons',
+                'voc_refinery_ustons',
+                'voc_egu_ustons',
                 'voc_upstream_ustons',
                 'nmog_and_voc_total_ustons',
                 'co_vehicle_ustons',
+                'co_refinery_ustons',
+                'co_egu_ustons',
                 'co_upstream_ustons',
                 'co_total_ustons',
             ]
             for cap in cap_list:
                 cap_tons_dict[cap] = physical_na[cap] - physical_a[cap]
-
-            # if calc_health_effects:
-            #
-            #     # criteria air pollutant (cap) tons
-            #     cap_list = [
-            #         'pm25_vehicle_ustons',
-            #         'pm25_upstream_ustons',
-            #         'pm25_total_ustons',
-            #         'nox_vehicle_ustons',
-            #         'nox_upstream_ustons',
-            #         'nox_total_ustons',
-            #         'sox_vehicle_ustons',
-            #         'sox_upstream_ustons',
-            #         'sox_total_ustons',
-            #         'nmog_vehicle_ustons',
-            #         'voc_upstream_ustons',
-            #         'nmog_and_voc_total_ustons',
-            #         'co_vehicle_ustons',
-            #         'co_upstream_ustons',
-            #         'co_total_ustons',
-            #     ]
-            #     for cap in cap_list:
-            #         cap_tons_dict[cap] = physical_na[cap] - physical_a[cap]
 
             # calculate cap benefits, if applicable
             if calc_health_effects:
@@ -360,32 +365,33 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 nox_veh_Pope_7_benefit_dollars = nox_tons * nox_Pope_7
 
                 # get upstream cap cost factors
-                if 'electricity' in fuel:
-                    source_id = 'egu'
-                else:
-                    source_id = 'refinery'
+                # if 'electricity' in fuel:
+                #     source_id = 'egu'
+                # else:
+                #     source_id = 'refinery'
+                for source_id in ['egu', 'refinery']:
 
-                pm25_Wu_3, sox_Wu_3, nox_Wu_3, \
-                    pm25_Wu_7, sox_Wu_7, nox_Wu_7, \
-                    pm25_Pope_3, sox_Pope_3, nox_Pope_3, \
-                    pm25_Pope_7, sox_Pope_7, nox_Pope_7 = get_cap_cf(batch_settings, calendar_year, source_id)
+                    pm25_Wu_3, sox_Wu_3, nox_Wu_3, \
+                        pm25_Wu_7, sox_Wu_7, nox_Wu_7, \
+                        pm25_Pope_3, sox_Pope_3, nox_Pope_3, \
+                        pm25_Pope_7, sox_Pope_7, nox_Pope_7 = get_cap_cf(batch_settings, calendar_year, source_id)
 
-                pm25_tons, sox_tons, nox_tons = \
-                    cap_tons_dict['pm25_upstream_ustons'], \
-                        cap_tons_dict['sox_upstream_ustons'], \
-                        cap_tons_dict['nox_upstream_ustons']
-                pm25_up_Wu_3_benefit_dollars = pm25_tons * pm25_Wu_3
-                sox_up_Wu_3_benefit_dollars = sox_tons * sox_Wu_3
-                nox_up_Wu_3_benefit_dollars = nox_tons * nox_Wu_3
-                pm25_up_Wu_7_benefit_dollars = pm25_tons * pm25_Wu_7
-                sox_up_Wu_7_benefit_dollars = sox_tons * sox_Wu_7
-                nox_up_Wu_7_benefit_dollars = nox_tons * nox_Wu_7
-                pm25_up_Pope_3_benefit_dollars = pm25_tons * pm25_Pope_3
-                sox_up_Pope_3_benefit_dollars = sox_tons * sox_Pope_3
-                nox_up_Pope_3_benefit_dollars = nox_tons * nox_Pope_3
-                pm25_up_Pope_7_benefit_dollars = pm25_tons * pm25_Pope_7
-                sox_up_Pope_7_benefit_dollars = sox_tons * sox_Pope_7
-                nox_up_Pope_7_benefit_dollars = nox_tons * nox_Pope_7
+                    pm25_tons, sox_tons, nox_tons = \
+                        cap_tons_dict[f'pm25_{source_id}_ustons'], \
+                            cap_tons_dict[f'sox_{source_id}_ustons'], \
+                            cap_tons_dict[f'nox_{source_id}_ustons']
+                    pm25_up_Wu_3_benefit_dollars += pm25_tons * pm25_Wu_3
+                    sox_up_Wu_3_benefit_dollars += sox_tons * sox_Wu_3
+                    nox_up_Wu_3_benefit_dollars += nox_tons * nox_Wu_3
+                    pm25_up_Wu_7_benefit_dollars += pm25_tons * pm25_Wu_7
+                    sox_up_Wu_7_benefit_dollars += sox_tons * sox_Wu_7
+                    nox_up_Wu_7_benefit_dollars += nox_tons * nox_Wu_7
+                    pm25_up_Pope_3_benefit_dollars += pm25_tons * pm25_Pope_3
+                    sox_up_Pope_3_benefit_dollars += sox_tons * sox_Pope_3
+                    nox_up_Pope_3_benefit_dollars += nox_tons * nox_Pope_3
+                    pm25_up_Pope_7_benefit_dollars += pm25_tons * pm25_Pope_7
+                    sox_up_Pope_7_benefit_dollars += sox_tons * sox_Pope_7
+                    nox_up_Pope_7_benefit_dollars += nox_tons * nox_Pope_7
 
                 cap_veh_Wu_3_benefit_dollars = pm25_veh_Wu_3_benefit_dollars \
                                                + sox_veh_Wu_3_benefit_dollars \
@@ -539,27 +545,43 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 'barrels_of_imported_oil_per_day': - imported_oil_bbl_per_day,
                 'session_fatalities': physical_a['session_fatalities'] - physical_na['session_fatalities'],
                 'co2_vehicle_metrictons': - ghg_tons_dict['co2_vehicle_metrictons'],
+                'co2_refinery_metrictons': -ghg_tons_dict['co2_refinery_metrictons'],
+                'co2_egu_metrictons': -ghg_tons_dict['co2_egu_metrictons'],
                 'co2_upstream_metrictons': - ghg_tons_dict['co2_upstream_metrictons'],
                 'co2_total_metrictons': - ghg_tons_dict['co2_total_metrictons'],
                 'ch4_vehicle_metrictons': - ghg_tons_dict['ch4_vehicle_metrictons'],
+                'ch4_refinery_metrictons': -ghg_tons_dict['ch4_refinery_metrictons'],
+                'ch4_egu_metrictons': -ghg_tons_dict['ch4_egu_metrictons'],
                 'ch4_upstream_metrictons': - ghg_tons_dict['ch4_upstream_metrictons'],
                 'ch4_total_metrictons': - ghg_tons_dict['ch4_total_metrictons'],
                 'n2o_vehicle_metrictons': - ghg_tons_dict['n2o_vehicle_metrictons'],
+                'n2o_refinery_metrictons': -ghg_tons_dict['n2o_refinery_metrictons'],
+                'n2o_egu_metrictons': -ghg_tons_dict['n2o_egu_metrictons'],
                 'n2o_upstream_metrictons': - ghg_tons_dict['n2o_upstream_metrictons'],
                 'n2o_total_metrictons': - ghg_tons_dict['n2o_total_metrictons'],
                 'pm25_vehicle_ustons': - cap_tons_dict['pm25_vehicle_ustons'],
+                'pm25_refinery_ustons': -cap_tons_dict['pm25_refinery_ustons'],
+                'pm25_egu_ustons': -cap_tons_dict['pm25_egu_ustons'],
                 'pm25_upstream_ustons': - cap_tons_dict['pm25_upstream_ustons'],
                 'pm25_total_ustons': - cap_tons_dict['pm25_total_ustons'],
                 'nox_vehicle_ustons': - cap_tons_dict['nox_vehicle_ustons'],
+                'nox_refinery_ustons': -cap_tons_dict['nox_refinery_ustons'],
+                'nox_egu_ustons': -cap_tons_dict['nox_egu_ustons'],
                 'nox_upstream_ustons': - cap_tons_dict['nox_upstream_ustons'],
                 'nox_total_ustons': - cap_tons_dict['nox_total_ustons'],
                 'sox_vehicle_ustons': - cap_tons_dict['sox_vehicle_ustons'],
+                'sox_refinery_ustons': -cap_tons_dict['sox_refinery_ustons'],
+                'sox_egu_ustons': -cap_tons_dict['sox_egu_ustons'],
                 'sox_upstream_ustons': - cap_tons_dict['sox_upstream_ustons'],
                 'sox_total_ustons': - cap_tons_dict['sox_total_ustons'],
                 'nmog_vehicle_ustons': - cap_tons_dict['nmog_vehicle_ustons'],
+                'voc_refinery_ustons': -cap_tons_dict['voc_refinery_ustons'],
+                'voc_egu_ustons': -cap_tons_dict['voc_egu_ustons'],
                 'voc_upstream_ustons': - cap_tons_dict['voc_upstream_ustons'],
                 'nmog_and_voc_total_ustons': - cap_tons_dict['nmog_and_voc_total_ustons'],
                 'co_vehicle_ustons': - cap_tons_dict['co_vehicle_ustons'],
+                'co_refinery_ustons': -cap_tons_dict['co_refinery_ustons'],
+                'co_egu_ustons': -cap_tons_dict['co_egu_ustons'],
                 'co_upstream_ustons': - cap_tons_dict['co_upstream_ustons'],
                 'co_total_ustons': - cap_tons_dict['co_total_ustons'],
                 'acetaldehyde_vehicle_ustons': - toxics_tons_dict['acetaldehyde_vehicle_ustons'],

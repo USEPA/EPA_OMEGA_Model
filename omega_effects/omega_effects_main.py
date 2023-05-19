@@ -294,8 +294,11 @@ def main():
             'discount_rate',
             'model_year',
             'body_style',
-            'in_use_fuel_id'
         ]
+        if 'fueling_class' in my_lifetime_cost_effects_df.columns:
+            arg_sort_list.append('fueling_class')
+        else:
+            arg_sort_list.append('in_use_fuel_id')
         my_lifetime_cost_effects_df = my_lifetime_cost_effects_df.sort_values(by=arg_sort_list)
 
         # save files to CSV ____________________________________________________________________________________________

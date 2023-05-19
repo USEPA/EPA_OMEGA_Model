@@ -32,6 +32,7 @@ def calc_social_effects(costs_df, benefits_df, ghg_scope, calc_health_effects=Fa
         dfc['discount_rate'],
         dfc['reg_class_id'],
         dfc['in_use_fuel_id'],
+        dfc['fueling_class'],
     )), inplace=True)
 
     dfb = benefits_df.copy()
@@ -42,6 +43,7 @@ def calc_social_effects(costs_df, benefits_df, ghg_scope, calc_health_effects=Fa
         dfb['discount_rate'],
         dfb['reg_class_id'],
         dfb['in_use_fuel_id'],
+        dfb['fueling_class'],
     )), inplace=True)
 
     net_benefit_cost_attributes = [
@@ -190,9 +192,10 @@ def calc_social_effects(costs_df, benefits_df, ghg_scope, calc_health_effects=Fa
     costs_dict = dfc.to_dict(orient='index')
     delta_costs_dict = dict()
     for k, v in costs_dict.items():
-        session_policy, calendar_year, series, discount_rate, reg_class_id, in_use_fuel_id = k
+        session_policy, calendar_year, series, discount_rate, reg_class_id, in_use_fuel_id, fueling_class = k
         if session_policy != 'no_action':
-            no_action_key = ('no_action', calendar_year, series, discount_rate, reg_class_id, in_use_fuel_id)
+            no_action_key = \
+                ('no_action', calendar_year, series, discount_rate, reg_class_id, in_use_fuel_id, fueling_class)
             costs_na = costs_dict[no_action_key]
             costs_a = costs_dict[k]
 

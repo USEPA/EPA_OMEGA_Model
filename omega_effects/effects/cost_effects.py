@@ -88,33 +88,34 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
 
             base_year_vehicle_id, model_year, mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, \
                 market_class_id, fueling_class, base_year_powertrain_type, body_style, footprint, workfactor, \
-                battery_kwh \
-                = physical['base_year_vehicle_id'], \
-                physical['model_year'], \
-                physical['manufacturer_id'], \
-                physical['name'], \
-                physical['base_year_reg_class_id'], \
-                physical['reg_class_id'], \
-                physical['in_use_fuel_id'], \
-                physical['market_class_id'], \
-                physical['fueling_class'], \
-                physical['base_year_powertrain_type'], \
-                physical['body_style'], \
-                physical['footprint_ft2'], \
-                physical['workfactor'], \
-                physical['battery_kwh'],
+                battery_kwh, battery_kwh_per_veh = \
+                physical['base_year_vehicle_id'], \
+                    physical['model_year'], \
+                    physical['manufacturer_id'], \
+                    physical['name'], \
+                    physical['base_year_reg_class_id'], \
+                    physical['reg_class_id'], \
+                    physical['in_use_fuel_id'], \
+                    physical['market_class_id'], \
+                    physical['fueling_class'], \
+                    physical['base_year_powertrain_type'], \
+                    physical['body_style'], \
+                    physical['footprint_ft2'], \
+                    physical['workfactor'], \
+                    physical['battery_kwh'], \
+                    physical['battery_kwh_per_veh']
 
-            vehicle_count, annual_vmt, odometer, vmt, vmt_rebound, vmt_liquid, vmt_elec, kwh, gallons, imported_bbl \
-                = physical['registered_count'], \
-                  physical['annual_vmt'], \
-                  physical['odometer'], \
-                  physical['vmt'], \
-                  physical['vmt_rebound'], \
-                  physical['vmt_liquid_fuel'], \
-                  physical['vmt_electricity'], \
-                  physical['fuel_consumption_kWh'], \
-                  physical['fuel_consumption_gallons'], \
-                  physical['barrels_of_imported_oil']
+            vehicle_count, annual_vmt, odometer, vmt, vmt_rebound, vmt_liquid, vmt_elec, kwh, gallons, imported_bbl = \
+                physical['registered_count'], \
+                    physical['annual_vmt'], \
+                    physical['odometer'], \
+                    physical['vmt'], \
+                    physical['vmt_rebound'], \
+                    physical['vmt_liquid_fuel'], \
+                    physical['vmt_electricity'], \
+                    physical['fuel_consumption_kWh'], \
+                    physical['fuel_consumption_gallons'], \
+                    physical['barrels_of_imported_oil']
 
             if vehicle_id not in vehicle_info_dict:
                 if vehicle_id < batch_settings.legacy_fleet.legacy_fleet_vehicle_id_start:
@@ -170,27 +171,48 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                     powertrain_type = 'BEV'
                 elif phev_flag == 1:
                     powertrain_type = 'PHEV'
-                if powertrain_type and battery_kwh > 7:
+                if powertrain_type and battery_kwh_per_veh >= 7:
                     battery_credit_dollars = \
                         session_settings.powertrain_cost.get_battery_tax_offset(
                             model_year, battery_kwh, powertrain_type
                         )
 
             # fuel costs
-            fuel_dict = eval(in_use_fuel_id)
-            for fuel, fuel_share in fuel_dict.items():
-                retail_price \
-                    = batch_settings.context_fuel_prices.get_fuel_prices(batch_settings, calendar_year,
-                                                                         'retail_dollars_per_unit', fuel)
-                pretax_price \
-                    = batch_settings.context_fuel_prices.get_fuel_prices(batch_settings, calendar_year,
-                                                                         'pretax_dollars_per_unit', fuel)
-                if 'electricity' in fuel and kwh:
-                    fuel_retail_cost_dollars += retail_price * kwh
-                    fuel_pretax_cost_dollars += pretax_price * kwh
-                elif 'electricity' not in fuel and gallons:
-                    fuel_retail_cost_dollars += retail_price * gallons
-                    fuel_pretax_cost_dollars += pretax_price * gallons
+            if kwh > 0:
+                electric_fuel = 'US electricity'
+                retail_price = batch_settings.context_fuel_prices.get_fuel_prices(
+                    batch_settings, calendar_year, 'retail_dollars_per_unit', electric_fuel
+                )
+                pretax_price = batch_settings.context_fuel_prices.get_fuel_prices(
+                    batch_settings, calendar_year, 'pretax_dollars_per_unit', electric_fuel
+                )
+                fuel_retail_cost_dollars += retail_price * kwh
+                fuel_pretax_cost_dollars += pretax_price * kwh
+            if gallons > 0:
+                fuel_dict = eval(in_use_fuel_id)
+                fuel = [item for item in fuel_dict.keys()][0]
+                retail_price = batch_settings.context_fuel_prices.get_fuel_prices(
+                    batch_settings, calendar_year, 'retail_dollars_per_unit', fuel
+                )
+                pretax_price = batch_settings.context_fuel_prices.get_fuel_prices(
+                    batch_settings, calendar_year, 'pretax_dollars_per_unit', fuel
+                )
+                fuel_retail_cost_dollars += retail_price * gallons
+                fuel_pretax_cost_dollars += pretax_price * gallons
+            # fuel_dict = eval(in_use_fuel_id)
+            # for fuel, fuel_share in fuel_dict.items():
+            #     retail_price \
+            #         = batch_settings.context_fuel_prices.get_fuel_prices(batch_settings, calendar_year,
+            #                                                              'retail_dollars_per_unit', fuel)
+            #     pretax_price \
+            #         = batch_settings.context_fuel_prices.get_fuel_prices(batch_settings, calendar_year,
+            #                                                              'pretax_dollars_per_unit', fuel)
+            #     if 'electricity' in fuel and kwh:
+            #         fuel_retail_cost_dollars += retail_price * kwh
+            #         fuel_pretax_cost_dollars += pretax_price * kwh
+            #     elif 'electricity' not in fuel and gallons:
+            #         fuel_retail_cost_dollars += retail_price * gallons
+            #         fuel_pretax_cost_dollars += pretax_price * gallons
 
             # maintenance costs
             powertrain_type = 'ICE'
@@ -212,9 +234,9 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
             else:
                 operating_veh_type = 'suv'
 
-            repair_cost_per_mile \
-                = batch_settings.repair_cost.calc_repair_cost_per_mile(avg_mfr_cost, powertrain_type,
-                                                                       operating_veh_type, age)
+            repair_cost_per_mile = batch_settings.repair_cost.calc_repair_cost_per_mile(
+                avg_mfr_cost, powertrain_type, operating_veh_type, age
+            )
             repair_cost_dollars = repair_cost_per_mile * vmt
 
             # refueling costs
@@ -240,16 +262,18 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
             congestion_cf, noise_cf = get_congestion_noise_cf(batch_settings, base_year_reg_class_id)
 
             # congestion and noise costs (maybe congestion and noise cost factors will differ one day?)
-            if vmt_elec:
-                congestion_cost_dollars += vmt_elec * congestion_cf
-                noise_cost_dollars += vmt_elec * noise_cf
-            if vmt_liquid:
-                congestion_cost_dollars += vmt_liquid * congestion_cf
-                noise_cost_dollars += vmt_liquid * noise_cf
+            if kwh > 0 and gallons == 0:
+                congestion_cost_dollars += vmt * congestion_cf
+                noise_cost_dollars += vmt * noise_cf
+            if gallons > 0:
+                congestion_cost_dollars += vmt * congestion_cf
+                noise_cost_dollars += vmt * noise_cf
 
             # calc drive value relative to the context as value of rebound vmt plus the drive surplus
             fuel_cpm = fuel_retail_cost_dollars / vmt
-            context_fuel_cpm_dict_key = (int(base_year_vehicle_id), base_year_powertrain_type, int(model_year), age)
+            context_fuel_cpm_dict_key = \
+                (int(base_year_vehicle_id), base_year_powertrain_type, int(model_year), age
+                 )
             if context_fuel_cpm_dict_key in context_fuel_cpm_dict:
                 context_fuel_cpm = context_fuel_cpm_dict[context_fuel_cpm_dict_key]['fuel_cost_per_mile']
                 drive_value_cost_dollars = 0.5 * vmt_rebound * (fuel_cpm + context_fuel_cpm)
@@ -322,15 +346,25 @@ def calc_annual_cost_effects(input_df):
                 attributes.append(col)
 
     # groupby calendar year, regclass and fuel
-    groupby_cols = ['session_policy', 'session_name', 'discount_rate', 'calendar_year', 'reg_class_id', 'in_use_fuel_id']
+    # if 'medium' in [item for item in input_df['reg_class_id']]:
+    #     groupby_cols = ['session_policy', 'session_name', 'discount_rate', 'calendar_year', 'reg_class_id',
+    #                     'in_use_fuel_id', 'fueling_class'
+    #                     ]
+    # else:
+    #     groupby_cols = ['session_policy', 'session_name', 'discount_rate', 'calendar_year', 'reg_class_id',
+    #                     'fueling_class'
+    #                     ]
+    groupby_cols = ['session_policy', 'session_name', 'discount_rate', 'calendar_year', 'reg_class_id',
+                    'in_use_fuel_id', 'fueling_class'
+                    ]
     return_df = input_df[[*groupby_cols, *attributes]]
     return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
 
-    return_df.insert(return_df.columns.get_loc('in_use_fuel_id') + 1,
-                     'fueling_class',
-                     '')
-    return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
-    return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
+    # return_df.insert(return_df.columns.get_loc('in_use_fuel_id') + 1,
+    #                  'fueling_class',
+    #                  '')
+    # return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
+    # return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
 
     return_df.insert(return_df.columns.get_loc('calendar_year') + 1, 'series', 'AnnualValue')
 
@@ -374,23 +408,27 @@ def calc_period_consumer_view(batch_settings, input_df):
     df.reset_index(inplace=True, drop=True)
 
     # groupby model year, body_style, powertrain and fuel
-    groupby_cols = ['session_policy', 'session_name', 'discount_rate', 'model_year', 'body_style', 'in_use_fuel_id']
-    include_powertrain = \
-        batch_settings.general_inputs_for_effects.get_value('include_powertrain_type_in_consumer_cost_view')
+    if 'medium' in [item for item in input_df['reg_class_id']]:
+        groupby_cols = ['session_policy', 'session_name', 'discount_rate', 'model_year', 'body_style', 'in_use_fuel_id']
+    else:
+        groupby_cols = ['session_policy', 'session_name', 'discount_rate', 'model_year', 'body_style', 'fueling_class']
+    include_powertrain = batch_settings.general_inputs_for_effects.get_value(
+        'include_powertrain_type_in_consumer_cost_view'
+    )
     if include_powertrain == 1:
-        groupby_cols.append('powertrain_type')
+        groupby_cols.append('powertrain_type')  # note: this will break out HEVs
 
     attributes.append('sales')
     return_df = df[[*groupby_cols, *attributes]]
     return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
 
-    return_df.insert(
-        return_df.columns.get_loc('in_use_fuel_id') + 1,
-        'fueling_class',
-        '')
-
-    return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
-    return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
+    # return_df.insert(
+    #     return_df.columns.get_loc('in_use_fuel_id') + 1,
+    #     'fueling_class',
+    #     '')
+    #
+    # return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
+    # return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
 
     # return_df.insert(return_df.columns.get_loc('model_year') + 1, 'discount_rate', 0)
     return_df.insert(return_df.columns.get_loc('model_year') + 1, 'periods', 0)
