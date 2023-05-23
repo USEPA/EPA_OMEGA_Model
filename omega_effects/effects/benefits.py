@@ -116,10 +116,6 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
         effects for each action session relative to the no_action session.
 
     """
-    # fuel_arg = 'fueling_class'
-    # if 'medium' in [item for item in annual_physical_effects_df['reg_class_id']]:
-    #     fuel_arg = 'in_use_fuel_id'
-
     keys = pd.Series(zip(
         annual_physical_effects_df['session_policy'],
         annual_physical_effects_df['calendar_year'],
@@ -145,7 +141,6 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
     for key in physical_effects_dict:
         
         session_policy, calendar_year, reg_class_id, in_use_fuel_id, fueling_class = key
-        # fueling_class = physical_effects_dict[key]['fueling_class']
 
         flag = None
         benefits_dict_for_key = {}
@@ -166,9 +161,6 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
     
             fuel_dict = eval(in_use_fuel_id)
             fuel = [item for item in fuel_dict.keys()][0]
-            # fuel = None
-            # for fuel, fuel_share in fuel_dict.items():
-            #     fuel, fuel_share = fuel, fuel_share
 
             oper_attrs_dict = {}
             oper_attrs_list = [
@@ -189,10 +181,6 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                                        - physical_a['barrels_of_imported_oil_per_day']
             energy_security_cf = get_energysecurity_cf(batch_settings, calendar_year)
             energy_security_benefit_dollars += imported_oil_bbl * energy_security_cf
-            # if fuel == 'US electricity':
-            #     pass
-            # elif fuel != 'US electricity':
-            #     energy_security_benefit_dollars += imported_oil_bbl * energy_security_cf
     
             # calc drive value as drive_value_cost in action less drive_value_cost in no_action
             drive_value_benefit_dollars = cost_a['drive_value_cost_dollars'] - cost_na['drive_value_cost_dollars']
@@ -365,10 +353,6 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 nox_veh_Pope_7_benefit_dollars = nox_tons * nox_Pope_7
 
                 # get upstream cap cost factors
-                # if 'electricity' in fuel:
-                #     source_id = 'egu'
-                # else:
-                #     source_id = 'refinery'
                 for source_id in ['egu', 'refinery']:
 
                     pm25_Wu_3, sox_Wu_3, nox_Wu_3, \

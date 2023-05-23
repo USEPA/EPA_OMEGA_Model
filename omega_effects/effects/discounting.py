@@ -297,20 +297,3 @@ def annualize_value(present_value, rate, periods, cost_accrual):
     else:
         return present_value * rate * (1 + rate) ** periods \
                / ((1 + rate) ** periods - 1)
-
-#
-# def set_fueling_class(fuel_id):
-#     """
-#     Set fueling class based on the provided fuel id.
-#
-#     Args:
-#         fuel_id (str): e.g. 'electricity'
-#
-#     Returns:
-#         ``'BEV'`` or ``'ICE'`` depending on the fuel id.
-#
-#     """
-#     if 'electricity' in fuel_id:
-#         return 'BEV'
-#     else:
-#         return 'ICE'

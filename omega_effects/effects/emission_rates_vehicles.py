@@ -71,10 +71,8 @@ Data Column Name and Description
 **CODE**
 
 """
-
 from omega_effects.general.general_functions import read_input_file
-from omega_effects.general.input_validation import \
-    validate_template_version_info, validate_template_column_names
+from omega_effects.general.input_validation import validate_template_version_info, validate_template_column_names
 
 _cache = dict()
 
@@ -85,7 +83,7 @@ class EmissionRatesVehicles:
 
     """
     def __init__(self):
-        self._data = dict()  # private dict, emission factors vehicles by model year, age, legacy reg class ID and in-use fuel ID
+        self._data = dict()
         self._cache = dict()
         self.startyear_min = 0
 

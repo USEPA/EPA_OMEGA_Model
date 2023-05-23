@@ -82,8 +82,7 @@ Data Column Name and Description
 
 """
 from omega_effects.general.general_functions import read_input_file
-from omega_effects.general.input_validation import \
-    validate_template_version_info, validate_template_column_names
+from omega_effects.general.input_validation import validate_template_version_info, validate_template_column_names
 
 
 class LegacyFleet:
@@ -96,7 +95,7 @@ class LegacyFleet:
         Loads and provides access to legacy fleet data by model year and age.
 
         """
-        self._data = {}  # private dict, the legacy_fleet_file data
+        self._data = {}  # the legacy_fleet_file data
         self._legacy_fleet = {}  # the built legacy fleet for the analysis
         self.adjusted_legacy_fleet = {}
         self.legacy_fleet_calendar_year_max = 0

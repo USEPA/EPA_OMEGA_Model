@@ -7,7 +7,6 @@
 **CODE**
 
 """
-
 from pathlib import Path
 import shutil
 import tkinter as tk
@@ -110,30 +109,6 @@ class SetPaths:
         path_of_code_folder.mkdir(exist_ok=False)
 
         return path_of_run_folder, path_of_code_folder
-
-    @staticmethod
-    def path_to_runtime_options_csv():
-        """
-
-        Returns:
-            A console prompt to enter a run identifier; entering "test" sends outputs to a test folder; if left blank a
-            default name is used.
-
-        Note:
-            This method allows for a user-interactive identifier (name) for the given run.
-
-        """
-        # set full path to the batch settings file
-        root = tk.Tk()
-        root.attributes("-topmost", True)
-        root.withdraw()
-
-        path_identifier = filedialog.askopenfilename(title='Select the runtime options CSV file')
-
-        path_of_csv = Path(path_identifier)
-        path_to_csv = path_of_csv.parent
-
-        return path_of_csv, path_to_csv
 
     @staticmethod
     def path_of_batch_settings_csv():

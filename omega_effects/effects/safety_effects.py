@@ -398,15 +398,12 @@ def calc_annual_avg_safety_effects(input_df):
         temp_df = pd.concat([temp_df, s], axis=1)
 
     mediumduty = None
-    if 'medium' in [item for item in input_df['reg_class_id']]:
+    if 'medium' in [item for item in input_df['reg_class_id']]:  # TODO is this what is needed?
         mediumduty = 1
-        cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id', 'fueling_class',
-                'registered_count', 'base_fatalities', 'session_fatalities'
-                ]
-    else:
-        cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'fueling_class',
-                'registered_count', 'base_fatalities', 'session_fatalities'
-                ]
+
+    cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id', 'fueling_class',
+            'registered_count', 'base_fatalities', 'session_fatalities'
+            ]
     for attribute in attributes:
         cols.append(attribute)
     df = input_df[cols]
@@ -422,11 +419,5 @@ def calc_annual_avg_safety_effects(input_df):
 
     for attribute in wtd_attributes:
         return_df[attribute] = return_df[attribute] / return_df['registered_count']
-
-    # return_df.insert(return_df.columns.get_loc('in_use_fuel_id') + 1,
-    #                  'fueling_class',
-    #                  '')
-    # return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
-    # return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
 
     return return_df

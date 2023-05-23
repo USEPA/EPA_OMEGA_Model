@@ -7,7 +7,6 @@
 **CODE**
 
 """
-
 import pandas as pd
 
 from omega_effects.general.general_functions import read_input_file

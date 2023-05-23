@@ -199,20 +199,6 @@ def calc_cost_effects(batch_settings, session_settings, physical_effects_dict, c
                 )
                 fuel_retail_cost_dollars += retail_price * gallons
                 fuel_pretax_cost_dollars += pretax_price * gallons
-            # fuel_dict = eval(in_use_fuel_id)
-            # for fuel, fuel_share in fuel_dict.items():
-            #     retail_price \
-            #         = batch_settings.context_fuel_prices.get_fuel_prices(batch_settings, calendar_year,
-            #                                                              'retail_dollars_per_unit', fuel)
-            #     pretax_price \
-            #         = batch_settings.context_fuel_prices.get_fuel_prices(batch_settings, calendar_year,
-            #                                                              'pretax_dollars_per_unit', fuel)
-            #     if 'electricity' in fuel and kwh:
-            #         fuel_retail_cost_dollars += retail_price * kwh
-            #         fuel_pretax_cost_dollars += pretax_price * kwh
-            #     elif 'electricity' not in fuel and gallons:
-            #         fuel_retail_cost_dollars += retail_price * gallons
-            #         fuel_pretax_cost_dollars += pretax_price * gallons
 
             # maintenance costs
             powertrain_type = 'ICE'
@@ -345,26 +331,12 @@ def calc_annual_cost_effects(input_df):
             if additional_attribute in col:
                 attributes.append(col)
 
-    # groupby calendar year, regclass and fuel
-    # if 'medium' in [item for item in input_df['reg_class_id']]:
-    #     groupby_cols = ['session_policy', 'session_name', 'discount_rate', 'calendar_year', 'reg_class_id',
-    #                     'in_use_fuel_id', 'fueling_class'
-    #                     ]
-    # else:
-    #     groupby_cols = ['session_policy', 'session_name', 'discount_rate', 'calendar_year', 'reg_class_id',
-    #                     'fueling_class'
-    #                     ]
+    # note that the groupby_cols must include fuel_id to calculate benefits since vehicle emission rates differ by fuel
     groupby_cols = ['session_policy', 'session_name', 'discount_rate', 'calendar_year', 'reg_class_id',
                     'in_use_fuel_id', 'fueling_class'
                     ]
     return_df = input_df[[*groupby_cols, *attributes]]
     return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
-
-    # return_df.insert(return_df.columns.get_loc('in_use_fuel_id') + 1,
-    #                  'fueling_class',
-    #                  '')
-    # return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
-    # return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
 
     return_df.insert(return_df.columns.get_loc('calendar_year') + 1, 'series', 'AnnualValue')
 
@@ -422,15 +394,6 @@ def calc_period_consumer_view(batch_settings, input_df):
     return_df = df[[*groupby_cols, *attributes]]
     return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
 
-    # return_df.insert(
-    #     return_df.columns.get_loc('in_use_fuel_id') + 1,
-    #     'fueling_class',
-    #     '')
-    #
-    # return_df.loc[return_df['in_use_fuel_id'] == "{'US electricity':1.0}", 'fueling_class'] = 'BEV'
-    # return_df.loc[return_df['in_use_fuel_id'] != "{'US electricity':1.0}", 'fueling_class'] = 'ICE'
-
-    # return_df.insert(return_df.columns.get_loc('model_year') + 1, 'discount_rate', 0)
     return_df.insert(return_df.columns.get_loc('model_year') + 1, 'periods', 0)
     return_df.insert(return_df.columns.get_loc('model_year') + 1, 'series', 'PeriodValue')
 

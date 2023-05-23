@@ -49,10 +49,8 @@ Data Column Name and Description
 **CODE**
 
 """
-
 from omega_effects.general.general_functions import read_input_file
-from omega_effects.general.input_validation import \
-    validate_template_version_info, validate_template_column_names
+from omega_effects.general.input_validation import validate_template_version_info, validate_template_column_names
 
 
 class EmissionRatesRefinery:
@@ -95,23 +93,11 @@ class EmissionRatesRefinery:
         df = read_input_file(filepath, effects_log, skiprows=1)
         validate_template_column_names(filepath, df, input_template_columns, effects_log)
 
-        # rate_keys = zip(
-        #     df['rate_name']
-        # )
-        # df.set_index(rate_keys, inplace=True)
         df.set_index(df['rate_name'], inplace=True)
 
         self.calendar_year_max = df['last_year'][0]
 
         self._data = df.to_dict('index')
-
-        # for rate_key in self._data:
-        #
-        #     rate_eq = self._data[rate_key]['equation_rate_id']
-        #
-        #     self._data[rate_key].update({
-        #         'equation_rate_id': compile(rate_eq, '<string>', 'eval'),
-        #     })
 
     def get_emission_rate(self, calendar_year, rate_names):
         """

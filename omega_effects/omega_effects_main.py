@@ -345,7 +345,7 @@ def main():
         add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', output_file_id_info)
 
     except Exception as e:
-        effects_log.logwrite(f'*** {e} ***\n%s\n' % traceback.format_exc(), stamp=True)
+        effects_log.logwrite(f'*** {e} ***\n{traceback.format_exc()}\n', stamp=True)
         sys.exit()
 
     elapsed_runtime = round(time() - start_time, 2)

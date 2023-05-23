@@ -94,10 +94,8 @@ Data Column Name and Description
 **CODE**
 
 """
-
 from omega_effects.general.general_functions import read_input_file
-from omega_effects.general.input_validation import \
-    validate_template_version_info, validate_template_column_names
+from omega_effects.general.input_validation import validate_template_version_info, validate_template_column_names
 
 
 class EmissionRatesEGU:
@@ -160,18 +158,6 @@ class EmissionRatesEGU:
         self.calendar_year_max = df['last_year'][0]
 
         self._data = df.to_dict('index')
-
-        # for rate_key in self._data:
-        #
-        #     rate_eq = self._data[rate_key]['equation_rate_id']
-        #     kwh_demand_eq = self._data[rate_key]['equation_kwh_demand_metric']
-        #     kwh_consumption_eq = self._data[rate_key]['equation_kwh_consumption_metric']
-        #
-        #     self._data[rate_key].update({
-        #         'equation_rate_id': compile(rate_eq, '<string>', 'eval'),
-        #         'equation_kwh_demand_metric': compile(kwh_demand_eq, '<string>', 'eval'),
-        #         'equation_kwh_consumption_metric': compile(kwh_consumption_eq, '<string>', 'eval'),
-        #     })
 
     def get_emission_rate(self, calendar_year, kwh_session, rate_names):
         """
