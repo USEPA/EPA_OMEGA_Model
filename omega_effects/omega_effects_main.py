@@ -130,15 +130,13 @@ def main():
 
             # safety effects ___________________________________________________________________________________________
             effects_log.logwrite(f'\nCalculating legacy fleet safety effects for {session_name}')
-            legacy_fleet_safety_effects_dict = calc_legacy_fleet_safety_effects(batch_settings, session_settings)
+            legacy_vses = calc_legacy_fleet_safety_effects(batch_settings, session_settings)
 
             effects_log.logwrite(f'Calculating analysis fleet safety effects for {session_name}')
-            analysis_fleet_safety_effects_dict = calc_safety_effects(batch_settings, session_settings)
+            analysis_vses = calc_safety_effects(batch_settings, session_settings)
 
-            session_safety_effects_dict = {**analysis_fleet_safety_effects_dict, **legacy_fleet_safety_effects_dict}
-
-            session_safety_effects_df = \
-                pd.DataFrame.from_dict(session_safety_effects_dict, orient='index').reset_index(drop=True)
+            session_vses = analysis_vses + legacy_vses
+            session_safety_effects_df = pd.DataFrame([vars(vse) for vse in session_vses])
 
             if batch_settings.save_vehicle_safety_effects_files:
                 effects_log.logwrite(f'Saving safety effects file for {session_name}')
@@ -155,18 +153,13 @@ def main():
 
             # physical effects _________________________________________________________________________________________
             effects_log.logwrite(f'\nCalculating analysis fleet physical effects for {session_name}')
-            analysis_fleet_physical_effects_dict \
-                = calc_physical_effects(batch_settings, session_settings, analysis_fleet_safety_effects_dict)
+            analysis_vpes = calc_physical_effects(batch_settings, session_settings, analysis_vses)
 
             effects_log.logwrite(f'Calculating legacy fleet physical effects for {session_name}')
-            legacy_fleet_physical_effects_dict \
-                = calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_fleet_safety_effects_dict)
+            legacy_vpes = calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_vses)
 
-            session_physical_effects_dict = \
-                {**analysis_fleet_physical_effects_dict, **legacy_fleet_physical_effects_dict}
-
-            session_physical_effects_df = \
-                pd.DataFrame.from_dict(session_physical_effects_dict, orient='index').reset_index(drop=True)
+            session_vpes = analysis_vpes + legacy_vpes
+            session_physical_effects_df = pd.DataFrame([vars(vpe) for vpe in session_vpes])
 
             if batch_settings.save_vehicle_physical_effects_files:
                 effects_log.logwrite(f'Saving physical effects file for {session_name}')
@@ -196,8 +189,7 @@ def main():
             effects_log.logwrite(f'\nCalculating cost effects for {session_name}')
             session_cost_effects_dict = {}
             session_cost_effects_dict.update(
-                calc_cost_effects(batch_settings, session_settings, session_physical_effects_dict,
-                                  context_fuel_cpm_dict))
+                calc_cost_effects(batch_settings, session_settings, session_vpes, context_fuel_cpm_dict))
 
             session_cost_effects_df = \
                 pd.DataFrame.from_dict(session_cost_effects_dict, orient='index').reset_index(drop=True)

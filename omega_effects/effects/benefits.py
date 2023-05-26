@@ -288,8 +288,8 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 'naphthalene_exhaust_ustons',
                 'naphthalene_evaporative_ustons',
                 'naphthalene_vehicle_ustons',
-                '13_butadiene_vehicle_ustons',
-                '15pah_vehicle_ustons',
+                'butadiene13_vehicle_ustons',
+                'pah15_vehicle_ustons',
             ]
             for toxic in toxics_list:
                 toxics_tons_dict[toxic] = physical_na[toxic] - physical_a[toxic]
@@ -580,8 +580,8 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 'naphthalene_exhaust_ustons': - toxics_tons_dict['naphthalene_exhaust_ustons'],
                 'naphthalene_evaporative_ustons': - toxics_tons_dict['naphthalene_evaporative_ustons'],
                 'naphthalene_vehicle_ustons': - toxics_tons_dict['naphthalene_vehicle_ustons'],
-                '13_butadiene_vehicle_ustons': - toxics_tons_dict['13_butadiene_vehicle_ustons'],
-                '15pah_vehicle_ustons': - toxics_tons_dict['15pah_vehicle_ustons'],
+                'butadiene13_vehicle_ustons': - toxics_tons_dict['butadiene13_vehicle_ustons'],
+                'pah15_vehicle_ustons': - toxics_tons_dict['pah15_vehicle_ustons'],
             }
 
         if flag:

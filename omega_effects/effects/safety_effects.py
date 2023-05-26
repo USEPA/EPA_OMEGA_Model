@@ -9,6 +9,7 @@ calendar year and vehicle age, and to calculate fatalities.
 
 """
 import pandas as pd
+from omega_effects.effects.vehicle_safety_effects import VehicleSafetyEffects
 
 
 def get_safety_values(session_settings, body_style):
@@ -145,22 +146,18 @@ def calc_safety_effects(batch_settings, session_settings):
         'body_style',
         'base_year_curbweight_lbs',
         'curbweight_lbs',
-        'onroad_direct_co2e_grams_per_mile',
-        'onroad_direct_kwh_per_mile',
-    ]
+        ]
 
-    safety_effects_dict = {}
     vehicle_info_dict = {}
-
     calendar_years = batch_settings.calendar_years
+    vses = []
     for calendar_year in calendar_years:
 
         vads = session_settings.vehicle_annual_data.get_adjusted_vehicle_annual_data_by_calendar_year(calendar_year)
 
-        calendar_year_safety_dict = {}
         for vad in vads:
 
-            vehicle_safety_dict = {}
+            vehicle_safety_effects = VehicleSafetyEffects()
 
             # need vehicle info once for each vehicle, not every calendar year for each vehicle
             vehicle_id = int(vad['vehicle_id'])
@@ -169,11 +166,10 @@ def calc_safety_effects(batch_settings, session_settings):
                 vehicle_info_dict[vehicle_id] \
                     = session_settings.vehicles.get_vehicle_attributes(vehicle_id, *vehicle_attribute_list)
 
-            base_year_vehicle_id, mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, size_class, \
+            base_year_vehicle_id, manufacturer_id, name, model_year, base_year_reg_class_id, reg_class_id, size_class, \
                 in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, footprint, workfactor, \
-                body_style, base_year_curbweight_lbs, curbweight_lbs, \
-                onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
-                = vehicle_info_dict[vehicle_id]
+                body_style, base_year_curbweight_lbs, curbweight_lbs = \
+                vehicle_info_dict[vehicle_id]
 
             # exclude any vehicle_ids that are considered legacy fleet
             if model_year >= calendar_years[0]:
@@ -201,12 +197,12 @@ def calc_safety_effects(batch_settings, session_settings):
 
                 fatalities_session = fatality_rate_session * vad['vmt'] / 1000000000
 
-                vehicle_safety_dict.update({
+                vehicle_safety_effects.update_value({
                     'session_policy': session_settings.session_policy,
                     'session_name': session_settings.session_name,
                     'vehicle_id': vehicle_id,
                     'base_year_vehicle_id': int(base_year_vehicle_id),
-                    'manufacturer_id': mfr_id,
+                    'manufacturer_id': manufacturer_id,
                     'name': name,
                     'calendar_year': calendar_year,
                     'model_year': int(model_year),
@@ -245,13 +241,9 @@ def calc_safety_effects(batch_settings, session_settings):
                     'session_fatalities': fatalities_session,
                 }
                 )
+                vses.append(vehicle_safety_effects)
 
-                calendar_year_safety_dict[int(vehicle_id), int(calendar_year)] = vehicle_safety_dict
-
-        safety_effects_dict.update(calendar_year_safety_dict)
-
-    return safety_effects_dict
-
+    return vses
 
 def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
     """
@@ -267,10 +259,12 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
         There is no rebound VMT calculated for the legacy fleet.
 
     """
-    mfr_id = 'legacy_fleet'
+    manufacturer_id = 'legacy_fleet'
 
-    legacy_fleet_safety_effects_dict = {}
+    vses = []
     for key, nested_dict in batch_settings.legacy_fleet.adjusted_legacy_fleet.items():
+
+        vehicle_safety_effects = VehicleSafetyEffects()
 
         vehicle_id, calendar_year, age = nested_dict['vehicle_id'], nested_dict['calendar_year'], nested_dict['age']
 
@@ -292,18 +286,16 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
         threshold_lbs, change_per_100lbs_below, change_per_100lbs_above = \
             get_safety_values(session_settings, body_style)
 
-        vehicle_safety_dict = {}
-
         fatality_rate_base = get_fatality_rate(session_settings, model_year, age)
 
         fatalities_base = fatality_rate_base * nested_dict['vmt'] / 1000000000
 
-        vehicle_safety_dict.update({
+        vehicle_safety_effects.update_value({
             'session_policy': session_settings.session_policy,
             'session_name': session_settings.session_name,
             'vehicle_id': vehicle_id,
             'base_year_vehicle_id': vehicle_id,
-            'manufacturer_id': mfr_id,
+            'manufacturer_id': manufacturer_id,
             'name': name,
             'calendar_year': int(calendar_year),
             'model_year': int(model_year),
@@ -342,10 +334,9 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
             'session_fatalities': fatalities_base,
         }
         )
+        vses.append(vehicle_safety_effects)
 
-        legacy_fleet_safety_effects_dict[int(vehicle_id), int(calendar_year)] = vehicle_safety_dict
-
-    return legacy_fleet_safety_effects_dict
+    return vses
 
 
 def set_legacy_fleet_name(market_class_id):
