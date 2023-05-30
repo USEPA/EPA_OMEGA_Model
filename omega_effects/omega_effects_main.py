@@ -93,10 +93,12 @@ def main():
         vmt_adjustments_context = AdjustmentsVMT()
         vmt_adjustments_context.calc_vmt_adjustments(batch_settings, session_settings)
 
-        context_fuel_cpm_dict = calc_fuel_cost_per_mile(batch_settings, session_settings)
+        # context_fuel_cpm_dict = calc_fuel_cost_per_mile(batch_settings, session_settings)
+        context_fuel_cpm_list = calc_fuel_cost_per_mile(batch_settings, session_settings)
         if batch_settings.save_context_fuel_cost_per_mile_file:
             effects_log.logwrite(f'Saving context fuel cost per mile file')
-            context_fuel_cpm_df = pd.DataFrame.from_dict(context_fuel_cpm_dict, orient='index').reset_index(drop=True)
+            context_fuel_cpm_df = pd.DataFrame([vars(vcpm) for vcpm in context_fuel_cpm_list])
+            # context_fuel_cpm_df = pd.DataFrame.from_dict(context_fuel_cpm_dict, orient='index').reset_index(drop=True)
             save_file(session_settings, context_fuel_cpm_df, path_of_run_folder, 'context_fuel_cost_per_mile',
                       effects_log, extension=batch_settings.file_format)
 
@@ -123,7 +125,9 @@ def main():
 
             effects_log.logwrite(f'\nAdjusting analysis fleet VMT for {session_name}')
             session_settings.vehicle_annual_data.adjust_vad(batch_settings, session_settings,
-                                                            vmt_adjustments_session, context_fuel_cpm_dict)
+                                                            vmt_adjustments_session, context_fuel_cpm_list)
+            # session_settings.vehicle_annual_data.adjust_vad(batch_settings, session_settings,
+            #                                                 vmt_adjustments_session, context_fuel_cpm_dict)
 
             effects_log.logwrite(f'\nAdjusting legacy fleet VMT and stock for {session_name}')
             batch_settings.legacy_fleet.adjust_legacy_fleet_stock_and_vmt(batch_settings, vmt_adjustments_session)
@@ -189,7 +193,7 @@ def main():
             effects_log.logwrite(f'\nCalculating cost effects for {session_name}')
             session_cost_effects_dict = {}
             session_cost_effects_dict.update(
-                calc_cost_effects(batch_settings, session_settings, session_vpes, context_fuel_cpm_dict))
+                calc_cost_effects(batch_settings, session_settings, session_vpes, context_fuel_cpm_list))
 
             session_cost_effects_df = \
                 pd.DataFrame.from_dict(session_cost_effects_dict, orient='index').reset_index(drop=True)

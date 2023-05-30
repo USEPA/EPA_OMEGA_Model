@@ -285,15 +285,16 @@ def calc_physical_effects(batch_settings, session_settings, analysis_vses):
     vpds = []  # this list will house applicable VehiclePhysicalData objects
     for calendar_year in calendar_years:
 
-        vads = session_settings.vehicle_annual_data.get_adjusted_vehicle_annual_data_by_calendar_year(calendar_year)
+        adjusted_vads = \
+            session_settings.vehicle_annual_data.get_adjusted_vehicle_annual_data_by_calendar_year(calendar_year)
 
         # first a loop to determine kwh demand for this calendar year
         fuel_consumption_kWh_annual = fuel_generation_kWh_annual = 0
-        for vad in vads:
+        for vad in adjusted_vads:
 
             # this loops thru vehicles this calendar year to get kWh consumption this calendar year
             # need vehicle info once for each vehicle, not every calendar year for each vehicle
-            vehicle_id = int(vad['vehicle_id'])
+            vehicle_id = int(vad.vehicle_id)
 
             if vehicle_id not in vehicle_info_dict:
                 vehicle_info_dict[vehicle_id] \
@@ -314,14 +315,14 @@ def calc_physical_effects(batch_settings, session_settings, analysis_vses):
             co2_egu_rate, ch4_egu_rate, n2o_egu_rate, hcl_egu_rate, hg_egu_rate \
             = get_egu_emission_rate(session_settings, calendar_year, fuel_consumption_kWh_annual)
 
-        for vad in vads:
+        for vad in adjusted_vads:
 
             vehicle_data = VehiclePhysicalData()
 
             # this loops thru vehicles this calendar year to calc physical effects for this calendar year
-            vehicle_id = int(vad['vehicle_id'])
-            age = int(vad['age'])
-            registered_count = vad['registered_count']
+            vehicle_id = int(vad.vehicle_id)
+            age = int(vad.age)
+            registered_count = vad.registered_count
 
             base_year_vehicle_id, manufacturer_id, name, model_year, base_year_reg_class_id, reg_class_id, \
                 in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, footprint_ft2, workfactor, \
@@ -659,7 +660,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
     Args:
         batch_settings: an instance of the BatchSettings class.
         session_settings: an instance of the SessionSettings class.
-        legacy_vses: The list of legacy fleet VehicleSafetyEffects objects.
+        legacy_vses: a list of legacy fleet VehicleSafetyEffects objects.
 
     Returns:
         A list of VehiclePhysicalEffects objects.

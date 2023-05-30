@@ -48,15 +48,15 @@ def get_maintenance_cost(batch_settings, veh_type):
     return d['slope'], d['intercept']
 
 
-def calc_cost_effects(batch_settings, session_settings, session_vpes, context_fuel_cpm_dict):
+def calc_cost_effects(batch_settings, session_settings, session_vpes, context_fuel_cpm_list):
     """
     Calculate cost effects
 
     Args:
         batch_settings: an instance of the BatchSettings class.
         session_settings: an instance of the SessionSettings class.
-        session_vpes: A list of VehiclePhysicalEffects objects for the session.
-        context_fuel_cpm_dict: dictionary; the context session fuel costs per mile by vehicle_id and age.
+        session_vpes (list): A list of VehiclePhysicalEffects objects for the session.
+        context_fuel_cpm_list (list): a list of VehicleCostPerMile class objects.
 
     Returns:
         A dictionary of cost effects for each vehicle in each analysis year.
