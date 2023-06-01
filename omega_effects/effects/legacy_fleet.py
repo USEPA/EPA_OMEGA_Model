@@ -98,7 +98,6 @@ class LegacyFleet:
         self._data = {}  # the legacy_fleet_file data
         self._legacy_fleet = {}  # the built legacy fleet for the analysis
         self.adjusted_legacy_fleet = {}
-        self.alvs = {}  # this will be a dict of AdjustedLegacyVehicle objects
         self.legacy_fleet_calendar_year_max = 0
         self.legacy_fleet_vehicle_id_start = pow(10, 6)
 
@@ -251,10 +250,9 @@ class LegacyFleet:
         Returns:
 
         """
-        odometer = [v.odometer for v in self.alvs if v.vehicle_id == vehicle_id and v.calendar_year == calendar_year][0]
-        # odometer = [v['odometer'] for v in self.adjusted_legacy_fleet.values()
-        #             if v['vehicle_id'] == vehicle_id
-        #             and v['calendar_year'] == calendar_year][0]
+        odometer = [v['odometer'] for v in self.adjusted_legacy_fleet.values()
+                    if v['vehicle_id'] == vehicle_id
+                    and v['calendar_year'] == calendar_year][0]
 
         return odometer
 
@@ -273,39 +271,30 @@ class LegacyFleet:
             There is no rebound VMT calculated for the legacy fleet.
 
         """
-        # self.adjusted_legacy_fleet = {}
-
-        calendar_years = batch_settings.calendar_years
-
         for v in self._legacy_fleet.values():
 
-            alv = AdjustedLegacyVehicle()
-
-            vehicle_id, calendar_year, age = v['vehicle_id'], v['calendar_year'], v['age']
-            registered_count = v['registered_count']
-
             # adjust vmt and legacy fleet stock
-            context_vmt_adjustment = vmt_adjustments_session.get_vmt_adjustment(calendar_year)
+            context_vmt_adjustment = vmt_adjustments_session.get_vmt_adjustment(v['calendar_year'])
             vmt_adjusted = v['vmt'] * context_vmt_adjustment
 
-            calendar_year_stock_adj = vmt_adjustments_session.get_stock_adjustment(calendar_year)
-            registered_count = registered_count * calendar_year_stock_adj
+            context_stock_adj = vmt_adjustments_session.get_stock_adjustment(v['calendar_year'])
+            adjusted_registered_count = v['registered_count'] * context_stock_adj
 
-            annual_vmt_adjusted = vmt_adjusted / registered_count
+            annual_vmt_adjusted = vmt_adjusted / adjusted_registered_count
 
-            if v['calendar_year'] == calendar_years[0]:
+            if v['calendar_year'] == batch_settings.analysis_initial_year:
                 annual_vmt = v['annual_vmt']
                 odometer = v['odometer']
                 odometer_adjusted = odometer - annual_vmt + annual_vmt_adjusted
             else:
-                odometer_last_year = self.get_adjusted_legacy_fleet_odometer(vehicle_id, calendar_year - 1)
+                odometer_last_year = self.get_adjusted_legacy_fleet_odometer(v['vehicle_id'], v['calendar_year'] - 1)
                 odometer_adjusted = odometer_last_year + annual_vmt_adjusted
 
-            alv.update_value({
-                'vehicle_id': vehicle_id,
-                'age': age,
-                'calendar_year': calendar_year,
-                'registered_count': registered_count,
+            update_dict = {
+                'vehicle_id': v['vehicle_id'],
+                'age': v['age'],
+                'calendar_year': v['calendar_year'],
+                'registered_count': adjusted_registered_count,
                 'context_vmt_adjustment': context_vmt_adjustment,
                 'annual_vmt': annual_vmt_adjusted,
                 'odometer': odometer_adjusted,
@@ -317,40 +306,5 @@ class LegacyFleet:
                 'curbweight_lbs': v['curbweight_lbs'],
                 'miles_per_gallon': v['miles_per_gallon'],
                 'kwh_per_mile': v['kwh_per_mile'],
-            })
-            self.alvs[(vehicle_id, calendar_year)] = alv
-            # self.adjusted_legacy_fleet[(vehicle_id, calendar_year)] = update_dict
-
-
-class AdjustedLegacyVehicle:
-    
-    def __init__(self):
-
-        self.vehicle_id = None
-        self.age = None
-        self.calendar_year = None
-        self.registered_count = None
-        self.context_vmt_adjustment = None
-        self.annual_vmt = None
-        self.odometer = None
-        self.vmt = None
-        self.market_class_id = None
-        self.reg_class_id = None
-        self.in_use_fuel_id = None
-        self.body_style = None
-        self.curbweight_lbs = None
-        self.miles_per_gallon = None
-        self.kwh_per_mile = None
-
-    def update_value(self, update_dict):
-        """
-
-        Args:
-            update_dict (dict): the class instance attributes as keys along with their values.
-
-        Returns:
-            Nothing, but it sets class instance attributes to the values contained in update_dict.
-
-        """
-        for k, v in update_dict.items():
-            self.__setattr__(k, v)
+            }
+            self.adjusted_legacy_fleet[(v['vehicle_id'], v['calendar_year'])] = update_dict

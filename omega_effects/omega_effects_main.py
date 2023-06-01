@@ -93,21 +93,19 @@ def main():
         vmt_adjustments_context = AdjustmentsVMT()
         vmt_adjustments_context.calc_vmt_adjustments(batch_settings, session_settings)
 
-        # context_fuel_cpm_dict = calc_fuel_cost_per_mile(batch_settings, session_settings)
-        context_fuel_cpm_list = calc_fuel_cost_per_mile(batch_settings, session_settings)
+        context_fuel_cpm_dict = calc_fuel_cost_per_mile(batch_settings, session_settings)
         if batch_settings.save_context_fuel_cost_per_mile_file:
             effects_log.logwrite(f'Saving context fuel cost per mile file')
-            context_fuel_cpm_df = pd.DataFrame([vars(vcpm) for vcpm in context_fuel_cpm_list])
-            # context_fuel_cpm_df = pd.DataFrame.from_dict(context_fuel_cpm_dict, orient='index').reset_index(drop=True)
+            context_fuel_cpm_df = pd.DataFrame.from_dict(context_fuel_cpm_dict, orient='index').reset_index(drop=True)
             save_file(session_settings, context_fuel_cpm_df, path_of_run_folder, 'context_fuel_cost_per_mile',
                       effects_log, extension=batch_settings.file_format)
 
         # loop thru sessions to calc safety effects, physical effects, cost effects for each ___________________________
-        annual_safety_effects_df = pd.DataFrame()
-        annual_physical_effects_df = pd.DataFrame()
-        annual_cost_effects_df = pd.DataFrame()
-        my_lifetime_physical_effects_df = pd.DataFrame()
-        my_lifetime_cost_effects_df = pd.DataFrame()
+        annual_safety_df = pd.DataFrame()
+        annual_physical_df = pd.DataFrame()
+        annual_costs_df = pd.DataFrame()
+        my_lifetime_physical_df = pd.DataFrame()
+        my_lifetime_costs_df = pd.DataFrame()
 
         effects_log.logwrite(f'\nStarting work on sessions')
         for session_num in batch_settings.session_dict:
@@ -125,104 +123,99 @@ def main():
 
             effects_log.logwrite(f'\nAdjusting analysis fleet VMT for {session_name}')
             session_settings.vehicle_annual_data.adjust_vad(batch_settings, session_settings,
-                                                            vmt_adjustments_session, context_fuel_cpm_list)
-            # session_settings.vehicle_annual_data.adjust_vad(batch_settings, session_settings,
-            #                                                 vmt_adjustments_session, context_fuel_cpm_dict)
+                                                            vmt_adjustments_session, context_fuel_cpm_dict)
 
             effects_log.logwrite(f'\nAdjusting legacy fleet VMT and stock for {session_name}')
             batch_settings.legacy_fleet.adjust_legacy_fleet_stock_and_vmt(batch_settings, vmt_adjustments_session)
 
             # safety effects ___________________________________________________________________________________________
             effects_log.logwrite(f'\nCalculating legacy fleet safety effects for {session_name}')
-            legacy_vses = calc_legacy_fleet_safety_effects(batch_settings, session_settings)
+            legacy_fleet_safety = calc_legacy_fleet_safety_effects(batch_settings, session_settings)
 
             effects_log.logwrite(f'Calculating analysis fleet safety effects for {session_name}')
-            analysis_vses = calc_safety_effects(batch_settings, session_settings)
+            analysis_fleet_safety = calc_safety_effects(batch_settings, session_settings)
 
-            session_vses = analysis_vses + legacy_vses
-            session_safety_effects_df = pd.DataFrame([vars(vse) for vse in session_vses])
+            session_fleet_safety = {**analysis_fleet_safety, **legacy_fleet_safety}
+            session_fleet_safety_df = \
+                pd.DataFrame.from_dict(session_fleet_safety, orient='index').reset_index(drop=True)
 
             if batch_settings.save_vehicle_safety_effects_files:
                 effects_log.logwrite(f'Saving safety effects file for {session_name}')
-                save_file(session_settings, session_safety_effects_df, path_of_run_folder, 'safety_effects',
+                save_file(session_settings, session_fleet_safety_df, path_of_run_folder, 'safety_effects',
                           effects_log, extension=batch_settings.file_format)
 
             effects_log.logwrite(f'\nCalculating annual safety effects for {session_name}')
-            session_annual_safety_effects_df = calc_annual_avg_safety_effects(session_safety_effects_df)
+            session_annual_safety_df = calc_annual_avg_safety_effects(session_fleet_safety_df)
 
             # create an annual_safety_effects_df
-            annual_safety_effects_df \
-                = pd.concat([annual_safety_effects_df, session_annual_safety_effects_df], axis=0, ignore_index=True)
-            annual_safety_effects_df.reset_index(inplace=True, drop=True)
+            annual_safety_df = pd.concat([annual_safety_df, session_annual_safety_df], axis=0, ignore_index=True)
+            annual_safety_df.reset_index(inplace=True, drop=True)
 
             # physical effects _________________________________________________________________________________________
             effects_log.logwrite(f'\nCalculating analysis fleet physical effects for {session_name}')
-            analysis_vpes = calc_physical_effects(batch_settings, session_settings, analysis_vses)
+            analysis_fleet_physical = calc_physical_effects(batch_settings, session_settings, analysis_fleet_safety)
 
             effects_log.logwrite(f'Calculating legacy fleet physical effects for {session_name}')
-            legacy_vpes = calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_vses)
+            legacy_fleet_physical = \
+                calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_fleet_safety)
 
-            session_vpes = analysis_vpes + legacy_vpes
-            session_physical_effects_df = pd.DataFrame([vars(vpe) for vpe in session_vpes])
+            session_fleet_physical = {**analysis_fleet_physical, **legacy_fleet_physical}
+            session_fleet_physical_df = \
+                pd.DataFrame.from_dict(session_fleet_physical, orient='index').reset_index(drop=True)
 
             if batch_settings.save_vehicle_physical_effects_files:
                 effects_log.logwrite(f'Saving physical effects file for {session_name}')
-                save_file(session_settings, session_physical_effects_df, path_of_run_folder, 'physical_effects',
+                save_file(session_settings, session_fleet_physical_df, path_of_run_folder, 'physical_effects',
                           effects_log, extension=batch_settings.file_format)
 
             effects_log.logwrite(f'\nCalculating annual physical effects for {session_name}')
-            session_annual_physical_effects_df = \
-                calc_annual_physical_effects(batch_settings, session_physical_effects_df)
+            session_annual_physical_df = calc_annual_physical_effects(batch_settings, session_fleet_physical_df)
 
             effects_log.logwrite(f'\nCalculating model year period_duration physical effects for {session_name}')
-            session_my_period_physical_effects_df = \
-                calc_period_consumer_physical_view(batch_settings, session_physical_effects_df)
+            session_my_period_physical_df = \
+                calc_period_consumer_physical_view(batch_settings, session_fleet_physical_df)
 
             # for use in benefits calcs, create an annual_physical_effects_df
-            annual_physical_effects_df = \
-                pd.concat([annual_physical_effects_df, session_annual_physical_effects_df], axis=0, ignore_index=True)
-            annual_physical_effects_df.reset_index(inplace=True, drop=True)
+            annual_physical_df = pd.concat([annual_physical_df, session_annual_physical_df], axis=0, ignore_index=True)
+            annual_physical_df.reset_index(inplace=True, drop=True)
 
             # for use in consumer calcs, create a my_lifetime_physical_effects_df of lifetime physical effects
-            my_lifetime_physical_effects_df = \
-                pd.concat([my_lifetime_physical_effects_df, session_my_period_physical_effects_df],
-                          axis=0, ignore_index=True)
-            my_lifetime_physical_effects_df.reset_index(inplace=True, drop=True)
+            my_lifetime_physical_df = \
+                pd.concat([my_lifetime_physical_df, session_my_period_physical_df], axis=0, ignore_index=True)
+            my_lifetime_physical_df.reset_index(inplace=True, drop=True)
 
             # cost effects _____________________________________________________________________________________________
             effects_log.logwrite(f'\nCalculating cost effects for {session_name}')
-            session_cost_effects_dict = {}
-            session_cost_effects_dict.update(
-                calc_cost_effects(batch_settings, session_settings, session_vpes, context_fuel_cpm_list))
-
-            session_cost_effects_df = \
-                pd.DataFrame.from_dict(session_cost_effects_dict, orient='index').reset_index(drop=True)
+            session_fleet_costs = {}
+            session_fleet_costs.update(
+                calc_cost_effects(batch_settings, session_settings, session_fleet_physical, context_fuel_cpm_dict)
+            )
+            session_costs_df = pd.DataFrame.from_dict(session_fleet_costs, orient='index').reset_index(drop=True)
 
             if batch_settings.save_vehicle_cost_effects_files:
                 effects_log.logwrite(f'Saving cost effects file for {session_name}')
-                save_file(session_settings, session_cost_effects_df, path_of_run_folder, 'cost_effects', effects_log,
+                save_file(session_settings, session_costs_df, path_of_run_folder, 'cost_effects', effects_log,
                           extension=batch_settings.file_format)
 
             effects_log.logwrite(f'\nCalculating annual costs effects for {session_name}')
-            session_annual_cost_effects_df = calc_annual_cost_effects(session_cost_effects_df)
+            session_annual_costs_df = calc_annual_cost_effects(session_costs_df)
 
             effects_log.logwrite(f'\nCalculating model year period_duration cost effects for {session_name}')
-            session_my_period_cost_effects_df = calc_period_consumer_view(batch_settings, session_cost_effects_df)
+            session_my_period_costs_df = calc_period_consumer_view(batch_settings, session_costs_df)
 
             # for use in benefits calcs, create an annual_cost_effects_df of undiscounted annual costs
-            annual_cost_effects_df = \
-                pd.concat([annual_cost_effects_df, session_annual_cost_effects_df], axis=0, ignore_index=True)
-            annual_cost_effects_df.reset_index(inplace=True, drop=True)
+            annual_costs_df = pd.concat([annual_costs_df, session_annual_costs_df], axis=0, ignore_index=True)
+            annual_costs_df.reset_index(inplace=True, drop=True)
 
             # for use in consumer calcs, create a my_lifetime_cost_effects_df of lifetime costs
-            my_lifetime_cost_effects_df = \
-                pd.concat([my_lifetime_cost_effects_df, session_my_period_cost_effects_df], axis=0, ignore_index=True)
-            my_lifetime_cost_effects_df.reset_index(inplace=True, drop=True)
+            my_lifetime_costs_df = \
+                pd.concat([my_lifetime_costs_df, session_my_period_costs_df], axis=0, ignore_index=True)
+            my_lifetime_costs_df.reset_index(inplace=True, drop=True)
 
         # discount annual costs ________________________________________________________________________________________
         effects_log.logwrite('\nCalculating discounted annual costs, PVs and EAVs for the batch')
         discounted_costs = Discounting()
-        discounted_costs.discount_annual_values(batch_settings, annual_cost_effects_df)
+        discounted_costs.discount_annual_values(batch_settings, annual_costs_df)
         discounted_costs.calc_present_values(batch_settings)
         discounted_costs.calc_annualized_values(batch_settings)
         discounted_costs_dict = \
@@ -232,15 +225,15 @@ def main():
 
         # calculate annual benefits and annual physical effects deltas _________________________________________________
         effects_log.logwrite(f'\nCalculating annual benefits for the batch')
-        benefits_dict, delta_physical_effects_dict = \
-            calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effects_df,
+        annual_benefits, delta_fleet_physical = \
+            calc_benefits(batch_settings, annual_physical_df, annual_costs_df,
                           calc_health_effects=batch_settings.criteria_cost_factors.calc_health_effects)
 
-        annual_benefits_df = pd.DataFrame.from_dict(benefits_dict, orient='index')
+        annual_benefits_df = pd.DataFrame.from_dict(annual_benefits, orient='index')
         annual_benefits_df.reset_index(inplace=True, drop=True)
 
-        annual_physical_effects_deltas_df = pd.DataFrame.from_dict(delta_physical_effects_dict, orient='index')
-        annual_physical_effects_deltas_df.reset_index(inplace=True, drop=True)
+        delta_annual_physical_df = pd.DataFrame.from_dict(delta_fleet_physical, orient='index')
+        delta_annual_physical_df.reset_index(inplace=True, drop=True)
 
         # discount annual benefits _____________________________________________________________________________________
         effects_log.logwrite('\nCalculating discounted annual benefits, PVs and EAVs for the batch')
@@ -291,18 +284,18 @@ def main():
             'model_year',
             'body_style',
         ]
-        if 'fueling_class' in my_lifetime_cost_effects_df.columns:
+        if 'fueling_class' in my_lifetime_costs_df.columns:
             arg_sort_list.append('fueling_class')
         else:
             arg_sort_list.append('in_use_fuel_id')
-        my_lifetime_cost_effects_df = my_lifetime_cost_effects_df.sort_values(by=arg_sort_list)
+        my_lifetime_costs_df = my_lifetime_costs_df.sort_values(by=arg_sort_list)
 
         # save files to CSV ____________________________________________________________________________________________
-        annual_safety_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv',
+        annual_safety_df.to_csv(path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv',
                                         index=False)
-        annual_physical_effects_df.to_csv(path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv',
+        annual_physical_df.to_csv(path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv',
                                           index=False)
-        annual_physical_effects_deltas_df.to_csv(
+        delta_annual_physical_df.to_csv(
             path_of_run_folder / f'{start_time_readable}_physical_effects_annual_action_minus_no_action.csv',
             index=False)
         discounted_costs_df.to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv', index=False)
@@ -313,10 +306,10 @@ def main():
         if social_effects_domestic_df is not None:
             social_effects_domestic_df.to_csv(
                 path_of_run_folder / f'{start_time_readable}_social_effects_domestic_ghg_annual.csv', index=False)
-        my_lifetime_physical_effects_df.to_csv(
+        my_lifetime_physical_df.to_csv(
             path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv', index=False
         )
-        my_lifetime_cost_effects_df.to_csv(
+        my_lifetime_costs_df.to_csv(
             path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', index=False
         )
 

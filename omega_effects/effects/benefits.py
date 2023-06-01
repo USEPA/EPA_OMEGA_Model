@@ -168,7 +168,7 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 'vmt_rebound',
                 'vmt_liquid_fuel',
                 'vmt_electricity',
-                'fuel_consumption_kWh',
+                'fuel_consumption_kwh',
                 'fuel_consumption_gallons',
             ]
             for oper_attr in oper_attrs_list:
@@ -522,7 +522,7 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 'vmt_rebound': - oper_attrs_dict['vmt_rebound'],
                 'vmt_liquid_fuel': - oper_attrs_dict['vmt_liquid_fuel'],
                 'vmt_electricity': - oper_attrs_dict['vmt_electricity'],
-                'fuel_consumption_kWh': - oper_attrs_dict['fuel_consumption_kWh'],
+                'fuel_consumption_kwh': - oper_attrs_dict['fuel_consumption_kwh'],
                 'fuel_consumption_gallons': - oper_attrs_dict['fuel_consumption_gallons'],
                 'barrels_of_oil': - oil_barrels,
                 'barrels_of_imported_oil': - imported_oil_bbl,
