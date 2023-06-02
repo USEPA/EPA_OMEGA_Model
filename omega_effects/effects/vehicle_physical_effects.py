@@ -54,6 +54,8 @@ class VehiclePhysicalData:
         self.fuel_consumption_gallons = 0
         self.fuel_consumption_kwh = 0
         self.fuel_generation_kwh = 0
+        self.curbweight_lbs = 0
+        self.gvwr_lbs = 0
 
         self.session_fatalities = 0
         self.energy_security_import_factor = 0
@@ -305,6 +307,8 @@ def calc_vehicle_physical_effects(vpd):
         'fuel_consumption_gallons': vpd.fuel_consumption_gallons,
         'fuel_consumption_kwh': vpd.fuel_consumption_kwh,
         'fuel_generation_kwh': vpd.fuel_generation_kwh,
+        'curbweight_lbs': vpd.curbweight_lbs,
+        'gvwr_lbs': vpd.gvwr_lbs,
 
         'barrels_of_oil': oil_bbl,
         'barrels_of_imported_oil': imported_oil_bbl,

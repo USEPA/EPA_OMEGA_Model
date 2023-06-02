@@ -271,6 +271,8 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
         'onroad_direct_kwh_per_mile',
         'body_style',
         'battery_kwh',
+        'curbweight_lbs',
+        'gvwr_lbs',
     ]
 
     grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, \
@@ -304,14 +306,13 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                 vehicle_info_dict[v['vehicle_id']] \
                     = session_settings.vehicles.get_vehicle_attributes(v['vehicle_id'], *vehicle_attribute_list)
 
-            base_year_vehicle_id, mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, \
-                market_class_id, fueling_class, base_year_powertrain_type, footprint_ft2, workfactor, \
-                target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile, \
-                body_style, battery_kwh_per_veh = \
+            base_year_vehicle_id, manufacturer_id, name, model_year, base_year_reg_class_id, reg_class_id, \
+                in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, footprint_ft2, workfactor, \
+                target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile, body_style, \
+                battery_kwh_per_veh, curbweight_lbs, gvwr_lbs = \
                 vehicle_info_dict[v['vehicle_id']]
 
             if onroad_direct_kwh_per_mile:
-                vse = analysis_fleet_safety[(v['vehicle_id'], calendar_year)]
                 fuel_consumption_kwh_annual += v['vmt'] * onroad_direct_kwh_per_mile
 
         # upstream EGU emission rates for this calendar year to apply to electric fuel operation
@@ -327,7 +328,7 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
             base_year_vehicle_id, manufacturer_id, name, model_year, base_year_reg_class_id, reg_class_id, \
                 in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, footprint_ft2, workfactor, \
                 target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile, body_style, \
-                battery_kwh_per_veh = \
+                battery_kwh_per_veh, curbweight_lbs, gvwr_lbs = \
                 vehicle_info_dict[v['vehicle_id']]
 
             if target_co2e_grams_per_mile is not None:
@@ -370,6 +371,8 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                     'workfactor': workfactor,
                     'battery_kwh_per_veh': battery_kwh_per_veh,
                     'battery_kwh': battery_kwh,
+                    'curbweight_lbs': curbweight_lbs,
+                    'gvwr_lbs': gvwr_lbs,
                     'vmt': v['vmt'],
                     'annual_vmt': v['annual_vmt'],
                     'odometer': v['odometer'],
@@ -658,6 +661,8 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'in_use_fuel_id': v['in_use_fuel_id'],
             'miles_per_gallon': v['miles_per_gallon'],
             'kwh_per_mile': v['kwh_per_mile'],
+            # 'curbweight_lbs': v['curbweight_lbs'],
+            # 'gvwr_lbs': v['curbweight_lbs'],
         })
 
         onroad_miles_per_gallon = v['miles_per_gallon'] * 0.8
