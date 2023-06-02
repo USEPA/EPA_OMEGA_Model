@@ -40,6 +40,9 @@ def return_df(table, col_id, case_id, version_id):
         A DataFrame consisting of only the data for the given AEO case; the name of the AEO case is also removed from the 'full name' column entries.
         
     """
+    # rename cases since EIA changes them sometimes for some reason
+    table[col_id].replace('High Oil Price', 'High oil price', regex=True, inplace=True)
+    table[col_id].replace('Low Oil Price', 'Low oil price', regex=True, inplace=True)
     table[col_id].replace(f'{version_id} {case_id}', case_id, regex=True, inplace=True)
     df_return = pd.DataFrame(table.loc[table[col_id].str.endswith(f'{case_id}'), :]).reset_index(drop=True)
     df_return.replace({col_id: f': {case_id}'}, {col_id: ''}, regex=True, inplace=True)
@@ -179,6 +182,7 @@ class GetContext:
             The year of the report, e.g., 'AEO2020'.
 
         """
+        self.table['api key'].replace('AEO.2', 'AEO2', regex=True, inplace=True)
         a_loc = self.table.at[0, 'api key'].find('A')
         return self.table.at[0, 'api key'][a_loc: a_loc + 7]
 
@@ -346,7 +350,7 @@ def main():
 
         # work on fuel prices
         for aeo_case in settings.aeo_cases:
-            # print(f'Working on context gasoline prices for the AEO {aeo_case}')
+            # print(f'Working on context gasoline prices for the {aeo_version} {aeo_case}')
             case_df = return_df(aeo_petroleum_fuel_prices_table, 'full name', aeo_case, aeo_version)
             aeo_table_obj = GetContext(case_df)
 
@@ -356,7 +360,7 @@ def main():
                                  'Diesel': 'pump diesel'}
             case_prices = pd.DataFrame()
             for liquid_fuel in ['Motor Gasoline', 'Diesel']:
-                print(f'Working on {liquid_fuel} prices for the AEO {aeo_case}')
+                print(f'Working on {liquid_fuel} prices for the {aeo_version} {aeo_case}')
 
                 omega_fuel_id = aeo_to_omega_dict[liquid_fuel]
                 retail_prices = aeo_table_obj.select_table_rows('full name', f'Price Components: {liquid_fuel}: End-User Price', settings.create_results_thru)
@@ -436,7 +440,7 @@ def main():
             # concatenate the fuel prices into one DF
             fuel_context_df = pd.concat([fuel_context_df, case_prices], ignore_index=True, axis=0)
 
-            print(f'Working on market context vehicle attributes for the AEO {aeo_case}')
+            print(f'Working on market context vehicle attributes for the {aeo_version} {aeo_case}')
             attribute = dict()
             attributes_df = return_df(aeo_class_attributes_table, 'full name', aeo_case, aeo_version)
             aeo_table_obj = GetContext(attributes_df)
@@ -481,7 +485,7 @@ def main():
             # work on sales
             sales_df = return_df(aeo_sales_table, 'full name', aeo_case, aeo_version)
             aeo_table_obj = GetContext(sales_df)
-            print(f'Working on market context vehicle sales for the AEO {aeo_case}')
+            print(f'Working on market context vehicle sales for the {aeo_version} {aeo_case}')
             sales_fleet = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total Vehicles Sales', settings.create_results_thru)
             sales_car = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total New Car', settings.create_results_thru)
             sales_truck = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total New Truck', settings.create_results_thru)
@@ -522,7 +526,7 @@ def main():
             # work on vehicle prices
             prices_df = return_df(aeo_vehicle_prices_table, 'full name', aeo_case, aeo_version)
             aeo_table_obj = GetContext(prices_df)
-            print(f'Working on market context vehicle prices for the AEO {aeo_case}')
+            print(f'Working on market context vehicle prices for the {aeo_version} {aeo_case}\n')
             vehicle_prices = dict()
             vehicle_prices['gasoline'] = aeo_table_obj.select_table_rows('full name', 'Gasoline: ', settings.create_results_thru, replace='New Light-Duty Vehicle Prices: Gasoline: ')
             vehicle_prices['electric'] = aeo_table_obj.select_table_rows('full name', '300 Mile Electric Vehicle: ', settings.create_results_thru, replace='New Light-Duty Vehicle Prices: 300 Mile Electric Vehicle: ')
