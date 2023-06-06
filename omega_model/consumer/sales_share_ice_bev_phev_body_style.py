@@ -263,17 +263,69 @@ class SalesShare(OMEGABase, SalesShareBase):
                     market_class_data['consumer_share_frac_%s' % market_class_id] = demanded_share
                     market_class_data['consumer_abs_share_frac_%s' % market_class_id] = demanded_absolute_share
 
-                    # distribute absolute shares to ALT / NO_ALT, NO_ALT first:
-                    for alt in ['NO_ALT', 'ALT']:
-                        share_id = 'consumer_abs_share_frac_%s.%s' % (market_class_id, alt)
-                        if alt == 'NO_ALT':
-                            market_class_data[share_id] = \
-                                min_constraints[share_id.replace('consumer', 'producer')] * parent_share
-                            demanded_absolute_share -= market_class_data[share_id]
-                        else:
-                            market_class_data[share_id] = demanded_absolute_share
+                    # # distribute absolute shares to ALT / NO_ALT, NO_ALT first:
+                    # for alt in ['NO_ALT', 'ALT']:
+                    #     share_id = 'consumer_abs_share_frac_%s.%s' % (market_class_id, alt)
+                    #     if alt == 'NO_ALT':
+                    #         market_class_data[share_id] = \
+                    #             min_constraints[share_id.replace('consumer', 'producer')] * parent_share
+                    #         demanded_absolute_share -= market_class_data[share_id]
+                    #     else:
+                    #         market_class_data[share_id] = demanded_absolute_share
+
+        reconciliation_df = pd.DataFrame()
+        abs_share_columns = []
+        share_columns = []
+        share_names = []
+        for market_class_id in child_market_classes:
+            reconciliation_df['consumer_share_frac_%s' % market_class_id] = \
+                market_class_data['consumer_share_frac_%s' % market_class_id]
+            share_columns.append('consumer_share_frac_%s' % market_class_id)
+            abs_share_columns.append('consumer_abs_share_frac_%s' % market_class_id)
+            share_names.append(market_class_id.replace(parent_market_class + '.', ''))
+
+        min_constraints = omega_globals.constraints['min_constraints_%s' % parent_market_class]
+        max_constraints = omega_globals.constraints['max_constraints_%s' % parent_market_class]
+
+        for N in range(len(share_columns), 0, -1):
+            reconciliation_df['change_needed'] = 1 - reconciliation_df[share_columns].sum(axis=1)
+
+            for share_name, share_col in zip(share_names, share_columns):
+                reconciliation_df[share_col] = reconciliation_df.apply(SalesShare.calc_attempted_share, args=(share_col, min_constraints[share_name], max_constraints[share_name], N), axis=1)
+
+            reconciliation_df['sum'] = reconciliation_df[share_columns].sum(axis=1)
+            # reconciliation_df.to_csv('rdf_%s.csv' % N)
+
+            if all(reconciliation_df['sum'] == 1):
+                break
+
+        for share_name, share_col, abs_share_col in zip(share_names, share_columns, abs_share_columns):
+            market_class_data[share_col] = reconciliation_df[share_col]
+            demanded_absolute_share = market_class_data[share_col] * parent_share
+            market_class_data[abs_share_col] = demanded_absolute_share
+
+            # distribute absolute shares to ALT / NO_ALT, NO_ALT first:
+            for alt in ['NO_ALT', 'ALT']:
+                share_id = '%s.%s' % (abs_share_col, alt)
+                if alt == 'NO_ALT':
+                    market_class_data[share_id] = \
+                        min_constraints[share_id.replace('consumer', 'producer')] * parent_share
+                    demanded_absolute_share -= market_class_data[share_id]
+                else:
+                    market_class_data[share_id] = demanded_absolute_share
 
         return market_class_data.copy()
+
+    @staticmethod
+    def calc_attempted_share(row, share_col, MIN_SHARE, MAX_SHARE, N):
+        if row['change_needed'] < 0:
+            share = max(MIN_SHARE, row[share_col] + row['change_needed'] / N)
+        elif row['change_needed'] > 0:
+            share = min(MAX_SHARE, row[share_col] + row['change_needed'] / N)
+        else:
+            share = row[share_col]
+
+        return share
 
     @staticmethod
     def calc_shares(calendar_year, compliance_id, producer_decision, market_class_data, mc_parent, mc_pair):
