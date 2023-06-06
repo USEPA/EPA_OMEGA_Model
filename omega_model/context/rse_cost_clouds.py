@@ -485,13 +485,6 @@ class CostCloud(OMEGABase, CostCloudBase):
                 vehicle.__setattr__(tf, tech_flags[tf])
 
             if vehicle.bev:
-                rated_hp = vehicle.motor_kw * 1.34102
-            elif vehicle.ice:
-                rated_hp = vehicle.base_year_eng_rated_hp
-            else:  # PHEV, MHEV, HEV RV
-                rated_hp = vehicle.base_year_eng_rated_hp + vehicle.motor_kw * 1.34102
-
-            if vehicle.bev:
                 vehicle.powertrain_type = 'BEV'
             elif vehicle.hev or vehicle.mhev:  # mhev/hev have same mass calcs for now
                 vehicle.powertrain_type = 'HEV'
@@ -511,9 +504,10 @@ class CostCloud(OMEGABase, CostCloudBase):
                             cloud_point['powertrain_type'] = vehicle.powertrain_type
 
                             # ------------------------------------------------------------------------------------#
-                            prior_powertrain_mass_lbs = 1
+                            rated_hp = 1
                             prior_rated_hp = 1
                             prior_battery_kwh = 1
+                            prior_powertrain_mass_lbs = 1
 
                             converged = False
                             while not converged:
