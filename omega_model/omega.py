@@ -1002,7 +1002,7 @@ def calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict,
 
     """
     # calculate sales-weighted values by market class
-    weight_by = 'initial_registered_count'
+    weight_by = 'market_class_share_frac'
 
     for mc in omega_globals.options.MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
