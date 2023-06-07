@@ -1,4 +1,4 @@
-input_template_name:,powertrain_cost,input_template_version:,0.1,description:,20230224 add battery_GWh_cost_curve
+input_template_name:,powertrain_cost,input_template_version:,0.1,description:,20230314 updated battery_offset values; 20230517 added phev battery offset; updated PHEV battery cost using NPRM @250K curve
 powertrain_type,item,value,quantity,dollar_basis,notes
 ALL,dollars_per_cylinder,((-28.814) * CYL + 726.27) * CYL * MARKUP_ICE,,2019,
 ALL,dollars_per_liter,((400) * LITERS) * MARKUP_ICE,,2019,
@@ -35,10 +35,11 @@ ALL,ac_leakage,(63) * MARKUP_ALL,,2010,
 ICE,LV_battery,((3) * VEHICLE_SIZE_CLASS + 51) * MARKUP_ICE,1,2019,set equal to electrified vehicle values
 ICE,HVAC,((11.5) * VEHICLE_SIZE_CLASS + 195.5) * MARKUP_ICE,1,2019,set equal to electrified vehicle values
 BEV,battery,261.61 * (KWH ** -0.184) * KWH * MARKUP_BEV,,2019,KWH denotes gross kWh; coefficients denote 250K production volume
-BEV,battery_offset,"{""dollars_per_kwh"": {2023: -45, 2024: -45, 2025: -45, 2026: -45, 2027: -45, 2028: -45, 2029: -45, 2030: -33.75, 2031: -22.50, 2032: -11.25}}",,,
-PHEV,battery,261.61 * (KWH ** -0.184) * KWH * MARKUP_PHEV,,2019,KWH denotes gross kWh; coefficients denote 250K production volume
-HEV,battery,"max(((-250.72) * KWH + 1058.2), 532) * KWH * MARKUP_HEV",,2017,
-MHEV,battery,"max(((-250.72) * KWH + 1058.2), 532) * KWH * MARKUP_HEV",,2017,
+BEV,battery_offset,"{""dollars_per_kwh"": {2020: 0}}",,,
+PHEV,battery_offset,"{""dollars_per_kwh"": {2020: 0}}",,,
+PHEV,battery,658.48 * (KWH ** -0.45) * KWH * MARKUP_PHEV,,2019,KWH denotes gross kWh; coefficients denote 250K production volume
+HEV,battery,(936.1) * KWH ** -0.802 * KWH * MARKUP_HEV,,2019,20221028 MSa
+MHEV,battery,(936.1) * KWH ** -0.802 * KWH * MARKUP_HEV,,2019,20221028 MSa
 BEV,motor_single,((4.29) * KW) * MARKUP_BEV,1,2019,Costing_Guide_BEV_HEV_Draft_04_30_2021.xlsx
 BEV,inverter_single,((2.5) * KW) * MARKUP_BEV,1,2019,ibid
 BEV,induction_motor_single,(0) * 1,0,2019,ibid
@@ -132,6 +133,7 @@ ICE,sales_scaler,(1.5) * 1,,,
 PEV,sales_scaler,(6.6) * 1,,,
 ALL,turb_scaler,(1.2) * 1,,,
 ALL,battery_cost_scalers,"{""scaler"": {2019: 1, 2025: 1, 2029: 0.75, 2035: 0.625, 2050: 0.538, 2060: 0.538}}",,,
-ALL,diesel_aftertreatment_system,(700) * LITERS* MARKUP_ICE,,2020,HD2027 NPRM
+ALL,diesel_aftertreatment_system,(700) * LITERS * MARKUP_ICE,,2020,HD2027 NPRM
 ALL,diesel_engine_cost_scaler,(1.5) * 1,,,"diesel engine cost = (engine_cylinder_cost + engine_displacement_cost) * diesel_engine_cost_scaler; i.e., 1.5 times the gasoline engine cost of equivalent size"
-PEV,battery_GWh_learning_curve,(1.3954 * CUMULATIVE_GWH ** -0.095) ,,,
+PEV,battery_GWh_learning_curve,(4.1917 * CUMULATIVE_GWH ** -0.225) ,,,
+PEV,cumulative_GWh_LD_noIRA,"{""GWh"": {2022: 26, 2023: 110, 2024: 265, 2025: 500, 2026: 818, 2027: 1132, 2028: 1433, 2029: 1744, 2030: 2075, 2031: 2410, 2032: 2758}}",,,D:\TSh\omega\runs\2023_03_01_15_39_43_central_3alts_20230301\_NTR-noIRA\out\2023_03_01_15_39_43_central_3alts_20230301_NTR-noIRA_summary_results.csv
