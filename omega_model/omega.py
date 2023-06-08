@@ -456,7 +456,7 @@ def calc_cross_subsidy_metrics(mcat, cross_subsidy_group, producer_decision, cro
             cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mc].values)
 
         _cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] += \
-            0.5 * _cross_subsidy_options_and_response['abs_share_delta_%s' % mc]
+            _cross_subsidy_options_and_response['abs_share_delta_%s' % mc]
 
     _cross_subsidy_options_and_response['pricing_price_ratio_delta_%s' % mcat] = \
         abs(1 - _cross_subsidy_options_and_response['average_ALT_cross_subsidized_price_%s' % mcat] /
