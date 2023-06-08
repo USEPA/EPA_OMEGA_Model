@@ -389,13 +389,13 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                                             omega_globals.price_modification_data[nmc_]
                                                 for k in min_constraints.keys():
                                                     if '.ALT' in k:
-                                                        if 'p-c_shares_and_costs' in \
-                                                                omega_globals.options.verbose_console_modules:
-                                                            print('%50s, %.5f, %.5f, %.5f, %.5f' %
-                                                                  (k, min_constraints[k], max_constraints[k],
-                                                                   consumer_response[k] / node_abs_share,
-                                                                   consumer_response[k.replace('producer', 'consumer')]
-                                                                   / consumer_node_abs_share))
+                                                        # if 'p-c_shares_and_costs' in \
+                                                        #         omega_globals.options.verbose_console_modules:
+                                                        #     print('%50s, %.5f, %.5f, %.5f, %.5f' %
+                                                        #           (k, min_constraints[k], max_constraints[k],
+                                                        #            consumer_response[k] / node_abs_share,
+                                                        #            consumer_response[k.replace('producer', 'consumer')]
+                                                        #            / consumer_node_abs_share))
                                                         min_constraints[k] = \
                                                             (consumer_response[k.replace('producer', 'consumer')] /
                                                              consumer_node_abs_share)
