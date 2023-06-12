@@ -62,6 +62,7 @@ class EmissionRatesRefinery:
         self._data = dict()  # private dict
         self._cache = dict()
         self.calendar_year_max = None
+        self.deets = {}  # this dictionary will not include the legacy fleet
 
     def init_from_file(self, filepath, effects_log):
         """
@@ -99,12 +100,13 @@ class EmissionRatesRefinery:
 
         self._data = df.to_dict('index')
 
-    def get_emission_rate(self, calendar_year, rate_names):
+    def get_emission_rate(self, session_settings, calendar_year, rate_names):
         """
 
         Get emission rates by calendar year
 
         Args:
+            session_settings: an instance of the SessionSettings class
             calendar_year (int): calendar year for which to get emission rates
             rate_names (str, [strs]): name of emission rate(s) to get
 
@@ -127,6 +129,15 @@ class EmissionRatesRefinery:
 
                 return_rates.append(rate)
 
+                self.deets.update(
+                    {(calendar_year, rate_name): {
+                        'session_policy': session_settings.session_policy,
+                        'session_name': session_settings.session_name,
+                        'calendar_year': calendar_year,
+                        'rate_name': rate_name,
+                        'rate': rate,
+                    }}
+                )
             self._cache[calendar_year] = return_rates
 
         return return_rates

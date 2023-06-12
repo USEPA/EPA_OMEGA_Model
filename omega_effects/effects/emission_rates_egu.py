@@ -104,12 +104,14 @@ class EmissionRatesEGU:
 
     """
     def __init__(self):
-        self._data = dict()  # private dict, emissions factors power sector by calendar year
+        self._data = {}  # private dict, emissions factors power sector by calendar year
         self._cases = None
-        self._cache = dict()
+        self._cache = {}
+        self.calendar_year_min = None
         self.calendar_year_max = None
         self.kwh_demand_metric = None
         self.kwh_consumption_metric = None
+        self.deets = {}  # this dictionary will not include the legacy fleet
 
     def init_from_file(self, filepath, effects_log):
         """
@@ -155,18 +157,22 @@ class EmissionRatesEGU:
         self._cases = df['case'].unique()
         self.kwh_demand_metric = df['kwh_demand_metric'][0]
         self.kwh_consumption_metric = df['kwh_consumption_metric'][0]
+        self.calendar_year_min = df['initial_year'][0]
         self.calendar_year_max = df['last_year'][0]
 
         self._data = df.to_dict('index')
 
-    def get_emission_rate(self, calendar_year, kwh_session, rate_names):
+    def get_emission_rate(self, session_settings, cyear,
+                          session_kwh_consumption, session_kwh_generation, rate_names):
         """
 
         Get emission rates by calendar year
 
         Args:
-            calendar_year (int): calendar year for which to get emission rates
-            kwh_session (numeric): the session kWh to use (e.g., kwh_consumption or kwh_generation; this is omega-only)
+            session_settings: an instance of the SessionSettings class
+            cyear (int): calendar year for which to get emission rates
+            session_kwh_consumption (numeric): the session kWh to use (e.g., kwh_consumption or kwh_generation; this is omega-only)
+            session_kwh_generation (numeric): the session kWh generation needed to satisfy kwh_session.
             rate_names (str, [strs]): name of emission rate(s) to get
 
         Returns:
@@ -178,11 +184,17 @@ class EmissionRatesEGU:
 
         kwh_demand_low = kwh_demand_high = kwh_low_bound = 0
 
-        if calendar_year > self.calendar_year_max:
+        if cyear < self.calendar_year_min:
+            calendar_year = self.calendar_year_min
+        elif cyear > self.calendar_year_max:
             calendar_year = self.calendar_year_max
+        else:
+            calendar_year = cyear
 
-        if calendar_year in self._cache:
-            return_rates = self._cache[calendar_year]
+        locals_dict.update({'calendar_year': calendar_year})
+
+        if cyear in self._cache:
+            return_rates = self._cache[cyear]
 
         else:
             kwh_demand_low \
@@ -194,25 +206,48 @@ class EmissionRatesEGU:
             kwh_low_bound \
                 = eval(self._data['low_bound', rate_names[0]]['equation_kwh_consumption_metric'], {}, locals_dict)
 
-            # back out the low-bound consumption provided to IPM to establish a base without the low bound omega demand
+            # back out the low-bound consumption provided to IPM to establish a base
             kwh_base = kwh_demand_low - kwh_low_bound
 
-            # add the kwh_session to the new kwh base value to determine the US demand for the session
-            kwh_session += kwh_base
+            # add the kwh_session to the new kwh base value to determine the US base plus omega session consumption
+            us_kwh_generation = session_kwh_generation + kwh_base
 
             for idx, rate_name in enumerate(rate_names):
+
+                self.deets.update(
+                    {(cyear, rate_name): {
+                        'session_policy': session_settings.session_policy,
+                        'session_name': session_settings.session_name,
+                        'calendar_year': cyear,
+                        'kwh_demand_low': kwh_demand_low,
+                        'kwh_demand_high': kwh_demand_high,
+                        'kwh_low_bound': kwh_low_bound,
+                        'kwh_base': kwh_base,
+                        'us_kwh_generation': us_kwh_generation,
+                        'fleet_kwh_consumption': session_kwh_consumption,
+                        'fleet_kwh_generation': session_kwh_generation,
+                        'rate_name': rate_name,
+                    }})
                 rate_low = eval(self._data['low_bound', rate_name]['equation_rate_id'], {}, locals_dict)
                 rate_high = eval(self._data['high_bev', rate_name]['equation_rate_id'], {}, locals_dict)
 
                 # interpolate the rate for kwh_demand
-                rate = (rate_low - (kwh_demand_low - kwh_session) * (rate_low - rate_high) /
-                       (kwh_demand_low - kwh_demand_high))
+                rate = rate_low - (kwh_demand_low - us_kwh_generation) * (rate_low - rate_high) / \
+                       (kwh_demand_low - kwh_demand_high)
 
                 if rate <= 0:
-                    rate = self._cache[calendar_year - 1][idx]
+                    rate = self._cache[cyear - 1][idx]
 
                 return_rates.append(rate)
 
-            self._cache[calendar_year] = return_rates
+                self.deets[cyear, rate_name].update({
+                    'rate_low': rate_low,
+                    'rate_high': rate_high,
+                    'rate': rate,
+                    'US_inventory_grams_excl_legacy_fleet': rate * us_kwh_generation,
+                    'analysis_fleet_inventory_grams': rate * session_kwh_generation,
+                })
+
+            self._cache[cyear] = return_rates
 
         return return_rates

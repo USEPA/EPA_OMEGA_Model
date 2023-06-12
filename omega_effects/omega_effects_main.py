@@ -103,6 +103,9 @@ def main():
         # loop thru sessions to calc safety effects, physical effects, cost effects for each ___________________________
         annual_safety_df = pd.DataFrame()
         annual_physical_df = pd.DataFrame()
+        vehicle_inventory_details_df = pd.DataFrame()
+        egu_inventory_details_df = pd.DataFrame()
+        refinery_inventory_details_df = pd.DataFrame()
         annual_costs_df = pd.DataFrame()
         my_lifetime_physical_df = pd.DataFrame()
         my_lifetime_costs_df = pd.DataFrame()
@@ -183,6 +186,21 @@ def main():
             my_lifetime_physical_df = \
                 pd.concat([my_lifetime_physical_df, session_my_period_physical_df], axis=0, ignore_index=True)
             my_lifetime_physical_df.reset_index(inplace=True, drop=True)
+
+            session_vehicle_inventory_details_df = pd.DataFrame.from_dict(
+                session_settings.emission_rates_vehicles.deets, orient='index').reset_index(drop=True)
+            vehicle_inventory_details_df = pd.concat(
+                [vehicle_inventory_details_df, session_vehicle_inventory_details_df], axis=0, ignore_index=True)
+
+            session_egu_inventory_details_df = pd.DataFrame.from_dict(
+                session_settings.emission_rates_egu.deets, orient='index').reset_index(drop=True)
+            egu_inventory_details_df = pd.concat(
+                [egu_inventory_details_df, session_egu_inventory_details_df], axis=0, ignore_index=True)
+
+            session_refinery_inventory_details_df = pd.DataFrame.from_dict(
+                session_settings.emission_rates_refinery.deets, orient='index').reset_index(drop=True)
+            refinery_inventory_details_df = pd.concat(
+                [refinery_inventory_details_df, session_refinery_inventory_details_df], axis=0, ignore_index=True)
 
             # cost effects _____________________________________________________________________________________________
             effects_log.logwrite(f'\nCalculating cost effects for {session_name}')
@@ -312,6 +330,15 @@ def main():
         my_lifetime_costs_df.to_csv(
             path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', index=False
         )
+        vehicle_inventory_details_df.to_csv(
+            path_of_run_folder / f'{start_time_readable}_vehicle_inventory_details.csv', index=False
+        )
+        egu_inventory_details_df.to_csv(
+            path_of_run_folder / f'{start_time_readable}_egu_inventory_details.csv', index=False
+        )
+        refinery_inventory_details_df.to_csv(
+            path_of_run_folder / f'{start_time_readable}_refinery_inventory_details.csv', index=False
+        )
 
         # add identifying info to CSV files ____________________________________________________________________________
         output_file_id_info = \
@@ -332,6 +359,9 @@ def main():
                           output_file_id_info)
         add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv', output_file_id_info)
         add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', output_file_id_info)
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_vehicle_inventory_details.csv', output_file_id_info)
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_egu_inventory_details.csv', output_file_id_info)
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_refinery_inventory_details.csv', output_file_id_info)
 
     except Exception as e:
         effects_log.logwrite(f'*** {e} ***\n{traceback.format_exc()}\n', stamp=True)

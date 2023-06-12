@@ -96,26 +96,28 @@ def get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg
     else:
         rate_names = []
 
-    rates = session_settings.emission_rates_vehicles.get_emission_rate(model_year, sourcetype_name, reg_class_id, fuel,
-                                                                       ind_var_value, *rate_names)
+    rates = session_settings.emission_rates_vehicles.get_emission_rate(
+        session_settings, model_year, sourcetype_name, reg_class_id, fuel, ind_var_value, *rate_names
+    )
 
     return rates
 
 
-def get_egu_emission_rate(session_settings, calendar_year, kwh_consumption):
+def get_egu_emission_rate(session_settings, calendar_year, kwh_consumption, kwh_generation):
     """
 
     Args:
         session_settings: an instance of the SessionSettings class.
         calendar_year (int): The calendar year for which egu emission rates are needed.
-        kwh_consumption (float): The energy consumed by the fleet measured at the wall or charger outlet
+        kwh_consumption (float): The energy consumed by the fleet measured at the wall or charger outlet.
+        kwh_generation (float): The energy generation required to satisfy kwh_consumption.
 
     Returns:
         A list of EGU emission rates for the given calendar year.
 
     """
-    kwh_session = kwh_consumption
-
+    # kwh_session = kwh_consumption
+    #
     rate_names = (
         'voc_grams_per_kwh',
         'co_grams_per_kwh',
@@ -129,7 +131,9 @@ def get_egu_emission_rate(session_settings, calendar_year, kwh_consumption):
         'hg_grams_per_kwh',
     )
 
-    return session_settings.emission_rates_egu.get_emission_rate(calendar_year, kwh_session, rate_names)
+    return session_settings.emission_rates_egu.get_emission_rate(
+        session_settings, calendar_year, kwh_consumption, kwh_generation, rate_names
+    )
 
 
 def get_refinery_emission_rate(session_settings, calendar_year):
@@ -150,7 +154,7 @@ def get_refinery_emission_rate(session_settings, calendar_year):
         'sox_grams_per_gallon',
     )
 
-    return session_settings.emission_rates_refinery.get_emission_rate(calendar_year, emission_rates)
+    return session_settings.emission_rates_refinery.get_emission_rate(session_settings, calendar_year, emission_rates)
 
 
 def get_refinery_ef(session_settings, calendar_year, fuel):
@@ -315,10 +319,18 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
             if onroad_direct_kwh_per_mile:
                 fuel_consumption_kwh_annual += v['vmt'] * onroad_direct_kwh_per_mile
 
+        transmission_efficiency = \
+            batch_settings.onroad_fuels.get_fuel_attribute(
+                calendar_year, 'US electricity', 'transmission_efficiency'
+            )
+        fuel_generation_kwh_annual = fuel_consumption_kwh_annual / transmission_efficiency
+
         # upstream EGU emission rates for this calendar year to apply to electric fuel operation
         voc_egu_rate, co_egu_rate, nox_egu_rate, pm25_egu_rate, sox_egu_rate, \
             co2_egu_rate, ch4_egu_rate, n2o_egu_rate, hcl_egu_rate, hg_egu_rate = \
-            get_egu_emission_rate(session_settings, calendar_year, fuel_consumption_kwh_annual)
+            get_egu_emission_rate(
+                session_settings, calendar_year, fuel_consumption_kwh_annual, fuel_generation_kwh_annual
+            )
 
         # this loops thru vehicles this calendar year to calc physical effects for this calendar year
         for v in adjusted_vads:
@@ -405,12 +417,12 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                 if veh_rates_by == 'odometer':
                     ind_var_value = v['odometer']
 
-                # calc fuel consumption and get emission rates
+                # calc fuel consumption and update emission rates
                 if onroad_direct_kwh_per_mile:
                     fuel_consumption_kwh = v['vmt'] * onroad_direct_kwh_per_mile
                     transmission_efficiency = \
                         batch_settings.onroad_fuels.get_fuel_attribute(
-                            calendar_year, fuel, 'transmission_efficiency'
+                            calendar_year, 'US electricity', 'transmission_efficiency'
                         )
                     fuel_generation_kwh = fuel_consumption_kwh / transmission_efficiency
 
@@ -715,14 +727,14 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             fuel_consumption_kwh = v['vmt'] * onroad_direct_kwh_per_mile
             transmission_efficiency = \
                 batch_settings.onroad_fuels.get_fuel_attribute(
-                    v['calendar_year'], fuel, 'transmission_efficiency'
+                    v['calendar_year'], 'US electricity', 'transmission_efficiency'
                 )
             fuel_generation_kwh = fuel_consumption_kwh / transmission_efficiency
 
             # the energy consumption and generation values do not matter here, so set to 0
             voc_egu_rate, co_egu_rate, nox_egu_rate, pm25_egu_rate, sox_egu_rate, \
                 co2_egu_rate, ch4_egu_rate, n2o_egu_rate, hcl_egu_rate, hg_egu_rate = \
-                get_egu_emission_rate(session_settings, v['calendar_year'], 0)
+                get_egu_emission_rate(session_settings, v['calendar_year'], 0, 0)
 
             vehicle_data.update_value({
                 'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
