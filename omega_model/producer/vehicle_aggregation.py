@@ -82,7 +82,7 @@ Data Column Name and Description
         Vehicle body structure; 1 = unibody, 0 = body-on-frame
 
     :drive_system:
-        Vehicle drive system, 2=FWD/RWD, 4=AWD
+        Vehicle drive system, FWD, RWD, AWD
 
     :dual_rear_wheel:
         = 1 if vehicle has dual rear wheels, i.e. 'duallies', = 0 otherwise
@@ -325,7 +325,7 @@ class VehicleAggregation(OMEGABase):
                                                   "{'US electricity':1.0}"],
                                'cert_fuel_id': ["{'gasoline':1.0}", "{'diesel':1.0}", "{'hydrogen':1.0}",
                                                 "{'electricity':1.0}"],
-                               'drive_system': [2, 4],  # RV
+                               'drive_system': ['FWD', 'RWD', 'AWD'],  # [2, 4],  # RV
                                'dual_rear_wheel': [0, 1],
                                'high_eff_alternator': [0, 1],
                                'start_stop': [0, 1],
@@ -381,8 +381,8 @@ class VehicleAggregation(OMEGABase):
             df['motor_kw'] = df[['base_year_powertrain_type']].\
                 replace({'base_year_powertrain_type': {'HEV': 20,
                                              'PHEV': 50,
-                                             'BEV': 150 + (100 * (df['drive_system'] == 4)),
-                                             'FCV': 150 + (100 * (df['drive_system'] == 4)),
+                                             'BEV': 150 + (100 * (df['drive_system'] == 'AWD')),
+                                             'FCV': 150 + (100 * (df['drive_system'] == 'AWD')),
                                              'ICE': 0}})
 
             # RV
