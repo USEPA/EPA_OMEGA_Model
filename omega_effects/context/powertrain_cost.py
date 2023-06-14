@@ -53,8 +53,7 @@ Data Column Name and Description
 
 """
 from omega_effects.general.general_functions import read_input_file
-from omega_effects.general.input_validation import \
-    validate_template_version_info, validate_template_column_names
+from omega_effects.general.input_validation import validate_template_version_info, validate_template_column_names
 
 
 class PowertrainCost:
@@ -111,10 +110,11 @@ class PowertrainCost:
 
             cost_info = df[(df['powertrain_type'] == powertrain_type) & (df['item'] == item)].iloc[0]
 
-            self._data[cost_key] = {'value': dict(),
-                                    'quantity': 0,
-                                    'dollar_adjustment': 1}
-
+            self._data[cost_key] = {
+                'value': dict(),
+                'quantity': 0,
+                'dollar_adjustment': 1
+            }
             self._data[cost_key]['value'] = compile(str(cost_info['value']), '<string>', 'eval')
 
     def get_battery_tax_offset(self, year, battery_kwh, powertrain_type):

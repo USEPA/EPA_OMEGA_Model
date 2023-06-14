@@ -71,10 +71,8 @@ Data Column Name and Description
 **CODE**
 
 """
-
 from omega_effects.general.general_functions import read_input_file
-from omega_effects.general.input_validation import \
-    validate_template_version_info, validate_template_column_names
+from omega_effects.general.input_validation import validate_template_version_info, validate_template_column_names
 
 _cache = dict()
 
@@ -85,9 +83,10 @@ class EmissionRatesVehicles:
 
     """
     def __init__(self):
-        self._data = dict()  # private dict, emission factors vehicles by model year, age, legacy reg class ID and in-use fuel ID
+        self._data = dict()
         self._cache = dict()
         self.startyear_min = 0
+        self.deets = {}  # this dictionary will not include the legacy fleet
 
     def init_from_file(self, filepath, effects_log):
         """
@@ -139,10 +138,12 @@ class EmissionRatesVehicles:
             rate_eq = self._data[rate_key]['equation']
             self._data[rate_key].update({'equation': compile(rate_eq, '<string>', 'eval')})
 
-    def get_emission_rate(self, model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age, *rate_names):
+    def get_emission_rate(self, session_settings, model_year, sourcetype_name, reg_class_id,
+                          in_use_fuel_id, age, *rate_names):
         """
 
         Args:
+            session_settings: an instance of the SessionSettings class
             model_year (int): vehicle model year for which to get emission factors
             sourcetype_name (str): the MOVES sourcetype name (e.g., 'passenger car', 'light commercial truck')
             reg_class_id (str): the regulatory class, e.g., 'car' or 'truck'
@@ -198,6 +199,19 @@ class EmissionRatesVehicles:
 
                 self._cache[cache_key] = rate
 
+                self.deets.update(
+                    {cache_key: {
+                        'session_policy': session_settings.session_policy,
+                        'session_name': session_settings.session_name,
+                        'model_year': model_year,
+                        'age': age,
+                        'reg_class_id': reg_class_id,
+                        'sourcetype_name': sourcetype_name,
+                        'in_use_fuel_id': in_use_fuel_id,
+                        'rate_name': rate_name,
+                        'rate': rate,
+                    }}
+                )
             return_rates.append(rate)
 
         return return_rates

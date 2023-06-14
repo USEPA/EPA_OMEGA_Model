@@ -82,8 +82,7 @@ Data Column Name and Description
 
 """
 from omega_effects.general.general_functions import read_input_file
-from omega_effects.general.input_validation import \
-    validate_template_version_info, validate_template_column_names
+from omega_effects.general.input_validation import validate_template_version_info, validate_template_column_names
 
 
 class LegacyFleet:
@@ -96,7 +95,7 @@ class LegacyFleet:
         Loads and provides access to legacy fleet data by model year and age.
 
         """
-        self._data = {}  # private dict, the legacy_fleet_file data
+        self._data = {}  # the legacy_fleet_file data
         self._legacy_fleet = {}  # the built legacy fleet for the analysis
         self.adjusted_legacy_fleet = {}
         self.legacy_fleet_calendar_year_max = 0
@@ -272,38 +271,31 @@ class LegacyFleet:
             There is no rebound VMT calculated for the legacy fleet.
 
         """
-        self.adjusted_legacy_fleet = {}
-
-        calendar_years = batch_settings.calendar_years
-
         for v in self._legacy_fleet.values():
 
-            vehicle_id, calendar_year, age = v['vehicle_id'], v['calendar_year'], v['age']
-            registered_count = v['registered_count']
-
             # adjust vmt and legacy fleet stock
-            calendar_year_vmt_adj = vmt_adjustments_session.get_vmt_adjustment(calendar_year)
-            vmt_adjusted = v['vmt'] * calendar_year_vmt_adj
+            context_vmt_adjustment = vmt_adjustments_session.get_vmt_adjustment(v['calendar_year'])
+            vmt_adjusted = v['vmt'] * context_vmt_adjustment
 
-            calendar_year_stock_adj = vmt_adjustments_session.get_stock_adjustment(calendar_year)
-            stock_adjusted = registered_count * calendar_year_stock_adj
+            context_stock_adj = vmt_adjustments_session.get_stock_adjustment(v['calendar_year'])
+            adjusted_registered_count = v['registered_count'] * context_stock_adj
 
-            annual_vmt_adjusted = vmt_adjusted / stock_adjusted
+            annual_vmt_adjusted = vmt_adjusted / adjusted_registered_count
 
-            if v['calendar_year'] == calendar_years[0]:
+            if v['calendar_year'] == batch_settings.analysis_initial_year:
                 annual_vmt = v['annual_vmt']
                 odometer = v['odometer']
                 odometer_adjusted = odometer - annual_vmt + annual_vmt_adjusted
             else:
-                odometer_last_year = self.get_adjusted_legacy_fleet_odometer(vehicle_id, calendar_year - 1)
+                odometer_last_year = self.get_adjusted_legacy_fleet_odometer(v['vehicle_id'], v['calendar_year'] - 1)
                 odometer_adjusted = odometer_last_year + annual_vmt_adjusted
 
             update_dict = {
-                'vehicle_id': vehicle_id,
-                'age': age,
-                'calendar_year': calendar_year,
-                'registered_count': stock_adjusted,
-                'context_vmt_adjustment': calendar_year_vmt_adj,
+                'vehicle_id': v['vehicle_id'],
+                'age': v['age'],
+                'calendar_year': v['calendar_year'],
+                'registered_count': adjusted_registered_count,
+                'context_vmt_adjustment': context_vmt_adjustment,
                 'annual_vmt': annual_vmt_adjusted,
                 'odometer': odometer_adjusted,
                 'vmt': vmt_adjusted,
@@ -315,4 +307,4 @@ class LegacyFleet:
                 'miles_per_gallon': v['miles_per_gallon'],
                 'kwh_per_mile': v['kwh_per_mile'],
             }
-            self.adjusted_legacy_fleet[(vehicle_id, calendar_year)] = update_dict
+            self.adjusted_legacy_fleet[(v['vehicle_id'], v['calendar_year'])] = update_dict

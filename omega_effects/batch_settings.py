@@ -41,7 +41,6 @@ class BatchSettings:
     Settings that apply to the whole batch of effects to run.
 
     """
-
     def __init__(self):
         self.batch_df = pd.DataFrame()
         self.batch_program = None
