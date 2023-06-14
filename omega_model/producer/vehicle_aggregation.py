@@ -387,7 +387,9 @@ class VehicleAggregation(OMEGABase):
 
             # RV
             df['charge_depleting_range_mi'] = df[['base_year_powertrain_type']].\
-                replace({'base_year_powertrain_type': {'HEV': 0, 'PHEV': 50, 'BEV': 300, 'FCV': 300, 'ICE': 0}})
+                replace({'base_year_powertrain_type': {'HEV': 0, 'PHEV': omega_globals.options.phev_range_mi,
+                                                       'BEV': omega_globals.options.bev_range_mi,
+                                                       'FCV': 300, 'ICE': 0}})
 
             # need to determine vehicle trans / techs
             df['engine_cylinders'] = df['engine_cylinders']  # RV

@@ -158,7 +158,9 @@ try:
             self.analysis_dollar_basis = 2020
 
             self.allow_ice_of_bev = False
-            self.use_rse_phev_battery_kwh = False
+            self.phev_battery_kwh = None  # 'RSE' -> use RSE, None -> use range calc, otherwise use scalar value
+            self.phev_range_mi = 50
+            self.bev_range_mi = 300
 
             self.ip_deflators_file = path + 'test_inputs/implicit_price_deflators.csv'
 

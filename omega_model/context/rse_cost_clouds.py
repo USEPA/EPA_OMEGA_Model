@@ -547,9 +547,15 @@ class CostCloud(OMEGABase, CostCloudBase):
                                     cloud_point = vehicle.calc_battery_sizing_onroad_direct_kWh_per_mile(cloud_point)
 
                                     if vehicle.powertrain_type == 'PHEV' and \
-                                            omega_globals.options.use_rse_phev_battery_kwh:
+                                            omega_globals.options.phev_battery_kwh == 'RSE':
+                                        # use nominal size from RSE
                                         battery_kwh = cloud_point['hev_batt_kwh']
+                                    elif vehicle.powertrain_type == 'PHEV' and \
+                                            omega_globals.options.phev_battery_kwh is not None:
+                                        # override battery size by kWh
+                                        battery_kwh = omega_globals.options.phev_battery_kwh
                                     else:
+                                        # BEVs and range-sized PHEVs
                                         battery_kwh = vehicle.charge_depleting_range_mi * \
                                                       cloud_point['battery_sizing_onroad_direct_kwh_per_mile'] / \
                                                       usable_battery_capacity_norm

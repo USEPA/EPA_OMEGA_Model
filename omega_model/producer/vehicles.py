@@ -1693,7 +1693,7 @@ class VehicleFinal(SQABase, Vehicle):
                     if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
                         alt_veh.charge_depleting_range_mi = 150
                     else:
-                        alt_veh.charge_depleting_range_mi = 300  # RV
+                        alt_veh.charge_depleting_range_mi = omega_globals.options.bev_range_mi  # RV
                     alt_veh.base_year_eng_rated_hp = 0
                     alt_veh.engine_cylinders = 0
                     alt_veh.engine_displacement_liters = 0
@@ -1714,7 +1714,7 @@ class VehicleFinal(SQABase, Vehicle):
                     if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
                         alt_veh.charge_depleting_range_mi = 25  # RV
                     else:
-                        alt_veh.charge_depleting_range_mi = 50  # RV
+                        alt_veh.charge_depleting_range_mi = omega_globals.options.phev_range_mi  # RV
                     alt_veh.base_year_eng_rated_hp = v.base_year_eng_rated_hp
                     alt_veh.engine_cylinders = v.engine_cylinders
                     alt_veh.engine_displacement_liters = v.engine_displacement_liters
