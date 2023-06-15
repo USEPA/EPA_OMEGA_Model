@@ -798,17 +798,17 @@ context inputs as shown in :numref:`effects_module_figure`.
     Overview of the Effects Module
 
 * Key examples of physical effects that OMEGA will estimate:
-	* Stock of registered vehicles, along with key attributes
-	* VMT of registered vehicles
-	* Tailpipe GHG and criteria pollutant emissions
-	* Upstream (refinery, power sector) GHG and criteria pollutant emissions
+    * Stock of registered vehicles, along with key attributes
+    * VMT of registered vehicles
+    * Tailpipe GHG and criteria pollutant emissions
+    * Upstream (refinery, power sector) GHG and criteria pollutant emissions
 * Key examples of monetized effects that OMEGA will estimate:
-	* Vehicle production costs
-	* Vehicle ownership and operation costs, including fuel and maintenance
-	* Other consumer effects
-	* Impacts of criteria air pollutants
-	* Impacts of greenhouse gas pollutants
-	* Congestion, noise, and safety costs
+    * Vehicle production costs
+    * Vehicle ownership and operation costs, including fuel and maintenance
+    * Other consumer effects
+    * Impacts of criteria air pollutants
+    * Impacts of greenhouse gas pollutants
+    * Congestion, noise, and safety costs
 
 The Effects Module generates: physical effects, cost effects, safety effects, benefits and social effects. In general, the cost effects and benefits output files build upon the physical effects output file in conjunction with several of the context input files. Those context input files are the cost factor and emission rate input files. For example, the benefits file would present CO2-related benefits as the CO2 cost factor (a social cost of carbon per metric ton value set in the input file) multiplied by the emission impacts of CO2 (or other GHG) calculated using physical effects. Similarly, fuel costs would be calculated as fuel prices (dollars/gallon as provided in the input file) multiplied by gallons consumed as presented in the physical effects file.
 

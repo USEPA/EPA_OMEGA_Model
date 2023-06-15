@@ -157,7 +157,7 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
             pm25_up_Wu_3_benefit_dollars = sox_up_Wu_3_benefit_dollars = nox_up_Wu_3_benefit_dollars = 0
             pm25_up_Wu_7_benefit_dollars = sox_up_Wu_7_benefit_dollars = nox_up_Wu_7_benefit_dollars = 0
             pm25_up_Pope_3_benefit_dollars = sox_up_Pope_3_benefit_dollars = nox_up_Pope_3_benefit_dollars = 0
-            pm25_up_Pope_7_benefit_dollars = sox_up_Pope_7_benefit_dollars = nox_up_Pope_7_benefit_dollars =0
+            pm25_up_Pope_7_benefit_dollars = sox_up_Pope_7_benefit_dollars = nox_up_Pope_7_benefit_dollars = 0
     
             fuel_dict = eval(in_use_fuel_id)
             fuel = [item for item in fuel_dict.keys()][0]

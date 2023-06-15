@@ -1,3 +1,7 @@
+"""
+    Vehicle Physical Effects
+
+"""
 
 
 class VehiclePhysicalData:
