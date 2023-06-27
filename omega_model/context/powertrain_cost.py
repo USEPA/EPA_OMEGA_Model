@@ -150,12 +150,20 @@ class PowertrainCost(OMEGABase):
                 if model_year - 1 in cumulative_GWh_ld_dict['GWh']:
                     gwh = cumulative_GWh_ld_dict['GWh'][model_year - 1]
                     locals_dict.update({'CUMULATIVE_GWH': vehicle.global_cumulative_battery_GWh[model_year - 1] + gwh})
+                    learning_pev_battery_scaling_factor = eval(_cache['PEV', 'battery_GWh_learning_curve']['value'],
+                                                               {'np': np}, locals_dict)
+                    if learning_pev_battery_scaling_factor > 1:
+                        gwh += cumulative_GWh_ld_dict['GWh'][model_year - 2]
+                        locals_dict.update(
+                            {'CUMULATIVE_GWH': vehicle.global_cumulative_battery_GWh[model_year - 1] + gwh})
+                        learning_pev_battery_scaling_factor = eval(_cache['PEV', 'battery_GWh_learning_curve']['value'],
+                                                                   {'np': np}, locals_dict)
                 else:
                     year = max(yr for yr in cumulative_GWh_ld_dict['GWh'])
                     gwh = cumulative_GWh_ld_dict['GWh'][year]
                     locals_dict.update({'CUMULATIVE_GWH': vehicle.global_cumulative_battery_GWh[model_year - 1] + gwh})
-                learning_pev_battery_scaling_factor = eval(_cache['PEV', 'battery_GWh_learning_curve']['value'],
-                                                           {'np': np}, locals_dict)
+                    learning_pev_battery_scaling_factor = eval(_cache['PEV', 'battery_GWh_learning_curve']['value'],
+                                                               {'np': np}, locals_dict)
 
         # markups and learning
         MARKUP_ICE = eval(_cache['ICE', 'markup']['value'], {'np': np}, locals_dict)
@@ -185,7 +193,7 @@ class PowertrainCost(OMEGABase):
         if (market_class_id.__contains__('non_hauling') and vehicle.drive_system < 4) or powertrain_type == 'HEV':
             tractive_motor = 'single'
 
-        trans_cost = cyl_cost = liter_cost = 0
+        drive_system_cost = trans_cost = cyl_cost = liter_cost = 0
         high_eff_alt_cost = start_stop_cost = deac_pd_cost = deac_fc_cost = cegr_cost = atk2_cost = gdi_cost = 0
         turb12_cost = turb11_cost = 0
         twc_cost = gpf_cost = diesel_eas_cost = 0
@@ -235,6 +243,12 @@ class PowertrainCost(OMEGABase):
             turb_input_scaler = eval(_cache['ALL', 'turb_scaler']['value'], {'np': np}, locals_dict)
 
             learn = learning_factor_ice
+            # determine drive system and calc cost
+            if type(pkg_info['drive_system']) is str:
+                adj_factor = _cache['ICE', pkg_info['drive_system']]['dollar_adjustment']
+                drive_system_cost = eval(_cache['ICE', pkg_info['drive_system']]['value'], {'np': np}, locals_dict) \
+                                    * adj_factor * learn
+
             # determine trans and calc cost
             adj_factor = _cache['ALL', trans]['dollar_adjustment']
             trans_cost = eval(_cache['ALL', trans]['value'], {'np': np}, locals_dict) \
@@ -478,6 +492,13 @@ class PowertrainCost(OMEGABase):
                                          + power_management_and_distribution_cost + brake_sensors_actuators_cost \
                                          + additional_pair_of_half_shafts_cost
 
+        if powertrain_type is 'BEV':
+            # determine drive system and calc cost
+            if type(pkg_info['drive_system']) is str:
+                adj_factor = _cache['BEV', pkg_info['drive_system']]['dollar_adjustment']
+                drive_system_cost = eval(_cache['BEV', pkg_info['drive_system']]['value'], {'np': np}, locals_dict) \
+                                    * adj_factor * learning_factor_pev
+
         # ac leakage cost
         adj_factor = _cache['ALL', 'ac_leakage']['dollar_adjustment']
         ac_leakage_cost = eval(_cache['ALL', 'ac_leakage']['value'], {'np': np}, locals_dict) \
@@ -510,7 +531,7 @@ class PowertrainCost(OMEGABase):
                       + turb12_cost + turb11_cost \
                       + twc_cost + gpf_cost + diesel_eas_cost
 
-        driveline_cost = trans_cost \
+        driveline_cost = drive_system_cost + trans_cost \
                          + high_eff_alt_cost + start_stop_cost \
                          + ac_leakage_cost + ac_efficiency_cost \
                          + lv_battery_cost + hvac_cost

@@ -7,7 +7,7 @@
 **CODE**
 
 """
-
+import numpy as np
 import pandas as pd
 import sys
 from pathlib import Path
@@ -41,7 +41,6 @@ class BatchSettings:
     Settings that apply to the whole batch of effects to run.
 
     """
-
     def __init__(self):
         self.batch_df = pd.DataFrame()
         self.batch_program = None
@@ -132,6 +131,7 @@ class BatchSettings:
             'NO': False,
             'N': False,
             'n': False,
+            np.nan: None
         })
 
     def init_from_file(self, filepath):
@@ -255,56 +255,57 @@ class BatchSettings:
         self.context_session_name = self.get_attribute_value(('Session Name', 'context'), 'value')
         path_context_in = self.batch_folder / f'_{self.context_session_name}' / 'in'
 
-        self.context_stock_and_vmt_file = self.get_attribute_value(('Context Stock and VMT File', 'context'), 'full_path')
+        self.context_stock_and_vmt_file = \
+            self.get_attribute_value(('Context Stock and VMT File', 'context'), 'full_path')
 
         find_string = None
         try:
             find_string = 'implicit_price_deflators'
             self.ip_deflators_file = self.find_file(path_context_in, find_string)
         except FileNotFoundError:
-            effects_log(f'{path_context_in} does not contain a {find_string} file.')
+            effects_log.logwrite(f'{path_context_in} does not contain a {find_string} file.')
             sys.exit()
 
         try:
             find_string = 'cpi_price_deflators'
             self.cpi_deflators_file = self.find_file(path_context_in, find_string)
         except FileNotFoundError:
-            effects_log(f'{path_context_in} does not contain a {find_string} file.')
+            effects_log.logwrite(f'{path_context_in} does not contain a {find_string} file.')
             sys.exit()
 
         try:
             find_string = 'context_fuel_prices'
             self.context_fuel_prices_file = self.find_file(path_context_in, find_string)
         except FileNotFoundError:
-            effects_log(f'{path_context_in} does not contain a {find_string} file.')
+            effects_log.logwrite(f'{path_context_in} does not contain a {find_string} file.')
             sys.exit()
 
         try:
             find_string = 'onroad_fuels'
             self.onroad_fuels_file = self.find_file(path_context_in, find_string)
         except FileNotFoundError:
-            effects_log(f'{path_context_in} does not contain a {find_string} file.')
+            effects_log.logwrite(f'{path_context_in} does not contain a {find_string} file.')
             sys.exit()
 
         try:
             find_string = 'onroad_vehicle_calculations'
             self.onroad_vehicle_calculations_file = self.find_file(path_context_in, find_string)
         except FileNotFoundError:
-            effects_log(f'{path_context_in} does not contain a {find_string} file.')
+            effects_log.logwrite(f'{path_context_in} does not contain a {find_string} file.')
             sys.exit()
 
         try:
             find_string = 'annual_vmt'
             self.onroad_vmt_file = self.find_file(path_context_in, find_string)
         except FileNotFoundError:
-            effects_log(f'{path_context_in} does not contain a {find_string} file.')
+            effects_log.logwrite(f'{path_context_in} does not contain a {find_string} file.')
             sys.exit()
 
         try:
             find_string = 'reregistration'
             self.vehicle_reregistration_file = self.find_file(path_context_in, find_string)
         except FileNotFoundError:
-            effects_log(f'{path_context_in} does not contain a {find_string} file.')
+            effects_log.logwrite(f'{path_context_in} does not contain a {find_string} file.')
             sys.exit()
 
         self.session_dict[0] = {'session_policy': 'no_action',

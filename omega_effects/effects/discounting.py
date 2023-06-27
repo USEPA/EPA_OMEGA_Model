@@ -29,6 +29,8 @@ class Discounting:
         self.monetized_non_emission_args = []
         self.rate_list_dict = {}
 
+        self.fuel_arg = None
+
     def discount_annual_values(self, batch_settings, annual_values_df):
         """
         The discount function determines attributes appropriate for discounting and does the discounting calculation to
@@ -55,6 +57,10 @@ class Discounting:
         dict_of_values = annual_values_df.to_dict(orient='index')
         discount_to_year = batch_settings.discount_values_to_year
         cost_accrual = batch_settings.cost_accrual
+
+        self.fuel_arg = 'fueling_class'
+        if 'medium' in [item for item in annual_values_df['reg_class_id']]:
+            self.fuel_arg = 'in_use_fuel_id'
 
         emission_dr25 = '2.5'
         emission_dr3 = '3.'
@@ -86,7 +92,7 @@ class Discounting:
         for v in dict_of_values.values():
 
             session_policy, calendar_year, reg_class_id, fuel_id = \
-                v['session_policy'], v['calendar_year'], v['reg_class_id'], v['in_use_fuel_id']
+                v['session_policy'], v['calendar_year'], v['reg_class_id'], v[self.fuel_arg]
             series = 'AnnualValue'
 
             for social_discrate in self.social_discrates:
@@ -132,7 +138,7 @@ class Discounting:
         for v in self.annual_values_dict.values():
 
             session_policy, calendar_year, reg_class_id, fuel_id, discount_rate = \
-                v['session_policy'], v['calendar_year'], v['reg_class_id'], v['in_use_fuel_id'], v['discount_rate']
+                v['session_policy'], v['calendar_year'], v['reg_class_id'], v[self.fuel_arg], v['discount_rate']
 
             if discount_rate != 0:
 
@@ -170,7 +176,7 @@ class Discounting:
         for v in self.pv_dict.values():
 
             session_policy, calendar_year, reg_class_id, fuel_id, discount_rate = \
-                v['session_policy'], v['calendar_year'], v['reg_class_id'], v['in_use_fuel_id'], v['discount_rate']
+                v['session_policy'], v['calendar_year'], v['reg_class_id'], v[self.fuel_arg], v['discount_rate']
 
             eav_dict_key = (session_policy, calendar_year, reg_class_id, fuel_id, discount_rate, 'AnnualizedValue')
             self.eav_dict[eav_dict_key] = v.copy()
@@ -291,20 +297,3 @@ def annualize_value(present_value, rate, periods, cost_accrual):
     else:
         return present_value * rate * (1 + rate) ** periods \
                / ((1 + rate) ** periods - 1)
-
-
-def set_fueling_class(fuel_id):
-    """
-    Set fueling class based on the provided fuel id.
-
-    Args:
-        fuel_id (str): e.g. 'electricity'
-
-    Returns:
-        ``'BEV'`` or ``'ICE'`` depending on the fuel id.
-
-    """
-    if 'electricity' in fuel_id:
-        return 'BEV'
-    else:
-        return 'ICE'

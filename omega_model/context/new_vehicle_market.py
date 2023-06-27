@@ -423,11 +423,7 @@ class NewVehicleMarket(OMEGABase):
         input_template_name = 'context_new_vehicle_market'
         input_template_version = 0.22
         input_template_columns = {'context_id', 'dollar_basis',	'case_id', 'context_size_class', 'body_style',
-                                  'calendar_year', 'reg_class_id', 'sales_share_of_body_style',
-                                  'sales_share_of_regclass', 'sales_share_of_total', 'sales', 'weight_lbs',
-                                  'horsepower', 'horsepower_to_weight_ratio', 'mpg_conventional',
-                                  'mpg_conventional_onroad', 'mpg_alternative', 'mpg_alternative_onroad',
-                                  'onroad_to_cycle_mpg_ratio', 'ice_price_dollars', 'bev_price_dollars'}
+                                  'calendar_year', 'reg_class_id', 'sales'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)

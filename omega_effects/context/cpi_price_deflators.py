@@ -44,8 +44,7 @@ import pandas as pd
 import sys
 
 from omega_effects.general.general_functions import read_input_file
-from omega_effects.general.input_validation import \
-    validate_template_version_info, validate_template_column_names
+from omega_effects.general.input_validation import validate_template_version_info, validate_template_column_names
 
 
 class CPIPriceDeflators:

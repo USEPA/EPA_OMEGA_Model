@@ -435,7 +435,6 @@ Data Column Name and Description
 **CODE**
 
 """
-
 from omega_effects.general.general_functions import read_input_file
 from omega_effects.consumer import deregionalizer
 

@@ -846,7 +846,7 @@ class Vehicle(OMEGABase):
         self.cost_curve = None
         self.cost_curve_non_numeric_data = None
         self.unibody_structure = 1
-        self.drive_system = 1
+        self.drive_system = ''
         self.dual_rear_wheel = 0
         self.curbweight_lbs = 0
         self.footprint_ft2 = 0
@@ -1258,7 +1258,7 @@ class VehicleFinal(SQABase, Vehicle):
     cert_fuel_id = Column(String)  #: cert fuel ID
     market_class_id = Column(String)  #: market class ID, as determined by the consumer subpackage
     unibody_structure = Column(Float)  #: unibody structure flag, e.g. 0,1
-    drive_system = Column(Float)  #: drive system, 1=FWD, 2=RWD, 4=AWD
+    drive_system = Column(Float)  #: drive system, FWD, RWD, AWD
     dual_rear_wheel = Column(Float)  #: dual_rear_wheel, 0=No, 1=Yes
     body_style = Column(String)  #: vehicle body style, e.g. 'sedan'
     base_year_powertrain_type = Column(String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
@@ -1689,7 +1689,7 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
                     alt_veh.cert_fuel_id = "{'electricity':1.0}"
                     alt_veh.battery_kwh = 60  # RV
-                    alt_veh.motor_kw = 150 + 100 * (v.drive_system == 4)  # RV
+                    alt_veh.motor_kw = 150 + 100 * (v.drive_system == 'AWD')  # RV
                     if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
                         alt_veh.charge_depleting_range_mi = 150
                     else:

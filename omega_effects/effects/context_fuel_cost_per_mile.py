@@ -37,8 +37,8 @@ def calc_fuel_cost_per_mile(batch_settings, session_settings):
         'onroad_direct_kwh_per_mile',
     ]
     # let cpm refer to cost_per_mile
-    context_fuel_cpm_dict = dict()
-    vehicle_info_dict = dict()
+    context_fuel_cpm_dict = {}
+    vehicle_info_dict = {}
 
     calendar_years = batch_settings.calendar_years
 
@@ -46,82 +46,84 @@ def calc_fuel_cost_per_mile(batch_settings, session_settings):
 
         vads = session_settings.vehicle_annual_data.get_vehicle_annual_data_by_calendar_year(calendar_year)
 
-        calendar_year_fuel_cpm_dict = dict()
-        for vad in vads:
+        # limit to vads having model_year >= analysis_initial_year since only those might have new fuel consumption
+        vads = [v for v in vads if (v['calendar_year'] - v['age']) >= batch_settings.analysis_initial_year]
 
-            vehicle_fuel_cpm_dict = dict()
+        calendar_year_fuel_cpm_dict = {}
+        for v in vads:
+
+            vehicle_fuel_cpm_dict = {}
 
             # need vehicle info once for each vehicle_id, not every calendar year for each vehicle_id
-            vehicle_id = int(vad['vehicle_id'])
-            age = int(vad['age'])
+            vehicle_id = int(v['vehicle_id'])
+            age = int(v['age'])
 
             if vehicle_id not in vehicle_info_dict:
                 vehicle_info_dict[vehicle_id] \
                     = session_settings.vehicles.get_vehicle_attributes(vehicle_id, *vehicle_attribute_list)
 
-            base_year_vehicle_id, name, model_year, base_year_reg_class_id, reg_class_id, size_class, in_use_fuel_id, \
-                market_class_id, fueling_class, base_year_powertrain_type, body_style, \
+            base_year_vehicle_id, name, model_year, base_year_reg_class_id, reg_class_id, context_size_class, \
+                in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, body_style, \
                 onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
                     = vehicle_info_dict[vehicle_id]
 
-            if model_year >= calendar_years[0]:
+            key = (int(base_year_vehicle_id), base_year_powertrain_type, int(model_year), int(age))
+            if key not in calendar_year_fuel_cpm_dict:
 
-                onroad_kwh_per_mile = onroad_gallons_per_mile = onroad_miles_per_gallon = fuel_cpm = 0
-                retail_price_e = retail_price_l = None
+                onroad_gallons_per_mile = onroad_miles_per_gallon = fuel_cost_per_mile = 0
+                retail_price_per_kwh = retail_price_per_gallon = None
 
-                fuel_dict = eval(in_use_fuel_id)
+                # calc fuel cost per mile
+                if onroad_direct_kwh_per_mile:
+                    fuel = 'US electricity'
+                    retail_price_per_kwh = \
+                        batch_settings.context_fuel_prices.get_fuel_prices(
+                            batch_settings, calendar_year, 'retail_dollars_per_unit', fuel
+                        )
+                    fuel_cost_per_mile += onroad_direct_kwh_per_mile * retail_price_per_kwh
 
-                for fuel, fuel_share in fuel_dict.items():
+                if onroad_direct_co2e_grams_per_mile:
+                    fuel_dict = eval(in_use_fuel_id)
+                    fuel = [fuel for fuel in fuel_dict.keys()][0]
+                    retail_price_per_gallon = \
+                        batch_settings.context_fuel_prices.get_fuel_prices(
+                            batch_settings, calendar_year, 'retail_dollars_per_unit', fuel
+                        )
+                    refuel_efficiency = \
+                        batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
+                    co2_emissions_grams_per_unit = \
+                        batch_settings.onroad_fuels.get_fuel_attribute(
+                            calendar_year, fuel, 'direct_co2e_grams_per_unit'
+                        ) / refuel_efficiency
+                    onroad_gallons_per_mile += onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
+                    onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
+                    fuel_cost_per_mile += onroad_gallons_per_mile * retail_price_per_gallon
 
-                    # calc fuel cost per mile
-                    if fuel == 'US electricity' and onroad_direct_kwh_per_mile:
-                        retail_price_e \
-                            = batch_settings.context_fuel_prices.get_fuel_prices(
-                                batch_settings, calendar_year, 'retail_dollars_per_unit', fuel)
-                        onroad_kwh_per_mile += onroad_direct_kwh_per_mile
-                        fuel_cpm += onroad_kwh_per_mile * retail_price_e
+                vehicle_fuel_cpm_dict.update({
+                    'session_policy': session_settings.session_policy,
+                    'session_name': session_settings.session_name,
+                    'base_year_vehicle_id': int(base_year_vehicle_id),
+                    'calendar_year': int(calendar_year),
+                    'model_year': int(model_year),
+                    'age': int(age),
+                    'base_year_reg_class_id': base_year_reg_class_id,
+                    'reg_class_id': reg_class_id,
+                    'context_size_class': context_size_class,
+                    'in_use_fuel_id': in_use_fuel_id,
+                    'market_class_id': market_class_id,
+                    'fueling_class': fueling_class,
+                    'base_year_powertrain_type': base_year_powertrain_type,
+                    'body_style': body_style,
+                    'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,
+                    'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
+                    'onroad_gallons_per_mile': onroad_gallons_per_mile,
+                    'onroad_miles_per_gallon': onroad_miles_per_gallon,
+                    'retail_price_per_gallon': retail_price_per_gallon,
+                    'retail_price_per_kwh': retail_price_per_kwh,
+                    'fuel_cost_per_mile': fuel_cost_per_mile,
+                })
 
-                    elif fuel != 'US electricity' and onroad_direct_co2e_grams_per_mile:
-                        retail_price_l = batch_settings.context_fuel_prices.get_fuel_prices(
-                            batch_settings, calendar_year, 'retail_dollars_per_unit', fuel)
-                        refuel_efficiency \
-                            = batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
-                        co2_emissions_grams_per_unit \
-                            = batch_settings.onroad_fuels.get_fuel_attribute(
-                                calendar_year, fuel, 'direct_co2e_grams_per_unit') / refuel_efficiency
-                        onroad_gallons_per_mile += onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
-                        onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
-                        fuel_cpm += onroad_gallons_per_mile * retail_price_l
-
-                key = (int(base_year_vehicle_id), base_year_powertrain_type, int(model_year), int(age))
-                if key in calendar_year_fuel_cpm_dict:
-                    pass
-                else:
-                    vehicle_fuel_cpm_dict.update({
-                        'session_policy': session_settings.session_policy,
-                        'session_name': session_settings.session_name,
-                        'base_year_vehicle_id': int(base_year_vehicle_id),
-                        'calendar_year': int(calendar_year),
-                        'model_year': int(model_year),
-                        'age': int(age),
-                        'base_year_reg_class_id': base_year_reg_class_id,
-                        'reg_class_id': reg_class_id,
-                        'context_size_class': size_class,
-                        'in_use_fuel_id': in_use_fuel_id,
-                        'market_class_id': market_class_id,
-                        'fueling_class': fueling_class,
-                        'base_year_powertrain_type': base_year_powertrain_type,
-                        'body_style': body_style,
-                        'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,
-                        'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
-                        'onroad_gallons_per_mile': onroad_gallons_per_mile,
-                        'onroad_miles_per_gallon': onroad_miles_per_gallon,
-                        'retail_price_per_gallon': retail_price_l,
-                        'retail_price_per_kwh': retail_price_e,
-                        'fuel_cost_per_mile': fuel_cpm,
-                    })
-
-                    calendar_year_fuel_cpm_dict[key] = vehicle_fuel_cpm_dict
+                calendar_year_fuel_cpm_dict[key] = vehicle_fuel_cpm_dict
 
         context_fuel_cpm_dict.update(calendar_year_fuel_cpm_dict)
 

@@ -49,10 +49,8 @@ Data Column Name and Description
 **CODE**
 
 """
-
 from omega_effects.general.general_functions import read_input_file
-from omega_effects.general.input_validation import \
-    validate_template_version_info, validate_template_column_names
+from omega_effects.general.input_validation import validate_template_version_info, validate_template_column_names
 
 
 class EmissionRatesRefinery:
@@ -64,6 +62,7 @@ class EmissionRatesRefinery:
         self._data = dict()  # private dict
         self._cache = dict()
         self.calendar_year_max = None
+        self.deets = {}  # this dictionary will not include the legacy fleet
 
     def init_from_file(self, filepath, effects_log):
         """
@@ -95,30 +94,19 @@ class EmissionRatesRefinery:
         df = read_input_file(filepath, effects_log, skiprows=1)
         validate_template_column_names(filepath, df, input_template_columns, effects_log)
 
-        # rate_keys = zip(
-        #     df['rate_name']
-        # )
-        # df.set_index(rate_keys, inplace=True)
         df.set_index(df['rate_name'], inplace=True)
 
         self.calendar_year_max = df['last_year'][0]
 
         self._data = df.to_dict('index')
 
-        # for rate_key in self._data:
-        #
-        #     rate_eq = self._data[rate_key]['equation_rate_id']
-        #
-        #     self._data[rate_key].update({
-        #         'equation_rate_id': compile(rate_eq, '<string>', 'eval'),
-        #     })
-
-    def get_emission_rate(self, calendar_year, rate_names):
+    def get_emission_rate(self, session_settings, calendar_year, rate_names):
         """
 
         Get emission rates by calendar year
 
         Args:
+            session_settings: an instance of the SessionSettings class
             calendar_year (int): calendar year for which to get emission rates
             rate_names (str, [strs]): name of emission rate(s) to get
 
@@ -141,6 +129,15 @@ class EmissionRatesRefinery:
 
                 return_rates.append(rate)
 
+                self.deets.update(
+                    {(calendar_year, rate_name): {
+                        'session_policy': session_settings.session_policy,
+                        'session_name': session_settings.session_name,
+                        'calendar_year': calendar_year,
+                        'rate_name': rate_name,
+                        'rate': rate,
+                    }}
+                )
             self._cache[calendar_year] = return_rates
 
         return return_rates

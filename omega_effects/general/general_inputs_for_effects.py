@@ -86,8 +86,7 @@ Data Row Name and Description:
 
 """
 from omega_effects.general.general_functions import read_input_file
-from omega_effects.general.input_validation import \
-    validate_template_version_info, validate_template_column_names
+from omega_effects.general.input_validation import validate_template_version_info, validate_template_column_names
 
 
 class GeneralInputsForEffects:
@@ -96,7 +95,7 @@ class GeneralInputsForEffects:
 
     """
     def __init__(self):
-        self._data = dict()  # private dict of general input attributes and values
+        self._data = dict()
 
     def init_from_file(self, filepath, effects_log):
         """

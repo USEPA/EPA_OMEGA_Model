@@ -53,8 +53,7 @@ Data Column Name and Description
 
 """
 from omega_effects.general.general_functions import read_input_file
-from omega_effects.general.input_validation import \
-    validate_template_version_info, validate_template_column_names
+from omega_effects.general.input_validation import validate_template_version_info, validate_template_column_names
 
 
 class PowertrainCost:
@@ -111,26 +110,28 @@ class PowertrainCost:
 
             cost_info = df[(df['powertrain_type'] == powertrain_type) & (df['item'] == item)].iloc[0]
 
-            self._data[cost_key] = {'value': dict(),
-                                    'quantity': 0,
-                                    'dollar_adjustment': 1}
-
+            self._data[cost_key] = {
+                'value': dict(),
+                'quantity': 0,
+                'dollar_adjustment': 1
+            }
             self._data[cost_key]['value'] = compile(str(cost_info['value']), '<string>', 'eval')
 
-    def get_battery_tax_offset(self, year, battery_kwh):
+    def get_battery_tax_offset(self, year, battery_kwh, powertrain_type):
         """
         Get battery tax offset.
 
         Args:
             year (int): year for which battery tax credit is needed.
             battery_kwh (float): battery pack capacity in kWh
+            powertrain_type (str): 'BEV' or 'PHEV'
 
         Returns:
             The battery tax offset (dollars per kWh credit) for the given year.
 
         """
         battery_offset = 0
-        battery_offset_dict = eval(self._data['BEV', 'battery_offset']['value'])
+        battery_offset_dict = eval(self._data[powertrain_type, 'battery_offset']['value'])
         battery_offset_min_year = min(battery_offset_dict['dollars_per_kwh'].keys())
         battery_offset_max_year = max(battery_offset_dict['dollars_per_kwh'].keys())
         if battery_offset_min_year <= year <= battery_offset_max_year:
