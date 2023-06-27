@@ -1138,9 +1138,14 @@ class Vehicle(OMEGABase):
             # try to take lowest generalized cost point
             cost_curve = cost_cloud[cost_cloud['new_vehicle_mfr_generalized_cost_dollars'] == cost_cloud[
                 'new_vehicle_mfr_generalized_cost_dollars'].values.min()]
+
             # if somehow more than one point, just take the first one...
             if len(cost_curve) > 1:
                 cost_curve = cost_curve.iloc[[0]]
+
+            # drop non-numeric columns so dtypes don't become "object"
+            cost_curve = cost_curve.drop(columns=omega_globals.options.CostCloud.cloud_non_numeric_columns,
+                                         errors='ignore')
         else:
             cost_curve = calc_frontier(cost_cloud, cost_curve_interp_key,
                                        'new_vehicle_mfr_generalized_cost_dollars', allow_upslope=allow_upslope)

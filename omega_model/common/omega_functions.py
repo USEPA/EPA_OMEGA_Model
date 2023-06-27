@@ -187,11 +187,11 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=True):
     """
     cloud_non_numeric_columns = omega_globals.options.CostCloud.cloud_non_numeric_columns
 
+    # drop non-numeric columns so dtypes don't become "object"
+    cloud = cloud.drop(columns=cloud_non_numeric_columns, errors='ignore')
+
     if len(cloud) > 1:
         frontier_pts = []
-
-        # drop non-numeric columns so dtypes don't become "object"
-        cloud = cloud.drop(columns=cloud_non_numeric_columns, errors='ignore')
 
         if invert_x_axis:
             x_sign = -1
