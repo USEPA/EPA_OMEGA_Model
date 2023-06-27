@@ -82,7 +82,7 @@ Data Column Name and Description
         Vehicle body structure; 1 = unibody, 0 = body-on-frame
 
     :drive_system:
-        Vehicle drive system, FWD, RWD, AWD
+        Vehicle drive system, 'FWD', 'RWD', 'AWD'
 
     :dual_rear_wheel:
         = 1 if vehicle has dual rear wheels, i.e. 'duallies', = 0 otherwise
