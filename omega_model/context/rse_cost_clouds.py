@@ -206,7 +206,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                                'electrified_driveline_cost', 'structure_cost', 'glider_non_structure_cost']
 
     cloud_non_numeric_columns = ['cost_curve_class', 'structure_material', 'powertrain_type', 'vehicle_name',
-                                 'application_id']
+                                 'drive_system', 'application_id']
 
     cloud_non_numeric_data_columns = ['cost_curve_class', 'structure_material', 'powertrain_type']
 
