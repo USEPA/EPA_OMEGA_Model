@@ -492,7 +492,7 @@ class PowertrainCost(OMEGABase):
                                          + power_management_and_distribution_cost + brake_sensors_actuators_cost \
                                          + additional_pair_of_half_shafts_cost
 
-        if powertrain_type is 'BEV':
+        if powertrain_type == 'BEV':
             # determine drive system and calc cost
             if type(pkg_info['drive_system']) is str:
                 adj_factor = _cache['BEV', pkg_info['drive_system']]['dollar_adjustment']
