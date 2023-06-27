@@ -268,34 +268,48 @@ class CostCloud(OMEGABase, CostCloudBase):
                 rse_columns = drive_cycle_columns
                 rse_columns.update(['engine_displacement_liters', 'engine_cylinders', 'hev_motor_kw', 'hev_batt_kwh'])
 
-                non_data_columns = list(rse_columns) + ['cost_curve_class']
+                non_data_columns = list(rse_columns) + ['cost_curve_class', 'drive_system', 'application_id']
                 tech_flags = list(df.columns.drop(non_data_columns))
                 CostCloud.cost_cloud_data_columns.update(tech_flags + ['engine_displacement_liters', 'engine_cylinders'])
 
-                _cache[powertrain_type] = dict()
-
                 # convert cost clouds into curves and set up cost_curves table...
                 cost_curve_classes = df['cost_curve_class'].unique()
-                # for each cost curve class
-                for cost_curve_class in cost_curve_classes:
-                    class_cloud = df[df['cost_curve_class'] == cost_curve_class].iloc[0]
-                    _cache[powertrain_type][cost_curve_class] = \
-                        {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
+                drive_systems = df['drive_system'].unique()
 
-                    for c in rse_columns:
-                        _cache[powertrain_type][cost_curve_class]['rse'][c] = \
-                            compile(str(class_cloud[c]), '<string>', 'eval')
+                for drive_system in drive_systems:
 
-                    rse_tuple = (sorted(rse_columns), tuple(class_cloud[sorted(rse_columns)]))
+                    cache_key = '%s_%s' % (powertrain_type, drive_system)
 
-                    _cache[powertrain_type][cost_curve_class]['rse_names'] = rse_tuple[0]
+                    if cache_key not in _cache:
+                        _cache[cache_key] = dict()
 
-                    _cache[powertrain_type][cost_curve_class]['rse_tuple'] = \
-                        str(rse_tuple[1]).replace("'", '')
+                    # for each cost curve class
+                    for cost_curve_class in cost_curve_classes:
 
-                    _cache[powertrain_type][cost_curve_class]['tech_flags'] = class_cloud[tech_flags]
+                        rse_condition = (df['cost_curve_class'] == cost_curve_class) & \
+                                        (df['drive_system'] == drive_system)
 
-                    CostCloud.tech_flags.update(tech_flags)
+                        if any(rse_condition):
+
+                            class_cloud = df[rse_condition].iloc[0]
+
+                            _cache[cache_key][cost_curve_class] = \
+                                {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
+
+                            for c in rse_columns:
+                                _cache[cache_key][cost_curve_class]['rse'][c] = \
+                                    compile(str(class_cloud[c]), '<string>', 'eval')
+
+                            rse_tuple = (sorted(rse_columns), tuple(class_cloud[sorted(rse_columns)]))
+
+                            _cache[cache_key][cost_curve_class]['rse_names'] = rse_tuple[0]
+
+                            _cache[cache_key][cost_curve_class]['rse_tuple'] = \
+                                str(rse_tuple[1]).replace("'", '')
+
+                            _cache[cache_key][cost_curve_class]['tech_flags'] = class_cloud[tech_flags]
+
+                            CostCloud.tech_flags.update(tech_flags)
 
         return template_errors
 
@@ -350,34 +364,48 @@ class CostCloud(OMEGABase, CostCloudBase):
                 rse_columns = drive_cycle_columns
                 rse_columns.update(['bev_motor_kw'])
 
-                non_data_columns = list(rse_columns) + ['cost_curve_class']
+                non_data_columns = list(rse_columns) + ['cost_curve_class', 'drive_system']  # , 'application_id'] eventually?
                 tech_flags = list(df.columns.drop(non_data_columns))
                 CostCloud.cost_cloud_data_columns.update(tech_flags)
 
-                _cache[powertrain_type] = dict()
-
                 # convert cost clouds into curves and set up cost_curves table...
                 cost_curve_classes = df['cost_curve_class'].unique()
-                # for each cost curve class
-                for cost_curve_class in cost_curve_classes:
-                    class_cloud = df[df['cost_curve_class'] == cost_curve_class].iloc[0]
-                    _cache[powertrain_type][cost_curve_class] = \
-                        {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
+                drive_systems = df['drive_system'].unique()
 
-                    for c in rse_columns:
-                        _cache[powertrain_type][cost_curve_class]['rse'][c] = \
-                            compile(str(class_cloud[c]), '<string>', 'eval')
+                for drive_system in drive_systems:
 
-                    rse_tuple = (sorted(rse_columns), tuple(class_cloud[sorted(rse_columns)]))
+                    cache_key = '%s_%s' % (powertrain_type, drive_system)
 
-                    _cache[powertrain_type][cost_curve_class]['rse_names'] = rse_tuple[0]
+                    if cache_key not in _cache:
+                        _cache[cache_key] = dict()
 
-                    _cache[powertrain_type][cost_curve_class]['rse_tuple'] = \
-                        str(rse_tuple[1]).replace("'", '')
+                    # for each cost curve class
+                    for cost_curve_class in cost_curve_classes:
 
-                    _cache[powertrain_type][cost_curve_class]['tech_flags'] = class_cloud[tech_flags]
+                        rse_condition = (df['cost_curve_class'] == cost_curve_class) & \
+                                        (df['drive_system'] == drive_system)
 
-                    CostCloud.tech_flags.update(tech_flags)
+                        if any(rse_condition):
+
+                            class_cloud = df[rse_condition].iloc[0]
+
+                            _cache[cache_key][cost_curve_class] = \
+                                {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
+
+                            for c in rse_columns:
+                                _cache[cache_key][cost_curve_class]['rse'][c] = \
+                                    compile(str(class_cloud[c]), '<string>', 'eval')
+
+                            rse_tuple = (sorted(rse_columns), tuple(class_cloud[sorted(rse_columns)]))
+
+                            _cache[cache_key][cost_curve_class]['rse_names'] = rse_tuple[0]
+
+                            _cache[cache_key][cost_curve_class]['rse_tuple'] = \
+                                str(rse_tuple[1]).replace("'", '')
+
+                            _cache[cache_key][cost_curve_class]['tech_flags'] = class_cloud[tech_flags]
+
+                            CostCloud.tech_flags.update(tech_flags)
 
         return template_errors
 
@@ -451,6 +479,8 @@ class CostCloud(OMEGABase, CostCloudBase):
             calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b,
                              vehicle.base_year_target_coef_c, 60)
 
+        cache_key = '%s_%s' % (vehicle.fueling_class, vehicle.drive_system)
+
         if is_up_for_redesign(vehicle):
             # sweep vehicle params
             rlhp20s = np.unique((vehicle_rlhp20 * omega_globals.options.rlhp20_min_scaler,
@@ -468,7 +498,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
             structure_materials = MassScaling.structure_materials
 
-            cost_curve_classes = _cache[vehicle.fueling_class]
+            cost_curve_classes = _cache[cache_key]
 
             vehicle.prior_redesign_year = vehicle.model_year
         else:
@@ -478,7 +508,7 @@ class CostCloud(OMEGABase, CostCloudBase):
             vehicle_footprints = [vehicle.footprint_ft2]
             structure_materials = [vehicle.structure_material]
 
-            cost_curve_classes = {vehicle.cost_curve_class: _cache[vehicle.fueling_class][vehicle.cost_curve_class]}
+            cost_curve_classes = {vehicle.cost_curve_class: _cache[cache_key][vehicle.cost_curve_class]}
 
         # convergence terms init
         convergence_tolerance = 0.01
@@ -520,6 +550,8 @@ class CostCloud(OMEGABase, CostCloudBase):
                             cloud_point = copy.copy(tech_flags)  # cost_curve_classes[ccc]['tech_flags'].to_dict()
 
                             cloud_point['powertrain_type'] = vehicle.powertrain_type
+                            cloud_point['drive_system'] = vehicle.drive_system
+                            # cloud_point['application_id'] = vehicle.application_id
 
                             # ------------------------------------------------------------------------------------#
                             rated_hp = 1
@@ -552,8 +584,8 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 RLHP60 = rlhp60 / ETW
                                 HP_ETW = rated_hp / ETW
 
-                                cloud_point.update(zip(_cache[vehicle.fueling_class][ccc]['rse_names'],
-                                                       Eval.eval(_cache[vehicle.fueling_class][ccc]['rse_tuple'], {},
+                                cloud_point.update(zip(_cache[cache_key][ccc]['rse_names'],
+                                                       Eval.eval(_cache[cache_key][ccc]['rse_tuple'], {},
                                                                  {'ETW': ETW, 'RLHP20': RLHP20, 'RLHP60': RLHP60,
                                                                   'HP_ETW': HP_ETW})))
 
@@ -728,4 +760,3 @@ if __name__ == '__main__':
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)
-
