@@ -34,9 +34,15 @@ ALL,ac_efficiency,(40) * MARKUP_ALL,,2010,
 ALL,ac_leakage,(63) * MARKUP_ALL,,2010,
 ICE,LV_battery,((3) * VEHICLE_SIZE_CLASS + 51) * MARKUP_ICE,1,2019,set equal to electrified vehicle values
 ICE,HVAC,((11.5) * VEHICLE_SIZE_CLASS + 195.5) * MARKUP_ICE,1,2019,set equal to electrified vehicle values
+ICE,FWD,(75) * MARKUP_ICE,,2021,placeholder
+ICE,RWD,(50) * MARKUP_ICE,,2021,placeholder
+ICE,AWD,(125) * MARKUP_ICE,,2021,placeholder
+BEV,FWD,(75) * MARKUP_BEV,,2021,placeholder
+BEV,RWD,(50) * MARKUP_BEV,,2021,placeholder
+BEV,AWD,(125) * MARKUP_BEV,,2021,placeholder
 BEV,battery,261.61 * (KWH ** -0.184) * KWH * MARKUP_BEV,,2019,KWH denotes gross kWh; coefficients denote 250K production volume
-BEV,battery_offset,"{""dollars_per_kwh"": {2020: 0}}",,,
-PHEV,battery_offset,"{""dollars_per_kwh"": {2020: 0}}",,,
+BEV,battery_offset,"{""dollars_per_kwh"": {2023: -27, 2024: -31.5, 2025: -36, 2026: -40.5, 2027: -45, 2028: -45, 2029: -45, 2030: -33.75, 2031: -22.50, 2032: -11.25, 2033: -0}}",,,
+PHEV,battery_offset,"{""dollars_per_kwh"": {2023: -27, 2024: -31.5, 2025: -36, 2026: -40.5, 2027: -45, 2028: -45, 2029: -45, 2030: -33.75, 2031: -22.50, 2032: -11.25, 2033: -0}}",,,
 PHEV,battery,658.48 * (KWH ** -0.45) * KWH * MARKUP_PHEV,,2019,KWH denotes gross kWh; coefficients denote 250K production volume
 HEV,battery,(936.1) * KWH ** -0.802 * KWH * MARKUP_HEV,,2019,20221028 MSa
 MHEV,battery,(936.1) * KWH ** -0.802 * KWH * MARKUP_HEV,,2019,20221028 MSa
