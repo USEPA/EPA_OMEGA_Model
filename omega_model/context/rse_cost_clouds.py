@@ -205,7 +205,9 @@ class CostCloud(OMEGABase, CostCloudBase):
     cost_cloud_cost_columns = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
                                'electrified_driveline_cost', 'structure_cost', 'glider_non_structure_cost']
 
-    cloud_non_numeric_columns = ['cost_curve_class', 'structure_material', 'powertrain_type', 'vehicle_name']
+    cloud_non_numeric_columns = ['cost_curve_class', 'structure_material', 'powertrain_type', 'vehicle_name',
+                                 'application_id']
+
     cloud_non_numeric_data_columns = ['cost_curve_class', 'structure_material', 'powertrain_type']
 
     tech_flags = set()
@@ -227,13 +229,21 @@ class CostCloud(OMEGABase, CostCloudBase):
         if verbose:
             omega_log.logwrite('\nInitializing CostCloud from %s...' % filename)
         input_template_name = __name__
-        input_template_version = 0.21
+        # input_template_version = 0.21
         # TODO: move phev flag to phev rse only when it gets its own init:
+        # input_template_columns = {'cost_curve_class', 'engine_displacement_liters', 'engine_cylinders', 'hev_motor_kw',
+        #                           'hev_batt_kwh', 'unibody', 'high_eff_alternator', 'start_stop', 'mhev', 'hev',
+        #                           'hev_truck', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11',
+        #                           'gas_fuel', 'diesel_fuel', 'awd', 'fwd', 'trx10', 'trx11', 'trx12', 'trx21', 'trx22',
+        #                           'ecvt', 'ice', 'fcv', 'phev'}
+
+        input_template_version = 0.22
         input_template_columns = {'cost_curve_class', 'engine_displacement_liters', 'engine_cylinders', 'hev_motor_kw',
-                                  'hev_batt_kwh', 'unibody', 'high_eff_alternator', 'start_stop', 'mhev', 'hev',
+                                  'hev_batt_kwh', 'high_eff_alternator', 'start_stop', 'mhev', 'hev',
                                   'hev_truck', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11',
-                                  'gas_fuel', 'diesel_fuel', 'awd', 'fwd', 'trx10', 'trx11', 'trx12', 'trx21', 'trx22',
-                                  'ecvt', 'ice', 'fcv', 'phev'}
+                                  'gas_fuel', 'diesel_fuel', 'trx10', 'trx11', 'trx12', 'trx21', 'trx22',
+                                  'ecvt', 'ice', 'fcv', 'phev', 'drive_system', 'application_id'}
+
 
         # input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -305,8 +315,14 @@ class CostCloud(OMEGABase, CostCloudBase):
         if verbose:
             omega_log.logwrite('\nInitializing CostCloud from %s...' % filename)
         input_template_name = __name__
-        input_template_version = 0.12
-        input_template_columns = {'cost_curve_class', 'bev',
+        # input_template_version = 0.12
+        # input_template_columns = {'cost_curve_class', 'bev',
+        #                           }
+
+        input_template_version = 0.13
+        # input_template_columns = {'cost_curve_class', 'bev', 'bev_batt_kwh', 'bev_motor_kw', 'drive_system',
+        #                           }
+        input_template_columns = {'cost_curve_class', 'bev_motor_kw', 'bev', 'drive_system',
                                   }
 
         powertrain_type = 'BEV'
@@ -323,7 +339,8 @@ class CostCloud(OMEGABase, CostCloudBase):
 
             # validate drive cycle columns
             from policy.drive_cycles import DriveCycles
-            drive_cycle_columns = sorted(set.difference(set(df.columns), input_template_columns))
+            drive_cycle_columns = set.difference(set(df.columns), input_template_columns)
+
 
             if not all([dc in DriveCycles.drive_cycle_names for dc in drive_cycle_columns]):
                 template_errors.append('Invalid drive cycle column in %s' % filename)
@@ -331,6 +348,7 @@ class CostCloud(OMEGABase, CostCloudBase):
             if not template_errors:
                 # RSE columns are the drive cycle columns + the displacement and cylinder columns
                 rse_columns = drive_cycle_columns
+                rse_columns.update(['bev_motor_kw'])
 
                 non_data_columns = list(rse_columns) + ['cost_curve_class']
                 tech_flags = list(df.columns.drop(non_data_columns))
@@ -587,7 +605,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                             else:
                                 # BEV battery size and motor power determined by vehicle and iterative range calculation
                                 cloud_point['battery_kwh'] = battery_kwh
-                                cloud_point['motor_kw'] = rated_hp / 1.34102
+                                cloud_point['motor_kw'] = cloud_point['bev_motor_kw']  # rated_hp / 1.34102
 
                             cloud_point = vehicle.calc_cert_and_onroad_values(cloud_point)
 
