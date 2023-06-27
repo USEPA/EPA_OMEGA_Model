@@ -1263,7 +1263,7 @@ class VehicleFinal(SQABase, Vehicle):
     cert_fuel_id = Column(String)  #: cert fuel ID
     market_class_id = Column(String)  #: market class ID, as determined by the consumer subpackage
     unibody_structure = Column(Float)  #: unibody structure flag, e.g. 0,1
-    drive_system = Column(Float)  #: drive system, FWD, RWD, AWD
+    drive_system = Column(String)  #: drive system, 'FWD', 'RWD', 'AWD'
     dual_rear_wheel = Column(Float)  #: dual_rear_wheel, 0=No, 1=Yes
     body_style = Column(String)  #: vehicle body style, e.g. 'sedan'
     base_year_powertrain_type = Column(String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
