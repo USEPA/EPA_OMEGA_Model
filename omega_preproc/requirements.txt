@@ -1,0 +1,11 @@
+# This requirements file indicates packages necessary to run the omega_preproc scripts
+#
+# quick uninstall all: pip freeze | xargs pip uninstall -y
+# or
+# pip freeze > freeze.txt
+# pip uninstall -r freeze.txt -y
+#
+# Install using pip:
+# pip install -r requirements.txt --compile
+
+selenium==4.2.0
