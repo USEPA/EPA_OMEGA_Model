@@ -755,7 +755,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'cert_fuel_id', 'market_class_id', 'lifetime_VMT',
                        'context_size_class',
                        'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs', 'base_year_eng_rated_hp',
-                       'footprint_ft2',
+                       'footprint_ft2', 'application_id',
                        'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c', 'body_style',
                        'structure_material', 'base_year_powertrain_type', 'base_year_reg_class_id',
                        'base_year_market_share',
@@ -847,6 +847,7 @@ class Vehicle(OMEGABase):
         self.cost_curve_non_numeric_data = None
         self.unibody_structure = 1
         self.drive_system = ''
+        self.application_id = ''
         self.dual_rear_wheel = 0
         self.curbweight_lbs = 0
         self.footprint_ft2 = 0
@@ -1264,6 +1265,7 @@ class VehicleFinal(SQABase, Vehicle):
     market_class_id = Column(String)  #: market class ID, as determined by the consumer subpackage
     unibody_structure = Column(Float)  #: unibody structure flag, e.g. 0,1
     drive_system = Column(String)  #: drive system, 'FWD', 'RWD', 'AWD'
+    application_id = Column(String)  #: application ID 'SLA' -> standard load application, 'HLA' -> high load application
     dual_rear_wheel = Column(Float)  #: dual_rear_wheel, 0=No, 1=Yes
     body_style = Column(String)  #: vehicle body style, e.g. 'sedan'
     base_year_powertrain_type = Column(String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
@@ -1325,7 +1327,7 @@ class VehicleFinal(SQABase, Vehicle):
                                    'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs', 'gvwr_lbs',
                                    'gcwr_lbs', 'target_coef_a', 'target_coef_b', 'target_coef_c',
                                    'body_style', 'msrp_dollars', 'structure_material',
-                                   'prior_redesign_year', 'redesign_interval'}  # RV any other columns
+                                   'prior_redesign_year', 'redesign_interval', 'application_id'}  # RV any other columns
 
     dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
     dynamic_attributes = []  #: list of dynamic attribute names, from dynamic_columns
@@ -1466,7 +1468,7 @@ class VehicleFinal(SQABase, Vehicle):
                               'dual_rear_wheel', 'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
                               'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c',
                               'prior_redesign_year', 'redesign_interval', 'workfactor', 'gvwr_lbs', 'gcwr_lbs',
-                              'base_year_workfactor', 'base_year_gvwr_lbs', 'base_year_gcwr_lbs'] \
+                              'base_year_workfactor', 'base_year_gvwr_lbs', 'base_year_gcwr_lbs', 'application_id'] \
                               + VehicleFinal.dynamic_attributes
 
         # model year and registered count are required to make a full-blown VehicleFinal object, compliance_id
@@ -1522,6 +1524,7 @@ class VehicleFinal(SQABase, Vehicle):
                 cert_fuel_id=df.loc[i, 'cert_fuel_id'],
                 unibody_structure=df.loc[i, 'unibody_structure'],
                 drive_system=df.loc[i, 'drive_system'],
+                application_id=df.loc[i, 'application_id'],
                 dual_rear_wheel=df.loc[i, 'dual_rear_wheel'],
                 curbweight_lbs=df.loc[i, 'curbweight_lbs'],
                 footprint_ft2=df.loc[i, 'footprint_ft2'],

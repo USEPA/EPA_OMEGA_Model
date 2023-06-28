@@ -258,7 +258,8 @@ from omega_model import *
 # 'manufacturer_id' added if not consolidating manufacturers
 aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
                        'cert_fuel_id', 'reg_class_id', 'drive_system', 'dual_rear_wheel', 'model_year',
-                       'prior_redesign_year', 'redesign_interval', 'cost_curve_class', 'structure_material']
+                       'prior_redesign_year', 'redesign_interval', 'cost_curve_class', 'structure_material',
+                       'application_id']
 
 
 class VehicleAggregation(OMEGABase):
@@ -296,7 +297,7 @@ class VehicleAggregation(OMEGABase):
         # omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.49
+        input_template_version = 0.50
         input_template_columns = VehicleFinal.mandatory_input_template_columns
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -325,7 +326,7 @@ class VehicleAggregation(OMEGABase):
                                                   "{'US electricity':1.0}"],
                                'cert_fuel_id': ["{'gasoline':1.0}", "{'diesel':1.0}", "{'hydrogen':1.0}",
                                                 "{'electricity':1.0}"],
-                               'drive_system': ['FWD', 'RWD', 'AWD'],  # [2, 4],  # RV
+                               'drive_system': ['FWD', 'RWD', 'AWD'],
                                'dual_rear_wheel': [0, 1],
                                'high_eff_alternator': [0, 1],
                                'start_stop': [0, 1],
@@ -341,6 +342,7 @@ class VehicleAggregation(OMEGABase):
                                'turb11': [0, 1],
                                'gas_fuel': [0, 1],
                                'diesel_fuel': [0, 1],
+                               'application_id': ['SLA', 'HLA']
                                }
 
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
