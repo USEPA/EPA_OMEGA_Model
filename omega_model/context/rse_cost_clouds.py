@@ -121,17 +121,8 @@ Data Column Name and Description
     :turb11:
         = 1 if powertrain package includes a convenvtional turbo charger, = 0 otherwise
 
-    :gas_fuel:
-        = 1 if powertrain package is associated with a gasoline-fueled engine, = 0 otherwise
-
-    :diesel_fuel:
-        = 1 if powertrain package is associated with a diesel-fueled engine, = 0 otherwise
-
-    :awd:
-        = 1 if powertrain package includes all-wheel drive, = 0 otherwise
-
-    :fwd:
-        = 1 if powertrain package includes front-wheel drive, = 0 otherwise
+    :cert_fuel_id:
+        = cert fuel id, e.g. 'gasoline'
 
     :trx10:
         = 1 if powertrain package includes a baseline transmission, = 0 otherwise
@@ -162,6 +153,12 @@ Data Column Name and Description
 
     :bev:
         = 1 if powertrain package is associated with a battery-electric vehicle, = 0 otherwise
+
+    :drive_system:
+        = drive system, e.g. 'FWD', 'RWD', 'AWD'
+
+    :application_id:
+        = high-load application = 'HLA', standard-load application = 'SLA', medium-duty application = 'MDV'
 
 ----
 

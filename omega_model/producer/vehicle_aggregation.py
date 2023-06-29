@@ -67,7 +67,7 @@ Data Column Name and Description
 
     :cert_fuel_id:
         Certification fuel id, for determining certification upstream CO2e grams/mile, must be in the table loaded by
-        ``class fuels.Fuel``
+        ``class policy.policy_fuels.PolicyFuel``
 
     :sales:
         Number of vehicles sold in the ``model_year``
@@ -125,77 +125,6 @@ Data Column Name and Description
 
     :engine_displacement_liters:
         Engine displacement (liters)
-
-    :high_eff_alternator:
-        Technology flag for high efficiency alternator (1 = Equipped, 0 = Not equipped)
-
-    :start_stop:
-        Technology flag for engine start-stop system (1 = Equipped, 0 = Not equipped)
-
-    :ice:
-        Technology flag for internal combustion engine (1 = Equipped, 0 = Not equipped)
-
-    :hev:
-        Technology flag for non plug-in hybrid system (1 = Equipped, 0 = Not equipped)
-
-    :phev:
-        Technology flag for plug-in hybrid system (1 = Equipped, 0 = Not equipped)
-
-    :bev:
-        Technology flag for battery electric vehicle (1 = Equipped, 0 = Not equipped)
-
-    :deac_pd:
-        Technology flag for cylinder deactivation, discrete operation of partial number of cylinders
-        (1 = Equipped, 0 = Not equipped)
-
-    :deac_fc:
-        Technology flag for cylinder deactivation, continuosly variable operation of full number of cylinders
-        (1 = Equipped, 0 = Not equipped)
-
-    :cegr:
-        Technology flag for cooled exhaust gas recirculation (1 = Equipped, 0 = Not equipped)
-
-    :atk2:
-        Technology flag for high geometric compression ratio Atkinson cycle engine (1 = Equipped, 0 = Not equipped)
-
-    :gdi:
-        Technology flag for gasoline direct injection system (1 = Equipped, 0 = Not equipped)
-
-    :turb12:
-        Technology flag for turbocharged engine, 18-21bar 2nd generation (1 = Equipped, 0 = Not equipped)
-
-    :turb11:
-        Technology flag for turbocharged engine, 18-21bar 1st generation (1 = Equipped, 0 = Not equipped)
-
-    :gas_fuel:
-        Technology flag for gasoline-fueled engine (1 = Equipped, 0 = Not equipped)
-
-    :diesel_fuel:
-        Technology flag for diesel-fueled engine (1 = Equipped, 0 = Not equipped)
-
-    :awd:
-        Technology flag for all-wheel drive (1 = Equipped, 0 = Not equipped)
-
-    :fwd:
-        Technology flag for front-wheel drive (1 = Equipped, 0 = Not equipped)
-
-    :trx10:
-        Technology flag for a baseline transmission (1 = Equipped, 0 = Not equipped)
-
-    :trx11:
-        Technology flag for an improved transmission (1 = Equipped, 0 = Not equipped)
-
-    :trx12:
-        Technology flag for an advanced transmission (1 = Equipped, 0 = Not equipped)
-
-    :trx21:
-        Technology flag for a high gear count transmission or equivalent (1 = Equipped, 0 = Not equipped)
-
-    :trx22:
-        Technology flag for an advanced high gear count transmission or equivalent (1 = Equipped, 0 = Not equipped)
-
-    :ecvt:
-        Technology flag for a powersplit-type hybrid vehicle transmission (1 = Equipped, 0 = Not equipped)
 
     **OPTIONAL COLUMNS**
         These columns become object attributes that may be used to determine vehicle regulatory class
