@@ -219,11 +219,8 @@ class PowertrainCost(OMEGABase):
 
             trans = get_trans(pkg_info)
 
-            gasoline_flag = 1
-            diesel_flag = 0
-            if 'diesel' in base_year_cert_fuel_id:
-                diesel_flag = 1
-                gasoline_flag = 0
+            gasoline_flag = base_year_cert_fuel_id == 'gasoline'
+            diesel_flag = base_year_cert_fuel_id == 'diesel'
 
             CYL = pkg_info['engine_cylinders']
             LITERS = pkg_info['engine_displacement_liters']
@@ -231,7 +228,7 @@ class PowertrainCost(OMEGABase):
             locals_dict = locals()
 
             # PGM costs and loadings for gasoline
-            if gasoline_flag == 1:
+            if gasoline_flag:
                 PT_USD_PER_OZ = eval(_cache['ALL', 'pt_dollars_per_oz']['value'], {'np': np}, locals_dict)
                 PD_USD_PER_OZ = eval(_cache['ALL', 'pd_dollars_per_oz']['value'], {'np': np}, locals_dict)
                 RH_USD_PER_OZ = eval(_cache['ALL', 'rh_dollars_per_oz']['value'], {'np': np}, locals_dict)
@@ -312,7 +309,7 @@ class PowertrainCost(OMEGABase):
             turb_scaler += (turb_input_scaler - turb_scaler) * (pkg_info['turb11'] | pkg_info['turb12'])
 
             # 3-way catalyst cost
-            if gasoline_flag == 1:
+            if gasoline_flag:
                 adj_factor_sub = _cache['ALL', 'twc_substrate']['dollar_adjustment']
                 adj_factor_wash = _cache['ALL', 'twc_washcoat']['dollar_adjustment']
                 adj_factor_can = _cache['ALL', 'twc_canning']['dollar_adjustment']
@@ -334,7 +331,7 @@ class PowertrainCost(OMEGABase):
                            * adj_factor_gpf * learn
 
             # diesel exhaust aftertreatment cost
-            elif diesel_flag == 1:
+            elif diesel_flag:
                 adj_factor_diesel_eas = _cache['ALL', 'diesel_aftertreatment_system']['dollar_adjustment']
                 locals_dict = locals()
                 diesel_eas_cost = \
@@ -521,7 +518,7 @@ class PowertrainCost(OMEGABase):
                     * adj_factor * learn * quantity
 
         diesel_engine_cost_scaler = 1
-        if diesel_flag == 1:
+        if diesel_flag:
             diesel_engine_cost_scaler = \
                 eval(_cache['ALL', 'diesel_engine_cost_scaler']['value'], {'np': np}, locals_dict)
 

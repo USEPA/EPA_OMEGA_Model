@@ -140,7 +140,7 @@ class PolicyFuel(OMEGABase):
                                                              verbose=verbose)
 
         if not template_errors:
-            validation_dict = {'unit': ['gallon', 'kWh']}
+            validation_dict = {'unit': ['gallon', 'kWh', 'kg']}
 
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 

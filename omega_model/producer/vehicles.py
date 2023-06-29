@@ -1684,7 +1684,7 @@ class VehicleFinal(SQABase, Vehicle):
                         alt_veh.__setattr__(tf, None)
                     alt_veh.bev = 1
                     alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
-                    alt_veh.cert_fuel_id = "{'electricity':1.0}"
+                    alt_veh.cert_fuel_id = 'electricity'
                     alt_veh.battery_kwh = 60  # RV
                     alt_veh.motor_kw = 150 + 100 * (v.drive_system == 'AWD')  # RV
                     if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
@@ -1705,7 +1705,7 @@ class VehicleFinal(SQABase, Vehicle):
                         alt_veh.__setattr__(tf, None)
                     alt_veh.phev = 1
                     alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
-                    alt_veh.cert_fuel_id = "{'gasoline':1.0}"
+                    alt_veh.cert_fuel_id = 'gasoline'
                     alt_veh.battery_kwh = 18  # RV
                     alt_veh.motor_kw = 50  # RV
                     if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
@@ -1727,7 +1727,7 @@ class VehicleFinal(SQABase, Vehicle):
                         alt_veh.__setattr__(tf, None)
                     alt_veh.ice = 1
                     alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
-                    alt_veh.cert_fuel_id = "{'gasoline':1.0}"
+                    alt_veh.cert_fuel_id = 'gasoline'
                     alt_veh.base_year_eng_rated_hp = v.motor_kw * 1.34102  # RV
                     alt_veh.motor_kw = 0
                     alt_veh.charge_depleting_range_mi = 0
@@ -1807,7 +1807,7 @@ class VehicleFinal(SQABase, Vehicle):
             if veh.base_year_powertrain_type == 'FCV':
                 # RV
                 veh.in_use_fuel_id = "{'US electricity':1.0}"
-                veh.cert_fuel_id = "{'electricity':1.0}"
+                veh.cert_fuel_id = 'electricity'
                 veh.base_year_powertrain_type = 'BEV'
             veh.fueling_class = 'BEV'
         elif veh.base_year_powertrain_type == 'PHEV':

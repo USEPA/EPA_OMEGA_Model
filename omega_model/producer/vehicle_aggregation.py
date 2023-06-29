@@ -294,6 +294,7 @@ class VehicleAggregation(OMEGABase):
         from context.powertrain_cost import PowertrainCost
         from policy.workfactor_definition import WorkFactor
         from context.rse_cost_clouds import CostCloud
+        from policy.policy_fuels import PolicyFuel
 
         # omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
 
@@ -328,8 +329,7 @@ class VehicleAggregation(OMEGABase):
                                'structure_material': MassScaling.structure_materials,
                                'in_use_fuel_id': ["{'pump gasoline':1.0}", "{'pump diesel':1.0}", "{'hydrogen':1.0}",
                                                   "{'US electricity':1.0}"],
-                               'cert_fuel_id': ["{'gasoline':1.0}", "{'diesel':1.0}", "{'hydrogen':1.0}",
-                                                "{'electricity':1.0}"],
+                               'cert_fuel_id': PolicyFuel.fuel_ids,
                                'drive_system': ['FWD', 'RWD', 'AWD'],
                                'dual_rear_wheel': [0, 1],
                                'application_id': ['SLA', 'HLA']
