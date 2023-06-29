@@ -211,6 +211,7 @@ class CostCloud(OMEGABase, CostCloudBase):
     cloud_non_numeric_data_columns = ['cost_curve_class', 'structure_material', 'powertrain_type']
 
     tech_flags = set()
+    rse_names = set()
 
     @staticmethod
     def init_from_ice_file(filename, powertrain_type='ICE', verbose=False):
@@ -279,6 +280,8 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                 # for each cost curve class
                 for cost_curve_class in cost_curve_classes:
+                    CostCloud.rse_names.update([cost_curve_class])
+
                     for application_id in application_ids:
                         for drive_system in drive_systems:
                             cache_key = '%s_%s_%s' % (powertrain_type, application_id, drive_system)
@@ -375,6 +378,8 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                 # for each cost curve class
                 for cost_curve_class in cost_curve_classes:
+                    CostCloud.rse_names.update([cost_curve_class])
+
                     for drive_system in drive_systems:
 
                         cache_key = '%s_%s' % (powertrain_type, drive_system)
