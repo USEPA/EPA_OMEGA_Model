@@ -259,7 +259,7 @@ from omega_model import *
 aggregation_columns = ['context_size_class', 'body_style', 'base_year_powertrain_type', 'unibody_structure',
                        'cert_fuel_id', 'reg_class_id', 'drive_system', 'dual_rear_wheel', 'model_year',
                        'prior_redesign_year', 'redesign_interval', 'cost_curve_class', 'structure_material',
-                       'application_id']
+                       'application_id', 'cert_fuel_id']
 
 
 class VehicleAggregation(OMEGABase):
@@ -428,6 +428,7 @@ class VehicleAggregation(OMEGABase):
 
                 veh.base_year_reg_class_id = row['reg_class_id']
                 veh.base_year_cert_fuel_id = row['cert_fuel_id']
+                veh.cert_fuel_id = row['cert_fuel_id']
 
                 veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
                 row['market_class_id'] = omega_globals.options.MarketClass.get_vehicle_market_class(veh)

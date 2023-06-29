@@ -206,7 +206,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                                'electrified_driveline_cost', 'structure_cost', 'glider_non_structure_cost']
 
     cloud_non_numeric_columns = ['cost_curve_class', 'structure_material', 'powertrain_type', 'vehicle_name',
-                                 'drive_system', 'application_id']
+                                 'drive_system', 'application_id', 'cert_fuel_id']
 
     cloud_non_numeric_data_columns = ['cost_curve_class', 'structure_material', 'powertrain_type']
 
@@ -230,19 +230,13 @@ class CostCloud(OMEGABase, CostCloudBase):
         if verbose:
             omega_log.logwrite('\nInitializing CostCloud from %s...' % filename)
         input_template_name = __name__
-        # input_template_version = 0.21
         # TODO: move phev flag to phev rse only when it gets its own init:
-        # input_template_columns = {'cost_curve_class', 'engine_displacement_liters', 'engine_cylinders', 'hev_motor_kw',
-        #                           'hev_batt_kwh', 'unibody', 'high_eff_alternator', 'start_stop', 'mhev', 'hev',
-        #                           'hev_truck', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11',
-        #                           'gas_fuel', 'diesel_fuel', 'awd', 'fwd', 'trx10', 'trx11', 'trx12', 'trx21', 'trx22',
-        #                           'ecvt', 'ice', 'fcv', 'phev'}
 
         input_template_version = 0.22
         input_template_columns = {'cost_curve_class', 'engine_displacement_liters', 'engine_cylinders', 'hev_motor_kw',
                                   'hev_batt_kwh', 'high_eff_alternator', 'start_stop', 'mhev', 'hev',
                                   'hev_truck', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11',
-                                  'gas_fuel', 'diesel_fuel', 'trx10', 'trx11', 'trx12', 'trx21', 'trx22',
+                                  'cert_fuel_id', 'trx10', 'trx11', 'trx12', 'trx21', 'trx22',
                                   'ecvt', 'ice', 'fcv', 'phev', 'drive_system', 'application_id'}
 
 
@@ -269,7 +263,9 @@ class CostCloud(OMEGABase, CostCloudBase):
                 rse_columns = drive_cycle_columns
                 rse_columns.update(['engine_displacement_liters', 'engine_cylinders', 'hev_motor_kw', 'hev_batt_kwh'])
 
-                non_data_columns = list(rse_columns) + ['cost_curve_class', 'drive_system', 'application_id']
+                non_data_columns = list(rse_columns) + ['cost_curve_class', 'drive_system', 'application_id',
+                                                        'cert_fuel_id']
+
                 tech_flags = list(df.columns.drop(non_data_columns))
                 CostCloud.cost_cloud_data_columns.update(tech_flags + ['engine_displacement_liters', 'engine_cylinders'])
 
@@ -277,43 +273,47 @@ class CostCloud(OMEGABase, CostCloudBase):
                 cost_curve_classes = df['cost_curve_class'].unique()
                 drive_systems = df['drive_system'].unique()
                 application_ids = df['application_id'].unique()
+                cert_fuel_ids = df['cert_fuel_id'].unique()
 
                 # for each cost curve class
                 for cost_curve_class in cost_curve_classes:
                     CostCloud.rse_names.update([cost_curve_class])
 
-                    for application_id in application_ids:
-                        for drive_system in drive_systems:
-                            cache_key = '%s_%s_%s' % (powertrain_type, application_id, drive_system)
+                    for cert_fuel_id in cert_fuel_ids:
+                        for application_id in application_ids:
+                            for drive_system in drive_systems:
+                                cache_key = \
+                                    '%s_%s_%s_%s' % (powertrain_type, cert_fuel_id, application_id, drive_system)
 
-                            if cache_key not in _cache:
-                                _cache[cache_key] = dict()
+                                if cache_key not in _cache:
+                                    _cache[cache_key] = dict()
 
-                            rse_condition = (df['cost_curve_class'] == cost_curve_class) & \
-                                            (df['drive_system'] == drive_system) & \
-                                            (df['application_id'] == application_id)
+                                rse_condition = (df['cost_curve_class'] == cost_curve_class) & \
+                                                (df['cert_fuel_id'] == cert_fuel_id) & \
+                                                (df['drive_system'] == drive_system) & \
+                                                (df['application_id'] == application_id)
 
-                            if any(rse_condition):
+                                if any(rse_condition):
 
-                                class_cloud = df[rse_condition].iloc[0]
+                                    class_cloud = df[rse_condition].iloc[0]
 
-                                _cache[cache_key][cost_curve_class] = \
-                                    {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
+                                    _cache[cache_key][cost_curve_class] = \
+                                        {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
 
-                                for c in rse_columns:
-                                    _cache[cache_key][cost_curve_class]['rse'][c] = \
-                                        compile(str(class_cloud[c]), '<string>', 'eval')
+                                    for c in rse_columns:
+                                        _cache[cache_key][cost_curve_class]['rse'][c] = \
+                                            compile(str(class_cloud[c]), '<string>', 'eval')
 
-                                rse_tuple = (sorted(rse_columns), tuple(class_cloud[sorted(rse_columns)]))
+                                    rse_tuple = (sorted(rse_columns), tuple(class_cloud[sorted(rse_columns)]))
 
-                                _cache[cache_key][cost_curve_class]['rse_names'] = rse_tuple[0]
+                                    _cache[cache_key][cost_curve_class]['rse_names'] = rse_tuple[0]
 
-                                _cache[cache_key][cost_curve_class]['rse_tuple'] = \
-                                    str(rse_tuple[1]).replace("'", '')
+                                    _cache[cache_key][cost_curve_class]['rse_tuple'] = \
+                                        str(rse_tuple[1]).replace("'", '')
 
-                                _cache[cache_key][cost_curve_class]['tech_flags'] = class_cloud[tech_flags]
+                                    _cache[cache_key][cost_curve_class]['tech_flags'] = class_cloud[tech_flags]
 
-                                CostCloud.tech_flags.update(tech_flags)
+                                    CostCloud.tech_flags.update(tech_flags)
 
         return template_errors
 
@@ -333,16 +333,9 @@ class CostCloud(OMEGABase, CostCloudBase):
         if verbose:
             omega_log.logwrite('\nInitializing CostCloud from %s...' % filename)
         input_template_name = __name__
-        # input_template_version = 0.12
-        # input_template_columns = {'cost_curve_class', 'bev',
-        #                           }
-
         input_template_version = 0.13
-        # input_template_columns = {'cost_curve_class', 'bev', 'bev_batt_kwh', 'bev_motor_kw', 'drive_system',
-        #                           }
-        input_template_columns = {'cost_curve_class', 'bev_motor_kw', 'bev', 'drive_system',
+        input_template_columns = {'cost_curve_class', 'bev_motor_kw', 'bev', 'drive_system', 'cert_fuel_id',
                                   }
-
         powertrain_type = 'BEV'
 
         # input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
@@ -368,49 +361,51 @@ class CostCloud(OMEGABase, CostCloudBase):
                 rse_columns = drive_cycle_columns
                 rse_columns.update(['bev_motor_kw'])
 
-                non_data_columns = list(rse_columns) + ['cost_curve_class', 'drive_system']  # , 'application_id'] eventually?
+                non_data_columns = list(rse_columns) + ['cost_curve_class', 'drive_system', 'cert_fuel_id']  # , 'application_id'] eventually?
                 tech_flags = list(df.columns.drop(non_data_columns))
                 CostCloud.cost_cloud_data_columns.update(tech_flags)
 
                 # convert cost clouds into curves and set up cost_curves table...
                 cost_curve_classes = df['cost_curve_class'].unique()
                 drive_systems = df['drive_system'].unique()
+                cert_fuel_ids = df['cert_fuel_id'].unique()
 
                 # for each cost curve class
                 for cost_curve_class in cost_curve_classes:
                     CostCloud.rse_names.update([cost_curve_class])
 
-                    for drive_system in drive_systems:
+                    for cert_fuel_id in cert_fuel_ids:
+                        for drive_system in drive_systems:
 
-                        cache_key = '%s_%s' % (powertrain_type, drive_system)
+                            cache_key = '%s_%s_%s' % (powertrain_type, cert_fuel_id, drive_system)
 
-                        if cache_key not in _cache:
-                            _cache[cache_key] = dict()
-                
-                        rse_condition = (df['cost_curve_class'] == cost_curve_class) & \
-                                        (df['drive_system'] == drive_system)
+                            if cache_key not in _cache:
+                                _cache[cache_key] = dict()
 
-                        if any(rse_condition):
+                            rse_condition = (df['cost_curve_class'] == cost_curve_class) & \
+                                            (df['drive_system'] == drive_system)
 
-                            class_cloud = df[rse_condition].iloc[0]
+                            if any(rse_condition):
 
-                            _cache[cache_key][cost_curve_class] = \
-                                {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
+                                class_cloud = df[rse_condition].iloc[0]
 
-                            for c in rse_columns:
-                                _cache[cache_key][cost_curve_class]['rse'][c] = \
-                                    compile(str(class_cloud[c]), '<string>', 'eval')
+                                _cache[cache_key][cost_curve_class] = \
+                                    {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
 
-                            rse_tuple = (sorted(rse_columns), tuple(class_cloud[sorted(rse_columns)]))
+                                for c in rse_columns:
+                                    _cache[cache_key][cost_curve_class]['rse'][c] = \
+                                        compile(str(class_cloud[c]), '<string>', 'eval')
 
-                            _cache[cache_key][cost_curve_class]['rse_names'] = rse_tuple[0]
+                                rse_tuple = (sorted(rse_columns), tuple(class_cloud[sorted(rse_columns)]))
 
-                            _cache[cache_key][cost_curve_class]['rse_tuple'] = \
-                                str(rse_tuple[1]).replace("'", '')
+                                _cache[cache_key][cost_curve_class]['rse_names'] = rse_tuple[0]
 
-                            _cache[cache_key][cost_curve_class]['tech_flags'] = class_cloud[tech_flags]
+                                _cache[cache_key][cost_curve_class]['rse_tuple'] = \
+                                    str(rse_tuple[1]).replace("'", '')
 
-                            CostCloud.tech_flags.update(tech_flags)
+                                _cache[cache_key][cost_curve_class]['tech_flags'] = class_cloud[tech_flags]
+
+                                CostCloud.tech_flags.update(tech_flags)
 
         return template_errors
 
@@ -745,9 +740,10 @@ class CostCloud(OMEGABase, CostCloudBase):
         """
         if vehicle.fueling_class == 'BEV':
             # ** no application ids for BEV yet, one size fits all **
-            rse_group_key = '%s_%s' % (vehicle.fueling_class, vehicle.drive_system)
+            rse_group_key = '%s_%s_%s' % (vehicle.fueling_class, vehicle.cert_fuel_id, vehicle.drive_system)
         else:
-            rse_group_key = '%s_%s_%s' % (vehicle.fueling_class, vehicle.application_id, vehicle.drive_system)
+            rse_group_key = '%s_%s_%s_%s' % \
+                            (vehicle.fueling_class, vehicle.cert_fuel_id, vehicle.application_id, vehicle.drive_system)
 
         return rse_group_key
 
