@@ -344,6 +344,9 @@ class VehicleAggregation(OMEGABase):
             aggregation_columns += ['manufacturer_id']
             omega_globals.manufacturer_aggregation = True
 
+            # potentially drop low-volume vehicles
+            df = df[df['sales'] >= omega_globals.options.base_year_min_sales]
+
             # process manufacturer include/exclude lists
             if omega_globals.options.include_manufacturers_list != 'all':
                 df = df[[mid in omega_globals.options.include_manufacturers_list

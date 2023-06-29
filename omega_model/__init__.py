@@ -92,6 +92,7 @@ try:
             self.force_two_pass = False
             self.include_manufacturers_list = 'all'
             self.exclude_manufacturers_list = 'none'
+            self.base_year_min_sales = 0
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
             self.vehicles_file = path + 'test_inputs/vehicles.csv'
             self.vehicles_file_base_year = None
