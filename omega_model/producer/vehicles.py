@@ -1576,24 +1576,13 @@ class VehicleFinal(SQABase, Vehicle):
             # update initial registered count >after< setting compliance id, it's required for vehicle annual data
             veh.initial_registered_count = df.loc[i, 'sales']
 
-            # RV
-            if veh.base_year_powertrain_type in ['BEV', 'FCV']:
-                if veh.base_year_powertrain_type == 'FCV':
-                    # RV
-                    veh.in_use_fuel_id = "{'US electricity':1.0}"
-                    veh.cert_fuel_id = "{'electricity':1.0}"
-                    veh.base_year_powertrain_type = 'BEV'
-                veh.fueling_class = 'BEV'
-            elif veh.base_year_powertrain_type == 'PHEV':
-                veh.fueling_class = 'PHEV'
-            else:
-                veh.fueling_class = 'ICE'
+            VehicleFinal.set_fueling_class(veh)
 
-            veh.cert_direct_oncycle_co2e_grams_per_mile = df.loc[i, 'cert_direct_oncycle_co2e_grams_per_mile']
-            veh.cert_direct_co2e_grams_per_mile = veh.cert_direct_oncycle_co2e_grams_per_mile
-
+            veh.cert_direct_oncycle_co2e_grams_per_mile = None
+            veh.cert_direct_co2e_grams_per_mile = None
             veh.cert_co2e_grams_per_mile = None
-            veh.cert_direct_kwh_per_mile = df.loc[i, 'cert_direct_oncycle_kwh_per_mile']  # RV
+            veh.cert_direct_kwh_per_mile = None
+
             veh.onroad_direct_co2e_grams_per_mile = 0
             veh.onroad_direct_kwh_per_mile = 0
 
@@ -1802,6 +1791,29 @@ class VehicleFinal(SQABase, Vehicle):
             print_dict(NewVehicleMarket.base_year_context_size_class_sales)
             print_dict(NewVehicleMarket.base_year_other_sales)
             print_dict(VehicleFinal.mfr_base_year_share_data)
+
+    @staticmethod
+    # RV
+    def set_fueling_class(veh):
+        """
+
+        Args:
+            veh:
+
+        Returns:
+
+        """
+        if veh.base_year_powertrain_type in ['BEV', 'FCV']:
+            if veh.base_year_powertrain_type == 'FCV':
+                # RV
+                veh.in_use_fuel_id = "{'US electricity':1.0}"
+                veh.cert_fuel_id = "{'electricity':1.0}"
+                veh.base_year_powertrain_type = 'BEV'
+            veh.fueling_class = 'BEV'
+        elif veh.base_year_powertrain_type == 'PHEV':
+            veh.fueling_class = 'PHEV'
+        else:
+            veh.fueling_class = 'ICE'
 
     @staticmethod
     def assign_vehicle_market_class_ID(vehicle):

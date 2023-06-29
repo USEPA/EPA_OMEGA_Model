@@ -332,20 +332,6 @@ class VehicleAggregation(OMEGABase):
                                                 "{'electricity':1.0}"],
                                'drive_system': ['FWD', 'RWD', 'AWD'],
                                'dual_rear_wheel': [0, 1],
-                               'high_eff_alternator': [0, 1],
-                               'start_stop': [0, 1],
-                               'hev': [0, 1],
-                               'phev': [0, 1],
-                               'bev': [0, 1],
-                               'deac_pd': [0, 1],
-                               'deac_fc': [0, 1],
-                               'cegr': [0, 1],
-                               'atk2': [0, 1],
-                               'gdi': [0, 1],
-                               'turb12': [0, 1],
-                               'turb11': [0, 1],
-                               'gas_fuel': [0, 1],
-                               'diesel_fuel': [0, 1],
                                'application_id': ['SLA', 'HLA']
                                }
 
@@ -426,20 +412,31 @@ class VehicleAggregation(OMEGABase):
                 # calc powertrain cost
                 veh = Vehicle()
                 veh.model_year = row['model_year']
-                veh.base_year_powertrain_type = row['base_year_powertrain_type']
                 veh.body_style = row['body_style']
+                veh.drive_system = row['drive_system']
 
-                if veh.base_year_powertrain_type == 'FCV':
-                    veh.base_year_powertrain_type = 'BEV'  # RV
+                if row['base_year_powertrain_type'] == 'FCV':
+                    # RV map FCV to BEV for now
+                    veh.base_year_powertrain_type = 'BEV'
+                    veh.cost_curve_class = 'BEV_%s' % veh.drive_system
+                else:
+                    veh.base_year_powertrain_type = row['base_year_powertrain_type']
+                    veh.cost_curve_class = row['cost_curve_class']
 
                 veh.base_year_reg_class_id = row['reg_class_id']
                 veh.base_year_cert_fuel_id = row['cert_fuel_id']
 
                 veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
                 row['market_class_id'] = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
-                veh.drive_system = row['drive_system']
 
                 veh.global_cumulative_battery_GWh = omega_globals.cumulative_battery_GWh
+
+                veh.application_id = row['application_id']
+                VehicleFinal.set_fueling_class(veh)
+
+                # row tech flags needed by powertrain cost
+                for tech_flag, value in CostCloud.get_tech_flags(veh).items():
+                    row[tech_flag] = value
 
                 powertrain_cost = sum(PowertrainCost.calc_cost(veh, row, veh.base_year_powertrain_type))
 

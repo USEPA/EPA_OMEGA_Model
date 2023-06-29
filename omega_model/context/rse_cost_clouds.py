@@ -486,11 +486,7 @@ class CostCloud(OMEGABase, CostCloudBase):
             calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b,
                              vehicle.base_year_target_coef_c, 60)
 
-        if vehicle.fueling_class == 'BEV':
-            # ** no application ids for BEV yet, one size fits all **
-            rse_group_key = '%s_%s' % (vehicle.fueling_class, vehicle.drive_system)
-        else:
-            rse_group_key = '%s_%s_%s' % (vehicle.fueling_class, vehicle.application_id, vehicle.drive_system)
+        rse_group_key = CostCloud.get_rse_group_key(vehicle)
 
         if is_up_for_redesign(vehicle):
             # sweep vehicle params
@@ -736,6 +732,38 @@ class CostCloud(OMEGABase, CostCloudBase):
             vehicle.__setattr__(tf, None)
 
         return cost_cloud
+
+    @staticmethod
+    def get_rse_group_key(vehicle):
+        """
+
+        Args:
+            vehicle:
+
+        Returns:
+
+        """
+        if vehicle.fueling_class == 'BEV':
+            # ** no application ids for BEV yet, one size fits all **
+            rse_group_key = '%s_%s' % (vehicle.fueling_class, vehicle.drive_system)
+        else:
+            rse_group_key = '%s_%s_%s' % (vehicle.fueling_class, vehicle.application_id, vehicle.drive_system)
+
+        return rse_group_key
+
+    @staticmethod
+    def get_tech_flags(vehicle):
+        """
+
+        Args:
+            vehicle:
+
+        Returns:
+
+        """
+        rse_group_key = CostCloud.get_rse_group_key(vehicle)
+
+        return _cache[rse_group_key][vehicle.cost_curve_class]['tech_flags']
 
 
 if __name__ == '__main__':
