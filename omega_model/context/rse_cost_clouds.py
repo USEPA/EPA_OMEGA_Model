@@ -468,7 +468,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         """
 
-        print(vehicle.name)
+        # print(vehicle.name)
 
         vehicle_rlhp20 = \
             calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b,
