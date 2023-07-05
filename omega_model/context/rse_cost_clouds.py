@@ -747,16 +747,23 @@ class CostCloud(OMEGABase, CostCloudBase):
     @staticmethod
     def get_tech_flags(vehicle):
         """
+        Get tech flags associated with the vehicle cost curve class
 
         Args:
-            vehicle:
+            vehicle (Vehicle): the vehicle
 
         Returns:
+            Pandas Series of tech flags and values associated with the vehicle cost curve class
 
         """
         rse_group_key = CostCloud.get_rse_group_key(vehicle)
 
-        return _cache[rse_group_key][vehicle.cost_curve_class]['tech_flags']
+        try:
+            tech_flags = _cache[rse_group_key][vehicle.cost_curve_class]['tech_flags']
+        except:
+            raise Exception('Unknown cost curve class "%s" in RSE group "%s"' % (vehicle.cost_curve_class, rse_group_key))
+
+        return tech_flags
 
 
 if __name__ == '__main__':
