@@ -23,16 +23,16 @@ Template Header
 Sample Header
     .. csv-table::
 
-       input_template_name:,consumer.sales_share_ice_bev_responsive_body_style,input_template_version:,0.1
+       input_template_name:,consumer.sales_share_ice_bev_responsive_body_style,input_template_version:,0.11
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        market_class_id,start_year,annual_vmt,payback_years,price_amortization_period,share_weight,discount_rate,o_m_costs,average_occupancy,logit_exponent_mu
-        sedan_wagon.BEV,2020,12000,5,5,0.142,0.1,1600,1.58,-8
-        sedan_wagon.BEV,2021,12000,5,5,0.142,0.1,1600,1.58,-8
-        sedan_wagon.BEV,2022,12000,5,5,0.168,0.1,1600,1.58,-8
+        market_class_id,start_year,annual_vmt,price_amortization_period,share_weight,discount_rate,o_m_costs,average_occupancy,logit_exponent_mu
+        sedan_wagon.BEV,2020,12000,5,0.142,0.1,1600,1.58,-8
+        sedan_wagon.BEV,2021,12000,5,0.142,0.1,1600,1.58,-8
+        sedan_wagon.BEV,2022,12000,5,0.168,0.1,1600,1.58,-8
 
 
 Data Column Name and Description
@@ -704,8 +704,8 @@ class SalesShare(OMEGABase, SalesShareBase):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = __name__
-        input_template_version = 0.1
-        input_template_columns = {'market_class_id', 'start_year', 'annual_vmt', 'payback_years',
+        input_template_version = 0.11
+        input_template_columns = {'market_class_id', 'start_year', 'annual_vmt',
                                   'price_amortization_period', 'share_weight', 'discount_rate',
                                   'o_m_costs', 'average_occupancy', 'logit_exponent_mu'
                                   }

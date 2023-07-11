@@ -409,6 +409,8 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
     iteration_log_df = pd.DataFrame(iteration_log)
 
+    iteration_log_df = iteration_log_df.drop_duplicates()
+
     iteration_log_df.to_csv(
         omega_globals.options.output_folder + omega_globals.options.session_unique_name +
         '_producer_consumer_iteration_log.csv', columns=sorted(iteration_log_df.columns))
