@@ -51,7 +51,7 @@ Data Column Name and Description
 print('importing %s' % __file__)
 
 from omega_model import *
-from context.ip_deflators import ImplictPriceDeflators
+from context.ip_deflators import ImplicitPriceDeflators
 
 _cache = dict()
 
@@ -198,7 +198,7 @@ class GliderCost(OMEGABase):
             df = pd.read_csv(filename, skiprows=1)
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
-                                                        verbose=verbose)
+                                                             verbose=verbose)
 
             if not template_errors:
 
@@ -217,7 +217,7 @@ class GliderCost(OMEGABase):
                                         'dollar_adjustment': 1}
 
                     if cost_info['dollar_basis'] > 0:
-                        adj_factor = ImplictPriceDeflators.dollar_adjustment_factor(int(cost_info['dollar_basis']))
+                        adj_factor = ImplicitPriceDeflators.dollar_adjustment_factor(int(cost_info['dollar_basis']))
                         _cache[cost_key]['dollar_adjustment'] = adj_factor
 
                     _cache[cost_key]['value'] = compile(str(cost_info['value']), '<string>', 'eval')
