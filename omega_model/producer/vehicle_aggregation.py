@@ -335,10 +335,9 @@ class VehicleAggregation(OMEGABase):
                                             df['battery_kwh'], df['footprint_ft2'])
             df.insert(len(df.columns), 'workfactor', 0)
 
-            if omega_globals.options.vehicles_file_base_year is not None:
-                model_year_delta = omega_globals.options.vehicles_file_base_year - df['model_year']
-                df['prior_redesign_year'] += model_year_delta
-                df['model_year'] += model_year_delta
+            if omega_globals.options.vehicles_file_base_year_offset is not None:
+                df['prior_redesign_year'] += omega_globals.options.vehicles_file_base_year_offset
+                df['model_year'] += omega_globals.options.vehicles_file_base_year_offset
 
             for idx, row in df.iterrows():
                 # calc powertrain cost

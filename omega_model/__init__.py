@@ -95,7 +95,7 @@ try:
             self.base_year_min_sales = 0
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
             self.vehicles_file = path + 'test_inputs/vehicles.csv'
-            self.vehicles_file_base_year = None
+            self.vehicles_file_base_year_offset = None
             self.vehicles_df = pd.DataFrame()
             self.onroad_vehicle_calculations_file = path + 'test_inputs/onroad_vehicle_calculations.csv'
             self.onroad_fuels_file = path + 'test_inputs/onroad_fuels.csv'
