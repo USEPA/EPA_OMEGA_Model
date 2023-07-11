@@ -157,8 +157,12 @@ class VehicleAnnualData:
                             )
                         # calc fuel cost per mile
                         if fuel == 'US electricity' and onroad_direct_kwh_per_mile:
+                            refuel_efficiency = \
+                                batch_settings.onroad_fuels.get_fuel_attribute(
+                                    calendar_year, fuel, 'refuel_efficiency'
+                                )
                             onroad_kwh_per_mile += onroad_direct_kwh_per_mile
-                            fuel_cpm += onroad_kwh_per_mile * retail_price
+                            fuel_cpm += onroad_kwh_per_mile * retail_price / refuel_efficiency
                             rebound_rate = rebound_rate_bev
                             fuel_flag += 1
 

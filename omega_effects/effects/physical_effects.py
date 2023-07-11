@@ -317,7 +317,9 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                 vehicle_info_dict[v['vehicle_id']]
 
             if onroad_direct_kwh_per_mile:
-                fuel_consumption_kwh_annual += v['vmt'] * onroad_direct_kwh_per_mile
+                refuel_efficiency = \
+                    batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, 'US electricity', 'refuel_efficiency')
+                fuel_consumption_kwh_annual += v['vmt'] * onroad_direct_kwh_per_mile / refuel_efficiency
 
         transmission_efficiency = \
             batch_settings.onroad_fuels.get_fuel_attribute(
@@ -419,7 +421,10 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
 
                 # calc fuel consumption and update emission rates
                 if onroad_direct_kwh_per_mile:
-                    fuel_consumption_kwh = v['vmt'] * onroad_direct_kwh_per_mile
+                    refuel_efficiency = \
+                        batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, 'US electricity',
+                                                                       'refuel_efficiency')
+                    fuel_consumption_kwh = v['vmt'] * onroad_direct_kwh_per_mile / refuel_efficiency
                     transmission_efficiency = \
                         batch_settings.onroad_fuels.get_fuel_attribute(
                             calendar_year, 'US electricity', 'transmission_efficiency'
@@ -428,6 +433,7 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
 
                     vehicle_data.update_value({
                         'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
+                        'evse_kwh_per_mile': onroad_direct_kwh_per_mile / refuel_efficiency,
                         'fuel_consumption_kwh': fuel_consumption_kwh,
                         'fuel_generation_kwh': fuel_generation_kwh,
                         'voc_egu_rate': voc_egu_rate,
@@ -724,7 +730,10 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
         fuel_dict = eval(v['in_use_fuel_id'])
         fuel = [item for item in fuel_dict.keys()][0]
         if onroad_direct_kwh_per_mile:
-            fuel_consumption_kwh = v['vmt'] * onroad_direct_kwh_per_mile
+            refuel_efficiency = \
+                batch_settings.onroad_fuels.get_fuel_attribute(v['calendar_year'], 'US electricity',
+                                                               'refuel_efficiency')
+            fuel_consumption_kwh = v['vmt'] * onroad_direct_kwh_per_mile / refuel_efficiency
             transmission_efficiency = \
                 batch_settings.onroad_fuels.get_fuel_attribute(
                     v['calendar_year'], 'US electricity', 'transmission_efficiency'
@@ -738,6 +747,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
 
             vehicle_data.update_value({
                 'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
+                'evse_kwh_per_mile': onroad_direct_kwh_per_mile / refuel_efficiency,
                 'fuel_consumption_kwh': fuel_consumption_kwh,
                 'fuel_generation_kwh': fuel_generation_kwh,
                 'voc_egu_rate': voc_egu_rate,
@@ -944,8 +954,19 @@ def calc_annual_physical_effects(batch_settings, input_df):
                      return_df['fuel_consumption_gallons'] / return_df['vmt'])
 
     return_df.insert(return_df.columns.get_loc('fuel_generation_kwh') + 1,
-                     'onroad_direct_kwh_per_mile',
+                     'evse_kwh_per_mile',
                      return_df['fuel_consumption_kwh'] / return_df['vmt'])
+
+    cyears = pd.DataFrame(return_df['calendar_year'])
+    cyears.insert(0, 'refuel_efficiency', 0)
+    for cyear in cyears['calendar_year'].unique():
+        refuel_efficiency = \
+            batch_settings.onroad_fuels.get_fuel_attribute(cyear, 'US electricity', 'refuel_efficiency')
+        cyears.loc[cyears['calendar_year'] == cyear, 'refuel_efficiency'] = refuel_efficiency
+
+    return_df.insert(return_df.columns.get_loc('fuel_generation_kwh') + 1,
+                     'onroad_direct_kwh_per_mile',
+                     return_df['fuel_consumption_kwh'] * cyears['refuel_efficiency'] / return_df['vmt'])
 
     return_df.insert(return_df.columns.get_loc('fuel_generation_kwh') + 1,
                      'onroad_direct_co2e_grams_per_mile',
