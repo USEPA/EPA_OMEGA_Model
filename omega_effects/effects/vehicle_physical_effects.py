@@ -53,6 +53,7 @@ class VehiclePhysicalData:
         self.battery_kwh_per_veh = 0
         self.onroad_direct_co2e_grams_per_mile = 0
         self.onroad_direct_kwh_per_mile = 0
+        self.evse_kwh_per_mile = 0
         self.onroad_gallons_per_mile = 0
         self.onroad_miles_per_gallon = 0
         self.fuel_consumption_gallons = 0
@@ -306,6 +307,7 @@ def calc_vehicle_physical_effects(vpd):
         'battery_kwh_per_veh': vpd.battery_kwh_per_veh,  # this is kwh/veh - used for battery tax credit
         'onroad_direct_co2e_grams_per_mile': vpd.onroad_direct_co2e_grams_per_mile,
         'onroad_direct_kwh_per_mile': vpd.onroad_direct_kwh_per_mile,
+        'evse_kwh_per_mile': vpd.evse_kwh_per_mile,
         'onroad_gallons_per_mile': vpd.onroad_gallons_per_mile,
         'onroad_miles_per_gallon': vpd.onroad_miles_per_gallon,
         'fuel_consumption_gallons': vpd.fuel_consumption_gallons,

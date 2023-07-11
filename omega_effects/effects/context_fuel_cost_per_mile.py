@@ -39,6 +39,7 @@ def calc_fuel_cost_per_mile(batch_settings, session_settings):
     # let cpm refer to cost_per_mile
     context_fuel_cpm_dict = {}
     vehicle_info_dict = {}
+    refuel_efficiency_e = 1
 
     calendar_years = batch_settings.calendar_years
 
@@ -80,7 +81,9 @@ def calc_fuel_cost_per_mile(batch_settings, session_settings):
                         batch_settings.context_fuel_prices.get_fuel_prices(
                             batch_settings, calendar_year, 'retail_dollars_per_unit', fuel
                         )
-                    fuel_cost_per_mile += onroad_direct_kwh_per_mile * retail_price_per_kwh
+                    refuel_efficiency_e = \
+                        batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
+                    fuel_cost_per_mile += onroad_direct_kwh_per_mile * retail_price_per_kwh / refuel_efficiency_e
 
                 if onroad_direct_co2e_grams_per_mile:
                     fuel_dict = eval(in_use_fuel_id)
@@ -89,12 +92,12 @@ def calc_fuel_cost_per_mile(batch_settings, session_settings):
                         batch_settings.context_fuel_prices.get_fuel_prices(
                             batch_settings, calendar_year, 'retail_dollars_per_unit', fuel
                         )
-                    refuel_efficiency = \
+                    refuel_efficiency_l = \
                         batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
                     co2_emissions_grams_per_unit = \
                         batch_settings.onroad_fuels.get_fuel_attribute(
                             calendar_year, fuel, 'direct_co2e_grams_per_unit'
-                        ) / refuel_efficiency
+                        ) / refuel_efficiency_l
                     onroad_gallons_per_mile += onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
                     onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
                     fuel_cost_per_mile += onroad_gallons_per_mile * retail_price_per_gallon
@@ -116,6 +119,7 @@ def calc_fuel_cost_per_mile(batch_settings, session_settings):
                     'body_style': body_style,
                     'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,
                     'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
+                    'evse_kwh_per_mile': onroad_direct_kwh_per_mile / refuel_efficiency_e,
                     'onroad_gallons_per_mile': onroad_gallons_per_mile,
                     'onroad_miles_per_gallon': onroad_miles_per_gallon,
                     'retail_price_per_gallon': retail_price_per_gallon,
