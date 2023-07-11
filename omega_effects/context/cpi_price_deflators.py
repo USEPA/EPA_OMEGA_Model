@@ -101,7 +101,9 @@ class CPIPriceDeflators:
         calendar_years = pd.Series(self._data.keys())
         if len(calendar_years[calendar_years <= calendar_year]) > 0:
             year = max(calendar_years[calendar_years <= calendar_year])
-
+            if year < calendar_year:
+                effects_log.logwrite(f'Missing CPI price deflator for {calendar_year}')
+                sys.exit()
             return self._data[year]['price_deflator']
         else:
             effects_log.logwrite(f'Missing CPI price deflator for {calendar_year} or prior')

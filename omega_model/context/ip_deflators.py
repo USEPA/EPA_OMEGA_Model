@@ -46,7 +46,7 @@ print('importing %s' % __file__)
 from omega_model import *
 
 
-class ImplictPriceDeflators(OMEGABase):
+class ImplicitPriceDeflators(OMEGABase):
     """
     **Loads and provides access to implicit price deflators by calendar year.**
 
@@ -69,19 +69,20 @@ class ImplictPriceDeflators(OMEGABase):
         """
         cache_key = calendar_year
 
-        if cache_key not in ImplictPriceDeflators._cache:
+        if cache_key not in ImplicitPriceDeflators._cache:
 
-            calendar_years = pd.Series(ImplictPriceDeflators._data.keys())
-            # calendar_years = np.array(list(ImplictPriceDeflators._data.keys()))
-            # calendar_years = np.array([*ImplictPriceDeflators._data])
+            calendar_years = pd.Series(ImplicitPriceDeflators._data.keys())
+
             if len(calendar_years[calendar_years <= calendar_year]) > 0:
                 year = max(calendar_years[calendar_years <= calendar_year])
-
-                ImplictPriceDeflators._cache[cache_key] = ImplictPriceDeflators._data[year]['price_deflator']
+                ImplicitPriceDeflators._cache[cache_key] = ImplicitPriceDeflators._data[year]['price_deflator']
             else:
                 raise Exception(f'Missing implicit price deflator for {calendar_year} or prior')
 
-        return ImplictPriceDeflators._cache[cache_key]
+            if max(calendar_years[calendar_years <= calendar_year]) < calendar_year:
+                raise Exception(f'Missing implicit price deflator for {calendar_year}')
+
+        return ImplicitPriceDeflators._cache[cache_key]
 
     @staticmethod
     def dollar_adjustment_factor(dollar_basis_input):
@@ -97,8 +98,8 @@ class ImplictPriceDeflators(OMEGABase):
         """
         analysis_basis = omega_globals.options.analysis_dollar_basis
 
-        adj_factor_numerator = ImplictPriceDeflators.get_price_deflator(analysis_basis)
-        adj_factor_denominator = ImplictPriceDeflators.get_price_deflator(dollar_basis_input)
+        adj_factor_numerator = ImplicitPriceDeflators.get_price_deflator(analysis_basis)
+        adj_factor_denominator = ImplicitPriceDeflators.get_price_deflator(dollar_basis_input)
 
         adj_factor = adj_factor_numerator / adj_factor_denominator
 
@@ -118,9 +119,9 @@ class ImplictPriceDeflators(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        ImplictPriceDeflators._data.clear()
+        ImplicitPriceDeflators._data.clear()
 
-        ImplictPriceDeflators._cache.clear()
+        ImplicitPriceDeflators._cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
@@ -140,7 +141,7 @@ class ImplictPriceDeflators(OMEGABase):
                                                              verbose=verbose)
 
             if not template_errors:
-                ImplictPriceDeflators._data = df.set_index('calendar_year').to_dict(orient='index')
+                ImplicitPriceDeflators._data = df.set_index('calendar_year').to_dict(orient='index')
 
         return template_errors
 
@@ -158,13 +159,13 @@ if __name__ == '__main__':
 
         init_fail = []
 
-        init_fail += ImplictPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
-                                                    verbose=omega_globals.options.verbose)
+        init_fail += ImplicitPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
+                                                           verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            print(ImplictPriceDeflators.get_price_deflator(2010))
-            print(ImplictPriceDeflators.get_price_deflator(2020))
-            print(ImplictPriceDeflators.get_price_deflator(2050))
+            print(ImplicitPriceDeflators.get_price_deflator(2010))
+            print(ImplicitPriceDeflators.get_price_deflator(2020))
+            print(ImplicitPriceDeflators.get_price_deflator(2050))
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
