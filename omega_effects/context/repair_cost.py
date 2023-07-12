@@ -100,7 +100,7 @@ class RepairCost:
             A single repair cost per mile for the given vehicle at the given age.
 
         """
-        veh_type_multiplier = self._data[f'{repair_type}_multiplier']['value']
+        repair_type_multiplier = self._data[f'{repair_type}_multiplier']['value']
         pt_multiplier = self._data[f'{pt_type}_multiplier']['value']
         if age <= 4:
             a_value = self._data[f'a_value_{age}']['value']
@@ -109,6 +109,6 @@ class RepairCost:
                       + self._data['a_value_add']['value'] * (age - 4)
         b = self._data['b']['value']
 
-        repair_cost_per_mile = veh_type_multiplier * pt_multiplier * a_value * e ** (veh_cost * b)
+        repair_cost_per_mile = repair_type_multiplier * pt_multiplier * a_value * e ** (veh_cost * b)
 
         return repair_cost_per_mile
