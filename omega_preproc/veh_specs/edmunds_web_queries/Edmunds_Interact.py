@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.common.exceptions import WebDriverException, NoSuchElementException, TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.chrome.service import Service
 
 import os
 import time
@@ -470,6 +471,7 @@ def est_max_towing_capacity(df):
     return df
 
 def Edmunds_Interact(url):
+
     max_attempts = 10
     max_time = 30
     sleep_3sec = 3
@@ -492,21 +494,28 @@ def Edmunds_Interact(url):
         # caps = DesiredCapabilities().CHROME
         # caps["pageLoadStrategy"] = "none"
         # chromeOptions.add_argument("--kiosk")  # for Mac/Linux OS
-        chromeOptions.add_argument("--start-maximized")
+        # chromeOptions.add_argument("--start-maximized")
         # driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions, desired_capabilities=caps)
-        driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
+        # driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
+        service = Service();
+        options = webdriver.ChromeOptions()
+        options.add_argument("--start-maximized")
+        driver = webdriver.Chrome(service=service, options=options)
         try:
             driver.set_page_load_timeout(wait_sec)
             driver.implicitly_wait(5)
             time.sleep(sleep_sec)
             driver.get(url)
             # find and click main button to reveal drop-down menu
-            menus = driver.find_elements_by_xpath(trim_dropdown_buttons_xpath)
+            # menus = driver.find_elements_by_xpath(trim_dropdown_buttons_xpath);
+            menus = driver.find_elements(By.XPATH, trim_dropdown_buttons_xpath);
+
             WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_dropdown_buttons_xpath)))
             time.sleep(sleep_sec)
             menus[0].click() # click the first dropdown menu button. Assumes all menus contain the same trim list.
             # find trim buttons in drop-down menu
-            trim_buttons = driver.find_elements_by_xpath(trim_select_buttons_xpath)
+            # trim_buttons = driver.find_elements_by_xpath(trim_select_buttons_xpath)
+            trim_buttons = driver.find_elements(By.XPATH, trim_select_buttons_xpath)
             WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_select_buttons_xpath)))
 
             _trim_start = 0
@@ -597,14 +606,16 @@ def Edmunds_Interact(url):
                             if _num_menu_columns == 1:
                                 element.click()
                             else:
-                                menus = driver.find_elements_by_xpath(trim_dropdown_buttons_xpath)
+                                # menus = driver.find_elements_by_xpath(trim_dropdown_buttons_xpath)
+                                menus = driver.find_elements(By.XPATH, trim_dropdown_buttons_xpath)
                                 menus[i].click()
                         except (NoSuchElementException, TimeoutException, UnboundLocalError):
                             print('element click Timeout')
                             continue
                     trims_text.append(trim_options[_index * _num_menu_columns + i])
                     element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_select_buttons_xpath)))
-                    dropdown_item = driver.find_elements_by_xpath(trim_select_buttons_xpath)[_index * _num_menu_columns + i]
+                    # dropdown_item = driver.find_elements_by_xpath(trim_select_buttons_xpath)[_index * _num_menu_columns + i]
+                    dropdown_item = driver.find_elements(By.XPATH, trim_select_buttons_xpath)[_index * _num_menu_columns + i]
                     actions = ActionChains(driver)
                     actions.move_to_element(dropdown_item).click().perform()
                     actions.reset_actions()
@@ -780,15 +791,16 @@ def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_t
                 #         (str(tmp_raw_table['Category'][0]).lower() == 'interior options' and SKIP_PRINTING_INTERIOR_OPTIONS == True):
                 #     continue
                 # else:
-                df_tmp = df_tmp.append(tmp_raw_table, ignore_index=True)
+                # df_tmp = df_tmp.append(tmp_raw_table, ignore_index=True)
+                df_tmp = pd.concat([df_tmp, tmp_raw_table], ignore_index=True);
+
                 df_tmp.fillna('', inplace=True)
                 if table_count == (num_table_list-1):
                     if (trim_group == 0 and _num_menu_columns > 1) or (i_trims_page == 0):
                         df = df_tmp
                     else:
-                        # dfc = pd.concat([df, df_tmp], axis=1, keys=["Category", "Specifications"], how = 'outer', ignore_index=True, sort=False) #join="inner", ignore_index=True, sort=False)
+                        df_tmp = df_tmp.rename(columns={df_tmp.columns[2]: 'Trim_' + str(i_trims_page+1)})  # , df_tmp.columns[2]: 'Spec Values'})
                         df =  pd.merge(df, df_tmp, on=['Category', 'Specifications'], how='outer')
-                        # dfj = df.join(df_tmp, how='outer')
                         df = df.drop_duplicates(subset=['Specifications'])
             except NameError:
                 df_tmp = table_list[table_count]
