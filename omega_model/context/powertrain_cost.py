@@ -52,56 +52,14 @@ Data Column Name and Description
 **CODE**
 
 """
-
 print('importing %s' % __file__)
+import pandas as pd
 
 from common.omega_types import *
 from common.input_validation import *
-from context.ip_deflators import ImplictPriceDeflators
+from context.ip_deflators import ImplicitPriceDeflators
 
 _cache = dict()
-
-
-def get_trans(pkg_info):
-    """
-    Get the transmission code for the given powertrain package.
-
-    Args:
-        pkg_info (Series): powertain package information
-
-    Returns:
-        The transmission code for the given data.
-
-    """
-    trans = ''
-    flags = 0
-
-    if pkg_info['trx10']:
-        trans = 'TRX10'
-        flags += 1
-    elif pkg_info['trx11']:
-        trans = 'TRX11'
-        flags += 1
-    elif pkg_info['trx12']:
-        trans = 'TRX12'
-        flags += 1
-    elif pkg_info['trx21']:
-        trans = 'TRX21'
-        flags += 1
-    elif pkg_info['trx22']:
-        trans = 'TRX22'
-        flags += 1
-    elif pkg_info['ecvt']:
-        trans = 'TRXCV'
-        flags += 1
-
-    if flags == 0:
-        raise Exception('%s has no transmission tech flag' % pkg_info.vehicle_name)
-
-    if flags > 1:
-        raise Exception('%s has multiple transmission tech flags' % pkg_info.vehicle_name)
-
-    return trans
 
 
 class PowertrainCost(OMEGABase):
@@ -109,7 +67,8 @@ class PowertrainCost(OMEGABase):
     **Loads and provides access to powertrain cost data, provides methods to calculate powertrain costs.**
 
     """
-    battery_cost_scalers = dict()
+    build_tracker = True
+    cost_tracker = {}
 
     @staticmethod
     def calc_cost(vehicle, pkg_info, powertrain_type):
@@ -118,7 +77,7 @@ class PowertrainCost(OMEGABase):
         package) for the full factorial combination of the iterable terms.
 
         Args:
-            powertrain_type:
+            powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
             vehicle (Vehicle): the vehicle to calc costs for
             pkg_info (dict-like): the necessary information for developing cost estimates.
 
@@ -126,8 +85,10 @@ class PowertrainCost(OMEGABase):
             A list of cost values indexed the same as pkg_df.
 
         """
-        market_class_id, model_year, base_year_cert_fuel_id, reg_class_id = \
-            vehicle.market_class_id, vehicle.model_year, vehicle.base_year_cert_fuel_id, vehicle.reg_class_id
+        update_dict = None
+        market_class_id, model_year, base_year_cert_fuel_id, reg_class_id, drive_system, body_style = \
+            vehicle.market_class_id, vehicle.model_year, vehicle.base_year_cert_fuel_id, vehicle.reg_class_id, \
+                vehicle.drive_system, vehicle.body_style
 
         locals_dict = locals()
 
@@ -210,17 +171,33 @@ class PowertrainCost(OMEGABase):
         emachine_cost = 0
         gasoline_flag = diesel_flag = 0
 
+        KW = KWH = KW_OBC = KW_DU = KW_FDU = KW_RDU = KW_P2 = KW_P4 = 0
+        trans = CYL = engine_config = LITERS = None
+        twc_substrate = twc_washcoat = twc_canning = twc_pgm = twc_cost = gpf_cost = diesel_eas_cost = eas_cost = 0
+        engine_cost = engine_block_cost = cegr_cost = gdi_cost = turb_cost = deac_pd_cost = deac_fc_cost = atk2_cost = 0
+        fuel_storage_cost = non_eas_exhaust_cost = exhaust_cost = 0
+        lv_battery_cost = start_stop_cost = trans_cost = high_eff_alt_cost = thermal_cost = lv_harness_cost = 0
+        hv_harness_cost = dc_dc_converter_cost = charge_cord_cost = 0
+        motor_cost = gearbox_cost = inverter_cost = battery_cost = battery_offset = 0
+        ac_leakage_cost = ac_efficiency_cost = 0
+        powertrain_cost = engine_cost = driveline_cost = e_machine_cost = electrified_driveline_cost = 0
+
         CURBWT = pkg_info['curbweight_lbs']
-        # VEHICLE_SIZE_CLASS = np.array([weight_bins.index(min([v for v in weight_bins if cw < v])) for cw in CURBWT])
         VEHICLE_SIZE_CLASS = weight_bins.index(min([v for v in weight_bins if CURBWT < v]))
+
+        if drive_system != 'AWD':
+            drive_system = '2WD'
+            locals_dict = locals()
 
         # powertrain costs for anything with a liquid fueled engine
         if powertrain_type in ['ICE', 'HEV', 'PHEV', 'MHEV']:
 
             trans = get_trans(pkg_info)
 
-            gasoline_flag = base_year_cert_fuel_id == 'gasoline'
-            diesel_flag = base_year_cert_fuel_id == 'diesel'
+            gasoline_flag = True
+            if 'diesel' in base_year_cert_fuel_id:
+                diesel_flag = True
+                gasoline_flag = False
 
             CYL = pkg_info['engine_cylinders']
             LITERS = pkg_info['engine_displacement_liters']
@@ -240,11 +217,6 @@ class PowertrainCost(OMEGABase):
             turb_input_scaler = eval(_cache['ALL', 'turb_scaler']['value'], {'np': np}, locals_dict)
 
             learn = learning_factor_ice
-            # determine drive system and calc cost
-            if type(pkg_info['drive_system']) is str:
-                adj_factor = _cache['ICE', pkg_info['drive_system']]['dollar_adjustment']
-                drive_system_cost = eval(_cache['ICE', pkg_info['drive_system']]['value'], {'np': np}, locals_dict) \
-                                    * adj_factor * learn
 
             # determine trans and calc cost
             adj_factor = _cache['ALL', trans]['dollar_adjustment']
@@ -338,6 +310,8 @@ class PowertrainCost(OMEGABase):
                     eval(_cache['ALL', 'diesel_aftertreatment_system']['value'], {'np': np}, locals_dict) * \
                     adj_factor_diesel_eas * learn
 
+            eas_cost = twc_cost + gpf_cost + diesel_eas_cost
+
         if powertrain_type in ['MHEV', 'HEV', 'PHEV', 'BEV']:
 
             if powertrain_type == 'PHEV' or powertrain_type == 'BEV':
@@ -371,24 +345,6 @@ class PowertrainCost(OMEGABase):
 
             # battery cost
             if powertrain_type in ['MHEV', 'HEV', 'PHEV', 'BEV']:
-                # battery_cost_scaler_dict \
-                #     = eval(_cache['ALL', 'battery_cost_scalers']['value'], {'np': np}, locals_dict)
-                #
-                # if model_year in battery_cost_scaler_dict['scaler'].keys():
-                #     cost_scaler = battery_cost_scaler_dict['scaler'][model_year]
-                # elif model_year in PowertrainCost.battery_cost_scalers:
-                #     cost_scaler = PowertrainCost.battery_cost_scalers[model_year]
-                # else:
-                #     min_year = max([yr for yr in battery_cost_scaler_dict['scaler'].keys() if yr < model_year])
-                #     max_year = min([yr for yr in battery_cost_scaler_dict['scaler'].keys() if yr > model_year])
-                #     min_year_scaler = battery_cost_scaler_dict['scaler'][min_year]
-                #     max_year_scaler = battery_cost_scaler_dict['scaler'][max_year]
-                #
-                #     m = (max_year_scaler - min_year_scaler) / (max_year - min_year)
-                #     cost_scaler = m * (model_year - min_year) + min_year_scaler
-                #
-                #     PowertrainCost.battery_cost_scalers[model_year] = cost_scaler
-
                 adj_factor = _cache[powertrain_type, 'battery']['dollar_adjustment']
                 battery_cost = eval(_cache[powertrain_type, 'battery']['value'], {'np': np}, locals_dict) \
                                * adj_factor * learning_pev_battery_scaling_factor
@@ -489,13 +445,6 @@ class PowertrainCost(OMEGABase):
                                          + power_management_and_distribution_cost + brake_sensors_actuators_cost \
                                          + additional_pair_of_half_shafts_cost
 
-        if powertrain_type == 'BEV':
-            # determine drive system and calc cost
-            if type(pkg_info['drive_system']) is str:
-                adj_factor = _cache['BEV', pkg_info['drive_system']]['dollar_adjustment']
-                drive_system_cost = eval(_cache['BEV', pkg_info['drive_system']]['value'], {'np': np}, locals_dict) \
-                                    * adj_factor * learning_factor_pev
-
         # ac leakage cost
         adj_factor = _cache['ALL', 'ac_leakage']['dollar_adjustment']
         ac_leakage_cost = eval(_cache['ALL', 'ac_leakage']['value'], {'np': np}, locals_dict) \
@@ -510,12 +459,21 @@ class PowertrainCost(OMEGABase):
         adj_factor = _cache[powertrain_type, 'LV_battery']['dollar_adjustment']
         quantity = _cache[powertrain_type, 'LV_battery']['quantity']
         lv_battery_cost = eval(_cache[powertrain_type, 'LV_battery']['value'], {'np': np}, locals_dict) \
-                          * adj_factor * learn * quantity
+                          * adj_factor * learning_factor_ice * quantity
 
         adj_factor = _cache[powertrain_type, 'HVAC']['dollar_adjustment']
         quantity = _cache[powertrain_type, 'HVAC']['quantity']
         hvac_cost = eval(_cache[powertrain_type, 'HVAC']['value'], {'np': np}, locals_dict) \
                     * adj_factor * learn * quantity
+
+        if powertrain_type == 'BEV':
+            adj_factor = _cache[powertrain_type, pkg_info['drive_system']]['dollar_adjustment']
+            drive_system_cost = eval(_cache[powertrain_type, pkg_info['drive_system']]['value'], {'np': np},
+                                     locals_dict) * adj_factor * learning_factor_ice
+        else:
+            adj_factor = _cache['ICE', pkg_info['drive_system']]['dollar_adjustment']
+            drive_system_cost = eval(_cache['ICE', pkg_info['drive_system']]['value'], {'np': np},
+                                     locals_dict) * adj_factor * learning_factor_ice
 
         diesel_engine_cost_scaler = 1
         if diesel_flag:
@@ -532,6 +490,80 @@ class PowertrainCost(OMEGABase):
                          + high_eff_alt_cost + start_stop_cost \
                          + ac_leakage_cost + ac_efficiency_cost \
                          + lv_battery_cost + hvac_cost
+
+        powertrain_cost = engine_cost + driveline_cost + emachine_cost + electrified_driveline_cost + battery_cost
+        if PowertrainCost.build_tracker:
+            update_dict = {
+                'vehicle_id': vehicle.vehicle_id,
+                'model_year': model_year,
+                'reg_class_id': reg_class_id,
+                'market_class_id': market_class_id,
+                'base_year_cert_fuel_id': base_year_cert_fuel_id,
+                'body_style': body_style,
+                'drive_system': vehicle.drive_system,
+                'powertrain_type': powertrain_type,
+                'learning_factor_ice': learning_factor_ice,
+                'learning_factor_pev': learning_factor_pev,
+                'learning_pev_battery_scaling_factor': learning_pev_battery_scaling_factor,
+                'trans': trans,
+                'CYL': CYL,
+                'engine_config': 'n/a',
+                'LITERS': LITERS,
+                'twc_substrate': twc_substrate,
+                'twc_washcoat': twc_washcoat,
+                'twc_canning': twc_canning,
+                'twc_pgm': twc_pgm,
+                'twc_cost': twc_cost,
+                'gpf_cost': gpf_cost,
+                'diesel_eas_cost': diesel_eas_cost,
+                'eas_cost': eas_cost,
+                'engine_block_cost': (cyl_cost + liter_cost) * turb_scaler * diesel_engine_cost_scaler,
+                'cegr_cost': cegr_cost,
+                'gdi_cost': gdi_cost,
+                'turb_cost': turb11_cost + turb12_cost,
+                'deac_pd_cost': deac_pd_cost,
+                'deac_fc_cost': deac_fc_cost,
+                'atk2_cost': atk2_cost,
+                'fuel_storage_cost': 'n/a',
+                'non_eas_exhaust_cost': 'n/a',
+                'exhaust_cost': 'n/a',
+                'lv_battery_cost': lv_battery_cost,
+                'start_stop_cost': start_stop_cost,
+                'drive_system_cost': drive_system_cost,
+                'trans_cost': trans_cost,
+                'high_eff_alternator_cost': high_eff_alt_cost,
+                'hvac_cost': hvac_cost,
+                'lv_harness_cost': 'n/a',
+                'hv_orange_cables_cost': hv_orange_cables_cost,
+                'DC_DC_converter_cost': obc_and_dcdc_converter_cost,
+                'dc_fast_charge_circuitry_cost': dc_fast_charge_circuitry_cost,
+                'external_charge_device': charging_cord_kit_cost,
+                'kW_DU': KW,
+                'kW_FDU': KW_FDU,
+                'kW_RDU': KW_RDU,
+                'kW_P2': KW_P2,
+                'kW_P4': KW_P4,
+                'kWh_battery': KWH,
+                'motor_cost': motor_cost,
+                'induction_motor_cost': induction_motor_cost,
+                'gearbox_cost': single_speed_gearbox_cost,
+                'inverter_cost': inverter_cost,
+                'induction_inverter_cost': induction_inverter_cost,
+                'powertrain_cooling_loop_cost': powertrain_cooling_loop_cost,
+                'power_management_and_distribution_cost': power_management_and_distribution_cost,
+                'brake_sensors_actuators_cost': brake_sensors_actuators_cost,
+                'additional_pair_of_half_shafts_cost': additional_pair_of_half_shafts_cost,
+                'battery_cost': battery_cost,
+                'battery_offset': battery_offset,
+                'ac_leakage_cost': ac_leakage_cost,
+                'ac_efficiency_cost': ac_efficiency_cost,
+                'engine_cost': engine_cost,
+                'driveline_cost': driveline_cost,
+                'e_machine_cost': emachine_cost,
+                'electrified_driveline_cost': electrified_driveline_cost,
+                'powertrain_cost': powertrain_cost,
+            }
+            PowertrainCost.cost_tracker[vehicle.vehicle_id] = update_dict
 
         return engine_cost, driveline_cost, emachine_cost, battery_cost, electrified_driveline_cost
 
@@ -575,7 +607,7 @@ class PowertrainCost(OMEGABase):
 
                 for cost_key in cost_keys:
 
-                    _cache[cost_key] = dict()
+                    _cache[cost_key] = {}
                     powertrain_type, item = cost_key
 
                     cost_info = df[(df['powertrain_type'] == powertrain_type) & (df['item'] == item)].iloc[0]
@@ -585,14 +617,56 @@ class PowertrainCost(OMEGABase):
                     else:
                         quantity = 0
 
-                    _cache[cost_key] = {'value': dict(),
+                    _cache[cost_key] = {'value': {},
                                         'quantity': quantity,
                                         'dollar_adjustment': 1}
 
                     if cost_info['dollar_basis'] > 0:
-                        adj_factor = ImplictPriceDeflators.dollar_adjustment_factor(int(cost_info['dollar_basis']))
+                        adj_factor = ImplicitPriceDeflators.dollar_adjustment_factor(int(cost_info['dollar_basis']))
                         _cache[cost_key]['dollar_adjustment'] = adj_factor
 
                     _cache[cost_key]['value'] = compile(str(cost_info['value']), '<string>', 'eval')
 
         return template_errors
+
+
+def get_trans(pkg_info):
+    """
+    Get the transmission code for the given powertrain package.
+
+    Args:
+        pkg_info (Series): powertain package information
+
+    Returns:
+        The transmission code for the given data.
+
+    """
+    trans = ''
+    flags = 0
+
+    if pkg_info['trx10']:
+        trans = 'TRX10'
+        flags += 1
+    elif pkg_info['trx11']:
+        trans = 'TRX11'
+        flags += 1
+    elif pkg_info['trx12']:
+        trans = 'TRX12'
+        flags += 1
+    elif pkg_info['trx21']:
+        trans = 'TRX21'
+        flags += 1
+    elif pkg_info['trx22']:
+        trans = 'TRX22'
+        flags += 1
+    elif pkg_info['ecvt']:
+        trans = 'TRXCV'
+        flags += 1
+
+    if flags == 0:
+        raise Exception('%s has no transmission tech flag' % pkg_info.vehicle_name)
+
+    if flags > 1:
+        raise Exception('%s has multiple transmission tech flags' % pkg_info.vehicle_name)
+
+    return trans

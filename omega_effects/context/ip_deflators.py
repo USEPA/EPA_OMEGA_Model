@@ -107,11 +107,13 @@ class ImplicitPriceDeflators:
 
             if len(calendar_years[calendar_years <= calendar_year]) > 0:
                 year = max(calendar_years[calendar_years <= calendar_year])
-
                 self._cache[cache_key] = self._data[year]['price_deflator']
-
             else:
                 effects_log.logwrite(f'Missing implicit price deflator for {calendar_year} or prior')
+                sys.exit()
+
+            if max(calendar_years[calendar_years <= calendar_year]) < calendar_year:
+                effects_log.logwrite(f'Missing implicit price deflator for {calendar_year}')
                 sys.exit()
 
         return self._cache[cache_key]
