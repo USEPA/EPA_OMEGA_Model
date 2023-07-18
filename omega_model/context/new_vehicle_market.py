@@ -167,6 +167,7 @@ class NewVehicleMarket(OMEGABase):
         cls._session_new_vehicle_generalized_costs.clear()
 
         if not omega_globals.options.generate_context_calibration_files:
+            max_year = 0
             df = pd.read_csv(filename, index_col=0, dtype=str)
             # wanted to do: cls._new_vehicle_generalized_costs = df['new_vehicle_price_dollars'].to_dict()
             # OK, this is really weird and you shouldn't have to do this, but for whatever reason, when pandas
@@ -174,6 +175,10 @@ class NewVehicleMarket(OMEGABase):
             # This is the workaround: let python do the conversion
             for key, value in df['new_vehicle_price_dollars'].items():
                 cls._context_new_vehicle_generalized_costs[key] = float(value)
+                year = int(str.split(key, '_')[0])
+                max_year = max(max_year, year)
+
+            cls._context_new_vehicle_generalized_costs['max_year'] = max_year
 
     @classmethod
     def save_context_new_vehicle_generalized_costs(cls, filename):
@@ -231,6 +236,14 @@ class NewVehicleMarket(OMEGABase):
 
 
         """
+
+        max_year = cls._context_new_vehicle_generalized_costs['max_year']
+
+        if calendar_year > max_year:
+            omega_log.logwrite('\n### %d Exceeds context new vehicle gneralized cost max year %d ###' %
+                               (calendar_year, max_year))
+
+            calendar_year = max_year
 
         return cls._context_new_vehicle_generalized_costs['%s_%s' % (calendar_year, compliance_id)]
 
