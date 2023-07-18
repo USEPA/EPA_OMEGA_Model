@@ -454,7 +454,7 @@ class CompositeVehicle(OMEGABase):
         if calc_composite_cost_curve:
             plot_cost_curve = ((omega_globals.options.log_vehicle_cloud_years == 'all') or
                               (self.model_year in omega_globals.options.log_vehicle_cloud_years)) and \
-                              'v_cloud_plots' in omega_globals.options.verbose_log_modules
+                              'cv_cloud_plots' in omega_globals.options.verbose_log_modules
             # CU
             self.cost_curve = self.calc_composite_cost_curve(plot=plot_cost_curve)
 
