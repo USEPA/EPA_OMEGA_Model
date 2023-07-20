@@ -1167,6 +1167,7 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
             manufacturer_new_vehicles.append(veh_final)
 
             from context.powertrain_cost import PowertrainCost
+            veh_final.global_cumulative_battery_GWh = omega_globals.cumulative_battery_GWh
             PowertrainCost.calc_cost(veh_final)  # update build dict
 
     # propagate pre-production vehicles
