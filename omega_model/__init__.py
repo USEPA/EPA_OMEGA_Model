@@ -216,6 +216,9 @@ try:
 
             self.manufacturer_gigawatthour_data = None
 
+            self.powertrain_cost_fev = False
+            self.powertrain_cost_tracker = False
+
             # list of modules to allow verbose log files, or empty to disable:
             self.verbose_log_modules = ['database_', 'producer_compliance_search', 'cross_subsidy_search_',
                                         'cv_cost_curves_', 'v_cost_curves_', 'v_cost_clouds_',

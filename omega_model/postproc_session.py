@@ -286,7 +286,7 @@ def run_postproc(iteration_log, credit_banks):
 
     session_results.to_csv(summary_filename, index=False, columns=sorted(session_results.columns))
 
-    if PowertrainCost.build_tracker:
+    if omega_globals.options.powertrain_cost_tracker:
         powertrain_costs_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name \
                                     + '_powertrain_cost_results.csv'
         pt_cost_df = pd.DataFrame.from_dict(PowertrainCost.cost_tracker, orient='index')

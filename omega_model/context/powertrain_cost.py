@@ -93,10 +93,32 @@ class PowertrainCost(OMEGABase):
             pkg_info['drive_system'] = vehicle.drive_system
             pkg_info['engine_cylinders'] = vehicle.engine_cylinders
             pkg_info['engine_displacement_liters'] = vehicle.engine_displacement_liters
+            pkg_info['footprint_ft2'] = vehicle.footprint_ft2
 
         if powertrain_type is None:
             powertrain_type = omega_globals.options.CostCloud.get_powertrain_type(pkg_info)
 
+        if omega_globals.options.powertrain_cost_fev:
+            return PowertrainCost.calc_cost_fev(vehicle, pkg_info, powertrain_type)
+
+        else:
+            return PowertrainCost.calc_cost_nprm(vehicle, pkg_info, powertrain_type)
+
+    @staticmethod
+    def calc_cost_nprm(vehicle, pkg_info, powertrain_type):
+        """
+        Calculate the value of the response surface equation for the given powertrain type, cost curve class (tech
+        package) for the full factorial combination of the iterable terms.
+
+        Args:
+            powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
+            vehicle (Vehicle): the vehicle to calc costs for
+            pkg_info (dict-like): the necessary information for developing cost estimates.
+
+        Returns:
+            A list of cost values indexed the same as pkg_df.
+
+        """
         update_dict = None
         market_class_id, model_year, base_year_cert_fuel_id, reg_class_id, drive_system, body_style = \
             vehicle.market_class_id, vehicle.model_year, vehicle.base_year_cert_fuel_id, vehicle.reg_class_id, \
@@ -111,7 +133,7 @@ class PowertrainCost(OMEGABase):
             if reg_class_id != 'mediumduty':
                 locals_dict.update({'CUMULATIVE_GWH': vehicle.global_cumulative_battery_GWh[model_year - 1]})
                 learning_pev_battery_scaling_factor = eval(_cache['PEV', 'battery_GWh_learning_curve']['value'],
-                                                           {'np': np}, locals_dict)
+                                                               {'np': np}, locals_dict)
                 if learning_pev_battery_scaling_factor > 1:
                     gwh = vehicle.global_cumulative_battery_GWh[model_year - 2]
                     locals_dict.update({'CUMULATIVE_GWH': vehicle.global_cumulative_battery_GWh[model_year - 1] + gwh})
@@ -504,9 +526,12 @@ class PowertrainCost(OMEGABase):
                          + lv_battery_cost + hvac_cost
 
         powertrain_cost = engine_cost + driveline_cost + emachine_cost + electrified_driveline_cost + battery_cost
-        if PowertrainCost.build_tracker:
+        if omega_globals.options.powertrain_cost_tracker:
             update_dict = {
                 'vehicle_id': vehicle.vehicle_id,
+                'name': vehicle.name,
+                'manufacturer_id': vehicle.manufacturer_id,
+                'compliance_id': vehicle.compliance_id,
                 'model_year': model_year,
                 'reg_class_id': reg_class_id,
                 'market_class_id': market_class_id,
@@ -514,6 +539,8 @@ class PowertrainCost(OMEGABase):
                 'body_style': body_style,
                 'drive_system': vehicle.drive_system,
                 'powertrain_type': powertrain_type,
+                'charge_depleting_range_mi': vehicle.charge_depleting_range_mi,
+                'footprint_ft2': pkg_info['footprint_ft2'],
                 'learning_factor_ice': learning_factor_ice,
                 'learning_factor_pev': learning_factor_pev,
                 'learning_pev_battery_scaling_factor': learning_pev_battery_scaling_factor,
@@ -580,6 +607,291 @@ class PowertrainCost(OMEGABase):
         return engine_cost, driveline_cost, emachine_cost, battery_cost, electrified_driveline_cost
 
     @staticmethod
+    def calc_cost_fev(vehicle, pkg_info, powertrain_type):
+        """
+        Calculate the value of the response surface equation for the given powertrain type, cost curve class (tech
+        package) for the full factorial combination of the iterable terms.
+
+        Args:
+            powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
+            vehicle (Vehicle): the Vehicle for which to calculate costs
+            pkg_info (Series): the necessary information for developing cost estimates.
+
+        Returns:
+            A list of cost values indexed the same as pkg_df.
+
+        """
+        update_dict = {}
+        locals_dict = locals()
+
+        market_class_id, model_year, base_year_cert_fuel_id, reg_class_id, drive_system, body_style = \
+            vehicle.market_class_id, vehicle.model_year, vehicle.base_year_cert_fuel_id, vehicle.reg_class_id, \
+                vehicle.drive_system, vehicle.body_style
+
+        learning_pev_battery_scaling_factor, learning_factor_ice, learning_factor_pev, locals_dict = \
+            get_learning_factors(vehicle, locals_dict)
+
+        KWH = KW_OBC = KW_DU = KW_FDU = KW_RDU = KW_P2 = KW_P4 = 0
+        trans = CYL = engine_config = LITERS = None
+        twc_substrate= twc_washcoat = twc_canning = twc_pgm = twc_cost = gpf_cost = diesel_eas_cost = eas_cost = 0
+        engine_cost = engine_block_cost = cegr_cost = gdi_cost = turb_cost = deac_pd_cost = deac_fc_cost = atk2_cost = 0
+        fuel_storage_cost = non_eas_exhaust_cost = exhaust_cost = 0
+        lv_battery_cost = start_stop_cost = trans_cost = high_eff_alt_cost = thermal_cost = lv_harness_cost = 0
+        hv_harness_cost = dc_dc_converter_cost = charge_cord_cost = 0
+        motor_cost = gearbox_cost = inverter_cost = battery_cost = battery_offset = 0
+        ac_leakage_cost = ac_efficiency_cost = 0
+        powertrain_cost = engine_cost = driveline_cost = e_machine_cost = electrified_driveline_cost = 0
+
+        if powertrain_type in ['MHEV', 'HEV', 'PHEV', 'BEV']:
+            KW_OBC = get_obc_power(pkg_info, powertrain_type)
+
+        if powertrain_type in ['BEV', 'MHEV', 'HEV', 'PHEV']:
+            KWH = pkg_info['battery_kwh']
+            KW_DU, KW_FDU, KW_RDU, KW_P2, KW_P4 = get_motor_power(pkg_info, powertrain_type, drive_system)
+
+        MARKUP_ICE, MARKUP_MHEV, MARKUP_HEV, MARKUP_PHEV, MARKUP_BEV = get_markups(locals_dict)
+
+        locals_dict = locals()
+
+        gasoline_flag = diesel_flag = False
+        if powertrain_type in ['ICE', 'MHEV', 'HEV', 'PHEV']:
+
+            # set some needed attributes
+            gasoline_flag = True
+            if 'diesel' in base_year_cert_fuel_id:
+                diesel_flag, gasoline_flag = True, False
+            trans = get_trans(pkg_info)
+            CYL, LITERS, engine_config = get_engine_deets(pkg_info)
+
+            locals_dict = locals()
+
+            # Engine System Costs ______________________________________________________________________________________
+            # exhaust and exhaust aftertreatment system (eas)
+            eas_cost = 0
+            if gasoline_flag:
+                twc_substrate, twc_washcoat, twc_canning, twc_pgm, twc_cost, gpf_cost = \
+                    calc_gasoline_eas_cost(locals_dict, learning_factor_ice)
+                eas_cost = twc_cost + gpf_cost
+            elif diesel_flag:
+                diesel_eas_cost = calc_diesel_eas_cost(locals_dict, learning_factor_ice)
+                eas_cost = diesel_eas_cost
+
+            non_eas_exhaust_cost = \
+                calc_non_eas_exhaust_cost(locals_dict, learning_factor_ice, powertrain_type, engine_config, body_style)
+
+            exhaust_cost = eas_cost + non_eas_exhaust_cost
+
+            locals_dict = locals()
+
+            # engine block and tech
+            engine_block_cost, cegr_cost, gdi_cost, turb_cost, deac_pd_cost, deac_fc_cost, atk2_cost = \
+                calc_engine_cost(
+                    locals_dict, learning_factor_ice, pkg_info, powertrain_type, engine_config, body_style, diesel_flag
+                )
+
+            # fuel storage
+            fuel_storage_cost = calc_fuel_storage_cost(locals_dict, learning_factor_ice, powertrain_type, body_style)
+
+            # Driveline System Costs ___________________________________________________________________________________
+            trans_cost = calc_trans_cost(locals_dict, learning_factor_ice, trans, drive_system)
+
+            motor_cost = 0
+            if powertrain_type != 'ICE':
+                motor_cost = \
+                    calc_motor_cost(locals_dict, learning_factor_ice, powertrain_type, drive_system, body_style)
+
+            inverter_cost = 0
+            if powertrain_type in ['MHEV', 'HEV', 'PHEV']:
+                inverter_cost = \
+                    calc_inverter_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
+
+            gearbox_cost = 0
+            if powertrain_type == 'PHEV':
+                gearbox_cost = \
+                    calc_gearbox_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
+
+            lv_battery_cost = calc_lv_battery_cost(locals_dict, learning_factor_ice, powertrain_type)
+
+            start_stop_cost = high_eff_alt_cost = 0
+            if powertrain_type == 'ICE':
+                start_stop_cost = calc_start_stop_cost(locals_dict, learning_factor_ice, pkg_info)
+                high_eff_alt_cost = calc_high_efficiency_alternator(locals_dict, learning_factor_ice, pkg_info)
+
+            thermal_cost = calc_thermal_cost(
+                locals_dict, learning_factor_ice, powertrain_type, drive_system, engine_config, body_style
+            )
+            ac_leakage_cost, ac_efficiency_cost = calc_air_conditioning_costs(locals_dict, learning_factor_ice)
+            lv_harness_cost = \
+                calc_lv_harness_cost(locals_dict, learning_factor_ice, powertrain_type, drive_system, body_style)
+
+            hv_harness_cost = dc_dc_converter_cost = 0
+            if powertrain_type in ['MHEV', 'HEV']:
+                hv_harness_cost = \
+                    calc_hv_harness_cost(locals_dict, learning_factor_ice, powertrain_type, drive_system, body_style)
+                dc_dc_converter_cost = calc_dc_dc_converter_cost(locals_dict, learning_factor_ice, powertrain_type)
+            if powertrain_type == 'PHEV':
+                hv_harness_cost = \
+                    calc_hv_harness_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
+                dc_dc_converter_cost = calc_dc_dc_converter_cost(locals_dict, learning_factor_pev, powertrain_type)
+
+            charge_cord_cost = 0
+            if powertrain_type == 'PHEV':
+                charge_cord_cost = calc_charge_cord_cost(locals_dict, learning_factor_pev, powertrain_type)
+
+            battery_cost = battery_offset = 0
+            if powertrain_type in ['MHEV', 'HEV', 'PHEV']:
+                battery_cost = calc_battery_cost(locals_dict, learning_pev_battery_scaling_factor, powertrain_type)
+
+                if powertrain_type == 'PHEV':
+                    battery_offset = calc_battery_offset(locals_dict, vehicle, powertrain_type, KWH)
+
+            battery_cost += battery_offset
+
+            engine_cost = sum([
+                exhaust_cost, engine_block_cost, cegr_cost, gdi_cost, turb_cost, deac_pd_cost, deac_fc_cost, atk2_cost,
+                fuel_storage_cost
+            ])
+
+            driveline_cost = \
+                lv_battery_cost + lv_harness_cost + \
+                trans_cost + start_stop_cost + high_eff_alt_cost + \
+                thermal_cost + ac_leakage_cost + ac_efficiency_cost
+
+            e_machine_cost = motor_cost
+
+            electrified_driveline_cost = dc_dc_converter_cost + hv_harness_cost + charge_cord_cost + \
+                                         inverter_cost + gearbox_cost
+
+        if powertrain_type == 'BEV':
+
+            engine_cost = 0
+
+            KW_DU, KW_FDU, KW_RDU, KW_P2, KW_P4 = get_motor_power(pkg_info, powertrain_type, drive_system)
+
+            locals_dict = locals()
+
+            # Driveline System Costs ___________________________________________________________________________________
+            motor_cost = 0
+            motor_cost = \
+                    calc_motor_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
+            inverter_cost = \
+                calc_inverter_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
+            gearbox_cost = \
+                calc_gearbox_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
+
+            lv_battery_cost = calc_lv_battery_cost(locals_dict, learning_factor_ice, powertrain_type)
+            thermal_cost = calc_thermal_cost(
+                locals_dict, learning_factor_ice, powertrain_type, drive_system, '-', body_style
+            )
+            ac_leakage_cost, ac_efficiency_cost = calc_air_conditioning_costs(locals_dict, learning_factor_ice)
+            lv_harness_cost = \
+                calc_lv_harness_cost(locals_dict, learning_factor_ice, powertrain_type, drive_system, body_style)
+
+            hv_harness_cost = dc_dc_converter_cost = 0
+            hv_harness_cost = \
+                calc_hv_harness_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
+            dc_dc_converter_cost = calc_dc_dc_converter_cost(locals_dict, learning_factor_pev, powertrain_type)
+
+            charge_cord_cost = calc_charge_cord_cost(locals_dict, learning_factor_pev, powertrain_type)
+
+            battery_cost = calc_battery_cost(locals_dict, learning_pev_battery_scaling_factor, powertrain_type)
+
+            battery_offset = calc_battery_offset(locals_dict, vehicle, powertrain_type, KWH)
+
+            battery_cost += battery_offset
+
+            driveline_cost = \
+                lv_battery_cost + lv_harness_cost + \
+                thermal_cost + ac_leakage_cost + ac_efficiency_cost
+
+            e_machine_cost = motor_cost
+
+            electrified_driveline_cost = dc_dc_converter_cost + hv_harness_cost + charge_cord_cost + \
+                                         inverter_cost + gearbox_cost
+
+        powertrain_cost = engine_cost + driveline_cost + e_machine_cost + electrified_driveline_cost + battery_cost
+
+        if omega_globals.options.powertrain_cost_tracker:
+            update_dict = {
+                'vehicle_id': vehicle.vehicle_id,
+                'name': vehicle.name,
+                'manufacturer_id': vehicle.manufacturer_id,
+                'compliance_id': vehicle.compliance_id,
+                'model_year': model_year,
+                'reg_class_id': reg_class_id,
+                'market_class_id': market_class_id,
+                'base_year_cert_fuel_id': base_year_cert_fuel_id,
+                'body_style': body_style,
+                'drive_system': vehicle.drive_system,
+                'powertrain_type': powertrain_type,
+                'charge_depleting_range_mi': vehicle.charge_depleting_range_mi,
+                'footprint_ft2': pkg_info['footprint_ft2'],
+                'learning_factor_ice': learning_factor_ice,
+                'learning_factor_pev': learning_factor_pev,
+                'learning_pev_battery_scaling_factor': learning_pev_battery_scaling_factor,
+                'trans': trans,
+                'CYL': CYL,
+                'engine_config': engine_config,
+                'LITERS': LITERS,
+                'twc_substrate': twc_substrate,
+                'twc_washcoat': twc_washcoat,
+                'twc_canning': twc_canning,
+                'twc_pgm': twc_pgm,
+                'twc_cost': twc_cost,
+                'gpf_cost': gpf_cost,
+                'diesel_eas_cost': diesel_eas_cost,
+                'eas_cost': eas_cost,
+                'engine_block_cost': engine_block_cost,
+                'cegr_cost': cegr_cost,
+                'gdi_cost': gdi_cost,
+                'turb_cost': turb_cost,
+                'deac_pd_cost': deac_pd_cost,
+                'deac_fc_cost': deac_fc_cost,
+                'atk2_cost': atk2_cost,
+                'fuel_storage_cost': fuel_storage_cost,
+                'non_eas_exhaust_cost': non_eas_exhaust_cost,
+                'exhaust_cost': exhaust_cost,
+                'lv_battery_cost': lv_battery_cost,
+                'drive_system_cost': 'n/a',
+                'start_stop_cost': start_stop_cost,
+                'trans_cost': trans_cost,
+                'high_eff_alternator_cost': high_eff_alt_cost,
+                'thermal_cost': thermal_cost,
+                'lv_harness_cost': lv_harness_cost,
+                'hv_harness_cost': hv_harness_cost,
+                'DC_DC_converter_cost': dc_dc_converter_cost,
+                'dc_fast_charge_circuitry_cost': 'n/a',
+                'external_charge_device': charge_cord_cost,
+                'kW_DU': KW_DU,
+                'kW_FDU': KW_FDU,
+                'kW_RDU': KW_RDU,
+                'kW_P2': KW_P2,
+                'kW_P4': KW_P4,
+                'kWh_battery': KWH,
+                'e_motor_cost': motor_cost,
+                'induction_motor': 'n/a',
+                'gearbox_cost': gearbox_cost,
+                'inverter_cost': inverter_cost,
+                'induction_inverter_cost': 'n/a',
+                'powertrain_cooling_loop_cost': 'n/a',
+                'power_management_and_distribution_cost': 'n/a',
+                'brake_sensors_actuators_cost': 'n/a',
+                'additional_pair_of_half_shafts_cost': 'n/a',
+                'battery_cost': battery_cost,
+                'battery_offset': battery_offset,
+                'ac_leakage_cost': ac_leakage_cost,
+                'ac_efficiency_cost': ac_efficiency_cost,
+                'engine_cost': engine_cost,
+                'driveline_cost': driveline_cost,
+                'e_machine_cost': e_machine_cost,
+                'electrified_driveline_cost': electrified_driveline_cost,
+                'powertrain_cost': powertrain_cost,
+            }
+            PowertrainCost.cost_tracker[vehicle.vehicle_id] = update_dict
+
+        return engine_cost, driveline_cost, e_machine_cost, battery_cost, electrified_driveline_cost
+
+    @staticmethod
     def init_from_file(filename, verbose=False):
         """
 
@@ -598,8 +910,28 @@ class PowertrainCost(OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing PowertrainCost from %s...' % filename)
         input_template_name = 'powertrain_cost'
-        input_template_version = 0.1
-        input_template_columns = {'powertrain_type', 'item', 'value', 'quantity', 'dollar_basis', 'notes'}
+
+        if omega_globals.options.powertrain_cost_fev:
+            input_template_version = 0.2
+            input_template_columns = {
+                'powertrain_type',
+                'system',
+                'subsystem',
+                'drive_system',
+                'engine_configuration',
+                'body_style',
+                'value',
+                'dollar_basis',
+            }
+        else:
+            input_template_version = 0.1
+            input_template_columns = {
+                'powertrain_type',
+                'item',
+                'value',
+                'quantity',
+                'dollar_basis',
+            }
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -615,31 +947,208 @@ class PowertrainCost(OMEGABase):
                 df['value'] = df['value'] \
                     .apply(lambda x: str.replace(x, 'max(', 'np.maximum(').replace('min(', 'np.minimum('))
 
-                cost_keys = zip(df['powertrain_type'], df['item'])
+                if omega_globals.options.powertrain_cost_fev:
+                    cost_keys = pd.Series(zip(
+                        df['powertrain_type'],
+                        df['system'],
+                        df['subsystem'],
+                        df['drive_system'],
+                        df['engine_configuration'],
+                        df['body_style'],
+                    ))
+                    df.insert(0, 'cost_key', cost_keys)
 
-                for cost_key in cost_keys:
+                    for cost_key in cost_keys:
+                        _cache[cost_key] = dict()
+                        cost_info = df[df['cost_key'] == cost_key].iloc[0]
 
-                    _cache[cost_key] = {}
-                    powertrain_type, item = cost_key
+                        _cache[cost_key] = {'value': dict(),
+                                            'dollar_adjustment': 1}
 
-                    cost_info = df[(df['powertrain_type'] == powertrain_type) & (df['item'] == item)].iloc[0]
+                        if cost_info['dollar_basis'] > 0:
+                            adj_factor = ImplicitPriceDeflators.dollar_adjustment_factor(int(cost_info['dollar_basis']))
+                            _cache[cost_key]['dollar_adjustment'] = adj_factor
 
-                    if cost_info['quantity'] >= 1:
-                        quantity = cost_info['quantity']
-                    else:
-                        quantity = 0
+                        _cache[cost_key]['value'] = compile(str(cost_info['value']), '<string>', 'eval')
 
-                    _cache[cost_key] = {'value': {},
-                                        'quantity': quantity,
-                                        'dollar_adjustment': 1}
+                else:
 
-                    if cost_info['dollar_basis'] > 0:
-                        adj_factor = ImplicitPriceDeflators.dollar_adjustment_factor(int(cost_info['dollar_basis']))
-                        _cache[cost_key]['dollar_adjustment'] = adj_factor
+                    cost_keys = zip(df['powertrain_type'], df['item'])
 
-                    _cache[cost_key]['value'] = compile(str(cost_info['value']), '<string>', 'eval')
+                    for cost_key in cost_keys:
+
+                        _cache[cost_key] = {}
+                        powertrain_type, item = cost_key
+
+                        cost_info = df[(df['powertrain_type'] == powertrain_type) & (df['item'] == item)].iloc[0]
+
+                        if cost_info['quantity'] >= 1:
+                            quantity = cost_info['quantity']
+                        else:
+                            quantity = 0
+
+                        _cache[cost_key] = {'value': {},
+                                            'quantity': quantity,
+                                            'dollar_adjustment': 1}
+
+                        if cost_info['dollar_basis'] > 0:
+                            adj_factor = ImplicitPriceDeflators.dollar_adjustment_factor(int(cost_info['dollar_basis']))
+                            _cache[cost_key]['dollar_adjustment'] = adj_factor
+
+                        _cache[cost_key]['value'] = compile(str(cost_info['value']), '<string>', 'eval')
 
         return template_errors
+
+
+def get_learning_factors(v, locals_dict):
+    """
+    Get learning factors for use in estimating powertrain costs.
+
+    Args:
+        v (Vehicle): the Vehicle object
+        locals_dict (dict): local attributes
+
+    Returns:
+        Learning factors for ICE, PEV, and high-voltage batteries for use in calculating powertrain costs; locals_dict
+        is also returned with updated local attributes.
+
+    """
+    if v.model_year <= 2025 or v.global_cumulative_battery_GWh['total'] == 0 \
+            or v.global_cumulative_battery_GWh[v.model_year - 1] == 0:
+        learning_pev_battery_scaling_factor = 1
+    else:
+        cost_key = ('PEV', 'battery_GWh_learning_curve', '-', '-', '-', '-')
+        if v.reg_class_id != 'mediumduty':
+            cumulative_gwh = v.global_cumulative_battery_GWh[v.model_year - 1]
+            locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh})
+            learning_pev_battery_scaling_factor = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
+
+            if learning_pev_battery_scaling_factor > 1:
+                gwh = v.global_cumulative_battery_GWh[v.model_year - 2]
+                locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh + gwh})
+                learning_pev_battery_scaling_factor = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
+
+        else:
+            ld_dict_key = ('PEV', 'cumulative_GWh_LD_noIRA', '-', '-', '-', '-')
+            cumulative_GWh_ld_dict = eval(_cache[ld_dict_key]['value'], {'np': np}, locals_dict)
+
+            if v.model_year - 1 in cumulative_GWh_ld_dict['GWh']:
+                gwh = cumulative_GWh_ld_dict['GWh'][v.model_year - 1]
+                cumulative_gwh = v.global_cumulative_battery_GWh[v.model_year - 1]
+                locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh + gwh})
+                learning_pev_battery_scaling_factor = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
+
+                if learning_pev_battery_scaling_factor > 1:
+                    gwh += cumulative_GWh_ld_dict['GWh'][v.model_year - 2]
+                    locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh + gwh})
+                    learning_pev_battery_scaling_factor = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
+            else:
+                year = max(yr for yr in cumulative_GWh_ld_dict['GWh'])
+                gwh = cumulative_GWh_ld_dict['GWh'][year]
+                cumulative_gwh = v.global_cumulative_battery_GWh[v.model_year - 1]
+                locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh + gwh})
+                learning_pev_battery_scaling_factor = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
+
+    # non-battery learning
+    learning_rate = eval(_cache['ALL', 'learning_rate', '-', '-', '-', '-']['value'], {'np': np}, locals_dict)
+    learning_start = eval(_cache['ALL', 'learning_start', '-', '-', '-', '-']['value'], {'np': np}, locals_dict)
+    legacy_sales_scaler_ice = \
+        eval(_cache['ICE', 'legacy_sales_learning_scaler', '-', '-', '-', '-']['value'], {'np': np}, locals_dict)
+    legacy_sales_scaler_pev = \
+        eval(_cache['PEV', 'legacy_sales_learning_scaler', '-', '-', '-', '-']['value'], {'np': np}, locals_dict)
+    sales_scaler_ice = eval(_cache['ICE', 'sales_scaler', '-', '-', '-', '-']['value'], {'np': np}, locals_dict)
+    sales_scaler_pev = eval(_cache['PEV', 'sales_scaler', '-', '-', '-', '-']['value'], {'np': np}, locals_dict)
+    cumulative_sales_ice = abs(sales_scaler_ice * (v.model_year - learning_start))
+    cumulative_sales_pev = abs(sales_scaler_pev * (v.model_year - learning_start))
+    learning_factor_ice = \
+        ((cumulative_sales_ice + legacy_sales_scaler_ice) / legacy_sales_scaler_ice) ** learning_rate
+    learning_factor_pev = \
+        ((cumulative_sales_pev + legacy_sales_scaler_pev) / legacy_sales_scaler_pev) ** learning_rate
+    if v.model_year < learning_start:
+        learning_factor_ice = 1 / learning_factor_ice
+        learning_factor_pev = 1 / learning_factor_pev
+
+    return learning_pev_battery_scaling_factor, learning_factor_ice, learning_factor_pev, locals_dict
+
+
+def get_markups(locals_dict):
+    """
+    Get markups for estimating indirect costs.
+
+    Args:
+        locals_dict (dict): local attributes
+
+    Returns:
+        A list of markup factors for use with ICE, MHEV, HEV, PHEV and BEV technologies
+
+    """
+    markup_list = []
+    for ptrain in ['ICE', 'MHEV', 'HEV', 'PHEV', 'BEV']:
+        markup_list.append(eval(_cache[ptrain, 'markup', '-', '-', '-', '-']['value'], {'np': np}, locals_dict))
+
+    return markup_list
+
+
+def get_obc_power(pkg_info, powertrain_type):
+    """
+    Get the charging power of the onboard charger, if equipped.
+
+    Args:
+        pkg_info (Series): the necessary information for developing cost estimates
+        powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
+
+    Returns:
+        The charging power of the onboard charger
+
+    """
+    kw_obc = 3.5
+    kwh = pkg_info['battery_kwh']
+    if powertrain_type == 'PHEV':
+        kw_obc += 1.9
+        if kwh < 10:
+            kw_obc += 1.1
+        elif kwh < 7:
+            kw_obc += 0.7
+    elif powertrain_type == 'BEV':
+        kw_obc += 19
+        if kwh < 100:
+            kw_obc += 11
+        elif kwh < 70:
+            kw_obc += 7
+
+    return kw_obc
+
+
+def get_motor_power(pkg_info, powertrain_type, drive_system):
+    """
+    Get the electric drive motor-power, if equipped, of the given package.
+
+    Args:
+        pkg_info (Series): the necessary information for developing cost estimates
+        powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
+        drive_system (str): e.g., 'FWD', 'RWD', 'AWD' denoting front/rear/all wheel drive
+
+    Returns:
+        The motive power of the electric drive motor(s) whether it be the primary drive unit, the front and rear drive
+        units or the P2 and P4 drive units, depending on the package architecture
+
+    """
+    kw = pkg_info['motor_kw']
+
+    kw_fdu = kw_rdu = kw_du = kw_p2 = kw_p4 = 0
+
+    if powertrain_type == 'BEV':
+        if drive_system == 'AWD':
+            kw_fdu, kw_rdu = 0.4 * kw, 0.6 * kw  # TODO for now to test but better approach needed?
+        else:
+            kw_du = kw
+    elif powertrain_type == 'PHEV':
+        kw_p4, kw_p2 = 0.4 * kw, 0.6 * kw
+
+    elif powertrain_type in ['MHEV', 'HEV']:
+        kw_p2 = kw
+
+    return kw_du, kw_fdu, kw_rdu, kw_p2, kw_p4
 
 
 def get_trans(pkg_info):
@@ -682,3 +1191,584 @@ def get_trans(pkg_info):
         raise Exception('%s has multiple transmission tech flags' % pkg_info.vehicle_name)
 
     return trans
+
+
+def get_engine_deets(pkg_info):
+    """
+    Get engine details, if equipped, for the given powertrain package.
+
+    Args:
+        pkg_info (Series): powertain package information
+
+    Returns:
+        The number of cylinders, the displacement (liters) and 'I' or 'V' configuration of the engine block.
+
+    """
+    CYL = pkg_info['engine_cylinders']
+    engine_config = 'I'
+    if pkg_info['engine_cylinders'] >= 6:
+        engine_config = 'V'
+    LITERS = pkg_info['engine_displacement_liters']
+
+    return CYL, LITERS, engine_config
+
+
+def calc_gasoline_eas_cost(locals_dict, learning_factor):
+    """
+    Calculate exhaust aftertreatment system (eas) costs for gasoline-fueled engines.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+
+    Returns:
+        The three-way catalyst (twc) substrate, washcoat, canning, platinum group metal (pgm) and total costs along with
+        the gasoline particulate filter (gpf) cost
+
+    """
+    pt_cost_key = ('ALL', 'Exhaust', 'pt_dollars_per_oz', '-', '-', '-')
+    pd_cost_key = ('ALL', 'Exhaust', 'pd_dollars_per_oz', '-', '-', '-')
+    rh_cost_key = ('ALL', 'Exhaust', 'rh_dollars_per_oz', '-', '-', '-')
+    pt_load_key = ('ALL', 'Exhaust', 'twc_pt_grams_per_liter', '-', '-', '-')
+    pd_load_key = ('ALL', 'Exhaust', 'twc_pd_grams_per_liter', '-', '-', '-')
+    rh_load_key = ('ALL', 'Exhaust', 'twc_rh_grams_per_liter', '-', '-', '-')
+    PT_USD_PER_OZ = eval(_cache[pt_cost_key]['value'], {'np': np}, locals_dict)
+    PD_USD_PER_OZ = eval(_cache[pd_cost_key]['value'], {'np': np}, locals_dict)
+    RH_USD_PER_OZ = eval(_cache[rh_cost_key]['value'], {'np': np}, locals_dict)
+    PT_GRAMS_PER_LITER_TWC = eval(_cache[pt_load_key]['value'], {'np': np}, locals_dict)
+    PD_GRAMS_PER_LITER_TWC = eval(_cache[pd_load_key]['value'], {'np': np}, locals_dict)
+    RH_GRAMS_PER_LITER_TWC = eval(_cache[rh_load_key]['value'], {'np': np}, locals_dict)
+    OZ_PER_GRAM = \
+        eval(_cache['ALL', 'Exhaust', 'troy_oz_per_gram', '-', '-', '-']['value'], {'np': np}, locals_dict)
+
+    adj_factor_sub = _cache['ALL', 'Exhaust', 'twc_substrate', '-', '-', '-']['dollar_adjustment']
+    adj_factor_wash = _cache['ALL', 'Exhaust', 'twc_substrate', '-', '-', '-']['dollar_adjustment']
+    adj_factor_can = _cache['ALL', 'Exhaust', 'twc_canning', '-', '-', '-']['dollar_adjustment']
+    TWC_SWEPT_VOLUME = \
+        eval(_cache['ALL', 'Exhaust', 'twc_swept_volume', '-', '-', '-']['value'], {'np': np}, locals_dict)
+
+    locals_dict.update(locals())
+
+    twc_substrate = \
+        eval(_cache['ALL', 'Exhaust', 'twc_substrate', '-', '-', '-']['value'], {'np': np}, locals_dict) \
+        * adj_factor_sub * learning_factor
+    twc_washcoat = \
+        eval(_cache['ALL', 'Exhaust', 'twc_washcoat', '-', '-', '-']['value'], {'np': np}, locals_dict) \
+        * adj_factor_wash * learning_factor
+    twc_canning = \
+        eval(_cache['ALL', 'Exhaust', 'twc_canning', '-', '-', '-']['value'], {'np': np}, locals_dict) \
+        * adj_factor_can * learning_factor
+    twc_pgm = eval(_cache['ALL', 'Exhaust', 'twc_pgm', '-', '-', '-']['value'], {'np': np}, locals_dict)
+    twc_cost = (twc_substrate + twc_washcoat + twc_canning + twc_pgm)
+
+    # gpf cost
+    cost_key = ('ALL', 'Exhaust', 'gpf', '-', '-', '-')
+    adj_factor_gpf = _cache[cost_key]['dollar_adjustment']
+    gpf_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) \
+               * adj_factor_gpf * learning_factor
+
+    return twc_substrate, twc_washcoat, twc_canning, twc_pgm, twc_cost, gpf_cost
+
+
+def calc_diesel_eas_cost(locals_dict, learning_factor):
+    """
+    Calculate exhaust aftertreatment system (eas) cost for diesel-fueled engines.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+
+    Returns:
+        The diesel exhaust aftertreatment system cost
+
+    """
+    cost_key = ('ALL', 'Exhaust', 'diesel_aftertreatment_system', '-', '-', '-')
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    diesel_eas_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * \
+                      adj_factor * learning_factor
+
+    return diesel_eas_cost
+
+
+def calc_non_eas_exhaust_cost(locals_dict, learning_factor, powertrain_type, engine_config, body_style):
+    """
+    Calculate non-eas exhaust system cost for all liquid-fueled engines.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
+        engine_config (str): e.g., 'I' or 'V' configuration of the engine block
+        body_style (str): e.g., 'sedan', 'cuv_suv' or 'pickup'
+
+    Returns:
+        The exhaust system cost excluding the exhaust aftertreatment system (eas)
+
+    """
+    cost_key = (powertrain_type, 'Exhaust', 'Non-EAS', '-', engine_config, body_style)
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    non_eas_exhaust_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) \
+                           * adj_factor * learning_factor
+
+    return non_eas_exhaust_cost
+
+
+def calc_engine_cost(locals_dict, learning_factor, pkg_info, powertrain_type, engine_config, body_style,
+                     diesel_flag=False):
+    """
+    Calculate the cost of the engine, if equipped, including technologies included on the engine, if equipped
+    (e.g., GDI, EGR, etc.).
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        pkg_info (Series): powertain package information
+        powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
+        engine_config (str): e.g., 'I' or 'V' configuration of the engine block
+        body_style (str): e.g., 'sedan', 'cuv_suv' or 'pickup'
+        diesel_flag (bool): True for diesel engines (default is False)
+
+    Returns:
+        The engine block cost, cooled EGR cost, GDI cost, turbocharger cost, cylinder deactivation cost, and
+        Atkinson-specific cost, all where applicable; costs are $0 where not applicable
+
+    """
+    # engine block
+    cost_key = (powertrain_type, 'Engine', 'ALL', '-', engine_config, body_style)
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    engine_block_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
+
+    if diesel_flag:
+        cost_key = ('ALL', 'Engine', 'diesel_engine_cost_scaler', '-', '-', '-')
+        diesel_scaler = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
+        engine_block_cost *= diesel_scaler
+
+    # vvt (included on all liquid-fueled engines)
+    cost_key = (powertrain_type, 'Engine', 'VVT', '-', engine_config, body_style)
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    engine_block_cost += eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
+
+    # cegr cost
+    cost_key = (powertrain_type, 'Engine', 'EGR', '-', '-', body_style)
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    cegr_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor * \
+                pkg_info['cegr']
+
+    # gdi cost
+    cost_key = (powertrain_type, 'Engine', 'DI', '-', engine_config, body_style)
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    gdi_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor * \
+               pkg_info['gdi']
+
+    # turb cost
+    cost_key = (powertrain_type, 'Engine', 'Turbo Charger', '-', engine_config, body_style)
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    turb_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor * \
+                (pkg_info['turb11'] + pkg_info['turb12'])
+
+    # deac_pd cost
+    cost_key = ('ALL', 'Engine', 'deac_pd', '-', '-', '-')
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    deac_pd_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor * \
+                   pkg_info['deac_pd']
+
+    # deac_fc cost
+    cost_key = ('ICE', 'Engine', 'deac_fc', '-', engine_config, body_style)
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    deac_fc_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor * \
+                   pkg_info['deac_fc']
+
+    # atk2 cost
+    cost_key = ('ALL', 'Engine', 'atk2', '-', '-', '-')
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    atk2_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor * \
+                pkg_info['atk2']
+
+    return engine_block_cost, cegr_cost, gdi_cost, turb_cost, deac_pd_cost, deac_fc_cost, atk2_cost
+
+
+def calc_fuel_storage_cost(locals_dict, learning_factor, powertrain_type, body_style):
+    """
+    Calculate the cost of the liquid-fuel storage on liquid-fueled vehicles.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
+        body_style (str): e.g., 'sedan', 'cuv_suv' or 'pickup'
+
+    Returns:
+        The fuel storage system cost for liquid-fueled vehicles
+
+    """
+    cost_key = (powertrain_type, 'Fuel', 'Storage', '-', '-', body_style)
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    fuel_storage_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
+
+    return fuel_storage_cost
+
+
+def calc_lv_battery_cost(locals_dict, learning_factor, powertrain_type):
+    """
+    Calculate the low voltage battery cost for all vehicles.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
+
+    Returns:
+        The low voltage battery cost
+
+    """
+    cost_key = (powertrain_type, 'Driveline', 'LV_Battery_Less_Than_Equalto_48V', '-', '-', '-')
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    lv_battery_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
+
+    return lv_battery_cost
+
+
+def calc_start_stop_cost(locals_dict, learning_factor, pkg_info):
+    """
+    Calculate the start-stop system cost, if equipped.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        pkg_info (Series): powertain package information
+
+    Returns:
+        The start-stop system cost
+
+    """
+    cost_key = ('ALL', 'Driveline', 'start_stop', '-', '-', '-')
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    start_stop_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor * \
+                      pkg_info['start_stop']
+
+    return start_stop_cost
+
+
+def calc_trans_cost(locals_dict, learning_factor, trans, drive_system):
+    """
+    Calculate the transmission cost, if equipped, of the given package.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        trans (str): the transmission code returned by the get_trans function
+        drive_system (str): e.g., 'FWD', 'RWD', 'AWD' denoting front/rear/all wheel drive
+
+    Returns:
+        The transmission cost for the given package
+
+    """
+    if trans == 'TRXCV' and drive_system == 'AWD':
+        cost_key = ('ALL', 'Transmission', trans, 'AWD', '-', '-')
+        adj_factor = _cache[cost_key]['dollar_adjustment']
+
+    else:
+        cost_key = ('ALL', 'Transmission', trans, '-', '-', '-')
+        adj_factor = _cache[cost_key]['dollar_adjustment']
+
+    trans_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
+
+    return trans_cost
+
+
+def calc_motor_cost(locals_dict, learning_factor, powertrain_type, drive_system, body_style):
+    """
+    Calculate the electric drive motor cost, if equipped.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        powertrain_type (str): e.g., 'BEV', 'PHEV', 'HEV'
+        drive_system (str): e.g., 'FWD', 'RWD', 'AWD' denoting front/rear/all wheel drive
+        body_style (str): e.g., 'sedan', 'cuv_suv' or 'pickup'
+
+    Returns:
+        The electric drive motor cost, including all drive motors
+
+    """
+    cost_key = None
+    if powertrain_type in ['HEV', 'PHEV']:
+        cost_key = (powertrain_type, 'Transmission', 'E_Motor', '-', '-', body_style)
+    elif powertrain_type == 'BEV':
+        cost_key = (powertrain_type, 'Drive_Unit', 'E_Motor', drive_system, '-', body_style)
+
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    motor_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
+
+    return motor_cost
+
+
+def calc_high_efficiency_alternator(locals_dict, learning_factor, pkg_info):
+    """
+    Calculate the cost of the high efficiency alternator, if equipped.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        pkg_info (Series): powertain package information
+
+    Returns:
+        The high efficiency alternator cost
+
+    """
+    cost_key = ('ALL', 'Driveline', 'high_eff_alternator', '-', '-', '-')
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    high_eff_alt_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor * \
+                        pkg_info['high_eff_alternator']
+
+    return high_eff_alt_cost
+
+
+def calc_thermal_cost(locals_dict, learning_factor, powertrain_type, drive_system, engine_config, body_style):
+    """
+    Calculate the thermal control system cost (coolant circuit, cabin heating and cooling) for all vehicles.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
+        drive_system (str): e.g., 'FWD', 'RWD', 'AWD' denoting front/rear/all wheel drive
+        engine_config (str): e.g., 'I' or 'V' configuration of the engine block
+        body_style (str): e.g., 'sedan', 'cuv_suv' or 'pickup'
+
+    Returns:
+        The thermal control system cost
+
+    """
+    cost_key = (powertrain_type, 'Thermal', 'Coolant_Circuit_Cooling_Heating', '-', engine_config, '-')
+    if powertrain_type == 'BEV':
+        if drive_system == 'AWD':
+            cost_key = (powertrain_type, 'Thermal', 'Coolant_Circuit_Cooling_Heating', drive_system, '-', body_style)
+        else:
+            cost_key = (powertrain_type, 'Thermal', 'Coolant_Circuit_Cooling_Heating', '2WD', '-', body_style)
+
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    thermal_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
+
+    return thermal_cost
+
+
+def calc_air_conditioning_costs(locals_dict, learning_factor):
+    """
+    Calculate the air conditioning (ac) system costs for all vehicles.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+
+    Returns:
+        The ac-leakage and ac-efficiency costs
+
+    """
+    cost_key = ('ALL', 'Driveline', 'ac_leakage', '-', '-', '-')
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    ac_leakage_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
+
+    cost_key = ('ALL', 'Driveline', 'ac_efficiency', '-', '-', '-')
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    ac_efficiency_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
+
+    return ac_leakage_cost, ac_efficiency_cost
+
+
+def calc_lv_harness_cost(locals_dict, learning_factor, powertrain_type, drive_system, body_style):
+    """
+    Calculate the low voltage harness cost for all vehicles.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
+        drive_system (str): e.g., 'FWD', 'RWD', 'AWD' denoting front/rear/all wheel drive
+        body_style (str): e.g., 'sedan', 'cuv_suv' or 'pickup'
+
+    Returns:
+        The low voltage harness cost
+
+    """
+    if drive_system == 'AWD':
+        cost_key = \
+            (powertrain_type, 'Elect._Distribution_and_Electronic_Controls', 'Harness_Low_Voltage_LV', 'AWD',
+             '-', body_style
+             )
+    else:
+        cost_key = \
+            (powertrain_type, 'Elect._Distribution_and_Electronic_Controls', 'Harness_Low_Voltage_LV', '2WD',
+             '-', body_style
+             )
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    lv_harness_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
+
+    return lv_harness_cost
+
+
+def calc_hv_harness_cost(locals_dict, learning_factor, powertrain_type, drive_system, body_style):
+    """
+    Calculate the high voltage harness cost, if equipped.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        powertrain_type (str): e.g., 'BEV', 'PHEV', 'HEV', 'MHEV'
+        drive_system (str): e.g., 'FWD', 'RWD', 'AWD' denoting front/rear/all wheel drive
+        body_style (str): e.g., 'sedan', 'cuv_suv' or 'pickup'
+
+    Returns:
+        The high voltage harness cost
+
+    """
+    if drive_system == 'AWD':
+        cost_key = \
+            (powertrain_type, 'Elect._Distribution_and_Electronic_Controls', 'Harness_High_Voltage_HV', 'AWD',
+             '-', body_style
+             )
+    else:
+        cost_key = \
+            (powertrain_type, 'Elect._Distribution_and_Electronic_Controls', 'Harness_High_Voltage_HV', '2WD',
+             '-', body_style
+             )
+
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    hv_harness_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
+
+    return hv_harness_cost
+
+
+def calc_dc_dc_converter_cost(locals_dict, learning_factor, powertrain_type):
+    """
+    Calculate the DC-to-DC converter cost, if equipped.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        powertrain_type (str): e.g., 'BEV', 'PHEV', 'HEV', 'MHEV'
+
+    Returns:
+        The DC-to-DC converter cost
+
+    """
+    cost_key = (powertrain_type, 'Electrical_Power_Supply', 'DC_DC_Converter', '-', '-', '-')
+    if powertrain_type in ['BEV', 'PHEV']:
+        cost_key = (powertrain_type, 'Electrical_Power_Supply', 'DC_DC_Converter + OBC', '-', '-', '-')
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    dc_dc_converter_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
+
+    return dc_dc_converter_cost
+
+
+def calc_charge_cord_cost(locals_dict, learning_factor, powertrain_type):
+    """
+    Calculate the external charging device cost, if equipped.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        powertrain_type (str): e.g., 'BEV', 'PHEV'
+
+    Returns:
+        The external charging device cost
+
+    """
+    cost_key = (powertrain_type, 'Electrical_Power_Supply', 'External_Battery_Charge_Device', '-', '-', '-')
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    charge_cord_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
+
+    return charge_cord_cost
+
+
+def calc_inverter_cost(locals_dict, learning_factor, powertrain_type, drive_system, body_style):
+    """
+    Calculate the costs for inverters on BEVs.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        powertrain_type (str): e.g., 'BEV'
+        drive_system (str): e.g., 'FWD', 'RWD', 'AWD' denoting front/rear/all wheel drive
+        body_style (str): e.g., 'sedan', 'cuv_suv' or 'pickup'
+
+    Returns:
+        The inverter(s) cost
+
+    """
+    cost_key = (powertrain_type, 'Drive_Unit', 'Inverter', drive_system, '-', body_style)
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    inverter_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) \
+                    * adj_factor * learning_factor
+
+    return inverter_cost
+
+
+def calc_gearbox_cost(locals_dict, learning_factor, powertrain_type, drive_system, body_style):
+    """
+    Calculate the costs for gearboxes on BEVs.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        powertrain_type (str): e.g., 'BEV'
+        drive_system (str): e.g., 'FWD', 'RWD', 'AWD' denoting front/rear/all wheel drive
+        body_style (str): e.g., 'sedan', 'cuv_suv' or 'pickup'
+
+    Returns:
+        The gearbox(es) cost
+
+    """
+    cost_key = (powertrain_type, 'Drive_Unit', 'Gearbox', drive_system, '-', body_style)
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    gearbox_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) \
+                   * adj_factor * learning_factor
+
+    return gearbox_cost
+
+
+def calc_battery_cost(locals_dict, learning_factor, powertrain_type):
+    """
+    Calculate the high voltage battery pack cost on electrified vehicles.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        powertrain_type (str): e.g., 'BEV', 'PHEV', 'HEV', 'MHEV'
+
+    Returns:
+        The high voltage battery pack cost
+
+    """
+    cost_key = (powertrain_type, 'Electrical_Power_Supply', 'HV_Battery', '-', '-', '-')
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    battery_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) \
+                   * adj_factor * learning_factor
+
+    return battery_cost
+
+
+def calc_battery_offset(locals_dict, v, powertrain_type, battery_kwh):
+    """
+    Calculate the high voltage battery pack cost offset, where applicable (e.g., pursuant to the
+    Inflation Reduction Act).
+
+    Args:
+        locals_dict (dict): local attributes
+        v (Vehicle): the Vehicle object
+        powertrain_type (str): e.g., 'BEV', 'PHEV'
+
+    Returns:
+        The high voltage battery pack cost offset
+
+    """
+    battery_offset = 0
+    if battery_kwh >= 7:
+        cost_key = (powertrain_type, 'battery_offset', '-', '-', '-', '-')
+        battery_offset_dict = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
+        battery_offset_min_year = min(battery_offset_dict['dollars_per_kwh'])
+        battery_offset_max_year = max(battery_offset_dict['dollars_per_kwh'])
+        if battery_offset_min_year <= v.model_year <= battery_offset_max_year:
+            battery_offset = battery_offset_dict['dollars_per_kwh'][v.model_year] * battery_kwh
+
+    return battery_offset
