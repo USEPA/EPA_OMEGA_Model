@@ -531,16 +531,7 @@ class CostCloud(OMEGABase, CostCloudBase):
             for tf in tech_flags:
                 vehicle.__setattr__(tf, tech_flags[tf])
 
-            if vehicle.bev:
-                vehicle.powertrain_type = 'BEV'
-            elif vehicle.hev or vehicle.mhev:  # mhev/hev have same mass calcs for now
-                vehicle.powertrain_type = 'HEV'
-            elif vehicle.phev:
-                vehicle.powertrain_type = 'PHEV'
-            # elif vehicle.fcv:
-            #     vehicle.powertrain_type = 'FCV'
-            else:
-                vehicle.powertrain_type = 'ICE'
+            vehicle.powertrain_type = CostCloud.get_powertrain_type(tech_flags)
 
             for structure_material in structure_materials:
                 for footprint_ft2 in vehicle_footprints:
@@ -683,8 +674,8 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                             # add powertrain costs
                             powertrain_costs = \
-                                PowertrainCost.calc_cost(vehicle, cloud_point,
-                                                         cloud_point['powertrain_type'])  # includes battery cost
+                                PowertrainCost.calc_cost(vehicle, cloud_point['powertrain_type'],
+                                                         cloud_point)  # includes battery cost
                             powertrain_cost_terms = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
                                                      'electrified_driveline_cost']
                             for idx, ct in enumerate(powertrain_cost_terms):
@@ -759,11 +750,37 @@ class CostCloud(OMEGABase, CostCloudBase):
         rse_group_key = CostCloud.get_rse_group_key(vehicle)
 
         try:
-            tech_flags = _cache[rse_group_key][vehicle.cost_curve_class]['tech_flags']
+            tech_flags = _cache[rse_group_key][vehicle.cost_curve_class]['tech_flags'].to_dict()
         except:
             raise Exception('Unknown cost curve class "%s" in RSE group "%s"' % (vehicle.cost_curve_class, rse_group_key))
 
         return tech_flags
+
+    @staticmethod
+    def get_powertrain_type(tech_flags):
+        """
+        Determine powertrain type based on tech flags
+
+        Args:
+            tech_flags (dict-like):  tech flags and values
+
+        Returns:
+            Powertrain type based on tech flags
+
+        """
+
+        if 'bev' in tech_flags and tech_flags['bev']:
+            powertrain_type = 'BEV'
+        elif ('hev' in tech_flags and tech_flags['hev']) or ('mhev' in tech_flags and tech_flags['mhev']):  # mhev/hev have same mass calcs for now
+            powertrain_type = 'HEV'
+        elif 'phev' in tech_flags and tech_flags['phev']:
+            powertrain_type = 'PHEV'
+        # elif 'fcv' in tech_flags and tech_flags['fcv']:
+        #     powertrain_type = 'FCV'
+        else:
+            powertrain_type = 'ICE'
+
+        return powertrain_type
 
 
 if __name__ == '__main__':

@@ -71,7 +71,7 @@ class PowertrainCost(OMEGABase):
     cost_tracker = {}
 
     @staticmethod
-    def calc_cost(vehicle, pkg_info, powertrain_type):
+    def calc_cost(vehicle, powertrain_type=None, pkg_info=None):
         """
         Calculate the value of the response surface equation for the given powertrain type, cost curve class (tech
         package) for the full factorial combination of the iterable terms.
@@ -85,6 +85,18 @@ class PowertrainCost(OMEGABase):
             A list of cost values indexed the same as pkg_df.
 
         """
+        if pkg_info is None:
+            pkg_info = omega_globals.options.CostCloud.get_tech_flags(vehicle)
+            pkg_info['curbweight_lbs'] = vehicle.curbweight_lbs
+            pkg_info['battery_kwh'] = vehicle.battery_kwh
+            pkg_info['motor_kw'] = vehicle.motor_kw
+            pkg_info['drive_system'] = vehicle.drive_system
+            pkg_info['engine_cylinders'] = vehicle.engine_cylinders
+            pkg_info['engine_displacement_liters'] = vehicle.engine_displacement_liters
+
+        if powertrain_type is None:
+            powertrain_type = omega_globals.options.CostCloud.get_powertrain_type(pkg_info)
+
         update_dict = None
         market_class_id, model_year, base_year_cert_fuel_id, reg_class_id, drive_system, body_style = \
             vehicle.market_class_id, vehicle.model_year, vehicle.base_year_cert_fuel_id, vehicle.reg_class_id, \

@@ -1166,6 +1166,9 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
 
             manufacturer_new_vehicles.append(veh_final)
 
+            from context.powertrain_cost import PowertrainCost
+            PowertrainCost.calc_cost(veh_final)  # update build dict
+
     # propagate pre-production vehicles
     for ppv in pre_production_vehicles:
         veh_final = VehicleFinal()

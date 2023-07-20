@@ -222,7 +222,6 @@ class VehicleAggregation(OMEGABase):
         from context.glider_cost import GliderCost
         from context.powertrain_cost import PowertrainCost
         from policy.workfactor_definition import WorkFactor
-        from context.rse_cost_clouds import CostCloud
         from policy.policy_fuels import PolicyFuel
 
         # omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
@@ -246,13 +245,13 @@ class VehicleAggregation(OMEGABase):
             from context.mass_scaling import MassScaling
             from context.body_styles import BodyStyles
 
-            CostCloud.rse_names.update(['FCV'])  # RV add 'FCV' RSE name for validation purposes for now
+            omega_globals.options.CostCloud.rse_names.update(['FCV'])  # RV add 'FCV' RSE name for validation purposes for now
 
             validation_dict = {'manufacturer_id': Manufacturer.manufacturers,
                                'reg_class_id': list(legacy_reg_classes),
                                'context_size_class': NewVehicleMarket.context_size_classes,
                                'electrification_class': ['N', 'EV', 'HEV', 'PHEV', 'FCV'],
-                               'cost_curve_class': CostCloud.rse_names,
+                               'cost_curve_class': omega_globals.options.CostCloud.rse_names,
                                'unibody_structure': [0, 1],
                                'body_style': BodyStyles.body_styles,
                                'structure_material': MassScaling.structure_materials,
@@ -367,10 +366,10 @@ class VehicleAggregation(OMEGABase):
                 VehicleFinal.set_fueling_class(veh)
 
                 # row tech flags needed by powertrain cost
-                for tech_flag, value in CostCloud.get_tech_flags(veh).items():
+                for tech_flag, value in omega_globals.options.CostCloud.get_tech_flags(veh).items():
                     row[tech_flag] = value
 
-                powertrain_cost = sum(PowertrainCost.calc_cost(veh, row, veh.base_year_powertrain_type))
+                powertrain_cost = sum(PowertrainCost.calc_cost(veh, veh.base_year_powertrain_type, row))
 
                 # calc glider cost
                 veh.structure_material = row['structure_material']
