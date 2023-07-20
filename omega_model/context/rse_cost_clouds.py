@@ -631,6 +631,14 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                             cloud_point = vehicle.calc_cert_and_onroad_values(cloud_point)
 
+                            if rlhp20 == vehicle_rlhp20 and \
+                                    rlhp60 == vehicle_rlhp60 and \
+                                    footprint_ft2 == vehicle.footprint_ft2 and \
+                                    structure_material == vehicle.structure_material and \
+                                    ccc == vehicle.cost_curve_class:
+                                vehicle.cert_direct_oncycle_co2e_grams_per_mile = \
+                                    cloud_point['cert_direct_oncycle_co2e_grams_per_mile']
+
                             v = copy.copy(vehicle)
                             v.footprint_ft2 = footprint_ft2
                             cloud_point['target_co2e_Mg_per_vehicle'] = \
@@ -684,6 +692,10 @@ class CostCloud(OMEGABase, CostCloudBase):
                             cloud_points.append(cloud_point)
 
         cost_cloud = pd.DataFrame(cloud_points)
+
+        if omega_globals.no_backsliding:
+            cost_cloud = cost_cloud[cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] <=
+                                    vehicle.cert_direct_oncycle_co2e_grams_per_mile]
 
         glider_costs = \
             GliderCost.calc_cost(vehicle, cost_cloud)  # includes structure_cost and glider_non_structure_cost
