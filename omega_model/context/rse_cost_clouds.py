@@ -693,7 +693,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         cost_cloud = pd.DataFrame(cloud_points)
 
-        if omega_globals.no_backsliding:
+        if omega_globals.options.no_backsliding:
             cost_cloud = cost_cloud[cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] <=
                                     vehicle.cert_direct_oncycle_co2e_grams_per_mile]
 
