@@ -470,30 +470,32 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         # print(vehicle.name)
 
+        sweep_precision = 10
+
         vehicle_rlhp20 = \
-            calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b,
-                             vehicle.base_year_target_coef_c, 20)
+            ASTM_round(calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b,
+                             vehicle.base_year_target_coef_c, 20), sweep_precision)
 
         vehicle_rlhp60 = \
-            calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b,
-                             vehicle.base_year_target_coef_c, 60)
+            ASTM_round(calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b,
+                             vehicle.base_year_target_coef_c, 60), sweep_precision)
 
         rse_group_key = CostCloud.get_rse_group_key(vehicle)
 
         if is_up_for_redesign(vehicle):
             # sweep vehicle params
-            rlhp20s = np.unique((vehicle_rlhp20 * omega_globals.options.rlhp20_min_scaler,
+            rlhp20s = np.unique((ASTM_round(vehicle_rlhp20 * omega_globals.options.rlhp20_min_scaler, sweep_precision),
                                  vehicle_rlhp20,
-                                 vehicle_rlhp20 * omega_globals.options.rlhp20_max_scaler))
+                                 ASTM_round(vehicle_rlhp20 * omega_globals.options.rlhp20_max_scaler, sweep_precision)))
 
-            rlhp60s = np.unique((vehicle_rlhp60 * omega_globals.options.rlhp60_min_scaler,
+            rlhp60s = np.unique((ASTM_round(vehicle_rlhp60 * omega_globals.options.rlhp60_min_scaler, sweep_precision),
                                  vehicle_rlhp60,
-                                 vehicle_rlhp60 * omega_globals.options.rlhp60_max_scaler))
+                                 ASTM_round(vehicle_rlhp60 * omega_globals.options.rlhp60_max_scaler, sweep_precision)))
 
             vehicle_footprints = \
-                np.unique((vehicle.base_year_footprint_ft2 * omega_globals.options.footprint_min_scaler,
-                           vehicle.base_year_footprint_ft2,
-                           vehicle.base_year_footprint_ft2 * omega_globals.options.footprint_max_scaler))
+                np.unique((ASTM_round(vehicle.base_year_footprint_ft2 * omega_globals.options.footprint_min_scaler, sweep_precision),
+                           ASTM_round(vehicle.base_year_footprint_ft2, sweep_precision),
+                           ASTM_round(vehicle.base_year_footprint_ft2 * omega_globals.options.footprint_max_scaler, sweep_precision)))
 
             structure_materials = MassScaling.structure_materials
 
@@ -633,11 +635,18 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                             if rlhp20 == vehicle_rlhp20 and \
                                     rlhp60 == vehicle_rlhp60 and \
-                                    footprint_ft2 == vehicle.footprint_ft2 and \
+                                    footprint_ft2 == ASTM_round(vehicle.base_year_footprint_ft2, sweep_precision) and \
                                     structure_material == vehicle.structure_material and \
-                                    ccc == vehicle.cost_curve_class:
+                                    ccc == vehicle.cost_curve_class and vehicle.fueling_class != 'BEV':
                                 vehicle.cert_direct_oncycle_co2e_grams_per_mile = \
                                     cloud_point['cert_direct_oncycle_co2e_grams_per_mile']
+                            elif rlhp20 == vehicle_rlhp20 and \
+                                    rlhp60 == vehicle_rlhp60 and \
+                                    footprint_ft2 == ASTM_round(vehicle.base_year_footprint_ft2, sweep_precision) and \
+                                    structure_material == vehicle.structure_material and \
+                                    ccc == vehicle.cost_curve_class and vehicle.fueling_class == 'BEV':
+                                vehicle.cert_direct_oncycle_kwh_per_mile = \
+                                    cloud_point['cert_direct_oncycle_kwh_per_mile']
 
                             v = copy.copy(vehicle)
                             v.footprint_ft2 = footprint_ft2
@@ -693,9 +702,12 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         cost_cloud = pd.DataFrame(cloud_points)
 
-        if omega_globals.options.no_backsliding and vehicle.fueling_class == 'ICE':
+        if omega_globals.options.no_backsliding and vehicle.fueling_class != 'BEV' and vehicle.cost_curve_class != None:
             cost_cloud = cost_cloud[cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] <=
                                     vehicle.cert_direct_oncycle_co2e_grams_per_mile]
+        elif omega_globals.options.no_backsliding and vehicle.fueling_class == 'BEV' and vehicle.cost_curve_class != None:
+            cost_cloud = cost_cloud[cost_cloud['cert_direct_oncycle_kwh_per_mile'] <=
+                                    vehicle.cert_direct_oncycle_kwh_per_mile]
 
         glider_costs = \
             GliderCost.calc_cost(vehicle, cost_cloud)  # includes structure_cost and glider_non_structure_cost
