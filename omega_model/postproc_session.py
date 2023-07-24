@@ -64,6 +64,7 @@ def run_postproc(iteration_log, credit_banks):
                                                VehicleFinal.new_vehicle_mfr_cost_dollars,
                                                VehicleFinal.target_co2e_grams_per_mile,
                                                VehicleFinal.cert_co2e_grams_per_mile,
+                                               VehicleFinal.cert_direct_oncycle_co2e_grams_per_mile,
                                                VehicleFinal.cert_direct_kwh_per_mile,
                                                VehicleFinal.lifetime_VMT, VehicleFinal.compliance_id,
                                                VehicleFinal.battery_kwh, VehicleFinal._initial_registered_count,
@@ -240,6 +241,8 @@ def run_postproc(iteration_log, credit_banks):
 
     average_cert_co2e_gpmi_data = plot_cert_co2e_gpmi(analysis_years)
 
+    average_cert_direct_oncycle_co2e_gpmi_data = plot_cert_direct_oncycle_co2e_gpmi(analysis_years)
+
     average_cert_direct_kwh_pmi_data = plot_cert_direct_kwh_pmi(analysis_years)
 
     average_target_co2e_gpmi_data = plot_target_co2e_gpmi(analysis_years)
@@ -262,6 +265,9 @@ def run_postproc(iteration_log, credit_banks):
         session_results \
             = pd.concat([session_results, pd.Series(average_cert_co2e_gpmi_data[cat],
                                                     name=f'average_{cat}_cert_co2e_gpmi')], axis=1)
+        session_results \
+            = pd.concat([session_results, pd.Series(average_cert_direct_oncycle_co2e_gpmi_data[cat],
+                                                    name=f'average_{cat}_cert_direct_oncycle_co2e_gpmi')], axis=1)
         session_results \
             = pd.concat([session_results, pd.Series(average_cert_direct_kwh_pmi_data[cat],
                                                     name=f'average_{cat}_cert_direct_kwh_pmi')], axis=1)
@@ -463,6 +469,105 @@ def plot_cert_co2e_gpmi(calendar_years):
     ax1.legend(market_classes)
     fig.savefig(
         omega_globals.options.output_folder + '%s ALL V Cert CO2e gpmi Mkt Cls.png' %
+        omega_globals.options.session_unique_name)
+
+    return co2e_data
+
+
+def plot_cert_direct_oncycle_co2e_gpmi(calendar_years):
+    """
+    Plot cert direct oncycle CO2e g/mi versus model year, by market class and market category.
+
+    Args:
+        calendar_years ([years]): list of model years
+
+    Returns:
+        dict of average cert co2e g/mi data by total, market class and market category
+
+    """
+    co2e_data = dict()
+
+    co2e_data['vehicle'] = []
+    for cy in calendar_years:
+        weighted_value = 0
+        count = 0
+        vehicle_id_and_vmt_and_co2gpmi = [((v.compliance_id, v.vehicle_id), v.lifetime_VMT,
+                                           v.cert_direct_oncycle_co2e_grams_per_mile)
+                                          for v in vehicle_data if v.model_year == cy]
+
+        for vehicle_id, lifetime_vmt, co2gpmi in vehicle_id_and_vmt_and_co2gpmi:
+            weighted_value += vehicle_annual_data[vehicle_id + tuple([0])]['registered_count'] * lifetime_vmt * co2gpmi
+            count += vehicle_annual_data[vehicle_id + tuple([0])]['registered_count'] * lifetime_vmt
+
+        co2e_data['vehicle'].append(weighted_value / max(1, count))
+
+    # tally up market_category sales- and VMT- weighted co2
+    for mcat in market_categories:
+        market_category_co2e = []
+        for cy in calendar_years:
+            weighted_value = 0
+            count = 0
+            vehicle_id_and_vmt_and_co2gpmi_market_class_id = \
+                [((v.compliance_id, v.vehicle_id), v.lifetime_VMT, v.cert_direct_oncycle_co2e_grams_per_mile,
+                  v.market_class_id)
+                 for v in vehicle_data if v.model_year == cy]
+
+            for vehicle_id, lifetime_vmt, co2gpmi, market_class_id in vehicle_id_and_vmt_and_co2gpmi_market_class_id:
+                if mcat in market_class_id.split('.'):
+                    weighted_value += \
+                        vehicle_annual_data[vehicle_id + tuple([0])]['registered_count'] * lifetime_vmt * co2gpmi
+                    count += vehicle_annual_data[vehicle_id + tuple([0])]['registered_count'] * lifetime_vmt
+
+            market_category_co2e.append(weighted_value / max(1, count))
+
+        co2e_data[mcat] = market_category_co2e
+
+    # tally up market_class sales- and VMT- weighted co2
+    for mc in market_classes:
+        market_class_co2e = []
+        for cy in calendar_years:
+            weighted_value = 0
+            count = 0
+            vehicle_id_and_vmt_and_co2gpmi = \
+                [((v.compliance_id, v.vehicle_id), v.lifetime_VMT, v.cert_direct_oncycle_co2e_grams_per_mile) for v in
+                 vehicle_data if v.model_year == cy and v.market_class_id == mc]
+
+            for vehicle_id, lifetime_vmt, co2gpmi in vehicle_id_and_vmt_and_co2gpmi:
+                weighted_value += \
+                    vehicle_annual_data[vehicle_id + tuple([0])]['registered_count'] * lifetime_vmt * co2gpmi
+                count += vehicle_annual_data[vehicle_id + tuple([0])]['registered_count'] * lifetime_vmt
+
+            market_class_co2e.append(weighted_value / max(1, count))
+
+        co2e_data[mc] = market_class_co2e
+
+    # market category chart
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
+    for mcat in market_categories:
+        ax1.plot(calendar_years, co2e_data[mcat], '.--')
+    ax1.plot(calendar_years, co2e_data['vehicle'], '.-')
+    ax1.legend(market_categories + ['vehicle'])
+    label_xyt(ax1, 'Year', 'CO2e [g/mi]',
+              '%s\nAverage Vehicle Cert Direct Oncycle CO2e g/mi by Market Category v Year' %
+              omega_globals.options.session_unique_name)
+    fig.savefig(
+        omega_globals.options.output_folder + '%s ALL V Cert CO2e Direct gpmi Mkt Cat.png' %
+        omega_globals.options.session_unique_name)
+
+    # market class chart
+    fig, ax1 = figure(omega_globals.options.auto_close_figures)
+    for mc in market_classes:
+        if 'ICE' in mc:
+            ax1.plot(calendar_years, co2e_data[mc], '.-')
+        else:
+            ax1.plot(calendar_years, co2e_data[mc], '.--')
+
+    label_xyt(ax1, 'Year', 'CO2e [g/mi]',
+              '%s\nAverage Vehicle Cert Direct Oncycle CO2e g/mi  by Market Class v Year' %
+              omega_globals.options.session_unique_name)
+    ax1.legend(market_classes)
+    fig.savefig(
+        omega_globals.options.output_folder + '%s ALL V Cert CO2e Direct gpmi Mkt Cls.png' %
         omega_globals.options.session_unique_name)
 
     return co2e_data
