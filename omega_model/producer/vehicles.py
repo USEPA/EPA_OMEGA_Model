@@ -1160,7 +1160,7 @@ class Vehicle(OMEGABase):
         cost_curve = cost_curve.drop(columns=['frontier_factor'], errors='ignore')
 
         self.cost_curve_non_numeric_data = \
-            cost_cloud[omega_globals.options.CostCloud.cloud_non_numeric_data_columns].iloc[cost_curve.index]
+            cost_cloud[omega_globals.options.CostCloud.cloud_non_numeric_data_columns].loc[cost_curve.index]
 
         # save vehicle cost cloud, with indicated frontier points
         if (omega_globals.options.log_vehicle_cloud_years == 'all') or \
