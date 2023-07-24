@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.common.exceptions import WebDriverException, NoSuchElementException, TimeoutException
+from selenium.webdriver.chrome.service import Service
 
 import os
 import time
@@ -16,12 +17,18 @@ from bs4 import BeautifulSoup
 import numpy as np
 from pathlib import *
 max_URLs = 1000
-_makers_no_models = ['BYTON', 'Lucid', 'Rivian']
+_makers_no_models = ['BYTON'] #, 'Lucid', 'Rivian']
 
 chromedriver = 'chromedriver.exe'
 os.environ["webdriver.chrome.driver"] = chromedriver
 chromeOptions = Options()
-chromeOptions.add_argument("--start-maximized")
+# chromeOptions = Options()
+# chromeOptions.add_argument("--start-maximized")
+service = Service();
+options = webdriver.ChromeOptions()
+options.add_argument("--start-maximized")
+# driver = webdriver.Chrome(service=service, options=options)
+
 wait_sec = 30
 sleep_short = 0.1
 sleep_long = 1.5
@@ -31,12 +38,14 @@ def reset_url_clickable(driver, base_url, xpath_make, make_idx, xpath_model, mod
     # make_idx, model_icx, year_idx == -1 no execution, == 0 no select_by_index() since a dropdown item starts from 1
     continue_flag = True
     driver.quit()
-    driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
+    driver = webdriver.Chrome(service=service, options=options)
+    # driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
     time.sleep(sleep_short)
     driver.get(base_url)
 
     time.sleep(sleep_short)
-    make_dropdown = Select(driver.find_element_by_xpath(xpath_make))
+    # make_dropdown = Select(driver.find_element_by_xpath(xpath_make))
+    make_dropdown = Select(driver.find_element(By.XPATH, xpath_make))
     if make_idx > 0 and make_idx < len(make_dropdown.options):
         time.sleep(sleep_short)
         make_dropdown.select_by_index(make_idx)
@@ -44,14 +53,16 @@ def reset_url_clickable(driver, base_url, xpath_make, make_idx, xpath_model, mod
     xpath_text = xpath_make
     if model_idx >= 0:
         time.sleep(sleep_short)
-        model_dropdown = Select(driver.find_element_by_xpath(xpath_model))
+        # model_dropdown = Select(driver.find_element_by_xpath(xpath_model))
+        model_dropdown = Select(driver.find_element(By.XPATH, xpath_model))
         if make_idx > 0: xpath_text = xpath_model
         if model_idx > 0 and model_idx < len(model_dropdown.options):
             time.sleep(sleep_short)
             model_dropdown.select_by_index(model_idx)
     if year_idx >= 0:
         time.sleep(sleep_short)
-        year_dropdown = Select(driver.find_element_by_xpath(xpath_year))
+        # year_dropdown = Select(driver.find_element_by_xpath(xpath_year))
+        year_dropdown = Select(driver.find_element(By.XPATH, xpath_year))
         if year_idx > 0 and year_idx < len(year_dropdown.options):
             time.sleep(sleep_short)
             year_dropdown.select_by_index(year_idx)
@@ -112,14 +123,20 @@ def Get_URLs_Edmunds(model_year):
     # caps = DesiredCapabilities().CHROME
     # caps["pageLoadStrategy"] = "none"
     # # chromeOptions.add_argument("--kiosk")
-    chromeOptions.add_argument("--start-maximized")
+    # chromeOptions.add_argument("--start-maximized")
+    service = Service();
+    options = webdriver.ChromeOptions()
+    options.add_argument("--start-maximized")
+
     #prefs = {'profile.managed_default_content_settings.images':2}
     # prefs = {"plugins.plugins_disabled": ["Chrome PDF Viewer"]}
     #chromeOptions.add_experimental_option('prefs', prefs)
     #chromeOptions.add_argument("--disable-extensions")
     # driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions, desired_capabilities=caps)
     time.sleep(sleep_short)
-    driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
+    # driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
+    driver = webdriver.Chrome(service=service, options=options)
+
     time.sleep(sleep_short)
     driver.get(base_url)
 
@@ -138,7 +155,8 @@ def Get_URLs_Edmunds(model_year):
     time.sleep(sleep_short)
     element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, xpath_make)))
     # time.sleep(sleep_short); element.click()
-    make_dropdown = Select(driver.find_element_by_xpath(xpath_make))
+    # make_dropdown = Select(driver.find_element_by_xpath(xpath_make))
+    make_dropdown = Select(driver.find_element(By.XPATH, xpath_make))
     total_make_options = len(make_dropdown.options)
     for make_idx in range (1, total_make_options):
         try:
@@ -148,7 +166,8 @@ def Get_URLs_Edmunds(model_year):
             [driver, continue_flag] = reset_url_clickable(driver, base_url, xpath_make, make_idx, xpath_model, -1, xpath_year, -1,
                                                           xpath_go_button, url_list, working_directory)
             time.sleep(sleep_short)
-            make_dropdown = Select(driver.find_element_by_xpath(xpath_make))
+            # make_dropdown = Select(driver.find_element_by_xpath(xpath_make))
+            make_dropdown = Select(driver.find_element(By.XPATH, xpath_make))
             if continue_flag: continue
         if make_dropdown.options[make_idx].text in _makers_no_models: continue
         try:
@@ -160,7 +179,8 @@ def Get_URLs_Edmunds(model_year):
             if continue_flag: continue
 
             time.sleep(sleep_short)
-            make_dropdown = Select(driver.find_element_by_xpath(xpath_make))
+            # make_dropdown = Select(driver.find_element_by_xpath(xpath_make))
+            make_dropdown = Select(driver.find_elements(By.XPATH, xpath_make))
             make_dropdown.select_by_index(make_idx)
             try:
                 time.sleep(sleep_short)
@@ -171,7 +191,8 @@ def Get_URLs_Edmunds(model_year):
                 if continue_flag: continue
 
         time.sleep(sleep_short)
-        model_dropdown = Select(driver.find_element_by_xpath(xpath_model))
+        # model_dropdown = Select(driver.find_element_by_xpath(xpath_model))
+        model_dropdown = Select(driver.find_element(By.XPATH, xpath_model))
         total_model_options = len(model_dropdown.options)
         for model_idx in range(1, total_model_options):
             try:
@@ -190,7 +211,8 @@ def Get_URLs_Edmunds(model_year):
                 if continue_flag: continue
 
             time.sleep(sleep_short)
-            year_dropdown = Select(driver.find_element_by_xpath(xpath_year))
+            # year_dropdown = Select(driver.find_element_by_xpath(xpath_year))
+            year_dropdown = Select(driver.find_element(By.XPATH, xpath_year))
             total_year_options = len(year_dropdown.options)
             for year_idx in range(1, total_year_options):
                 if int(year_dropdown.options[1].text.strip()) < int(model_year): break
@@ -198,7 +220,8 @@ def Get_URLs_Edmunds(model_year):
                     time.sleep(sleep_short)
                     year_dropdown.select_by_index(year_idx)
                     time.sleep(sleep_short)
-                    go_button = driver.find_element_by_xpath(xpath_go_button)
+                    # go_button = driver.find_element_by_xpath(xpath_go_button)
+                    go_button = driver.find_element(By.XPATH, xpath_go_button)
                     try:
                         time.sleep(sleep_long)  # time.sleep(sleep_long)
                         go_button.click()
@@ -228,7 +251,8 @@ def Get_URLs_Edmunds(model_year):
                                                                       xpath_year, -1, xpath_go_button, url_list, working_directory)
                         if continue_flag: continue
                     time.sleep(sleep_short)
-                    make_dropdown = Select(driver.find_element_by_xpath(xpath_make))
+                    # make_dropdown = Select(driver.find_element_by_xpath(xpath_make))
+                    make_dropdown = Select(driver.find_element(By.XPATH, xpath_make))
                     if make_dropdown.options[make_idx].text in _makers_no_models: break
                     time.sleep(sleep_short)
                     make_dropdown.select_by_index(make_idx)
@@ -240,7 +264,8 @@ def Get_URLs_Edmunds(model_year):
                                                                       xpath_year, -1, xpath_go_button, url_list, working_directory)
                         if continue_flag: continue
                     time.sleep(sleep_short)
-                    model_dropdown = Select(driver.find_element_by_xpath(xpath_model))
+                    # model_dropdown = Select(driver.find_element_by_xpath(xpath_model))
+                    model_dropdown = Select(driver.find_element(By.XPATH, xpath_model))
                     break
 
     url_list_to_csv(url_list, -1, working_directory)
