@@ -48,3 +48,36 @@ Correction Index,Correction Type,Column Name Change?,Column Name,MODEL_YEAR,CAFE
 47,Replace,n,FOOTPRINT_CARLINE_NM,2020,3523,Porsche AG,PRX,Porsche,1,Cayenne Turbo Coupé,423,1,Cayenne Turbo Coupé,Cayenne Turbo Coupe,n
 48,Replace,n,FOOTPRINT_CARLINE_NM,2020,3523,Porsche AG,PRX,Porsche,1,Cayenne e-Hybrid Coupé,442,1,Cayenne e-Hybrid Coupé,Cayenne e-Hybrid Coupe,n
 49,Replace,n,FOOTPRINT_CARLINE_NM,2020,3523,Porsche AG,PRX,Porsche,1,Cayenne Turbo S e-Hybrid Coupé,452,1,Cayenne Turbo S e-Hybrid Coupé,Cayenne Turbo S e-Hybrid Coupe,n
+50,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE GT,39,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+51,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE MODENA AWD,33,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+52,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE MODENA RWD,37,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+53,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE TROFEO,31,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+54,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2022,4130,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE GT,41,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+55,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2022,4130,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE MODENA,40,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+56,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2022,4130,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE MODENA V8,45,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+57,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2022,4130,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE TROFEO,46,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+58,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI GT,36,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+59,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI MODENA AWD,35,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+60,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI MODENA RWD,38,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+61,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI TROFEO,32,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+62,Replace,n,"['CAFE_MFR_NM', 'CAFE_MFR_CD']",2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,MC20,50,1,"['FCA US LLC', 'CRX']","['Maserati North America, Inc.', 'MAX']",n
+63,Replace,n,CAFE_ID,2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE GT,30,2,4129,4057,y
+64,Replace,n,CAFE_ID,2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE MODENA AWD,33,2,4129,4037,y
+65,Replace,n,CAFE_ID,2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE MODENA RWD,35,1,4129,4057,y
+66,Replace,n,CAFE_ID,2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE TROFEO,36,1,4129,4057,y
+67,Replace,n,CAFE_ID,2022,4130,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE GT,37,2,4130,4037,y
+68,Replace,n,CAFE_ID,2022,4130,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE MODENA,38,1,4130,4037,y
+69,Replace,n,CAFE_ID,2022,4130,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE MODENA V8,40,1,4130,4037,y
+70,Replace,n,CAFE_ID,2022,4130,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE TROFEO,41,1,4130,4037,y
+71,Replace,n,CAFE_ID,2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI GT,45,1,4129,4057,y
+72,Replace,n,CAFE_ID,2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI MODENA AWD,46,1,4129,4057,y
+73,Replace,n,CAFE_ID,2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI MODENA RWD,40,1,4129,4057,y
+74,Replace,n,CAFE_ID,2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI TROFEO,41,1,4129,4057,y
+75,Replace,n,CAFE_ID,2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,MC20,45,1,4129,4057,y
+76,Replace,n,"['FOOTPRINT_MFR_NM', 'FOOTPRINT_MFR_CD']",2022,4149,BMW,BMX,TOYOTA,5,Supra 3.0,303,1,"['BMW', 'BMX']","['Toyota Motor Corporation', 'TYX']",n
+77,Replace,n,"['FOOTPRINT_MFR_NM', 'FOOTPRINT_MFR_CD']",2022,4149,BMW,BMX,TOYOTA,5,Supra 3.0,303,2,"['BMW', 'BMX']","['Toyota Motor Corporation', 'TYX']",n
+78,Replace,n,FOOTPRINT_CARLINE_NM,2022,4175,Porsche AG,PRX,Porsche,1,Cayenne / Cayenne Coupé,402,1,Cayenne / Cayenne Coupé,Cayenne / Cayenne Coupe,n
+79,Replace,n,FOOTPRINT_CARLINE_NM,2022,4175,Porsche AG,PRX,Porsche,1,Cayenne / Coupé E-Hybrid,407,1,Cayenne / Coupé E-Hybrid,Cayenne / Coupe E-Hybrid,n
+80,Replace,n,FOOTPRINT_CARLINE_NM,2022,4175,Porsche AG,PRX,Porsche,1,Cayenne S Coupé,411,1,Cayenne S Coupé,Cayenne S Coupe,n
+81,Replace,n,FOOTPRINT_CARLINE_NM,2022,4175,Porsche AG,PRX,Porsche,1,Cayenne Turbo Coupé,451,1,Cayenne Turbo Coupé,Cayenne Turbo Coupe,n
+82,Replace,n,FOOTPRINT_CARLINE_NM,2022,4175,Porsche AG,PRX,Porsche,1,Cayenne Turbo S / Coupé E-Hybrid,447,1,Cayenne Turbo S / Coupé E-Hybrid,Cayenne Turbo S / Coupe E-Hybrid,n
