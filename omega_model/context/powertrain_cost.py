@@ -529,6 +529,7 @@ class PowertrainCost(OMEGABase):
         if omega_globals.options.powertrain_cost_tracker:
             update_dict = {
                 'vehicle_id': vehicle.vehicle_id,
+                'base_year_vehicle_id': vehicle.base_year_vehicle_id,
                 'name': vehicle.name,
                 'manufacturer_id': vehicle.manufacturer_id,
                 'compliance_id': vehicle.compliance_id,
@@ -814,6 +815,7 @@ class PowertrainCost(OMEGABase):
         if omega_globals.options.powertrain_cost_tracker:
             update_dict = {
                 'vehicle_id': vehicle.vehicle_id,
+                'base_year_vehicle_id': vehicle.base_year_vehicle_id,
                 'name': vehicle.name,
                 'manufacturer_id': vehicle.manufacturer_id,
                 'compliance_id': vehicle.compliance_id,
