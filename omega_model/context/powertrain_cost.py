@@ -1026,9 +1026,9 @@ def get_learning_factors(v, locals_dict):
             locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh})
             learning_pev_battery_scaling_factor = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
 
-            if learning_pev_battery_scaling_factor > 1:
-                gwh = v.global_cumulative_battery_GWh[v.model_year - 2]
-                locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh + gwh})
+            while learning_pev_battery_scaling_factor > 1:
+                cumulative_gwh *= 1.1
+                locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh})
                 learning_pev_battery_scaling_factor = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
 
         else:
@@ -1041,10 +1041,11 @@ def get_learning_factors(v, locals_dict):
                 locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh + gwh})
                 learning_pev_battery_scaling_factor = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
 
-                if learning_pev_battery_scaling_factor > 1:
-                    gwh += cumulative_GWh_ld_dict['GWh'][v.model_year - 2]
-                    locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh + gwh})
+                while learning_pev_battery_scaling_factor > 1:
+                    cumulative_gwh *= 1.1
+                    locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh})
                     learning_pev_battery_scaling_factor = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
+
             else:
                 year = max(yr for yr in cumulative_GWh_ld_dict['GWh'])
                 gwh = cumulative_GWh_ld_dict['GWh'][year]
