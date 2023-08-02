@@ -732,22 +732,10 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
         production_options['battery_GWh_limit'] = battery_GWh_limit
 
-        # RV
-        # valid_production_options = \
-        #     production_options[production_options['total_battery_GWh'] <= battery_GWh_limit].copy()
-        #
-        # if valid_production_options.empty:
-        #     # omega_log.logwrite('%%%%%% Production Constraints Violated ... limit: %f, min / max: %f / %f %%%%%%' %
-        #     #                    (battery_GWh_limit,
-        #     #                     production_options['total_battery_GWh'].min(),
-        #     #                     production_options['total_battery_GWh'].max())
-        #     #                    )
-        #     # take the closest one(s), see how that goes...
-        #     valid_production_options = \
-        #         production_options[production_options['total_battery_GWh'] ==
-        #                            production_options['total_battery_GWh'].min()].copy()
-        #
-        # production_options = valid_production_options
+        # penalize, but don't cull, points that exceed the limit
+        invalid_pts = production_options['total_battery_GWh'] > battery_GWh_limit
+        production_options.loc[invalid_pts, 'total_generalized_cost_dollars'] = \
+            production_options.loc[invalid_pts, 'total_generalized_cost_dollars'] * 1.25
 
         if production_options.empty:
             producer_compliance_possible = None
