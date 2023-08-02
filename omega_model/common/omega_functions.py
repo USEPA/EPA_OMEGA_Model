@@ -686,7 +686,7 @@ def cartesian_prod(left_df, right_df):
         return pd.merge(left_df, right_df, how='cross')
 
 
-def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_steps, min_constraints, max_constraints,
+def generate_constrained_nearby_shares(columns, combo, half_range_frac, num_steps, min_constraints, max_constraints,
                                        verbose=False):
     """
     Generate a partition of share values in the neighborhood of an initial set of share values.
@@ -697,7 +697,7 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
 
     Args:
         columns ([strs]): list of values that represent shares in combo
-        combos (Series, DataFrame): typically a Series or Dataframe that contains the initial set of share values
+        combo (Series): Series that contains the initial set of share values
         half_range_frac (float): search "radius" [0..1], half the search range
         num_steps (int): number of values to divide the search range into
         min_constraints (dict): minimum partition constraints [0..1], by column name
@@ -767,17 +767,18 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
     else:
         for i in range(0, len(columns) - 1):
             shares = np.array([])
-            for idx, combo in combos.iterrows():
-                k = columns[i]
-                val = combo[k]
-                min_val = ASTM_round(np.maximum(min_constraints[k], val - half_range_frac), machine_resolution)
-                max_val = ASTM_round(np.minimum(max_constraints[k], val + half_range_frac), machine_resolution)
-                if min_val == max_val:
-                    shares = np.append(shares, ASTM_round(val, machine_resolution))
-                else:
-                    # create new share spread and include previous value
-                    shares = np.append(np.append(shares, np.linspace(min_val, max_val, num_steps)),
-                                       ASTM_round(val, machine_resolution))
+
+            k = columns[i]
+            val = combo[k]
+            min_val = ASTM_round(np.maximum(min_constraints[k], val - half_range_frac), machine_resolution)
+            max_val = ASTM_round(np.minimum(max_constraints[k], val + half_range_frac), machine_resolution)
+            if min_val == max_val:
+                shares = np.append(shares, ASTM_round(val, machine_resolution))
+            else:
+                # create new share spread and include previous value
+                shares = np.append(np.append(shares, np.linspace(min_val, max_val, num_steps)),
+                                   ASTM_round(val, machine_resolution))
+
             dfs.append(pd.DataFrame({k: np.unique(shares)}))
 
         dfx = pd.DataFrame()
