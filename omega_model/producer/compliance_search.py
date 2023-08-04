@@ -97,21 +97,20 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
 
         if candidate_production_decisions is not None:
             cost_curve_options = np.array([])
-            for idx, combo in candidate_production_decisions.iterrows():
 
-                if ((combo['veh_%s_sales' % cv.vehicle_id] > 0) or (cv.tech_option_iteration_num > 0)) and \
-                        not incremented:
-                    cv.tech_option_iteration_num += 1
-                    incremented = True
+            if ((candidate_production_decisions['veh_%s_sales' % cv.vehicle_id] > 0) or (cv.tech_option_iteration_num > 0)) and \
+                    not incremented:
+                cv.tech_option_iteration_num += 1
+                incremented = True
 
-                tech_share_range = omega_globals.options.producer_compliance_search_convergence_factor ** \
-                                   cv.tech_option_iteration_num
-                veh_cost_curve_index = combo['veh_%s_cost_curve_indices' % cv.vehicle_id]
-                min_value = max(veh_min_cost_curve_index, veh_cost_curve_index * (1 - tech_share_range))
-                max_value = min(veh_max_cost_curve_index, veh_cost_curve_index * (1 + tech_share_range))
-                cost_curve_options = \
-                    np.append(np.append(cost_curve_options,
-                                        np.linspace(min_value, max_value, num=num_tech_options)), veh_cost_curve_index)
+            tech_share_range = omega_globals.options.producer_compliance_search_convergence_factor ** \
+                               cv.tech_option_iteration_num
+            veh_cost_curve_index = candidate_production_decisions['veh_%s_cost_curve_indices' % cv.vehicle_id]
+            min_value = max(veh_min_cost_curve_index, veh_cost_curve_index * (1 - tech_share_range))
+            max_value = min(veh_max_cost_curve_index, veh_cost_curve_index * (1 + tech_share_range))
+            cost_curve_options = \
+                np.append(np.append(cost_curve_options,
+                                    np.linspace(min_value, max_value, num=num_tech_options)), veh_cost_curve_index)
 
             if num_tech_options == 1:
                 # CU
@@ -171,9 +170,7 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
                 if linked_col in tech_combos_df:
                     tech_combos_df[col] = tech_combos_df[linked_col]
 
-    tech_combos_df = tech_combos_df.drop_duplicates()
-
-    return tech_combos_df
+    return tech_combos_df.apply(ASTM_round, args=[omega_globals.share_precision]).drop_duplicates()
 
 
 def round_constraints(constraints, min_val=0.0, max_val=1.0):
@@ -599,7 +596,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
         if not df.empty:
             share_combos_df = cartesian_prod(share_combos_df, df)
 
-    return share_combos_df
+    return share_combos_df.apply(ASTM_round, args=[omega_globals.share_precision])
 
 
 def apply_production_decision_to_composite_vehicles(composite_vehicles, selected_production_decision):
@@ -691,23 +688,35 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         composite_vehicles, pre_production_vehicles, market_class_tree, context_based_total_sales = \
             create_composite_vehicles(calendar_year, compliance_id)
 
-        tech_sweeps = create_tech_sweeps(composite_vehicles, candidate_production_decisions, share_range)
+        if candidate_production_decisions is None:
+            candidate_production_decisions = [None]
+        elif type(candidate_production_decisions) is not list:
+            candidate_production_decisions = [r for _, r in candidate_production_decisions.iterrows()]
 
-        share_sweeps = create_share_sweeps(calendar_year, market_class_tree,
-                                           candidate_production_decisions, share_range,
-                                           producer_decision_and_response, context_based_total_sales,
-                                           prior_producer_decision_and_response, producer_consumer_iteration_num)
+        production_options = []
 
-        # attempt to save some RAM...
-        tech_sweeps = tech_sweeps.astype(np.float32)
-        share_sweeps = share_sweeps.astype(np.float32)
+        for candidate_production_decision in candidate_production_decisions:
+            tech_sweeps = create_tech_sweeps(composite_vehicles, candidate_production_decision, share_range)
 
-        tech_and_share_sweeps = cartesian_prod(tech_sweeps, share_sweeps)
+            share_sweeps = create_share_sweeps(calendar_year, market_class_tree,
+                                               candidate_production_decision, share_range,
+                                               producer_decision_and_response, context_based_total_sales,
+                                               prior_producer_decision_and_response, producer_consumer_iteration_num)
 
-        # CU
+            # attempt to save some RAM...
+            tech_sweeps = tech_sweeps.astype(np.float32)
+            share_sweeps = share_sweeps.astype(np.float32)
 
-        production_options = create_production_options_from_shares(composite_vehicles, tech_and_share_sweeps,
-                                                                   context_based_total_sales)
+            share_sweeps = share_sweeps.drop_duplicates()
+
+            tech_and_share_sweeps = cartesian_prod(tech_sweeps, share_sweeps)
+
+            # CU
+
+            production_options.append(create_production_options_from_shares(composite_vehicles, tech_and_share_sweeps,
+                                                                       context_based_total_sales))
+
+        production_options = pd.concat(production_options, ignore_index=True)
 
         # insert code to cull production options based on policy here #
 
@@ -722,21 +731,11 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                                           omega_globals.options.manufacturer_gigawatthour_data[compliance_id])
 
         production_options['battery_GWh_limit'] = battery_GWh_limit
-        valid_production_options = \
-            production_options[production_options['total_battery_GWh'] <= battery_GWh_limit].copy()
 
-        if valid_production_options.empty:
-            # omega_log.logwrite('%%%%%% Production Constraints Violated ... limit: %f, min / max: %f / %f %%%%%%' %
-            #                    (battery_GWh_limit,
-            #                     production_options['total_battery_GWh'].min(),
-            #                     production_options['total_battery_GWh'].max())
-            #                    )
-            # take the closest one(s), see how that goes...
-            valid_production_options = \
-                production_options[production_options['total_battery_GWh'] ==
-                                   production_options['total_battery_GWh'].min()].copy()
-
-        production_options = valid_production_options
+        # penalize, but don't cull, points that exceed the limit
+        invalid_pts = production_options['total_battery_GWh'] > battery_GWh_limit
+        production_options.loc[invalid_pts, 'total_generalized_cost_dollars'] = \
+            production_options.loc[invalid_pts, 'total_generalized_cost_dollars'] * 1.25
 
         if production_options.empty:
             producer_compliance_possible = None
@@ -801,23 +800,23 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             else:
                 best_candidate_production_decision = most_strategic_production_decision
 
-            if omega_globals.options.producer_compliance_search_multipoint:
-                # enable multi-point search, might still be a single point
-                candidate_production_decisions = candidate_production_decisions
-            else:
-                # single-point search:
-                candidate_production_decisions = \
-                    most_strategic_points.loc[[most_strategic_points['strategic_compliance_error'].idxmin()]]
+        if omega_globals.options.producer_compliance_search_multipoint:
+            # enable multi-point search, might still be a single point
+            candidate_production_decisions = candidate_production_decisions
+        else:
+            # single-point search:
+            candidate_production_decisions = \
+                most_strategic_points.loc[[most_strategic_points['strategic_compliance_error'].idxmin()]]
 
-            if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
-                omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,
-                                                  search_iteration)).ljust(12) + 'SR:%f CR:%.10f BCR:%.10f' %
-                                   (share_range, most_strategic_production_decision['strategic_compliance_ratio'],
-                                    best_candidate_production_decision['strategic_compliance_ratio']))
+        if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
+            omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,
+                                              search_iteration)).ljust(12) + 'SR:%f CR:%.10f BCR:%.10f' %
+                               (share_range, most_strategic_production_decision['strategic_compliance_ratio'],
+                                best_candidate_production_decision['strategic_compliance_ratio']))
 
-            search_iteration += 1
+        search_iteration += 1
 
-            continue_search = (share_range > omega_globals.options.producer_compliance_search_min_share_range)  # RV
+        continue_search = (share_range > omega_globals.options.producer_compliance_search_min_share_range)  # RV
 
     if producer_compliance_possible is not None:
         if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
