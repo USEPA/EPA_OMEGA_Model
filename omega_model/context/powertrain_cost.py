@@ -209,7 +209,8 @@ class PowertrainCost(OMEGABase):
         twc_substrate = twc_washcoat = twc_canning = twc_pgm = twc_cost = gpf_cost = diesel_eas_cost = eas_cost = 0
         engine_cost = engine_block_cost = cegr_cost = gdi_cost = turb_cost = deac_pd_cost = deac_fc_cost = atk2_cost = 0
         fuel_storage_cost = non_eas_exhaust_cost = exhaust_cost = 0
-        lv_battery_cost = start_stop_cost = trans_cost = high_eff_alt_cost = thermal_cost = lv_harness_cost = 0
+        lv_battery_cost = start_stop_cost = trans_cost = high_eff_alt_cost = lv_harness_cost = 0
+        powertrain_cooling_cost = hvac_cost = 0
         hv_harness_cost = dc_dc_converter_cost = charge_cord_cost = 0
         motor_cost = gearbox_cost = inverter_cost = battery_cost = battery_offset = 0
         ac_leakage_cost = ac_efficiency_cost = 0
@@ -474,7 +475,7 @@ class PowertrainCost(OMEGABase):
 
             electrified_driveline_cost = inverter_cost + induction_inverter_cost \
                                          + obc_and_dcdc_converter_cost + hv_orange_cables_cost \
-                                         + single_speed_gearbox_cost + powertrain_cooling_loop_cost \
+                                         + single_speed_gearbox_cost \
                                          + charging_cord_kit_cost + dc_fast_charge_circuitry_cost \
                                          + power_management_and_distribution_cost + brake_sensors_actuators_cost \
                                          + additional_pair_of_half_shafts_cost
@@ -523,7 +524,7 @@ class PowertrainCost(OMEGABase):
         driveline_cost = drive_system_cost + trans_cost \
                          + high_eff_alt_cost + start_stop_cost \
                          + ac_leakage_cost + ac_efficiency_cost \
-                         + lv_battery_cost + hvac_cost
+                         + lv_battery_cost + powertrain_cooling_loop_cost + hvac_cost
 
         powertrain_cost = engine_cost + driveline_cost + emachine_cost + electrified_driveline_cost + battery_cost
         if omega_globals.options.powertrain_cost_tracker:
@@ -572,7 +573,8 @@ class PowertrainCost(OMEGABase):
                 'drive_system_cost': drive_system_cost,
                 'trans_cost': trans_cost,
                 'high_eff_alternator_cost': high_eff_alt_cost,
-                'thermal_hvac_cost': hvac_cost,
+                'hvac_cost': hvac_cost,
+                'powertrain_cooling_cost': powertrain_cooling_loop_cost,
                 'lv_harness_cost': 'n/a',
                 'hv_harness_cost': hv_orange_cables_cost,
                 'DC_DC_converter_cost': obc_and_dcdc_converter_cost,
@@ -589,7 +591,6 @@ class PowertrainCost(OMEGABase):
                 'gearbox_cost': single_speed_gearbox_cost,
                 'inverter_cost': inverter_cost,
                 'induction_inverter_cost': induction_inverter_cost,
-                'powertrain_cooling_loop_cost': powertrain_cooling_loop_cost,
                 'power_management_and_distribution_cost': power_management_and_distribution_cost,
                 'brake_sensors_actuators_cost': brake_sensors_actuators_cost,
                 'additional_pair_of_half_shafts_cost': additional_pair_of_half_shafts_cost,
@@ -637,7 +638,8 @@ class PowertrainCost(OMEGABase):
         twc_substrate= twc_washcoat = twc_canning = twc_pgm = twc_cost = gpf_cost = diesel_eas_cost = eas_cost = 0
         engine_cost = engine_block_cost = cegr_cost = gdi_cost = turb_cost = deac_pd_cost = deac_fc_cost = atk2_cost = 0
         fuel_storage_cost = non_eas_exhaust_cost = exhaust_cost = 0
-        lv_battery_cost = start_stop_cost = trans_cost = high_eff_alt_cost = thermal_cost = lv_harness_cost = 0
+        lv_battery_cost = start_stop_cost = trans_cost = high_eff_alt_cost = lv_harness_cost = 0
+        powertrain_cooling_cost = hvac_cost = 0
         hv_harness_cost = dc_dc_converter_cost = charge_cord_cost = 0
         motor_cost = gearbox_cost = inverter_cost = battery_cost = battery_offset = 0
         ac_leakage_cost = ac_efficiency_cost = 0
@@ -648,7 +650,7 @@ class PowertrainCost(OMEGABase):
 
         if powertrain_type in ['BEV', 'MHEV', 'HEV', 'PHEV']:
             KWH = pkg_info['battery_kwh']
-            KW_DU, KW_FDU, KW_RDU, KW_P2, KW_P4 = get_motor_power(pkg_info, powertrain_type, drive_system)
+            KW_DU, KW_FDU, KW_RDU, KW_P2, KW_P4 = get_motor_power(locals_dict, pkg_info, powertrain_type, drive_system)
 
         MARKUP_ICE, MARKUP_MHEV, MARKUP_HEV, MARKUP_PHEV, MARKUP_BEV = get_markups(locals_dict)
 
@@ -707,9 +709,9 @@ class PowertrainCost(OMEGABase):
                     calc_inverter_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
 
             gearbox_cost = 0
-            if powertrain_type == 'PHEV':
-                gearbox_cost = \
-                    calc_gearbox_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
+            # if powertrain_type == 'PHEV':
+            #     gearbox_cost = \
+            #         calc_gearbox_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
 
             lv_battery_cost = calc_lv_battery_cost(locals_dict, learning_factor_ice, powertrain_type)
 
@@ -718,10 +720,13 @@ class PowertrainCost(OMEGABase):
                 start_stop_cost = calc_start_stop_cost(locals_dict, learning_factor_ice, pkg_info)
                 high_eff_alt_cost = calc_high_efficiency_alternator(locals_dict, learning_factor_ice, pkg_info)
 
-            thermal_cost = calc_thermal_cost(
+            powertrain_cooling_cost = calc_powertrain_cooling_cost(
                 locals_dict, learning_factor_ice, powertrain_type, drive_system, engine_config, body_style
             )
+            hvac_cost = calc_hvac_cost(locals_dict, learning_factor_ice, powertrain_type)
+
             ac_leakage_cost, ac_efficiency_cost = calc_air_conditioning_costs(locals_dict, learning_factor_ice)
+
             lv_harness_cost = \
                 calc_lv_harness_cost(locals_dict, learning_factor_ice, powertrain_type, drive_system, body_style)
 
@@ -756,7 +761,7 @@ class PowertrainCost(OMEGABase):
             driveline_cost = \
                 lv_battery_cost + lv_harness_cost + \
                 trans_cost + start_stop_cost + high_eff_alt_cost + \
-                thermal_cost + ac_leakage_cost + ac_efficiency_cost
+                powertrain_cooling_cost + hvac_cost + ac_leakage_cost + ac_efficiency_cost
 
             e_machine_cost = motor_cost
 
@@ -766,8 +771,6 @@ class PowertrainCost(OMEGABase):
         if powertrain_type == 'BEV':
 
             engine_cost = 0
-
-            KW_DU, KW_FDU, KW_RDU, KW_P2, KW_P4 = get_motor_power(pkg_info, powertrain_type, drive_system)
 
             locals_dict = locals()
 
@@ -781,10 +784,14 @@ class PowertrainCost(OMEGABase):
                 calc_gearbox_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
 
             lv_battery_cost = calc_lv_battery_cost(locals_dict, learning_factor_ice, powertrain_type)
-            thermal_cost = calc_thermal_cost(
+
+            powertrain_cooling_cost = calc_powertrain_cooling_cost(
                 locals_dict, learning_factor_ice, powertrain_type, drive_system, '-', body_style
             )
+            hvac_cost = calc_hvac_cost(locals_dict, learning_factor_ice, powertrain_type)
+
             ac_leakage_cost, ac_efficiency_cost = calc_air_conditioning_costs(locals_dict, learning_factor_ice)
+
             lv_harness_cost = \
                 calc_lv_harness_cost(locals_dict, learning_factor_ice, powertrain_type, drive_system, body_style)
 
@@ -803,7 +810,7 @@ class PowertrainCost(OMEGABase):
 
             driveline_cost = \
                 lv_battery_cost + lv_harness_cost + \
-                thermal_cost + ac_leakage_cost + ac_efficiency_cost
+                powertrain_cooling_cost + hvac_cost + ac_leakage_cost + ac_efficiency_cost
 
             e_machine_cost = motor_cost
 
@@ -858,7 +865,8 @@ class PowertrainCost(OMEGABase):
                 'start_stop_cost': start_stop_cost,
                 'trans_cost': trans_cost,
                 'high_eff_alternator_cost': high_eff_alt_cost,
-                'thermal_hvac_cost': thermal_cost,
+                'hvac_cost': hvac_cost,
+                'powertrain_cooling_cost': powertrain_cooling_cost,
                 'lv_harness_cost': lv_harness_cost,
                 'hv_harness_cost': hv_harness_cost,
                 'DC_DC_converter_cost': dc_dc_converter_cost,
@@ -875,7 +883,6 @@ class PowertrainCost(OMEGABase):
                 'gearbox_cost': gearbox_cost,
                 'inverter_cost': inverter_cost,
                 'induction_inverter_cost': 'n/a',
-                'powertrain_cooling_loop_cost': 'n/a',
                 'power_management_and_distribution_cost': 'n/a',
                 'brake_sensors_actuators_cost': 'n/a',
                 'additional_pair_of_half_shafts_cost': 'n/a',
@@ -1128,11 +1135,12 @@ def get_obc_power(pkg_info, powertrain_type):
     return kw_obc
 
 
-def get_motor_power(pkg_info, powertrain_type, drive_system):
+def get_motor_power(locals_dict, pkg_info, powertrain_type, drive_system):
     """
     Get the electric drive motor-power, if equipped, of the given package.
 
     Args:
+        locals_dict (dict): local attributes
         pkg_info (Series): the necessary information for developing cost estimates
         powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
         drive_system (str): e.g., 'FWD', 'RWD', 'AWD' denoting front/rear/all wheel drive
@@ -1143,19 +1151,22 @@ def get_motor_power(pkg_info, powertrain_type, drive_system):
 
     """
     kw = pkg_info['motor_kw']
-
     kw_fdu = kw_rdu = kw_du = kw_p2 = kw_p4 = 0
 
     if powertrain_type == 'BEV':
         if drive_system == 'AWD':
-            kw_fdu, kw_rdu = 0.4 * kw, 0.6 * kw  # TODO for now to test but better approach needed?
+            share_key = (powertrain_type, 'KW_RDU_share', 'E_Motor', '-', '-', '-')
+            share = eval(_cache[share_key]['value'], {'np': np}, locals_dict)
+            kw_fdu, kw_rdu = (1 - share) * kw, share * kw
         else:
             kw_du = kw
-    elif powertrain_type == 'PHEV':
-        kw_p4, kw_p2 = 0.4 * kw, 0.6 * kw
-
-    elif powertrain_type in ['MHEV', 'HEV']:
-        kw_p2 = kw
+    elif powertrain_type in ['PHEV', 'MHEV', 'HEV']:
+        if drive_system == 'AWD':
+            share_key = (powertrain_type, 'KW_P2_share', 'E_Motor', '-', '-', '-')
+            share = eval(_cache[share_key]['value'], {'np': np}, locals_dict)
+            kw_p4, kw_p2 = (1 - share) * kw, share * kw
+        else:
+            kw_p2 = kw
 
     return kw_du, kw_fdu, kw_rdu, kw_p2, kw_p4
 
@@ -1504,8 +1515,8 @@ def calc_motor_cost(locals_dict, learning_factor, powertrain_type, drive_system,
 
     """
     cost_key = None
-    if powertrain_type in ['HEV', 'PHEV']:
-        cost_key = (powertrain_type, 'Transmission', 'E_Motor', '-', '-', body_style)
+    if powertrain_type in ['MHEV', 'HEV', 'PHEV']:
+        cost_key = (powertrain_type, 'Transmission', 'E_Motor', drive_system, '-', body_style)
     elif powertrain_type == 'BEV':
         cost_key = (powertrain_type, 'Drive_Unit', 'E_Motor', drive_system, '-', body_style)
 
@@ -1536,9 +1547,9 @@ def calc_high_efficiency_alternator(locals_dict, learning_factor, pkg_info):
     return high_eff_alt_cost
 
 
-def calc_thermal_cost(locals_dict, learning_factor, powertrain_type, drive_system, engine_config, body_style):
+def calc_powertrain_cooling_cost(locals_dict, learning_factor, powertrain_type, drive_system, engine_config, body_style):
     """
-    Calculate the thermal control system cost (coolant circuit, cabin heating and cooling) for all vehicles.
+    Calculate the powertrain thermal control system cost for all vehicles.
 
     Args:
         locals_dict (dict): local attributes
@@ -1549,7 +1560,7 @@ def calc_thermal_cost(locals_dict, learning_factor, powertrain_type, drive_syste
         body_style (str): e.g., 'sedan', 'cuv_suv' or 'pickup'
 
     Returns:
-        The thermal control system cost
+        The powertrain thermal control system cost
 
     """
     cost_key = (powertrain_type, 'Thermal', 'Coolant_Circuit_Cooling_Heating', '-', engine_config, body_style)
@@ -1557,9 +1568,30 @@ def calc_thermal_cost(locals_dict, learning_factor, powertrain_type, drive_syste
         cost_key = (powertrain_type, 'Thermal', 'Coolant_Circuit_Cooling_Heating', drive_system, '-', body_style)
 
     adj_factor = _cache[cost_key]['dollar_adjustment']
-    thermal_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
+    powertrain_cooling_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
 
-    return thermal_cost
+    return powertrain_cooling_cost
+
+
+def calc_hvac_cost(locals_dict, learning_factor, powertrain_type):
+    """
+    Calculate the powertrain thermal control system cost for all vehicles.
+
+    Args:
+        locals_dict (dict): local attributes
+        learning_factor (float): the learning factor to use
+        powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
+
+    Returns:
+        The HVAC system cost
+
+    """
+    cost_key = (powertrain_type, 'Thermal', 'HVAC', '-', '-', '-')
+
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    hvac_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) * adj_factor * learning_factor
+
+    return hvac_cost
 
 
 def calc_air_conditioning_costs(locals_dict, learning_factor):
