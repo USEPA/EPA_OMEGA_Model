@@ -1039,11 +1039,11 @@ def calc_market_class_data_from_market_class_vehicles(market_class_vehicle_dict,
             if 'ICE' in mc:
                 producer_decision['average_onroad_mpg_%s' % mc] = \
                     OnroadFuel.grams_co2e_per_gallon / \
-                    producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc]
+                    max(sys.float_info.epsilon, producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc])
             else:
                 producer_decision['average_onroad_mpg_%s' % mc] = \
                     OnroadFuel.kilowatt_hours_per_gallon / \
-                    producer_decision['average_onroad_direct_kwh_pmi_%s' % mc]
+                    max(sys.float_info.epsilon, producer_decision['average_onroad_direct_kwh_pmi_%s' % mc])
 
         else:
             producer_decision['average_onroad_direct_co2e_gpmi_%s' % mc] = 0
