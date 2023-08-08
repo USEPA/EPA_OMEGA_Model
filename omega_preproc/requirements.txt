@@ -11,3 +11,9 @@
 selenium==4.10.0
 bs4
 lxml
+
+# numpy
+# pandas
+# scipy
+# matplotlib
+# sympy

@@ -44,6 +44,7 @@ for run_count in range (0,len(run_controller)):
     tstcar_MY_errta_filename = str(run_controller['tstCar File Exceptions Table filename'][run_count])
     tstcar_MY_carline_name_mapping_filename = str(run_controller['tstCar CARLINE_NAME mapping filename'][run_count])
     set_bodyid_to_lineageid = int(run_controller['SetBodyIDtoLineageID'][run_count])
+    tstcar_folder = str(run_controller['tstcar_folder'][run_count])
     drivecycle_filenames = str(run_controller['Drive Cycle Filenames'][run_count])
     if ('[' and ']') in drivecycle_filenames:
         drivecycle_filenames = eval(drivecycle_filenames)
@@ -72,7 +73,7 @@ for run_count in range (0,len(run_controller)):
         modeltype_exceptions_table = pd.read_csv(input_path+'\\'+ model_type_exceptions_table_filename, encoding="ISO-8859-1")
         subconfig_MY_exceptions_table = pd.read_csv(input_path+'\\'+ subconfig_MY_exceptions_table_filename, encoding="ISO-8859-1")
         subconfig_sales_exceptions_table = pd.read_csv(input_path+'\\'+ subconfig_sales_exceptions_table_filename, encoding="ISO-8859-1")
-        tstcar_MY_exceptions_table = pd.read_csv(input_path +'\\'+ tstcar_MY_errta_filename, encoding="ISO-8859-1")
+        tstcar_MY_exceptions_table = pd.read_csv(tstcar_folder +'\\'+ tstcar_MY_errta_filename, encoding="ISO-8859-1")
         # modeltype_exceptions_table = modeltype_exceptions_table.applymap(lambda s: s.upper() if type(s) == str else s)
         # subconfig_MY_exceptions_table = subconfig_MY_exceptions_table.applymap(lambda s: s.upper() if type(s) == str else s)
         # subconfig_sales_exceptions_table = subconfig_sales_exceptions_table.applymap(lambda s: s.upper() if type(s) == str else s)
@@ -89,7 +90,7 @@ for run_count in range (0,len(run_controller)):
             (input_path, footprint_filename, lineageid_mapping_filename, bodyid_filename, \
              bool_run_new_manual_filter, manual_filter_filename, expanded_footprint_filename, subconfig_filename, model_type_filename, vehghg_filename, output_path_vehghgid, footprint_exceptions_table, \
              modeltype_exceptions_table, subconfig_MY_exceptions_table, subconfig_sales_exceptions_table, tstcar_MY_exceptions_table, model_year, roadload_coefficient_table_filename, set_bodyid_to_lineageid, \
-             drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, set_roadload_coefficient_table_filename, tstcar_MY_carline_name_mapping_filename)
+             drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, set_roadload_coefficient_table_filename, tstcar_MY_carline_name_mapping_filename, tstcar_folder);
 
     print('VehGHG Run Completed !!!')
         # import Subconfig_Expansion

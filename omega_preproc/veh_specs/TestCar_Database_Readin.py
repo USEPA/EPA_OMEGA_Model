@@ -205,8 +205,15 @@ def TestCar_Database_Readin(rawdata_input_path, run_input_path, input_filename, 
     air_density = 1.17 * kgpm32slugpft3
 
     import Drive_Cycle_Differentiation_and_Integration
-    (FTP_array, HWFET_array) = Drive_Cycle_Differentiation_and_Integration.\
-        Drive_Cycle_Differentiation_and_Integration(run_input_path, ftp_drivecycle_filename, hwfet_drivecycle_filename)
+    drivecycle_filenames = ['ftpcol10hz.csv', 'hwycol10hz.csv'];
+    drivecycle_input_filenames = ['FTP', 'HWY'];
+    drivecycle_output_filenames = ['FTP', 'HWY'];
+
+    (FTP_array, HWFET_array, US06_array, Custom_Array) = Drive_Cycle_Differentiation_and_Integration. \
+        Drive_Cycle_Differentiation_and_Integration(run_input_path, drivecycle_filenames, drivecycle_input_filenames,
+                                                    drivecycle_output_filenames);
+    # (FTP_array, HWFET_array) = Drive_Cycle_Differentiation_and_Integration.\
+    #     Drive_Cycle_Differentiation_and_Integration(run_input_path, ftp_drivecycle_filename, hwfet_drivecycle_filename)
     FTP_troadwork_mjpkm_col = pd.Series(np.zeros(len(raw_data_merged)), name = 'FTP Tractive Road Energy Intensity (MJ/km)')
     HWFET_troadwork_mjpkm_col = pd.Series(np.zeros(len(raw_data_merged)), name = 'HWFET Tractive Road Energy Intensity (MJ/km)')
     Comb_LF_col = pd.Series(np.zeros(len(raw_data_merged)), name = 'Combined Load Factor (%)')
@@ -273,21 +280,21 @@ def TestCar_Database_Readin(rawdata_input_path, run_input_path, input_filename, 
         /matching_eng_disp[matching_eng_disp > 0])
 
     bodyid_file_raw = pd.read_csv(run_input_path + '\\' + bodyid_filename, \
-        converters={'LineageID': int, 'BodyID': int, 'StartYear':int})
-    bodyid_file_nonfuture = bodyid_file_raw[(bodyid_file_raw['StartYear'] <= year) & \
-        (bodyid_file_raw['EndYear'] != 'xx')].reset_index(drop=True)
-    bodyid_file_notnull = bodyid_file_nonfuture[bodyid_file_nonfuture['EndYear'] != 'null']
-    bodyid_file_notnull['EndYear'] = bodyid_file_notnull['EndYear'].astype(int)
-    bodyid_file = pd.concat([bodyid_file_notnull[bodyid_file_notnull['EndYear'] >= year], \
-                             bodyid_file_nonfuture[bodyid_file_nonfuture['EndYear'] == 'null']]).reset_index(drop=True)
+        converters={'LineageID': int, 'BodyID': int, 'BodyID StartYear':int, 'BodyID EndYear':str})
+    bodyid_file_nonfuture = bodyid_file_raw[(bodyid_file_raw['BodyID StartYear'] <= year) & \
+        (bodyid_file_raw['BodyID EndYear'] != 'xx')].reset_index(drop=True)
+    bodyid_file_notnull = bodyid_file_nonfuture[bodyid_file_nonfuture['BodyID EndYear'] != 'null']
+    bodyid_file_notnull['BodyID EndYear'] = bodyid_file_notnull['BodyID EndYear'].astype(int)
+    bodyid_file = pd.concat([bodyid_file_notnull[bodyid_file_notnull['BodyID EndYear'] >= year], \
+                             bodyid_file_nonfuture[bodyid_file_nonfuture['BodyID EndYear'] == 'null']]).reset_index(drop=True)
     del bodyid_file_raw, bodyid_file_nonfuture, bodyid_file_notnull
     try:
         matched_bodyid_file_raw = pd.read_csv(rawdata_input_path+'\\'+matched_bodyid_filename, converters = {'LineageID': int, \
             'BodyID':int, 'Test Veh Configuration #':int, 'Year':int})
         matched_bodyid_file_modelyear = matched_bodyid_file_raw[matched_bodyid_file_raw['Year'] == year]\
-            .groupby(['Test Vehicle ID', 'Test Veh Configuration #']).agg(lambda x:x.value_counts().index[0]).reset_index()
+            .groupby(['Test Vehicle ID', 'Test Veh Configuration #']).agg(lambda x:x.value_counts().index[0]).reset_index();
 
-        matched_bodyid_file = matched_bodyid_file_modelyear[matched_bodyid_file_modelyear['LineageID'] != -9].reset_index(drop=True)
+        matched_bodyid_file = matched_bodyid_file_modelyear[matched_bodyid_file_modelyear['LineageID'] != -9].reset_index(drop=True);
 
         matched_bodyid_file_singlematch = matched_bodyid_file[matched_bodyid_file['BodyID'] != -9]
         matched_bodyid_file_multimatch = matched_bodyid_file[matched_bodyid_file['BodyID'] == -9].drop('BodyID',axis=1).reset_index(drop=True)

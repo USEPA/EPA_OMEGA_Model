@@ -245,9 +245,12 @@ for model_year in model_years:
             except FileNotFoundError:
                 print(unique_filename, 'not found!!!')
                 continue
+            try:
+                if SetBodyIDtoLineageID == 1:
+                    source_file['BodyID'] = source_file['LineageID'];
+            except KeyError:
+                pass
 
-            if SetBodyIDtoLineageID == 1:
-                source_file['BodyID'] = source_file['LineageID']
             if unique_sourcename == 'Edmunds':
                 source_file['WHEELS-raw'] = pd.Series(np.zeros(len(source_file['WHEELS'])), name='WHEELS-raw')
                 source_file['WHEELS-raw'] = source_file['WHEELS']
@@ -352,7 +355,8 @@ for model_year in model_years:
                 #     source_file['Max Loaded Trailer Weight'] = source_file['Max Loaded Trailer Weight'].astype(str)
                 if 'WHEELBASE' in list(matching_categories):
                     source_file['WHEELBASE'] = source_file['WHEELBASE'].astype(float).round(decimals=0).astype(str)
-                    if unique_sourcename in 'OEM Towing Guide': OEM_towing_quide_unique_LineageID_list = source_file['LineageID'].unique().tolist()
+                    if unique_sourcename in 'OEM Towing Guide':
+                        OEM_towing_quide_unique_LineageID_list = source_file['LineageID'].unique().tolist()
                 master_index_file_with_desired_fields_all_merges = master_index_file.merge( \
                 # master_index_file_with_desired_fields_all_merges=pd.merge_ordered(master_index_file, \
                     source_file[list(pd.Series(list(matching_categories) + list(all_subarray['Column Name'].unique())).unique())], \
@@ -365,16 +369,21 @@ for model_year in model_years:
                     source_file[list(new_source_columns)],how='left',on=list(matching_categories)).replace([str(np.nan),''], np.nan)
             del source_file
         else:
-            master_index_file_with_desired_fields_all_merges = master_index_file.replace([str(np.nan), ''], np.nan)
+            master_index_file_with_desired_fields_all_merges = master_index_file.replace([str(np.nan), ''], np.nan);
 
+        # 'City PTEFF_FROM_RLCOEFFS'
         for all_subarray_count in range(0,len(all_subarray)):
             query_type = all_subarray['QueryType'][all_subarray_count]
             weighting_field = all_subarray['AvgWtField'][all_subarray_count]
             bounding_field = all_subarray['BoundingField'][all_subarray_count]
             information_toget_source_column_name = all_subarray['Column Name'][all_subarray_count]
             information_toget = all_subarray['Desired Field'][all_subarray_count]
-            # if information_toget_source_column_name == 'STABILITY CONTROL':
+            # if information_toget_source_column_name ==  'City PTEFF_FROM_RLCOEFFS': #'STABILITY CONTROL':
             #     print(information_toget_source_column_name)
+            if information_toget_source_column_name not in master_index_file_with_desired_fields_all_merges.columns:
+                print(information_toget_source_column_name, ' Not found')
+                continue
+
             if (aggregating_fields==information_toget).sum() == 0 and len(master_index_file_with_desired_fields_all_merges[\
                     ~pd.isnull(master_index_file_with_desired_fields_all_merges[information_toget_source_column_name])]) > 0:
                 print(str(1 + all_subarray_count) + ': ' + information_toget_source_column_name + ' ' + unique_sourcename + ' ' + query_type)
@@ -489,8 +498,8 @@ for model_year in model_years:
                         on=list(aggregating_columns)).sort_values(list(aggregating_columns)).reset_index(drop=True)
                 del query_output_source
         del master_index_file_with_desired_fields_all_merges
-        if unique_sourcename == 'OEM Towing Guide':
-            print(query_output)
+        # if unique_sourcename == 'OEM Towing Guide':
+            # print(query_output)
         #     query_output = query_output.drop(['Towing Capacity_Edmunds'], axis=1)
         #     query_output = pd.concat([Edmunds_query_output, query_output], axis=1)
     unique_column_names = pd.Series(all_array['Output Column'].unique()).dropna().reset_index(drop=True)
@@ -581,7 +590,28 @@ for model_year in model_years:
     query_output = query_output.sort_values(list(aggregating_columns)).reset_index(drop=True)
     query_output = query_output.loc[:, ~query_output.columns.duplicated()]
     query_output.loc[(query_output['TARGET_COEF_BEST_MTH_min'] == 0) & (query_output['TARGET_COEF_BEST_MTH_max'] == 0), 'TARGET_COEF_BEST_MTH'] = 0 #.replace('', 0, inplace=True, regex=True)
-    query_output.loc[(query_output['TARGET_COEF_BEST_MTH_min'] == 0) & (query_output['TARGET_COEF_BEST_MTH_max'] == 1), 'TARGET_COEF_BEST_MTH'] = 0 #.replace('', 0, inplace=True, regex=True)
+    query_output.loc[(query_output['TARGET_COEF_BEST_MTH_min'] == 0) & (query_output['TARGET_COEF_BEST_MTH_max'] == 1), 'TARGET_COEF_BEST_MTH'] = 0 #.
+
+    _FE_columns = ['FINAL_CALC_CITY_FE_4', 'FINAL_CALC_HWY_FE_4', 'FINAL_CALC_COMB_FE_4']
+    _ELEC_columns = ['ELEC_KWH_100MILES_CITY_FE_4', 'ELEC_KWH_100MILES_HWY_FE_4', 'ELEC_KWH_100MILES_COMB_FE_4']
+    _idx_HWY_GHG_1_all = query_output.columns.get_loc('FINAL_CALC_HWY_GHG_1_all');
+    df_tmp = pd.DataFrame(np.zeros(len(query_output['FINAL_CALC_CITY_FE_4'])));
+    for i in range(len(_ELEC_columns)):
+        _col_name = _ELEC_columns[i];
+        query_output.insert(_idx_HWY_GHG_1_all + i + 1, _col_name, df_tmp)
+
+    for i in range(len(query_output)):
+        for j in range(len(_ELEC_columns)):
+            _col_name_FE = _FE_columns[j];
+            _col_name_ELEC = _ELEC_columns[j]
+            if(query_output.loc[i, 'Electrification Category'] == 'EV'):
+                try:
+                    query_output.loc[i, _col_name_ELEC] = round(33.705 * 100 / query_output.loc[i, _col_name_FE], 1);
+                except KeyError:
+                    pass;
+            else:
+                query_output.loc[i, _col_name_ELEC] = np.nan;
+
     if '_plus_MTH_34' in master_index_filename: Query_filename = 'Query_plus_MTH_34'
     else: Query_filename = 'Query_MTH_012'
 
@@ -595,6 +625,9 @@ for model_year in model_years:
     #     query_output.loc[query_output[_airbag] == 'null-|yes', _airbag] = 'yes|null'
     #     query_output.loc[query_output[_airbag] == 'yes|null-', _airbag] = 'yes|null'
     #     query_output.loc[query_output[_airbag] == 'null-', _airbag] = 'null'
+    _idx_nulls = query_output.loc[query_output['PRODUCTION_VOLUME_GHG_50_STATE'] == 0, :].index;
+    query_output.drop(_idx_nulls, inplace=True);
+    # query_output = query_output.dropna(axis=1, how='all').reset_index(drop=True)
 
     query_output.to_csv(output_path + '\\' + str(model_year) + '_' + Query_filename + '_' + date_and_time + '.csv',index=False)
     query_output = query_output.drop(query_output.filter(regex='Master Index').columns, axis=1)

@@ -366,9 +366,12 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
 
     electrification_category = pd.Series(np.zeros(len(Edmunds_data_cleaned)), name = 'Electrification Category').replace(0,'N')
     electrification_category[Edmunds_data_cleaned['FUEL TYPE'] == 'Electric fuel'] = 'EV'
+    electrification_category[(Edmunds_data_cleaned['Trims'].str.contains('electric DD')) | (Edmunds_data_cleaned['Trims'].str.contains('electric 2AM'))] = 'EV'
     electrification_category[(Edmunds_data_cleaned['BASE ENGINE TYPE'].str.lower() == 'hybrid') & (Edmunds_data_cleaned['RANGE IN MILES (CTY/HWY)'].astype(str) != '0/0 mi.')] = 'HEV'
-    electrification_category[(Edmunds_data_cleaned['BASE ENGINE TYPE'].str.lower() == 'hybrid') & (Edmunds_data_cleaned['RANGE IN MILES (CTY/HWY)'].astype(str) == '0/0 mi.') ] = 'PHEV'
     electrification_category[(Edmunds_data_cleaned['BASE ENGINE TYPE'].str.lower() == 'hybrid') & (Edmunds_data_cleaned['RANGE IN MILES (CTY/HWY)'].astype(str) == 'false (electric)')] = 'REEV'
+    electrification_category[(Edmunds_data_cleaned['BASE ENGINE TYPE'].str.lower() == 'hybrid') & (Edmunds_data_cleaned['RANGE IN MILES (CTY/HWY)'].astype(str) == '0/0 mi.') ] = 'PHEV'
+    electrification_category[Edmunds_data_cleaned['Trims'].str.contains('plug-in')] = 'PHEV';
+    electrification_category[Edmunds_data_cleaned['Trims'].str.contains('fuel cell')] = 'FCEV';
 
     Edmunds_data_cleaned['CAM TYPE SHORT NAME'] = pd.Series(np.zeros(len(Edmunds_data_cleaned))).replace(0,'')
     Edmunds_data_cleaned['CAM TYPE SHORT NAME'][Edmunds_data_cleaned['CAM TYPE'].astype(str).str.contains('DOHC')] = 'DOHC'
