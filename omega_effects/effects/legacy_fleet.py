@@ -308,3 +308,24 @@ class LegacyFleet:
                 'kwh_per_mile': v['kwh_per_mile'],
             }
             self.adjusted_legacy_fleet[(v['vehicle_id'], v['calendar_year'])] = update_dict
+
+    @staticmethod
+    def set_legacy_fleet_name(market_class_id):
+        """
+
+        Args:
+            market_class_id: the legacy fleet market class id
+
+        Returns:
+            A name for the vehicle primarily for use in cost_effects, repair cost calculations which looks for
+            'car' or 'Pickup' in the name attribute
+
+        """
+        if 'sedan' in market_class_id:
+            _name = 'car'
+        elif 'pickup' in market_class_id:
+            _name = 'Pickup'
+        else:
+            _name = 'cuv_suv'
+
+        return _name

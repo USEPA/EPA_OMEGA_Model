@@ -272,7 +272,7 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
         in_use_fuel_id = v['in_use_fuel_id']
         registered_count = v['registered_count']
 
-        name = set_legacy_fleet_name(v['market_class_id'])
+        name = batch_settings.legacy_fleet.set_legacy_fleet_name(v['market_class_id'])
 
         fueling_class = base_year_powertrain_type = 'ICE'
         if 'BEV' in v['market_class_id']:
@@ -337,27 +337,6 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
         legacy_fleet_safety_effects_dict[key] = vehicle_safety_dict
 
     return legacy_fleet_safety_effects_dict
-
-
-def set_legacy_fleet_name(market_class_id):
-    """
-
-    Args:
-        market_class_id: the legacy fleet market class id
-
-    Returns:
-        A name for the vehicle primarily for use in cost_effects, repair cost calculations which looks for
-        'car' or 'Pickup' in the name attribute
-
-    """
-    if 'sedan' in market_class_id:
-        _name = 'car'
-    elif 'pickup' in market_class_id:
-        _name = 'Pickup'
-    else:
-        _name = 'cuv_suv'
-
-    return _name
 
 
 def calc_annual_avg_safety_effects(input_df):
