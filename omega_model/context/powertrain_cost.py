@@ -333,10 +333,11 @@ class PowertrainCost(OMEGABase):
                 twc_cost = (twc_substrate + twc_washcoat + twc_canning + twc_pgm)
 
                 # gpf cost
-                adj_factor_gpf = _cache['ALL', 'gpf_cost']['dollar_adjustment']
-                locals_dict = locals()
-                gpf_cost = eval(_cache['ALL', 'gpf_cost']['value'], {'np': np}, locals_dict) \
-                           * adj_factor_gpf * learn
+                if omega_globals.options.powertrain_cost_with_gpf:
+                    adj_factor_gpf = _cache['ALL', 'gpf_cost']['dollar_adjustment']
+                    locals_dict = locals()
+                    gpf_cost = eval(_cache['ALL', 'gpf_cost']['value'], {'np': np}, locals_dict) \
+                               * adj_factor_gpf * learn
 
             # diesel exhaust aftertreatment cost
             elif diesel_flag:
@@ -385,7 +386,7 @@ class PowertrainCost(OMEGABase):
                 battery_cost = eval(_cache[powertrain_type, 'battery']['value'], {'np': np}, locals_dict) \
                                * adj_factor * learning_pev_battery_scaling_factor
 
-            if powertrain_type in ['BEV', 'PHEV'] and KWH >= 7:
+            if powertrain_type in ['BEV', 'PHEV'] and KWH >= 7 and omega_globals.options.powertrain_cost_with_ira:
                 battery_offset_dict = eval(_cache[powertrain_type, 'battery_offset']['value'], {'np': np}, locals_dict)
                 battery_offset_min_year = min(battery_offset_dict['dollars_per_kwh'].keys())
                 battery_offset_max_year = max(battery_offset_dict['dollars_per_kwh'].keys())
@@ -750,7 +751,7 @@ class PowertrainCost(OMEGABase):
             if powertrain_type in ['MHEV', 'HEV', 'PHEV']:
                 battery_cost = calc_battery_cost(locals_dict, learning_pev_battery_scaling_factor, powertrain_type)
 
-                if powertrain_type == 'PHEV':
+                if powertrain_type == 'PHEV' and omega_globals.options.powertrain_cost_with_ira:
                     battery_offset = calc_battery_offset(locals_dict, vehicle, powertrain_type, KWH)
 
             battery_cost += battery_offset
@@ -806,7 +807,9 @@ class PowertrainCost(OMEGABase):
 
             battery_cost = calc_battery_cost(locals_dict, learning_pev_battery_scaling_factor, powertrain_type)
 
-            battery_offset = calc_battery_offset(locals_dict, vehicle, powertrain_type, KWH)
+            battery_offset = 0
+            if omega_globals.options.powertrain_cost_with_ira:
+                battery_offset = calc_battery_offset(locals_dict, vehicle, powertrain_type, KWH)
 
             battery_cost += battery_offset
 
@@ -1284,10 +1287,12 @@ def calc_gasoline_eas_cost(locals_dict, learning_factor):
     twc_cost = (twc_substrate + twc_washcoat + twc_canning + twc_pgm)
 
     # gpf cost
-    cost_key = ('ALL', 'Exhaust', 'gpf', '-', '-', '-')
-    adj_factor_gpf = _cache[cost_key]['dollar_adjustment']
-    gpf_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) \
-               * adj_factor_gpf * learning_factor
+    gpf_cost = 0
+    if omega_globals.options.powertrain_cost_with_gpf:
+        cost_key = ('ALL', 'Exhaust', 'gpf', '-', '-', '-')
+        adj_factor_gpf = _cache[cost_key]['dollar_adjustment']
+        gpf_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) \
+                   * adj_factor_gpf * learning_factor
 
     return twc_substrate, twc_washcoat, twc_canning, twc_pgm, twc_cost, gpf_cost
 
