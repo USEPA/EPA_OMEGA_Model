@@ -93,6 +93,7 @@ class PowertrainCost(OMEGABase):
             pkg_info['engine_cylinders'] = vehicle.engine_cylinders
             pkg_info['engine_displacement_liters'] = vehicle.engine_displacement_liters
             pkg_info['footprint_ft2'] = vehicle.footprint_ft2
+            pkg_info['cost_curve_class'] = vehicle.cost_curve_class
 
         if powertrain_type is None:
             powertrain_type = omega_globals.options.CostCloud.get_powertrain_type(pkg_info)
@@ -709,9 +710,10 @@ class PowertrainCost(OMEGABase):
                     calc_inverter_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
 
             gearbox_cost = 0
-            # if powertrain_type == 'PHEV':
-            #     gearbox_cost = \
-            #         calc_gearbox_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
+            cost_curve_class = pkg_info['cost_curve_class']
+            if 'PS_PHEV' in cost_curve_class and 'AER1' in cost_curve_class:
+                gearbox_cost = \
+                    calc_gearbox_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
 
             lv_battery_cost = calc_lv_battery_cost(locals_dict, learning_factor_ice, powertrain_type)
 
