@@ -205,7 +205,7 @@ class PowertrainCost(OMEGABase):
         emachine_cost = 0
         gasoline_flag = diesel_flag = 0
 
-        KW = KWH = KW_OBC = KW_DU = KW_FDU = KW_RDU = KW_P2 = KW_P4 = 0
+        KW = KWH = KW_OBC = obc_kw = KW_DU = KW_FDU = KW_RDU = KW_P2 = KW_P4 = 0
         trans = CYL = engine_config = LITERS = None
         twc_substrate = twc_washcoat = twc_canning = twc_pgm = twc_cost = gpf_cost = diesel_eas_cost = eas_cost = 0
         engine_cost = engine_block_cost = cegr_cost = gdi_cost = turb_cost = deac_pd_cost = deac_fc_cost = atk2_cost = 0
@@ -220,6 +220,8 @@ class PowertrainCost(OMEGABase):
         CURBWT = pkg_info['curbweight_lbs']
         VEHICLE_SIZE_CLASS = weight_bins.index(min([v for v in weight_bins if CURBWT < v]))
         locals_dict = locals()
+
+        cost_curve_class = pkg_info['cost_curve_class']
 
         if drive_system != 'AWD':
             drive_system = '2WD'
@@ -543,6 +545,7 @@ class PowertrainCost(OMEGABase):
                 'body_style': body_style,
                 'drive_system': vehicle.drive_system,
                 'powertrain_type': powertrain_type,
+                'cost_curve_class': cost_curve_class,
                 'charge_depleting_range_mi': vehicle.charge_depleting_range_mi,
                 'footprint_ft2': pkg_info['footprint_ft2'],
                 'learning_factor_ice': learning_factor_ice,
@@ -587,6 +590,7 @@ class PowertrainCost(OMEGABase):
                 'kW_RDU': KW_RDU,
                 'kW_P2': KW_P2,
                 'kW_P4': KW_P4,
+                'kW_OBC': obc_kw,
                 'kWh_battery': KWH,
                 'e_motor_cost': motor_cost,
                 'induction_motor_cost': induction_motor_cost,
@@ -658,6 +662,8 @@ class PowertrainCost(OMEGABase):
 
         locals_dict = locals()
 
+        cost_curve_class = pkg_info['cost_curve_class']
+
         gasoline_flag = diesel_flag = False
         if powertrain_type in ['ICE', 'MHEV', 'HEV', 'PHEV']:
 
@@ -701,7 +707,8 @@ class PowertrainCost(OMEGABase):
             trans_cost = calc_trans_cost(locals_dict, learning_factor_ice, trans, drive_system)
 
             motor_cost = 0
-            if powertrain_type != 'ICE':
+            if powertrain_type != 'ICE' and 'CV' not in trans:
+                # eCVT costed as including e-motor
                 motor_cost = \
                     calc_motor_cost(locals_dict, learning_factor_ice, powertrain_type, drive_system, body_style)
 
@@ -711,7 +718,6 @@ class PowertrainCost(OMEGABase):
                     calc_inverter_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
 
             gearbox_cost = 0
-            cost_curve_class = pkg_info['cost_curve_class']
             if 'PS_PHEV' in cost_curve_class and 'AER1' in cost_curve_class:
                 gearbox_cost = \
                     calc_gearbox_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
@@ -838,6 +844,7 @@ class PowertrainCost(OMEGABase):
                 'body_style': body_style,
                 'drive_system': vehicle.drive_system,
                 'powertrain_type': powertrain_type,
+                'cost_curve_class': cost_curve_class,
                 'charge_depleting_range_mi': vehicle.charge_depleting_range_mi,
                 'footprint_ft2': pkg_info['footprint_ft2'],
                 'learning_factor_ice': learning_factor_ice,
@@ -882,6 +889,7 @@ class PowertrainCost(OMEGABase):
                 'kW_RDU': KW_RDU,
                 'kW_P2': KW_P2,
                 'kW_P4': KW_P4,
+                'kW_OBC': KW_OBC,
                 'kWh_battery': KWH,
                 'e_motor_cost': motor_cost,
                 'induction_motor_cost': 'n/a',
@@ -1117,25 +1125,12 @@ def get_obc_power(pkg_info, powertrain_type):
         The charging power of the onboard charger
 
     """
-    # kw_obc = 3.5
     kw_obc = 0
     kwh = pkg_info['battery_kwh']
     if powertrain_type in ['BEV', 'PHEV']:
         kw_obc = 19
         if kwh < 100:
             kw_obc = 11
-    # if powertrain_type == 'PHEV':
-    #     kw_obc += 1.9
-    #     if kwh < 10:
-    #         kw_obc += 1.1
-    #     elif kwh < 7:
-    #         kw_obc += 0.7
-    # elif powertrain_type == 'BEV':
-    #     kw_obc += 19
-    #     if kwh < 100:
-    #         kw_obc += 11
-    #     elif kwh < 70:
-    #         kw_obc += 7
 
     return kw_obc
 
