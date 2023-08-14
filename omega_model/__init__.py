@@ -219,6 +219,8 @@ try:
 
             self.powertrain_cost_fev = False
             self.powertrain_cost_tracker = False
+            self.powertrain_cost_with_ira = True
+            self.powertrain_cost_with_gpf = True
 
             # list of modules to allow verbose log files, or empty to disable:
             self.verbose_log_modules = ['database_', 'producer_compliance_search', 'cross_subsidy_search_',

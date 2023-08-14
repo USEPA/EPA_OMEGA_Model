@@ -216,7 +216,7 @@ def calc_vehicle_physical_effects(vpd):
 
     # calc upstream emissions for both liquid and electric fuel operation
     kwhs, gallons = vpd.fuel_generation_kwh, vpd.fuel_consumption_gallons
-    ref_factor = vpd.fuel_reduction_leading_to_reduced_domestic_refining
+    ref_factor = vpd.fuel_reduction_leading_to_reduced_domestic_refining * vpd.pure_share
 
     voc_refinery_ustons = gallons * vpd.voc_ref_rate * ref_factor / vpd.grams_per_us_ton
     co_refinery_ustons = gallons * vpd.co_ref_rate * ref_factor / vpd.grams_per_us_ton

@@ -179,12 +179,17 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
             # repair costs
             if 'car' in v['name']:
                 operating_veh_type = repair_type = 'car'
-            elif 'Pickup' in v['name']:
+            elif 'Pickup' in v['name'] and 'mediumduty' not in v['reg_class_id']:
                 operating_veh_type = repair_type = 'truck'
+            elif 'mediumduty' in v['reg_class_id']:
+                if 'Pickup' in v['name']:
+                    operating_veh_type = 'mediumduty_pickup'
+                    repair_type = 'md_pickup'
+                else:
+                    operating_veh_type = 'mediumduty_van'
+                    repair_type = 'md_van'
             else:
                 operating_veh_type = repair_type = 'suv'
-            if 'mediumduty' in v['name']:
-                repair_type = 'md'
 
             repair_cost_per_mile = batch_settings.repair_cost.calc_repair_cost_per_mile(
                 avg_mfr_cost, powertrain_type, repair_type, v['age']
