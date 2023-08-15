@@ -289,9 +289,8 @@ class VehicleAggregation(OMEGABase):
             df['glider_non_structure_mass_lbs'] = 0
 
             # fill in missing values
-            df['ground_clearance_in'] = df['ground_clearance_in'].fillna(6.6)  # RV
-
-            df['height_in'] = df['height_in'].fillna(62.4)  # RV
+            VehicleAggregation.weighted_fillna(df, 'ground_clearance_in')
+            VehicleAggregation.weighted_fillna(df, 'height_in')
 
             df['base_year_powertrain_type'] = df['electrification_class'].\
                 replace({'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'FCV'})
@@ -429,6 +428,24 @@ class VehicleAggregation(OMEGABase):
             omega_globals.options.SalesShare.calc_base_year_data(omega_globals.options.vehicles_df)
 
         return template_errors
+
+    @staticmethod
+    def weighted_fillna(df, col, weight_by='sales'):
+        """
+        Fill NaNs (if any) with weighted value
+
+        Args:
+            df (DataFrame): the dataframe to fill
+            col (str): name of column to fill
+            weight_by (str): name of the weighting column
+
+        Returns:
+            Nothing, modifies df[col] by filling NaNs with weighted value
+
+        """
+        notnans = df[col].notna()
+        fillval = sum(df[col].loc[notnans] * df[weight_by].loc[notnans]) / df[weight_by].loc[notnans].sum()
+        df[col] = df[col].fillna(fillval)
 
 
 if __name__ == '__main__':
