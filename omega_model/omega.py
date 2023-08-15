@@ -465,6 +465,15 @@ def calc_cross_subsidy_metrics(mcat, cross_subsidy_group, producer_decision, cro
         abs(1 - _cross_subsidy_options_and_response['average_ALT_cross_subsidized_price_%s' % mcat] /
             _cross_subsidy_options_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat])
 
+    # for development
+    # _cross_subsidy_options_and_response['pricing_price_ratio_%s' % mcat] = \
+    #     _cross_subsidy_options_and_response['average_ALT_cross_subsidized_price_%s' % mcat] / \
+    #     _cross_subsidy_options_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat]
+
+    _cross_subsidy_options_and_response['pricing_price_ratio_delta_%s_raw' % mcat] = \
+        (1 - _cross_subsidy_options_and_response['average_ALT_cross_subsidized_price_%s' % mcat] /
+            _cross_subsidy_options_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat])
+
     # CU RV
     for k, v in _cross_subsidy_options_and_response.items():
         cross_subsidy_options_and_response[k] = v
@@ -675,13 +684,16 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_gro
 
         calc_cross_subsidy_metrics(mcat, cross_subsidy_group, producer_decision, cross_subsidy_options_and_response)
 
-        price_weight = 0.925
-
-        # calculate score, weighted distance to the origin
-        cross_subsidy_options_and_response['pricing_score'] = \
-            ((1 - price_weight) * cross_subsidy_options_and_response['abs_share_delta_%s' % mcat].values ** 2 +
-             price_weight * cross_subsidy_options_and_response[
-                 'pricing_price_ratio_delta_%s' % mcat].values ** 2) ** 0.5
+        if mcat_cross_subsidy_iteration_num == 0:
+            # take closest to origin to get in the ballpark
+            cross_subsidy_options_and_response['pricing_score'] = \
+                (cross_subsidy_options_and_response['pricing_price_ratio_delta_%s_raw' % mcat].values**2 +
+                cross_subsidy_options_and_response['abs_share_delta_%s' % mcat].values**2)**0.5
+        else:
+            # take lowest error sum
+            cross_subsidy_options_and_response['pricing_score'] = \
+                cross_subsidy_options_and_response['pricing_price_ratio_delta_%s' % mcat].values + \
+                cross_subsidy_options_and_response['abs_share_delta_%s' % mcat].values
 
         # select best score
         selected_cross_subsidy_index = cross_subsidy_options_and_response['pricing_score'].idxmin()
