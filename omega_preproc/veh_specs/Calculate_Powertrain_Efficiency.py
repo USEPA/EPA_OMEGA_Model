@@ -22,8 +22,8 @@ def Tractive_Energy_Calculation(A,B,C,ETW,Enghp, drivecycle_dist_mi, drivecycle_
         drivecycle_LF = 0
     return (drivecycle_troadwork_mjpkm, drivecycle_LF, drivecycle_tractive_kWhr)
 
-def Calculate_Powertrain_Efficiency(ID_col, TEST_PROC_CATEGORY_col, A_col, B_col, C_col, ETW_col, mpg_col, city_mpg_col, hwy_mpg_col, comb_mpg_col, run_input_path, \
-                                    drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, engdisp_col, ratedhp_col, fuelhv_col):
+def Calculate_Powertrain_Efficiency(ID_col, TEST_PROC_CATEGORY_col, A_col, B_col, C_col, ETW_col, mpg_col, city_mpg_col, hwy_mpg_col, comb_mpg_col, us06_mpg_col, \
+                                    run_input_path, drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, engdisp_col, ratedhp_col, fuelhv_col):
     import Drive_Cycle_Differentiation_and_Integration
     from Unit_Conversion import lbf2n, gravity_mps2, mph2mps, mi2km, mph22mps2, hps2kwhr, mj2kwhr, km2mi
 
@@ -96,13 +96,13 @@ def Calculate_Powertrain_Efficiency(ID_col, TEST_PROC_CATEGORY_col, A_col, B_col
             drivecycle_velocity_mph = US06_velocity_mph
             drivecycle_velocity_mps = US06_velocity_mps
             drivecycle_acceleration_mps2 = US06_acceleration_mps2
-        elif TEST_PROC_CATEGORY == 'Custom':
-            drivecycle_dist_mi = Custom_dist_mi
-            drivecycle_time = Custom_time
-            drivecycle_dt = Custom_dt
-            drivecycle_velocity_mph = Custom_velocity_mph
-            drivecycle_velocity_mps = Custom_velocity_mps
-            drivecycle_acceleration_mps2 = Custom_acceleration_mps2
+        # elif TEST_PROC_CATEGORY == 'Custom':
+        #     drivecycle_dist_mi = Custom_dist_mi
+        #     drivecycle_time = Custom_time
+        #     drivecycle_dt = Custom_dt
+        #     drivecycle_velocity_mph = Custom_velocity_mph
+        #     drivecycle_velocity_mps = Custom_velocity_mps
+        #     drivecycle_acceleration_mps2 = Custom_acceleration_mps2
         else:
             continue
 
@@ -135,8 +135,8 @@ def Calculate_Powertrain_Efficiency(ID_col, TEST_PROC_CATEGORY_col, A_col, B_col
     output_table['Displacement Specific Fuel Energy Intensity (Wh/mi/L)'] = pd.Series(np.zeros(len(output_table))).replace(0, '')
     output_table['Displacement Specific Fuel Energy Intensity (Wh/mi/L)'] = fuel_intensity_mjpkm_col/engdisp_col * 1000 * (mj2kwhr / km2mi)  # mj/km -> kwh/mi: mj2kwhr/km2mi
     output_table['Cycle Powertrain Efficiency (%)'] = 100 * drivecycle_troadwork_mjpkm_col / fuel_intensity_mjpkm_col
-    output_table1 = comb_Calculate_Powertrain_Efficiency(ID_col, A_col, B_col, C_col, ETW_col, mpg_col, city_mpg_col, hwy_mpg_col, comb_mpg_col, run_input_path, \
-                                         FTP_array, HWFET_array, US06_array, engdisp_col, ratedhp_col, fuelhv_col, output_table)
+    output_table1 = comb_Calculate_Powertrain_Efficiency(ID_col, A_col, B_col, C_col, ETW_col, mpg_col, city_mpg_col, hwy_mpg_col, comb_mpg_col, us06_mpg_col, \
+                                                         run_input_path, FTP_array, HWFET_array, US06_array, engdisp_col, ratedhp_col, fuelhv_col, output_table)
     output_table1 = output_table1.drop([A_col.name, B_col.name, C_col.name, ETW_col.name, ratedhp_col.name, mpg_col.name, fuelhv_col.name], axis=1).replace(0,np.nan)
     del drivecycle_troadwork_mjpkm_col, drivecycle_troadwork_kWhp100mi_col, drivecycle_tractive_kWhr_col, drivecycle_LF_col
     return output_table1
@@ -222,7 +222,7 @@ def comb_Tractive_Energy_Calculation(A, B, C, ETW, Enghp, FTP_array, HWFET_array
         Comb_LF = 0
     return (FTP_troadwork_mjpkm, HWFET_troadwork_mjpkm, US06_troadwork_mjpkm, Comb_LF, FTP_tractive_kWhr, HWFET_tractive_kWhr, US06_tractive_kWhr)
 
-def comb_Calculate_Powertrain_Efficiency(ID_col, A_col, B_col, C_col, ETW_col, mpg_col, city_mpg_col, hwy_mpg_col, combmpg_col, run_input_path, \
+def comb_Calculate_Powertrain_Efficiency(ID_col, A_col, B_col, C_col, ETW_col, mpg_col, city_mpg_col, hwy_mpg_col, combmpg_col, us06_mpg_col, run_input_path, \
                                          FTP_array, HWFET_array, US06_array, engdisp_col, ratedhp_col, fuelhv_col, output_table):
     from Unit_Conversion import lbf2n, gravity_mps2, mph2mps, mi2km, mph22mps2, hps2kwhr, mj2kwhr, km2mi
 

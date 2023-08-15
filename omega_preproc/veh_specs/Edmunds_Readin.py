@@ -11,6 +11,7 @@ def body_id_checks(Edmunds_Data, Edmunds_matched_bodyid_file_raw, year, base_yea
     if _body_style_check != 1: return Edmunds_matched_bodyid_file_raw;
 
     if _body_style_check == 1 and len(Edmunds_matched_bodyid_file_raw.loc[Edmunds_matched_bodyid_file_raw['ModelYear'] == year, 'BodyID'] == -9) > 0:
+        if year < 2019: base_year = year;
         Edmunds_matched_bodyid_file_raw0 = Edmunds_matched_bodyid_file_raw.loc[Edmunds_matched_bodyid_file_raw['ModelYear'] == base_year, :].reset_index(drop=True)
 
         Edmunds_matched_bodyid_file_raw0.loc[:, 'Powertrains'] = 'ICE';
@@ -195,7 +196,7 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
             exceptions_table['New Value'][error_check_count]
 
     # run_input_path
-    body_id_table_readin = pd.read_csv(rawdata_input_path + '\\' + bodyid_filename, low_memory=False)
+    body_id_table_readin = pd.read_csv(run_input_path + '\\' + bodyid_filename, low_memory=False)
     body_id_table_readin.dropna(subset=['BodyID', 'LineageID'], how='any', inplace=True)
     body_id_table_readin.reset_index(drop=True, inplace=True)
     body_id_table_readin[['BodyID', 'LineageID']].astype(int)
@@ -211,7 +212,7 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     body_id_table['LineageID'] = body_id_table['LineageID'].astype(int)
     body_id_table['BodyID'] = body_id_table['BodyID'].astype(int)
 
-    Edmunds_matched_bodyid_file_raw = pd.read_csv(rawdata_input_path + '\\' + matched_bodyid_filename, converters={'LineageID': int, 'BodyID': int, 'Model':str})
+    Edmunds_matched_bodyid_file_raw = pd.read_csv(run_input_path + '\\' + matched_bodyid_filename, converters={'LineageID': int, 'BodyID': int, 'Model':str})
 
     _body_style_check = 1;
     Edmunds_matched_bodyid_file_raw = body_id_checks(Edmunds_Data, Edmunds_matched_bodyid_file_raw, year, 2019, _body_style_check, rawdata_input_path, run_input_path, matched_bodyid_filename);
@@ -222,6 +223,11 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     Edmunds_matched_bodyid_file_many = Edmunds_matched_bodyid_file_notnone[Edmunds_matched_bodyid_file_notnone['BodyID'] == -9] \
         .drop('BodyID',axis=1).merge(body_id_table[['LineageID', 'BodyID']], how='left', on = 'LineageID').reset_index(drop=True)
     Edmunds_matched_bodyid = pd.concat([Edmunds_matched_bodyid_file_single, Edmunds_matched_bodyid_file_many, Edmunds_matched_bodyid_file_none]).reset_index(drop=True)
+    if year < 2019:
+        Edmunds_matched_bodyid['Model'] = Edmunds_matched_bodyid['Model'].str.upper();
+        l_str = [' SEDAN', ' SUV', ' WAGON', ' CONVERTIBLE', ' COUPE', ' HATCHBACK', ' DIESEL', ' HYBRID', ' MINIVAN'];
+        Edmunds_matched_bodyid['Model'] = Edmunds_matched_bodyid['Model'].str.replace('|'.join(l_str), '', regex=True).str.strip();
+        # Edmunds_data_cleaned = Edmunds_Data.merge(Edmunds_matched_bodyid[['Make', 'Trims', 'LineageID', 'BodyID']], how='left', on=['Make', 'Trims']).reset_index(drop=True);
     Edmunds_data_cleaned = Edmunds_Data.merge(Edmunds_matched_bodyid[['Model', 'Trims', 'LineageID', 'BodyID']], how='left', on = ['Model', 'Trims']).reset_index(drop=True)
     # Edmunds_data_cleaned['BodyID'] = Edmunds_data_cleaned['BodyID'].astype(float)
     Edmunds_data_cleaned['BodyID'] = Edmunds_data_cleaned['BodyID'].replace(np.nan, 0).astype(int)

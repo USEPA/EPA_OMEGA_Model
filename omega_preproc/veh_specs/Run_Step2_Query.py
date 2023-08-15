@@ -3,6 +3,7 @@ import numpy as np
 import datetime
 import os
 
+OMEGA_outputs = True;
 pd.options.mode.chained_assignment = None  # default='warn'
 cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
                 "DUAL FRONT AND DUAL REAR SIDE-MOUNTED AIRBAGS",
@@ -10,6 +11,17 @@ cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTI
                 "DRIVER ONLY WITH HEAD PROTECTION CHAMBER SIDE-MOUNTED AIRBAGS",
                 "FRONT, REAR AND THIRD ROW HEAD AIRBAGS", "FRONT AND REAR HEAD AIRBAGS", "FRONT HEAD AIRBAGS",
                 "STABILITY CONTROL", "TRACTION CONTROL", "TIRE PRESSURE MONITORING"]
+cols_OMEGA_inputs = ['CAFE_MFR_CD',	'MODEL_TYPE_INDEX',	'Electrification Category',	'Boost Type Category', 'CARLINE_CLASS_DESC_all', 'CARLINE_MFR_NAME_all', 'CARLINE_NAME_all', 'TARGET_COEF_BEST_MTH_min', \
+                     'TARGET_COEF_BEST_MTH_max', 'TARGET_COEF_BEST_MTH_all', 'TARGET_COEF_A_BEST', 'TARGET_COEF_B_BEST', 'TARGET_COEF_C_BEST', 'FTP_FE Bag 1', 'FTP_FE Bag 2', 'FTP_FE Bag 3', 'FTP_FE Bag 4', 'US06_FE', \
+                     'US06_FE Bag 1', 'US06_FE Bag 2', 'CAFE_MODEL_YEAR_all', 'RLHP_FROM_RLCOEFFS',	'ROUNDED_CARGO_CARRYING_VOL', 'BodyID_all',	'Combined Load Factor (%)',	'City Powertrain Efficiency', \
+                     'City Tractive Road Energy Intensity (Wh/mi)', 'Hwy Powertrain Efficiency', 'Hwy Tractive Road Energy Intensity (Wh/mi)', 'US06 Powertrain Efficiency', 'US06 Tractive Road Energy Intensity (Wh/mi)',\
+                     'COMPLIANCE_CATEGORY_CD_all', 'COOLED_EGR_YN_all', 'Curb Weight', 'CYL_DEACT_all', 'CYL_DEACT_DESC_all', 'DRV_SYS_all', 'Drive Sys tstcar_all', 'DRV_SYS_DESC_all', 'EGR_YN_all', 'EGR_TYPE_all', \
+                     'Electric Power Steering_all', 'ENG_BLOCK_ARRANGEMENT_CD_all', 'ENG_BLOCK_ARRANGEMENT_DESC_all', 'ENG_DISPL_all', 'DISPL_UNIT_all', 'Engine Displacement Category_all', 'ENG_TYPE_all', 'ENG_TYPE_DESC_all', \
+                     'ENGINE_TYPE_DETAIL_DESC_all',	'AXLE_RATIO', 'ETW', 'FINAL_CALC_CITY_FE_4', 'FINAL_CALC_HWY_FE_4', 'FOOTPRINT', 'FOOTPRINT_CARLINE_NM_all', 'FOOTPRINT_DESC_all', 'FOOTPRINT_DIVISION_NM_all', 'FOOTPRINT_MFR_NM_all', \
+                     'FRONT_TRACK_WIDTH_INCHES', 'FUEL_CELL_YN_all', 'FUEL_METERING_all', 'FUEL_METERING_DESC_all', 'Fuel Recommended_all', 'Fuel Tank Capacity', 'FUEL_USAGE_all', 'FUEL_USAGE_DESC_all', 'Gross Vehicle Weight Rating', \
+                     'Ground Clearance', 'Height', 'Horsepower at RPM_all', 'HYBRID_YN_all', 'HYBRID_TYPE_all', 'HYBRID_TYPE_DESC_all', 'Interior Volume', 'Length', 'LineageID_all', 'MSRP', 'NUM_CYLINDRS_ROTORS_all', 'TOTAL_NUM_TRANS_GEARS_all', \
+                     'NV_RATIO_BEST', 'OFF_BOARD_CHARGE_CAPABLE_YN_all', 'Passenger Capacity', 'Payload Capacity', 'PRODUCTION_VOLUME_GHG_50_STATE', 'ENG_RATED_HP', 'REAR_TRACK_WIDTH_INCHES', 'RECHARGE_ENERGY_STORAGE_SYS_YN_all', 'TOT_ROAD_LOAD_HP', \
+                     'STOP_START_ENG_MGT_all', 'STOP_START_ENG_MGT_DESC_all', 'THREE_ROWS_DES_SEATING_POS_YN_all', 'Torque_all', 'Towing Capacity', 'OEM Towing Capacity', 'Transmission Type Category_all', 'Wheelbase', 'Width', 'TARGET_COEF_BEST_MTH'];
 
 def weighted_average(grp):
     if grp[weighting_field]._get_numeric_data().sum() == 0: # if all the weighting factors are zero, take a simple average. Otherwise, it will calculate as 0/0.
@@ -252,11 +264,14 @@ for model_year in model_years:
                 pass
 
             if unique_sourcename == 'Edmunds':
-                source_file['WHEELS-raw'] = pd.Series(np.zeros(len(source_file['WHEELS'])), name='WHEELS-raw')
-                source_file['WHEELS-raw'] = source_file['WHEELS']
-                for i in range (len(source_file['WHEELS-raw'])):
-                    source_file['WHEELS'][i] = float(source_file['WHEELS-raw'][i].split(' ')[0])
-                source_file['WHEELS'] = source_file['WHEELS'].astype(float).round(1)
+                try:
+                    source_file['WHEELS-raw'] = pd.Series(np.zeros(len(source_file['WHEELS'])), name='WHEELS-raw')
+                    source_file['WHEELS-raw'] = source_file['WHEELS']
+                    for i in range (len(source_file['WHEELS-raw'])):
+                        source_file['WHEELS'][i] = float(source_file['WHEELS-raw'][i].split(' ')[0])
+                    source_file['WHEELS'] = source_file['WHEELS'].astype(float).round(1);
+                except KeyError:
+                    pass
             try:
                 source_file['CALC_ID'] = source_file['CALC_ID'].astype(float).astype(int).astype(str)
                 if 'WHEELBASE' in list(matching_categories):
@@ -378,8 +393,8 @@ for model_year in model_years:
             bounding_field = all_subarray['BoundingField'][all_subarray_count]
             information_toget_source_column_name = all_subarray['Column Name'][all_subarray_count]
             information_toget = all_subarray['Desired Field'][all_subarray_count]
-            # if information_toget_source_column_name ==  'City PTEFF_FROM_RLCOEFFS': #'STABILITY CONTROL':
-            #     print(information_toget_source_column_name)
+            if information_toget_source_column_name ==  'City PTEFF_FROM_RLCOEFFS': #'STABILITY CONTROL':
+                print(information_toget_source_column_name)
             if information_toget_source_column_name not in master_index_file_with_desired_fields_all_merges.columns:
                 print(information_toget_source_column_name, ' Not found')
                 continue
@@ -629,12 +644,24 @@ for model_year in model_years:
     query_output.drop(_idx_nulls, inplace=True);
     # query_output = query_output.dropna(axis=1, how='all').reset_index(drop=True)
 
-    query_output.to_csv(output_path + '\\' + str(model_year) + '_' + Query_filename + '_' + date_and_time + '.csv',index=False)
+    query_output.to_csv(output_path + '\\' + str(model_year) + '_' + Query_filename + '_' + date_and_time + '.csv',index=False);
+
     query_output = query_output.drop(query_output.filter(regex='Master Index').columns, axis=1)
     query_output = query_output.drop(query_output.filter(regex='Edmunds').columns, axis=1)
     query_output = query_output.drop(query_output.filter(regex='OEM Towing Guide').columns, axis=1)
-    query_output.to_csv(output_path + '\\' + str(model_year) + Query_filename + ' ' + date_and_time + '_noduplicatecolumns.csv',index=False)
+    query_output.to_csv(output_path + '\\' + str(model_year) + Query_filename + ' ' + date_and_time + '_noduplicatecolumns.csv',index=False);
 
-    del query_output
-    del all_array
-    del master_index_file
+    if (OMEGA_outputs == True):
+        query_output.rename(columns={'City PTEFF_FROM_RLCOEFFS': 'City Powertrain Efficiency', 'Hwy PTEFF_FROM_RLCOEFFS':'Hwy Powertrain Efficiency', \
+                                     'US06 PTEFF_FROM_RLCOEFFS':'US06 Powertrain Efficiency'}, inplace=True);
+        for i in range(len(cols_OMEGA_inputs)):
+            if cols_OMEGA_inputs[i] not in query_output.columns:
+                print(i, cols_OMEGA_inputs[i]);
+
+        omega_outputs = query_output.loc[:, cols_OMEGA_inputs];
+        omega_outputs.to_csv(output_path + '\\' + str(model_year) + Query_filename + '_OMEGA_' + date_and_time + '.csv',index=False);
+        del omega_outputs;
+
+    del query_output;
+    del all_array;
+    del master_index_file;

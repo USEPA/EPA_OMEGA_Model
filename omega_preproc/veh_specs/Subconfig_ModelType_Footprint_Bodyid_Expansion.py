@@ -1,7 +1,6 @@
 import pandas as pd
 import datetime
 import numpy as np
-
 eps = 1e-5
 CSV_OUTPUT_DEBUG_MODE = False
 DEBUGGING_CAFE_MFR_CD_MODE = False
@@ -9,7 +8,7 @@ DEBUGGING_CAFE_MFR_CD = 'FMX'
 ESTIMATE_NV_RATIO_SET_COEF_ABC_BY_ROAD_LOAD_HP = False
 ESTIMATE_TARGET_COEF_BEST_MTH_3_4 = True
 DEBUGGING_ERRTA_FILEs = False
-
+NO_DYNO_COEFS_OUTPUTS = False;
 def file_errta_update(errta_fname, footprintSubconfigMY_file, errta_table, year, Column_Name, Old_Value, New_Value, MODEL_YEAR, MFR_DIVISION_NM, MFR_DIVISION_CD, MFR_CARLINE_CD, CAFE_ID, footprintSubconfig_INDEX):
     errta_table = errta_table.loc[errta_table[MODEL_YEAR] == year, :].reset_index(drop=True)
     errta_table['Correction Index'] = errta_table.index;
@@ -455,8 +454,8 @@ def dyno_ABC_coefs_from_tstcar(year, _carline_names, _dyno_coefs, _dyno_coefs_ts
 
     for i in range(len(_carline_names)):
         _carline_name = _carline_names[i];
-        if (_carline_name == 'Kona N') or (_carline_name == 'Mustang Mach 1'):
-            print(_carline_name);
+        # if (_carline_name == 'Kona N') or (_carline_name == 'Mustang Mach 1'):
+        #     print(_carline_name);
         if (_carline_tstcar_model_mapping == True):
             _drive_systems = vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['CARLINE_NAME'] == _carline_name, :];
             if (_drv_sys_check == True) and (_model_check_exact == False):
@@ -820,11 +819,10 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                                                                                 (set_roadload_coefficient_table['Test Procedure Description'] != 'California fuel 3-day exhaust'), :]
 
             set_roadload_coefficient_table = set_roadload_coefficient_table.dropna(axis=1, how='all').reset_index(drop=True)
-            set_roadload_coefficient_table.insert(51, 'US06_FE', float('nan')); set_roadload_coefficient_table.insert(52, 'US06_FE_Bag 1', float('nan')); set_roadload_coefficient_table.insert(53, 'US06_FE_Bag 2', float('nan'));
+            set_roadload_coefficient_table.insert(51, 'US06_FE', float('nan')); set_roadload_coefficient_table.insert(52, 'US06_FE Bag 1', float('nan')); set_roadload_coefficient_table.insert(53, 'US06_FE Bag 2', float('nan'));
             set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE'] = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'RND_ADJ_FE']
             set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE Bag 1'] = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'FE Bag 1']
             set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'US06_FE Bag 2'] = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Test Category'] == 'US06'), 'FE Bag 2']
-
             _test_vehicle_IDs = set_roadload_coefficient_table['Test Vehicle ID'].unique();
             for i in range(len(_test_vehicle_IDs)):
                 _test_veh_ID = _test_vehicle_IDs[i]
@@ -867,7 +865,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.merge(set_roadload_coefficient_table, how='left', \
                                                                     left_on=['LABEL_MFR_CD', 'TEST_NUMBER', 'TEST_PROC_CATEGORY'], right_on=['Veh Mfr Code', 'Test Number', 'Test Category'])
             vehghg_file_nonflexfuel.loc[(~pd.isnull(vehghg_file_nonflexfuel['Target Coef A (lbf)']) == True), 'TARGET_COEF_MERGING_MTH'] = 2
-
+            # df_tmp = vehghg_file_nonflexfuel[['LABEL_MFR_CD', 'TEST_NUMBER', 'TEST_PROC_CATEGORY', 'US06_FE', 'US06_FE Bag 1', 'US06_FE Bag 2']]
             _target_coef_rated_hp_checks = (~pd.isnull(vehghg_file_nonflexfuel['Target Coef A (lbf)']) == True) & (vehghg_file_nonflexfuel['CAFE_MFR_CD'] == vehghg_file_nonflexfuel['Veh Mfr Code']) & \
                                            (vehghg_file_nonflexfuel['TEST_NUMBER'] == vehghg_file_nonflexfuel['Test Number']) & (vehghg_file_nonflexfuel['TEST_PROC_CATEGORY'] == vehghg_file_nonflexfuel['Test Category']) & \
                                            (vehghg_file_nonflexfuel['ENG_RATED_HP'] == vehghg_file_nonflexfuel['Rated Horsepower']) & ((~pd.isnull(vehghg_file_nonflexfuel['ENG_RATED_HP'])) == True)
@@ -1345,7 +1343,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                 vehghg_file_nonflexfuel['TEMP_ID'], vehghg_file_nonflexfuel['TEST_PROC_CATEGORY'], \
                 vehghg_file_nonflexfuel['TARGET_COEF_A_BEST'], vehghg_file_nonflexfuel['TARGET_COEF_B_BEST'], vehghg_file_nonflexfuel['TARGET_COEF_C_BEST'], vehghg_file_nonflexfuel['VEH_ETW'], \
                 vehghg_file_nonflexfuel['TEST_UNROUNDED_UNADJUSTED_FE'], vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_CITY_FE_4'], vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_HWY_FE_4'], \
-                vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_COMB_FE_4'], input_path, drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, \
+                vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_COMB_FE_4'], vehghg_file_nonflexfuel['US06_FE'], input_path, drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, \
                 vehghg_file_nonflexfuel['ENG_DISPL'], vehghg_file_nonflexfuel['ENG_RATED_HP'], vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_MJPL'])
 
             vehghg_file_nonflexfuel = pd.merge(vehghg_file_nonflexfuel, output_array, how='left', \
@@ -1459,6 +1457,8 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             if DEBUGGING_CAFE_MFR_CD_MODE != True: check_final_model_yr_ghg_prod_units('vehghg_file_output', vehghg_file_output, footprint_indexing_categories, subconfig_indexing_categories, grp_volumes_footprint_file_with_lineage)
 
             vehghg_file_output.rename({'Target Coef A (lbf)': 'Target Coef A (lbf) tstcar', 'Target Coef B (lbf/mph)': 'Target Coef B (lbf/mph) tstcar', 'Target Coef C (lbf/mph**2)': 'Target Coef C (lbf/mph**2) tstcar'}, axis=1)
+            vehghg_file_output.rename({'City Powertrain Efficiency (%)': 'City PTEFF_FROM_RLCOEFFS', 'Hwy Powertrain Efficiency (%)': 'Hwy PTEFF_FROM_RLCOEFFS', \
+                                       'Powertrain Efficiency (%)':'PTEFF_FROM_RLCOEFFS', 'US06 Powertrain Efficiency (%)': 'US06 PTEFF_FROM_RLCOEFFS'}, axis=1)
             vehghg_file_output.drop_duplicates(keep=False, inplace=True)
             # vehghg_file_output.loc[(vehghg_file_output['CAFE_MFR_CD'] != vehghg_file_output['LABEL_MFR_CD']) & (vehghg_file_output['LABEL_MFR_CD'] == 'PRX'), 'CAFE_MFR_CD']  = 'PRX';
             vehghg_file_output.reset_index(drop=True, inplace=True)
@@ -1473,17 +1473,18 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
 
             vehghg_file_output.to_csv(output_path + '\\' + vehghg_filename + '_' + date_and_time + '.csv', index=False)
 
-            # PHEV_no_dyno_coefs = vehghg_file_output.loc[(vehghg_file_output['Electrification Category'] == 'PHEV') & (pd.isnull(vehghg_file_output['SET_COEF_A'])), 'CARLINE_NAME'].unique().tolist()
-            # PHEV_no_dyno_coefs = pd.DataFrame(PHEV_no_dyno_coefs);
-            # PHEV_no_dyno_coefs.to_csv(output_path + '\\' + 'PHEV_no_dyno_coefs' + date_and_time + '.csv', index=False)
-            #
-            # HEV_no_dyno_coefs = vehghg_file_output.loc[(vehghg_file_output['Electrification Category'] == 'HEV') & (pd.isnull(vehghg_file_output['SET_COEF_A'])), 'CARLINE_NAME'].unique().tolist()
-            # HEV_no_dyno_coefs = pd.DataFrame(HEV_no_dyno_coefs);
-            # HEV_no_dyno_coefs.to_csv(output_path + '\\' + 'HEV_no_dyno_coefs' + date_and_time + '.csv', index=False)
-            #
-            # ICE_no_dyno_coefs = vehghg_file_output.loc[(vehghg_file_output['Electrification Category'] == 'N') & (pd.isnull(vehghg_file_output['SET_COEF_A'])), 'CARLINE_NAME'].unique().tolist()
-            # ICE_no_dyno_coefs = pd.DataFrame(ICE_no_dyno_coefs);
-            # ICE_no_dyno_coefs.to_csv(output_path + '\\' + 'ICE_no_dyno_coefs' + date_and_time + '.csv', index=False)
+            if (NO_DYNO_COEFS_OUTPUTS == True):
+                PHEV_no_dyno_coefs = vehghg_file_output.loc[(vehghg_file_output['Electrification Category'] == 'PHEV') & (pd.isnull(vehghg_file_output['SET_COEF_A'])), 'CARLINE_NAME'].unique().tolist()
+                PHEV_no_dyno_coefs = pd.DataFrame(PHEV_no_dyno_coefs);
+                PHEV_no_dyno_coefs.to_csv(output_path + '\\' + 'PHEV_no_dyno_coefs' + date_and_time + '.csv', index=False)
+
+                HEV_no_dyno_coefs = vehghg_file_output.loc[(vehghg_file_output['Electrification Category'] == 'HEV') & (pd.isnull(vehghg_file_output['SET_COEF_A'])), 'CARLINE_NAME'].unique().tolist()
+                HEV_no_dyno_coefs = pd.DataFrame(HEV_no_dyno_coefs);
+                HEV_no_dyno_coefs.to_csv(output_path + '\\' + 'HEV_no_dyno_coefs' + date_and_time + '.csv', index=False)
+
+                ICE_no_dyno_coefs = vehghg_file_output.loc[(vehghg_file_output['Electrification Category'] == 'N') & (pd.isnull(vehghg_file_output['SET_COEF_A'])), 'CARLINE_NAME'].unique().tolist()
+                ICE_no_dyno_coefs = pd.DataFrame(ICE_no_dyno_coefs);
+                ICE_no_dyno_coefs.to_csv(output_path + '\\' + 'ICE_no_dyno_coefs' + date_and_time + '.csv', index=False)
 
             print('\nFinish writing the', vehghg_filename, 'in the\n', output_path, 'directory\n')
         else:
