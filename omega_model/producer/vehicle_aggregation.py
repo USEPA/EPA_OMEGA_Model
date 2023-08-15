@@ -313,10 +313,6 @@ class VehicleAggregation(OMEGABase):
                                                        'BEV': omega_globals.options.bev_range_mi,
                                                        'FCV': 300, 'ICE': 0}})
 
-            # need to determine vehicle trans / techs
-            df['engine_cylinders'] = df['engine_cylinders']  # RV
-            df['engine_displacement_liters'] = df['engine_displacement_liters']  # RV
-
             import time
             start_time = time.time()
             # print('starting iterrows')
