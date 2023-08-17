@@ -3,7 +3,7 @@ import numpy as np
 import datetime
 import os
 
-OMEGA_outputs = False;
+OMEGA_outputs = False
 pd.options.mode.chained_assignment = None  # default='warn'
 cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
                 "DUAL FRONT AND DUAL REAR SIDE-MOUNTED AIRBAGS",
@@ -11,41 +11,24 @@ cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTI
                 "DRIVER ONLY WITH HEAD PROTECTION CHAMBER SIDE-MOUNTED AIRBAGS",
                 "FRONT, REAR AND THIRD ROW HEAD AIRBAGS", "FRONT AND REAR HEAD AIRBAGS", "FRONT HEAD AIRBAGS",
                 "STABILITY CONTROL", "TRACTION CONTROL", "TIRE PRESSURE MONITORING"]
-cols_OMEGA_inputs = ['CAFE_MFR_CD',	'MODEL_TYPE_INDEX',	'Electrification Category',	'Boost Type Category', 'CARLINE_CLASS_DESC_all', 'CARLINE_MFR_NAME_all', 'CARLINE_NAME_all', 'TARGET_COEF_BEST_MTH_min', \
-                     'TARGET_COEF_BEST_MTH_max', 'TARGET_COEF_BEST_MTH_all', 'TARGET_COEF_A_BEST', 'TARGET_COEF_B_BEST', 'TARGET_COEF_C_BEST', 'FTP_FE Bag 1', 'FTP_FE Bag 2', 'FTP_FE Bag 3', 'FTP_FE Bag 4', 'US06_FE', \
-                     'US06_FE Bag 1', 'US06_FE Bag 2', 'CAFE_MODEL_YEAR_all', 'RLHP_FROM_RLCOEFFS',	'ROUNDED_CARGO_CARRYING_VOL', 'BodyID_all',	'Combined Load Factor (%)',	'City Powertrain Efficiency (%)', \
-                     'City Tractive Road Energy Intensity (Wh/mi)', 'Hwy Powertrain Efficiency (%)', 'Hwy Tractive Road Energy Intensity (Wh/mi)', 'US06 Powertrain Efficiency (%)', 'US06 Tractive Road Energy Intensity (Wh/mi)',\
-                     'COMPLIANCE_CATEGORY_CD_all', 'COOLED_EGR_YN_all', 'Curb Weight', 'CYL_DEACT_all', 'CYL_DEACT_DESC_all', 'DRV_SYS_all', 'Drive Sys tstcar_all', 'DRV_SYS_DESC_all', 'EGR_YN_all', 'EGR_TYPE_all', \
-                     'Electric Power Steering_all', 'ENG_BLOCK_ARRANGEMENT_CD_all', 'ENG_BLOCK_ARRANGEMENT_DESC_all', 'ENG_DISPL_all', 'DISPL_UNIT_all', 'Engine Displacement Category_all', 'ENG_TYPE_all', 'ENG_TYPE_DESC_all', \
-                     'ENGINE_TYPE_DETAIL_DESC_all',	'AXLE_RATIO', 'ETW', 'FINAL_CALC_CITY_FE_4', 'FINAL_CALC_HWY_FE_4', 'FOOTPRINT', 'FOOTPRINT_CARLINE_NM_all', 'FOOTPRINT_DESC_all', 'FOOTPRINT_DIVISION_NM_all', 'FOOTPRINT_MFR_NM_all', \
-                     'FRONT_TRACK_WIDTH_INCHES', 'FUEL_CELL_YN_all', 'FUEL_METERING_all', 'FUEL_METERING_DESC_all', 'Fuel Recommended_all', 'Fuel Tank Capacity', 'FUEL_USAGE_all', 'FUEL_USAGE_DESC_all', 'Gross Vehicle Weight Rating', \
-                     'Ground Clearance', 'Height', 'Horsepower at RPM_all', 'HYBRID_YN_all', 'HYBRID_TYPE_all', 'HYBRID_TYPE_DESC_all', 'Interior Volume', 'Length', 'LineageID_all', 'MSRP', 'NUM_CYLINDRS_ROTORS_all', 'TOTAL_NUM_TRANS_GEARS_all', \
-                     'NV_RATIO_BEST', 'OFF_BOARD_CHARGE_CAPABLE_YN_all', 'Passenger Capacity', 'Payload Capacity', 'PRODUCTION_VOLUME_GHG_50_STATE', 'ENG_RATED_HP', 'REAR_TRACK_WIDTH_INCHES', 'RECHARGE_ENERGY_STORAGE_SYS_YN_all', 'TOT_ROAD_LOAD_HP', \
-                     'STOP_START_ENG_MGT_all', 'STOP_START_ENG_MGT_DESC_all', 'THREE_ROWS_DES_SEATING_POS_YN_all', 'Torque_all', 'Towing Capacity', 'OEM Towing Capacity', 'Transmission Type Category_all', 'Wheelbase', 'Width', 'TARGET_COEF_BEST_MTH'];
-cols_id_clean_worksheet = ['lookup01', 'carline_mfr_name', 'carline_name', 'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id', 'epa_size_class', \
-                           'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id', 'sales', 'cert_direct_oncycle_co2e_grams_per_mile', \
-                           'cert_direct_oncycle_kwh_per_mile', 'footprint_ft2', 'eng_rated_hp', 'tot_road_load_hp', 'etw_lbs', 'length_in', 'width_in', 'height_in', \
-                           'ground_clearance_in', 'wheelbase_in', 'interior_volume_cuft', 'msrp_dollars', 'passenger_capacity', 'payload_capacity_lbs', 'towing_capacity_lbs', \
-                           'unibody_structure', 'body_style', 'structure_material', 'drive_system', 'gvwr_lbs', 'gcwr_lbs', 'curbweight_lbs', 'eng_cyls_num', 'eng_disp_liters', \
-                           'high_eff_alternator', 'start_stop', 'hev', 'phev', 'bev', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11', 'gas_fuel', 'diesel_fuel', \
-                           'target_coef_a', 'target_coef_b', 'target_coef_c'];
-# cols_id_raw_worksheet = ['CAFE_MFR_CD', 'MODEL_TYPE_INDEX', 'Electrification Category', 'Boost Type Category', 'CARLINE_CLASS_DESC_all', 'CARLINE_MFR_NAME_all', 'CARLINE_NAME_all', \
-#                          'TARGET_COEF_BEST_MTH_min', 'TARGET_COEF_BEST_MTH_max', 'TARGET_COEF_BEST_MTH_all', 'TARGET_COEF_A_BEST', 'TARGET_COEF_B_BEST', 'TARGET_COEF_C_BEST', \
-#                          'FTP_FE Bag 1', 'FTP_FE Bag 2', 'FTP_FE Bag 3', 'FTP_FE Bag 4', 'US06_FE', 'US06_FE Bag 1', 'US06_FE Bag 2', 'CAFE_MODEL_YEAR_all', 'RLHP_FROM_RLCOEFFS', \
-#                          'ROUNDED_CARGO_CARRYING_VOL', 'BodyID_all', 'Combined Load Factor (%)', 'City Powertrain Efficiency (%)', 'City Tractive Road Energy Intensity (Wh/mi)', \
-#                          'Hwy Powertrain Efficiency (%)', 'Hwy Tractive Road Energy Intensity (Wh/mi)', 'US06 Powertrain Efficiency (%)', 'US06 Tractive Road Energy Intensity (Wh/mi)', \
-#                          'COMPLIANCE_CATEGORY_CD_all', 'COOLED_EGR_YN_all', 'Curb Weight', 'CYL_DEACT_all', 'CYL_DEACT_DESC_all', 'DRV_SYS_all', 'Drive Sys tstcar_all', \
-#                          'DRV_SYS_DESC_all', 'EGR_YN_all', 'EGR_TYPE_all', 'Electric Power Steering_all', 'ENG_BLOCK_ARRANGEMENT_CD_all', 'ENG_BLOCK_ARRANGEMENT_DESC_all', \
-#                          'ENG_DISPL_all', 'DISPL_UNIT_all', 'Engine Displacement Category_all', 'ENG_TYPE_all', 'ENG_TYPE_DESC_all', 'ENGINE_TYPE_DETAIL_DESC_all', 'AXLE_RATIO', \
-#                          'ETW', 'FINAL_CALC_CITY_FE_4', 'FINAL_CALC_HWY_FE_4', 'FOOTPRINT', 'FOOTPRINT_CARLINE_NM_all', 'FOOTPRINT_DESC_all', 'FOOTPRINT_DIVISION_NM_all', \
-#                          'FOOTPRINT_MFR_NM_all', 'FRONT_TRACK_WIDTH_INCHES', 'FUEL_CELL_YN_all', 'FUEL_METERING_all', 'FUEL_METERING_DESC_all', 'Fuel Recommended_all', \
-#                          'Fuel Tank Capacity', 'FUEL_USAGE_all', 'FUEL_USAGE_DESC_all', 'Gross Vehicle Weight Rating', 'Ground Clearance', 'Height', 'Horsepower at RPM_all', \
-#                          'HYBRID_YN_all', 'HYBRID_TYPE_all', 'HYBRID_TYPE_DESC_all', 'Interior Volume', 'Length', 'LineageID_all', 'MSRP', 'NUM_CYLINDRS_ROTORS_all', \
-#                          'TOTAL_NUM_TRANS_GEARS_all', 'NV_RATIO_BEST', 'OFF_BOARD_CHARGE_CAPABLE_YN_all', 'Passenger Capacity', 'Payload Capacity', 'PRODUCTION_VOLUME_GHG_50_STATE', \
-#                          'ENG_RATED_HP', 'REAR_TRACK_WIDTH_INCHES', 'RECHARGE_ENERGY_STORAGE_SYS_YN_all', 'TOT_ROAD_LOAD_HP', 'STOP_START_ENG_MGT_all', 'STOP_START_ENG_MGT_DESC_all', \
-#                          'THREE_ROWS_DES_SEATING_POS_YN_all', 'Torque_all', 'Towing Capacity', 'OEM Towing Capacity', 'Transmission Type Category_all', 'Wheelbase', 'Width', \
-#                          'TARGET_COEF_BEST_MTH'];
-# _cols_id_raw_extended = ['cert_direct_oncycle_co2e_grams_per_mile', 'cert_direct_oncycle_kwh_per_mile', 'gcwr', 'cost_curve_class'];
+cols_OMEGA_inputs = ['CAFE_MFR_CD',	'MODEL_TYPE_INDEX',	'Electrification Category',	'Boost Type Category', 'CARLINE_CLASS_DESC_all', 'CARLINE_MFR_NAME_all', 'CARLINE_NAME_all', 'TARGET_COEF_BEST_MTH_min',
+                     'TARGET_COEF_BEST_MTH_max', 'TARGET_COEF_BEST_MTH_all', 'TARGET_COEF_A_BEST', 'TARGET_COEF_B_BEST', 'TARGET_COEF_C_BEST', 'FTP_FE Bag 1', 'FTP_FE Bag 2', 'FTP_FE Bag 3', 'FTP_FE Bag 4', 'US06_FE',
+                     'US06_FE Bag 1', 'US06_FE Bag 2', 'CAFE_MODEL_YEAR_all', 'RLHP_FROM_RLCOEFFS',	'ROUNDED_CARGO_CARRYING_VOL', 'BodyID_all',	'Combined Load Factor (%)',	'City Powertrain Efficiency (%)',
+                     'City Tractive Road Energy Intensity (Wh/mi)', 'Hwy Powertrain Efficiency (%)', 'Hwy Tractive Road Energy Intensity (Wh/mi)', 'US06 Powertrain Efficiency (%)', 'US06 Tractive Road Energy Intensity (Wh/mi)',
+                     'COMPLIANCE_CATEGORY_CD_all', 'COOLED_EGR_YN_all', 'Curb Weight', 'CYL_DEACT_all', 'CYL_DEACT_DESC_all', 'DRV_SYS_all', 'Drive Sys tstcar_all', 'DRV_SYS_DESC_all', 'EGR_YN_all', 'EGR_TYPE_all',
+                     'Electric Power Steering_all', 'ENG_BLOCK_ARRANGEMENT_CD_all', 'ENG_BLOCK_ARRANGEMENT_DESC_all', 'ENG_DISPL_all', 'DISPL_UNIT_all', 'Engine Displacement Category_all', 'ENG_TYPE_all', 'ENG_TYPE_DESC_all',
+                     'ENGINE_TYPE_DETAIL_DESC_all',	'AXLE_RATIO', 'ETW', 'FINAL_CALC_CITY_FE_4', 'FINAL_CALC_HWY_FE_4', 'FOOTPRINT', 'FOOTPRINT_CARLINE_NM_all', 'FOOTPRINT_DESC_all', 'FOOTPRINT_DIVISION_NM_all', 'FOOTPRINT_MFR_NM_all',
+                     'FRONT_TRACK_WIDTH_INCHES', 'FUEL_CELL_YN_all', 'FUEL_METERING_all', 'FUEL_METERING_DESC_all', 'Fuel Recommended_all', 'Fuel Tank Capacity', 'FUEL_USAGE_all', 'FUEL_USAGE_DESC_all', 'Gross Vehicle Weight Rating',
+                     'Ground Clearance', 'Height', 'Horsepower at RPM_all', 'HYBRID_YN_all', 'HYBRID_TYPE_all', 'HYBRID_TYPE_DESC_all', 'Interior Volume', 'Length', 'LineageID_all', 'MSRP', 'NUM_CYLINDRS_ROTORS_all', 'TOTAL_NUM_TRANS_GEARS_all',
+                     'NV_RATIO_BEST', 'OFF_BOARD_CHARGE_CAPABLE_YN_all', 'Passenger Capacity', 'Payload Capacity', 'PRODUCTION_VOLUME_GHG_50_STATE', 'ENG_RATED_HP', 'REAR_TRACK_WIDTH_INCHES', 'RECHARGE_ENERGY_STORAGE_SYS_YN_all', 'TOT_ROAD_LOAD_HP',
+                     'STOP_START_ENG_MGT_all', 'STOP_START_ENG_MGT_DESC_all', 'THREE_ROWS_DES_SEATING_POS_YN_all', 'Torque_all', 'Towing Capacity', 'OEM Towing Capacity', 'Transmission Type Category_all', 'Wheelbase', 'Width', 'TARGET_COEF_BEST_MTH']
+cols_id_clean_worksheet = ['lookup01', 'carline_mfr_name', 'carline_name', 'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id', 'epa_size_class',
+                           'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id', 'sales', 'cert_direct_oncycle_co2e_grams_per_mile',
+                           'cert_direct_oncycle_kwh_per_mile', 'footprint_ft2', 'eng_rated_hp', 'tot_road_load_hp', 'etw_lbs', 'length_in', 'width_in', 'height_in',
+                           'ground_clearance_in', 'wheelbase_in', 'interior_volume_cuft', 'msrp_dollars', 'passenger_capacity', 'payload_capacity_lbs', 'towing_capacity_lbs',
+                           'unibody_structure', 'body_style', 'structure_material', 'drive_system', 'gvwr_lbs', 'gcwr_lbs', 'curbweight_lbs', 'eng_cyls_num', 'eng_disp_liters',
+                           'high_eff_alternator', 'start_stop', 'hev', 'phev', 'bev', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11', 'gas_fuel', 'diesel_fuel',
+                           'target_coef_a', 'target_coef_b', 'target_coef_c']
 
 def weighted_average(grp):
     if grp[weighting_field]._get_numeric_data().sum() == 0: # if all the weighting factors are zero, take a simple average. Otherwise, it will calculate as 0/0.
@@ -64,189 +47,172 @@ def weighted_average(grp):
     # return grp
 
 def scraping_Edmunds_MSRPs (omega_outputs0, df_edms):
-    omega_outputs = omega_outputs0.copy();
-    # df_edms = pd.read_csv("I:/Project/Midterm Review/Trends/Trends Data/Edmunds/2022 Measurements" + '\\' + 'Edmunds_MY2022_20230721-055344.csv', encoding="ISO-8859-1");
-    omega_outputs = pd.read_csv('I:/Project/Midterm Review/Trends/Original Trends Team Data Gathering and Analysis/Tech Specifications/techspecconsolidator/Query Runs/20230815/outputs' + '\\' + \
-                           '2022Query_plus_MTH_34_OMEGA_20230815 132716.csv', encoding="ISO-8859-1");
+    omega_outputs = omega_outputs0.copy()
+    # df_edms = pd.read_csv("I:/Project/Midterm Review/Trends/Trends Data/Edmunds/2022 Measurements" + '\\' + 'Edmunds_MY2022_20230721-055344.csv', encoding="ISO-8859-1")
+    # omega_outputs = pd.read_csv('I:/Project/Midterm Review/Trends/Original Trends Team Data Gathering and Analysis/Tech Specifications/techspecconsolidator/Query Runs/20230815/outputs' + '\\' + \
+    #                        '2022Query_plus_MTH_34_OMEGA_20230815 132716.csv', encoding="ISO-8859-1")
 
-    df_edms['Model'].replace(regex=['F-'],value='F', inplace=True);
+    df_edms['Model'].replace(regex=['F-'],value='F', inplace=True)
 
     df_ford = df_edms.loc[df_edms['Make'] == 'Ford', :]
-    df_edms['Model'].replace('-', ' ', inplace=True, regex=True);
-    df_edms['Model'].replace(regex=['MACH E'],value='MACH-E', inplace=True);
-    df_edms['Model'].replace(regex=['CX 5'],value='CX-5', inplace=True);
-    df_edms['Model'].replace(regex=['CX 30'],value='CX-30', inplace=True);
-    df_edms['Model'].replace(regex=['MX 30'],value='MX-30', inplace=True);
-    df_edms['Model'].replace(regex=['E TRON'],value='E-TRON', inplace=True);
-    df_edms['Model'].replace(regex=[' FACE'],value='-FACE', inplace=True);
-    df_edms['Model'].replace(regex=[' PACE'],value='-PACE', inplace=True);
-    df_edms['Model'].replace(regex=[' TYPE'],value='-TYPE', inplace=True);
+    df_edms['Model'].replace('-', ' ', inplace=True, regex=True)
+    df_edms['Model'].replace(regex=['MACH E'],value='MACH-E', inplace=True)
+    df_edms['Model'].replace(regex=['CX 5'],value='CX-5', inplace=True)
+    df_edms['Model'].replace(regex=['CX 30'],value='CX-30', inplace=True)
+    df_edms['Model'].replace(regex=['MX 30'],value='MX-30', inplace=True)
+    df_edms['Model'].replace(regex=['E TRON'],value='E-TRON', inplace=True)
+    df_edms['Model'].replace(regex=[' FACE'],value='-FACE', inplace=True)
+    df_edms['Model'].replace(regex=[' PACE'],value='-PACE', inplace=True)
+    df_edms['Model'].replace(regex=[' TYPE'],value='-TYPE', inplace=True)
     df_edms['Trims'] = df_edms['Trims'].str.upper()
 
     omega_outputs['CARLINE_MFR_NAME_all'] = omega_outputs['CARLINE_MFR_NAME_all'].str.upper()
     omega_outputs['CARLINE_NAME_all'] = omega_outputs['CARLINE_NAME_all'].str.upper()
-
-    _matching_steps = ['exact', 'model', 'model_trims', 'base'];
+    _idx_msrp = np.nan
+    _matching_steps = ['exact', 'model', 'model_trims', 'base']
     for k in range(len(_matching_steps)):
-        matching_step = _matching_steps[k];
-        _models_MSRP_nulls = omega_outputs.loc[omega_outputs['MSRP'].astype(str) == 'nan', 'CARLINE_NAME_all'].unique();
+        matching_step = _matching_steps[k]
+        _models_MSRP_nulls = omega_outputs.loc[omega_outputs['MSRP'].astype(str) == 'nan', 'CARLINE_NAME_all'].unique()
 
         for i in range(len(_models_MSRP_nulls)):
-            _modelname=_models_MSRP_nulls[i];
-            _idx = omega_outputs.loc[omega_outputs['CARLINE_NAME_all'] == _modelname, :].index[0];
+            _modelname=_models_MSRP_nulls[i]
+            _idx = omega_outputs.loc[omega_outputs['CARLINE_NAME_all'] == _modelname, :].index[0]
             _maker = omega_outputs.loc[_idx, 'CARLINE_MFR_NAME_all']
             _model = omega_outputs.loc[_idx, 'CARLINE_NAME_all']
-            if 'NX 250' in _model: _model = 'NX 250';
-            if 'NX 350' in _model: _model = 'NX 350';
-            if 'NX 450h+ AWD' in _model: _model = 'NX-450HPLUS';
+            if 'NX 250' in _model: _model = 'NX 250'
+            if 'NX 350' in _model: _model = 'NX 350'
+            if 'NX 450h+ AWD' in _model: _model = 'NX-450HPLUS'
             if ('i4eDrive40GranCoupe'.upper() in _model):_model = 'I4'
-            _modelsplitted = _model.split(' ');
+            _modelsplitted = _model.split(' ')
             if (matching_step == 'model_trims') and (len(_modelsplitted) > 1):
-                _model = _modelsplitted[0];
-                _trim = _modelsplitted[1];
+                _model = _modelsplitted[0]
+                _trim = _modelsplitted[1]
                 if _modelsplitted[0] =='SILVERADO':
                     _model ='SILVERADO 1500'
                     _trim = _modelsplitted[1]
                 if _modelsplitted[0] == 'TRANSIT':
                     _model = 'TRANSIT CONNECT'
                     _trim = _modelsplitted[2]
-            if (matching_step == 'model_trims') and (len(_modelsplitted) == 1): _model = _modelsplitted[0];
-            if (matching_step == 'base'): _model = _model.split(' ')[0];
+            if (matching_step == 'model_trims') and (len(_modelsplitted) == 1): _model = _modelsplitted[0]
+            if (matching_step == 'base'): _model = _model.split(' ')[0]
             if _model == 'SILVERADO':
                 _model = 'SILVERADO 1500'
             try:
                 _idx_most_popular = df_edms.loc[(df_edms['Make'] == _maker) & (df_edms['Model'] ==_model), :].index
                 if _idx_most_popular.size == 0:
-                    _idx_most_popular = df_edms.loc[(df_edms['Model'] == _model), :].index;
+                    _idx_most_popular = df_edms.loc[(df_edms['Model'] == _model), :].index
                 if (_idx_most_popular.size == 0) and (' ' in _model):
-                    _model = _model.split(' ')[0];
-                    _idx_most_popular = df_edms.loc[(df_edms['Model'] == _model), :].index;
+                    _model = _model.split(' ')[0]
+                    _idx_most_popular = df_edms.loc[(df_edms['Model'] == _model), :].index
                 if (_idx_most_popular.size == 0) and (' ' in _model):
-                    _model = _model.split(' ')[0];
-                    _idx_most_popular = df_edms.loc[(df_edms['Trims'].str.contains(_model)), :].index;
+                    _model = _model.split(' ')[0]
+                    _idx_most_popular = df_edms.loc[(df_edms['Trims'].str.contains(_model)), :].index
                 if (_idx_most_popular.size == 0) and (matching_step == 'model_trims') and (len(_modelsplitted) > 1):
                     _idx_most_popular = df_edms.loc[((df_edms['Model'].str.contains(_model)) & (df_edms['Trims'].str.contains(_trim))) | \
-                                                    (df_edms['Model'].str.contains(_model)), :].index;
+                                                    (df_edms['Model'].str.contains(_model)), :].index
                 if _idx_most_popular.size == 0:
                     try:
-                        _idx_most_popular = df_edms.loc[(df_edms['Trims'].str.contains(_model)) | (df_edms['Model'] == _model), :].index;
+                        _idx_most_popular = df_edms.loc[(df_edms['Trims'].str.contains(_model)) | (df_edms['Model'] == _model), :].index
                     except KeyError:
-                        continue;
+                        continue
 
-                    if _idx_most_popular.size == 0: continue;
+                    if _idx_most_popular.size == 0: continue
                 try:
                     for j in range(len(_idx_most_popular)):
                         if '(Most Popular)' in df_edms.loc[_idx_most_popular, 'MSRP'][_idx_most_popular[j]]:
                             _idx_msrp = _idx_most_popular[j]
-                            break;
+                            break
 
-                    omega_outputs.loc[(omega_outputs['CARLINE_NAME_all'] == _modelname) & (omega_outputs['MSRP'].astype(str) == 'nan'), 'MSRP'] = df_edms.loc[_idx_msrp, 'MSRP'].replace(',', '').split(' ')[0];
-                    print(_maker, _modelname, omega_outputs.loc[(omega_outputs['CARLINE_NAME_all'] == _modelname), 'MSRP'][0], ' (Most Popular)');
+                    omega_outputs.loc[(omega_outputs['CARLINE_NAME_all'] == _modelname) & (omega_outputs['MSRP'].astype(str) == 'nan'), 'MSRP'] = df_edms.loc[_idx_msrp, 'MSRP'].replace(',', '').split(' ')[0]
+                    print(_maker, _modelname, omega_outputs.loc[(omega_outputs['CARLINE_NAME_all'] == _modelname), 'MSRP'][0], ' (Most Popular)')
                 except KeyError:
-                    continue;
+                    continue
             except KeyError:
-                continue;
+                continue
 
-    return omega_outputs;
+    return omega_outputs
 
 def GCWRs_from_towing_guide(df_twgd, df_query):
     df_query['CARLINE_MFR_NAME_all'] = df_query['CARLINE_MFR_NAME_all'].str.upper()
     df_query['CARLINE_NAME_all'] = df_query['CARLINE_NAME_all'].str.upper()
-    df_query.insert(len(df_query.columns), 'GCWR', pd.DataFrame(np.zeros(len(df_query))));
-    df_query['GCWR'] = np.nan;
+    df_query.insert(len(df_query.columns), 'GCWR', pd.DataFrame(np.zeros(len(df_query))))
+    df_query['GCWR'] = np.nan
 
-    _mfrs = df_twgd['Maker'].unique();
+    _mfrs = df_twgd['Maker'].unique()
     for k in range(len(_mfrs)):
-        _mfr = _mfrs[k];
-        _modelnames = df_query.loc[df_query['CARLINE_MFR_NAME_all'] == _mfr, 'CARLINE_NAME_all'].unique();
+        _mfr = _mfrs[k]
+        _modelnames = df_query.loc[df_query['CARLINE_MFR_NAME_all'] == _mfr, 'CARLINE_NAME_all'].unique()
         for i in range(len(_modelnames)):
-            _modelname = _modelnames[i];
-            _idx = df_query.loc[df_query['CARLINE_NAME_all'] == _modelname, :].index[0];
+            _modelname = _modelnames[i]
+            _idx = df_query.loc[df_query['CARLINE_NAME_all'] == _modelname, :].index[0]
             _maker = df_query.loc[_idx, 'CARLINE_MFR_NAME_all']
             _model = df_query.loc[_idx, 'CARLINE_NAME_all']
-            if (_maker not in df_twgd['Maker'].unique()): continue;
+            if (_maker not in df_twgd['Maker'].unique()): continue
 
             _wheelbase = df_query.loc[_idx, 'Wheelbase']
             _num_cyl = df_query.loc[_idx, 'NUM_CYLINDRS_ROTORS_all']
-            _displ = df_query.loc[_idx, 'ENG_DISPL_all'];
+            _displ = df_query.loc[_idx, 'ENG_DISPL_all']
             _drivetrain = df_query.loc[_idx, 'DRV_SYS_all']
-            _fuel_type = df_query.loc[_idx, 'FUEL_USAGE_all'][0];
-            _axle_ratio = df_query.loc[_idx, 'AXLE_RATIO'];
+            _fuel_type = df_query.loc[_idx, 'FUEL_USAGE_all'][0]
+            _axle_ratio = df_query.loc[_idx, 'AXLE_RATIO']
             _curv_weight = df_query.loc[_idx, 'Curb Weight']
-            _payload = df_query.loc[_idx, 'Payload Capacity'];
-            _cargo_weight = 1250;
+            _payload = df_query.loc[_idx, 'Payload Capacity']
+            _cargo_weight = 1250
             if (_drivetrain == '4') or (_drivetrain == 'A') or (_drivetrain == 'All'):
                 _drivetrain = '4WD'
             else:
                 _drivetrain = '2WD'
 
             _base_model = _model.split(' ')[0]
-            _chk_maker_model_drivetrain_fuel_type_ncyl_displ_axle_ratio = (df_twgd['Maker'] == _maker) & (
-                df_twgd['Model'].str.contains(_base_model)) & (df_twgd['Drivetrain Layout Category'] == _drivetrain) & (
-                                                                                      df_twgd[
-                                                                                          'Fuel Type Category'] == _fuel_type) & \
-                                                                          (df_twgd[
-                                                                               'Number of Cylinders Category'] == _num_cyl) & (
-                                                                                      df_twgd[
-                                                                                          'Engine Displacement Category'] == _displ) & (
-                                                                                      abs(df_twgd[
-                                                                                              'AXLE_RATIO'] - _axle_ratio) <= 0.2);
-            _chk_maker_model_drivetrain_fuel_type_ncyl_displ = (df_twgd['Maker'] == _maker) & (
-                df_twgd['Model'].str.contains(_base_model)) & (df_twgd['Drivetrain Layout Category'] == _drivetrain) & (
-                                                                           df_twgd[
-                                                                               'Fuel Type Category'] == _fuel_type) & \
-                                                               (df_twgd['Number of Cylinders Category'] == _num_cyl) & (
-                                                                           df_twgd[
-                                                                               'Engine Displacement Category'] == _displ);
-            _chk_maker_model_drivetrain_fuel_type = (df_twgd['Maker'] == _maker) & (
-                df_twgd['Model'].str.contains(_base_model)) & (df_twgd['Drivetrain Layout Category'] == _drivetrain) & (
-                                                                df_twgd['Fuel Type Category'] == _fuel_type);
-            _chk_maker_model_drivetrain = (df_twgd['Maker'] == _maker) & (
-                df_twgd['Model'].str.contains(_base_model)) & (df_twgd['Drivetrain Layout Category'] == _drivetrain);
+            _chk_maker_model_drivetrain_fuel_type_ncyl_displ_axle_ratio = ((df_twgd['Maker'] == _maker) & (df_twgd['Model'].str.contains(_base_model)) & (df_twgd['Drivetrain Layout Category'] == _drivetrain) &
+                                                                           (df_twgd['Fuel Type Category'] == _fuel_type) & (df_twgd['Number of Cylinders Category'] == _num_cyl) &
+                                                                           (df_twgd['Engine Displacement Category'] == _displ) & (abs(df_twgd['AXLE_RATIO'] - _axle_ratio) <= 0.2))
+            _chk_maker_model_drivetrain_fuel_type_ncyl_displ = ((df_twgd['Maker'] == _maker) & (df_twgd['Model'].str.contains(_base_model)) & (df_twgd['Drivetrain Layout Category'] == _drivetrain) &
+                                                                           (df_twgd['Fuel Type Category'] == _fuel_type) & (df_twgd['Number of Cylinders Category'] == _num_cyl) &
+                                                                           (df_twgd['Engine Displacement Category'] == _displ))
+            _chk_maker_model_drivetrain_fuel_type = ((df_twgd['Maker'] == _maker) & (df_twgd['Model'].str.contains(_base_model)) & (df_twgd['Drivetrain Layout Category'] == _drivetrain) &
+                                                                           (df_twgd['Fuel Type Category'] == _fuel_type))
+            _chk_maker_model_drivetrain = ((df_twgd['Maker'] == _maker) & (df_twgd['Model'].str.contains(_base_model)) & (df_twgd['Drivetrain Layout Category'] == _drivetrain))
+
             if len(df_twgd.loc[_chk_maker_model_drivetrain_fuel_type_ncyl_displ_axle_ratio, :]) > 0:
-                df_tmp = df_twgd.loc[_chk_maker_model_drivetrain_fuel_type_ncyl_displ_axle_ratio, :];
+                df_tmp = df_twgd.loc[_chk_maker_model_drivetrain_fuel_type_ncyl_displ_axle_ratio, :]
             elif len(df_twgd.loc[_chk_maker_model_drivetrain_fuel_type_ncyl_displ, :]) > 0:
-                df_tmp = df_twgd.loc[_chk_maker_model_drivetrain_fuel_type_ncyl_displ, :];
+                df_tmp = df_twgd.loc[_chk_maker_model_drivetrain_fuel_type_ncyl_displ, :]
             elif len(df_twgd.loc[_chk_maker_model_drivetrain, :]) > 0:
-                df_tmp = df_twgd.loc[_chk_maker_model_drivetrain, :];
+                df_tmp = df_twgd.loc[_chk_maker_model_drivetrain, :]
             elif (_base_model == 'SIERRA') or (_base_model == 'SILVERADO'):
                 _max_trailer_weight = df_twgd.loc[
                     (df_twgd['Maker'] == _maker) & (df_twgd['Model'].str.contains(_base_model)) & (
-                                df_twgd['Drivetrain Layout Category'] == _drivetrain), 'Max Loaded Trailer Weight'];
+                                df_twgd['Drivetrain Layout Category'] == _drivetrain), 'Max Loaded Trailer Weight']
             else:
-                continue;
+                continue
 
-            df_closest_wheelbase = df_tmp.iloc[(df_tmp['WHEELBASE'] - _wheelbase).abs().argsort()[:1]];
+            df_closest_wheelbase = df_tmp.iloc[(df_tmp['WHEELBASE'] - _wheelbase).abs().argsort()[:1]]
             if len(df_closest_wheelbase) == 0:
                 df_closest_axle_ratio = df_tmp.iloc[(df_tmp['AXLE_RATIO'] - _axle_ratio).abs().argsort()[:]]
-                if len(df_closest_axle_ratio) == 0: continue;
+                if len(df_closest_axle_ratio) == 0: continue
                 if (df_tmp.loc[df_closest_wheelbase.index[0], 'GCWR'].astype(str) == 'nan'):
-                    if _payload.astype(str) == 'nan': _payload = 1250;
+                    if _payload.astype(str) == 'nan': _payload = 1250
                     if _curv_weight.astype(str) == 'nan': _curv_weight = df_query.loc[
                         df_query['CARLINE_NAME_all'] == _modelname, 'Curb Weight'].mean()
                     _max_trailer_weight = df_tmp.loc[df_closest_axle_ratio.index[0], 'Max Loaded Trailer Weight']
-                    df_query.loc[df_query[
-                                     'CARLINE_NAME_all'] == _modelname, 'GCWR'] = _curv_weight + _payload + _max_trailer_weight + 3 * 150;
+                    df_query.loc[df_query['CARLINE_NAME_all'] == _modelname, 'GCWR'] = _curv_weight + _payload + _max_trailer_weight + 3 * 150
                 else:
-                    df_query.loc[df_query['CARLINE_NAME_all'] == _modelname, 'GCWR'] = df_tmp.loc[
-                        df_closest_axle_ratio.index[0], 'GCWR']
+                    df_query.loc[df_query['CARLINE_NAME_all'] == _modelname, 'GCWR'] = df_tmp.loc[df_closest_axle_ratio.index[0], 'GCWR']
             else:
                 if (df_tmp.loc[df_closest_wheelbase.index[0], 'GCWR'].astype(str) == 'nan'):
                     # https: // www.readingtruck.com / calculating - your - trucks - maximum - payload - and -towing - capacity /
                     _max_trailer_weight = df_tmp.loc[df_closest_wheelbase.index[0], 'Max Loaded Trailer Weight']
-                    if _payload.astype(str) == 'nan': _payload = 1250;
+                    if _payload.astype(str) == 'nan': _payload = 1250
                     if _curv_weight.astype(str) == 'nan': _curv_weight = df_query.loc[
                         df_query['CARLINE_NAME_all'] == _modelname, 'Curb Weight'].mean()
-                    df_query.loc[df_query[
-                                     'CARLINE_NAME_all'] == _modelname, 'GCWR'] = _curv_weight + _payload + _max_trailer_weight + 3 * 150;
+                    df_query.loc[df_query['CARLINE_NAME_all'] == _modelname, 'GCWR'] = _curv_weight + _payload + _max_trailer_weight + 3 * 150
                 else:
-                    df_query.loc[df_query['CARLINE_NAME_all'] == _modelname, 'GCWR'] = df_tmp.loc[
-                        df_closest_wheelbase.index[0], 'GCWR']
+                    df_query.loc[df_query['CARLINE_NAME_all'] == _modelname, 'GCWR'] = df_tmp.loc[df_closest_wheelbase.index[0], 'GCWR']
 
-            print(_modelname, df_closest_wheelbase.index[0],
-                  df_query.loc[df_query['CARLINE_NAME_all'] == _modelname, 'GCWR']);
-            # df_query.loc[df_query['CARLINE_NAME_all'] == _modelname, 'GCWR'] = df_tmp.loc[df_closest_wheelbase.index[0], 'GCWR'];
-    return df_query;
+            print(_modelname, df_closest_wheelbase.index[0], df_query.loc[df_query['CARLINE_NAME_all'] == _modelname, 'GCWR'])
+            # df_query.loc[df_query['CARLINE_NAME_all'] == _modelname, 'GCWR'] = df_tmp.loc[df_closest_wheelbase.index[0], 'GCWR']
+    return df_query
 
 def mode(df, key_cols, value_col, count_col):
     return df.groupby(key_cols + [value_col]).size() \
@@ -267,21 +233,21 @@ SetBodyIDtoLineageID = int(run_controller.SetBodyIDtoLineageID[0])
 model_year = []
 # master_index_source = []
 aggregating_fields_input = []
-for _row in range (_rows):
+for _row in range(_rows):
     MY = run_controller['model_year'][_row]
     if MY != '' and str(MY).replace('.', '').isnumeric():
         model_year.append(int(MY))
     elif MY == '' or MY == 'Done':
         break
 
-for _row in range (_rows):
+for _row in range(_rows):
     _master_index_source = run_controller['master_index_source'][_row]
     if _master_index_source != '' and len(_master_index_source) > 0:
         master_index_source = _master_index_source
     elif _master_index_source == '' or _master_index_source == 'Done':
         break
 
-for _row in range (_rows):
+for _row in range(_rows):
     query_field_input = run_controller['aggregating_fields_input'][_row]
     if query_field_input != '' and len(query_field_input) > 0:
         aggregating_fields_input.append(query_field_input)
@@ -343,14 +309,12 @@ for model_year in model_years:
     all_desired_fields = pd.Series(np.zeros(total_schema_count), name = 'Desired Field')
     all_priority_values = pd.Series(np.zeros(total_schema_count), name = 'Priority')
     schema_track = 0
-    for run_count in range(0,len(run_controller)):
+    for run_count in range(0, len(run_controller)):
         information_toget = str(run_controller['Desired Field'][run_count])
         query_type_input = str(run_controller['QueryType'][run_count])
         weighting_field = str(run_controller['AvgWtField'][run_count])
         bounding_field = str(run_controller['BoundingField'][run_count])
-        information_priority = field_mapping_df[
-            list(pd.Series(field_mapping_df.columns)[pd.Series(field_mapping_df.columns).str.contains('Priority')])] \
-            [field_mapping_df['UserFriendlyName'] == information_toget].reset_index(drop=True)
+        information_priority = field_mapping_df[list(pd.Series(field_mapping_df.columns)[pd.Series(field_mapping_df.columns).str.contains('Priority')])][field_mapping_df['UserFriendlyName'] == information_toget].reset_index(drop=True)
         source_schemas = pd.Series(\
             information_priority.columns[~pd.isnull(information_priority.iloc[0].reset_index(drop=True))], \
             name = 'SourceSchema').str[0:5].reset_index(drop=True)
@@ -370,8 +334,7 @@ for model_year in model_years:
     model_year_column = pd.Series(np.zeros(total_schema_count), name = 'MY').replace(0,model_year)
     controller_index = pd.Series(all_schemas.index.values, name = 'Controller Index')
     all_array = pd.merge_ordered(pd.concat([controller_index, all_schemas, all_column_names, all_query_types, all_weighting_fields, all_bounding_fields,\
-        all_priority_values, all_desired_fields,model_year_column],axis=1),data_sources_df,how='left',on=['SourceSchema','MY'])\
-        .replace(str(np.nan), np.nan)
+        all_priority_values, all_desired_fields, model_year_column], axis=1), data_sources_df, how='left', on=['SourceSchema', 'MY']).replace(str(np.nan), np.nan)
     all_array = pd.merge_ordered(all_array, field_mapping_df[['UserFriendlyName', 'FieldName']], how='left', \
         left_on = 'Desired Field', right_on = 'UserFriendlyName').drop(['UserFriendlyName'],axis=1)\
         .sort_values('Controller Index').drop('Controller Index',axis=1)
@@ -468,7 +431,7 @@ for model_year in model_years:
                 continue
             try:
                 if SetBodyIDtoLineageID == 1:
-                    source_file['BodyID'] = source_file['LineageID'];
+                    source_file['BodyID'] = source_file['LineageID']
             except KeyError:
                 pass
 
@@ -476,9 +439,9 @@ for model_year in model_years:
                 try:
                     source_file['WHEELS-raw'] = pd.Series(np.zeros(len(source_file['WHEELS'])), name='WHEELS-raw')
                     source_file['WHEELS-raw'] = source_file['WHEELS']
-                    for i in range (len(source_file['WHEELS-raw'])):
+                    for i in range(len(source_file['WHEELS-raw'])):
                         source_file['WHEELS'][i] = float(source_file['WHEELS-raw'][i].split(' ')[0])
-                    source_file['WHEELS'] = source_file['WHEELS'].astype(float).round(1);
+                    source_file['WHEELS'] = source_file['WHEELS'].astype(float).round(1)
                 except KeyError:
                     pass
             try:
@@ -593,10 +556,10 @@ for model_year in model_years:
                     source_file[list(new_source_columns)],how='left',on=list(matching_categories)).replace([str(np.nan),''], np.nan)
             del source_file
         else:
-            master_index_file_with_desired_fields_all_merges = master_index_file.replace([str(np.nan), ''], np.nan);
+            master_index_file_with_desired_fields_all_merges = master_index_file.replace([str(np.nan), ''], np.nan)
 
         # 'City PTEFF_FROM_RLCOEFFS'
-        for all_subarray_count in range(0,len(all_subarray)):
+        for all_subarray_count in range(0, len(all_subarray)):
             query_type = all_subarray['QueryType'][all_subarray_count]
             weighting_field = all_subarray['AvgWtField'][all_subarray_count]
             bounding_field = all_subarray['BoundingField'][all_subarray_count]
@@ -818,23 +781,23 @@ for model_year in model_years:
 
     _FE_columns = ['FINAL_CALC_CITY_FE_4', 'FINAL_CALC_HWY_FE_4', 'FINAL_CALC_COMB_FE_4']
     _ELEC_columns = ['ELEC_KWH_100MILES_CITY_FE_4', 'ELEC_KWH_100MILES_HWY_FE_4', 'ELEC_KWH_100MILES_COMB_FE_4']
-    _idx_HWY_GHG_1_all = query_output.columns.get_loc('FINAL_CALC_HWY_GHG_1_all');
-    df_tmp = pd.DataFrame(np.zeros(len(query_output['FINAL_CALC_CITY_FE_4'])));
+    _idx_HWY_GHG_1_all = query_output.columns.get_loc('FINAL_CALC_HWY_GHG_1_all')
+    df_tmp = pd.DataFrame(np.zeros(len(query_output['FINAL_CALC_CITY_FE_4'])))
     for i in range(len(_ELEC_columns)):
-        _col_name = _ELEC_columns[i];
+        _col_name = _ELEC_columns[i]
         query_output.insert(_idx_HWY_GHG_1_all + i + 1, _col_name, df_tmp)
 
     for i in range(len(query_output)):
         for j in range(len(_ELEC_columns)):
-            _col_name_FE = _FE_columns[j];
+            _col_name_FE = _FE_columns[j]
             _col_name_ELEC = _ELEC_columns[j]
             if(query_output.loc[i, 'Electrification Category'] == 'EV'):
                 try:
-                    query_output.loc[i, _col_name_ELEC] = round(33.705 * 100 / query_output.loc[i, _col_name_FE], 1);
+                    query_output.loc[i, _col_name_ELEC] = round(33.705 * 100 / query_output.loc[i, _col_name_FE], 1)
                 except KeyError:
-                    pass;
+                    pass
             else:
-                query_output.loc[i, _col_name_ELEC] = np.nan;
+                query_output.loc[i, _col_name_ELEC] = np.nan
 
     if '_plus_MTH_34' in master_index_filename: Query_filename = 'Query_plus_MTH_34'
     else: Query_filename = 'Query_MTH_012'
@@ -849,33 +812,33 @@ for model_year in model_years:
     #     query_output.loc[query_output[_airbag] == 'null-|yes', _airbag] = 'yes|null'
     #     query_output.loc[query_output[_airbag] == 'yes|null-', _airbag] = 'yes|null'
     #     query_output.loc[query_output[_airbag] == 'null-', _airbag] = 'null'
-    _idx_nulls = query_output.loc[query_output['PRODUCTION_VOLUME_GHG_50_STATE'] == 0, :].index;
-    query_output.drop(_idx_nulls, inplace=True);
+    _idx_nulls = query_output.loc[query_output['PRODUCTION_VOLUME_GHG_50_STATE'] == 0, :].index
+    query_output.drop(_idx_nulls, inplace=True)
 
-    query_output.to_csv(output_path + '\\' + str(model_year) + '_' + Query_filename + '_' + date_and_time + '.csv',index=False);
+    query_output.to_csv(output_path + '\\' + str(model_year) + '_' + Query_filename + '_' + date_and_time + '.csv',index=False)
 
     query_output = query_output.drop(query_output.filter(regex='Master Index').columns, axis=1)
     query_output = query_output.drop(query_output.filter(regex='Edmunds').columns, axis=1)
     query_output = query_output.drop(query_output.filter(regex='OEM Towing Guide').columns, axis=1)
-    query_output.to_csv(output_path + '\\' + str(model_year) + Query_filename + ' ' + date_and_time + '_noduplicatecolumns.csv',index=False);
-    del all_array;
-    del master_index_file;
+    query_output.to_csv(output_path + '\\' + str(model_year) + Query_filename + ' ' + date_and_time + '_noduplicatecolumns.csv',index=False)
+    del all_array
+    del master_index_file
 
     if (OMEGA_outputs == True):
         for i in range(len(cols_OMEGA_inputs)):
             if cols_OMEGA_inputs[i] not in query_output.columns:
-                print(i, cols_OMEGA_inputs[i]);
+                print(i, cols_OMEGA_inputs[i])
 
         omega_outputs = query_output.loc[:, cols_OMEGA_inputs]
-        omega_outputs['cert_direct_oncycle_co2e_grams_per_mile']  = query_output['FINAL_CALC_COMB_GHG_1'];
-        omega_outputs['cert_direct_oncycle_kwh_per_mile']  = 33.705/query_output['FINAL_CALC_COMB_FE_4'];
-        df_edms = pd.read_csv("I:/Project/Midterm Review/Trends/Trends Data/Edmunds/2022 Measurements" + '\\' + 'Edmunds_MY2022_20230721-055344.csv', encoding="ISO-8859-1");
-        df_twgd = pd.read_csv('I:/Project/Midterm Review/Trends/Trends Data/OEMTowingGuide' + '\\' + 'MY2019_OEMTowingGuide_Readin.csv', encoding="ISO-8859-1");
+        omega_outputs['cert_direct_oncycle_co2e_grams_per_mile']  = query_output['FINAL_CALC_COMB_GHG_1']
+        omega_outputs['cert_direct_oncycle_kwh_per_mile']  = 33.705/query_output['FINAL_CALC_COMB_FE_4']
+        df_edms = pd.read_csv("I:/Project/Midterm Review/Trends/Trends Data/Edmunds/2022 Measurements" + '\\' + 'Edmunds_MY2022_20230721-055344.csv', encoding="ISO-8859-1")
+        df_twgd = pd.read_csv('I:/Project/Midterm Review/Trends/Trends Data/OEMTowingGuide' + '\\' + 'MY2019_OEMTowingGuide_Readin.csv', encoding="ISO-8859-1")
 
         omega_outputs = scraping_Edmunds_MSRPs(omega_outputs, df_edms)
         omega_outputs = GCWRs_from_towing_guide(df_twgd, omega_outputs)
-        del query_output;
-        omega_outputs.to_csv(output_path + '\\' + str(model_year) + Query_filename + '_OMEGA_' + date_and_time + '.csv', index=False);
+        del query_output
+        omega_outputs.to_csv(output_path + '\\' + str(model_year) + Query_filename + '_OMEGA_' + date_and_time + '.csv', index=False)
         del omega_outputs
     else:
-        del query_output;
+        del query_output
