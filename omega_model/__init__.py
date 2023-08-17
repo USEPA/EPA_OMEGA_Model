@@ -146,7 +146,7 @@ try:
 
             self.offcycle_credits_file = path + 'test_inputs/offcycle_credits.csv'
 
-            self.consumer_pricing_num_options = 10
+            self.consumer_pricing_num_options = 14
             self.consumer_pricing_multiplier_min = 1/1.1
             self.consumer_pricing_multiplier_max = 1.1
 

@@ -684,7 +684,7 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_gro
 
         calc_cross_subsidy_metrics(mcat, cross_subsidy_group, producer_decision, cross_subsidy_options_and_response)
 
-        if mcat_cross_subsidy_iteration_num == 0:
+        if mcat_cross_subsidy_iteration_num < 3:
             # take closest to origin to get in the ballpark
             cross_subsidy_options_and_response['pricing_score'] = \
                 (cross_subsidy_options_and_response['pricing_price_ratio_delta_%s_raw' % mcat].values**2 +
