@@ -130,12 +130,9 @@ class LegacyFleet:
             'in_use_fuel_id',
             'registered_count',
             'miles_per_gallon',
-            'horsepower',
             'curbweight_lbs',
-            'fuel_capacity_gallons',
             'kwh_per_mile',
-            'range_miles',
-            'transaction_price_dollars',
+            'transaction_price',
         ]
         validate_template_version_info(df, input_template_name, input_template_version, effects_log)
 
