@@ -333,7 +333,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                 constraint_ratio = 0
 
                             for k in keys:
-                                if 'BEV.ALT' in k:  # TODO: un-hardcode the 'BEV' part here...
+                                if 'EV.ALT' in k:  # TODO: un-hardcode the 'EV' part here...
                                     max_constraints[k] = \
                                         (consumer_response[k.replace('producer', 'consumer')] /
                                          consumer_response['consumer_abs_share_frac_%s' % node_name] *
