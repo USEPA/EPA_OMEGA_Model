@@ -1457,8 +1457,8 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             if DEBUGGING_CAFE_MFR_CD_MODE != True: check_final_model_yr_ghg_prod_units('vehghg_file_output', vehghg_file_output, footprint_indexing_categories, subconfig_indexing_categories, grp_volumes_footprint_file_with_lineage)
 
             vehghg_file_output.rename({'Target Coef A (lbf)': 'Target Coef A (lbf) tstcar', 'Target Coef B (lbf/mph)': 'Target Coef B (lbf/mph) tstcar', 'Target Coef C (lbf/mph**2)': 'Target Coef C (lbf/mph**2) tstcar'}, axis=1)
-            vehghg_file_output.rename({'City Powertrain Efficiency (%)': 'City PTEFF_FROM_RLCOEFFS', 'Hwy Powertrain Efficiency (%)': 'Hwy PTEFF_FROM_RLCOEFFS', \
-                                       'Powertrain Efficiency (%)':'PTEFF_FROM_RLCOEFFS', 'US06 Powertrain Efficiency (%)': 'US06 PTEFF_FROM_RLCOEFFS'}, axis=1)
+            # vehghg_file_output.rename({'City Powertrain Efficiency (%)': 'City PTEFF_FROM_RLCOEFFS', 'Hwy Powertrain Efficiency (%)': 'Hwy PTEFF_FROM_RLCOEFFS', \
+            #                            'Powertrain Efficiency (%)':'PTEFF_FROM_RLCOEFFS', 'US06 Powertrain Efficiency (%)': 'US06 PTEFF_FROM_RLCOEFFS'}, axis=1)
             vehghg_file_output.drop_duplicates(keep=False, inplace=True)
             # vehghg_file_output.loc[(vehghg_file_output['CAFE_MFR_CD'] != vehghg_file_output['LABEL_MFR_CD']) & (vehghg_file_output['LABEL_MFR_CD'] == 'PRX'), 'CAFE_MFR_CD']  = 'PRX';
             vehghg_file_output.reset_index(drop=True, inplace=True)
@@ -1469,8 +1469,6 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                 vehghg_filename = vehghg_filename + '_MTH_012'
 
             if DEBUGGING_CAFE_MFR_CD_MODE: vehghg_filename = vehghg_filename + '_' + DEBUGGING_CAFE_MFR_CD
-
-
             vehghg_file_output.to_csv(output_path + '\\' + vehghg_filename + '_' + date_and_time + '.csv', index=False)
 
             if (NO_DYNO_COEFS_OUTPUTS == True):

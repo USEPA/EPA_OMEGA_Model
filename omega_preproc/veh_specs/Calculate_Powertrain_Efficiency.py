@@ -125,7 +125,7 @@ def Calculate_Powertrain_Efficiency(ID_col, TEST_PROC_CATEGORY_col, A_col, B_col
     output_table['Load Factor (%)'] = drivecycle_LF_col * 100
     output_table['MPGe (kWh/100mi)'] = 3370.5/mpg_col # 1 gallon gasoline = 33.705 kWh
     fuel_intensity_mjpkm_col = pd.Series((1/pd.to_numeric(mpg_col))*fuelhv_col*km2mi*gal2l).replace([math.inf,''], np.nan)
-    comb_fuel_intensity_mjpkm_col = pd.Series((1/pd.to_numeric(comb_mpg_col))*fuelhv_col*km2mi*gal2l).replace([math.inf,''], np.nan)
+    # comb_fuel_intensity_mjpkm_col = pd.Series((1/pd.to_numeric(comb_mpg_col))*fuelhv_col*km2mi*gal2l).replace([math.inf,''], np.nan)
     output_table['Fuel Energy Intensity (Wh/mi)'] = fuel_intensity_mjpkm_col * 1000 * (mj2kwhr/km2mi)    # mj/km -> kwh/mi: mj2kwhr/km2mi
 
     engdisp_col = engdisp_col.replace([0,''],np.nan)
@@ -318,7 +318,8 @@ def comb_Calculate_Powertrain_Efficiency(ID_col, A_col, B_col, C_col, ETW_col, m
     output_table['Combined Fuel Energy Intensity (Wh/mi)'] = comb_fuel_energy_mjpkm_col * (mj2kwhr/km2mi)*1000
     output_table['Displacement Specific Combined Fuel Energy Intensity (Wh/mi/L)'] = pd.Series(np.zeros(len(output_table))).replace(0, '')
     output_table.loc[engdisp_col > 0, 'Displacement Specific Combined Fuel Energy Intensity (Wh/mi/L)'] = comb_fuel_energy_mjpkm_col/engdisp_col * (mj2kwhr / km2mi)*1000
-    output_table['Powertrain Efficiency (%)'] = 100 * comb_troadwork_mjpkm_col / comb_fuel_energy_mjpkm_col
+    output_table['Combined Powertrain Efficiency (%)'] = 100 * comb_troadwork_mjpkm_col / comb_fuel_energy_mjpkm_col
+    output_table['Combined Load Factor (%)'] = Comb_LF_col;
 
     output_table['US06 Tractive Road Energy Intensity (Wh/mi)'] = US06_troadwork_mjpkm_col * (mj2kwhr/km2mi)*1000
     output_table['Displacement Specific US06 Tractive Road Energy Intensity (Wh/mi/L)'] = pd.Series(np.zeros(len(output_table))).replace(0, '')
