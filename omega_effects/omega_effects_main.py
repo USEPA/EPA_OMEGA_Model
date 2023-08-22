@@ -163,6 +163,13 @@ def main():
                 calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_fleet_safety)
 
             session_fleet_physical = {**analysis_fleet_physical, **legacy_fleet_physical}
+
+            # adjust action session refinery emission inventories
+            if session_settings.session_policy == 'no_action':
+                no_action_fleet_physical = session_fleet_physical.copy()
+            else:
+                session_fleet_physical =
+
             session_fleet_physical_df = \
                 pd.DataFrame.from_dict(session_fleet_physical, orient='index').reset_index(drop=True)
 
