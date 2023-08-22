@@ -292,6 +292,12 @@ class VehicleAggregation(OMEGABase):
             VehicleAggregation.weighted_fillna(df, 'ground_clearance_in')
             VehicleAggregation.weighted_fillna(df, 'height_in')
 
+            df['gvwr_lbs'] = df['gvwr_lbs'].fillna(df['etw_lbs'] + 700)  # RV: placeholder BDE
+            df['gcwr_lbs'] = df['gcwr_lbs'].fillna(10000)  # RV: placeholder BDE
+            df['curbweight_lbs'] = df['etw_lbs'].fillna(df['etw_lbs'] - 300)  # RV: placeholder BDE
+            df['dual_rear_wheel'] = df['dual_rear_wheel'].fillna(0)  # RV: placeholder BDE
+            df['alvw_lbs'] = df['alvw_lbs'].fillna((df['etw_lbs'] + df['gvwr_lbs']) / 2)  # RV: placeholder BDE
+
             df['base_year_powertrain_type'] = df['electrification_class'].\
                 replace({'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'FCV'})
 
