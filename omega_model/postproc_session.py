@@ -195,16 +195,17 @@ def run_postproc(iteration_log, credit_banks):
     total_model_year_cert_co2e_Mg = np.zeros_like(analysis_years, dtype='float')
     total_target_co2e_Mg = np.zeros_like(analysis_years, dtype='float')
     for compliance_id in compliance_ids:
-        calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg, target_co2e_Mg = \
-            plot_manufacturer_compliance(analysis_years, compliance_id, credit_banks[compliance_id])
+        if compliance_id in credit_banks:
+            calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg, target_co2e_Mg = \
+                plot_manufacturer_compliance(analysis_years, compliance_id, credit_banks[compliance_id])
 
-        total_calendar_year_cert_co2e_Mg += calendar_year_cert_co2e_Mg
-        total_model_year_cert_co2e_Mg += model_year_cert_co2e_Mg
-        total_target_co2e_Mg += target_co2e_Mg
+            total_calendar_year_cert_co2e_Mg += calendar_year_cert_co2e_Mg
+            total_model_year_cert_co2e_Mg += model_year_cert_co2e_Mg
+            total_target_co2e_Mg += target_co2e_Mg
 
-        session_results['%s_target_co2e_Mg' % compliance_id] = target_co2e_Mg
-        session_results['%s_calendar_year_cert_co2e_Mg' % compliance_id] = calendar_year_cert_co2e_Mg
-        session_results['%s_model_year_cert_co2e_Mg' % compliance_id] = model_year_cert_co2e_Mg
+            session_results['%s_target_co2e_Mg' % compliance_id] = target_co2e_Mg
+            session_results['%s_calendar_year_cert_co2e_Mg' % compliance_id] = calendar_year_cert_co2e_Mg
+            session_results['%s_model_year_cert_co2e_Mg' % compliance_id] = model_year_cert_co2e_Mg
 
     for compliance_id in VehicleFinal.compliance_ids:
 
