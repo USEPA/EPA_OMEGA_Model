@@ -1482,6 +1482,9 @@ def plot_total_sales(calendar_years, compliance_ids):
         (context_sales, total_sales, manufacturer_sales)
 
     """
+
+    from context import new_vehicle_market
+
     total_sales = []
     for cy in calendar_years:
         count = 0
@@ -1507,10 +1510,17 @@ def plot_total_sales(calendar_years, compliance_ids):
                 count += vehicle_annual_data[vad_id]['registered_count']
             manufacturer_sales[compliance_id].append(count)
 
+    # TOTAL expected sales if ALL vehicle type represented in the base year vehicles file
+    # context_sales = np.array(
+    #     [consumer.sales_volume.context_new_vehicle_sales(cy)['total'] for cy in calendar_years[1:]])
+
+    # Total expected sales for vehicle types actually represented in the base year vehicles file)
     context_sales = np.array(
-        [consumer.sales_volume.context_new_vehicle_sales(cy)['total'] for cy in calendar_years[1:]])
+        [new_vehicle_market.NewVehicleMarket.context_based_total_sales[cy] for cy in calendar_years[1:]])
+
     fig, ax1 = fplothg(calendar_years[1:], context_sales / 1e6, '.-',
                        reuse_figure=omega_globals.options.auto_close_figures)
+
     ax1.plot(calendar_years, total_sales / 1e6)
 
     for manufacturer in manufacturer_sales:

@@ -894,6 +894,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
     """
 
     cache_key = calendar_year
+
     if cache_key not in _cache:
         # pull in last year's vehicles:
         manufacturer_prior_vehicles = VehicleFinal.get_compliance_vehicles(calendar_year - 1, compliance_id)
@@ -945,6 +946,8 @@ def create_composite_vehicles(calendar_year, compliance_id):
             context_based_total_sales += \
                 NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=csc) \
                 * VehicleFinal.mfr_base_year_share_data[compliance_id][csc]
+
+        NewVehicleMarket.context_based_total_sales[calendar_year] = context_based_total_sales
 
         # update new vehicle prevalence based on vehicle size mix from context (base year data)
         for new_veh in manufacturer_vehicles:
@@ -1004,6 +1007,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
             _cache['mcat_data_%d' % calendar_year][mcat] = {'sales': 0, 'abs_share': 0,
                                                             'NO_ALT_sales': 0, 'ALT_sales': 0,
                                                             'NO_ALT_abs_share': 0, 'ALT_abs_share': 0}
+
         for mcat in omega_globals.options.MarketClass.market_categories:
             for new_veh in manufacturer_vehicles:
                 new_veh_abs_share = new_veh.projected_sales / context_based_total_sales
@@ -1098,7 +1102,6 @@ def create_composite_vehicles(calendar_year, compliance_id):
         _cache[cache_key] = {'composite_vehicles': composite_vehicles,
                              'pre_production_vehicles': pre_production_vehicles,
                              'market_class_tree': market_class_tree,
-                             'context_based_total_sales': context_based_total_sales,
                              # CU
                              }
     else:
@@ -1106,7 +1109,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         composite_vehicles = _cache[cache_key]['composite_vehicles']
         pre_production_vehicles = _cache[cache_key]['pre_production_vehicles']
         market_class_tree = _cache[cache_key]['market_class_tree']
-        context_based_total_sales = _cache[cache_key]['context_based_total_sales']
+        context_based_total_sales = NewVehicleMarket.context_based_total_sales[calendar_year]
 
     return composite_vehicles, pre_production_vehicles, market_class_tree, context_based_total_sales
 
