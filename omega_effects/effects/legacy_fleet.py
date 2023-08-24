@@ -307,10 +307,11 @@ class LegacyFleet:
             self.adjusted_legacy_fleet[(v['vehicle_id'], v['calendar_year'])] = update_dict
 
     @staticmethod
-    def set_legacy_fleet_name(market_class_id):
+    def set_legacy_fleet_name(vehicle_id, market_class_id):
         """
 
         Args:
+            vehicle_id (int): the vehicle id number
             market_class_id: the legacy fleet market class id
 
         Returns:
@@ -319,10 +320,10 @@ class LegacyFleet:
 
         """
         if 'sedan' in market_class_id:
-            _name = 'car'
+            _name = f'car_{vehicle_id}'
         elif 'pickup' in market_class_id:
-            _name = 'Pickup'
+            _name = f'pickup_{vehicle_id}'
         else:
-            _name = 'cuv_suv'
+            _name = f'cuv_suv_{vehicle_id}'
 
         return _name

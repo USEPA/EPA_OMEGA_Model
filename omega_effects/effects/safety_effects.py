@@ -272,7 +272,7 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
         in_use_fuel_id = v['in_use_fuel_id']
         registered_count = v['registered_count']
 
-        name = batch_settings.legacy_fleet.set_legacy_fleet_name(v['market_class_id'])
+        name = batch_settings.legacy_fleet.set_legacy_fleet_name(v['vehicle_id'], v['market_class_id'])
 
         fueling_class = base_year_powertrain_type = 'ICE'
         if 'BEV' in v['market_class_id']:

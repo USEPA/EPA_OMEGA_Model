@@ -11,7 +11,7 @@ calculate from them the pollutant inventories, including fuel consumed, for each
 
 """
 import pandas as pd
-from omega_effects.effects.vehicle_physical_effects import VehiclePhysicalData, calc_vehicle_physical_effects
+from omega_effects.effects.vehicle_inventory import VehiclePhysicalData, calc_vehicle_inventory
 
 
 def get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg_class_id, fuel, ind_var_value):
@@ -101,92 +101,6 @@ def get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg
     )
 
     return rates
-
-
-def get_egu_emission_rate(session_settings, calendar_year, kwh_consumption, kwh_generation):
-    """
-
-    Args:
-        session_settings: an instance of the SessionSettings class.
-        calendar_year (int): The calendar year for which egu emission rates are needed.
-        kwh_consumption (float): The energy consumed by the fleet measured at the wall or charger outlet.
-        kwh_generation (float): The energy generation required to satisfy kwh_consumption.
-
-    Returns:
-        A list of EGU emission rates for the given calendar year.
-
-    """
-    # kwh_session = kwh_consumption
-    #
-    rate_names = (
-        'voc_grams_per_kwh',
-        'co_grams_per_kwh',
-        'nox_grams_per_kwh',
-        'pm25_grams_per_kwh',
-        'sox_grams_per_kwh',
-        'co2_grams_per_kwh',
-        'ch4_grams_per_kwh',
-        'n2o_grams_per_kwh',
-        'hcl_grams_per_kwh',
-        'hg_grams_per_kwh',
-    )
-
-    return session_settings.emission_rates_egu.get_emission_rate(
-        session_settings, calendar_year, kwh_consumption, kwh_generation, rate_names
-    )
-
-
-def get_refinery_emission_rate(session_settings, calendar_year):
-    """
-
-    Args:
-        session_settings: an instance of the SessionSettings class.
-        calendar_year (int): The calendar year for which a refinery emission factors are needed.
-
-    Returns:
-        A list of refinery emission rates as specified in the emission_rates list for the given calendar year.
-
-    """
-    emission_rates = (
-        'voc_grams_per_gallon',
-        'nox_grams_per_gallon',
-        'pm25_grams_per_gallon',
-        'sox_grams_per_gallon',
-    )
-
-    return session_settings.emission_rates_refinery.get_emission_rate(session_settings, calendar_year, emission_rates)
-
-
-def get_refinery_ef(session_settings, calendar_year, fuel):
-    """
-
-    Args:
-        session_settings: an instance of the SessionSettings class.
-        calendar_year (int): The calendar year for which a refinery emission factors are needed.
-        fuel (str): The fuel ID for which refinery emission factors are needed (i.e., pump_gasoline, pump_diesel).
-
-    Returns:
-        A list of refinery emission factors as specified in the emission_factors list for the given calendar year
-        and liquid fuel.
-
-    """
-    emission_factors = (
-        'voc_grams_per_gallon',
-        'co_grams_per_gallon',
-        'nox_grams_per_gallon',
-        'pm25_grams_per_gallon',
-        'sox_grams_per_gallon',
-        # 'benzene_grams_per_gallon',
-        # 'butadiene13_grams_per_gallon',
-        # 'formaldehyde_grams_per_gallon',
-        # 'acetaldehyde_grams_per_gallon',
-        # 'acrolein_grams_per_gallon',
-        'co2_grams_per_gallon',
-        'ch4_grams_per_gallon',
-        'n2o_grams_per_gallon',
-    )
-
-    return session_settings.emission_factors_refinery.get_emission_factors(calendar_year, fuel, emission_factors)
 
 
 def get_energysecurity_cf(batch_settings, calendar_year):
@@ -295,49 +209,14 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
         adjusted_vads = \
             session_settings.vehicle_annual_data.get_adjusted_vehicle_annual_data_by_calendar_year(calendar_year)
 
-        # limit to adjusted_vads having model_year >= analysis_initial_year since only those might have new fuel
-        # consumption
-        adjusted_vads = \
-            [v for v in adjusted_vads if (v['calendar_year'] - v['age']) >= batch_settings.analysis_initial_year]
-
-        # first a loop to determine kwh demand for this calendar year
-        fuel_consumption_kwh_annual = fuel_generation_kwh_annual = 0
-        for v in adjusted_vads:
-
-            # this loops thru vehicles this calendar year to get kWh consumption this calendar year
-            # need vehicle info once for each vehicle, not every calendar year for each vehicle
-            if v['vehicle_id'] not in vehicle_info_dict:
-                vehicle_info_dict[v['vehicle_id']] \
-                    = session_settings.vehicles.get_vehicle_attributes(v['vehicle_id'], *vehicle_attribute_list)
-
-            base_year_vehicle_id, manufacturer_id, name, model_year, base_year_reg_class_id, reg_class_id, \
-                in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, footprint_ft2, workfactor, \
-                target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile, body_style, \
-                battery_kwh_per_veh, curbweight_lbs, gvwr_lbs = \
-                vehicle_info_dict[v['vehicle_id']]
-
-            if onroad_direct_kwh_per_mile:
-                refuel_efficiency = \
-                    batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, 'US electricity', 'refuel_efficiency')
-                fuel_consumption_kwh_annual += v['vmt'] * onroad_direct_kwh_per_mile / refuel_efficiency
-
-        transmission_efficiency = \
-            batch_settings.onroad_fuels.get_fuel_attribute(
-                calendar_year, 'US electricity', 'transmission_efficiency'
-            )
-        fuel_generation_kwh_annual = fuel_consumption_kwh_annual / transmission_efficiency
-
-        # upstream EGU emission rates for this calendar year to apply to electric fuel operation
-        voc_egu_rate, co_egu_rate, nox_egu_rate, pm25_egu_rate, sox_egu_rate, \
-            co2_egu_rate, ch4_egu_rate, n2o_egu_rate, hcl_egu_rate, hg_egu_rate = \
-            get_egu_emission_rate(
-                session_settings, calendar_year, fuel_consumption_kwh_annual, fuel_generation_kwh_annual
-            )
-
         # this loops thru vehicles this calendar year to calc physical effects for this calendar year
         for v in adjusted_vads:
 
             vehicle_data = VehiclePhysicalData()
+
+            if v['vehicle_id'] not in vehicle_info_dict:
+                vehicle_info_dict[v['vehicle_id']] \
+                    = session_settings.vehicles.get_vehicle_attributes(v['vehicle_id'], *vehicle_attribute_list)
 
             base_year_vehicle_id, manufacturer_id, name, model_year, base_year_reg_class_id, reg_class_id, \
                 in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, footprint_ft2, workfactor, \
@@ -436,16 +315,6 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                         'evse_kwh_per_mile': onroad_direct_kwh_per_mile / refuel_efficiency,
                         'fuel_consumption_kwh': fuel_consumption_kwh,
                         'fuel_generation_kwh': fuel_generation_kwh,
-                        'voc_egu_rate': voc_egu_rate,
-                        'co_egu_rate': co_egu_rate,
-                        'nox_egu_rate': nox_egu_rate,
-                        'pm25_egu_rate': pm25_egu_rate,
-                        'sox_egu_rate': sox_egu_rate,
-                        'co2_egu_rate': co2_egu_rate,
-                        'ch4_egu_rate': ch4_egu_rate,
-                        'n2o_egu_rate': n2o_egu_rate,
-                        'hcl_egu_rate': hcl_egu_rate,
-                        'hg_egu_rate': hg_egu_rate,
                     })
 
                     if fueling_class == 'BEV':
@@ -586,36 +455,12 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                     else:
                         pass  # add additional liquid fuels (E85) if necessary
 
-                    # upstream refinery emission factors for liquid fuel operation
-                    if session_settings.emission_factors_refinery:
-                        voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, \
-                            co2_ref_rate, ch4_ref_rate, n2o_ref_rate = \
-                            get_refinery_ef(session_settings, calendar_year, fuel)
-                        vehicle_data.update_value({
-                            'voc_ref_rate': voc_ref_rate,
-                            'co_ref_rate': co_ref_rate,
-                            'nox_ref_rate': nox_ref_rate,
-                            'pm25_ref_rate': pm25_ref_rate,
-                            'sox_ref_rate': sox_ref_rate,
-                            'co2_ref_rate': co2_ref_rate,
-                            'ch4_ref_rate': ch4_ref_rate,
-                            'n2o_ref_rate': n2o_ref_rate,
-                        })
-                    else:
-                        voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate = \
-                            get_refinery_emission_rate(session_settings, calendar_year)
-                        vehicle_data.update_value({
-                            'voc_ref_rate': voc_ref_rate,
-                            'nox_ref_rate': nox_ref_rate,
-                            'pm25_ref_rate': pm25_ref_rate,
-                            'sox_ref_rate': sox_ref_rate,
-                            })
                 energy_security_import_factor = get_energysecurity_cf(batch_settings, calendar_year)
                 vehicle_data.update_value({
                     'energy_security_import_factor': energy_security_import_factor,
                 })
                 key = (int(v['vehicle_id']), int(v['calendar_year']))
-                calendar_year_effects_dict[key] = calc_vehicle_physical_effects(vehicle_data)
+                calendar_year_effects_dict[key] = calc_vehicle_inventory(vehicle_data)
 
         physical_effects_dict.update(calendar_year_effects_dict)
 
@@ -740,26 +585,11 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                 )
             fuel_generation_kwh = fuel_consumption_kwh / transmission_efficiency
 
-            # the energy consumption and generation values do not matter here, so set to 0
-            voc_egu_rate, co_egu_rate, nox_egu_rate, pm25_egu_rate, sox_egu_rate, \
-                co2_egu_rate, ch4_egu_rate, n2o_egu_rate, hcl_egu_rate, hg_egu_rate = \
-                get_egu_emission_rate(session_settings, v['calendar_year'], 0, 0)
-
             vehicle_data.update_value({
                 'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
                 'evse_kwh_per_mile': onroad_direct_kwh_per_mile / refuel_efficiency,
                 'fuel_consumption_kwh': fuel_consumption_kwh,
                 'fuel_generation_kwh': fuel_generation_kwh,
-                'voc_egu_rate': voc_egu_rate,
-                'co_egu_rate': co_egu_rate,
-                'nox_egu_rate': nox_egu_rate,
-                'pm25_egu_rate': pm25_egu_rate,
-                'sox_egu_rate': sox_egu_rate,
-                'co2_egu_rate': co2_egu_rate,
-                'ch4_egu_rate': ch4_egu_rate,
-                'n2o_egu_rate': n2o_egu_rate,
-                'hcl_egu_rate': hcl_egu_rate,
-                'hg_egu_rate': hg_egu_rate,
             })
 
             if vse['fueling_class'] == 'BEV':
@@ -885,36 +715,13 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                     'energy_density_ratio': energy_density_ratio,
                     'pure_share': pure_share,
                 })
-            # upstream refinery emission factors for liquid fuel operation
-            if session_settings.emission_factors_refinery:
-                voc_ref_rate, co_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, \
-                    co2_ref_rate, ch4_ref_rate, n2o_ref_rate = \
-                    get_refinery_ef(session_settings, v['calendar_year'], fuel)
-                vehicle_data.update_value({
-                    'voc_ref_rate': voc_ref_rate,
-                    'co_ref_rate': co_ref_rate,
-                    'nox_ref_rate': nox_ref_rate,
-                    'pm25_ref_rate': pm25_ref_rate,
-                    'sox_ref_rate': sox_ref_rate,
-                    'co2_ref_rate': co2_ref_rate,
-                    'ch4_ref_rate': ch4_ref_rate,
-                    'n2o_ref_rate': n2o_ref_rate,
-                })
-            else:
-                voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate = \
-                    get_refinery_emission_rate(session_settings, v['calendar_year'])
-                vehicle_data.update_value({
-                    'voc_ref_rate': voc_ref_rate,
-                    'nox_ref_rate': nox_ref_rate,
-                    'pm25_ref_rate': pm25_ref_rate,
-                    'sox_ref_rate': sox_ref_rate,
-                })
+
         energy_security_import_factor = get_energysecurity_cf(batch_settings, v['calendar_year'])
         vehicle_data.update_value({
             'energy_security_import_factor': energy_security_import_factor,
         })
         key = (int(v['vehicle_id']), int(v['calendar_year']))
-        physical_effects[key] = calc_vehicle_physical_effects(vehicle_data)
+        physical_effects[key] = calc_vehicle_inventory(vehicle_data)
 
     return physical_effects
 

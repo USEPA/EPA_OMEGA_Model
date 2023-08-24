@@ -30,6 +30,9 @@ from omega_effects.effects.safety_effects import \
     calc_safety_effects, calc_legacy_fleet_safety_effects, calc_annual_avg_safety_effects
 from omega_effects.effects.physical_effects import calc_physical_effects, calc_legacy_fleet_physical_effects, \
     calc_annual_physical_effects, calc_period_consumer_physical_view
+from omega_effects.effects.refinery_inventory import calc_refinery_inventory
+from omega_effects.effects.egu_inventory import calc_egu_inventory
+from omega_effects.effects.total_inventory import calc_total_inventory
 from omega_effects.effects.cost_effects import calc_cost_effects, calc_annual_cost_effects, calc_period_consumer_view
 
 from omega_effects.effects.discounting import Discounting
@@ -164,11 +167,27 @@ def main():
 
             session_fleet_physical = {**analysis_fleet_physical, **legacy_fleet_physical}
 
-            # adjust action session refinery emission inventories
+            # calculate refinery emission inventories
             if session_settings.session_policy == 'no_action':
+                session_fleet_physical = calc_refinery_inventory(
+                    batch_settings, session_settings, session_fleet_physical
+                )
                 no_action_fleet_physical = session_fleet_physical.copy()
             else:
-                session_fleet_physical =
+                try:
+                    session_fleet_physical = calc_refinery_inventory(
+                        batch_settings, session_settings, no_action_fleet_physical, session_fleet_physical
+                    )
+                except UserWarning:
+                    effects_log.logwrite(f'\nThe no_action policy must immediately follow the Context and precede any'
+                                         f'action policies in the batch input file')
+                    sys.exit()
+
+            # calculate egu emission inventories
+            session_fleet_physical = calc_egu_inventory(batch_settings, session_settings, session_fleet_physical)
+
+            # calculate final (total) inventories
+            session_fleet_physical = calc_total_inventory(session_fleet_physical)
 
             session_fleet_physical_df = \
                 pd.DataFrame.from_dict(session_fleet_physical, orient='index').reset_index(drop=True)
