@@ -21,7 +21,7 @@ File Type
 Sample Header
     .. csv-table::
 
-       input_template_name:,vehicles,input_template_version:,0.49,notes:,20220926 Added fields for prior_redesign_year and redesign_interval to 20220819 ver from base_year_compilation_LD_2b3_20220926.xlsx
+       input_template_name:,vehicles,input_template_version:,0.50,notes:,20220926 Added fields for prior_redesign_year and redesign_interval to 20220819 ver from base_year_compilation_LD_2b3_20220926.xlsx
 
 Sample Data Columns
     .. csv-table::
