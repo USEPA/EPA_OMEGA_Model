@@ -192,7 +192,25 @@ class MarketClassBase:
     market_categories = []
     responsive_market_categories = []
     non_responsive_market_categories = []
+    electrified_market_categories = []
     linked_market_classes = dict()
+
+    @staticmethod
+    def get_linestyle(varname):
+        """
+
+        Args:
+            varname (str): variable name, e.g. 'sedan_wagon.ICE', 'BEV', etc
+
+        Returns:
+            dict of linestyle arguments
+
+        For colors see: https://matplotlib.org/stable/gallery/color/named_colors.html
+        For linestyles see: https://matplotlib.org/stable/gallery/lines_bars_and_markers/linestyles.html
+        """
+        style_dict = {'marker': '.', 'linestyle': '-'}
+
+        return style_dict
 
     @staticmethod
     def parse_market_classes(market_class_list, market_class_dict=None, by_reg_class=False):

@@ -446,8 +446,9 @@ def plot_cert_co2e_gpmi(calendar_years):
     # market category chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
-        ax1.plot(calendar_years, co2e_data[mcat], '.--')
-    ax1.plot(calendar_years, co2e_data['vehicle'], '.-')
+        ax1.plot(calendar_years, co2e_data[mcat], **omega_globals.options.MarketClass.get_linestyle(mcat))
+    ax1.plot(calendar_years, co2e_data['vehicle'],
+             **omega_globals.options.MarketClass.get_linestyle('vehicle'))
     ax1.legend(market_categories + ['vehicle'])
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
               '%s\nAverage Vehicle Cert CO2e g/mi by Market Category v Year' %
@@ -459,10 +460,7 @@ def plot_cert_co2e_gpmi(calendar_years):
     # market class chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
-        if 'ICE' in mc:
-            ax1.plot(calendar_years, co2e_data[mc], '.-')
-        else:
-            ax1.plot(calendar_years, co2e_data[mc], '.--')
+        ax1.plot(calendar_years, co2e_data[mc], **omega_globals.options.MarketClass.get_linestyle(mc))
 
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
               '%s\nAverage Vehicle Cert CO2e g/mi  by Market Class v Year' %
@@ -545,8 +543,9 @@ def plot_cert_direct_oncycle_co2e_gpmi(calendar_years):
     # market category chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
-        ax1.plot(calendar_years, co2e_data[mcat], '.--')
-    ax1.plot(calendar_years, co2e_data['vehicle'], '.-')
+        ax1.plot(calendar_years, co2e_data[mcat], **omega_globals.options.MarketClass.get_linestyle(mcat))
+    ax1.plot(calendar_years, co2e_data['vehicle'],
+             **omega_globals.options.MarketClass.get_linestyle('vehicle'))
     ax1.legend(market_categories + ['vehicle'])
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
               '%s\nAverage Vehicle Cert Direct Oncycle CO2e g/mi by Market Category v Year' %
@@ -558,10 +557,7 @@ def plot_cert_direct_oncycle_co2e_gpmi(calendar_years):
     # market class chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
-        if 'ICE' in mc:
-            ax1.plot(calendar_years, co2e_data[mc], '.-')
-        else:
-            ax1.plot(calendar_years, co2e_data[mc], '.--')
+        ax1.plot(calendar_years, co2e_data[mc], **omega_globals.options.MarketClass.get_linestyle(mc))
 
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
               '%s\nAverage Vehicle Cert Direct Oncycle CO2e g/mi  by Market Class v Year' %
@@ -643,8 +639,10 @@ def plot_cert_direct_kwh_pmi(calendar_years):
     # market category chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
-        ax1.plot(calendar_years, average_cert_direct_kwh_data[mcat], '.--')
-    ax1.plot(calendar_years, average_cert_direct_kwh_data['vehicle'], '.-')
+        ax1.plot(calendar_years, average_cert_direct_kwh_data[mcat],
+                 **omega_globals.options.MarketClass.get_linestyle(mcat))
+    ax1.plot(calendar_years, average_cert_direct_kwh_data['vehicle'],
+             **omega_globals.options.MarketClass.get_linestyle('vehicle'))
     ax1.legend(market_categories + ['vehicle'])
     label_xyt(ax1, 'Year', 'Energy Consumption [kWh/mi]',
               '%s\nAverage Vehicle Cert kWh/mi by Market Category v Year' %
@@ -656,10 +654,8 @@ def plot_cert_direct_kwh_pmi(calendar_years):
     # market class chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
-        if 'ICE' in mc:
-            ax1.plot(calendar_years, average_cert_direct_kwh_data[mc], '.-')
-        else:
-            ax1.plot(calendar_years, average_cert_direct_kwh_data[mc], '.--')
+        ax1.plot(calendar_years, average_cert_direct_kwh_data[mc],
+                 **omega_globals.options.MarketClass.get_linestyle(mc))
 
     label_xyt(ax1, 'Year', 'Energy Consumption [kWh/mi]',
               '%s\nAverage Vehicle Cert kWh/mi  by Market Class v Year' %
@@ -740,8 +736,9 @@ def plot_target_co2e_gpmi(calendar_years):
     # market category chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
-        ax1.plot(calendar_years, co2e_data[mcat], '.--')
-    ax1.plot(calendar_years, co2e_data['vehicle'], '.-')
+        ax1.plot(calendar_years, co2e_data[mcat], **omega_globals.options.MarketClass.get_linestyle(mcat))
+    ax1.plot(calendar_years, co2e_data['vehicle'],
+             **omega_globals.options.MarketClass.get_linestyle('vehicle'))
     ax1.legend(market_categories + ['vehicle'])
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
               '%s\nAverage Vehicle Target CO2e g/mi by Market Category v Year' %
@@ -753,10 +750,7 @@ def plot_target_co2e_gpmi(calendar_years):
     # market class chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
-        if 'ICE' in mc:
-            ax1.plot(calendar_years, co2e_data[mc], '.-')
-        else:
-            ax1.plot(calendar_years, co2e_data[mc], '.--')
+        ax1.plot(calendar_years, co2e_data[mc], **omega_globals.options.MarketClass.get_linestyle(mc))
 
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
               '%s\nAverage Vehicle Target CO2e g/mi  by Market Class v Year' %
@@ -834,8 +828,10 @@ def plot_vehicle_cost(calendar_years):
     # market category chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
-        ax1.plot(calendar_years, average_cost_data[mcat], '.--')
-    ax1.plot(calendar_years, average_cost_data['vehicle'], '.-')
+        ax1.plot(calendar_years, average_cost_data[mcat],
+                 **omega_globals.options.MarketClass.get_linestyle(mcat))
+    ax1.plot(calendar_years, average_cost_data['vehicle'],
+             **omega_globals.options.MarketClass.get_linestyle('vehicle'))
     ax1.legend(market_categories + ['vehicle'])
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s\nAverage Vehicle Cost by Market Category v Year' % omega_globals.options.session_unique_name)
@@ -845,10 +841,7 @@ def plot_vehicle_cost(calendar_years):
     # market class chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
-        if 'ICE' in mc:
-            ax1.plot(calendar_years, average_cost_data[mc], '.-')
-        else:
-            ax1.plot(calendar_years, average_cost_data[mc], '.--')
+        ax1.plot(calendar_years, average_cost_data[mc], **omega_globals.options.MarketClass.get_linestyle(mc))
 
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s\nAverage Vehicle Cost  by Market Class v Year' % omega_globals.options.session_unique_name)
@@ -933,7 +926,8 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
     # market category chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
-        ax1.plot(calendar_years, mfr_cost_data['%s_%s' % (compliance_id, mcat)], '.--')
+        ax1.plot(calendar_years, mfr_cost_data['%s_%s' % (compliance_id, mcat)],
+                 **omega_globals.options.MarketClass.get_linestyle(mcat))
     ax1.plot(calendar_years, mfr_cost_data['%s_total' % compliance_id], '.-')
     ax1.legend(market_categories + ['%s_total' % compliance_id])
     label_xyt(ax1, 'Year', 'Cost [$]',
@@ -945,10 +939,8 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
     # market class chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
-        if 'ICE' in mc:
-            ax1.plot(calendar_years, mfr_cost_data['%s_%s' % (compliance_id, mc)], '.-')
-        else:
-            ax1.plot(calendar_years, mfr_cost_data['%s_%s' % (compliance_id, mc)], '.--')
+        ax1.plot(calendar_years, mfr_cost_data['%s_%s' % (compliance_id)],
+                 **omega_globals.options.MarketClass.get_linestyle(mc))
 
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s %s\nAverage Vehicle Cost  by Market Class v Year'
@@ -1031,8 +1023,9 @@ def plot_vehicle_generalized_cost(calendar_years):
     # market category chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
-        ax1.plot(calendar_years, cost_data[mcat], '.--')
-    ax1.plot(calendar_years, cost_data['vehicle'], '.-')
+        ax1.plot(calendar_years, cost_data[mcat], **omega_globals.options.MarketClass.get_linestyle(mcat))
+    ax1.plot(calendar_years, cost_data['vehicle'],
+             **omega_globals.options.MarketClass.get_linestyle('vehicle'))
     ax1.legend(market_categories + ['vehicle'])
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s\nAverage Vehicle Generalized Cost by Market Category v Year' %
@@ -1044,10 +1037,7 @@ def plot_vehicle_generalized_cost(calendar_years):
     # market class chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
-        if 'ICE' in mc:
-            ax1.plot(calendar_years, cost_data[mc], '.-')
-        else:
-            ax1.plot(calendar_years, cost_data[mc], '.--')
+        ax1.plot(calendar_years, cost_data[mc], **omega_globals.options.MarketClass.get_linestyle(mc))
 
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s\nAverage Vehicle Generalized_Cost  by Market Class v Year' %
@@ -1103,8 +1093,9 @@ def plot_vehicle_megagrams(calendar_years):
     # market category chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
-        ax1.plot(calendar_years, Mg_data[mcat], '.--')
-    ax1.plot(calendar_years, Mg_data['vehicle'], '.-')
+        ax1.plot(calendar_years, Mg_data[mcat], **omega_globals.options.MarketClass.get_linestyle(mcat))
+    ax1.plot(calendar_years, Mg_data['vehicle'],
+             **omega_globals.options.MarketClass.get_linestyle('vehicle'))
     ax1.legend(market_categories + ['vehicle'])
     label_xyt(ax1, 'Year', 'CO2e [Mg]',
               '%s\nVehicle CO2e Mg by Market Category v Year' % omega_globals.options.session_unique_name)
@@ -1114,11 +1105,10 @@ def plot_vehicle_megagrams(calendar_years):
     # market class chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
-        if 'ICE' in mc:
-            ax1.plot(calendar_years, Mg_data[mc], '.-')
-        else:
-            ax1.plot(calendar_years, Mg_data[mc], '.--')
-    ax1.plot(calendar_years, Mg_data['vehicle'], '.-')
+        ax1.plot(calendar_years, Mg_data[mc], **omega_globals.options.MarketClass.get_linestyle(mc))
+
+    ax1.plot(calendar_years, Mg_data['vehicle'],
+             **omega_globals.options.MarketClass.get_linestyle('vehicle'))
     label_xyt(ax1, 'Year', 'CO2e [Mg]',
               '%s\nVehicle CO2e Mg  by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(market_classes + ['vehicle'])
@@ -1178,8 +1168,10 @@ def plot_vehicle_GWh(calendar_years, manufacturer_id=None):
         # market category chart
         fig, ax1 = figure(omega_globals.options.auto_close_figures)
         for mcat in market_categories:
-            ax1.plot(calendar_years, GWh_data[mcat], '.--')
-        ax1.plot(calendar_years, GWh_data['vehicle'], '.-')
+            ax1.plot(calendar_years, GWh_data[mcat],
+                     **omega_globals.options.MarketClass.get_linestyle(mcat))
+        ax1.plot(calendar_years, GWh_data['vehicle'],
+                 **omega_globals.options.MarketClass.get_linestyle('vehicle'))
         ax1.set_xlim(ax1.get_xlim())
         ax1.set_ylim(ax1.get_ylim())
         ax1.plot(omega_globals.options.battery_GWh_limit_years,
@@ -1193,11 +1185,10 @@ def plot_vehicle_GWh(calendar_years, manufacturer_id=None):
         # market class chart
         fig, ax1 = figure(omega_globals.options.auto_close_figures)
         for mc in market_classes:
-            if 'ICE' in mc:
-                ax1.plot(calendar_years, GWh_data[mc], '.-')
-            else:
-                ax1.plot(calendar_years, GWh_data[mc], '.--')
-        ax1.plot(calendar_years, GWh_data['vehicle'], '.-')
+            ax1.plot(calendar_years, GWh_data[mc], **omega_globals.options.MarketClass.get_linestyle(mc))
+
+        ax1.plot(calendar_years, GWh_data['vehicle'],
+                 **omega_globals.options.MarketClass.get_linestyle('vehicle'))
         ax1.set_xlim(ax1.get_xlim())
         ax1.set_ylim(ax1.get_ylim())
         ax1.plot(omega_globals.options.battery_GWh_limit_years,
@@ -1286,7 +1277,8 @@ def plot_market_shares(calendar_years, total_sales):
     # plot market category results
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mcat in market_categories:
-        ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % mcat], '.--')
+        ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % mcat],
+                 **omega_globals.options.MarketClass.get_linestyle(mcat))
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]',
               '%s\nMarket Category Absolute Market Shares' % omega_globals.options.session_unique_name)
@@ -1297,7 +1289,8 @@ def plot_market_shares(calendar_years, total_sales):
     # plot market class results
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
-        ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % mc], '.--')
+        ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % mc],
+                 **omega_globals.options.MarketClass.get_linestyle(mc))
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]',
               '%s\nMarket Class Absolute Market Shares' % omega_globals.options.session_unique_name)
@@ -1414,7 +1407,8 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
     labels = []
     for mcat in market_categories:
         if max(mfr_market_share_results['abs_share_frac_%s_%s' % (compliance_id, mcat)]) > 0:
-            ax1.plot(calendar_years, mfr_market_share_results['abs_share_frac_%s_%s' % (compliance_id, mcat)], '.--')
+            ax1.plot(calendar_years, mfr_market_share_results['abs_share_frac_%s_%s' % (compliance_id, mcat)],
+                     **omega_globals.options.MarketClass.get_linestyle(mcat))
             labels += [mcat]
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s %s\nMarket Category Absolute Market Shares'
@@ -1428,7 +1422,8 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
     labels = []
     for mc in market_classes:
         if max(mfr_market_share_results['abs_share_frac_%s_%s' % (compliance_id, mc)]) > 0:
-            ax1.plot(calendar_years, mfr_market_share_results['abs_share_frac_%s_%s' % (compliance_id, mc)], '.--')
+            ax1.plot(calendar_years, mfr_market_share_results['abs_share_frac_%s_%s' % (compliance_id, mc)],
+                     **omega_globals.options.MarketClass.get_linestyle(mc))
             labels += [mc]
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s %s\nMarket Class Absolute Market Shares'

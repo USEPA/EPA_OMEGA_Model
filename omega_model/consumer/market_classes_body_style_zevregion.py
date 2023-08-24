@@ -65,10 +65,48 @@ class MarketClass(OMEGABase, MarketClassBase):
     responsive_market_categories = ['ICE', 'BEV']  #: market categories that have consumer response (i.e. price -> sales)
     non_responsive_market_categories = ['sedan_wagon_r1nonzev', 'cuv_suv_van_r1nonzev', 'pickup_r1nonzev',
                                         'sedan_wagon_r2zev', 'cuv_suv_van_r2zev', 'pickup_r2zev']  #: market categories that do not have consumer response
+    electrified_market_categories = ['BEV']
 
     linked_market_classes = {'sedan_wagon_r2zev.ICE': 'sedan_wagon_r1nonzev.ICE',
                              'cuv_suv_van_r2zev.ICE': 'cuv_suv_van_r1nonzev.ICE',
                              'pickup_r2zev.ICE': 'pickup_r1nonzev.ICE'}
+
+    @staticmethod
+    def get_linestyle(varname):
+        """
+
+        Args:
+            varname (str): market class string, e.g. 'sedan_wagon.ICE'
+
+        Returns:
+            dict of linestyle arguments
+
+        For colors see: https://matplotlib.org/stable/gallery/color/named_colors.html
+        For linestyles see: https://matplotlib.org/stable/gallery/lines_bars_and_markers/linestyles.html
+        """
+        style_dict = {'marker': '.', 'linestyle': '-'}
+
+        varname_split = varname.split('.')
+
+        if 'BEV' in varname_split:
+            style_dict['linestyle'] = ':'
+            style_dict['color'] = 'limegreen'
+            style_dict['linewidth'] = 2.5
+        elif 'ICE' in varname_split:
+            style_dict['linestyle'] = '--'
+            style_dict['color'] = 'red'
+
+        if 'sedan_wagon' in varname:
+            style_dict['color'] = 'deepskyblue'
+        elif 'cuv_suv_van' in varname:
+            style_dict['color'] = 'orange'
+        elif 'pickup' in varname:
+            style_dict['color'] = 'magenta'
+
+        if varname == 'vehicle':
+            style_dict['color'] = 'black'
+
+        return style_dict
 
     @staticmethod
     def get_vehicle_market_class(vehicle):

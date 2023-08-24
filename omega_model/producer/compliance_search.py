@@ -333,7 +333,9 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                 constraint_ratio = 0
 
                             for k in keys:
-                                if 'EV.ALT' in k:  # TODO: un-hardcode the 'EV' part here...
+                                if 'ALT' in k.split('.') and \
+                                        any(emc in k.split('.')
+                                            for emc in omega_globals.options.MarketClass.electrified_market_categories):
                                     if k.replace('producer', 'consumer') in consumer_response:
                                         max_constraints[k] = \
                                             (consumer_response[k.replace('producer', 'consumer')] /
