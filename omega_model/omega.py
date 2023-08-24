@@ -866,11 +866,14 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
         price_options_df = price_options_df.drop(multiplier_columns, axis=1, errors='ignore')
 
     if first_pass:
-        # first time through, span full range, including all 1's
-        multiplier_range = \
-            np.unique(np.append(np.linspace(omega_globals.options.consumer_pricing_multiplier_min,
-                                            omega_globals.options.consumer_pricing_multiplier_max,
-                                            omega_globals.options.consumer_pricing_num_options), 1.0))
+        if omega_globals.producer_shares_mode:
+            multiplier_range = np.array([1.0])
+        else:
+            # first time through, span full range, including all 1's
+            multiplier_range = \
+                np.unique(np.append(np.linspace(omega_globals.options.consumer_pricing_multiplier_min,
+                                                omega_globals.options.consumer_pricing_multiplier_max,
+                                                omega_globals.options.consumer_pricing_num_options), 1.0))
     search_collapsed = True
     for mc, mcc in zip(mc_pair, multiplier_columns):
 
