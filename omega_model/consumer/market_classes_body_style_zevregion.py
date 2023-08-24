@@ -90,18 +90,18 @@ class MarketClass(OMEGABase, MarketClassBase):
 
         if 'BEV' in varname_split:
             style_dict['linestyle'] = ':'
-            style_dict['color'] = 'limegreen'
+            style_dict['color'] = '#1ECF1E'
             style_dict['linewidth'] = 2.5
         elif 'ICE' in varname_split:
             style_dict['linestyle'] = '--'
-            style_dict['color'] = 'red'
+            style_dict['color'] = '#CF1E1E'
 
         if 'sedan_wagon' in varname:
-            style_dict['color'] = 'deepskyblue'
+            style_dict['color'] = '#0DBFF2'
         elif 'cuv_suv_van' in varname:
-            style_dict['color'] = 'orange'
+            style_dict['color'] = '#FFC700'
         elif 'pickup' in varname:
-            style_dict['color'] = 'magenta'
+            style_dict['color'] = '#F708F2'
 
         if varname == 'vehicle':
             style_dict['color'] = 'black'
