@@ -7,7 +7,7 @@ from pathlib import Path
 # import matplotlib.pyplot as plt
 home = str(Path.home())
 
-root_drive_letter = 'C:' # 'I:'
+root_drive_letter = 'I:' # 'C:'
 main_path = root_drive_letter + '/Project/Midterm Review/Trends/Original Trends Team Data Gathering and Analysis/Tech Specifications/techspecconsolidator/VehGHG Runs'
 
 run_folder = str(input('Enter Run Folder Name: '))
