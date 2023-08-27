@@ -356,8 +356,12 @@ for model_year in model_years:
     master_index_filename = data_sources_df['SourceFile'][data_sources_df['SourceFile'][ \
         (data_sources_df['SourceName'] == master_index_source) & \
         (data_sources_df['MY'] == model_year)].index[0]]
-    master_index_file = pd.read_csv(master_index_filepath + '\\' + master_index_filename, encoding="ISO-8859-1", \
+    try:
+        master_index_file = pd.read_csv(master_index_filepath + '\\' + master_index_filename, encoding="ISO-8859-1", \
                                     converters={'LineageID': int, 'BodyID': int, 'MODEL_YEAR': int,'Vehghg_ID': int, 'CabinID': float}).astype(str)
+    except KeyError:
+        print(master_index_filepath, master_index_filename)
+
     try:
         master_index_file['CabinID'] = master_index_file['CabinID'].astype(float).astype(int).astype(str)
     except KeyError:
@@ -463,17 +467,22 @@ for model_year in model_years:
 
             try:
                 if 'WHEELS' in list(matching_categories): print(matching_categories)
-                master_index_file[list(matching_categories)]
+                # if 'DRIVE TYPE' not in list(matching_categories): print('no DRIVE TYPE', matching_categories, ' *** Check the field-mapping & disable a flag in run-controller')
+                try:
+                    master_index_file[list(matching_categories)]
+                except KeyError:
+                    print('*** Error matching_categories', matching_categories, ' *** Check the field-mapping & disable a flag in run-controller')
                 # print(master_index_file.WHEEL_BASE_INCHES)
             except KeyError: #Matching Column not in master index file
                 missing_matching_categories = list(set(matching_categories)-set(master_index_file.columns))
                 present_matching_categories = list(set(matching_categories)-set(missing_matching_categories))
                 try:
+                    # print(vehghg_filepath, vehghg_filename)
                     vehghg_file = pd.read_csv(vehghg_filepath+'\\'+vehghg_filename,\
                     converters={'LineageID': int, 'BodyID': int}).astype(str)
                 except UnicodeDecodeError:
                     vehghg_file = pd.read_csv(vehghg_filepath+'\\'+vehghg_filename,\
-                    converters={'LineageID':int,'BodyID':int}, encoding = "ISO-8859-1").astype(str)
+                    converters={'LineageID': int, 'BodyID': int}, encoding = "ISO-8859-1").astype(str)
                 try:
                     vehghg_file['Number of Cylinders Category'][
                         (vehghg_file['Number of Cylinders Category'].astype(str) != 'ELE') & (
@@ -515,7 +524,7 @@ for model_year in model_years:
                     converters={'LineageID': int, 'BodyID': int}).astype(str)
                 except UnicodeDecodeError:
                     vehghg_file = pd.read_csv(vehghg_filepath+'\\'+vehghg_filename,\
-                    converters={'LineageID':int,'BodyID':int}, encoding = "ISO-8859-1").astype(str)
+                    converters={'LineageID': int, 'BodyID': int}, encoding = "ISO-8859-1").astype(str)
                 try:
                     source_file['Number of Cylinders Category'][
                         (source_file['Number of Cylinders Category'].astype(str) != 'ELE') & (
@@ -534,7 +543,8 @@ for model_year in model_years:
                 master_index_file = pd.merge_ordered(master_index_file, missing_weighting_fields_groups, \
                     how='left', on=list(present_matching_categories))
                 del vehghg_file
-            try: #Add in the columns to the master file from the source file
+            try:
+                # Add in the columns to the master file from the source file
                 # master_index_file_with_desired_fields_all_merges = master_index_file.merge( \
                 #     source_file[list(pd.Series(list(matching_categories) + list(all_subarray['Column Name'].unique())).unique())], \
                 #     how='left', on=list(matching_categories)).loc[(master_index_file['WHEEL_BASE_INCHES'].astype(float) - source_file['WHEEL_BASE_INCHES'].astype(float)).abs() <= 0.9].replace([str(np.nan), ''], np.nan)
@@ -545,15 +555,18 @@ for model_year in model_years:
                     if unique_sourcename in 'OEM Towing Guide':
                         OEM_towing_quide_unique_LineageID_list = source_file['LineageID'].unique().tolist()
                 master_index_file_with_desired_fields_all_merges = master_index_file.merge( \
-                # master_index_file_with_desired_fields_all_merges=pd.merge_ordered(master_index_file, \
+            # master_index_file_with_desired_fields_all_merges=pd.merge_ordered(master_index_file, \
                     source_file[list(pd.Series(list(matching_categories) + list(all_subarray['Column Name'].unique())).unique())], \
-                    # how='left', on=list(matching_categories), left_by='WHEELBASE').replace([str(np.nan), ''], np.nan)
+                # how='left', on=list(matching_categories), left_by='WHEELBASE').replace([str(np.nan), ''], np.nan)
                     how='left', on=list(matching_categories)).replace([str(np.nan), ''], np.nan)
             except KeyError: #Master file is missing at least one of the data columns from the source file
                 original_source_columns = list(pd.Series(list(matching_categories)+list(all_subarray['Column Name'].unique())).unique())
                 new_source_columns = list(set(original_source_columns)-(set(original_source_columns)-set(list(source_file.columns))))
-                master_index_file_with_desired_fields_all_merges = master_index_file.merge( \
-                    source_file[list(new_source_columns)],how='left',on=list(matching_categories)).replace([str(np.nan),''], np.nan)
+                try:
+                    master_index_file_with_desired_fields_all_merges = master_index_file.merge( \
+                        source_file[list(new_source_columns)], how='left', on=list(matching_categories)).replace([str(np.nan), ''], np.nan)
+                except KeyError:
+                    print('*** Merging Error ***', matching_categories)
             del source_file
         else:
             master_index_file_with_desired_fields_all_merges = master_index_file.replace([str(np.nan), ''], np.nan)
@@ -565,7 +578,7 @@ for model_year in model_years:
             bounding_field = all_subarray['BoundingField'][all_subarray_count]
             information_toget_source_column_name = all_subarray['Column Name'][all_subarray_count]
             information_toget = all_subarray['Desired Field'][all_subarray_count]
-            if information_toget_source_column_name ==  'City PTEFF_FROM_RLCOEFFS': #'STABILITY CONTROL':
+            if information_toget_source_column_name ==  'City PTEFF_FROM_RLCOEFFS': # 'STABILITY CONTROL':
                 print(information_toget_source_column_name)
             if information_toget_source_column_name not in master_index_file_with_desired_fields_all_merges.columns:
                 print('*** ', information_toget_source_column_name, ' Not found ***')
@@ -801,12 +814,15 @@ for model_year in model_years:
 
     if '_plus_MTH_34' in master_index_filename: Query_filename = 'Query_plus_MTH_34'
     else: Query_filename = 'Query_MTH_012'
+    if ('Drive System Code_all' in query_output.columns):
+        query_output.loc[query_output['Drive System Code_all'] == 'F|A', 'Drive System Code_all'] = 'A|F'
+        query_output.loc[query_output['Drive System Code_all'] == 'R|A', 'Drive System Code_all'] = 'A|R'
+        query_output = query_output.rename({'Drive System Code_all': 'Drive Sys tstcar_all'}, axis=1)
 
-    query_output.loc[query_output['Drive System Code_all'] == 'F|A', 'Drive System Code_all'] = 'A|F'
-    query_output.loc[query_output['Drive System Code_all'] == 'R|A', 'Drive System Code_all'] = 'A|R'
-    query_output=query_output.rename({'Drive System Code_all': 'Drive Sys tstcar_all', 'DRIVE TYPE_all': 'Drive Sys Edmunds_all'}, axis=1)
+    if ('DRIVE TYPE_all' in query_output.columns):
+        query_output = query_output.rename({'DRIVE TYPE_all': 'Drive Sys Edmunds_all'}, axis=1)
 
-    # _airbags = query_output.columns[query_output.columns.str.contains('AIRBAG')].tolist() + ['STABILITY CONTROL_all', 'TRACTION CONTROL_all', 'TIRE PRESSURE MONITORING_all']
+        # _airbags = query_output.columns[query_output.columns.str.contains('AIRBAG')].tolist() + ['STABILITY CONTROL_all', 'TRACTION CONTROL_all', 'TIRE PRESSURE MONITORING_all']
     # for i in range(len(_airbags)):
     #     _airbag = _airbags[i]
     #     query_output.loc[query_output[_airbag] == 'null-|yes', _airbag] = 'yes|null'

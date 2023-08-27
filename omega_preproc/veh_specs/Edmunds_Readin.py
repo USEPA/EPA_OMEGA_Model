@@ -43,14 +43,20 @@ def body_id_checks(Edmunds_Data, Edmunds_matched_bodyid_file_raw, year, base_yea
             _length_df_tmp = [];
             for ik in range (len(df_tmp)):
                 _wheelbase_tmp = float(df_tmp.loc[ik, 'WHEELBASE'].split(' ')[0])
-                if isinstance(df_tmp.loc[ik, 'HEIGHT'], float):
+                if isinstance(df_tmp.loc[ik, 'HEIGHT'], float): continue
                     # print(df_tmp.loc[ik, 'HEIGHT'])
-                    tmp_str = Edmunds_Data.loc[(Edmunds_Data['Model'] == _model_org) & (Edmunds_Data['Trims'] == df_tmp.loc[ik, 'Trims']), 'HEIGHT'].reset_index(drop=True)
-                    if isinstance(tmp_str, float) == False:
-                        df_tmp.loc[ik, 'HEIGHT'] = tmp_str[0];
+                    # tmp_str = Edmunds_Data.loc[(Edmunds_Data['Model'] == _model_org) & (Edmunds_Data['Trims'] == df_tmp.loc[ik, 'Trims']), 'HEIGHT'].reset_index(drop=True)
+                    # if isinstance(tmp_str, float) == False:
+                    #     df_tmp.loc[ik, 'HEIGHT'] = tmp_str[0];
                         # Edmunds_matched_bodyid_null.loc[(Edmunds_matched_bodyid_null['Model'] == _model_org), :].reset_index(drop=True)
                 _height_tmp = float(df_tmp.loc[ik, 'HEIGHT'].split(' ')[0]);
+                if isinstance(df_tmp.loc[ik, 'LENGTH'], float): continue
+                print(i, _model_org, df_tmp.loc[ik, 'Trims'], 'Length = ', df_tmp.loc[ik, 'LENGTH'], '*** edmunds-body file and Edmunds-MY file data matching')
+                    # continue
                 _length_tmp = float(df_tmp.loc[ik, 'LENGTH'].split(' ')[0]);
+                # except KeyError:
+                #     print(i, _model_org, df_tmp.loc[ik, 'Trims'], df_tmp.loc[ik, 'LENGTH'])
+                #     continue
                 if _wheelbase_tmp not in _wheelbase_df_tmp:
                     _wheelbase_df_tmp.append(_wheelbase_tmp);
                     _height_df_tmp.append(_height_tmp);
@@ -184,7 +190,9 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
                    ftp_drivecycle_filename, hwfet_drivecycle_filename, ratedhp_filename, lineageid_filename):
     raw_Edmunds_data = pd.read_csv(rawdata_input_path+'\\'+input_filename, dtype=object, encoding="ISO-8859-1")
     Edmunds_Data = raw_Edmunds_data;
-    if year >= 2022: Edmunds_Data.rename(columns={"RANGE IN MILES (CITY/HWY)": "RANGE IN MILES (CTY/HWY)"}, inplace=True)
+    if ('RANGE IN MILES (CTY/HWY)' not in Edmunds_Data.columns) and ('RANGE IN MILES (CITY/HWY)' in Edmunds_Data.columns):
+        Edmunds_Data.rename(columns={'RANGE IN MILES (CITY/HWY)': 'RANGE IN MILES (CTY/HWY)'}, inplace=True)
+    Edmunds_Data.loc[(Edmunds_Data['BASE ENGINE TYPE'].str.lower() == 'electric') & (Edmunds_Data['RANGE IN MILES (CTY/HWY)'].astype(str) != 'nan'), 'RANGE IN MILES (CTY/HWY)'] = '0/0 mi.'
 
     Edmunds_Data['Model'] = Edmunds_Data['Model'].astype(str)
     Edmunds_Data['ELECTRIC POWER STEERING'] = Edmunds_Data['ELECTRIC POWER STEERING'].replace([False,str(False).upper()], 'NOT EPS')\
@@ -223,10 +231,10 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     Edmunds_matched_bodyid_file_many = Edmunds_matched_bodyid_file_notnone[Edmunds_matched_bodyid_file_notnone['BodyID'] == -9] \
         .drop('BodyID',axis=1).merge(body_id_table[['LineageID', 'BodyID']], how='left', on = 'LineageID').reset_index(drop=True)
     Edmunds_matched_bodyid = pd.concat([Edmunds_matched_bodyid_file_single, Edmunds_matched_bodyid_file_many, Edmunds_matched_bodyid_file_none]).reset_index(drop=True)
-    if year < 2019:
-        Edmunds_matched_bodyid['Model'] = Edmunds_matched_bodyid['Model'].str.upper();
-        l_str = [' SEDAN', ' SUV', ' WAGON', ' CONVERTIBLE', ' COUPE', ' HATCHBACK', ' DIESEL', ' HYBRID', ' MINIVAN'];
-        Edmunds_matched_bodyid['Model'] = Edmunds_matched_bodyid['Model'].str.replace('|'.join(l_str), '', regex=True).str.strip();
+    # if year < 2019:
+    #     Edmunds_matched_bodyid['Model'] = Edmunds_matched_bodyid['Model'].str.upper();
+    #     l_str = [' SEDAN', ' SUV', ' WAGON', ' CONVERTIBLE', ' COUPE', ' HATCHBACK', ' DIESEL', ' HYBRID', ' MINIVAN'];
+    #     Edmunds_matched_bodyid['Model'] = Edmunds_matched_bodyid['Model'].str.replace('|'.join(l_str), '', regex=True).str.strip();
         # Edmunds_data_cleaned = Edmunds_Data.merge(Edmunds_matched_bodyid[['Make', 'Trims', 'LineageID', 'BodyID']], how='left', on=['Make', 'Trims']).reset_index(drop=True);
     Edmunds_data_cleaned = Edmunds_Data.merge(Edmunds_matched_bodyid[['Model', 'Trims', 'LineageID', 'BodyID']], how='left', on = ['Model', 'Trims']).reset_index(drop=True)
     # Edmunds_data_cleaned['BodyID'] = Edmunds_data_cleaned['BodyID'].astype(float)
@@ -373,7 +381,10 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     electrification_category = pd.Series(np.zeros(len(Edmunds_data_cleaned)), name = 'Electrification Category').replace(0,'N')
     electrification_category[Edmunds_data_cleaned['FUEL TYPE'] == 'Electric fuel'] = 'EV'
     electrification_category[(Edmunds_data_cleaned['Trims'].str.contains('electric DD')) | (Edmunds_data_cleaned['Trims'].str.contains('electric 2AM'))] = 'EV'
-    electrification_category[(Edmunds_data_cleaned['BASE ENGINE TYPE'].str.lower() == 'hybrid') & (Edmunds_data_cleaned['RANGE IN MILES (CTY/HWY)'].astype(str) != '0/0 mi.')] = 'HEV'
+    try:
+        electrification_category[(Edmunds_data_cleaned['BASE ENGINE TYPE'].str.lower() == 'hybrid') & (Edmunds_data_cleaned['RANGE IN MILES (CTY/HWY)'].astype(str) != '0/0 mi.')] = 'HEV'
+    except KeyError:
+        print(Edmunds_data_cleaned['RANGE IN MILES (CTY/HWY)'])
     electrification_category[(Edmunds_data_cleaned['BASE ENGINE TYPE'].str.lower() == 'hybrid') & (Edmunds_data_cleaned['RANGE IN MILES (CTY/HWY)'].astype(str) == 'false (electric)')] = 'REEV'
     electrification_category[(Edmunds_data_cleaned['BASE ENGINE TYPE'].str.lower() == 'hybrid') & (Edmunds_data_cleaned['RANGE IN MILES (CTY/HWY)'].astype(str) == '0/0 mi.') ] = 'PHEV'
     electrification_category[Edmunds_data_cleaned['Trims'].str.contains('plug-in')] = 'PHEV';

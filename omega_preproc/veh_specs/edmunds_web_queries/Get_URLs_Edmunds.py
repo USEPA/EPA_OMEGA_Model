@@ -22,12 +22,9 @@ _makers_no_models = ['BYTON'] #, 'Lucid', 'Rivian']
 chromedriver = 'chromedriver.exe'
 os.environ["webdriver.chrome.driver"] = chromedriver
 chromeOptions = Options()
-# chromeOptions = Options()
-# chromeOptions.add_argument("--start-maximized")
 service = Service();
 options = webdriver.ChromeOptions()
 options.add_argument("--start-maximized")
-# driver = webdriver.Chrome(service=service, options=options)
 
 wait_sec = 30
 sleep_short = 0.1
@@ -120,21 +117,11 @@ def Get_URLs_Edmunds(model_year):
     chromedriver = 'chromedriver.exe'
     os.environ["webdriver.chrome.driver"] = chromedriver
     chromeOptions = Options()
-    # caps = DesiredCapabilities().CHROME
-    # caps["pageLoadStrategy"] = "none"
-    # # chromeOptions.add_argument("--kiosk")
-    # chromeOptions.add_argument("--start-maximized")
     service = Service();
     options = webdriver.ChromeOptions()
     options.add_argument("--start-maximized")
 
-    #prefs = {'profile.managed_default_content_settings.images':2}
-    # prefs = {"plugins.plugins_disabled": ["Chrome PDF Viewer"]}
-    #chromeOptions.add_experimental_option('prefs', prefs)
-    #chromeOptions.add_argument("--disable-extensions")
-    # driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions, desired_capabilities=caps)
     time.sleep(sleep_short)
-    # driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
     driver = webdriver.Chrome(service=service, options=options)
 
     time.sleep(sleep_short)
