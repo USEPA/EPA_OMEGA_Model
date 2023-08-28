@@ -58,7 +58,7 @@ from omega_effects.general.input_validation import validate_template_version_inf
 
 class PowertrainCost:
     """
-    **Loads and provides access to maintenance cost input values for effects calculations.**
+    **Loads and provides access to the battery_offsets set via the applicable powertrain_cost input file.**
 
     """
     def __init__(self):
@@ -79,13 +79,19 @@ class PowertrainCost:
         """
         # don't forget to update the module docstring with changes here
         input_template_name = 'powertrain_cost'
-        input_template_version = 0.1
+        # input_template_version = 0.1
+        # input_template_columns = {
+        #     'powertrain_type',
+        #     'item',
+        #     'value',
+        #     'quantity',
+        #     'dollar_basis',
+        # }
+        input_template_version = 0.2
         input_template_columns = {
             'powertrain_type',
-            'item',
+            'system',
             'value',
-            'quantity',
-            'dollar_basis',
         }
 
         df = read_input_file(filepath, effects_log)
@@ -98,24 +104,34 @@ class PowertrainCost:
         df['value'] = df['value'] \
             .apply(lambda x: str.replace(x, 'max(', 'np.maximum(').replace('min(', 'np.minimum('))
 
-        cost_keys = zip(
-            df['powertrain_type'],
-            df['item'],
-        )
+        # cost_keys = zip(
+        #     df['powertrain_type'],
+        #     df['item'],
+        # )
+        df = df.loc[df['system'] == 'battery_offset', :]
+        powertrain_types = df['powertrain_type']
 
-        for cost_key in cost_keys:
+        for powertrain_type in powertrain_types:
+            self._data[powertrain_type] = {}
+            cost_info = df[df['powertrain_type'] == powertrain_type].iloc[0]
 
-            self._data[cost_key] = dict()
-            powertrain_type, item = cost_key
-
-            cost_info = df[(df['powertrain_type'] == powertrain_type) & (df['item'] == item)].iloc[0]
-
-            self._data[cost_key] = {
-                'value': dict(),
-                'quantity': 0,
-                'dollar_adjustment': 1
+            self._data[powertrain_type] = {
+                'value': {}
             }
-            self._data[cost_key]['value'] = compile(str(cost_info['value']), '<string>', 'eval')
+
+            self._data[powertrain_type]['value'] = compile(str(cost_info['value']), '<string>', 'eval')
+
+            # self._data[cost_key] = dict()
+            # powertrain_type, item = cost_key
+            #
+            # cost_info = df[(df['powertrain_type'] == powertrain_type) & (df['item'] == item)].iloc[0]
+            #
+            # self._data[cost_key] = {
+            #     'value': dict(),
+            #     'quantity': 0,
+            #     'dollar_adjustment': 1
+            # }
+            # self._data[cost_key]['value'] = compile(str(cost_info['value']), '<string>', 'eval')
 
     def get_battery_tax_offset(self, year, battery_kwh, powertrain_type):
         """
@@ -131,10 +147,15 @@ class PowertrainCost:
 
         """
         battery_offset = 0
-        battery_offset_dict = eval(self._data[powertrain_type, 'battery_offset']['value'])
-        battery_offset_min_year = min(battery_offset_dict['dollars_per_kwh'].keys())
-        battery_offset_max_year = max(battery_offset_dict['dollars_per_kwh'].keys())
+        battery_offset_dict = eval(self._data[powertrain_type]['value'])
+        battery_offset_min_year = min(battery_offset_dict['dollars_per_kwh'])
+        battery_offset_max_year = max(battery_offset_dict['dollars_per_kwh'])
         if battery_offset_min_year <= year <= battery_offset_max_year:
             battery_offset = battery_offset_dict['dollars_per_kwh'][year] * battery_kwh
+        # battery_offset_dict = eval(self._data[powertrain_type, 'battery_offset']['value'])
+        # battery_offset_min_year = min(battery_offset_dict['dollars_per_kwh'].keys())
+        # battery_offset_max_year = max(battery_offset_dict['dollars_per_kwh'].keys())
+        # if battery_offset_min_year <= year <= battery_offset_max_year:
+        #     battery_offset = battery_offset_dict['dollars_per_kwh'][year] * battery_kwh
 
         return battery_offset
