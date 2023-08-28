@@ -23,7 +23,23 @@ def get_refinery_emission_rate(session_settings, calendar_year):
 
 
 def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, action_dict=None):
+    """
 
+    Args:
+        batch_settings: an instance of the BatchSettings class
+        session_settings: an instance of the SessionSettings class
+        no_action (dict): the no_action physical effects
+        action_dict (dict): the action physical effects, if the current session is an action session
+
+    Returns:
+        The passed physical effects dictionary with refinery inventories included
+
+    Note:
+        For action sessions, both the action and no_action physical effects are needed so that the fuel reductions
+        can be calculated; reduced fuel may or may not result in less refining depending on the
+        general_inputs_for_effects input setting "fuel_reduction_leading_to_reduced_domestic_refining"
+
+    """
     grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, \
         diesel_energy_density_ratio, fuel_reduction_leading_to_reduced_domestic_refining = \
         get_inputs_for_effects(batch_settings)

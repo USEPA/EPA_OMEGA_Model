@@ -168,6 +168,7 @@ def main():
             session_fleet_physical = {**analysis_fleet_physical, **legacy_fleet_physical}
 
             # calculate refinery emission inventories
+            effects_log.logwrite(f'\nCalculating refinery inventories for {session_name}')
             if session_settings.session_policy == 'no_action':
                 session_fleet_physical = calc_refinery_inventory(
                     batch_settings, session_settings, session_fleet_physical
@@ -184,16 +185,18 @@ def main():
                     sys.exit()
 
             # calculate egu emission inventories
+            effects_log.logwrite(f'Calculating EGU inventories for {session_name}')
             session_fleet_physical = calc_egu_inventory(batch_settings, session_settings, session_fleet_physical)
 
             # calculate final (total) inventories
+            effects_log.logwrite(f'Calculating total inventories for {session_name}')
             session_fleet_physical = calc_total_inventory(session_fleet_physical)
 
             session_fleet_physical_df = \
                 pd.DataFrame.from_dict(session_fleet_physical, orient='index').reset_index(drop=True)
 
             if batch_settings.save_vehicle_physical_effects_files:
-                effects_log.logwrite(f'Saving physical effects file for {session_name}')
+                effects_log.logwrite(f'\nSaving physical effects file for {session_name}')
                 save_file(session_settings, session_fleet_physical_df, path_of_run_folder, 'physical_effects',
                           effects_log, extension=batch_settings.file_format)
 
@@ -357,13 +360,13 @@ def main():
             path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', index=False
         )
         vehicle_inventory_details_df.to_csv(
-            path_of_run_folder / f'{start_time_readable}_vehicle_inventory_details.csv', index=False
+            path_of_run_folder / f'{start_time_readable}_vehicle_emission_rate_details.csv', index=False
         )
         egu_inventory_details_df.to_csv(
             path_of_run_folder / f'{start_time_readable}_egu_inventory_details.csv', index=False
         )
         refinery_inventory_details_df.to_csv(
-            path_of_run_folder / f'{start_time_readable}_refinery_inventory_details.csv', index=False
+            path_of_run_folder / f'{start_time_readable}_refinery_emission_rate_details.csv', index=False
         )
 
         # add identifying info to CSV files ____________________________________________________________________________
@@ -385,9 +388,9 @@ def main():
                           output_file_id_info)
         add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv', output_file_id_info)
         add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', output_file_id_info)
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_vehicle_inventory_details.csv', output_file_id_info)
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_vehicle_emission_rate_details.csv', output_file_id_info)
         add_id_to_csv(path_of_run_folder / f'{start_time_readable}_egu_inventory_details.csv', output_file_id_info)
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_refinery_inventory_details.csv', output_file_id_info)
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_refinery_emission_rate_details.csv', output_file_id_info)
 
     except Exception as e:
         effects_log.logwrite(f'*** {e} ***\n{traceback.format_exc()}\n', stamp=True)

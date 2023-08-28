@@ -251,6 +251,7 @@ class BatchSettings:
         self.congestion_noise_cost_factors_file \
             = self.get_attribute_value(('Context Congestion-Noise Cost Factors File', 'all'), 'full_path')
         self.legacy_fleet_file = self.get_attribute_value(('Context Legacy Fleet File', 'all'), 'full_path')
+        self.cpi_deflators_file = self.get_attribute_value(('Context CPI Price Deflators File', 'all'), 'full_path')
 
         self.context_session_name = self.get_attribute_value(('Session Name', 'context'), 'value')
         path_context_in = self.batch_folder / f'_{self.context_session_name}' / 'in'
@@ -262,13 +263,6 @@ class BatchSettings:
         try:
             find_string = 'implicit_price_deflators'
             self.ip_deflators_file = self.find_file(path_context_in, find_string)
-        except FileNotFoundError:
-            effects_log.logwrite(f'{path_context_in} does not contain a {find_string} file.')
-            sys.exit()
-
-        try:
-            find_string = 'cpi_price_deflators'
-            self.cpi_deflators_file = self.find_file(path_context_in, find_string)
         except FileNotFoundError:
             effects_log.logwrite(f'{path_context_in} does not contain a {find_string} file.')
             sys.exit()

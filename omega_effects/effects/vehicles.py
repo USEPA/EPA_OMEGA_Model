@@ -481,7 +481,7 @@ class Vehicles:
             Vehicle attributes by vehicle id and attribute name(s).
 
         """
-        attribute_list = list()
+        attribute_list = []
         for attribute_name in attribute_names:
             attribute_list.append(self._dict[vehicle_id][attribute_name])
         if len(attribute_list) == 1:

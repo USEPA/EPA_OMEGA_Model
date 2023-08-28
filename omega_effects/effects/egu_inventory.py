@@ -33,7 +33,17 @@ def get_egu_emission_rate(session_settings, calendar_year, kwh_consumption, kwh_
 
 
 def calc_egu_inventory(batch_settings, session_settings, physical_effects_dict):
+    """
 
+    Args:
+        batch_settings: an instance of the BatchSettings class
+        session_settings: an instance of the SessionSettings class
+        physical_effects_dict (dict): the physical effects for which to calculate EGU inventories
+
+    Returns:
+        The passed physical effects dictionary with EGU inventories included
+
+    """
     grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, \
         diesel_energy_density_ratio, fuel_reduction_leading_to_reduced_domestic_refining = \
         get_inputs_for_effects(batch_settings)
