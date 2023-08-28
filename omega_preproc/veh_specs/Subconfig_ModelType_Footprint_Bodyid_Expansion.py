@@ -1900,6 +1900,12 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                 #     print('# of TARGET_COEF_BEST_MTH = 4 (', len(vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['TARGET_COEF_BEST_MTH'] == 4]), ')')
                 #     print('# of TARGET_COEF_A_BEST (', (~pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A_BEST'])).sum(), ')')
                 #     print('')
+                _set_coefs_abc = ['SET_COEF_A', 'SET_COEF_B', 'SET_COEF_C']
+                for i in range(len(_set_coefs_abc)):
+                    _set_coef_A = _set_coefs_abc[i]
+                    _set_coef_A_best = _set_coef_A + '_BEST'
+                    _idx_set_coefs_best_nulls = vehghg_file_nonflexfuel.loc[(pd.notnull(vehghg_file_nonflexfuel[_set_coef_A])) & (pd.isnull(vehghg_file_nonflexfuel[_set_coef_A_best])), _set_coef_A].index
+                    vehghg_file_nonflexfuel.loc[_idx_set_coefs_best_nulls, _set_coef_A_best] = vehghg_file_nonflexfuel.loc[_idx_set_coefs_best_nulls, _set_coef_A]
 
                 df_target_coef_corr = vehghg_file_nonflexfuel.loc[(~pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A_SURRO']) == True) & \
                     (~pd.isnull(vehghg_file_nonflexfuel['TOT_ROAD_LOAD_HP_SURRO']) == True), _target_coef_surro_indexing_category]
