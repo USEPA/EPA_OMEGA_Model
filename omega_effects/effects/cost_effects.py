@@ -130,7 +130,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                 if v['battery_kwh'] > 0:
                     battery_cost_dollars_per_kwh = battery_cost_dollars / v['battery_kwh']
 
-                if powertrain_type and v['battery_kwh_per_veh'] >= 7:
+                if powertrain_type in ['BEV', 'PHEV'] and v['battery_kwh_per_veh'] >= 7:
                     battery_credit_dollars = \
                         session_settings.powertrain_cost.get_battery_tax_offset(
                             v['model_year'], v['battery_kwh'], powertrain_type
@@ -183,7 +183,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
             )
             repair_cost_dollars = repair_cost_per_mile * v['vmt']
 
-            # refueling costs
+            # refueling costs for time spent during mid-trip refueling events (assume PHEVs do not recharge mid-trip)
             if powertrain_type == 'BEV':
                 if (operating_veh_type, charge_depleting_range) in refueling_bev_dict:
                     refueling_cost_per_mile = refueling_bev_dict[(operating_veh_type, charge_depleting_range)]
