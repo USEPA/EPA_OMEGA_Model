@@ -389,7 +389,7 @@ class DriveCycleWeights(OMEGABase):
 
         phev_batt_kwh = cycle_values['battery_kwh']
         usable_battery_capacity_norm = cycle_values['usable_battery_capacity_norm']
-        phev_cd_battery_kwh = phev_batt_kwh * usable_battery_capacity_norm ** 2
+        phev_cd_battery_kwh = phev_batt_kwh * usable_battery_capacity_norm
 
         cd_ftp_kwh_per_mile = \
             DriveCycleWeights.calc_weighted_value(calendar_year, 'PHEV', cycle_values, 'cd_ftp_kwh', weighted=False)
