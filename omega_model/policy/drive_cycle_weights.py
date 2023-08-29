@@ -301,6 +301,9 @@ class DriveCycleWeights(OMEGABase):
             A pandas ``Series`` object of the weighted results
 
         """
+
+        utility_factor = 0
+
         if fueling_class == 'PHEV':
             ftp_cd_uf, hwfet_cd_uf, us06_uf = DriveCycleWeights.calc_phev_utility_factors(calendar_year, cycle_values)
 
@@ -347,6 +350,20 @@ class DriveCycleWeights(OMEGABase):
                 cert_direct_oncycle_kwh_per_mile = \
                     DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, phev_cycle_values,
                                                           'cs_cert_direct_oncycle_kwh_per_mile', weighted=False)
+
+                # calculate weight utility factor
+                phev_cycle_values['cs_ftp_1:cert_direct_oncycle_kwh_per_mile'] = ftp_cd_uf
+                phev_cycle_values['cs_ftp_2:cert_direct_oncycle_kwh_per_mile'] = ftp_cd_uf
+                phev_cycle_values['cs_ftp_3:cert_direct_oncycle_kwh_per_mile'] = ftp_cd_uf
+                phev_cycle_values['cs_ftp_4:cert_direct_oncycle_kwh_per_mile'] = ftp_cd_uf
+                phev_cycle_values['cs_hwfet:cert_direct_oncycle_kwh_per_mile'] = hwfet_cd_uf
+                phev_cycle_values['cs_us06_1:cert_direct_oncycle_kwh_per_mile'] = us06_uf
+                phev_cycle_values['cs_us06_2:cert_direct_oncycle_kwh_per_mile'] = us06_uf
+
+                utility_factor = \
+                    DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, phev_cycle_values,
+                                                          'cs_cert_direct_oncycle_kwh_per_mile', weighted=False)
+
         else:
             cert_direct_oncycle_kwh_per_mile = \
                 DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
@@ -355,7 +372,7 @@ class DriveCycleWeights(OMEGABase):
         kwh_per_mile_scale = np.interp(calendar_year, omega_globals.options.kwh_per_mile_scale_years,
                                       omega_globals.options.kwh_per_mile_scale)
 
-        return cert_direct_oncycle_kwh_per_mile * kwh_per_mile_scale
+        return cert_direct_oncycle_kwh_per_mile * kwh_per_mile_scale, utility_factor
 
     @staticmethod
     def calc_phev_utility_factors(calendar_year, cycle_values):
