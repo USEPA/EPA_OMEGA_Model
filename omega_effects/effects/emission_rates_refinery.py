@@ -59,10 +59,11 @@ class EmissionRatesRefinery:
 
     """
     def __init__(self):
-        self._data = dict()  # private dict
-        self._cache = dict()
+        self._data = {}  # private dict
+        self._cache = {}
         self.calendar_year_max = None
-        self.deets = {}  # this dictionary will not include the legacy fleet
+        self.deets = {}
+        self.rate_names = []
 
     def init_from_file(self, filepath, effects_log):
         """
@@ -95,6 +96,8 @@ class EmissionRatesRefinery:
         validate_template_column_names(filepath, df, input_template_columns, effects_log)
 
         df.set_index(df['rate_name'], inplace=True)
+
+        self.rate_names = [rate_name for rate_name in df['rate_name'].unique()]
 
         self.calendar_year_max = df['last_year'][0]
 

@@ -47,8 +47,8 @@ class VehiclePhysicalData:
         self.vmt = 0
         self.annual_vmt_rebound = 0
         self.vmt_rebound = 0
-        self.vmt_liquid_fuel = 0
-        self.vmt_electricity = 0
+        # self.vmt_liquid_fuel = 0
+        # self.vmt_electricity = 0
         self.battery_kwh = 0
         self.battery_kwh_per_veh = 0
         self.onroad_direct_co2e_grams_per_mile = 0
@@ -109,26 +109,6 @@ class VehiclePhysicalData:
         self.butadiene13_exh_rate = 0
         self.pah15_exh_rate = 0
 
-        self.voc_ref_rate = 0
-        self.co_ref_rate = 0
-        self.nox_ref_rate = 0
-        self.pm25_ref_rate = 0
-        self.sox_ref_rate = 0
-        self.co2_ref_rate = 0
-        self.ch4_ref_rate = 0
-        self.n2o_ref_rate = 0
-
-        self.voc_egu_rate = 0
-        self.co_egu_rate = 0
-        self.nox_egu_rate = 0
-        self.pm25_egu_rate = 0
-        self.sox_egu_rate = 0
-        self.co2_egu_rate = 0
-        self.ch4_egu_rate = 0
-        self.n2o_egu_rate = 0
-        self.hcl_egu_rate = 0
-        self.hg_egu_rate = 0
-
     def update_value(self, update_dict):
         """
 
@@ -143,7 +123,7 @@ class VehiclePhysicalData:
             self.__setattr__(k, v)
 
 
-def calc_vehicle_physical_effects(vpd):
+def calc_vehicle_inventory(vpd):
     """
 
     Args:
@@ -214,61 +194,6 @@ def calc_vehicle_physical_effects(vpd):
 
     pm25_veh_ustons = pm25_exh_ustons + pm25_brakewear_ustons + pm25_tirewear_ustons
 
-    # calc upstream emissions for both liquid and electric fuel operation
-    kwhs, gallons = vpd.fuel_generation_kwh, vpd.fuel_consumption_gallons
-    ref_factor = vpd.fuel_reduction_leading_to_reduced_domestic_refining * vpd.pure_share
-
-    voc_refinery_ustons = gallons * vpd.voc_ref_rate * ref_factor / vpd.grams_per_us_ton
-    co_refinery_ustons = gallons * vpd.co_ref_rate * ref_factor / vpd.grams_per_us_ton
-    nox_refinery_ustons = gallons * vpd.nox_ref_rate * ref_factor / vpd.grams_per_us_ton
-    pm25_refinery_ustons = gallons * vpd.pm25_ref_rate * ref_factor / vpd.grams_per_us_ton
-    sox_refinery_ustons = gallons * vpd.sox_ref_rate * ref_factor / vpd.grams_per_us_ton
-
-    voc_egu_ustons = kwhs * vpd.voc_egu_rate / vpd.grams_per_us_ton
-    co_egu_ustons = kwhs * vpd.co_egu_rate / vpd.grams_per_us_ton
-    nox_egu_ustons = kwhs * vpd.nox_egu_rate / vpd.grams_per_us_ton
-    pm25_egu_ustons = kwhs * vpd.pm25_egu_rate / vpd.grams_per_us_ton
-    sox_egu_ustons = kwhs * vpd.sox_egu_rate / vpd.grams_per_us_ton
-    hcl_egu_ustons = kwhs * vpd.hcl_egu_rate / vpd.grams_per_us_ton
-    hg_egu_ustons = kwhs * vpd.hg_egu_rate / vpd.grams_per_us_ton
-
-    voc_upstream_ustons = voc_refinery_ustons + voc_egu_ustons
-    co_upstream_ustons = co_refinery_ustons + co_egu_ustons
-    nox_upstream_ustons = nox_refinery_ustons + nox_egu_ustons
-    pm25_upstream_ustons = pm25_refinery_ustons + pm25_egu_ustons
-    sox_upstream_ustons = sox_refinery_ustons + sox_egu_ustons
-
-    co2_refinery_metrictons = gallons * vpd.co2_ref_rate * ref_factor / vpd.grams_per_metric_ton
-    ch4_refinery_metrictons = gallons * vpd.ch4_ref_rate * ref_factor / vpd.grams_per_metric_ton
-    n2o_refinery_metrictons = gallons * vpd.n2o_ref_rate * ref_factor / vpd.grams_per_metric_ton
-
-    co2_egu_metrictons = kwhs * vpd.co2_egu_rate / vpd.grams_per_metric_ton
-    ch4_egu_metrictons = kwhs * vpd.ch4_egu_rate / vpd.grams_per_metric_ton
-    n2o_egu_metrictons = kwhs * vpd.n2o_egu_rate / vpd.grams_per_metric_ton
-
-    co2_upstream_metrictons = co2_refinery_metrictons + co2_egu_metrictons
-    ch4_upstream_metrictons = ch4_refinery_metrictons + ch4_egu_metrictons
-    n2o_upstream_metrictons = n2o_refinery_metrictons + n2o_egu_metrictons
-
-    # sum vehicle and upstream into totals
-    voc_total_ustons = voc_upstream_ustons  # + voc_tailpipe_ustons
-    nmog_total_ustons = nmog_veh_ustons  # + nmog_upstream_ustons
-    co_total_ustons = co_veh_ustons + co_upstream_ustons
-    nox_total_ustons = nox_veh_ustons + nox_upstream_ustons
-    pm25_total_ustons = pm25_veh_ustons + pm25_upstream_ustons
-    sox_total_ustons = sox_veh_ustons + sox_upstream_ustons
-    acetaldehyde_total_ustons = acetaldehyde_veh_ustons  # + acetaldehyde_upstream_ustons
-    acrolein_total_ustons = acrolein_veh_ustons  # + acrolein_upstream_ustons
-    benzene_total_ustons = benzene_veh_ustons  # + benzene_upstream_ustons
-    ethylbenzene_total_ustons = ethylbenzene_veh_ustons  # + ethylbenzene_upstream_ustons
-    formaldehyde_total_ustons = formaldehyde_veh_ustons  # + formaldehyde_upstream_ustons
-    naphthalene_total_ustons = naphthalene_veh_ustons  # + naphlathene_upstream_ustons
-    butadiene13_total_ustons = butadiene13_veh_ustons  # + butadiene13_upstream_ustons
-    pah15_total_ustons = pah15_veh_ustons  # + pah15_upstream_ustons
-    co2_total_metrictons = co2_veh_metrictons + co2_upstream_metrictons
-    ch4_total_metrictons = ch4_veh_metrictons + ch4_upstream_metrictons
-    n2o_total_metrictons = n2o_veh_metrictons + n2o_upstream_metrictons
-
     # calc energy security related attributes and comparisons to year_for_compares
     oil_bbl = vpd.fuel_consumption_gallons * vpd.pure_share * vpd.energy_density_ratio / vpd.gal_per_bbl
     imported_oil_bbl = oil_bbl * vpd.energy_security_import_factor
@@ -301,8 +226,8 @@ def calc_vehicle_physical_effects(vpd):
         'vmt': vpd.vmt,
         'annual_vmt_rebound': vpd.annual_vmt_rebound,
         'vmt_rebound': vpd.vmt_rebound,
-        'vmt_liquid_fuel': vpd.vmt_liquid_fuel,
-        'vmt_electricity': vpd.vmt_electricity,
+        # 'vmt_liquid_fuel': vpd.vmt_liquid_fuel,
+        # 'vmt_electricity': vpd.vmt_electricity,
         'battery_kwh': vpd.battery_kwh,  # note: this is kwh/veh * registered_count
         'battery_kwh_per_veh': vpd.battery_kwh_per_veh,  # this is kwh/veh - used for battery tax credit
         'onroad_direct_co2e_grams_per_mile': vpd.onroad_direct_co2e_grams_per_mile,
@@ -344,61 +269,61 @@ def calc_vehicle_physical_effects(vpd):
         'naphthalene_exhaust_ustons': naphthalene_exh_ustons,
         'naphthalene_evaporative_ustons': naphthalene_evap_ustons,
         'naphthalene_vehicle_ustons': naphthalene_veh_ustons,
-        'butadiene13_vehicle_ustons': butadiene13_veh_ustons,
-        'pah15_vehicle_ustons': pah15_veh_ustons,
+        '13_butadiene_vehicle_ustons': butadiene13_veh_ustons,
+        '15pah_vehicle_ustons': pah15_veh_ustons,
 
         'ch4_vehicle_metrictons': ch4_veh_metrictons,
         'n2o_vehicle_metrictons': n2o_veh_metrictons,
         'co2_vehicle_metrictons': co2_veh_metrictons,
 
-        'voc_refinery_ustons': voc_refinery_ustons,
-        'co_refinery_ustons': co_refinery_ustons,
-        'nox_refinery_ustons': nox_refinery_ustons,
-        'pm25_refinery_ustons': pm25_refinery_ustons,
-        'sox_refinery_ustons': sox_refinery_ustons,
+        'voc_refinery_ustons': 0,
+        'co_refinery_ustons': 0,
+        'nox_refinery_ustons': 0,
+        'pm25_refinery_ustons': 0,
+        'sox_refinery_ustons': 0,
 
-        'voc_egu_ustons': voc_egu_ustons,
-        'co_egu_ustons': co_egu_ustons,
-        'nox_egu_ustons': nox_egu_ustons,
-        'pm25_egu_ustons': pm25_egu_ustons,
-        'sox_egu_ustons': sox_egu_ustons,
-        'hcl_egu_ustons': hcl_egu_ustons,
-        'hg_egu_ustons': hg_egu_ustons,
+        'voc_egu_ustons': 0,
+        'co_egu_ustons': 0,
+        'nox_egu_ustons': 0,
+        'pm25_egu_ustons': 0,
+        'sox_egu_ustons': 0,
+        'hcl_egu_ustons': 0,
+        'hg_egu_ustons': 0,
 
-        'voc_upstream_ustons': voc_upstream_ustons,
-        'co_upstream_ustons': co_upstream_ustons,
-        'nox_upstream_ustons': nox_upstream_ustons,
-        'pm25_upstream_ustons': pm25_upstream_ustons,
-        'sox_upstream_ustons': sox_upstream_ustons,
+        'voc_upstream_ustons': 0,
+        'co_upstream_ustons': 0,
+        'nox_upstream_ustons': 0,
+        'pm25_upstream_ustons': 0,
+        'sox_upstream_ustons': 0,
 
-        'ch4_refinery_metrictons': ch4_refinery_metrictons,
-        'n2o_refinery_metrictons': n2o_refinery_metrictons,
-        'co2_refinery_metrictons': co2_refinery_metrictons,
+        'ch4_refinery_metrictons': 0,
+        'n2o_refinery_metrictons': 0,
+        'co2_refinery_metrictons': 0,
 
-        'ch4_egu_metrictons': ch4_egu_metrictons,
-        'n2o_egu_metrictons': n2o_egu_metrictons,
-        'co2_egu_metrictons': co2_egu_metrictons,
+        'ch4_egu_metrictons': 0,
+        'n2o_egu_metrictons': 0,
+        'co2_egu_metrictons': 0,
 
-        'ch4_upstream_metrictons': ch4_upstream_metrictons,
-        'n2o_upstream_metrictons': n2o_upstream_metrictons,
-        'co2_upstream_metrictons': co2_upstream_metrictons,
+        'ch4_upstream_metrictons': 0,
+        'n2o_upstream_metrictons': 0,
+        'co2_upstream_metrictons': 0,
 
-        'nmog_and_voc_total_ustons': nmog_total_ustons + voc_total_ustons,
-        'co_total_ustons': co_total_ustons,
-        'nox_total_ustons': nox_total_ustons,
-        'pm25_total_ustons': pm25_total_ustons,
-        'sox_total_ustons': sox_total_ustons,
-        'acetaldehyde_total_ustons': acetaldehyde_total_ustons,
-        'acrolein_total_ustons': acrolein_total_ustons,
-        'benzene_total_ustons': benzene_total_ustons,
-        'ethylbenzene_total_ustons': ethylbenzene_total_ustons,
-        'formaldehyde_total_ustons': formaldehyde_total_ustons,
-        'naphthalene_total_ustons': naphthalene_total_ustons,
-        '13_butadiene_total_ustons': butadiene13_total_ustons,
-        '15pah_total_ustons': pah15_total_ustons,
-        'co2_total_metrictons': co2_total_metrictons,
-        'ch4_total_metrictons': ch4_total_metrictons,
-        'n2o_total_metrictons': n2o_total_metrictons,
+        'nmog_and_voc_total_ustons': 0,
+        'co_total_ustons': 0,
+        'nox_total_ustons': 0,
+        'pm25_total_ustons': 0,
+        'sox_total_ustons': 0,
+        'acetaldehyde_total_ustons': 0,
+        'acrolein_total_ustons': 0,
+        'benzene_total_ustons': 0,
+        'ethylbenzene_total_ustons': 0,
+        'formaldehyde_total_ustons': 0,
+        'naphthalene_total_ustons': 0,
+        '13_butadiene_total_ustons': 0,
+        '15pah_total_ustons': 0,
+        'co2_total_metrictons': 0,
+        'ch4_total_metrictons': 0,
+        'n2o_total_metrictons': 0,
     }
 
     return results_dict

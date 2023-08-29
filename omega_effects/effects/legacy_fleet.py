@@ -307,22 +307,27 @@ class LegacyFleet:
             self.adjusted_legacy_fleet[(v['vehicle_id'], v['calendar_year'])] = update_dict
 
     @staticmethod
-    def set_legacy_fleet_name(market_class_id):
+    def set_legacy_fleet_name(vehicle_id, market_class_id, fueling_class):
         """
 
         Args:
-            market_class_id: the legacy fleet market class id
+            vehicle_id (int): the vehicle id number
+            market_class_id (str): the legacy fleet market class id
+            fueling_class (str): 'BEV', 'ICE', 'PHEV'
 
         Returns:
             A name for the vehicle primarily for use in cost_effects, repair cost calculations which looks for
             'car' or 'Pickup' in the name attribute
 
+        Note:
+            This method is called in safety_effects.calc_legacy_fleet_safety_effects
+
         """
         if 'sedan' in market_class_id:
-            _name = 'car'
+            _name = f'car:{fueling_class}:{vehicle_id}'
         elif 'pickup' in market_class_id:
-            _name = 'Pickup'
+            _name = f'Pickup:{fueling_class}:{vehicle_id}'
         else:
-            _name = 'cuv_suv'
+            _name = f'cuv_suv:{fueling_class}:{vehicle_id}'
 
         return _name

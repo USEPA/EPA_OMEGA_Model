@@ -166,8 +166,6 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
             oper_attrs_list = [
                 'vmt',
                 'vmt_rebound',
-                'vmt_liquid_fuel',
-                'vmt_electricity',
                 'fuel_consumption_kwh',
                 'fuel_consumption_gallons',
             ]
@@ -288,8 +286,8 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 'naphthalene_exhaust_ustons',
                 'naphthalene_evaporative_ustons',
                 'naphthalene_vehicle_ustons',
-                'butadiene13_vehicle_ustons',
-                'pah15_vehicle_ustons',
+                '13_butadiene_vehicle_ustons',
+                '15pah_vehicle_ustons',
             ]
             for toxic in toxics_list:
                 toxics_tons_dict[toxic] = physical_na[toxic] - physical_a[toxic]
@@ -520,8 +518,6 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 'fueling_class': fueling_class,
                 'vmt': - oper_attrs_dict['vmt'],
                 'vmt_rebound': - oper_attrs_dict['vmt_rebound'],
-                'vmt_liquid_fuel': - oper_attrs_dict['vmt_liquid_fuel'],
-                'vmt_electricity': - oper_attrs_dict['vmt_electricity'],
                 'fuel_consumption_kwh': - oper_attrs_dict['fuel_consumption_kwh'],
                 'fuel_consumption_gallons': - oper_attrs_dict['fuel_consumption_gallons'],
                 'barrels_of_oil': - oil_barrels,
@@ -580,8 +576,8 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 'naphthalene_exhaust_ustons': - toxics_tons_dict['naphthalene_exhaust_ustons'],
                 'naphthalene_evaporative_ustons': - toxics_tons_dict['naphthalene_evaporative_ustons'],
                 'naphthalene_vehicle_ustons': - toxics_tons_dict['naphthalene_vehicle_ustons'],
-                'butadiene13_vehicle_ustons': - toxics_tons_dict['butadiene13_vehicle_ustons'],
-                'pah15_vehicle_ustons': - toxics_tons_dict['pah15_vehicle_ustons'],
+                '13_butadiene_vehicle_ustons': - toxics_tons_dict['13_butadiene_vehicle_ustons'],
+                '15pah_vehicle_ustons': - toxics_tons_dict['15pah_vehicle_ustons'],
             }
 
         if flag:

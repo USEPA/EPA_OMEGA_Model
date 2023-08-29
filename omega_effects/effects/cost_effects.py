@@ -77,9 +77,10 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
             congestion_cost_dollars = noise_cost_dollars = 0
             maintenance_cost_dollars = repair_cost_dollars = 0
             refueling_cost_dollars = drive_value_cost_dollars = 0
-            bev_flag = phev_flag = hev_flag = mhev_flag = 0
+            # bev_flag = phev_flag = hev_flag = mhev_flag = 0
             battery_credit_dollars = 0
             discount_rate = 0
+            powertrain_type = None
 
             if v['vehicle_id'] not in vehicle_info_dict:
                 if v['vehicle_id'] < batch_settings.legacy_fleet.legacy_fleet_vehicle_id_start:
@@ -88,10 +89,6 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                         'price_dollars',
                         'price_modification_dollars',
                         'battery_cost',
-                        'bev',
-                        'phev',
-                        'hev',
-                        'mhev',
                         'charge_depleting_range_mi',
                     ]
                     vehicle_info_dict[v['vehicle_id']] = \
@@ -103,23 +100,26 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                     battery_cost = 0  # this won't matter for legacy fleet since calculated only for age==0
                     charge_depleting_range = 0
                     if v['base_year_powertrain_type'] == 'BEV':
-                        bev_flag = 1
                         charge_depleting_range = 300  # this is for legacy fleet only
-                    elif v['base_year_powertrain_type'] == 'PHEV':
-                        phev_flag = 1
-                    elif v['base_year_powertrain_type'] == 'HEV':
-                        hev_flag = 1
-                    elif v['base_year_powertrain_type'] == 'MHEV':
-                        mhev_flag = 1
-                    else:
-                        pass
-                    vehicle_info_dict[v['vehicle_id']] = \
-                        avg_mfr_cost, avg_purchase_price, avg_purchase_credit, battery_cost, \
-                            bev_flag, phev_flag, hev_flag, mhev_flag, charge_depleting_range
 
-            avg_mfr_cost, avg_purchase_price, avg_purchase_credit, battery_cost, \
-                bev_flag, phev_flag, hev_flag, mhev_flag, charge_depleting_range = \
-                vehicle_info_dict[v['vehicle_id']]
+                    vehicle_info_dict[v['vehicle_id']] = [
+                        avg_mfr_cost, avg_purchase_price, avg_purchase_credit, battery_cost, charge_depleting_range
+                    ]
+
+                if 'BEV' in v['name']:
+                    powertrain_type = 'BEV'
+                elif 'PHEV' in v['name']:
+                    powertrain_type = 'PHEV'
+                elif 'HEV' in v['name']:
+                    powertrain_type = 'HEV'
+                else:
+                    powertrain_type = 'ICE'
+
+                vehicle_info_dict[v['vehicle_id']].append(powertrain_type)
+
+            [avg_mfr_cost, avg_purchase_price, avg_purchase_credit, battery_cost, charge_depleting_range,
+             powertrain_type
+             ] = vehicle_info_dict[v['vehicle_id']]
 
             # tech costs, only for age=0
             if v['age'] == 0:
@@ -130,12 +130,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                 if v['battery_kwh'] > 0:
                     battery_cost_dollars_per_kwh = battery_cost_dollars / v['battery_kwh']
 
-                powertrain_type = None
-                if bev_flag == 1:
-                    powertrain_type = 'BEV'
-                elif phev_flag == 1:
-                    powertrain_type = 'PHEV'
-                if powertrain_type and v['battery_kwh_per_veh'] >= 7:
+                if powertrain_type in ['BEV', 'PHEV'] and v['battery_kwh_per_veh'] >= 7:
                     battery_credit_dollars = \
                         session_settings.powertrain_cost.get_battery_tax_offset(
                             v['model_year'], v['battery_kwh'], powertrain_type
@@ -164,14 +159,6 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                 fuel_retail_cost_dollars += retail_price * v['fuel_consumption_gallons']
                 fuel_pretax_cost_dollars += pretax_price * v['fuel_consumption_gallons']
 
-            # maintenance costs
-            powertrain_type = 'ICE'
-            if bev_flag == 1:
-                powertrain_type = 'BEV'
-            elif phev_flag == 1:
-                powertrain_type = 'PHEV'
-            elif hev_flag == 1 or mhev_flag == 1:
-                powertrain_type = 'HEV'
             slope, intercept = get_maintenance_cost(batch_settings, powertrain_type)
             maintenance_cost_per_mile = slope * v['odometer'] + intercept
             maintenance_cost_dollars = maintenance_cost_per_mile * v['vmt']
@@ -196,15 +183,15 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
             )
             repair_cost_dollars = repair_cost_per_mile * v['vmt']
 
-            # refueling costs
-            if bev_flag == 1:
+            # refueling costs for time spent during mid-trip refueling events (assume PHEVs do not recharge mid-trip)
+            if powertrain_type == 'BEV':
                 if (operating_veh_type, charge_depleting_range) in refueling_bev_dict:
                     refueling_cost_per_mile = refueling_bev_dict[(operating_veh_type, charge_depleting_range)]
                 else:
                     refueling_cost_per_mile \
-                        = batch_settings.refueling_cost.calc_bev_refueling_cost_per_mile(operating_veh_type,
-                                                                                         charge_depleting_range
-                                                                                         )
+                        = batch_settings.refueling_cost.calc_bev_refueling_cost_per_mile(
+                        operating_veh_type, charge_depleting_range
+                    )
                     refueling_bev_dict.update({(operating_veh_type, charge_depleting_range): refueling_cost_per_mile})
                 refueling_cost_dollars = refueling_cost_per_mile * v['vmt']
             else:
@@ -259,8 +246,6 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                 'annual_vmt': v['annual_vmt'],
                 'odometer': v['odometer'],
                 'vmt': v['vmt'],
-                'vmt_liquid_fuel': v['vmt_liquid_fuel'],
-                'vmt_electricity': v['vmt_electricity'],
                 'battery_kwh': v['battery_kwh'],
                 'vehicle_cost_dollars': mfr_cost_dollars,
                 'battery_cost_dollars': battery_cost_dollars,
