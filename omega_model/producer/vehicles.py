@@ -765,7 +765,8 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'base_year_msrp_dollars', 'battery_kwh', 'motor_kw', 'charge_depleting_range_mi',
                        'prior_redesign_year', 'redesign_interval', 'in_production', 'base_year_product',
                        'workfactor', 'gvwr_lbs', 'gcwr_lbs', 'base_year_workfactor', 'base_year_gvwr_lbs',
-                       'base_year_gcwr_lbs', 'cert_utility_factor', 'onroad_utility_factor')
+                       'base_year_gcwr_lbs', 'cert_utility_factor', 'onroad_utility_factor',
+                       'battery_sizing_onroad_direct_kwh_per_mile')
 
     # transfer base properties
     for attr in base_properties:
@@ -878,6 +879,7 @@ class Vehicle(OMEGABase):
         self.charge_depleting_range_mi = 0
         self.cert_utility_factor = 0
         self.onroad_utility_factor = 0
+        self.battery_sizing_onroad_direct_kwh_per_mile = 0
         self.workfactor = 0
         self.gvwr_lbs = 0
         self.gcwr_lbs = 0
@@ -1060,8 +1062,14 @@ class Vehicle(OMEGABase):
             cloud['onroad_direct_oncycle_kwh_per_mile'] - \
             cloud['cert_direct_offcycle_kwh_per_mile']
 
-        # calc onroad_direct values
+        # calc onroad_direct values and save/restore battery sizing onroad direct kwh per mile, which gets overwritten
+        if 'battery_sizing_onroad_direct_kwh_per_mile' in cloud:
+            battery_sizing_onroad_direct_kwh_per_mile = cloud['battery_sizing_onroad_direct_kwh_per_mile']
+
         VehicleOnroadCalculations.perform_onroad_calculations(self, cloud)
+
+        if 'battery_sizing_onroad_direct_kwh_per_mile' in cloud:
+            cloud['battery_sizing_onroad_direct_kwh_per_mile'] = battery_sizing_onroad_direct_kwh_per_mile
 
         # calculate cert values ---------------------------------------------------------------------------------------
         if self.fueling_class != 'BEV':
@@ -1276,6 +1284,7 @@ class VehicleFinal(SQABase, Vehicle):
     charge_depleting_range_mi = Column(Float)  #: vehicle charge-depleting range, miles
     cert_utility_factor = Column(Float)  #: PHEV cert utility factor
     onroad_utility_factor = Column(Float)  #: PHEV onroad utility factor
+    battery_sizing_onroad_direct_kwh_per_mile = Column(Float)  #: battery-sizing onroad direct kWh/mi
     prior_redesign_year = Column(Float)  #: prior redesign year
     redesign_interval = Column(Float)  #: redesign interval
     in_production = Column(Boolean)  #: True if vehicle is in production
