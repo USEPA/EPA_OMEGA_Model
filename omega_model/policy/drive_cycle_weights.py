@@ -402,11 +402,11 @@ class DriveCycleWeights(OMEGABase):
         cd_us06_kwh_per_mile = \
             1.772 / 8.007 * cd_us06_1_kwh_per_mile + 6.235 / 8.007 * cd_us06_2_kwh_per_mile
 
-        cd_ftp_range_miles = phev_cd_battery_kwh / cd_ftp_kwh_per_mile
+        cd_ftp_range_miles = max(0, phev_cd_battery_kwh / cd_ftp_kwh_per_mile)
 
-        cd_hwfet_range_miles = phev_cd_battery_kwh / cd_hwfet_kwh_per_mile
+        cd_hwfet_range_miles = max(0, phev_cd_battery_kwh / cd_hwfet_kwh_per_mile)
 
-        cd_us06_range_miles = phev_cd_battery_kwh / cd_us06_kwh_per_mile
+        cd_us06_range_miles = max(0, phev_cd_battery_kwh / cd_us06_kwh_per_mile)
 
         ftp_cd_uf = UtilityFactorMethods.calc_city_utility_factor(calendar_year, cd_ftp_range_miles)
 
