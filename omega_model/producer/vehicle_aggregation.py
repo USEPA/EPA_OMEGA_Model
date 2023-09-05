@@ -227,7 +227,7 @@ class VehicleAggregation(OMEGABase):
         # omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.50
+        input_template_version = 0.51
         input_template_columns = VehicleFinal.mandatory_input_template_columns
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -294,7 +294,7 @@ class VehicleAggregation(OMEGABase):
 
             df['gvwr_lbs'] = df['gvwr_lbs'].fillna(df['etw_lbs'] + 700)  # RV: placeholder BDE
             df['gcwr_lbs'] = df['gcwr_lbs'].fillna(10000)  # RV: placeholder BDE
-            df['curbweight_lbs'] = df['etw_lbs'].fillna(df['etw_lbs'] - 300)  # RV: placeholder BDE
+            df['curbweight_lbs'] = df['curbweight_lbs'].fillna(df['etw_lbs'] - 300)  # RV: placeholder BDE
             df['dual_rear_wheel'] = df['dual_rear_wheel'].fillna(0)  # RV: placeholder BDE
             df['alvw_lbs'] = df['alvw_lbs'].fillna((df['etw_lbs'] + df['gvwr_lbs']) / 2)  # RV: placeholder BDE
 
@@ -303,21 +303,28 @@ class VehicleAggregation(OMEGABase):
 
             # RV
             df['battery_kwh'] = df[['base_year_powertrain_type']].\
-                replace({'base_year_powertrain_type': {'HEV': 1, 'PHEV': 18, 'BEV': 60, 'FCV': 60, 'ICE': 0}})
+                replace({'base_year_powertrain_type': {'HEV': 1, 'PHEV': df['battery_gross_kwh'], 'BEV': df['battery_gross_kwh'],
+                                                       'FCV': VehicleAggregation.weighted_fillna(
+                                                           df[df['electrification_class'] == 'EV'], 'battery_gross_kwh',
+                                                           update_df=False),
+                                                       'ICE': 0}})
 
             # RV
-            df['motor_kw'] = df[['base_year_powertrain_type']].\
+            df['total_emachine_kw'] = df[['base_year_powertrain_type']].\
                 replace({'base_year_powertrain_type': {'HEV': 20,
-                                             'PHEV': 50,
-                                             'BEV': 150 + (100 * (df['drive_system'] == 'AWD')),
-                                             'FCV': 150 + (100 * (df['drive_system'] == 'AWD')),
+                                             'PHEV': df['total_emachine_kw'],
+                                             'BEV': df['total_emachine_kw'],
+                                             'FCV': 150 + (50 * (df['drive_system'] != 'FWD')),
                                              'ICE': 0}})
 
             # RV
-            df['charge_depleting_range_mi'] = df[['base_year_powertrain_type']].\
-                replace({'base_year_powertrain_type': {'HEV': 0, 'PHEV': omega_globals.options.phev_range_mi,
-                                                       'BEV': omega_globals.options.bev_range_mi,
-                                                       'FCV': 300, 'ICE': 0}})
+            df['onroad_charge_depleting_range_mi'] = df[['base_year_powertrain_type']].\
+                replace({'base_year_powertrain_type': {'HEV': 0, 'PHEV': df['onroad_charge_depleting_range_mi'],
+                                                       'BEV': df['onroad_charge_depleting_range_mi'],
+                                                       'FCV': VehicleAggregation.weighted_fillna(
+                                                           df[df['electrification_class'] == 'EV'], 'onroad_charge_depleting_range_mi',
+                                                           update_df=False),
+                                                       'ICE': 0}})
 
             import time
             start_time = time.time()
@@ -333,6 +340,7 @@ class VehicleAggregation(OMEGABase):
             df['delta_glider_non_structure_mass_lbs'], df['usable_battery_capacity_norm'] = \
                 MassScaling.calc_mass_terms(df, df['structure_material'], df['eng_rated_hp'],
                                             df['battery_kwh'], df['footprint_ft2'])
+
             df.insert(len(df.columns), 'workfactor', 0)
 
             if omega_globals.options.vehicles_file_base_year_offset is not None:
@@ -432,7 +440,7 @@ class VehicleAggregation(OMEGABase):
         return template_errors
 
     @staticmethod
-    def weighted_fillna(df, col, weight_by='sales'):
+    def weighted_fillna(df, col, weight_by='sales', update_df=True):
         """
         Fill NaNs (if any) with weighted value
 
@@ -440,14 +448,20 @@ class VehicleAggregation(OMEGABase):
             df (DataFrame): the dataframe to fill
             col (str): name of column to fill
             weight_by (str): name of the weighting column
+            update_df (bool): if ``True`` then df will get updated values
 
         Returns:
             Nothing, modifies df[col] by filling NaNs with weighted value
 
         """
         notnans = df[col].notna()
+
         fillval = sum(df[col].loc[notnans] * df[weight_by].loc[notnans]) / df[weight_by].loc[notnans].sum()
-        df[col] = df[col].fillna(fillval)
+
+        if update_df:
+            df[col] = df[col].fillna(fillval)
+
+        return fillval
 
 
 if __name__ == '__main__':
