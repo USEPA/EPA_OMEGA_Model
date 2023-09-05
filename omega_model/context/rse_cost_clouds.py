@@ -478,7 +478,12 @@ class CostCloud(OMEGABase, CostCloudBase):
             ASTM_round(calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b,
                              vehicle.base_year_target_coef_c, 20), sweep_precision)
 
-        vehicle_rlhp60 = \
+        if 'BEV of' in vehicle.name:
+            rlhp60_scaler = omega_globals.options.bev_of_ice_rlhp60_scaler
+        else:
+            rlhp60_scaler = 1.0
+
+        vehicle_rlhp60 = rlhp60_scaler * \
             ASTM_round(calc_roadload_hp(vehicle.base_year_target_coef_a, vehicle.base_year_target_coef_b,
                              vehicle.base_year_target_coef_c, 60), sweep_precision)
 
