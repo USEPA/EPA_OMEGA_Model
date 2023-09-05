@@ -704,12 +704,15 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         cost_cloud = pd.DataFrame(cloud_points)
 
-        if omega_globals.options.no_backsliding and vehicle.fueling_class != 'BEV' and vehicle.cost_curve_class != None:
-            cost_cloud = cost_cloud[cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] <=
-                                    vehicle.cert_direct_oncycle_co2e_grams_per_mile]
-        elif omega_globals.options.no_backsliding and vehicle.fueling_class == 'BEV' and vehicle.cost_curve_class != None:
-            cost_cloud = cost_cloud[cost_cloud['cert_direct_oncycle_kwh_per_mile'] <=
-                                    vehicle.cert_direct_oncycle_kwh_per_mile]
+        if len(cost_cloud) > 1:
+            if omega_globals.options.no_backsliding and vehicle.fueling_class != 'BEV' and \
+                    vehicle.cost_curve_class != None:
+                cost_cloud = cost_cloud[cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] <=
+                                        vehicle.cert_direct_oncycle_co2e_grams_per_mile]
+            elif omega_globals.options.no_backsliding and vehicle.fueling_class == 'BEV' and \
+                    vehicle.cost_curve_class != None:
+                cost_cloud = cost_cloud[cost_cloud['cert_direct_oncycle_kwh_per_mile'] <=
+                                        vehicle.cert_direct_oncycle_kwh_per_mile]
 
         glider_costs = \
             GliderCost.calc_cost(vehicle, cost_cloud)  # includes structure_cost and glider_non_structure_cost
