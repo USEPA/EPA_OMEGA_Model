@@ -1618,11 +1618,8 @@ class VehicleFinal(SQABase, Vehicle):
             veh.onroad_direct_co2e_grams_per_mile = 0
             veh.onroad_direct_kwh_per_mile = 0
 
-            # RV
             if veh.base_year_powertrain_type in ['BEV', 'FCV']:
-                rated_hp = veh.motor_kw * 1.34102
-            elif electrification_class in ['HEV', 'PHEV']:
-                rated_hp = veh.base_year_eng_rated_hp + veh.motor_kw * 1.34102
+                rated_hp = veh.base_year_tractive_motor_kw / 0.746
             else:
                 rated_hp = veh.base_year_eng_rated_hp
 

@@ -846,7 +846,7 @@ def calc_roadload_hp(A_LBSF, B_LBSF, C_LBSF, MPH):
         Roadload horsepower at the given vehicle speed
 
     """
-    KW2HP = 1.341
+    KW2HP = 1 / 0.746
     N2LBF = 0.224808943
     KMH2MPH = .621371
     MPH2MPS = 1 / KMH2MPH * 1000.0 / 3600.0
