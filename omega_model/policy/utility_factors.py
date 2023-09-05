@@ -61,7 +61,7 @@ def labelUF(miles, norm_dist=400):
         Utility factor from SAEJ2841 SEP2010, Table 2 (Multi-day utility factor Fit)
 
     """
-    miles_norm = miles/norm_dist
+    miles_norm = min(2.0, miles/norm_dist)
 
     return ASTM_round(1-np.exp(-(
                         1.31e+01 * miles_norm +
@@ -90,7 +90,7 @@ def cityFUF(miles, norm_dist=399):
         City utility factor from SAEJ2841 SEP2010, Table 5 (55/45 city/highway split)
 
     """
-    miles_norm = miles/norm_dist
+    miles_norm = min(2.0, miles/norm_dist)
 
     return ASTM_round(1-np.exp(-(
                         1.486e+01 * miles_norm +
@@ -118,7 +118,7 @@ def highwayFUF(miles, norm_dist=399):
         Highway utility factor from SAEJ2841 SEP2010, Table 5 (55/45 city/highway split)
 
     """
-    miles_norm = miles/norm_dist
+    miles_norm = min(2.0, miles/norm_dist)
 
     return ASTM_round(1-np.exp(-(
                         4.8e+00 * miles_norm +
@@ -143,7 +143,7 @@ def FUF(miles, norm_dist=399):
         Fleet Utility Factor from SAEJ2841 SEP2010, Table 2
 
     """
-    miles_norm = miles/norm_dist
+    miles_norm = min(2.0, miles/norm_dist)
 
     return ASTM_round(1-np.exp(-(
                         10.52 * miles_norm +
