@@ -34,6 +34,8 @@ try:
     from pandas.api.types import is_numeric_dtype
 
     import numpy as np
+    np.seterr(all='raise')
+
     import copy
 
     from common.omega_globals import *
