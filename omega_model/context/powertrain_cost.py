@@ -88,7 +88,7 @@ class PowertrainCost(OMEGABase):
             pkg_info = omega_globals.options.CostCloud.get_tech_flags(vehicle)
             pkg_info['curbweight_lbs'] = vehicle.curbweight_lbs
             pkg_info['battery_kwh'] = vehicle.battery_kwh
-            pkg_info['motor_kw'] = vehicle.motor_kw
+            pkg_info['total_emachine_kw'] = vehicle.total_emachine_kw
             pkg_info['drive_system'] = vehicle.drive_system
             pkg_info['engine_cylinders'] = vehicle.engine_cylinders
             pkg_info['engine_displacement_liters'] = vehicle.engine_displacement_liters
@@ -357,7 +357,7 @@ class PowertrainCost(OMEGABase):
                 learn = learning_factor_pev
 
             KWH = pkg_info['battery_kwh']
-            KW = pkg_info['motor_kw']
+            KW = pkg_info['total_emachine_kw']
 
             if powertrain_type == 'HEV':
                 obc_kw = 0
@@ -546,7 +546,7 @@ class PowertrainCost(OMEGABase):
                 'drive_system': vehicle.drive_system,
                 'powertrain_type': powertrain_type,
                 'cost_curve_class': cost_curve_class,
-                'charge_depleting_range_mi': vehicle.charge_depleting_range_mi,
+                'onroad_charge_depleting_range_mi': vehicle.onroad_charge_depleting_range_mi,
                 'footprint_ft2': pkg_info['footprint_ft2'],
                 'learning_factor_ice': learning_factor_ice,
                 'learning_factor_pev': learning_factor_pev,
@@ -845,7 +845,7 @@ class PowertrainCost(OMEGABase):
                 'drive_system': vehicle.drive_system,
                 'powertrain_type': powertrain_type,
                 'cost_curve_class': cost_curve_class,
-                'charge_depleting_range_mi': vehicle.charge_depleting_range_mi,
+                'onroad_charge_depleting_range_mi': vehicle.onroad_charge_depleting_range_mi,
                 'footprint_ft2': pkg_info['footprint_ft2'],
                 'learning_factor_ice': learning_factor_ice,
                 'learning_factor_pev': learning_factor_pev,
@@ -1150,7 +1150,7 @@ def get_motor_power(locals_dict, pkg_info, powertrain_type, drive_system):
         units or the P2 and P4 drive units, depending on the package architecture
 
     """
-    kw = pkg_info['motor_kw']
+    kw = pkg_info['total_emachine_kw']
     kw_fdu = kw_rdu = kw_du = kw_p2 = kw_p4 = 0
 
     if powertrain_type == 'BEV':

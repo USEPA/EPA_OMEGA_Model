@@ -89,7 +89,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                         'price_dollars',
                         'price_modification_dollars',
                         'battery_cost',
-                        'charge_depleting_range_mi',
+                        'onroad_charge_depleting_range_mi',
                     ]
                     vehicle_info_dict[v['vehicle_id']] = \
                         session_settings.vehicles.get_vehicle_attributes(v['vehicle_id'], *attribute_list)

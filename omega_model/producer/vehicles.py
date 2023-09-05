@@ -762,11 +762,14 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'base_year_vehicle_id', 'base_year_glider_non_structure_mass_lbs', 'base_year_cert_fuel_id',
                        'base_year_glider_non_structure_cost_dollars',
                        'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'base_year_curbweight_lbs_to_hp',
-                       'base_year_msrp_dollars', 'battery_kwh', 'motor_kw', 'charge_depleting_range_mi',
+                       'base_year_msrp_dollars', 'battery_kwh', 'total_emachine_kw', 'onroad_charge_depleting_range_mi',
                        'prior_redesign_year', 'redesign_interval', 'in_production', 'base_year_product',
                        'workfactor', 'gvwr_lbs', 'gcwr_lbs', 'base_year_workfactor', 'base_year_gvwr_lbs',
                        'base_year_gcwr_lbs', 'cert_utility_factor', 'onroad_utility_factor',
-                       'battery_sizing_onroad_direct_kwh_per_mile')
+                       'battery_sizing_onroad_direct_kwh_per_mile', 'tractive_motor_kw',
+                       'base_year_battery_kwh', 'base_year_tractive_motor_kw', 'base_year_total_emachine_kw',
+                       'base_year_onroad_charge_depleting_range_mi',
+                       )
 
     # transfer base properties
     for attr in base_properties:
@@ -874,9 +877,14 @@ class Vehicle(OMEGABase):
         self.base_year_curbweight_lbs = 0
         self.base_year_curbweight_lbs_to_hp = 0
         self.base_year_msrp_dollars = 0
+        self.base_year_battery_kwh = 0
+        self.base_year_tractive_motor_kw = 0
+        self.base_year_total_emachine_kw = 0
+        self.base_year_onroad_charge_depleting_range_mi = 0
         self.battery_kwh = 0
-        self.motor_kw = 0
-        self.charge_depleting_range_mi = 0
+        self.total_emachine_kw = 0
+        self.tractive_motor_kw = 0
+        self.onroad_charge_depleting_range_mi = 0
         self.cert_utility_factor = 0
         self.onroad_utility_factor = 0
         self.battery_sizing_onroad_direct_kwh_per_mile = 0
@@ -1281,7 +1289,7 @@ class VehicleFinal(SQABase, Vehicle):
     dual_rear_wheel = Column(Float)  #: dual_rear_wheel, 0=No, 1=Yes
     body_style = Column(String)  #: vehicle body style, e.g. 'sedan'
     base_year_powertrain_type = Column(String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
-    charge_depleting_range_mi = Column(Float)  #: vehicle charge-depleting range, miles
+    onroad_charge_depleting_range_mi = Column(Float)  #: vehicle charge-depleting range, miles
     cert_utility_factor = Column(Float)  #: PHEV cert utility factor
     onroad_utility_factor = Column(Float)  #: PHEV onroad utility factor
     battery_sizing_onroad_direct_kwh_per_mile = Column(Float)  #: battery-sizing onroad direct kWh/mi
@@ -1312,13 +1320,18 @@ class VehicleFinal(SQABase, Vehicle):
     base_year_gvwr_lbs = Column(Float)
     base_year_gcwr_lbs = Column(Float)
     base_year_cert_fuel_id = Column(String)
+    base_year_battery_kwh = Column(Float)  #: vehicle propulsion battery kWh
+    base_year_tractive_motor_kw = Column(Float)  #: on-cycle tractive motor power, kW
+    base_year_total_emachine_kw = Column(Float)  #: vehicle motor/generator total combined power, kW
+    base_year_onroad_charge_depleting_range_mi = Column(Float)  #: charge depleting range, miles
 
     # non-numeric attributes that could change based on interpolating the frontier:
     cost_curve_class = Column(String)  #: ALPHA modeling result class
     structure_material = Column(String)  #: vehicle body structure material, e.g. 'steel'
     # numeric attributes that can change based on interpolating the frontier:
     battery_kwh = Column(Float)  #: vehicle propulsion battery kWh
-    motor_kw = Column(Float)  #: vehicle propulsion motor(s) total power, kW
+    total_emachine_kw = Column(Float)  #: vehicle motor/generator total combined power, kW
+    tractive_motor_kw = Column(Float)  #: on-cycle tractive motor power, kW
     curbweight_lbs = Column(Float)  #: vehicle curbweight, pounds
     footprint_ft2 = Column(Float)  #: vehicle footprint, square feet
     # RV
@@ -1337,12 +1350,13 @@ class VehicleFinal(SQABase, Vehicle):
     # these are used to validate vehicles.csv:
     # mandatory input file columns, the rest can be optional numeric columns:
     mandatory_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id',
-                                   'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id',
-                                   'cert_fuel_id', 'sales', 'footprint_ft2', 'eng_rated_hp',
-                                   'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs', 'gvwr_lbs',
-                                   'gcwr_lbs', 'target_coef_a', 'target_coef_b', 'target_coef_c',
-                                   'body_style', 'msrp_dollars', 'structure_material',
-                                   'prior_redesign_year', 'redesign_interval', 'application_id'}  # RV any other columns
+                                        'context_size_class', 'electrification_class', 'cost_curve_class',
+                                        'in_use_fuel_id', 'cert_fuel_id', 'sales', 'footprint_ft2', 'eng_rated_hp',
+                                        'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs',
+                                        'gvwr_lbs', 'gcwr_lbs', 'target_coef_a', 'target_coef_b', 'target_coef_c',
+                                        'body_style', 'msrp_dollars', 'structure_material', 'prior_redesign_year',
+                                        'redesign_interval', 'application_id', 'battery_gross_kwh', 'tractive_motor_kw',
+                                        'total_emachine_kw', }
 
     dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
     dynamic_attributes = []  #: list of dynamic attribute names, from dynamic_columns
@@ -1558,9 +1572,12 @@ class VehicleFinal(SQABase, Vehicle):
                 base_year_workfactor=df.loc[i, 'workfactor'],
                 base_year_vehicle_id=i,  # i.e. aggregated_vehicles.csv index number...
                 base_year_cert_fuel_id=df.loc[i, 'cert_fuel_id'],
-                battery_kwh=df.loc[i, 'battery_kwh'],
-                motor_kw=df.loc[i, 'motor_kw'],
-                charge_depleting_range_mi=df.loc[i, 'charge_depleting_range_mi'],
+                base_year_battery_kwh=df.loc[i, 'battery_kwh'],
+                base_year_total_emachine_kw=df.loc[i, 'total_emachine_kw'],
+                base_year_tractive_motor_kw=df.loc[i, 'tractive_motor_kw'],
+                base_year_onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi'],
+                battery_kwh=0,
+                onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi'],
                 base_year_powertrain_type=df.loc[i, 'base_year_powertrain_type'],
                 prior_redesign_year=df.loc[i, 'prior_redesign_year'],
                 redesign_interval=df.loc[i, 'redesign_interval'],
@@ -1700,12 +1717,19 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.bev = 1
                     alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
                     alt_veh.cert_fuel_id = 'electricity'
-                    alt_veh.battery_kwh = 60  # RV
-                    alt_veh.motor_kw = 150 + 100 * (v.drive_system == 'AWD')  # RV
-                    if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
-                        alt_veh.charge_depleting_range_mi = 150
+                    alt_veh.battery_kwh = 0  # pack sizes determined by range target
+                    alt_veh.total_emachine_kw = 0  # motor size determined during cost curve generation
+                    alt_veh.tractive_motor_kw = 0
+                    alt_veh.base_year_tractive_motor_kw = 1
+                    if (v.drive_system == 'AWD'):
+                        # ratio of AWD total power to tractive power
+                        alt_veh.base_year_total_emachine_kw = 1.75
                     else:
-                        alt_veh.charge_depleting_range_mi = omega_globals.options.bev_range_mi  # RV
+                        alt_veh.base_year_total_emachine_kw = 1
+                    if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
+                        alt_veh.onroad_charge_depleting_range_mi = 150  # RV
+                    else:
+                        alt_veh.onroad_charge_depleting_range_mi = omega_globals.options.bev_range_mi
                     alt_veh.base_year_eng_rated_hp = 0
                     alt_veh.engine_cylinders = 0
                     alt_veh.engine_displacement_liters = 0
@@ -1721,12 +1745,14 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.phev = 1
                     alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
                     alt_veh.cert_fuel_id = 'gasoline'
-                    alt_veh.battery_kwh = 18  # RV
-                    alt_veh.motor_kw = 50  # RV
+                    alt_veh.battery_kwh = 0  # pack sizes determined by range target
+                    alt_veh.total_emachine_kw = 0  # motor size determined during cost curve generation
+                    alt_veh.tractive_motor_kw = 0
                     if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
-                        alt_veh.charge_depleting_range_mi = 25  # RV
+                        alt_veh.onroad_charge_depleting_range_mi = 25  # RV
                     else:
-                        alt_veh.charge_depleting_range_mi = omega_globals.options.phev_range_mi  # RV
+                        alt_veh.onroad_charge_depleting_range_mi = omega_globals.options.phev_range_mi
+                    alt_veh.base_year_onroad_charge_depleting_range_mi = alt_veh.onroad_charge_depleting_range_mi
                     alt_veh.base_year_eng_rated_hp = v.base_year_eng_rated_hp
                     alt_veh.engine_cylinders = v.engine_cylinders
                     alt_veh.engine_displacement_liters = v.engine_displacement_liters
@@ -1743,9 +1769,10 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.ice = 1
                     alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
                     alt_veh.cert_fuel_id = 'gasoline'
-                    alt_veh.base_year_eng_rated_hp = v.motor_kw * 1.34102  # RV
-                    alt_veh.motor_kw = 0
-                    alt_veh.charge_depleting_range_mi = 0
+                    alt_veh.base_year_eng_rated_hp = v.total_emachine_kw / 0.746
+                    alt_veh.total_emachine_kw = 0
+                    alt_veh.tractive_motor_kw = 0
+                    alt_veh.onroad_charge_depleting_range_mi = 0
                     alt_veh.battery_kwh = 0
                     alt_veh.engine_cylinders = None
                     alt_veh.engine_displacement_liters = None
