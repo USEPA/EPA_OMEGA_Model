@@ -107,7 +107,8 @@ class RepairCost:
         repair_type_multiplier = self._data[f'{repair_type}_multiplier']['value']
         pt_multiplier = self._data[f'{pt_type}_multiplier']['value']
 
-        veh_cost = min(veh_cost, 100000)  # source data included MSRP up to 100k
+        if 'md' not in repair_type:
+            veh_cost = min(veh_cost, 100000)  # LD source data included MSRP up to 100k
         if age <= 4:
             a_value = self._data[f'a_value_{age}']['value']
         else:
