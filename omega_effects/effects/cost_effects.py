@@ -121,7 +121,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
              powertrain_type
              ] = vehicle_info_dict[v['vehicle_id']]
 
-            # tech costs, only for age=0
+            # tech costs, only for age=0 _______________________________________________________________________________
             if v['age'] == 0:
                 mfr_cost_dollars = v['registered_count'] * avg_mfr_cost
                 purchase_price_dollars = v['registered_count'] * avg_purchase_price
@@ -136,7 +136,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                             v['model_year'], v['battery_kwh'], powertrain_type
                         )
 
-            # fuel costs
+            # fuel costs _______________________________________________________________________________________________
             if v['fuel_consumption_kwh'] > 0:
                 electric_fuel = 'US electricity'
                 retail_price = batch_settings.context_fuel_prices.get_fuel_prices(
@@ -159,11 +159,12 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                 fuel_retail_cost_dollars += retail_price * v['fuel_consumption_gallons']
                 fuel_pretax_cost_dollars += pretax_price * v['fuel_consumption_gallons']
 
+            # maintenance costs ________________________________________________________________________________________
             slope, intercept = get_maintenance_cost(batch_settings, powertrain_type)
             maintenance_cost_per_mile = slope * v['odometer'] + intercept
             maintenance_cost_dollars = maintenance_cost_per_mile * v['vmt']
 
-            # repair costs
+            # repair costs _____________________________________________________________________________________________
             if 'car' in v['name']:
                 operating_veh_type = repair_type = 'car'
             elif 'Pickup' in v['name'] and 'mediumduty' not in v['reg_class_id']:
@@ -182,6 +183,18 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                 avg_mfr_cost, powertrain_type, repair_type, v['age']
             )
             repair_cost_dollars = repair_cost_per_mile * v['vmt']
+
+            # sales taxes ______________________________________________________________________________________________
+            sales_tax_rate = batch_settings.insurance_and_taxes_cost_factors.get_attribute_value(
+                'averge_state_tax_rate'
+            )
+            sales_tax_dollars = sales_tax_rate * purchase_price_dollars
+
+            # insurance costs __________________________________________________________________________________________
+            avg_insurance_cost = batch_settings.insurance_and_taxes_cost_factors.calc_insurance_cost(
+                avg_purchase_price, v['age']
+            )
+            insurance_cost_dollars = avg_insurance_cost * v['registered_count']
 
             # refueling costs for time spent during mid-trip refueling events (assume PHEVs do not recharge mid-trip)
             if powertrain_type == 'BEV':
@@ -253,6 +266,8 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                 'battery_credit_dollars': battery_credit_dollars,
                 'purchase_price_dollars': purchase_price_dollars,
                 'purchase_credit_dollars': purchase_credit_dollars,
+                'sales_taxes_cost_dollars': sales_tax_dollars,
+                'insurance_cost_dollars': insurance_cost_dollars,
                 'fuel_retail_cost_dollars': fuel_retail_cost_dollars,
                 'fuel_pretax_cost_dollars': fuel_pretax_cost_dollars,
                 'fuel_taxes_cost_dollars': fuel_retail_cost_dollars - fuel_pretax_cost_dollars,
@@ -362,7 +377,9 @@ def calc_period_consumer_view(batch_settings, input_df):
     for attribute in attributes:
         if attribute in ['sales', 'registered_count']:
             pass
-        elif attribute in ['vehicle_cost_dollars', 'purchase_price_dollars', 'purchase_credit_dollars']:
+        elif attribute in [
+            'vehicle_cost_dollars', 'purchase_price_dollars', 'purchase_credit_dollars', 'sales_taxes_cost_dollars'
+        ]:
             s = pd.Series(return_df[attribute] / return_df['sales'], name=f'{attribute}_per_period')
             return_df = pd.concat([return_df, s], axis=1)
 

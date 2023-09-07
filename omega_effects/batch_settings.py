@@ -23,6 +23,7 @@ from omega_effects.effects.legacy_fleet import LegacyFleet
 
 from omega_effects.consumer.annual_vmt_fixed_by_age import OnroadVMT
 from omega_effects.consumer.reregistration_fixed_by_age import Reregistration
+from omega_effects.consumer.cost_factors_insurance_and_taxes import InsuranceAndTaxes
 
 from omega_effects.context.fuel_prices import FuelPrice
 from omega_effects.context.context_stock_vmt import ContextStockVMT
@@ -81,6 +82,7 @@ class BatchSettings:
         self.scc_cost_factors_file = None
         self.energy_security_cost_factors_file = None
         self.congestion_noise_cost_factors_file = None
+        self.insurance_and_taxes_cost_factors_file = None
         self.legacy_fleet_file = None
 
         self.context_fuel_prices_file = None
@@ -102,6 +104,7 @@ class BatchSettings:
         self.scc_cost_factors = None
         self.energy_security_cost_factors = None
         self.congestion_noise_cost_factors = None
+        self.insurance_and_taxes_cost_factors = None
 
         self.context_fuel_prices = None
         self.onroad_vmt = None
@@ -250,6 +253,8 @@ class BatchSettings:
             = self.get_attribute_value(('Context Energy Security Cost Factors File', 'all'), 'full_path')
         self.congestion_noise_cost_factors_file \
             = self.get_attribute_value(('Context Congestion-Noise Cost Factors File', 'all'), 'full_path')
+        self.insurance_and_taxes_cost_factors_file \
+            = self.get_attribute_value(('Insurance and Taxes Cost Factors File', 'all'), 'full_path')
         self.legacy_fleet_file = self.get_attribute_value(('Context Legacy Fleet File', 'all'), 'full_path')
         self.cpi_deflators_file = self.get_attribute_value(('Context CPI Price Deflators File', 'all'), 'full_path')
 
@@ -398,6 +403,10 @@ class BatchSettings:
             self.context_stock_and_vmt = ContextStockVMT()
             self.context_stock_and_vmt.init_from_file(self.context_stock_and_vmt_file, self, effects_log)
             self.inputs_filelist.append(self.context_stock_and_vmt_file)
+
+            self.insurance_and_taxes_cost_factors = InsuranceAndTaxes()
+            self.insurance_and_taxes_cost_factors.init_from_file(self.insurance_and_taxes_cost_factors_file, effects_log)
+            self.inputs_filelist.append(self.insurance_and_taxes_cost_factors_file)
 
         except Exception as e:
             effects_log.logwrite(e)
