@@ -186,7 +186,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
 
             # sales taxes ______________________________________________________________________________________________
             sales_tax_rate = batch_settings.insurance_and_taxes_cost_factors.get_attribute_value(
-                'averge_state_tax_rate'
+                'average_state_tax_rate'
             )
             sales_tax_dollars = sales_tax_rate * purchase_price_dollars
 
