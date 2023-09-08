@@ -405,7 +405,9 @@ class BatchSettings:
             self.inputs_filelist.append(self.context_stock_and_vmt_file)
 
             self.insurance_and_taxes_cost_factors = InsuranceAndTaxes()
-            self.insurance_and_taxes_cost_factors.init_from_file(self.insurance_and_taxes_cost_factors_file, effects_log)
+            self.insurance_and_taxes_cost_factors.init_from_file(
+                self.insurance_and_taxes_cost_factors_file, self, effects_log
+            )
             self.inputs_filelist.append(self.insurance_and_taxes_cost_factors_file)
 
         except Exception as e:

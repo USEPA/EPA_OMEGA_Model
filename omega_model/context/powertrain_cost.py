@@ -982,10 +982,10 @@ class PowertrainCost(OMEGABase):
                     df.insert(0, 'cost_key', cost_keys)
 
                     for cost_key in cost_keys:
-                        _cache[cost_key] = dict()
+                        _cache[cost_key] = {}
                         cost_info = df[df['cost_key'] == cost_key].iloc[0]
 
-                        _cache[cost_key] = {'value': dict(),
+                        _cache[cost_key] = {'value': {},
                                             'dollar_adjustment': 1}
 
                         if cost_info['dollar_basis'] > 0:
