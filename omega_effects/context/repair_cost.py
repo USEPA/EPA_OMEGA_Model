@@ -94,14 +94,21 @@ class RepairCost:
             veh_cost: (Numeric) The value of the vehicle when sold as new
             pt_type: (str) The powertrain type (ICE, HEV, PHEV, BEV)
             repair_type: (str) The vehicle repair type (car, suv, truck)
-            age: (int) The age of the vehicle where age=0 is year 1 in operation.
+            age: (int) The age of the vehicle where age=0 is year 1 in operation
 
         Returns:
-            A single repair cost per mile for the given vehicle at the given age.
+            A single repair cost per mile for the given vehicle at the given age
+
+        Note:
+            The source data included MSRP up to $100,000 and through 10 years of service; MSRP is limited here to
+            $100,000 but calculations continue beyond 10 years at the growth indicated by the source data.
 
         """
         repair_type_multiplier = self._data[f'{repair_type}_multiplier']['value']
         pt_multiplier = self._data[f'{pt_type}_multiplier']['value']
+
+        if 'md' not in repair_type:
+            veh_cost = min(veh_cost, 100000)  # LD source data included MSRP up to 100k
         if age <= 4:
             a_value = self._data[f'a_value_{age}']['value']
         else:

@@ -77,7 +77,6 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
             congestion_cost_dollars = noise_cost_dollars = 0
             maintenance_cost_dollars = repair_cost_dollars = 0
             refueling_cost_dollars = drive_value_cost_dollars = 0
-            # bev_flag = phev_flag = hev_flag = mhev_flag = 0
             battery_credit_dollars = 0
             discount_rate = 0
             powertrain_type = None
@@ -121,7 +120,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
              powertrain_type
              ] = vehicle_info_dict[v['vehicle_id']]
 
-            # tech costs, only for age=0
+            # tech costs, only for age=0 _______________________________________________________________________________
             if v['age'] == 0:
                 mfr_cost_dollars = v['registered_count'] * avg_mfr_cost
                 purchase_price_dollars = v['registered_count'] * avg_purchase_price
@@ -136,7 +135,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                             v['model_year'], v['battery_kwh'], powertrain_type
                         )
 
-            # fuel costs
+            # fuel costs _______________________________________________________________________________________________
             if v['fuel_consumption_kwh'] > 0:
                 electric_fuel = 'US electricity'
                 retail_price = batch_settings.context_fuel_prices.get_fuel_prices(
@@ -159,11 +158,12 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                 fuel_retail_cost_dollars += retail_price * v['fuel_consumption_gallons']
                 fuel_pretax_cost_dollars += pretax_price * v['fuel_consumption_gallons']
 
+            # maintenance costs ________________________________________________________________________________________
             slope, intercept = get_maintenance_cost(batch_settings, powertrain_type)
             maintenance_cost_per_mile = slope * v['odometer'] + intercept
             maintenance_cost_dollars = maintenance_cost_per_mile * v['vmt']
 
-            # repair costs
+            # repair costs _____________________________________________________________________________________________
             if 'car' in v['name']:
                 operating_veh_type = repair_type = 'car'
             elif 'Pickup' in v['name'] and 'mediumduty' not in v['reg_class_id']:
@@ -183,7 +183,19 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
             )
             repair_cost_dollars = repair_cost_per_mile * v['vmt']
 
-            # refueling costs for time spent during mid-trip refueling events (assume PHEVs do not recharge mid-trip)
+            # sales taxes ______________________________________________________________________________________________
+            sales_tax_rate = batch_settings.insurance_and_taxes_cost_factors.get_tax_rate(
+                'average_state_tax_rate'
+            )
+            sales_tax_dollars = sales_tax_rate * purchase_price_dollars
+
+            # insurance costs __________________________________________________________________________________________
+            avg_insurance_cost = batch_settings.insurance_and_taxes_cost_factors.calc_insurance_cost(
+                avg_purchase_price, powertrain_type, v['body_style'], v['age']
+            )
+            insurance_cost_dollars = avg_insurance_cost * v['registered_count']
+
+            # refueling costs for time spent during mid-trip refueling events (assume PHEVs do not recharge mid-trip) __
             if powertrain_type == 'BEV':
                 if (operating_veh_type, charge_depleting_range) in refueling_bev_dict:
                     refueling_cost_per_mile = refueling_bev_dict[(operating_veh_type, charge_depleting_range)]
@@ -203,7 +215,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                     refueling_liquid_dict.update({operating_veh_type: refueling_cost_per_gallon})
                 refueling_cost_dollars = refueling_cost_per_gallon * v['fuel_consumption_gallons']
 
-            # congestion and noise costs (maybe congestion and noise cost factors will differ one day?)
+            # congestion and noise costs (maybe congestion and noise cost factors will differ one day?) ________________
             congestion_cf, noise_cf = get_congestion_noise_cf(batch_settings, v['base_year_reg_class_id'])
             if v['fuel_consumption_kwh'] > 0 and v['fuel_consumption_gallons'] == 0:
                 congestion_cost_dollars += v['vmt'] * congestion_cf
@@ -212,7 +224,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                 congestion_cost_dollars += v['vmt'] * congestion_cf
                 noise_cost_dollars += v['vmt'] * noise_cf
 
-            # calc drive value relative to the context as value of rebound vmt plus the drive surplus
+            # calc drive value relative to the context as value of rebound vmt plus the drive surplus __________________
             fuel_cpm = fuel_retail_cost_dollars / v['vmt']
             context_fuel_cpm_dict_key = \
                 (int(v['base_year_vehicle_id']), v['base_year_powertrain_type'], int(v['model_year']), v['age']
@@ -221,7 +233,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                 context_fuel_cpm = context_fuel_cpm_dict[context_fuel_cpm_dict_key]['fuel_cost_per_mile']
                 drive_value_cost_dollars = 0.5 * v['vmt_rebound'] * (fuel_cpm + context_fuel_cpm)
 
-            # save results in the vehicle effects dict for this vehicle
+            # save results in the vehicle effects dict for this vehicle ________________________________________________
             veh_effects_dict = {
                 'session_policy': session_settings.session_policy,
                 'session_name': session_settings.session_name,
@@ -253,6 +265,8 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                 'battery_credit_dollars': battery_credit_dollars,
                 'purchase_price_dollars': purchase_price_dollars,
                 'purchase_credit_dollars': purchase_credit_dollars,
+                'sales_taxes_cost_dollars': sales_tax_dollars,
+                'insurance_cost_dollars': insurance_cost_dollars,
                 'fuel_retail_cost_dollars': fuel_retail_cost_dollars,
                 'fuel_pretax_cost_dollars': fuel_pretax_cost_dollars,
                 'fuel_taxes_cost_dollars': fuel_retail_cost_dollars - fuel_pretax_cost_dollars,
@@ -362,7 +376,9 @@ def calc_period_consumer_view(batch_settings, input_df):
     for attribute in attributes:
         if attribute in ['sales', 'registered_count']:
             pass
-        elif attribute in ['vehicle_cost_dollars', 'purchase_price_dollars', 'purchase_credit_dollars']:
+        elif attribute in [
+            'vehicle_cost_dollars', 'purchase_price_dollars', 'purchase_credit_dollars', 'sales_taxes_cost_dollars'
+        ]:
             s = pd.Series(return_df[attribute] / return_df['sales'], name=f'{attribute}_per_period')
             return_df = pd.concat([return_df, s], axis=1)
 

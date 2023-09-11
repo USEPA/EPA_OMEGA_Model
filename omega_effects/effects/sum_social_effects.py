@@ -48,6 +48,7 @@ def calc_social_effects(costs_df, benefits_df, ghg_scope, calc_health_effects=Fa
     net_benefit_cost_attributes = [
         'fuel_pretax_cost_dollars',
         'vehicle_cost_dollars',
+        'insurance_cost_dollars',
         'congestion_cost_dollars',
         'noise_cost_dollars',
         'maintenance_cost_dollars',
@@ -57,6 +58,7 @@ def calc_social_effects(costs_df, benefits_df, ghg_scope, calc_health_effects=Fa
     non_net_benefit_cost_attributes = [
         'fuel_retail_cost_dollars',
         'fuel_taxes_cost_dollars',
+        'sales_taxes_cost_dollars',
         'battery_credit_dollars',
         'purchase_credit_dollars',
     ]
