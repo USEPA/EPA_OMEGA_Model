@@ -5,12 +5,14 @@ import os
 
 OMEGA_outputs = False
 pd.options.mode.chained_assignment = None  # default='warn'
+# "DRIVER ONLY WITH HEAD PROTECTION CHAMBER SIDE-MOUNTED AIRBAGS",
 cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
-                "DUAL FRONT AND DUAL REAR SIDE-MOUNTED AIRBAGS",
-                "DUAL FRONT AND DUAL REAR WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
-                "DRIVER ONLY WITH HEAD PROTECTION CHAMBER SIDE-MOUNTED AIRBAGS",
-                "FRONT, REAR AND THIRD ROW HEAD AIRBAGS", "FRONT AND REAR HEAD AIRBAGS", "FRONT HEAD AIRBAGS",
-                "STABILITY CONTROL", "TRACTION CONTROL", "TIRE PRESSURE MONITORING"]
+               "DUAL FRONT AND DUAL REAR SIDE-MOUNTED AIRBAGS",
+               "DUAL FRONT AND DUAL REAR WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
+               "DRIVER ONLY WITH HEAD PROTECTION CHAMBER SIDE-MOUNTED AIRBAGS",
+               "FRONT, REAR AND THIRD ROW HEAD AIRBAGS", "FRONT AND REAR HEAD AIRBAGS", "FRONT HEAD AIRBAGS",
+               "FRONT, REAR, THIRD AND FOURTH ROW HEAD AIRBAGS",
+               "STABILITY CONTROL", "TRACTION CONTROL", "TIRE PRESSURE MONITORING"]
 cols_OMEGA_inputs = ['CAFE_MFR_CD',	'MODEL_TYPE_INDEX',	'Electrification Category',	'Boost Type Category', 'CARLINE_CLASS_DESC_all', 'CARLINE_MFR_NAME_all', 'CARLINE_NAME_all', 'TARGET_COEF_BEST_MTH_min',
                      'TARGET_COEF_BEST_MTH_max', 'TARGET_COEF_BEST_MTH_all', 'TARGET_COEF_A_BEST', 'TARGET_COEF_B_BEST', 'TARGET_COEF_C_BEST', 'FTP_FE Bag 1', 'FTP_FE Bag 2', 'FTP_FE Bag 3', 'FTP_FE Bag 4', 'US06_FE',
                      'US06_FE Bag 1', 'US06_FE Bag 2', 'CAFE_MODEL_YEAR_all', 'RLHP_FROM_RLCOEFFS',	'ROUNDED_CARGO_CARRYING_VOL', 'BodyID_all',	'Combined Load Factor (%)',	'City Powertrain Efficiency (%)',
@@ -388,7 +390,6 @@ for model_year in model_years:
     try:
         master_index_file['CALC_ID'][~pd.isnull(master_index_file['CALC_ID'])] = \
             master_index_file['CALC_ID'][~pd.isnull(master_index_file['CALC_ID'])].astype(float).astype(str)
-            # master_index_file['CALC_ID'][~pd.isnull(master_index_file['CALC_ID'])].astype(float).astype(int).astype(str)
     except KeyError:
         pass
 
@@ -421,7 +422,6 @@ for model_year in model_years:
         if unique_sourcename != master_index_source: #If the current source is not the master index, readin the source file
             try:
                 source_file = pd.read_csv(unique_filepath+ '\\' + unique_filename, converters={'LineageID': int, 'BodyID': int}).astype(str)
-
             except ValueError:
                 try:
                     source_file = pd.read_csv(unique_filepath + '\\' + unique_filename).astype(str)
@@ -544,21 +544,17 @@ for model_year in model_years:
                     how='left', on=list(present_matching_categories))
                 del vehghg_file
             try:
-                # Add in the columns to the master file from the source file
-                # master_index_file_with_desired_fields_all_merges = master_index_file.merge( \
-                #     source_file[list(pd.Series(list(matching_categories) + list(all_subarray['Column Name'].unique())).unique())], \
-                #     how='left', on=list(matching_categories)).loc[(master_index_file['WHEEL_BASE_INCHES'].astype(float) - source_file['WHEEL_BASE_INCHES'].astype(float)).abs() <= 0.9].replace([str(np.nan), ''], np.nan)
-                # if unique_sourcename in 'OEM Towing Guide' and 'Max Loaded Trailer Weight' in source_file.columns:
-                #     source_file['Max Loaded Trailer Weight'] = source_file['Max Loaded Trailer Weight'].astype(str)
                 if 'WHEELBASE' in list(matching_categories):
                     source_file['WHEELBASE'] = source_file['WHEELBASE'].astype(float).round(decimals=0).astype(str)
                     if unique_sourcename in 'OEM Towing Guide':
                         OEM_towing_quide_unique_LineageID_list = source_file['LineageID'].unique().tolist()
-                master_index_file_with_desired_fields_all_merges = master_index_file.merge( \
-            # master_index_file_with_desired_fields_all_merges=pd.merge_ordered(master_index_file, \
+
+                try:
+                    master_index_file_with_desired_fields_all_merges = master_index_file.merge( \
                     source_file[list(pd.Series(list(matching_categories) + list(all_subarray['Column Name'].unique())).unique())], \
-                # how='left', on=list(matching_categories), left_by='WHEELBASE').replace([str(np.nan), ''], np.nan)
                     how='left', on=list(matching_categories)).replace([str(np.nan), ''], np.nan)
+                except KeyError:
+                    print('Turn off the missing list in the field_mapping.csv and main_mapping_category_key.csv')
             except KeyError: #Master file is missing at least one of the data columns from the source file
                 original_source_columns = list(pd.Series(list(matching_categories)+list(all_subarray['Column Name'].unique())).unique())
                 new_source_columns = list(set(original_source_columns)-(set(original_source_columns)-set(list(source_file.columns))))
@@ -571,15 +567,15 @@ for model_year in model_years:
         else:
             master_index_file_with_desired_fields_all_merges = master_index_file.replace([str(np.nan), ''], np.nan)
 
-        # 'City PTEFF_FROM_RLCOEFFS'
+        # if 'camry' in master_index_file['CARLINE_NAME'].str.lower().unique():
+        #     print('Camry is found')
         for all_subarray_count in range(0, len(all_subarray)):
             query_type = all_subarray['QueryType'][all_subarray_count]
             weighting_field = all_subarray['AvgWtField'][all_subarray_count]
             bounding_field = all_subarray['BoundingField'][all_subarray_count]
             information_toget_source_column_name = all_subarray['Column Name'][all_subarray_count]
             information_toget = all_subarray['Desired Field'][all_subarray_count]
-            if information_toget_source_column_name ==  'City PTEFF_FROM_RLCOEFFS': # 'STABILITY CONTROL':
-                print(information_toget_source_column_name)
+
             if information_toget_source_column_name not in master_index_file_with_desired_fields_all_merges.columns:
                 print('*** ', information_toget_source_column_name, ' Not found ***')
                 continue
@@ -595,16 +591,12 @@ for model_year in model_years:
                 if query_type == 'max' or query_type == 'min' or query_type == 'avg' \
                         or query_type == 'std' or query_type == 'sum':
                     try:
-                        # master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
-                        #     master_index_file_with_desired_field_all_merges[information_toget_source_column_name].astype(float)
                         master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
                             pd.to_numeric(master_index_file_with_desired_field_all_merges[information_toget_source_column_name], errors='coerce')
-                        # if (unique_sourcename == 'Edmunds') and ('CURB WEIGHT' in master_index_file_with_desired_field_all_merges.columns):
-                        #     print(master_index_file_with_desired_field_all_merges['CURB WEIGHT'])  # = pd.Series(source_file['CURB WEIGHT']).str.extract("(\d*\.?\d+)", expand=True).astype(float)
                     except ValueError:
                         testing_column = master_index_file_with_desired_field_all_merges[ \
                             information_toget_source_column_name].str.extract("(\d*\.?\d+)", expand=True).astype(float)
-                        # information_toget_source_column_name].str.extract('(\d+\.\d+)').astype(float)
+
                         if pd.isnull(testing_column).sum() >= 0:
                             master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
                                 master_index_file_with_desired_field_all_merges[information_toget_source_column_name].str.extract('(\d+)').astype(float)
@@ -658,8 +650,6 @@ for model_year in model_years:
                         list(aggregating_columns)) \
                         .sum().reset_index()
                 elif query_type == 'all':
-                    # if information_toget_source_column_name == 'FINAL_CALC_CITY_FE_4':
-                    #     print(information_toget_source_column_name)
                     query_output_source = master_index_file_with_desired_field_all_merges[ \
                         list(aggregating_columns) + [information_toget_source_column_name]].groupby(\
                         list(aggregating_columns))[information_toget_source_column_name].apply(lambda x: '|'.join(map(str, x))).reset_index()
@@ -696,8 +686,8 @@ for model_year in model_years:
                 else:
                     query_output = pd.merge_ordered(query_output, query_output_source, how='outer', \
                         on=list(aggregating_columns)).sort_values(list(aggregating_columns)).reset_index(drop=True)
-                del query_output_source
-        del master_index_file_with_desired_fields_all_merges
+                # del query_output_source
+        # del master_index_file_with_desired_fields_all_merges
         # if unique_sourcename == 'OEM Towing Guide':
             # print(query_output)
         #     query_output = query_output.drop(['Towing Capacity_Edmunds'], axis=1)
@@ -718,71 +708,6 @@ for model_year in model_years:
             except KeyError:
                 new_column[pd.isnull(new_column)] = pd.Series(np.zeros(len(query_output))).replace(0,np.nan)
         query_output = pd.concat([query_output, new_column],axis=1)
-
-    # _trims = ['V6', 'V8', 'V12', 'WITH RANGE EXTENDER', '(COUPE)', 'COUPE', 'XDRIVE', 'SDRIVE', '(CONVERTIBLE)', 'CONVERTIBLE', 'SRT', 'AWD', 'RWD', 'FWD', '4X2', '4X4', 'CLASSIC', 'UNLIMITED', '4-DOOR', '5-DOOR', \
-    #           'REAR', 'WHEEL', 'DRIVE', '(RWD)', 'HYBRID', '2DR', '4DR', '5DR', '4MATIC', 'ALL4', 'F SPORT', 'SPORT', 'HEV', 'PHEV', 'ES', 'ECO', 'LE', 'XLE', 'HATCHBACK', 'XSE', 'FFV', 'CAB', 'PICKUP', 'CHASSIS', \
-    #           'BADGE', 'BLACK', 'GRAN', 'TURISMO', 'COMPETITION', 'SPORTS', 'WAGON', 'EWB', 'LWB', 'BASE', 'PAYLOAD', 'LT', 'TIRE', 'USPS', 'A-SPEC', 'XL', 'ULTIMATE', 'BLUE', 'PLUG-IN HYBRID', 'SPORTBRAKE', \
-    #           'SV', 'SVA', 'SVR', 'MHEV', 'SI4', 'TOURING', 'NISMO', 'SR/PLATINUM', 'RED', 'PRO-4X', 'PLATINUM', 'CARGO', 'VAN', 'SV/SL', 'LE/XLE/SE/LTD', 'LE/SE', 'XLE/XSE', 'SPORTWAGEN', '4MOTION', 'ALLTRACK', \
-    #           'EXECUTIVE', 'ST', 'E-HYBRID', '2WD', '4WD', 'INCOMPLETE', 'SQ4', 'S', 'GTS', 'GEN2', 'SI4', 'MANUAL', 'P250', 'P300', 'GVWR>7599', 'LBS', '5.0L']
-    #
-    # df_query_output_grp = query_output.groupby(['CAFE_MFR_CD', 'CARLINE_NAME_all_Master Index', 'BodyID']).mean() # ELECTRIC POWER STEERING Edmunds all
-    # carline_name_empty = []
-    # for i in range(len(df_query_output_grp)):
-    #     _cafe_mfr_cd = df_query_output_grp.index[i][0]
-    #     _carline_name_all = df_query_output_grp.index[i][1]
-    #     _bodyid = df_query_output_grp.index[i][2]
-    #
-    #     if 'F150' in _carline_name_all: _carline_name_base = 'F150'
-    #     elif 'FUSION' in _carline_name_all: _carline_name_base = 'FUSION'
-    #     elif 'MUSTANG' in _carline_name_all: _carline_name_base = 'MUSTANG'
-    #     elif 'TRANSIT CONNECT' in _carline_name_all: _carline_name_base = 'TRANSIT CONNECT'
-    #     elif 'CAMRY' in _carline_name_all: _carline_name_base = 'CAMRY'
-    #     elif 'COROLLA' in _carline_name_all: _carline_name_base = 'COROLLA'
-    #     elif 'TACOMA' in _carline_name_all: _carline_name_base = 'TACOMA'
-    #     elif 'BOXSTER' in _carline_name_all: _carline_name_base = 'BOXSTER'
-    #     elif 'CAYMAN' in _carline_name_all: _carline_name_base = 'CAYMAN'
-    #     elif 'C10' in _carline_name_all: _carline_name_base = 'C10'
-    #     elif 'K10' in _carline_name_all: _carline_name_base = 'K10'
-    #     elif 'C15' in _carline_name_all: _carline_name_base = 'C15'
-    #     elif 'K15' in _carline_name_all: _carline_name_base = 'K15'
-    #     elif 'C1500' in _carline_name_all: _carline_name_base = 'C1500'
-    #     elif 'K1500' in _carline_name_all: _carline_name_base = 'K1500'
-    #     elif 'K1500' in _carline_name_all: _carline_name_base = 'K1500'
-    #     else:
-    #         _carline_name = str(_carline_name_all).strip().split(' ')
-    #         if len(_carline_name) > 1:
-    #             tmp = []
-    #             for i in range(len(_carline_name)):
-    #                 if ('(' in _carline_name[i]) and (')' not in _carline_name[i]):
-    #                     pass
-    #                 elif (')' in _carline_name[i]) and ('(' not in _carline_name[i]):
-    #                     pass
-    #                 elif (_carline_name[i] not in _trims):
-    #                     tmp.append(_carline_name[i].strip())
-    #             _carline_name_base = ' '.join(tmp)
-    #
-    #     try:
-    #         carline_name_checks = (query_output['CAFE_MFR_CD'] == _cafe_mfr_cd) & (query_output['CARLINE_NAME_all_Master Index'].str.contains(_carline_name_base))
-    #     except KeyError:
-    #         try:
-    #             print(_carline_name_base)
-    #             _carline_name_base = _carline_name_base.strip().split(' ')[0]
-    #             carline_name_checks = (query_output['CAFE_MFR_CD'] == _cafe_mfr_cd) & (query_output['CARLINE_NAME_all_Master Index'].str.contains(_carline_name_base))
-    #         except KeyError:
-    #             continue
-    #     try:
-    #         df_query_output = query_output.loc[carline_name_checks, :]
-    #     except KeyError:
-    #         print(_carline_name_base, _carline_name_all)
-    #         continue
-    #     if pd.isnull(df_query_output['Electric Power Steering_all']).sum() == 0: continue
-    #     if (~pd.isnull(df_query_output['Electric Power Steering_all']) == True).sum() == 0: continue
-    #     df_query_output_index = list(df_query_output.index)
-    #     df_query_output.reset_index(drop=True, inplace=True)
-    #     _eps_yes_index = df_query_output.loc[df_query_output['Electric Power Steering_all'] == 'yes', 'Electric Power Steering_all'].index
-    #     _eps_no_index = df_query_output.loc[df_query_output['Electric Power Steering_all'] != 'yes', 'Electric Power Steering_all'].index
-    #     for j in range(len(_eps_no_index)):
-    #         query_output['Electric Power Steering_all'][df_query_output_index[_eps_no_index[j]]] = 'yes' # query_output.loc did not work
 
     date_and_time = str(datetime.datetime.now())[:19].replace(':', '').replace('-', '')
     query_output = query_output.replace([np.nan, str(np.nan)], '')
@@ -828,19 +753,23 @@ for model_year in model_years:
     #     query_output.loc[query_output[_airbag] == 'null-|yes', _airbag] = 'yes|null'
     #     query_output.loc[query_output[_airbag] == 'yes|null-', _airbag] = 'yes|null'
     #     query_output.loc[query_output[_airbag] == 'null-', _airbag] = 'null'
-    _idx_nulls = query_output.loc[query_output['PRODUCTION_VOLUME_GHG_50_STATE'] == 0, :].index
-    query_output.drop(_idx_nulls, inplace=True)
+    if ('PRODUCTION_VOLUME_GHG_50_STATE' in query_output.columns):
+        query_output.drop(['PRODUCTION_VOLUME_GHG_50_STATE'], axis=1, inplace=True)
 
     query_output.to_csv(output_path + '\\' + str(model_year) + '_' + Query_filename + '_' + date_and_time + '.csv',index=False)
 
     query_output = query_output.drop(query_output.filter(regex='Master Index').columns, axis=1)
     query_output = query_output.drop(query_output.filter(regex='Edmunds').columns, axis=1)
     query_output = query_output.drop(query_output.filter(regex='OEM Towing Guide').columns, axis=1)
+    if ('PRODUCTION_VOLUME_GHG_50_STATE' in query_output.columns): query_output.drop(['PRODUCTION_VOLUME_GHG_50_STATE'], axis=1)
+
     query_output.to_csv(output_path + '\\' + str(model_year) + Query_filename + ' ' + date_and_time + '_noduplicatecolumns.csv',index=False)
     del all_array
     del master_index_file
 
     if (OMEGA_outputs == True):
+        print('*** Set OMEGA_outputs == False @ errors ***')
+
         for i in range(len(cols_OMEGA_inputs)):
             if cols_OMEGA_inputs[i] not in query_output.columns:
                 print(i, cols_OMEGA_inputs[i])

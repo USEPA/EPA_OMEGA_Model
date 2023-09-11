@@ -3,6 +3,15 @@ pd.options.mode.chained_assignment = None  # default='warn'
 import numpy as np
 import datetime
 
+cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
+               "DUAL FRONT AND DUAL REAR SIDE-MOUNTED AIRBAGS",
+               "DUAL FRONT AND DUAL REAR WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
+               "DRIVER ONLY WITH HEAD PROTECTION CHAMBER SIDE-MOUNTED AIRBAGS",
+               "FRONT, REAR AND THIRD ROW HEAD AIRBAGS", "FRONT AND REAR HEAD AIRBAGS", "FRONT HEAD AIRBAGS",
+               "FRONT, REAR, THIRD AND FOURTH ROW HEAD AIRBAGS",
+               "STABILITY CONTROL", "TRACTION CONTROL", "TIRE PRESSURE MONITORING"]
+edmunds_bodyid_to_edmunds_bodyid_match = True
+
 def body_id_checks(Edmunds_Data, Edmunds_matched_bodyid_file_raw, year, base_year, _body_style_check, rawdata_input_path, run_input_path, matched_bodyid_filename):
 
     Edmunds_matched_bodyid_file_raw = Edmunds_matched_bodyid_file_raw.loc[:, ~Edmunds_matched_bodyid_file_raw.columns.str.contains('^Unnamed')]
@@ -13,13 +22,64 @@ def body_id_checks(Edmunds_Data, Edmunds_matched_bodyid_file_raw, year, base_yea
     if _body_style_check == 1 and len(Edmunds_matched_bodyid_file_raw.loc[Edmunds_matched_bodyid_file_raw['ModelYear'] == year, 'BodyID'] == -9) > 0:
         if year < 2019: base_year = year;
         Edmunds_matched_bodyid_file_raw0 = Edmunds_matched_bodyid_file_raw.loc[Edmunds_matched_bodyid_file_raw['ModelYear'] == base_year, :].reset_index(drop=True)
+        _idx_blanks = Edmunds_matched_bodyid_file_raw1.loc[Edmunds_matched_bodyid_file_raw1['Model'].str.contains(' '), :].index
+        if (len(_idx_blanks) == 0):
+            Edmunds_matched_bodyid_file_raw0.loc[Edmunds_matched_bodyid_file_raw0['Model'].str.contains(' '), 'Model'].str.replace(' ', '-')
 
         Edmunds_matched_bodyid_file_raw0.loc[:, 'Powertrains'] = 'ICE';
         Edmunds_matched_bodyid_file_raw1.loc[:, 'Powertrains'] = 'ICE';
         Edmunds_matched_bodyid_file_raw1.loc[:, 'Matching'] = 0;
-        _body_styles = ['Sedan', 'Truck', 'Hatchback', 'Coupe', 'Convertible', 'SUV', 'Wagon', 'Minivan', 'Van', 'Pickup', 'Crew Cab', 'Regular Cab', 'Double Cab', 'Extended Cab', 'SuperCab', 'King Cab', 'Quad Cab', 'Mega Cab', \
+        Edmunds_matched_bodyid_file_raw1.loc[:, 'BodyStyle'] = '';
+        Edmunds_matched_bodyid_file_raw1.loc[:, 'Source'] = '';
+        _body_styles = ['Sedan', 'Truck', 'Hatchback', 'Coupe', 'Convertible', 'SUV', 'Wagon', 'Minivan', 'Cargo Van', 'Ext Van', 'Van', 'Pickup', 'Crew Cab', 'Regular Cab', 'Double Cab', 'Extended Cab', 'SuperCab', 'King Cab', 'Quad Cab', 'Mega Cab', \
                         'SuperCrew', 'CrewMax', 'Access Cab']
         _powertrain_styles = ['electric DD', 'electric 2AM', 'fuel cell', 'hybrid', 'mild hybrid', 'plug-in']
+
+        if edmunds_bodyid_to_edmunds_bodyid_match:
+            Edmunds_matched_bodyid_file_base = pd.read_csv(run_input_path + '\\' + 'edmunds-bodyid_197eea9a_20230830.csv')
+            Edmunds_matched_bodyid_file_base = Edmunds_matched_bodyid_file_base.loc[Edmunds_matched_bodyid_file_base['ModelYear'] == year, :].reset_index(drop=True)
+
+            _idx_spaces = Edmunds_matched_bodyid_file_base.loc[Edmunds_matched_bodyid_file_base['Model'].str.contains(' '), :].index
+            if len(_idx_spaces) > 0:
+                Edmunds_matched_bodyid_file_base.loc[_idx_spaces, 'Model'] = Edmunds_matched_bodyid_file_base.loc[_idx_spaces, 'Model'].str.replace(" ", "-")
+
+            _models = Edmunds_matched_bodyid_file_raw1['Model'].unique()
+            for i in range(len(_models)):
+                _model = _models[i]
+                _trims = Edmunds_matched_bodyid_file_raw1.loc[Edmunds_matched_bodyid_file_raw1['Model'] == _model, 'Trims'].unique()
+                for j in range(len(_trims)):
+                    _trim = _trims[j]
+                    # if _trim == 'Sport Hybrid SH-AWD 4dr Sedan AWD w/Technology Package (3.5L 6cyl gas/electric hybrid 7AM)':
+                        # print(_model)_model
+                    _idx_base = Edmunds_matched_bodyid_file_base.loc[(Edmunds_matched_bodyid_file_base['Model'] == _model) & (Edmunds_matched_bodyid_file_base['Trims'] == _trim), :].index
+                    if len(_idx_base > 0):
+                        Edmunds_matched_bodyid_file_raw1.loc[(Edmunds_matched_bodyid_file_raw1['Model'] == _model) & (Edmunds_matched_bodyid_file_raw1['Trims'] == _trim), 'BodyID'] = Edmunds_matched_bodyid_file_base.loc[_idx_base[0], 'BodyID']
+                        Edmunds_matched_bodyid_file_raw1.loc[(Edmunds_matched_bodyid_file_raw1['Model'] == _model) & (Edmunds_matched_bodyid_file_raw1['Trims'] == _trim), 'LineageID'] = Edmunds_matched_bodyid_file_base.loc[_idx_base[0], 'LineageID']
+
+            _models = Edmunds_matched_bodyid_file_raw1.loc[Edmunds_matched_bodyid_file_raw1['LineageID'] == -9 , 'Model'].unique()
+            for i in range(len(_models)):
+                _model = _models[i]
+                _idx_nulls = Edmunds_matched_bodyid_file_raw1.loc[(Edmunds_matched_bodyid_file_raw1['Model'] == _model) & (Edmunds_matched_bodyid_file_raw1['BodyID'] == -9), :].index
+                # if 30 in _idx_nulls:
+                #     print(_idx_nulls)
+                _idx_lineageid = Edmunds_matched_bodyid_file_raw1.loc[(Edmunds_matched_bodyid_file_raw1['Model'] == _model) & (Edmunds_matched_bodyid_file_raw1['LineageID'] != -9), :].index
+                if len(_idx_lineageid) == 0: continue
+                _bodyids = Edmunds_matched_bodyid_file_raw1.loc[_idx_lineageid, 'BodyID'].unique()
+                if (len(_bodyids) == 1):
+                    Edmunds_matched_bodyid_file_raw1.loc[_idx_nulls, 'BodyID'] = _bodyids[0]
+                    Edmunds_matched_bodyid_file_raw1.loc[_idx_nulls, 'LineageID'] = Edmunds_matched_bodyid_file_raw1.loc[_idx_lineageid[0], 'LineageID']
+                else:
+                    for j in range(len(_bodyids)):
+                        _bodyid = _bodyids[j]
+                        _wheelbases =  Edmunds_matched_bodyid_file_base.loc[(Edmunds_matched_bodyid_file_base['Model'] == _model) & (Edmunds_matched_bodyid_file_base['BodyID'] == _bodyid), 'WHEELBASE'].unique()
+                        for k in range(len(_wheelbases)):
+                            _idx_base = Edmunds_matched_bodyid_file_base.loc[(Edmunds_matched_bodyid_file_base['Model'] == _model) & (Edmunds_matched_bodyid_file_base['BodyID'] == _bodyid) &
+                            (Edmunds_matched_bodyid_file_base['WHEELBASE'] == _wheelbases[k]), :].index
+
+                            Edmunds_matched_bodyid_file_raw1.loc[(_idx_nulls) & (Edmunds_matched_bodyid_file_raw1['WHEELBASE'] == _wheelbases[k]), 'BodyID'] = Edmunds_matched_bodyid_file_base.loc[_idx_base[0], 'BodyID']
+                            Edmunds_matched_bodyid_file_raw1.loc[(_idx_nulls) & (Edmunds_matched_bodyid_file_raw1['WHEELBASE'] == _wheelbases[k]), 'LineageID'] = Edmunds_matched_bodyid_file_base.loc[_idx_base[0], 'LineageID']
+
+            Edmunds_matched_bodyid_file_raw1.to_csv(run_input_path + '\\' + matched_bodyid_filename.split('.csv')[0] + '-MY' + str(year) + '.csv', index=False)
 
         for j in range(len(_body_styles)):
             _body_style = _body_styles[j]
@@ -42,21 +102,19 @@ def body_id_checks(Edmunds_Data, Edmunds_matched_bodyid_file_raw, year, base_yea
             _height_df_tmp = [];
             _length_df_tmp = [];
             for ik in range (len(df_tmp)):
-                _wheelbase_tmp = float(df_tmp.loc[ik, 'WHEELBASE'].split(' ')[0])
-                if isinstance(df_tmp.loc[ik, 'HEIGHT'], float): continue
-                    # print(df_tmp.loc[ik, 'HEIGHT'])
-                    # tmp_str = Edmunds_Data.loc[(Edmunds_Data['Model'] == _model_org) & (Edmunds_Data['Trims'] == df_tmp.loc[ik, 'Trims']), 'HEIGHT'].reset_index(drop=True)
-                    # if isinstance(tmp_str, float) == False:
-                    #     df_tmp.loc[ik, 'HEIGHT'] = tmp_str[0];
-                        # Edmunds_matched_bodyid_null.loc[(Edmunds_matched_bodyid_null['Model'] == _model_org), :].reset_index(drop=True)
-                _height_tmp = float(df_tmp.loc[ik, 'HEIGHT'].split(' ')[0]);
-                if isinstance(df_tmp.loc[ik, 'LENGTH'], float): continue
-                print(i, _model_org, df_tmp.loc[ik, 'Trims'], 'Length = ', df_tmp.loc[ik, 'LENGTH'], '*** edmunds-body file and Edmunds-MY file data matching')
-                    # continue
-                _length_tmp = float(df_tmp.loc[ik, 'LENGTH'].split(' ')[0]);
-                # except KeyError:
-                #     print(i, _model_org, df_tmp.loc[ik, 'Trims'], df_tmp.loc[ik, 'LENGTH'])
-                #     continue
+                if (isinstance(df_tmp.loc[ik, 'WHEELBASE'], str) == True) and (df_tmp.loc[ik, 'WHEELBASE'] != str(np.nan)):
+                    _wheelbase_tmp = float(df_tmp.loc[ik, 'WHEELBASE'].split(' ')[0])
+                else:
+                    _wheelbase_tmp = ''
+                if (isinstance(df_tmp.loc[ik, 'LENGTH'], str) == True) and (df_tmp.loc[ik, 'LENGTH'] != str(np.nan)):
+                    _length_tmp = float(df_tmp.loc[ik, 'LENGTH'].split(' ')[0]);
+                else:
+                    _length_tmp = ''
+                if (isinstance(df_tmp.loc[ik, 'HEIGHT'], str) == True) and (df_tmp.loc[ik, 'HEIGHT'] != str(np.nan)):
+                    _height_tmp = float(df_tmp.loc[ik, 'HEIGHT'].split(' ')[0]);
+                else:
+                    _height_tmp = ''
+
                 if _wheelbase_tmp not in _wheelbase_df_tmp:
                     _wheelbase_df_tmp.append(_wheelbase_tmp);
                     _height_df_tmp.append(_height_tmp);
@@ -67,7 +125,6 @@ def body_id_checks(Edmunds_Data, Edmunds_matched_bodyid_file_raw, year, base_yea
             for j in range (len(_body_styles)):
                 _body_style = _body_styles[j];
                 df_base = Edmunds_matched_bodyid_file_raw0.loc[(Edmunds_matched_bodyid_file_raw0['Model'] == _model_org) & (Edmunds_matched_bodyid_file_raw0['BodyStyle'] == _body_style), :].reset_index(drop=True)
-                # if (_model_org == 'F-150') and (_body_style == 'SuperCab'): print(_model);
 
                 if (len(df_base) == 0):
                     if (_model == 'SILVERADO-1500-LIMITED'): _model = 'SILVERADO-1500';
@@ -134,7 +191,7 @@ def body_id_checks(Edmunds_Data, Edmunds_matched_bodyid_file_raw, year, base_yea
                                                                          (Edmunds_matched_bodyid_file_raw1['WHEELBASE'] == str(_wheelbase_df_tmp[m2]) + ' in.'), 'LineageID'] = df_base1.loc[l2, 'LineageID'];
 
                     del _wheelbase_df_base1;
-            del _wheelbase_df_tmp;
+            if len(_wheelbase_df_tmp) > 0: del _wheelbase_df_tmp;
 
         Edmunds_matched_bodyid_null = Edmunds_matched_bodyid_file_raw1.loc[Edmunds_matched_bodyid_file_raw1['BodyID'] == -9, :];
         _models_Edmunds_matched_bodyid_null = Edmunds_matched_bodyid_null['Model'].unique();
@@ -160,6 +217,7 @@ def body_id_checks(Edmunds_Data, Edmunds_matched_bodyid_file_raw, year, base_yea
                     _k_matching = 0
                     _min_diff = 1000;
                     for k in range(len(_wheelbases)):
+                        if (isinstance(df_base.loc[k, 'WHEELBASE'], float)) or (df_base.loc[k, 'WHEELBASE'] == str(np.nan)): continue
                         _wheelbases_k = float(df_base.loc[k, 'WHEELBASE'].split(' ')[0])
                         if (abs(_wheelbase - _wheelbases_k) < _min_diff):
                             _k_matching = k;
@@ -174,15 +232,123 @@ def body_id_checks(Edmunds_Data, Edmunds_matched_bodyid_file_raw, year, base_yea
                     Edmunds_matched_bodyid_file_raw1.loc[(Edmunds_matched_bodyid_file_raw1['Model'] == _model) & (Edmunds_matched_bodyid_file_raw1['BodyStyle'] == _body_style) & \
                         (Edmunds_matched_bodyid_file_raw1['WHEELBASE'] == df_tmp.loc[j, 'WHEELBASE']), 'Matching'] = 2;
 
+    _models = Edmunds_matched_bodyid_file_raw1.loc[(Edmunds_matched_bodyid_file_raw1['BodyID'] == -9), 'Model'].unique()
+    if (len(_models) > 0):
+        for i in range(len(_models)):
+            # if (_models[i] == 'TRANSIT-VAN') or (_models[i] == 'COLORADO'):
+                # print(_models[i])
+            _model_splitted = _models[i].split('-')
+            _model = _model_splitted[0]
+            _trims = Edmunds_matched_bodyid_file_raw1.loc[(Edmunds_matched_bodyid_file_raw1['Model'] == _models[i]) & (Edmunds_matched_bodyid_file_raw1['BodyID'] == -9), 'Trims']
+            _index = Edmunds_matched_bodyid_file_raw1.loc[(Edmunds_matched_bodyid_file_raw1['Model'] == _models[i]) & (Edmunds_matched_bodyid_file_raw1['BodyID'] == -9), 'Trims'].index
+            for j in range(len(_index)):
+                _drivetrain = ''
+                _doorstyle = ''
+                _roofstyle = ''
+                _vanstyle = ''
+                _trim = Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'Trims']
+                _wheelbase = Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'WHEELBASE']
+                _bodystyle = Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'BodyStyle']
+                _trim_splitted = _trim.split(' ')
+                for kk in range(len(_trim_splitted)):
+                    if 'dr' in _trim_splitted[kk]: _doorstyle = _trim_splitted[kk]
+                    if 'WD' in _trim_splitted[kk]: _drivetrain = _trim_splitted[kk]
+                    if 'Roof' in _trim_splitted[kk]: _roofstyle = _trim_splitted[kk-1] + ' ' + _trim_splitted[kk]
+
+                    if ('Van' in _trim_splitted[kk]) and (_bodystyle == "Van"):
+                        _vanstyle = _trim_splitted[kk]
+                        if (_trim_splitted[kk-1] == "Ext"): _vanstyle = _bodystyle = "Ext Van"
+                        if (_trim_splitted[kk-1] == "Cargo"): _vanstyle = _bodystyle = "Cargo Van"
+                        if (_trim_splitted[kk-1] == "Passenger"): _vanstyle = _bodystyle = "Passenger Van"
+
+                _trim0 = _trim_splitted[0]
+                _idx = Edmunds_matched_bodyid_file_raw.loc[(Edmunds_matched_bodyid_file_raw['Model'].str.contains((_model), case=False, na=False)) &
+                                                           (Edmunds_matched_bodyid_file_raw['Trims'].str.contains((_trim0), case=False, na=False)) &
+                                                           (Edmunds_matched_bodyid_file_raw['Trims'].str.contains((_drivetrain), case=False, na=False)) &
+                                                           (Edmunds_matched_bodyid_file_raw['Trims'].str.contains((_doorstyle), case=False, na=False)) &
+                                                           (Edmunds_matched_bodyid_file_raw['Trims'].str.contains((_roofstyle), case=False, na=False)) &
+                                                           (Edmunds_matched_bodyid_file_raw['Trims'].str.contains((_vanstyle), case=False, na=False)) &
+                                                           (Edmunds_matched_bodyid_file_raw['Trims'].str.contains((_bodystyle), case=False, na=False)) & (Edmunds_matched_bodyid_file_raw['BodyID'] != -9), :].index
+                if len(_idx) > 0:
+                    _yr = Edmunds_matched_bodyid_file_raw.loc[_idx, 'ModelYear'].max()
+                    _bodyids = Edmunds_matched_bodyid_file_raw.loc[(Edmunds_matched_bodyid_file_raw['Model'].str.contains((_model), case=False, na=False)) &
+                                                                   (Edmunds_matched_bodyid_file_raw['Trims'].str.contains((_trim0), case=False, na=False)) &
+                                                                   (Edmunds_matched_bodyid_file_raw['Trims'].str.contains((_drivetrain), case=False, na=False)) &
+                                                                   (Edmunds_matched_bodyid_file_raw['Trims'].str.contains((_doorstyle), case=False, na=False)) &
+                                                                   (Edmunds_matched_bodyid_file_raw['Trims'].str.contains((_roofstyle), case=False, na=False)) &
+                                                                   (Edmunds_matched_bodyid_file_raw['Trims'].str.contains((_vanstyle), case=False, na=False)) &
+                                                                   (Edmunds_matched_bodyid_file_raw['Trims'].str.contains((_bodystyle), case=False, na=False)) &
+                                                                   (Edmunds_matched_bodyid_file_raw['ModelYear'] == _yr) & (Edmunds_matched_bodyid_file_raw['BodyID'] != -9), :]
+
+                    if len(_bodyids) == 1:
+                        Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'BodyID'] = _bodyids.loc[_bodyids.index[0], 'BodyID']
+                        Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'LineageID'] = _bodyids.loc[_bodyids.index[0], 'LineageID']
+                        Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'Matching'] = 3
+                        Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'Source'] = str(_bodyids.loc[_bodyids.index[0], 'ModelYear']) + ', ' + _models[i] + ', ' + _trim
+                        # print(_trim, Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'Source'])
+                    else:
+                        _idx_wheelbase_matched_yr = 0
+                        _wheelbase_diff = 999*np.ones(len(_bodyids))
+                        for k in range(len(_bodyids)):
+                            _wheelbase_yr = _bodyids.loc[_bodyids.index[k], 'WHEELBASE']
+                            _wheelbase_diff[k] = abs(float(_wheelbase.split(' ')[0]) - float(_wheelbase_yr.split(' ')[0]))
+                            if (_wheelbase == _wheelbase_yr) or (_wheelbase_diff[k] <= 0.1):
+                                _idx_wheelbase_matched_yr = _bodyids.index[k]
+                                break;
+                        if _idx_wheelbase_matched_yr != 0:
+                            Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'BodyID'] = _bodyids.loc[_idx_wheelbase_matched_yr, 'BodyID']
+                            Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'LineageID'] = _bodyids.loc[_idx_wheelbase_matched_yr, 'LineageID']
+                            Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'Matching'] = 3
+                            Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'Source'] = str(_bodyids.loc[_idx_wheelbase_matched_yr, 'ModelYear']) + ', ' + _models[i] + ', ' + _trim
+                            # print(_trim, Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'Source'])
+                        else:
+                            _idx_wheelbase_diff_min = 0
+                            _wheelbase_diff_min = 999
+                            for kk in range(len(_wheelbase_diff)):
+                                if _wheelbase_diff[kk] < _wheelbase_diff_min:
+                                    _wheelbase_diff_min = _wheelbase_diff[kk]
+                                    _idx_wheelbase_diff_min = kk
+                                    break
+                            Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'BodyID'] = _bodyids.loc[_bodyids.index[_idx_wheelbase_diff_min], 'BodyID']
+                            Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'LineageID'] = _bodyids.loc[_bodyids.index[_idx_wheelbase_diff_min], 'LineageID']
+                            Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'Matching'] = 4
+                            Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'Source'] = str(_bodyids.loc[_bodyids.index[_idx_wheelbase_diff_min], 'ModelYear']) + ', ' + _models[i] + ', ' + _trim
+                            # print(_trim, Edmunds_matched_bodyid_file_raw1.loc[_index[j], 'Source'])
+
+    _idx_null_lineageIDs = Edmunds_matched_bodyid_file_raw1.loc[Edmunds_matched_bodyid_file_raw1['LineageID'] == -9, :].index
+    _models_null = Edmunds_matched_bodyid_file_raw1.loc[_idx_null_lineageIDs, 'Model'].unique()
+    _lineagdID = Edmunds_matched_bodyid_file_raw1['LineageID'].max()
+    for i in range(len(_models_null)):
+        _idx = Edmunds_matched_bodyid_file_raw1.loc[(Edmunds_matched_bodyid_file_raw1['Model'] == _models_null[i]) &
+                                                            (Edmunds_matched_bodyid_file_raw1['LineageID'] == -9), 'LineageID'].index
+        Edmunds_matched_bodyid_file_raw1.loc[_idx, 'LineageID'] = _lineagdID + 1
+
+    _idx_null_bodyIDs = Edmunds_matched_bodyid_file_raw1.loc[Edmunds_matched_bodyid_file_raw1['BodyID'] == -9, :].index
+    _models_null = Edmunds_matched_bodyid_file_raw1.loc[_idx_null_bodyIDs, 'Model'].unique()
+    _bodyID = Edmunds_matched_bodyid_file_raw1['BodyID'].max()
+    for i in range(len(_models_null)):
+        _idx = Edmunds_matched_bodyid_file_raw1.loc[(Edmunds_matched_bodyid_file_raw1['Model'] == _models_null[i]) &
+                                                            (Edmunds_matched_bodyid_file_raw1['BodyID'] == -9), 'BodyID'].index
+        Edmunds_matched_bodyid_file_raw1.loc[_idx, 'BodyID'] = _bodyID + 1
+
+    _idx_MY_drop = Edmunds_matched_bodyid_file_raw.loc[Edmunds_matched_bodyid_file_raw['ModelYear'] == year, 'ModelYear'].index
+    Edmunds_matched_bodyid_file_raw = Edmunds_matched_bodyid_file_raw.drop(index=_idx_MY_drop).reset_index(drop=True)
+    _columns_edmunds_bodyIDs = ['ModelYear', 'Make', 'Model', 'Trims', 'HEIGHT', 'LENGTH', 'WHEELBASE', 'BodyID', 'LineageID']
+    Edmunds_matched_bodyid_file_raw = pd.concat([Edmunds_matched_bodyid_file_raw, Edmunds_matched_bodyid_file_raw1[_columns_edmunds_bodyIDs]], axis=0, ignore_index=True)
+    Edmunds_matched_bodyid_file_raw.sort_values(by=['ModelYear'], ascending=True, inplace=True)
+    Edmunds_matched_bodyid_file_raw['Model'] = Edmunds_matched_bodyid_file_raw['Model'].apply(str.upper)
+    Edmunds_matched_bodyid_file_raw1['Model'] = Edmunds_matched_bodyid_file_raw1['Model'].apply(str.upper)
+
     date_and_time = str(datetime.datetime.now())[:19].replace(':', '').replace('-', '')
     print('input_path: ', run_input_path)
-    Edmunds_matched_bodyid_file_raw1.to_csv(run_input_path + '\\' + 'edmunds-bodyid-MY' + str(year) + '_' + date_and_time + '.csv', index=False)
-
-    null_BodyID_models  = Edmunds_matched_bodyid_file_raw1.loc[Edmunds_matched_bodyid_file_raw1['BodyID'] == -9, :]
-    null_BodyID_models =  null_BodyID_models.drop_duplicates(subset=['Model']);
-    null_BodyID_models = null_BodyID_models.drop(['Powertrains', 'Matching'], axis=1)
-
-    null_BodyID_models.to_csv(run_input_path + '\\' + 'Null-BodyIDs-MY' + str(year) + '_' + date_and_time + '.csv', index=False)
+    Edmunds_matched_bodyid_file_raw1.to_csv(run_input_path + '\\' + 'edmunds-bodyid-MY' + str(year) + '-' + date_and_time + '.csv', index=False)
+    Edmunds_matched_bodyid_file_raw.to_csv(run_input_path + '\\' + matched_bodyid_filename.split('.csv')[0] + '-1.csv', index=False)
+    # run_input_path + '\\' + matched_bodyid_filename.split('.csv')[0] + '-MY' + str(year) + '.csv', index = False)
+    # null_BodyID_models  = Edmunds_matched_bodyid_file_raw1.loc[Edmunds_matched_bodyid_file_raw1['BodyID'] == -9, :]
+    # if len(null_BodyID_models) > 0:
+    #     null_BodyID_models = null_BodyID_models.drop_duplicates(subset=['Model']);
+    #     null_BodyID_models = null_BodyID_models.drop(['Powertrains', 'Matching'], axis=1).reset_index(drop=True)
+    #     null_BodyID_models.to_csv(run_input_path + '\\' + 'Null-BodyIDs-MY' + str(year) + '_' + date_and_time + '.csv', index=False)
 
     return Edmunds_matched_bodyid_file_raw1;
 def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_path, exceptions_table, \
@@ -220,7 +386,14 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     body_id_table['LineageID'] = body_id_table['LineageID'].astype(int)
     body_id_table['BodyID'] = body_id_table['BodyID'].astype(int)
 
-    Edmunds_matched_bodyid_file_raw = pd.read_csv(run_input_path + '\\' + matched_bodyid_filename, converters={'LineageID': int, 'BodyID': int, 'Model':str})
+    Edmunds_matched_bodyid_file_raw = pd.read_csv(run_input_path + '\\' + matched_bodyid_filename)
+    Edmunds_matched_bodyid_file_raw.dropna(subset=['ModelYear', 'Make'], how='any', inplace=True)
+    Edmunds_matched_bodyid_file_raw.loc[Edmunds_matched_bodyid_file_raw['LineageID'].astype(str) == str(np.nan), 'LineageID'] = -9
+    Edmunds_matched_bodyid_file_raw.loc[Edmunds_matched_bodyid_file_raw['BodyID'].astype(str) == str(np.nan), 'BodyID'] = -9
+    Edmunds_matched_bodyid_file_raw.loc[Edmunds_matched_bodyid_file_raw['BodyID'].astype(str) == str(np.nan), 'BodyID'] = -9
+    Edmunds_matched_bodyid_file_raw['BodyID'] = Edmunds_matched_bodyid_file_raw['BodyID'].astype(int)
+    Edmunds_matched_bodyid_file_raw['ModelYear'] = Edmunds_matched_bodyid_file_raw['ModelYear'].astype(int)
+    Edmunds_matched_bodyid_file_raw['Model'] = Edmunds_matched_bodyid_file_raw['Model'].astype(str)
 
     _body_style_check = 1;
     Edmunds_matched_bodyid_file_raw = body_id_checks(Edmunds_Data, Edmunds_matched_bodyid_file_raw, year, 2019, _body_style_check, rawdata_input_path, run_input_path, matched_bodyid_filename);
@@ -237,10 +410,42 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     #     Edmunds_matched_bodyid['Model'] = Edmunds_matched_bodyid['Model'].str.replace('|'.join(l_str), '', regex=True).str.strip();
         # Edmunds_data_cleaned = Edmunds_Data.merge(Edmunds_matched_bodyid[['Make', 'Trims', 'LineageID', 'BodyID']], how='left', on=['Make', 'Trims']).reset_index(drop=True);
     Edmunds_data_cleaned = Edmunds_Data.merge(Edmunds_matched_bodyid[['Model', 'Trims', 'LineageID', 'BodyID']], how='left', on = ['Model', 'Trims']).reset_index(drop=True)
-    # Edmunds_data_cleaned['BodyID'] = Edmunds_data_cleaned['BodyID'].astype(float)
+    # Edmunds_data_cleaned = Edmunds_data_cleaned.merge(Edmunds_matched_bodyid[['Make', 'Model', 'Trims', 'LineageID', 'BodyID']], how='left', on = ['Make', 'Model']).reset_index(drop=True)
+    if ('Trims_y' in Edmunds_data_cleaned.columns):
+        Edmunds_data_cleaned.drop(['Trims_y'], axis=1, inplace=True)
+        Edmunds_data_cleaned.rename({'Trims_x': 'Trims'}, axis=1, inplace=True)
+    if ('BodyID_x' in Edmunds_data_cleaned.columns):
+        Edmunds_data_cleaned.drop(['BodyID_x'], axis=1, inplace=True)
+        Edmunds_data_cleaned.rename({'BodyID_y': 'BodyID'}, axis=1, inplace=True)
+    if ('LineageID_x' in Edmunds_data_cleaned.columns):
+        Edmunds_data_cleaned.drop(['LineageID_x'], axis=1, inplace=True)
+        Edmunds_data_cleaned.rename({'LineageID_y':'LineageID'}, axis=1, inplace=True)
     Edmunds_data_cleaned['BodyID'] = Edmunds_data_cleaned['BodyID'].replace(np.nan, 0).astype(int)
     Edmunds_data_cleaned['LineageID'] = Edmunds_data_cleaned['LineageID'].replace(np.nan, 0).astype(int)
     Edmunds_data_cleaned['LineageID'] = Edmunds_data_cleaned['LineageID'].replace(np.nan, 0)
+
+    _idx_blanks = Edmunds_matched_bodyid.loc[Edmunds_matched_bodyid['Model'].str.contains(' '), :].index
+    _extra_str = ['-VAN', '-WAGON', '-CONVERTIBLE']
+    if (len(_idx_blanks) > 0):
+        for i in range(len(_extra_str)):
+            Edmunds_data_cleaned.loc[Edmunds_data_cleaned['Model'].str.contains(_extra_str[i]), 'Model'].str.replace(_extra_str[i], '')
+        # else:
+        #     Edmunds_data_cleaned.loc[Edmunds_data_cleaned['Model'].str.contains_extra_str[i]), 'Model'].str.replace(
+        #         _extra_str[i], '')
+    # Edmunds_data_cleaned['Model'].str.replace('-', ' ')
+    _models_null = Edmunds_data_cleaned.loc[(Edmunds_data_cleaned['LineageID'] == 0), 'Model'].unique()
+
+    for i in range(len(_models_null)):
+        _model_null = _models_null[i]
+        _model0_null = _model_null.split(' ')[0]
+        _idx = Edmunds_matched_bodyid.loc[(Edmunds_matched_bodyid['Model'] == _model_null) & (Edmunds_matched_bodyid['LineageID'] != -9), :].index
+        _idx_null = Edmunds_data_cleaned.loc[(Edmunds_data_cleaned['Model'] == _model_null) & (Edmunds_data_cleaned['LineageID'] == 0), :].index
+        # if (len(_idx_null) > 0) and (len(_idx) == 0):
+        #     _idx = Edmunds_matched_bodyid.loc[(Edmunds_matched_bodyid['Model'].str.contains((_model_null[0]), case=False, na=False)) & (Edmunds_matched_bodyid['LineageID'] != -9), :].index
+        if (len(_idx) > 0) and (len(_idx_null) > 0):
+            Edmunds_data_cleaned.loc[_idx_null, 'LineageID'] = Edmunds_matched_bodyid.loc[_idx[0], 'LineageID']
+            Edmunds_data_cleaned.loc[_idx_null, 'BodyID'] = Edmunds_matched_bodyid.loc[_idx[0], 'BodyID']
+
     in_unit_columns=[]; ft_unit_columns = []; ft3_unit_columns = []; lbs_unit_columns = []
     degree_unit_columns=[]; gal_unit_columns = []; mpg_unit_columns = []; mpge_unit_columns = []; kwh_unit_columns = []; mi_unit_columns = []; hr_unit_columns = [];
     ncolumns = len(Edmunds_data_cleaned.columns)
@@ -282,7 +487,11 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
         # if mi_unit_columns[i] == 'FREE MAINTENANCE': print(mi_unit_columns[i]);
         Edmunds_data_cleaned[mi_unit_columns[i]] = Edmunds_data_cleaned[mi_unit_columns[i]].replace(np.nan, '').str.replace(' mi.', '').str.replace('no', '')
     for i in range(len(hr_unit_columns)):
-        Edmunds_data_cleaned[hr_unit_columns[i]] = Edmunds_data_cleaned[hr_unit_columns[i]].replace(np.nan, '').str.replace(' hr.', '').str.replace('no', '')
+        try:
+            Edmunds_data_cleaned[hr_unit_columns[i]] = Edmunds_data_cleaned[hr_unit_columns[i]].replace(np.nan, '').str.replace(' hr.', '').str.replace('no', '')
+        except KeyError:
+            print(Edmunds_data_cleaned[hr_unit_columns[i]])
+            continue
 
     # print(Edmunds_data_cleaned.loc[Edmunds_data_cleaned['TRANSMISSION'] == 'N/A', 'TRANSMISSION'])
 
@@ -320,6 +529,7 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     Edmunds_data_cleaned['MSRP'] = Edmunds_data_cleaned['MSRP'].str.rstrip(' (Discontinued)')
     Edmunds_data_cleaned['MAXIMUM TOWING CAPACITY'] = Edmunds_data_cleaned['MAXIMUM TOWING CAPACITY'].str.rstrip(' (Estimated)')
 
+    # Edmunds_data_cleaned[~Edmunds_data_cleaned['DRIVE TYPE'].str.contains(('wheel drive'), case=False, na=False)] = 'Front wheel drive'
     Edmunds_data_cleaned['Drivetrain Layout Category'] = Edmunds_data_cleaned['DRIVE TYPE'].copy()
     matching_drvtype = Edmunds_data_cleaned['DRIVE TYPE']
     matching_drvtype[matching_drvtype.str.contains('Front')] = 'F'
@@ -362,7 +572,6 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     matching_trns_category[Edmunds_data_cleaned['TRANSMISSION'].str.contains('speed manual')] = 'M'
     matching_trns_category[Edmunds_data_cleaned['TRANSMISSION'].str.contains('continuous')] = '1ST'
 
-    matching_boost_category = pd.Series(np.zeros(len(Edmunds_data_cleaned)), name = 'Boost Type Category').replace(0,'N')
     matching_boost_category = pd.Series(np.zeros(len(Edmunds_data_cleaned)), name = 'Boost Type Category').replace(0,'N')
     matching_boost_category[Edmunds_data_cleaned['Trims'].str.contains('Turbo')] = 'TC'
     matching_boost_category[Edmunds_data_cleaned['Trims'].str.contains('Turbodiesel')] = 'TC'
@@ -435,6 +644,11 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
                                            matching_trns_numgears, matching_boost_category, matching_mfr_category, \
                                            matching_fuel_category, electrification_category, tire_codes],axis=1)
     Edmunds_Final_Output.rename(columns={'WHEEL BASE':'WHEEL_BASE_INCHES'})
+    _column_insert_pos = len(Edmunds_Final_Output.columns);
+    for i in range(len(cols_safety)):
+        if (cols_safety[i] not in Edmunds_Final_Output.columns):
+            Edmunds_Final_Output.insert(_column_insert_pos, cols_safety[i], '')
+            _column_insert_pos += 1
     if ('OVERALL WIDTH WITHOUT MIRRORS' in Edmunds_Final_Output.columns) and ('WIDTH' not in Edmunds_Final_Output.columns):
         # Edmunds_Final_Output.rename(columns={'OVERALL WIDTH WITHOUT MIRRORS': 'WIDTH'})
         Edmunds_Final_Output['WIDTH'] = Edmunds_Final_Output['OVERALL WIDTH WITHOUT MIRRORS'].copy()
