@@ -1619,7 +1619,7 @@ class VehicleFinal(SQABase, Vehicle):
             veh.onroad_direct_kwh_per_mile = 0
 
             if veh.base_year_powertrain_type in ['BEV', 'FCV']:
-                rated_hp = veh.base_year_tractive_motor_kw / 0.746
+                rated_hp = veh.base_year_total_emachine_kw / 0.746
             else:
                 rated_hp = veh.base_year_eng_rated_hp
 

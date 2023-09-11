@@ -645,10 +645,10 @@ class CostCloud(OMEGABase, CostCloudBase):
                             else:
                                 # BEV battery size and motor power determined by vehicle and iterative range calculation
                                 cloud_point['battery_kwh'] = battery_kwh
-                                cloud_point['tractive_motor_kw'] = rated_hp * 0.746
-                                cloud_point['total_emachine_kw'] = \
-                                    cloud_point['tractive_motor_kw'] * vehicle.base_year_total_emachine_kw / \
-                                    vehicle.base_year_tractive_motor_kw
+                                cloud_point['total_emachine_kw'] = rated_hp * 0.746
+                                cloud_point['tractive_motor_kw'] = \
+                                    cloud_point['total_emachine_kw'] * vehicle.base_year_tractive_motor_kw / \
+                                    vehicle.base_year_total_emachine_kw
 
                             cloud_point = vehicle.calc_cert_and_onroad_values(cloud_point)
 
