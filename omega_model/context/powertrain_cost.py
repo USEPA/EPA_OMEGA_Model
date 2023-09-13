@@ -1226,7 +1226,7 @@ def get_engine_deets(pkg_info):
     """
     CYL = pkg_info['engine_cylinders']
     engine_config = 'I'
-    if pkg_info['engine_cylinders'] >= 6:
+    if pkg_info['engine_cylinders'] > 5:
         engine_config = 'V'
     LITERS = pkg_info['engine_displacement_liters']
 
