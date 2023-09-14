@@ -232,7 +232,7 @@ class PowertrainCost(OMEGABase):
         # powertrain costs for anything with a liquid fueled engine
         if powertrain_type in ['ICE', 'HEV', 'PHEV', 'MHEV']:
 
-            trans = get_trans(pkg_info)
+            trans = get_trans(pkg_info)[0]
 
             gasoline_flag = True
             if 'diesel' in base_year_cert_fuel_id:
