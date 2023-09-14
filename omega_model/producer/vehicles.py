@@ -1527,6 +1527,7 @@ class VehicleFinal(SQABase, Vehicle):
 
         """
         from context.new_vehicle_market import NewVehicleMarket
+        from context.powertrain_cost import PowertrainCost
 
         vehicle_shares_dict = {'total': 0}
 
@@ -1574,9 +1575,11 @@ class VehicleFinal(SQABase, Vehicle):
                 base_year_cert_fuel_id=df.loc[i, 'cert_fuel_id'],
                 base_year_battery_kwh=df.loc[i, 'battery_kwh'],
                 base_year_total_emachine_kw=df.loc[i, 'total_emachine_kw'],
+                total_emachine_kw=df.loc[i, 'total_emachine_kw'],
                 base_year_tractive_motor_kw=df.loc[i, 'tractive_motor_kw'],
+                tractive_motor_kw=df.loc[i, 'tractive_motor_kw'],
                 base_year_onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi'],
-                battery_kwh=0,
+                battery_kwh=df.loc[i, 'battery_kwh'],
                 onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi'],
                 base_year_powertrain_type=df.loc[i, 'base_year_powertrain_type'],
                 prior_redesign_year=df.loc[i, 'prior_redesign_year'],
@@ -1693,6 +1696,8 @@ class VehicleFinal(SQABase, Vehicle):
 
             if verbose:
                 print(veh)
+
+            PowertrainCost.calc_cost(veh, update_tracker=True)  # update build dict
 
         # Update market share and create alternative vehicles (a BEV equivalent for every ICE vehicle, etc).
         # Alternative vehicles maintain fleet utility mix across model years and prevent all future vehicles

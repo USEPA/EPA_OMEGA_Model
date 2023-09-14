@@ -221,7 +221,7 @@ try:
             self.manufacturer_gigawatthour_data = None
 
             self.powertrain_cost_fev = False
-            self.powertrain_cost_tracker = False
+            self.powertrain_cost_tracker = True
             self.powertrain_cost_with_ira = True
             self.powertrain_cost_with_gpf = True
 

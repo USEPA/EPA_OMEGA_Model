@@ -70,7 +70,7 @@ class PowertrainCost(OMEGABase):
     cost_tracker = {}
 
     @staticmethod
-    def calc_cost(vehicle, powertrain_type=None, pkg_info=None):
+    def calc_cost(vehicle, powertrain_type=None, pkg_info=None, update_tracker=False):
         """
         Calculate the value of the response surface equation for the given powertrain type, cost curve class (tech
         package) for the full factorial combination of the iterable terms.
@@ -79,6 +79,7 @@ class PowertrainCost(OMEGABase):
             powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
             vehicle (Vehicle): the vehicle to calc costs for
             pkg_info (dict-like): the necessary information for developing cost estimates.
+            update_tracker (bool): update cost tracking dict if ``True``
 
         Returns:
             A list of cost values indexed the same as pkg_df.
@@ -99,13 +100,13 @@ class PowertrainCost(OMEGABase):
             powertrain_type = omega_globals.options.CostCloud.get_powertrain_type(pkg_info)
 
         if omega_globals.options.powertrain_cost_fev:
-            return PowertrainCost.calc_cost_fev(vehicle, pkg_info, powertrain_type)
+            return PowertrainCost.calc_cost_fev(vehicle, pkg_info, powertrain_type, update_tracker)
 
         else:
-            return PowertrainCost.calc_cost_nprm(vehicle, pkg_info, powertrain_type)
+            return PowertrainCost.calc_cost_nprm(vehicle, pkg_info, powertrain_type, update_tracker)
 
     @staticmethod
-    def calc_cost_nprm(vehicle, pkg_info, powertrain_type):
+    def calc_cost_nprm(vehicle, pkg_info, powertrain_type, update_tracker=False):
         """
         Calculate the value of the response surface equation for the given powertrain type, cost curve class (tech
         package) for the full factorial combination of the iterable terms.
@@ -114,6 +115,7 @@ class PowertrainCost(OMEGABase):
             powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
             vehicle (Vehicle): the vehicle to calc costs for
             pkg_info (dict-like): the necessary information for developing cost estimates.
+            update_tracker (bool): update cost tracking dict if ``True``
 
         Returns:
             A list of cost values indexed the same as pkg_df.
@@ -610,12 +612,13 @@ class PowertrainCost(OMEGABase):
                 'electrified_driveline_cost': electrified_driveline_cost,
                 'powertrain_cost': powertrain_cost,
             }
-            PowertrainCost.cost_tracker[vehicle.vehicle_id, model_year] = update_dict
+            if update_tracker:
+                PowertrainCost.cost_tracker[vehicle.vehicle_id, model_year] = update_dict
 
         return engine_cost, driveline_cost, emachine_cost, battery_cost, electrified_driveline_cost
 
     @staticmethod
-    def calc_cost_fev(vehicle, pkg_info, powertrain_type):
+    def calc_cost_fev(vehicle, pkg_info, powertrain_type, update_tracker=False):
         """
         Calculate the value of the response surface equation for the given powertrain type, cost curve class (tech
         package) for the full factorial combination of the iterable terms.
@@ -624,6 +627,7 @@ class PowertrainCost(OMEGABase):
             powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
             vehicle (Vehicle): the Vehicle for which to calculate costs
             pkg_info (Series): the necessary information for developing cost estimates.
+            update_tracker (bool): update cost tracking dict if ``True``
 
         Returns:
             A list of cost values indexed the same as pkg_df.
@@ -909,7 +913,8 @@ class PowertrainCost(OMEGABase):
                 'electrified_driveline_cost': electrified_driveline_cost,
                 'powertrain_cost': powertrain_cost,
             }
-            PowertrainCost.cost_tracker[vehicle.vehicle_id, model_year] = update_dict
+            if update_tracker:
+                PowertrainCost.cost_tracker[vehicle.vehicle_id, model_year] = update_dict
 
         return engine_cost, driveline_cost, e_machine_cost, battery_cost, electrified_driveline_cost
 
