@@ -1579,7 +1579,7 @@ class VehicleFinal(SQABase, Vehicle):
                 base_year_tractive_motor_kw=df.loc[i, 'tractive_motor_kw'],
                 tractive_motor_kw=df.loc[i, 'tractive_motor_kw'],
                 base_year_onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi'],
-                battery_kwh=df.loc[i, 'battery_kwh'],
+                battery_kwh=df.loc[i, 'battery_gross_kwh'],
                 onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi'],
                 base_year_powertrain_type=df.loc[i, 'base_year_powertrain_type'],
                 prior_redesign_year=df.loc[i, 'prior_redesign_year'],

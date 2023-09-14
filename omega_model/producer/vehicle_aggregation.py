@@ -303,7 +303,16 @@ class VehicleAggregation(OMEGABase):
 
             # RV
             df['battery_kwh'] = df[['base_year_powertrain_type']].\
-                replace({'base_year_powertrain_type': {'HEV': 1, 'PHEV': df['battery_gross_kwh'], 'BEV': df['battery_gross_kwh'],
+                replace({'base_year_powertrain_type': {'HEV': df['battery_gross_kwh'], 'PHEV': df['battery_gross_kwh'],
+                                                       'BEV': df['battery_gross_kwh'],
+                                                       'FCV': VehicleAggregation.weighted_fillna(
+                                                           df[df['electrification_class'] == 'EV'], 'battery_gross_kwh',
+                                                           update_df=False),
+                                                       'ICE': 0}})
+
+            df['battery_gross_kwh'] = df[['base_year_powertrain_type']].\
+                replace({'base_year_powertrain_type': {'HEV': df['battery_gross_kwh'], 'PHEV': df['battery_gross_kwh'],
+                                                       'BEV': df['battery_gross_kwh'],
                                                        'FCV': VehicleAggregation.weighted_fillna(
                                                            df[df['electrification_class'] == 'EV'], 'battery_gross_kwh',
                                                            update_df=False),
