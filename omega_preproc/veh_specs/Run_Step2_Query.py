@@ -3,7 +3,10 @@ import numpy as np
 import datetime
 import os
 
-OMEGA_outputs = False
+OMEGA_outputs = True
+scraping_Edmunds_MSRP = False
+delete_Prod_VOL_GHG_50_State_for_safety_study_only = False
+
 pd.options.mode.chained_assignment = None  # default='warn'
 # "DRIVER ONLY WITH HEAD PROTECTION CHAMBER SIDE-MOUNTED AIRBAGS",
 cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
@@ -23,7 +26,8 @@ cols_OMEGA_inputs = ['CAFE_MFR_CD',	'MODEL_TYPE_INDEX',	'Electrification Categor
                      'FRONT_TRACK_WIDTH_INCHES', 'FUEL_CELL_YN_all', 'FUEL_METERING_all', 'FUEL_METERING_DESC_all', 'Fuel Recommended_all', 'Fuel Tank Capacity', 'FUEL_USAGE_all', 'FUEL_USAGE_DESC_all', 'Gross Vehicle Weight Rating',
                      'Ground Clearance', 'Height', 'Horsepower at RPM_all', 'HYBRID_YN_all', 'HYBRID_TYPE_all', 'HYBRID_TYPE_DESC_all', 'Interior Volume', 'Length', 'LineageID_all', 'MSRP', 'NUM_CYLINDRS_ROTORS_all', 'TOTAL_NUM_TRANS_GEARS_all',
                      'NV_RATIO_BEST', 'OFF_BOARD_CHARGE_CAPABLE_YN_all', 'Passenger Capacity', 'Payload Capacity', 'PRODUCTION_VOLUME_GHG_50_STATE', 'ENG_RATED_HP', 'REAR_TRACK_WIDTH_INCHES', 'RECHARGE_ENERGY_STORAGE_SYS_YN_all', 'TOT_ROAD_LOAD_HP',
-                     'STOP_START_ENG_MGT_all', 'STOP_START_ENG_MGT_DESC_all', 'THREE_ROWS_DES_SEATING_POS_YN_all', 'Torque_all', 'Towing Capacity', 'OEM Towing Capacity', 'Transmission Type Category_all', 'Wheelbase', 'Width', 'TARGET_COEF_BEST_MTH']
+                     'STOP_START_ENG_MGT_all', 'STOP_START_ENG_MGT_DESC_all', 'THREE_ROWS_DES_SEATING_POS_YN_all', 'Torque_all', 'Towing Capacity', 'OEM Towing Capacity', 'Transmission Type Category_all', 'Wheelbase', 'Width', 'TARGET_COEF_BEST_MTH',
+                     'Rated Motor Gen Power (kW)', 'Rated MG1 Power (kW)', 'Rated MG2 Power (kW)', 'Rated MG3 Power (kW)', 'Calculated battery kWh - FE Guide', 'Total Voltage for Battery Pack(s)', 'Batt Energy Capacity (Amp-hrs)']
 cols_id_clean_worksheet = ['lookup01', 'carline_mfr_name', 'carline_name', 'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id', 'epa_size_class',
                            'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id', 'sales', 'cert_direct_oncycle_co2e_grams_per_mile',
                            'cert_direct_oncycle_kwh_per_mile', 'footprint_ft2', 'eng_rated_hp', 'tot_road_load_hp', 'etw_lbs', 'length_in', 'width_in', 'height_in',
@@ -134,7 +138,9 @@ def scraping_Edmunds_MSRPs (omega_outputs0, df_edms):
 
     return omega_outputs
 
-def GCWRs_from_towing_guide(df_twgd, df_query):
+def GCWRs_from_towing_guide(model_year, df_twgd, df_query):
+    df_twgd = df_twgd.loc[df_twgd['Model Year'] == model_year, :].reset_index(drop=True)
+
     df_query['CARLINE_MFR_NAME_all'] = df_query['CARLINE_MFR_NAME_all'].str.upper()
     df_query['CARLINE_NAME_all'] = df_query['CARLINE_NAME_all'].str.upper()
     df_query.insert(len(df_query.columns), 'GCWR', pd.DataFrame(np.zeros(len(df_query))))
@@ -205,8 +211,8 @@ def GCWRs_from_towing_guide(df_twgd, df_query):
                 if (df_tmp.loc[df_closest_wheelbase.index[0], 'GCWR'].astype(str) == 'nan'):
                     # https: // www.readingtruck.com / calculating - your - trucks - maximum - payload - and -towing - capacity /
                     _max_trailer_weight = df_tmp.loc[df_closest_wheelbase.index[0], 'Max Loaded Trailer Weight']
-                    if _payload.astype(str) == 'nan': _payload = 1250
-                    if _curv_weight.astype(str) == 'nan': _curv_weight = df_query.loc[
+                    if (isinstance(_payload, str) == True) or (_payload  == 'nan') or (_payload  == ''): _payload = 1250
+                    if (isinstance(_curv_weight, str) == True) or (_curv_weight  == 'nan'): _curv_weight = df_query.loc[
                         df_query['CARLINE_NAME_all'] == _modelname, 'Curb Weight'].mean()
                     df_query.loc[df_query['CARLINE_NAME_all'] == _modelname, 'GCWR'] = _curv_weight + _payload + _max_trailer_weight + 3 * 150
                 else:
@@ -420,6 +426,8 @@ for model_year in model_years:
             vehghg_filename = unique_filename
             vehghg_matching_categories = matching_categories
         if unique_sourcename != master_index_source: #If the current source is not the master index, readin the source file
+            if ('Edmunds' in unique_filename):
+                print(unique_filename)
             try:
                 source_file = pd.read_csv(unique_filepath+ '\\' + unique_filename, converters={'LineageID': int, 'BodyID': int}).astype(str)
             except ValueError:
@@ -567,8 +575,6 @@ for model_year in model_years:
         else:
             master_index_file_with_desired_fields_all_merges = master_index_file.replace([str(np.nan), ''], np.nan)
 
-        # if 'camry' in master_index_file['CARLINE_NAME'].str.lower().unique():
-        #     print('Camry is found')
         for all_subarray_count in range(0, len(all_subarray)):
             query_type = all_subarray['QueryType'][all_subarray_count]
             weighting_field = all_subarray['AvgWtField'][all_subarray_count]
@@ -753,15 +759,14 @@ for model_year in model_years:
     #     query_output.loc[query_output[_airbag] == 'null-|yes', _airbag] = 'yes|null'
     #     query_output.loc[query_output[_airbag] == 'yes|null-', _airbag] = 'yes|null'
     #     query_output.loc[query_output[_airbag] == 'null-', _airbag] = 'null'
-    if ('PRODUCTION_VOLUME_GHG_50_STATE' in query_output.columns):
-        query_output.drop(['PRODUCTION_VOLUME_GHG_50_STATE'], axis=1, inplace=True)
 
     query_output.to_csv(output_path + '\\' + str(model_year) + '_' + Query_filename + '_' + date_and_time + '.csv',index=False)
 
     query_output = query_output.drop(query_output.filter(regex='Master Index').columns, axis=1)
     query_output = query_output.drop(query_output.filter(regex='Edmunds').columns, axis=1)
     query_output = query_output.drop(query_output.filter(regex='OEM Towing Guide').columns, axis=1)
-    if ('PRODUCTION_VOLUME_GHG_50_STATE' in query_output.columns): query_output.drop(['PRODUCTION_VOLUME_GHG_50_STATE'], axis=1)
+    if (delete_Prod_VOL_GHG_50_State_for_safety_study_only == True) and ('PRODUCTION_VOLUME_GHG_50_STATE' in query_output.columns):
+        query_output.drop(['PRODUCTION_VOLUME_GHG_50_STATE'], axis=1, inplace=True)
 
     query_output.to_csv(output_path + '\\' + str(model_year) + Query_filename + ' ' + date_and_time + '_noduplicatecolumns.csv',index=False)
     del all_array
@@ -776,12 +781,15 @@ for model_year in model_years:
 
         omega_outputs = query_output.loc[:, cols_OMEGA_inputs]
         omega_outputs['cert_direct_oncycle_co2e_grams_per_mile']  = query_output['FINAL_CALC_COMB_GHG_1']
-        omega_outputs['cert_direct_oncycle_kwh_per_mile']  = 33.705/query_output['FINAL_CALC_COMB_FE_4']
-        df_edms = pd.read_csv("I:/Project/Midterm Review/Trends/Trends Data/Edmunds/2022 Measurements" + '\\' + 'Edmunds_MY2022_20230721-055344.csv', encoding="ISO-8859-1")
-        df_twgd = pd.read_csv('I:/Project/Midterm Review/Trends/Trends Data/OEMTowingGuide' + '\\' + 'MY2019_OEMTowingGuide_Readin.csv', encoding="ISO-8859-1")
+        # omega_outputs['cert_direct_oncycle_kwh_per_mile']  = 33.705/query_output['FINAL_CALC_COMB_FE_4']
 
-        omega_outputs = scraping_Edmunds_MSRPs(omega_outputs, df_edms)
-        omega_outputs = GCWRs_from_towing_guide(df_twgd, omega_outputs)
+        if scraping_Edmunds_MSRP == True:
+            df_edms = pd.read_csv("I:/Project/Midterm Review/Trends/Trends Data/Edmunds/2022 Measurements" + '\\' + 'Edmunds_MY2022_20230721-055344.csv', encoding="ISO-8859-1")
+            omega_outputs = scraping_Edmunds_MSRPs(omega_outputs, df_edms)
+
+        df_twgd = pd.read_csv('I:/Project/Midterm Review/Trends/Trends Data/OEMTowingGuide' + '\\' + 'MY2019_OEMTowingGuide_Readin.csv', encoding="ISO-8859-1")
+        df_twgd.rename({df_twgd.columns[0]:'Model Year'}, axis=1, inplace=True)
+        omega_outputs = GCWRs_from_towing_guide(model_year, df_twgd, omega_outputs)
         del query_output
         omega_outputs.to_csv(output_path + '\\' + str(model_year) + Query_filename + '_OMEGA_' + date_and_time + '.csv', index=False)
         del omega_outputs

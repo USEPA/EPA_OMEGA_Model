@@ -79,7 +79,7 @@ def Tractive_Energy_Calculation(A,B,C,ETW,FTP_Array, HWFET_Array, TechPac, Enghp
 def TestCar_Database_Readin(rawdata_input_path, run_input_path, input_filename, output_path, \
                         exceptions_table, bodyid_filename, matched_bodyid_filename, unit_change_table, \
                          year, ratedhp_filename, ftp_drivecycle_filename, hwfet_drivecycle_filename, \
-                        lineageid_filename):
+                        lineageid_filename, skiprows_vec):
     import Unit_Conversion
     raw_data = pd.read_csv(rawdata_input_path+'\\'+input_filename) #utf-8 , encoding = "ISO-8859-1"
     if type(exceptions_table) != str:

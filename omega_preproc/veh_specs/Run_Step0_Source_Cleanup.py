@@ -36,6 +36,7 @@ for run_count in range(0,len(run_controller)):
         ftp_drivecycle_filename = str(run_controller['FTP Drive Cycle Filename'][run_count])
         hwfet_drivecycle_filename = str(run_controller['HWFET Drive Cycle Filename'][run_count])
         lineageid_filename = str(run_controller['LineageID Filename'][run_count])
+        skiprows_vec = str(run_controller['skiprows_vec'][run_count])
         if exception_table_filename != 'N':
             exceptions_table = pd.read_csv(input_path + '\\' + exception_table_filename)
         else:
@@ -46,7 +47,7 @@ for run_count in range(0,len(run_controller)):
         cleanup_function(raw_data_filepath, input_path, raw_data_filename, output_path, exceptions_table, \
                          bodyid_filename, matched_bodyid_filename, unit_table, model_year, \
                          ratedhp_filename, ftp_drivecycle_filename, hwfet_drivecycle_filename,  \
-                         lineageid_filename)
+                         lineageid_filename, skiprows_vec)
 # Wards_Readin.Wards_Readin(input_path_Wards,output_path,joining_path,file_Wards, merging_categories_file)
 # FE_Readin.FE_Readin(input_path_FE, output_path, joining_path, file_FE, merging_categories_file)
 # AllData_Readin.AllData_Readin(input_path_AllData, output_path, file_AllData, merging_categories_file)
