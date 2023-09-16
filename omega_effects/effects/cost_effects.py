@@ -136,7 +136,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                         )
 
             # fuel costs _______________________________________________________________________________________________
-            if v['fuel_consumption_kwh'] > 0:
+            if v['fuel_consumption_kwh'] > 0:  # this is consumption at the wall so includes charging losses
                 electric_fuel = 'US electricity'
                 retail_price = batch_settings.context_fuel_prices.get_fuel_prices(
                     batch_settings, v['calendar_year'], 'retail_dollars_per_unit', electric_fuel

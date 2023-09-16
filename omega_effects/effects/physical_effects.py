@@ -191,6 +191,7 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
         'battery_kwh',
         'curbweight_lbs',
         'gvwr_lbs',
+        'onroad_utility_factor',
     ]
 
     grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, \
@@ -221,7 +222,7 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
             base_year_vehicle_id, manufacturer_id, name, model_year, base_year_reg_class_id, reg_class_id, \
                 in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, footprint_ft2, workfactor, \
                 target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile, body_style, \
-                battery_kwh_per_veh, curbweight_lbs, gvwr_lbs = \
+                battery_kwh_per_veh, curbweight_lbs, gvwr_lbs, onroad_utility_factor = \
                 vehicle_info_dict[v['vehicle_id']]
 
             if target_co2e_grams_per_mile is not None:
@@ -233,6 +234,16 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                     battery_kwh = battery_kwh_per_veh * v['registered_count']
                 else:
                     battery_kwh = 0
+
+                # establish VMT shares
+                vmt_liquid_fuel = vmt_electricity = 0
+                if fueling_class == 'ICE':
+                    vmt_liquid_fuel = v['vmt']
+                elif fueling_class == 'BEV':
+                    vmt_electricity = v['vmt']
+                elif fueling_class == 'PHEV':
+                    vmt_liquid_fuel = v['vmt'] * (1 - onroad_utility_factor)
+                    vmt_electricity = v['vmt'] * onroad_utility_factor
 
                 vehicle_data.update_value({
                     'session_policy': session_settings.session_policy,
@@ -267,6 +278,8 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                     'curbweight_lbs': curbweight_lbs,
                     'gvwr_lbs': gvwr_lbs,
                     'vmt': v['vmt'],
+                    'vmt_liquid_fuel': vmt_liquid_fuel,
+                    'vmt_electricity': vmt_electricity,
                     'annual_vmt': v['annual_vmt'],
                     'odometer': v['odometer'],
                     'context_vmt_adjustment': v['context_vmt_adjustment'],
@@ -497,6 +510,14 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
         vehicle_data = VehiclePhysicalData()
 
         model_year = v['calendar_year'] - v['age']
+
+        # establish VMT shares
+        vmt_liquid_fuel = v['vmt']
+        vmt_electricity = 0
+        if 'electricity' in v['in_use_fuel_id']:
+            vmt_electricity = v['vmt']
+            vmt_liquid_fuel = 0
+
         vehicle_data.update_value({
             'session_policy': session_settings.session_policy,
             'session_name': session_settings.session_name,
@@ -513,6 +534,8 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'model_year': model_year,
             'age': v['age'],
             'vmt': v['vmt'],
+            'vmt_liquid_fuel': vmt_liquid_fuel,
+            'vmt_electricity': vmt_electricity,
             'annual_vmt': v['annual_vmt'],
             'odometer': v['odometer'],
             'context_vmt_adjustment': v['context_vmt_adjustment'],

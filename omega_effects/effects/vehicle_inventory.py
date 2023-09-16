@@ -47,8 +47,8 @@ class VehiclePhysicalData:
         self.vmt = 0
         self.annual_vmt_rebound = 0
         self.vmt_rebound = 0
-        # self.vmt_liquid_fuel = 0
-        # self.vmt_electricity = 0
+        self.vmt_liquid_fuel = 0
+        self.vmt_electricity = 0
         self.battery_kwh = 0
         self.battery_kwh_per_veh = 0
         self.onroad_direct_co2e_grams_per_mile = 0
@@ -134,7 +134,7 @@ def calc_vehicle_inventory(vpd):
 
     """
     # calc exhaust and evaporative emissions for liquid fuel operation
-    factor = vpd.vmt / vpd.grams_per_us_ton
+    factor = vpd.vmt_liquid_fuel / vpd.grams_per_us_ton
     pm25_exh_ustons = vpd.pm25_exh_rate * factor
     nmog_exh_ustons = vpd.nmog_exh_rate * factor
     co_exh_ustons = vpd.co_exh_rate * factor
@@ -167,7 +167,7 @@ def calc_vehicle_inventory(vpd):
                                     vpd.ethylbenzene_refuel_spill_rate]) * factor
     naphthalene_evap_ustons = vpd.naphthalene_refuel_spill_rate * factor
 
-    factor = vpd.vmt / vpd.grams_per_metric_ton
+    factor = vpd.vmt_liquid_fuel / vpd.grams_per_metric_ton
     ch4_veh_metrictons = vpd.ch4_exh_rate * factor
     n2o_veh_metrictons = vpd.n2o_exh_rate * factor
     co2_veh_metrictons = vpd.onroad_direct_co2e_grams_per_mile * factor
@@ -186,7 +186,8 @@ def calc_vehicle_inventory(vpd):
     butadiene13_veh_ustons = butadiene13_exh_ustons
     pah15_veh_ustons = pah15_exh_ustons
 
-    # calc vehicle pm25 emissions, note that rate_l is 0 for BEVs and rate_e is 0 for non-BEVs (for now)
+    # calc vehicle pm25 emissions, note that rate_l is 0 for BEVs and rate_e is 0 for non-BEVs (for now), so PHEVs emit
+    # brakewear and tirewear pm25 using the liquid-fuel emission rates so no need to distinguish VMT shares
     pm25_brakewear_ustons = \
         vpd.vmt * (vpd.pm25_brakewear_rate_l + vpd.pm25_brakewear_rate_e) / vpd.grams_per_us_ton
     pm25_tirewear_ustons = \
@@ -226,8 +227,8 @@ def calc_vehicle_inventory(vpd):
         'vmt': vpd.vmt,
         'annual_vmt_rebound': vpd.annual_vmt_rebound,
         'vmt_rebound': vpd.vmt_rebound,
-        # 'vmt_liquid_fuel': vpd.vmt_liquid_fuel,
-        # 'vmt_electricity': vpd.vmt_electricity,
+        'vmt_liquid_fuel': vpd.vmt_liquid_fuel,
+        'vmt_electricity': vpd.vmt_electricity,
         'battery_kwh': vpd.battery_kwh,  # note: this is kwh/veh * registered_count
         'battery_kwh_per_veh': vpd.battery_kwh_per_veh,  # this is kwh/veh - used for battery tax credit
         'onroad_direct_co2e_grams_per_mile': vpd.onroad_direct_co2e_grams_per_mile,
