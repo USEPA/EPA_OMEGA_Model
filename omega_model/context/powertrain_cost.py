@@ -743,7 +743,7 @@ class PowertrainCost(OMEGABase):
                 calc_lv_harness_cost(locals_dict, learning_factor_ice, powertrain_type, drive_system, body_style)
 
             hv_harness_cost = dc_dc_converter_cost = 0
-            if powertrain_type == ['MHEV', 'HEV', 'PHEV']:
+            if powertrain_type in ['MHEV', 'HEV', 'PHEV']:
                 hv_harness_cost = \
                     calc_hv_harness_cost(locals_dict, learning_factor_pev, powertrain_type, drive_system, body_style)
                 dc_dc_converter_cost = calc_dc_dc_converter_cost(locals_dict, learning_factor_pev, powertrain_type)
