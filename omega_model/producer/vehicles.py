@@ -760,7 +760,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'structure_material', 'base_year_powertrain_type', 'base_year_reg_class_id',
                        'base_year_market_share',
                        'base_year_vehicle_id', 'base_year_glider_non_structure_mass_lbs', 'base_year_cert_fuel_id',
-                       'base_year_glider_non_structure_cost_dollars',
+                       'base_year_glider_non_structure_cost_dollars', 'base_year_glider_structure_cost_dollars',
                        'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'base_year_curbweight_lbs_to_hp',
                        'base_year_msrp_dollars', 'battery_kwh', 'total_emachine_kw', 'onroad_charge_depleting_range_mi',
                        'prior_redesign_year', 'redesign_interval', 'in_production', 'base_year_product',
@@ -873,6 +873,7 @@ class Vehicle(OMEGABase):
         self.model_year_prevalence = 0
         self.base_year_glider_non_structure_mass_lbs = 0
         self.base_year_glider_non_structure_cost_dollars = 0
+        self.base_year_glider_structure_cost_dollars = 0
         self.base_year_footprint_ft2 = 0
         self.base_year_curbweight_lbs = 0
         self.base_year_curbweight_lbs_to_hp = 0
@@ -1308,7 +1309,8 @@ class VehicleFinal(SQABase, Vehicle):
     base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
     model_year_prevalence = Column(Float)  #: used to maintain market share relationships within context size classes during market projection
     base_year_glider_non_structure_mass_lbs = Column(Float)  #: base year non-structure mass lbs (i.e. "content")
-    base_year_glider_non_structure_cost_dollars = Column(Float)  #: base year non-structure cost dollars
+    base_year_glider_non_structure_cost_dollars = Column(Float)  #: base year glider non-structure cost dollars
+    base_year_glider_structure_cost_dollars = Column(Float)  #: base year glider structure cost dollars
     base_year_footprint_ft2 = Column(Float)  #: base year vehicle footprint, square feet
     base_year_curbweight_lbs = Column(Float)  #: base year vehicle curbweight, pounds
     base_year_curbweight_lbs_to_hp = Column(Float)  #: base year curbweight to power ratio (pounds per hp)
@@ -1492,7 +1494,7 @@ class VehicleFinal(SQABase, Vehicle):
                               'reg_class_id', 'context_size_class', 'unibody_structure', 'body_style',
                               'base_year_reg_class_id', 'base_year_market_share', 'base_year_vehicle_id',
                               'curbweight_lbs', 'base_year_glider_non_structure_mass_lbs', 'base_year_cert_fuel_id',
-                              'base_year_glider_non_structure_cost_dollars',
+                              'base_year_glider_non_structure_cost_dollars', 'base_year_glider_structure_cost_dollars',
                               'footprint_ft2', 'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'drive_system',
                               'dual_rear_wheel', 'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
                               'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c',
@@ -1570,6 +1572,7 @@ class VehicleFinal(SQABase, Vehicle):
                 base_year_msrp_dollars=df.loc[i, 'msrp_dollars'],
                 base_year_glider_non_structure_mass_lbs=df.loc[i, 'glider_non_structure_mass_lbs'],
                 base_year_glider_non_structure_cost_dollars=df.loc[i, 'glider_non_structure_cost_dollars'],
+                base_year_glider_structure_cost_dollars=df.loc[i, 'glider_structure_cost_dollars'],
                 base_year_workfactor=df.loc[i, 'workfactor'],
                 base_year_vehicle_id=i,  # i.e. aggregated_vehicles.csv index number...
                 base_year_cert_fuel_id=df.loc[i, 'cert_fuel_id'],

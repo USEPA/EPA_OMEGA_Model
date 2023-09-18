@@ -406,8 +406,14 @@ class VehicleAggregation(OMEGABase):
 
                 veh.base_year_curbweight_lbs = row['curbweight_lbs']
 
+                glider_structure_cost_dollars, glider_non_structure_cost_dollars = \
+                    GliderCost.calc_cost(veh, pd.DataFrame([row]))
+
+                df.loc[idx, 'glider_structure_cost_dollars'] = \
+                    float(glider_structure_cost_dollars)
+
                 df.loc[idx, 'glider_non_structure_cost_dollars'] = \
-                    float(GliderCost.calc_cost(veh, pd.DataFrame([row]))[1])
+                    float(glider_non_structure_cost_dollars)
 
                 workfactor = 0
                 if row['reg_class_id'] == 'mediumduty':
