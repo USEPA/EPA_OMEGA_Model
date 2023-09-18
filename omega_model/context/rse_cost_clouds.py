@@ -198,7 +198,8 @@ class CostCloud(OMEGABase, CostCloudBase):
     cost_cloud_generated_columns = ['curbweight_lbs', 'rated_hp', 'battery_kwh', 'total_emachine_kw',
                                     'ac_efficiency', 'ac_leakage', 'footprint_ft2', 'etw_lbs',
                                     'cert_utility_factor', 'onroad_utility_factor',
-                                    'battery_sizing_onroad_direct_kwh_per_mile', 'tractive_motor_kw']
+                                    'battery_sizing_onroad_direct_kwh_per_mile', 'tractive_motor_kw',
+                                    'cert_blended_operation_frac', 'onroad_blended_operation_frac']
 
     # for reporting powertrain cost breakdowns
     cost_cloud_cost_columns = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
