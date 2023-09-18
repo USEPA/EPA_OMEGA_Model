@@ -308,7 +308,7 @@ class DriveCycleWeights(OMEGABase):
             ftp_cd_uf, hwfet_cd_uf, us06_uf = DriveCycleWeights.calc_phev_utility_factors(calendar_year, cycle_values)
 
             if charge_depleting_only:
-                cert_direct_oncycle_kwh_per_mile = \
+                cd_cert_direct_oncycle_kwh_per_mile = \
                     (DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
                                                           'cd_cert_direct_oncycle_kwh_per_mile', weighted=False) /
                      cycle_values['usable_battery_capacity_norm'])
@@ -347,32 +347,26 @@ class DriveCycleWeights(OMEGABase):
                 phev_cycle_values['cs_us06_2:cert_direct_oncycle_kwh_per_mile'] = \
                     us06_uf * cd_us06_2_kwh_per_mile + (1 - us06_uf) * cs_us06_2_kwh_per_mile
 
-                cert_direct_oncycle_kwh_per_mile = \
+                cs_cert_direct_oncycle_kwh_per_mile = \
                     DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, phev_cycle_values,
                                                           'cs_cert_direct_oncycle_kwh_per_mile', weighted=False)
 
-                # calculate weight utility factor
-                phev_cycle_values['cs_ftp_1:cert_direct_oncycle_kwh_per_mile'] = ftp_cd_uf
-                phev_cycle_values['cs_ftp_2:cert_direct_oncycle_kwh_per_mile'] = ftp_cd_uf
-                phev_cycle_values['cs_ftp_3:cert_direct_oncycle_kwh_per_mile'] = ftp_cd_uf
-                phev_cycle_values['cs_ftp_4:cert_direct_oncycle_kwh_per_mile'] = ftp_cd_uf
-                phev_cycle_values['cs_hwfet:cert_direct_oncycle_kwh_per_mile'] = hwfet_cd_uf
-                phev_cycle_values['cs_us06_1:cert_direct_oncycle_kwh_per_mile'] = us06_uf
-                phev_cycle_values['cs_us06_2:cert_direct_oncycle_kwh_per_mile'] = us06_uf
-
-                utility_factor = \
+                # calculate weighted utility factor
+                cd_cert_direct_oncycle_kwh_per_mile = \
                     DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, phev_cycle_values,
-                                                          'cs_cert_direct_oncycle_kwh_per_mile', weighted=False)
+                                                          'cd_cert_direct_oncycle_kwh_per_mile', weighted=False)
+
+                utility_factor = cs_cert_direct_oncycle_kwh_per_mile / cd_cert_direct_oncycle_kwh_per_mile
 
         else:
-            cert_direct_oncycle_kwh_per_mile = \
+            cd_cert_direct_oncycle_kwh_per_mile = \
                 DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
                                                   'cd_cert_direct_oncycle_kwh_per_mile', weighted=False)
 
         kwh_per_mile_scale = np.interp(calendar_year, omega_globals.options.kwh_per_mile_scale_years,
                                       omega_globals.options.kwh_per_mile_scale)
 
-        return cert_direct_oncycle_kwh_per_mile * kwh_per_mile_scale, utility_factor
+        return cd_cert_direct_oncycle_kwh_per_mile * kwh_per_mile_scale, utility_factor
 
     @staticmethod
     def calc_phev_utility_factors(calendar_year, cycle_values):
