@@ -162,11 +162,12 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
 # Output final FE data
     FE_matched_bodyid_file_raw = pd.read_csv(run_input_path + '\\' + matched_bodyid_filename)
     FE_matched_bodyid_file_raw = FE_matched_bodyid_file_raw.loc[(FE_matched_bodyid_file_raw['Model Year'] == year), :].reset_index(drop=True)
+    _lineageid_nulls = FE_matched_bodyid_file_raw.loc[(FE_matched_bodyid_file_raw['LineageID'] == -9) | (FE_matched_bodyid_file_raw['LineageID'] == ''), :]
+    _bodyid_nulls = FE_matched_bodyid_file_raw.loc[FE_matched_bodyid_file_raw['BodyID'] == -9, :]
 
-    if (FE_Guide_BodyID_MY_BodyID_Matching == True):
+    if (FE_Guide_BodyID_MY_BodyID_Matching == True) and ((len(_lineageid_nulls) > 0) or (len(_bodyid_nulls) > 0)):
         footprint_lineageid_in_vehghgid = pd.read_csv(run_input_path + '\\' + lineageid_filename)
-        footprint_lineageid_in_vehghgid.rename(
-            {'MODEL_YEAR': 'Model Year', 'MFR_DIVISION_SHORT_NM': 'Division', 'CARLINE_NAME': 'Carline',
+        footprint_lineageid_in_vehghgid.rename({'MODEL_YEAR': 'Model Year', 'MFR_DIVISION_SHORT_NM': 'Division', 'CARLINE_NAME': 'Carline',
              'MODEL_TYPE_INDEX': 'Index (Model Type Index)'}, axis=1, inplace=True)
         footprint_lineageid_in_vehghgid['Model Year'] = footprint_lineageid_in_vehghgid['Model Year'].astype(int)
         footprint_lineageid_in_vehghgid['BodyID'] = footprint_lineageid_in_vehghgid['BodyID'].astype(int)
@@ -177,16 +178,45 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
                                              footprint_lineageid_in_vehghgid['Model Year'] == year, :].reset_index(drop=True)
         for i in range(len(footprint_lineageid_in_vehghgid_my)):
             _make = footprint_lineageid_in_vehghgid_my.loc[i, 'Division']
+            _model = footprint_lineageid_in_vehghgid_my.loc[i, 'Carline']
+            _model_splitted = _model.split(' ')
+
             _lineageid = footprint_lineageid_in_vehghgid_my.loc[i, 'LineageID']
             _bodyid = footprint_lineageid_in_vehghgid_my.loc[i, 'BodyID']
             _model_type_index = footprint_lineageid_in_vehghgid_my.loc[i, 'Index (Model Type Index)']
+            # print(_model)
+            # (FE_matched_bodyid_file_raw['Carline'].str.contains((_model), case=False, na=False)) &
 
-            FE_matched_bodyid_file_raw.loc[FE_matched_bodyid_file_raw['Division'].str.contains((_make), case=False, na=False) &
+            _idx_lineageid = FE_matched_bodyid_file_raw.loc[(FE_matched_bodyid_file_raw['Division'].str.contains((_make), case=False, na=False)) &
+                                                            (FE_matched_bodyid_file_raw['Carline'].str.contains((_model), case=False, na=False)) &
+                                                            (FE_matched_bodyid_file_raw['Index (Model Type Index)'] == _model_type_index) &
+                                                            (FE_matched_bodyid_file_raw['LineageID'] == -9), :].index
+            if len(_idx_lineageid) > 0:
+                FE_matched_bodyid_file_raw.loc[_idx_lineageid, 'LineageID'] = _lineageid
+            elif len(_model_splitted) > 1:
+                _idx_lineageid = FE_matched_bodyid_file_raw.loc[(FE_matched_bodyid_file_raw['Division'].str.contains((_make), case=False, na=False)) &
+                                                                (FE_matched_bodyid_file_raw['Carline'].str.contains((_model_splitted[0]), case=False, na=False)) &
+                                                                (FE_matched_bodyid_file_raw['Index (Model Type Index)'] == _model_type_index) &
+                                                                (FE_matched_bodyid_file_raw['LineageID'] == -9), :].index
+                if len(_idx_lineageid) > 0:
+                    FE_matched_bodyid_file_raw.loc[_idx_lineageid, 'LineageID'] = _lineageid
+            try:
+                _idx_bodyid = FE_matched_bodyid_file_raw.loc[(FE_matched_bodyid_file_raw['Division'].str.contains((_make), case=False, na=False)) &
+                                           (FE_matched_bodyid_file_raw['Carline'].str.contains((_model), case=False, na=False)) &
                                            (FE_matched_bodyid_file_raw['Index (Model Type Index)'] == _model_type_index) &
-                                           (FE_matched_bodyid_file_raw['LineageID'] == -9), 'LineageID'] = _lineageid
-            FE_matched_bodyid_file_raw.loc[FE_matched_bodyid_file_raw['Division'].str.contains((_make), case=False, na=False) &
-                                           (FE_matched_bodyid_file_raw['Index (Model Type Index)'] == _model_type_index) &
-                                           (FE_matched_bodyid_file_raw['BodyID'] == -9), 'BodyID'] = _bodyid
+                                           (FE_matched_bodyid_file_raw['BodyID'] == -9), :].index
+            except KeyError:
+                print(_model)
+                continue
+            if len(_idx_bodyid) > 0:
+                FE_matched_bodyid_file_raw.loc[_idx_bodyid, 'BodyID'] = _bodyid
+            elif len(_model_splitted) > 1:
+                _idx_bodyid = FE_matched_bodyid_file_raw.loc[(FE_matched_bodyid_file_raw['Division'].str.contains((_make), case=False, na=False)) &
+                                                             (FE_matched_bodyid_file_raw['Carline'].str.contains((_model_splitted[0]), case=False, na=False)) &
+                                                             (FE_matched_bodyid_file_raw['Index (Model Type Index)'] == _model_type_index) &
+                                                             (FE_matched_bodyid_file_raw['BodyID'] == -9), 'BodyID'].index
+                if len(_idx_bodyid) > 0:
+                    FE_matched_bodyid_file_raw.loc[_idx_bodyid, 'BodyID'] = _bodyid
 
         _lineageid_nulls = FE_matched_bodyid_file_raw.loc[FE_matched_bodyid_file_raw['LineageID']==-9, :]
         _idx_nulls = _lineageid_nulls.index
@@ -220,7 +250,7 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
 
             _idx_lineageids = footprint_lineageid_my.loc[((footprint_lineageid_my['FOOTPRINT_DIVISION_NM'] == _make) |
                                                         (footprint_lineageid_my['FOOTPRINT_DIVISION_NM'].str.contains((_make), case=False, na=False))) & \
-                                                        ((footprint_lineageid_my['FOOTPRINT_CARLINE_NM'] == _model) |
+                                                        ((footprint_lineageid_my['FOOTPRINT_CARLINE_NM'].str.contains((_model), case=False, na=False)) | \
                                                         (footprint_lineageid_my['FOOTPRINT_CARLINE_NM'].str.contains((_model0), case=False, na=False))), 'LineageID'].index
             if (len(_idx_lineageids) > 0):
                 FE_matched_bodyid_file_raw.loc[_idx, 'LineageID'] = footprint_lineageid_my.loc[_idx_lineageids[0], 'LineageID']
@@ -253,11 +283,13 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
     FE_readin_final_output.insert(_col_pos+1, 'Rated MG1 Power (kW)', FE_readin_final_output['Rated Motor Gen Power (kW)'].copy())
     FE_readin_final_output.insert(_col_pos+2, 'Rated MG2 Power (kW)', FE_readin_final_output['Rated Motor Gen Power (kW)'].copy())
     FE_readin_final_output.insert(_col_pos+3, 'Rated MG3 Power (kW)', FE_readin_final_output['Rated Motor Gen Power (kW)'].copy())
+    FE_readin_final_output.insert(_col_pos+4, 'Rated MG4 Power (kW)', FE_readin_final_output['Rated Motor Gen Power (kW)'].copy())
     for i in range(len(FE_readin_final_output)):
         if (FE_readin_final_output.loc[i, 'Rated Motor Gen Power (kW)'] == '') or (FE_readin_final_output.loc[i, 'Rated Motor Gen Power (kW)'] == str(np.nan)):
             FE_readin_final_output.loc[i, 'Rated MG1 Power (kW)'] = ''
             FE_readin_final_output.loc[i, 'Rated MG2 Power (kW)'] = ''
             FE_readin_final_output.loc[i, 'Rated MG3 Power (kW)'] = ''
+            FE_readin_final_output.loc[i, 'Rated MG4 Power (kW)'] = ''
             continue
         if isinstance(FE_readin_final_output.loc[i, 'Rated Motor Gen Power (kW)'], str) == False: continue
         _ragted_MG_power_kW = FE_readin_final_output.loc[i, 'Rated Motor Gen Power (kW)'].split(' ')
@@ -267,6 +299,7 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
             FE_readin_final_output.loc[i, 'Rated MG1 Power (kW)'] = _ragted_MG_power_kW[0]
             FE_readin_final_output.loc[i, 'Rated MG2 Power (kW)'] = ''
             FE_readin_final_output.loc[i, 'Rated MG3 Power (kW)'] = ''
+            FE_readin_final_output.loc[i, 'Rated MG4 Power (kW)'] = ''
             if len(_ragted_MG_power_kW) == 1: continue
 
         k = 1
@@ -277,6 +310,8 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
                 FE_readin_final_output.loc[i, 'Rated MG2 Power (kW)'] = _ragted_MG_power_kW[j]
             if (k == 2):
                 FE_readin_final_output.loc[i, 'Rated MG3 Power (kW)'] = _ragted_MG_power_kW[j]
+            if (k == 3):
+                FE_readin_final_output.loc[i, 'Rated MG4 Power (kW)'] = _ragted_MG_power_kW[j]
             k += 1
 
     if ('Index (Model Type Index)' in FE_matched_bodyid_file_raw.columns):

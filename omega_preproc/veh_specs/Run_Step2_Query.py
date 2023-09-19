@@ -27,7 +27,7 @@ cols_OMEGA_inputs = ['CAFE_MFR_CD',	'MODEL_TYPE_INDEX',	'Electrification Categor
                      'Ground Clearance', 'Height', 'Horsepower at RPM_all', 'HYBRID_YN_all', 'HYBRID_TYPE_all', 'HYBRID_TYPE_DESC_all', 'Interior Volume', 'Length', 'LineageID_all', 'MSRP', 'NUM_CYLINDRS_ROTORS_all', 'TOTAL_NUM_TRANS_GEARS_all',
                      'NV_RATIO_BEST', 'OFF_BOARD_CHARGE_CAPABLE_YN_all', 'Passenger Capacity', 'Payload Capacity', 'PRODUCTION_VOLUME_GHG_50_STATE', 'ENG_RATED_HP', 'REAR_TRACK_WIDTH_INCHES', 'RECHARGE_ENERGY_STORAGE_SYS_YN_all', 'TOT_ROAD_LOAD_HP',
                      'STOP_START_ENG_MGT_all', 'STOP_START_ENG_MGT_DESC_all', 'THREE_ROWS_DES_SEATING_POS_YN_all', 'Torque_all', 'Towing Capacity', 'OEM Towing Capacity', 'Transmission Type Category_all', 'Wheelbase', 'Width', 'TARGET_COEF_BEST_MTH',
-                     'Rated Motor Gen Power (kW)', 'Rated MG1 Power (kW)', 'Rated MG2 Power (kW)', 'Rated MG3 Power (kW)', 'Calculated battery kWh - FE Guide', 'Total Voltage for Battery Pack(s)', 'Batt Energy Capacity (Amp-hrs)']
+                     'Rated Motor Gen Power (kW)_all', 'Rated MG1 Power (kW)', 'Rated MG2 Power (kW)', 'Rated MG3 Power (kW)',  'Rated MG4 Power (kW)', 'Calculated battery kWh - FE Guide', 'Total Voltage for Battery Pack(s)', 'Batt Energy Capacity (Amp-hrs)']
 cols_id_clean_worksheet = ['lookup01', 'carline_mfr_name', 'carline_name', 'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id', 'epa_size_class',
                            'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id', 'sales', 'cert_direct_oncycle_co2e_grams_per_mile',
                            'cert_direct_oncycle_kwh_per_mile', 'footprint_ft2', 'eng_rated_hp', 'tot_road_load_hp', 'etw_lbs', 'length_in', 'width_in', 'height_in',
@@ -780,7 +780,7 @@ for model_year in model_years:
                 print(i, cols_OMEGA_inputs[i])
 
         omega_outputs = query_output.loc[:, cols_OMEGA_inputs]
-        omega_outputs['cert_direct_oncycle_co2e_grams_per_mile']  = query_output['FINAL_CALC_COMB_GHG_1']
+        # omega_outputs['cert_direct_oncycle_co2e_grams_per_mile']  = query_output['FINAL_CALC_COMB_GHG_1']
         # omega_outputs['cert_direct_oncycle_kwh_per_mile']  = 33.705/query_output['FINAL_CALC_COMB_FE_4']
 
         if scraping_Edmunds_MSRP == True:
