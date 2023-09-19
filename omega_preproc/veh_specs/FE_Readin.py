@@ -73,6 +73,13 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
             #                                             'Release Date (gold fill means release date is after 8/2/2012)': 'Release Date'})
             #readin_sheet = readin_sheet[readin_sheet['Index (Model Type Index)'] != ''].reset_index(drop=True)
         readin_sheet = pd.concat([pd.Series(np.zeros(len(readin_sheet)),name = 'Sheet Type').replace(0,sheettype_vec[i]), readin_sheet],axis=1)
+        exceptions_table = exceptions_table.loc[exceptions_table['Model Year'] == year, :]
+        if type(exceptions_table) != str:
+            for error_check_count in range(0, len(exceptions_table)):
+                readin_sheet.loc[(readin_sheet['Sheet Name'] == exceptions_table['Sheet Name'][error_check_count]) & \
+                                 (readin_sheet['Index (Model Type Index)'] == exceptions_table['Index (Model Type Index)'][error_check_count]) & \
+                                 (readin_sheet['Carline'] == exceptions_table['Carline'][error_check_count]),
+                exceptions_table['Column Name'][error_check_count]] = exceptions_table['New Value'][error_check_count]
 
         if i == 0: #Create final output array from worksheet outputs
             FE_readin_final_output = readin_sheet

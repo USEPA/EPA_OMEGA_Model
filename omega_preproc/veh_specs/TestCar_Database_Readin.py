@@ -2,6 +2,8 @@ import pandas as pd
 import datetime
 import numpy as np
 from Unit_Conversion import hps2kwhr
+
+testcar_LineageIDs_to_footprint_lineageids_Matching = False
 def Tractive_Energy_Calculation(A,B,C,ETW,FTP_Array, HWFET_Array, TechPac, Enghp):
     from Unit_Conversion import lbf2n, gravity_mps2, mph2mps, mi2km, mph22mps2, hps2kwhr, lbfmph2hp
     FTP_dist_mi = FTP_Array['Displacement (mi)'].sum()
@@ -76,36 +78,124 @@ def Tractive_Energy_Calculation(A,B,C,ETW,FTP_Array, HWFET_Array, TechPac, Enghp
         Comb_LF = 0
     return (FTP_troadwork_mjpkm, HWFET_troadwork_mjpkm, Comb_LF, FTP_tractive_kWhr, HWFET_tractive_kWhr, comb_forceavg_speed_mph)
 
+def get_lineageids(year, run_input_path, matched_bodyid_file_raw, lineageid_filename):
+    _lineageid_nulls = matched_bodyid_file_raw.loc[(matched_bodyid_file_raw['LineageID'] == -9) | (matched_bodyid_file_raw['LineageID'] == ''), :]
+    _bodyid_nulls = matched_bodyid_file_raw.loc[matched_bodyid_file_raw['BodyID'] == -9, :]
+
+    if (testcar_LineageIDs_to_footprint_lineageids_Matching == True) and ((len(_lineageid_nulls) > 0) or (len(_bodyid_nulls) > 0)):
+        footprint_lineageid_in_vehghgid = pd.read_csv(run_input_path + '\\' + lineageid_filename)
+        footprint_lineageid_in_vehghgid.rename({'MODEL_YEAR': 'Model Year', 'MFR_DIVISION_SHORT_NM': 'Division', 'CARLINE_NAME': 'Carline',
+             'MODEL_TYPE_INDEX': 'Index (Model Type Index)'}, axis=1, inplace=True)
+        footprint_lineageid_in_vehghgid['Model Year'] = footprint_lineageid_in_vehghgid['Model Year'].astype(int)
+        footprint_lineageid_in_vehghgid['BodyID'] = footprint_lineageid_in_vehghgid['BodyID'].astype(int)
+        footprint_lineageid_in_vehghgid['LineageID'] = footprint_lineageid_in_vehghgid['LineageID'].astype(int)
+        footprint_lineageid_in_vehghgid['Index (Model Type Index)'] = footprint_lineageid_in_vehghgid['Index (Model Type Index)'].astype(int)
+        footprint_lineageid_in_vehghgid = footprint_lineageid_in_vehghgid.drop_duplicates().reset_index(drop=True)
+        footprint_lineageid_in_vehghgid_my = footprint_lineageid_in_vehghgid.loc[
+                                             footprint_lineageid_in_vehghgid['Model Year'] == year, :].reset_index(drop=True)
+        for i in range(len(footprint_lineageid_in_vehghgid_my)):
+            _make = footprint_lineageid_in_vehghgid_my.loc[i, 'Division']
+            _model = footprint_lineageid_in_vehghgid_my.loc[i, 'Carline']
+            _model_splitted = _model.split(' ')
+
+            _lineageid = footprint_lineageid_in_vehghgid_my.loc[i, 'LineageID']
+            _bodyid = footprint_lineageid_in_vehghgid_my.loc[i, 'BodyID']
+            # _model_type_index = footprint_lineageid_in_vehghgid_my.loc[i, 'Index (Model Type Index)']
+            # print(_model)
+            # (matched_bodyid_file_raw['Carline'].str.contains((_model), case=False, na=False)) &
+
+            _idx_lineageid = matched_bodyid_file_raw.loc[(matched_bodyid_file_raw['Represented Test Veh Make'].str.contains((_make), case=False, na=False)) &
+                                                            (matched_bodyid_file_raw['Represented Test Veh Model'] == _model) &
+                                                            (matched_bodyid_file_raw['LineageID'] == -9), :].index
+            if len(_idx_lineageid) > 0:
+                matched_bodyid_file_raw.loc[_idx_lineageid, 'LineageID'] = _lineageid
+            elif len(_model_splitted) > 1:
+                _idx_lineageid = matched_bodyid_file_raw.loc[(matched_bodyid_file_raw['Represented Test Veh Make'].str.contains((_make), case=False, na=False)) &
+                                                                (matched_bodyid_file_raw['Represented Test Veh Model'].str.contains((_model_splitted[0]), case=False, na=False)) &
+                                                                (matched_bodyid_file_raw['LineageID'] == -9), :].index
+                if len(_idx_lineageid) > 0:
+                    matched_bodyid_file_raw.loc[_idx_lineageid, 'LineageID'] = _lineageid
+            try:
+                _idx_bodyid = matched_bodyid_file_raw.loc[(matched_bodyid_file_raw['Represented Test Veh Make'].str.contains((_make), case=False, na=False)) &
+                                           (matched_bodyid_file_raw['Represented Test Veh Model'] == _model) &
+                                           (matched_bodyid_file_raw['BodyID'] == -9), :].index
+            except KeyError:
+                print(_model)
+                continue
+            if len(_idx_bodyid) > 0:
+                matched_bodyid_file_raw.loc[_idx_bodyid, 'BodyID'] = _bodyid
+            elif len(_model_splitted) > 1:
+                _idx_bodyid = matched_bodyid_file_raw.loc[(matched_bodyid_file_raw['Represented Test Veh Make'].str.contains((_make), case=False, na=False)) &
+                                                             (matched_bodyid_file_raw['Represented Test Veh Model'].str.contains((_model_splitted[0]), case=False, na=False)) &
+                                                             (matched_bodyid_file_raw['BodyID'] == -9), 'BodyID'].index
+                if len(_idx_bodyid) > 0:
+                    matched_bodyid_file_raw.loc[_idx_bodyid, 'BodyID'] = _bodyid
+
+        _lineageid_nulls = matched_bodyid_file_raw.loc[matched_bodyid_file_raw['LineageID']==-9, :]
+        _idx_nulls = _lineageid_nulls.index
+        if len(_idx_nulls) > 0:
+            footprint_lineageid_my = pd.read_csv(run_input_path + '\\' + 'footprint-lineageid_8bca1fd7_20230724.csv')
+            footprint_lineageid_my = footprint_lineageid_my.loc[(footprint_lineageid_my['MODEL_YEAR'] == year), :].reset_index(drop=True)
+
+        for i in range(len(_idx_nulls)):
+            _idx = _idx_nulls[i]
+            _make = matched_bodyid_file_raw.loc[_idx, 'Represented Test Veh Make']
+            _model = matched_bodyid_file_raw.loc[_idx, 'Represented Test Veh Model']
+            _make0 = _make.split(' ')[0]
+            _model0 = _model.split(' ')[0]
+
+            _idx_lineageids = footprint_lineageid_my.loc[((footprint_lineageid_my['FOOTPRINT_DIVISION_NM'] == _make) |
+                                                        (footprint_lineageid_my['FOOTPRINT_DIVISION_NM'].str.contains((_make), case=False, na=False))) & \
+                                                        ((footprint_lineageid_my['FOOTPRINT_CARLINE_NM'] == _model) |
+                                                        (footprint_lineageid_my['FOOTPRINT_CARLINE_NM'].str.contains((_model), case=False, na=False))), 'LineageID'].index
+            if (len(_idx_lineageids) > 0):
+                matched_bodyid_file_raw.loc[_idx, 'LineageID'] = footprint_lineageid_my.loc[_idx_lineageids[0], 'LineageID']
+                # matched_bodyid_file_raw.loc[_idx, 'BodyID'] = footprint_lineageid_my.loc[_idx_lineageids[0], 'BodyID']
+
+        _lineageid_nulls = matched_bodyid_file_raw.loc[matched_bodyid_file_raw['LineageID']==-9, :]
+        _idx_nulls = _lineageid_nulls.index
+        for i in range(len(_idx_nulls)):
+            _idx = _idx_nulls[i]
+            _make = matched_bodyid_file_raw.loc[_idx, 'Represented Test Veh Make']
+            _model = matched_bodyid_file_raw.loc[_idx, 'Represented Test Veh Model']
+            _make0 = _make.split(' ')[0]
+            _model0 = _model.split(' ')[0]
+
+            _idx_lineageids = footprint_lineageid_my.loc[((footprint_lineageid_my['FOOTPRINT_DIVISION_NM'] == _make) |
+                                                        (footprint_lineageid_my['FOOTPRINT_DIVISION_NM'].str.contains((_make), case=False, na=False))) & \
+                                                        ((footprint_lineageid_my['FOOTPRINT_CARLINE_NM'].str.contains((_model), case=False, na=False)) | \
+                                                        (footprint_lineageid_my['FOOTPRINT_CARLINE_NM'].str.contains((_model0), case=False, na=False))), 'LineageID'].index
+            if (len(_idx_lineageids) > 0):
+                matched_bodyid_file_raw.loc[_idx, 'LineageID'] = footprint_lineageid_my.loc[_idx_lineageids[0], 'LineageID']
+            # matched_bodyid_file_raw.loc[_idx, 'BodyID'] = footprint_lineageid_my.loc[_idx_lineageids[0], 'BodyID']
+    return matched_bodyid_file_raw
 def TestCar_Database_Readin(rawdata_input_path, run_input_path, input_filename, output_path, \
                         exceptions_table, bodyid_filename, matched_bodyid_filename, unit_change_table, \
                          year, ratedhp_filename, ftp_drivecycle_filename, hwfet_drivecycle_filename, \
                         lineageid_filename, skiprows_vec):
     import Unit_Conversion
     raw_data = pd.read_csv(rawdata_input_path+'\\'+input_filename) #utf-8 , encoding = "ISO-8859-1"
-    if type(exceptions_table) != str:
+    raw_data = raw_data.loc[raw_data['Model Year'] == year, :]
+    exceptions_table = exceptions_table.loc[exceptions_table['Model Year'] == year, :].reset_index(drop=True)
+    if (len(exceptions_table) > 0):
         for error_check_count in range(0, len(exceptions_table)):
             if exceptions_table['Numeric (y/n)'][error_check_count] == 'y':
-                raw_data.loc[
-                    (raw_data['Test Vehicle ID'] == exceptions_table['Test Vehicle ID'][error_check_count]) & \
-                    (raw_data['Test Veh Configuration #'] == exceptions_table['Test Veh Configuration #'][
-                        error_check_count]) & \
-                    (raw_data['Test Procedure Description'] == exceptions_table['Test Procedure Description'][
-                        error_check_count]) & \
-                    (raw_data[exceptions_table['Column Name'][error_check_count]].astype(float) == float(
-                        exceptions_table['Old Value'][error_check_count])), \
-                    exceptions_table['Column Name'][error_check_count]] = \
-                    float(exceptions_table['New Value'][error_check_count])
+                raw_data.loc[(raw_data['Represented Test Veh Make'] == exceptions_table['Represented Test Veh Make'][error_check_count]) & \
+                    (raw_data['Represented Test Veh Model'] == exceptions_table['Represented Test Veh Model'][error_check_count]) & \
+                    (raw_data[exceptions_table['Column Name'][error_check_count]].astype(float) == float(exceptions_table['Old Value'][error_check_count])), \
+                    exceptions_table['Column Name'][error_check_count]] = float(exceptions_table['New Value'][error_check_count])
             else:
-                raw_data.loc[
-                    (raw_data['Test Vehicle ID'] == exceptions_table['Test Vehicle ID'][error_check_count]) & \
-                    (raw_data['Test Veh Configuration #'] == exceptions_table['Test Veh Configuration #'][
-                        error_check_count]) & \
-                    (raw_data['Test Procedure Description'] == exceptions_table['Test Procedure Description'][
-                        error_check_count]) & \
-                    (raw_data[exceptions_table['Column Name'][error_check_count]] ==
-                     exceptions_table['Old Value'][error_check_count]), \
-                    exceptions_table['Column Name'][error_check_count]] = \
-                    exceptions_table['New Value'][error_check_count]
+                if exceptions_table.loc[error_check_count, 'Correction Type'] == 'Replace':
+                    raw_data.loc[(raw_data['Represented Test Veh Make'] == exceptions_table['Represented Test Veh Make'][error_check_count]) & \
+                        (raw_data['Represented Test Veh Model'] == exceptions_table['Represented Test Veh Model'][error_check_count]) & \
+                        (raw_data[exceptions_table['Column Name'][error_check_count]] == exceptions_table['Old Value'][error_check_count]), \
+                        exceptions_table['Column Name'][error_check_count]] = exceptions_table['New Value'][error_check_count]
+                elif exceptions_table.loc[error_check_count, 'Correction Type'] == 'Replace Part':
+                    _idx = raw_data.loc[(raw_data['Represented Test Veh Make'] == exceptions_table['Represented Test Veh Make'][error_check_count]) & \
+                        (raw_data[exceptions_table['Column Name'][error_check_count]].str.contains((exceptions_table['Old Value'][error_check_count]), case=False, na=False)), :].index
+
+                    raw_data.loc[_idx, exceptions_table['Column Name'][error_check_count]].replace(exceptions_table['Old Value'][error_check_count], exceptions_table['New Value'][error_check_count])
+    df_tmp = raw_data.loc[(raw_data['Represented Test Veh Model'].str.contains(('Supra'), case=False, na=False)), :]
 
     raw_data = raw_data[raw_data['Test Procedure Description'] != 'Cold CO']
     raw_data = raw_data[raw_data['Model Year']==year].reset_index(drop=True)
@@ -187,10 +277,12 @@ def TestCar_Database_Readin(rawdata_input_path, run_input_path, input_filename, 
         subarray = raw_data_merged[raw_data_merged['Actual Tested Testgroup'] == vehicle]
         if len(subarray[subarray['Test Procedure Description_FTP'] != 'Charge Depleting UDDS']) > 0 or \
             len(subarray[subarray['Test Procedure Description_HWY'] != 'Charge Depleting Highway']) > 0:
-            electrification_category[raw_data_merged['Actual Tested Testgroup'] == vehicle] = 'REEV'
+            electrification_category[raw_data_merged['Actual Tested Testgroup'] == vehicle] = 'PHEV'
         else:
             electrification_category[raw_data_merged['Actual Tested Testgroup'] == vehicle] = 'EV'
-    electrification_category[raw_data_merged['Test Fuel Type Description_FTP'].str.contains('Hydrogen')] = 'EV'
+    electrification_category[raw_data_merged['Test Fuel Type Description_FTP'].str.contains('Hydrogen')] = 'FCV'
+    electrification_category[raw_data_merged['Test Fuel Type Description_FTP'].str.contains('MHEV')] = 'MHEV'
+    electrification_category[raw_data_merged['Test Fuel Type Description_FTP'].str.contains('Hydrogen')] = 'FCV'
     # electrification_category[(matching_fuel_category == 'D') & (raw_data_merged['Actual Tested Testgroup'].isin(REEV_Vehicles))] = 'REEV'
     # electrification_category[(matching_fuel_category == 'G') & (raw_data_merged['Test Procedure Description_FTP'] == 'Charge Depleting UDDS')] = 'REEV'
     # electrification_category[(matching_fuel_category == 'G') & (raw_data_merged['Test Procedure Description_HWY'] == 'Charge Depleting Highway')] = 'REEV'
@@ -279,8 +371,15 @@ def TestCar_Database_Readin(rawdata_input_path, run_input_path, input_filename, 
         pd.Series(testcar_data_table['Combined Fuel Energy Intensity (MJ/km)'][matching_eng_disp > 0] \
         /matching_eng_disp[matching_eng_disp > 0])
 
-    bodyid_file_raw = pd.read_csv(run_input_path + '\\' + bodyid_filename, \
-        converters={'LineageID': int, 'BodyID': int, 'BodyID StartYear':int, 'BodyID EndYear':str})
+    if ('.csv' in bodyid_filename):
+        # bodyid_file_raw = pd.read_csv(run_input_path + '\\' + bodyid_filename)
+        bodyid_file_raw = pd.read_csv(run_input_path + '\\' + bodyid_filename, converters={'LineageID': int, 'BodyID': int, 'BodyID StartYear': int, 'BodyID EndYear': str})
+        bodyid_file_raw = bodyid_file_raw.loc[pd.notnull(bodyid_file_raw['BodyID']), :].reset_index(drop=True)
+        # bodyid_file_raw['BodyID'] = bodyid_file_raw['BodyID'].astype(int)
+        # bodyid_file_raw['LineageID'] = bodyid_file_raw['LineageID'].astype(int)
+    else:
+        bodyid_file_raw = pd.read_excel(run_input_path + '\\' + bodyid_filename, converters={'LineageID': int, 'BodyID': int})
+
     bodyid_file_nonfuture = bodyid_file_raw[(bodyid_file_raw['BodyID StartYear'] <= year) & \
         (bodyid_file_raw['BodyID EndYear'] != 'xx')].reset_index(drop=True)
     bodyid_file_notnull = bodyid_file_nonfuture[bodyid_file_nonfuture['BodyID EndYear'] != 'null']
@@ -288,11 +387,16 @@ def TestCar_Database_Readin(rawdata_input_path, run_input_path, input_filename, 
     bodyid_file = pd.concat([bodyid_file_notnull[bodyid_file_notnull['BodyID EndYear'] >= year], \
                              bodyid_file_nonfuture[bodyid_file_nonfuture['BodyID EndYear'] == 'null']]).reset_index(drop=True)
     del bodyid_file_raw, bodyid_file_nonfuture, bodyid_file_notnull
+
     try:
-        matched_bodyid_file_raw = pd.read_csv(rawdata_input_path+'\\'+matched_bodyid_filename, converters = {'LineageID': int, \
+        matched_bodyid_file_raw = pd.read_csv(run_input_path+'\\'+matched_bodyid_filename, converters = {'LineageID': int, \
             'BodyID':int, 'Test Veh Configuration #':int, 'Year':int})
-        matched_bodyid_file_modelyear = matched_bodyid_file_raw[matched_bodyid_file_raw['Year'] == year]\
-            .groupby(['Test Vehicle ID', 'Test Veh Configuration #']).agg(lambda x:x.value_counts().index[0]).reset_index();
+        matched_bodyid_file_raw = matched_bodyid_file_raw.loc[matched_bodyid_file_raw['Year'] == year, :]
+        if (testcar_LineageIDs_to_footprint_lineageids_Matching == True):
+            matched_bodyid_file_raw = get_lineageids(year, run_input_path, matched_bodyid_file_raw, lineageid_filename)
+
+        matched_bodyid_file_modelyear = matched_bodyid_file_raw[matched_bodyid_file_raw['Year'] == year] \
+                    .groupby(['Test Vehicle ID', 'Test Veh Configuration #']).agg(lambda x:x.value_counts().index[0]).reset_index();
 
         matched_bodyid_file = matched_bodyid_file_modelyear[matched_bodyid_file_modelyear['LineageID'] != -9].reset_index(drop=True);
 
@@ -305,8 +409,8 @@ def TestCar_Database_Readin(rawdata_input_path, run_input_path, input_filename, 
             ,how='left', on = ['Test Vehicle ID', 'Test Veh Configuration #']).reset_index(drop=True)
         date_and_time = str(datetime.datetime.now())[:19].replace(':', '').replace('-', '')
         testcar_missingentries = testcar_data_table[pd.isnull(testcar_data_table['LineageID'])].reset_index(drop=True)
-        testcar_missingentries.to_csv(output_path + '\\' + 'Missing Test Car Entries'+'_MY'+str(year) +' ' +date_and_time+'.csv', \
-                                    index=False)
+        if (len(testcar_missingentries) > 0):
+            testcar_missingentries.to_csv(output_path + '\\' + 'Missing Test Car Entries'+'_MY'+str(year) +' ' +date_and_time+'.csv', index=False)
         testcar_data_table = testcar_data_table[(~pd.isnull(testcar_data_table['LineageID'])) \
                                                 & (~pd.isnull(testcar_data_table['BodyID']))].reset_index(drop=True)
         testcar_data_table['Combined Powertrain Efficiency (%)'] = pd.Series(100 * testcar_data_table[ \
@@ -320,8 +424,7 @@ def TestCar_Database_Readin(rawdata_input_path, run_input_path, input_filename, 
 
         # aero_table = pd.read_csv(run_input_path+'\\'+aero_table_filename)
         # testcar_data_table_output = pd.merge_ordered(testcar_data_table, aero_table, how='left', on=['CALC_ID', 'BodyID'])
-        testcar_data_table.to_csv(output_path + '\\' + 'Test Car' + '_MY' + str(year) + ' ' + date_and_time + '.csv', \
-                                  index=False)
+        testcar_data_table.to_csv(output_path + '\\' + 'Test Car' + '_MY' + str(year) + ' ' + date_and_time + '.csv', index=False)
     except FileNotFoundError:
         try:
             possible_bodyid_file = pd.read_csv(rawdata_input_path + '\\' + 'Test Car BodyID Check'+ '.csv')

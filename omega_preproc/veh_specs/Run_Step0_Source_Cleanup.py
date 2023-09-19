@@ -38,7 +38,8 @@ for run_count in range(0,len(run_controller)):
         lineageid_filename = str(run_controller['LineageID Filename'][run_count])
         skiprows_vec = str(run_controller['skiprows_vec'][run_count])
         if exception_table_filename != 'N':
-            exceptions_table = pd.read_csv(input_path + '\\' + exception_table_filename)
+            exceptions_table = pd.read_csv(input_path + '\\' + exception_table_filename, encoding = 'unicode_escape', engine ='python')
+            exceptions_table = exceptions_table.dropna(axis = 0, how = 'all') #.reset_index(drop=True)
         else:
             exceptions_table = 'N'
         # aero_table_filename = str(run_controller['Aero Table Filename'][run_count])
