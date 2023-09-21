@@ -768,8 +768,8 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'base_year_gcwr_lbs', 'cert_utility_factor', 'onroad_utility_factor',
                        'battery_sizing_onroad_direct_kwh_per_mile', 'tractive_motor_kw',
                        'base_year_battery_kwh', 'base_year_tractive_motor_kw', 'base_year_total_emachine_kw',
-                       'base_year_onroad_charge_depleting_range_mi', 'cert_blended_operation_frac',
-                       'onroad_blended_operation_frac'
+                       'base_year_onroad_charge_depleting_range_mi', 'cert_engine_on_distance_frac',
+                       'onroad_engine_on_distance_frac'
                        )
 
     # transfer base properties
@@ -889,8 +889,8 @@ class Vehicle(OMEGABase):
         self.onroad_charge_depleting_range_mi = 0
         self.cert_utility_factor = 0
         self.onroad_utility_factor = 0
-        self.cert_blended_operation_frac = 0
-        self.onroad_blended_operation_frac = 0
+        self.cert_engine_on_distance_frac = 0
+        self.onroad_engine_on_distance_frac = 0
         self.battery_sizing_onroad_direct_kwh_per_mile = 0
         self.workfactor = 0
         self.gvwr_lbs = 0
@@ -1048,13 +1048,12 @@ class Vehicle(OMEGABase):
         cloud['onroad_direct_kwh_per_mile'] = 0
 
         if self.fueling_class != 'BEV':
-            cloud['onroad_direct_oncycle_co2e_grams_per_mile'], cloud['onroad_blended_operation_frac'] = \
+            cloud['onroad_direct_oncycle_co2e_grams_per_mile'] = \
                 DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(drive_cycle_weight_year,
                                                                                self.fueling_class,
                                                                                cloud)
         else:
             cloud['onroad_direct_oncycle_co2e_grams_per_mile'] = 0
-            cloud['onroad_blended_operation_frac'] = 0
 
         if self.fueling_class != 'ICE':
             cloud['onroad_direct_oncycle_kwh_per_mile'], cloud['onroad_utility_factor'] = \
@@ -1063,6 +1062,16 @@ class Vehicle(OMEGABase):
         else:
             cloud['onroad_direct_oncycle_kwh_per_mile'] = 0
             cloud['onroad_utility_factor'] = 0
+
+        if self.fueling_class == 'ICE':
+            cloud['onroad_engine_on_distance_frac'] = \
+                DriveCycleWeights.calc_engine_on_distance_frac(drive_cycle_weight_year, self.fueling_class, cloud)
+        elif self.fueling_class == 'PHEV':
+            cloud['onroad_engine_on_distance_frac'] = \
+                DriveCycleWeights.calc_engine_on_distance_frac(drive_cycle_weight_year, self.fueling_class, cloud,
+                                                               cloud['onroad_utility_factor'])
+        else:
+            cloud['onroad_engine_on_distance_frac'] = 0
 
         # calculate offcycle values before calculating onroad
         cloud = OffCycleCredits.calc_off_cycle_credits(drive_cycle_weight_year, self, cloud)
@@ -1086,12 +1095,11 @@ class Vehicle(OMEGABase):
 
         # calculate cert values ---------------------------------------------------------------------------------------
         if self.fueling_class != 'BEV':
-            cloud['cert_direct_oncycle_co2e_grams_per_mile'], cloud['cert_blended_operation_frac'] = \
+            cloud['cert_direct_oncycle_co2e_grams_per_mile'] = \
                 DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(self.model_year, self.fueling_class,
                                                                                cloud)
         else:
             cloud['cert_direct_oncycle_co2e_grams_per_mile'] = 0
-            cloud['cert_blended_operation_frac'] = 0
 
         if self.fueling_class != 'ICE':
             cloud['cert_direct_oncycle_kwh_per_mile'], cloud['cert_utility_factor'] = \
@@ -1099,6 +1107,16 @@ class Vehicle(OMEGABase):
         else:
             cloud['cert_direct_oncycle_kwh_per_mile'] = 0
             cloud['cert_utility_factor'] = 0
+
+        if self.fueling_class == 'ICE':
+            cloud['cert_engine_on_distance_frac'] = \
+                DriveCycleWeights.calc_engine_on_distance_frac(self.model_year, self.fueling_class, cloud)
+        elif self.fueling_class == 'PHEV':
+            cloud['cert_engine_on_distance_frac'] = \
+                DriveCycleWeights.calc_engine_on_distance_frac(self.model_year, self.fueling_class, cloud,
+                                                               cloud['cert_utility_factor'])
+        else:
+            cloud['cert_engine_on_distance_frac'] = 0
 
         # re-calculate off cycle credits before calculating upstream
         cloud = OffCycleCredits.calc_off_cycle_credits(self.model_year, self, cloud)
@@ -1298,8 +1316,8 @@ class VehicleFinal(SQABase, Vehicle):
     onroad_charge_depleting_range_mi = Column(Float)  #: vehicle charge-depleting range, miles
     cert_utility_factor = Column(Float)  #: PHEV cert utility factor
     onroad_utility_factor = Column(Float)  #: PHEV onroad utility factor
-    cert_blended_operation_frac = Column(Float)  #: PHEV cert blended operation frac
-    onroad_blended_operation_frac = Column(Float)  #: PHEV cert blended operation frac
+    cert_engine_on_distance_frac = Column(Float)  #: PHEV cert engine-on distance frac
+    onroad_engine_on_distance_frac = Column(Float)  #: PHEV onroad engine-on disance frac
     battery_sizing_onroad_direct_kwh_per_mile = Column(Float)  #: battery-sizing onroad direct kWh/mi
     prior_redesign_year = Column(Float)  #: prior redesign year
     redesign_interval = Column(Float)  #: redesign interval

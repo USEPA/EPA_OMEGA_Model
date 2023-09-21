@@ -237,8 +237,6 @@ class DriveCycleWeights(OMEGABase):
             A pandas ``Series`` object of the weighted results
 
         """
-        blended_operation_frac = 0
-
         if fueling_class == 'PHEV':
             ftp_cd_uf, hwfet_cd_uf, us06_uf = \
                 DriveCycleWeights.calc_phev_utility_factors(calendar_year, cycle_values)
@@ -280,19 +278,16 @@ class DriveCycleWeights(OMEGABase):
                 DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, phev_cycle_values,
                                                       'cs_cert_direct_oncycle_co2e_grams_per_mile', weighted=False)
 
-            cd_cert_direct_oncycle_co2e_grams_per_mile = \
-                DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, phev_cycle_values,
-                                                      'cd_cert_direct_oncycle_co2e_grams_per_mile', weighted=False)
-
-            blended_operation_frac = \
-                cd_cert_direct_oncycle_co2e_grams_per_mile / cs_cert_direct_oncycle_co2e_grams_per_mile
+            # cd_cert_direct_oncycle_co2e_grams_per_mile = \
+            #     DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, phev_cycle_values,
+            #                                           'cd_cert_direct_oncycle_co2e_grams_per_mile', weighted=False)
 
         else:
             cs_cert_direct_oncycle_co2e_grams_per_mile = \
                 DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
                                                          'cs_cert_direct_oncycle_co2e_grams_per_mile', weighted=False)
 
-        return cs_cert_direct_oncycle_co2e_grams_per_mile, blended_operation_frac
+        return cs_cert_direct_oncycle_co2e_grams_per_mile
 
     @staticmethod
     def calc_cert_direct_oncycle_kwh_per_mile(calendar_year, fueling_class, cycle_values, charge_depleting_only=False):
@@ -376,6 +371,42 @@ class DriveCycleWeights(OMEGABase):
                                       omega_globals.options.kwh_per_mile_scale)
 
         return cd_cert_direct_oncycle_kwh_per_mile * kwh_per_mile_scale, utility_factor
+
+    @staticmethod
+    def calc_engine_on_distance_frac(calendar_year, fueling_class, cycle_values, utility_factor=1):
+        """
+        Calculate engine-on distance frac
+
+        Args:
+            calendar_year (numeric): calendar year to calculated weighted value in
+            fueling_class (str): e.g. 'ICE', 'BEV', etc
+            cycle_values (DataFrame): contains cycle values to be weighted
+                (e.g. the simulated vehicles input data with results (columns) for each drive cycle phase)
+            utility_factor (float): the utility factor for PHEVs
+
+        Returns:
+            The engine-on distance frac
+
+        """
+
+        if fueling_class == 'PHEV':
+            cd_engine_on_distance_frac = \
+                DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
+                                                      'cd_engine_on_distance_frac', weighted=False)
+
+            cs_engine_on_distance_frac = \
+                DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
+                                                      'cs_engine_on_distance_frac', weighted=False)
+
+            engine_on_distance_frac = utility_factor * cd_engine_on_distance_frac + \
+                                      (1 - utility_factor) * cs_engine_on_distance_frac
+
+        else:
+            engine_on_distance_frac = \
+                DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
+                                                      'cs_engine_on_distance_frac', weighted=False)
+
+        return engine_on_distance_frac
 
     @staticmethod
     def calc_phev_utility_factors(calendar_year, cycle_values):
