@@ -44,10 +44,10 @@ class IterationLog(OMEGABase):
 
         """
         if self.create_file:
-            dataframe.to_csv(self.logfilename, mode='w')
+            dataframe.to_csv(self.logfilename, mode='w', columns=sorted(dataframe.columns))
             self.create_file = False
         else:
-            dataframe.to_csv(self.logfilename, mode='a', header=False)
+            dataframe.to_csv(self.logfilename, mode='a', header=False, columns=sorted(dataframe.columns))
 
 
 class OMEGABatchLog(OMEGABase):

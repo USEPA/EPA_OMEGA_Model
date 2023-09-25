@@ -249,6 +249,6 @@ def dump_table_to_csv(output_folder, table, filename, verbose):
     if verbose:
         omega_log.logwrite(table)
     sql_df = pd.read_sql("SELECT * FROM %s" % table, con=omega_globals.engine)
-    sql_df.to_csv('%s/%s.csv' % (output_folder, filename), index=False)
+    sql_df.to_csv('%s/%s.csv' % (output_folder, filename), columns=sorted(sql_df.columns), index=False)
 
     return sql_df

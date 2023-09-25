@@ -111,7 +111,7 @@ def save_dict(settings, dict_to_save, save_path, row_header=None, stamp=None, in
         cols = [col for col in df.columns if col not in row_header]
         df = pd.DataFrame(df, columns=row_header + cols)
 
-    df.to_csv(f'{save_path}_{stamp}.csv', index=index)
+    df.to_csv(f'{save_path}_{stamp}.csv', columns=sorted(df.columns), index=index)
 
     return
 
@@ -136,7 +136,7 @@ def save_dict_return_df(dict_to_save, save_path, row_header=None, stamp=None, in
         cols = [col for col in df.columns if col not in row_header]
         df = pd.DataFrame(df, columns=row_header + cols)
 
-    df.to_csv(f'{save_path}_{stamp}.csv', index=index)
+    df.to_csv(f'{save_path}_{stamp}.csv', columns=sorted(df.columns), index=index)
 
     return df
 

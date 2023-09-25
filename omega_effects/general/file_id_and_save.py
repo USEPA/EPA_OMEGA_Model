@@ -46,7 +46,7 @@ def save_file(session_settings, df, save_folder, file_id, effects_log, extension
     if extension == 'parquet':
         df.to_parquet(filepath, engine='fastparquet', compression='snappy', index=False)
     else:
-        df.to_csv(filepath, index=False)
+        df.to_csv(filepath, columns=sorted(df.columns), index=False)
 
 
 def add_id_to_csv(filepath, output_file_id_info):

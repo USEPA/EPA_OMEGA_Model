@@ -339,34 +339,43 @@ def main():
 
         # save files to CSV ____________________________________________________________________________________________
         annual_safety_df.to_csv(path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv',
-                                        index=False)
+                                columns=sorted(annual_safety_df.columns), index=False)
         annual_physical_df.to_csv(path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv',
-                                          index=False)
+                                columns=sorted(annual_physical_df.columns), index=False)
         delta_annual_physical_df.to_csv(
             path_of_run_folder / f'{start_time_readable}_physical_effects_annual_action_minus_no_action.csv',
-            index=False)
-        discounted_costs_df.to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv', index=False)
-        discounted_benefits_df.to_csv(path_of_run_folder / f'{start_time_readable}_benefits_annual.csv', index=False)
+            columns=sorted(delta_annual_physical_df.columns), index=False)
+        discounted_costs_df.to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv',
+                                   columns=sorted(discounted_costs_df.columns), index=False)
+        discounted_benefits_df.to_csv(path_of_run_folder / f'{start_time_readable}_benefits_annual.csv',
+                                      columns=sorted(discounted_benefits_df.columns), index=False)
         if social_effects_global_df is not None:
             social_effects_global_df.to_csv(
-                path_of_run_folder / f'{start_time_readable}_social_effects_global_ghg_annual.csv', index=False)
+                path_of_run_folder / f'{start_time_readable}_social_effects_global_ghg_annual.csv',
+                columns=sorted(social_effects_global_df.columns), index=False)
         if social_effects_domestic_df is not None:
             social_effects_domestic_df.to_csv(
-                path_of_run_folder / f'{start_time_readable}_social_effects_domestic_ghg_annual.csv', index=False)
+                path_of_run_folder / f'{start_time_readable}_social_effects_domestic_ghg_annual.csv',
+                columns=sorted(social_effects_domestic_df.columns), index=False)
         my_lifetime_physical_df.to_csv(
-            path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv', index=False
+            path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv',
+            columns=sorted(my_lifetime_physical_df.columns), index=False
         )
         my_lifetime_costs_df.to_csv(
-            path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', index=False
+            path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv',
+            columns=sorted(my_lifetime_costs_df.columns), index=False
         )
         vehicle_inventory_details_df.to_csv(
-            path_of_run_folder / f'{start_time_readable}_vehicle_emission_rate_details.csv', index=False
+            path_of_run_folder / f'{start_time_readable}_vehicle_emission_rate_details.csv',
+            columns=sorted(vehicle_inventory_details_df.columns), index=False
         )
         egu_inventory_details_df.to_csv(
-            path_of_run_folder / f'{start_time_readable}_egu_inventory_details.csv', index=False
+            path_of_run_folder / f'{start_time_readable}_egu_inventory_details.csv',
+            columns=sorted(egu_inventory_details_df.columns), index=False
         )
         refinery_inventory_details_df.to_csv(
-            path_of_run_folder / f'{start_time_readable}_refinery_emission_rate_details.csv', index=False
+            path_of_run_folder / f'{start_time_readable}_refinery_emission_rate_details.csv',
+            columns=sorted(refinery_inventory_details_df.columns), index=False
         )
 
         # add identifying info to CSV files ____________________________________________________________________________

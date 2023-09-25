@@ -402,11 +402,14 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
         credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
                                                        omega_globals.options.session_unique_name +
-                                                       ' %s GHG_credit_balances.csv' % compliance_id, index=False)
+                                                       ' %s GHG_credit_balances.csv' % compliance_id,
+                                                       columns=sorted(credit_banks[compliance_id].credit_bank.columns),
+                                                       index=False)
 
         credit_banks[compliance_id].transaction_log.to_csv(
             omega_globals.options.output_folder + omega_globals.options.session_unique_name +
-            ' %s GHG_credit_transactions.csv' % compliance_id, index=False)
+            ' %s GHG_credit_transactions.csv' % compliance_id,
+            columns=sorted(credit_banks[compliance_id].transaction_log.columns), index=False)
 
     iteration_log_df = pd.DataFrame(iteration_log)
 
@@ -1768,9 +1771,12 @@ def run_omega(session_runtime_options, standalone_run=False):
                 manufacturer_annual_data_table, manufacturer_gigawatthour_data = \
                     postproc_session.run_postproc(iteration_log, credit_banks)
 
-                pd.DataFrame.from_dict(manufacturer_gigawatthour_data).to_csv(
+                manufacturer_gigawatthour_df = pd.DataFrame.from_dict(manufacturer_gigawatthour_data)
+
+                manufacturer_gigawatthour_df.to_csv(
                     '%s/manufacturer_gigawatthour_data_%d.csv' % (omega_globals.options.output_folder_base,
-                                                                  omega_globals.options.consolidate_manufacturers))
+                                                                  omega_globals.options.consolidate_manufacturers),
+                    columns=sorted(manufacturer_gigawatthour_df.columns))
 
                 cert_offset = \
                     manufacturer_annual_data_table['calendar_year_cert_co2e_megagrams'] - \
@@ -1785,7 +1791,9 @@ def run_omega(session_runtime_options, standalone_run=False):
 
                 manufacturer_annual_data_table.to_csv('%s/manufacturer_annual_data_table_%d.csv' %
                                                       (omega_globals.options.output_folder_base,
-                                                       omega_globals.options.consolidate_manufacturers), index=False)
+                                                       omega_globals.options.consolidate_manufacturers),
+                                                      columns=sorted(manufacturer_annual_data_table.columns),
+                                                      index=False)
 
                 # everybody out of the pool
                 if omega_globals.options.multiprocessing:
@@ -1833,7 +1841,8 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             metadata_df.to_csv(
                 omega_globals.options.output_folder +
-                f'{omega_globals.options.session_unique_name}_inputfile_metadata.csv', index=False, header=True)
+                f'{omega_globals.options.session_unique_name}_inputfile_metadata.csv',
+                columns=sorted(metadata_df.columns), index=False, header=True)
 
             omega_log.end_logfile("\nSession Complete")
 

@@ -442,7 +442,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         calibration = pd.DataFrame.from_dict(SalesShare._calibration_data)
 
-        calibration.to_csv(filename)
+        calibration.to_csv(filename, columns=sorted(calibration.columns))
 
     @staticmethod
     def store_producer_decision_and_response(producer_decision_and_response):

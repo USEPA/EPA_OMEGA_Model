@@ -82,7 +82,7 @@ def run_postproc(iteration_log, credit_banks):
                       omega_globals.options.verbose)
 
     vehicle_annual_data_df.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name
-                                  + '_vehicle_annual_data.csv')
+                                  + '_vehicle_annual_data.csv', columns=sorted(vehicle_annual_data_df.columns))
 
     manufacturer_ids = sorted(vehicles_table['manufacturer_id'].unique())
 
@@ -183,11 +183,13 @@ def run_postproc(iteration_log, credit_banks):
         credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
                                                        omega_globals.options.session_unique_name +
                                                        ' %s GHG_credit_balances.csv' % compliance_id,
+                                                       columns=sorted(credit_banks[compliance_id].credit_bank.columns),
                                                        index=False)
 
         credit_banks[compliance_id].transaction_log.to_csv(
             omega_globals.options.output_folder + omega_globals.options.session_unique_name +
-            ' %s GHG_credit_transactions.csv' % compliance_id, index=False)
+            ' %s GHG_credit_transactions.csv' % compliance_id,
+            columns=sorted(credit_banks[compliance_id].transaction_log.columns), index=False)
 
         compliance_ids = np.append(compliance_ids, 'consolidated_OEM')
 
@@ -297,7 +299,7 @@ def run_postproc(iteration_log, credit_banks):
         powertrain_costs_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name \
                                     + '_powertrain_cost_results.csv'
         pt_cost_df = pd.DataFrame.from_dict(PowertrainCost.cost_tracker, orient='index')
-        pt_cost_df.to_csv(powertrain_costs_filename, index=False)
+        pt_cost_df.to_csv(powertrain_costs_filename, columns=sorted(pt_cost_df.columns), index=False)
 
     return manufacturer_annual_data_table, mfr_gigawatthour_data
 

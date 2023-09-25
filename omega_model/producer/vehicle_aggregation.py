@@ -433,7 +433,7 @@ class VehicleAggregation(OMEGABase):
 
             # print('done %.2f' % (time.time() - start_time))
 
-            df.to_csv(omega_globals.options.output_folder + 'costed_vehicles.csv')
+            df.to_csv(omega_globals.options.output_folder + 'costed_vehicles.csv', columns=sorted(df.columns))
 
             # calculate weighted numeric values within the groups, and combined string values
             agg_df = df.groupby(aggregation_columns, as_index=False).apply(sales_weight_average_dataframe)
@@ -444,7 +444,8 @@ class VehicleAggregation(OMEGABase):
             else:
                 agg_df['compliance_id'] = agg_df['manufacturer_id']
 
-            agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
+            agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv',
+                          columns=sorted(agg_df.columns))
 
             agg_df['rated_hp'] = agg_df['eng_rated_hp']  # RV
 
