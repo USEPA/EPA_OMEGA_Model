@@ -941,7 +941,7 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
     # market class chart
     fig, ax1 = figure(omega_globals.options.auto_close_figures)
     for mc in market_classes:
-        ax1.plot(calendar_years, mfr_cost_data['%s_%s' % (compliance_id)],
+        ax1.plot(calendar_years, mfr_cost_data['%s_%s' % (compliance_id, mc)],
                  **omega_globals.options.MarketClass.get_linestyle(mc))
 
     label_xyt(ax1, 'Year', 'Cost [$]',
