@@ -145,6 +145,7 @@ def get_inputs_for_effects(batch_settings, arg=None):
             'e0_in_retail_gasoline',
             'e0_energy_density_ratio',
             'diesel_energy_density_ratio',
+            'share_of_fuel_refined_domestically',
             'fuel_reduction_leading_to_reduced_domestic_refining',
         ]
         values = []
@@ -194,8 +195,8 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
         'onroad_utility_factor',
     ]
 
-    grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, \
-        diesel_energy_density_ratio, fuel_reduction_leading_to_reduced_domestic_refining = \
+    (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, diesel_energy_density_ratio,
+    share_of_fuel_refined_domestically, fuel_reduction_leading_to_reduced_domestic_refining) = \
         get_inputs_for_effects(batch_settings)
 
     sourcetype_name = None
@@ -498,8 +499,8 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
         small and gets smaller with each future year making this a minor, if not acceptably negligible, impact.
 
     """
-    grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, \
-        diesel_energy_density_ratio, fuel_reduction_leading_to_reduced_domestic_refining = \
+    (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, diesel_energy_density_ratio,
+    share_of_fuel_refined_domestically, fuel_reduction_leading_to_reduced_domestic_refining) = \
         get_inputs_for_effects(batch_settings)
 
     sourcetype_name = None
