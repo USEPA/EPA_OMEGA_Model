@@ -48,7 +48,6 @@ class VehiclePhysicalData:
         self.annual_vmt_rebound = 0
         self.vmt_rebound = 0
         self.vmt_liquid_fuel = 0
-        self.vmt_electricity = 0
         self.battery_kwh = 0
         self.battery_kwh_per_veh = 0
         self.onroad_direct_co2e_grams_per_mile = 0
@@ -230,7 +229,6 @@ def calc_vehicle_inventory(vpd):
         'annual_vmt_rebound': vpd.annual_vmt_rebound,
         'vmt_rebound': vpd.vmt_rebound,
         'vmt_liquid_fuel': vpd.vmt_liquid_fuel,
-        'vmt_electricity': vpd.vmt_electricity,
         'battery_kwh': vpd.battery_kwh,  # note: this is kwh/veh * registered_count
         'battery_kwh_per_veh': vpd.battery_kwh_per_veh,  # this is kwh/veh - used for battery tax credit
         'onroad_direct_co2e_grams_per_mile': vpd.onroad_direct_co2e_grams_per_mile,
