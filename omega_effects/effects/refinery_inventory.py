@@ -17,9 +17,12 @@ def get_refinery_emission_rate(session_settings, calendar_year):
         'nox_grams_per_gallon',
         'pm25_grams_per_gallon',
         'sox_grams_per_gallon',
+        'co_grams_per_gallon',
+        'co2_grams_per_gallon',
+        'n2o_grams_per_gallon',
     )
 
-    return session_settings.emission_rates_refinery.get_emission_rate(session_settings, calendar_year, emission_rates)
+    return session_settings.emission_rates_refinery.get_emission_rate(calendar_year, emission_rates)
 
 
 def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, action_dict=None):
@@ -44,7 +47,7 @@ def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, ac
      share_of_fuel_refined_domestically, fuel_reduction_leading_to_reduced_domestic_refining) = \
         get_inputs_for_effects(batch_settings)
 
-    co_ref_rate = co2_ref_rate = ch4_ref_rate = n2o_ref_rate = 0
+    # co_ref_rate = co2_ref_rate = ch4_ref_rate = n2o_ref_rate = 0
 
     if action_dict is None:
         
@@ -54,9 +57,9 @@ def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, ac
             calendar_year = na['calendar_year']
 
             if gallons_refined > 0:
-            
-                voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate \
-                    = get_refinery_emission_rate(session_settings, calendar_year)
+
+                voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co_ref_rate, co2_ref_rate, n2o_ref_rate = \
+                    get_refinery_emission_rate(session_settings, calendar_year)
 
                 na['domestic_refined_gallons'] = gallons_refined
                 na['voc_refinery_ustons'] = gallons_refined * voc_ref_rate / grams_per_us_ton
@@ -66,7 +69,7 @@ def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, ac
                 na['sox_refinery_ustons'] = gallons_refined * sox_ref_rate / grams_per_us_ton
 
                 na['co2_refinery_metrictons'] = gallons_refined * co2_ref_rate / grams_per_metric_ton
-                na['ch4_refinery_metrictons'] = gallons_refined * ch4_ref_rate / grams_per_metric_ton
+                # na['ch4_refinery_metrictons'] = gallons_refined * ch4_ref_rate / grams_per_metric_ton
                 na['n2o_refinery_metrictons'] = gallons_refined * n2o_ref_rate / grams_per_metric_ton
 
         return no_action_dict
@@ -80,8 +83,8 @@ def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, ac
                    na['base_year_vehicle_id'], na['calendar_year'], na['age']
             )
 
-            voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate \
-                = get_refinery_emission_rate(session_settings, calendar_year)
+            voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co_ref_rate, co2_ref_rate, n2o_ref_rate = \
+                get_refinery_emission_rate(session_settings, calendar_year)
 
             refinery_factor = share_of_fuel_refined_domestically * fuel_reduction_leading_to_reduced_domestic_refining
             a_gallons_refined = 0
@@ -115,7 +118,7 @@ def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, ac
                     a['sox_refinery_ustons'] = a_gallons_refined * sox_ref_rate / grams_per_us_ton
 
                     a['co2_refinery_metrictons'] = a_gallons_refined * co2_ref_rate / grams_per_metric_ton
-                    a['ch4_refinery_metrictons'] = a_gallons_refined * ch4_ref_rate / grams_per_metric_ton
+                    # a['ch4_refinery_metrictons'] = a_gallons_refined * ch4_ref_rate / grams_per_metric_ton
                     a['n2o_refinery_metrictons'] = a_gallons_refined * n2o_ref_rate / grams_per_metric_ton
 
         return action_dict
