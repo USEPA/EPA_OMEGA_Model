@@ -70,10 +70,13 @@ Data Row Name and Description:
     :grams_per_metric_ton:
         The number of grams in a metric ton.
 
+    :share_of_fuel_refined_domestically:
+        The share of petroleum fuel refined domestically.
+
     :fuel_reduction_leading_to_reduced_domestic_refining:
-        The share of reduced liquid fuel consumption leading to reduced domestic refining of crude oil; if 0 then domestic
-        refining is assumed to be unaffected by reduced liquid-fuel demand; if 1 then domestic refining for liquid-fuel
-        generation is assumed to cease.
+        The share of reduced petroleum fuel consumption leading to reduced domestic refining of crude oil; if 0 then domestic
+        refining is assumed to be unaffected by reduced petroleum fuel demand; if 1 then all reduced petroleum demand
+        reduces domestic refining an equal amount.
 
     :years_in_consumer_view:
         The number of years of a vehicle's lifetime to include in the model year lifetime, or consumer view, calculations.

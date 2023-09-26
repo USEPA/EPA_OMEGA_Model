@@ -48,7 +48,6 @@ class VehiclePhysicalData:
         self.annual_vmt_rebound = 0
         self.vmt_rebound = 0
         self.vmt_liquid_fuel = 0
-        self.vmt_electricity = 0
         self.battery_kwh = 0
         self.battery_kwh_per_veh = 0
         self.onroad_direct_co2e_grams_per_mile = 0
@@ -57,6 +56,7 @@ class VehiclePhysicalData:
         self.onroad_gallons_per_mile = 0
         self.onroad_miles_per_gallon = 0
         self.fuel_consumption_gallons = 0
+        self.petroleum_consumption_gallons = 0
         self.fuel_consumption_kwh = 0
         self.fuel_generation_kwh = 0
         self.curbweight_lbs = 0
@@ -196,7 +196,8 @@ def calc_vehicle_inventory(vpd):
     pm25_veh_ustons = pm25_exh_ustons + pm25_brakewear_ustons + pm25_tirewear_ustons
 
     # calc energy security related attributes and comparisons to year_for_compares
-    oil_bbl = vpd.fuel_consumption_gallons * vpd.pure_share * vpd.energy_density_ratio / vpd.gal_per_bbl
+    vpd.petroleum_consumption_gallons = vpd.fuel_consumption_gallons * vpd.pure_share
+    oil_bbl = vpd.petroleum_consumption_gallons * vpd.energy_density_ratio / vpd.gal_per_bbl
     imported_oil_bbl = oil_bbl * vpd.energy_security_import_factor
     imported_oil_bbl_per_day = imported_oil_bbl / 365
 
@@ -228,7 +229,6 @@ def calc_vehicle_inventory(vpd):
         'annual_vmt_rebound': vpd.annual_vmt_rebound,
         'vmt_rebound': vpd.vmt_rebound,
         'vmt_liquid_fuel': vpd.vmt_liquid_fuel,
-        'vmt_electricity': vpd.vmt_electricity,
         'battery_kwh': vpd.battery_kwh,  # note: this is kwh/veh * registered_count
         'battery_kwh_per_veh': vpd.battery_kwh_per_veh,  # this is kwh/veh - used for battery tax credit
         'onroad_direct_co2e_grams_per_mile': vpd.onroad_direct_co2e_grams_per_mile,
@@ -237,6 +237,8 @@ def calc_vehicle_inventory(vpd):
         'onroad_gallons_per_mile': vpd.onroad_gallons_per_mile,
         'onroad_miles_per_gallon': vpd.onroad_miles_per_gallon,
         'fuel_consumption_gallons': vpd.fuel_consumption_gallons,
+        'petroleum_consumption_gallons': vpd.petroleum_consumption_gallons,
+        'domestic_refined_gallons': 0,
         'fuel_consumption_kwh': vpd.fuel_consumption_kwh,
         'fuel_generation_kwh': vpd.fuel_generation_kwh,
         'curbweight_lbs': vpd.curbweight_lbs,
