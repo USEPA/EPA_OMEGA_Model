@@ -13,36 +13,43 @@ File Type
 Sample Header
     .. csv-table::
 
-       input_template_name:,emission_rates_refinery,input_template_version:,0.1
+       input_template_name:,emission_rates_refinery,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        rate_name,independent_variable,last_year,slope_rate,intercept_rate,equation_rate_id
-        pm25_grams_per_gallon,(calendar_year - 2016),2055,-2.58E-04,1.47E-01,((-0.000257743900872186 * (calendar_year - 2016)) + 0.147171057586721)
-        nox_grams_per_gallon,(calendar_year - 2016),2055,-0.002233801,0.57763691,((-0.00223380056415021 * (calendar_year - 2016)) + 0.577636910469321)
-        sox_grams_per_gallon,(calendar_year - 2016),2055,-0.00030085,0.221705126,((-0.000300850396789525 * (calendar_year - 2016)) + 0.221705126043959)
-        voc_grams_per_gallon,(calendar_year - 2016),2055,-2.19E-03,5.00E-01,((-0.00219248448866068 * (calendar_year - 2016)) + 0.500358765360277)
+        calendar_year,co_grams_per_gallon,co2_grams_per_gallon,n2o_grams_per_gallon,nox_grams_per_gallon,pm25_grams_per_gallon,sox_grams_per_gallon,voc_grams_per_gallon
+        2030,0.221366923,776.3322717,0.006565074,0.333376711,0.079500558,0.099981211,0.23941677
+        2031,0.225401153,790.8154639,0.006687551,0.339531504,0.080958362,0.101826973,0.24376566
+        2032,0.229435383,805.2986561,0.006810029,0.345686296,0.082416166,0.103672736,0.248114551
+        2033,0.233469613,819.7818483,0.006932506,0.351841089,0.083873971,0.105518498,0.252463441
 
 Data Column Name and Description
-    :rate_name:
-        The emission rate providing the pollutant and units.
 
-    :independent_variable:
-        The independent variable used in calculating the emission rate.
+    :calendar_year:
+        The calendar year for which rates are sought.
 
-    :last_year:
-        The last calendar year from which the rate regression curves were generated.
+    :co_grams_per_gallon:
+        The CO emission rate in grams per gallon of fuel refined.
 
-    :slope_rate:
-        The slope of the linear fit to the emission rate input data.
+    :co2_grams_per_gallon:
+        The CO2 emission rate in grams per gallon of fuel refined.
 
-    :intercept_rate:
-        The intercept of the linear fit to the emission rate input data.
+    :n2o_grams_per_gallon:
+        The N2O emission rate in grams per gallon of fuel refined.
 
-    :equation_rate_id:
-        The linear fit emission rate equation used to calculate an emission rate at the given independent variable.
+    :nox_grams_per_gallon:
+        The NOx emission rate in grams per gallon of fuel refined.
+
+    :pm25_grams_per_gallon:
+        The PM2.5 emission rate in grams per gallon of fuel refined.
+
+    :sox_grams_per_gallon:
+        The SOx emission rate in grams per gallon of fuel refined.
+
+    :voc_grams_per_gallon:
+        The VOC emission rate in grams per gallon of fuel refined.
 
 ----
 
@@ -59,10 +66,9 @@ class EmissionRatesRefinery:
 
     """
     def __init__(self):
-        self._data = {}  # private dict
-        self._cache = {}
+        self._data = {}
+        self.calendar_year_min = None
         self.calendar_year_max = None
-        self.deets = {}
         self.rate_names = []
 
     def init_from_file(self, filepath, effects_log):
@@ -80,14 +86,17 @@ class EmissionRatesRefinery:
         """
         # don't forget to update the module docstring with changes here
         input_template_name = 'emission_rates_refinery'
-        input_template_version = 0.1
+        input_template_version = 0.2
         input_template_columns = {
-            'rate_name',
-            'independent_variable',
-            'last_year',
-            'equation_rate_id',
+            'calendar_year',
+            'co_grams_per_gallon',
+            'co2_grams_per_gallon',
+            'n2o_grams_per_gallon',
+            'nox_grams_per_gallon',
+            'pm25_grams_per_gallon',
+            'sox_grams_per_gallon',
+            'voc_grams_per_gallon',
         }
-
         df = read_input_file(filepath, effects_log)
         validate_template_version_info(df, input_template_name, input_template_version, effects_log)
 
@@ -95,21 +104,20 @@ class EmissionRatesRefinery:
         df = read_input_file(filepath, effects_log, skiprows=1)
         validate_template_column_names(filepath, df, input_template_columns, effects_log)
 
-        df.set_index(df['rate_name'], inplace=True)
+        self.rate_names = [rate_name for rate_name in df.columns if 'year' not in rate_name]
+        self.calendar_year_min = int(min(df['calendar_year']))
+        self.calendar_year_max = int(max(df['calendar_year']))
 
-        self.rate_names = [rate_name for rate_name in df['rate_name'].unique()]
-
-        self.calendar_year_max = df['last_year'][0]
+        df.set_index(df['calendar_year'], inplace=True)
 
         self._data = df.to_dict('index')
 
-    def get_emission_rate(self, session_settings, calendar_year, rate_names):
+    def get_emission_rate(self, calendar_year, rate_names):
         """
 
         Get emission rates by calendar year
 
         Args:
-            session_settings: an instance of the SessionSettings class
             calendar_year (int): calendar year for which to get emission rates
             rate_names (str, [strs]): name of emission rate(s) to get
 
@@ -117,30 +125,13 @@ class EmissionRatesRefinery:
             A list of emission rates for the given kwh_demand in the given calendar_year.
 
         """
-        locals_dict = locals()
-        return_rates = list()
-
+        if calendar_year < self.calendar_year_min:
+            calendar_year = self.calendar_year_min
         if calendar_year > self.calendar_year_max:
             calendar_year = self.calendar_year_max
 
-        if calendar_year in self._cache:
-            return_rates = self._cache[calendar_year]
+        rates = []
+        for rate_name in rate_names:
+            rates.append(self._data[calendar_year][rate_name])
 
-        else:
-            for idx, rate_name in enumerate(rate_names):
-                rate = eval(self._data[rate_name]['equation_rate_id'], {}, locals_dict)
-
-                return_rates.append(rate)
-
-                self.deets.update(
-                    {(calendar_year, rate_name): {
-                        'session_policy': session_settings.session_policy,
-                        'session_name': session_settings.session_name,
-                        'calendar_year': calendar_year,
-                        'rate_name': rate_name,
-                        'rate': rate,
-                    }}
-                )
-            self._cache[calendar_year] = return_rates
-
-        return return_rates
+        return rates
