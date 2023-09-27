@@ -968,8 +968,12 @@ class OMEGASessionObject(OMEGABase):
         backdoor_settings = [i.replace('settings.', '') for i in self.batch.dataframe.index
                              if type(i) == str and i.startswith('settings.')]
 
+        attributes = sorted(list(self.settings.__dict__.keys()))
         for bo in backdoor_settings:
-            self.settings.__setattr__(bo, self.read_parameter('settings.%s' % bo))
+            if bo in attributes:
+                self.settings.__setattr__(bo, self.read_parameter('settings.%s' % bo))
+            else:
+                raise Exception('Batch file contains unknown developer settings attribute "%s"' % bo)
 
     def init(self, verbose=False):
         """
