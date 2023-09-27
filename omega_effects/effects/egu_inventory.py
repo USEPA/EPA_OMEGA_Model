@@ -72,7 +72,7 @@ def calc_egu_inventory(batch_settings, session_settings, physical_effects_dict):
 
         for v in physical_effects_dict.values():
 
-            kwhs = v['fuel_consumption_kwh']
+            kwhs = v['fuel_consumption_kwh']  # TODO should this be consumption or generation?
 
             if v['calendar_year'] == calendar_year:
 
