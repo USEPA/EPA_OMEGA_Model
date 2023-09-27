@@ -758,7 +758,9 @@ def calc_annual_physical_effects(batch_settings, input_df):
     grams_per_metric_ton = get_inputs_for_effects(batch_settings, arg='grams_per_metric_ton')
 
     attributes = [col for col in input_df.columns if ('vmt' in col or 'vmt_' in col) and '_vmt' not in col]
-    additional_attributes = ['count', 'consumption', 'generation', 'barrels', 'tons', 'fatalit', 'battery_kwh']
+    additional_attributes = [
+        'count', 'consumption', 'refined', 'generation', 'barrels', 'tons', 'fatalit', 'battery_kwh'
+    ]
     for additional_attribute in additional_attributes:
         for col in input_df:
             if additional_attribute in col:
