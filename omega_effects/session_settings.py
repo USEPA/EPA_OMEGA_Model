@@ -350,7 +350,7 @@ class SessionSettings:
                 self.inputs_filelist.append(self.refinery_emission_factors_file)
             else:
                 self.emission_rates_refinery = EmissionRatesRefinery()
-                self.emission_rates_refinery.init_from_file(self.refinery_emission_rates_file, effects_log)
+                self.emission_rates_refinery.init_from_file(self, self.refinery_emission_rates_file, effects_log)
                 self.inputs_filelist.append(self.refinery_emission_rates_file)
 
             self.emission_rates_vehicles = EmissionRatesVehicles()

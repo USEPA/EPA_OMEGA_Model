@@ -24,12 +24,11 @@ def validate_template_version_info(df, input_template_name, input_template_versi
 
     """
     for item in [input_template_name, input_template_version]:
-        try:
-            item in df.columns
-        except Exception as e:
+        if not str(item) in df.columns:
             if effects_log:
-                effects_log.logwrite(e)
-                sys.exit()
+                effects_log.logwrite(f'{item} is not a valid template name or version number.')
+            sys.exit()
+
     if effects_log:
         effects_log.logwrite('Template version info is valid.')
 
