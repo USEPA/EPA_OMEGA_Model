@@ -658,16 +658,26 @@ class CostCloud(OMEGABase, CostCloudBase):
                                     footprint_ft2 == ASTM_round(vehicle.base_year_footprint_ft2, sweep_precision) and \
                                     structure_material == vehicle.structure_material and \
                                     ccc == vehicle.cost_curve_class and vehicle.fueling_class != 'BEV':
-                                vehicle.onroad_direct_co2e_grams_per_mile = \
+                                vehicle.onroad_direct_oncycle_co2e_grams_per_mile = \
                                     cloud_point['onroad_direct_oncycle_co2e_grams_per_mile']
+                                if vehicle.model_year == omega_globals.options.analysis_initial_year:
+                                    vehicle.base_year_cert_direct_oncycle_co2e_grams_per_mile = \
+                                        cloud_point['cert_direct_oncycle_co2e_grams_per_mile']
+                                    vehicle.base_year_onroad_direct_oncycle_co2e_grams_per_mile = \
+                                        cloud_point['onroad_direct_oncycle_co2e_grams_per_mile']
+
                             elif rlhp20 == vehicle_rlhp20 and \
                                     rlhp60 == vehicle_rlhp60 and \
                                     footprint_ft2 == ASTM_round(vehicle.base_year_footprint_ft2, sweep_precision) and \
                                     structure_material == vehicle.structure_material and \
                                     ccc == vehicle.cost_curve_class and vehicle.fueling_class == 'BEV':
-                                vehicle.battery_sizing_onroad_direct_kwh_per_mile = \
-                                    cloud_point['battery_sizing_onroad_direct_kwh_per_mile']
-
+                                vehicle.onroad_direct_oncycle_kwh_per_mile = \
+                                    cloud_point['onroad_direct_oncycle_kwh_per_mile']
+                                if vehicle.model_year == omega_globals.options.analysis_initial_year:
+                                    vehicle.base_year_cert_direct_oncycle_kwh_per_mile = \
+                                        cloud_point['cert_direct_oncycle_kwh_per_mile']
+                                    vehicle.base_year_onroad_direct_oncycle_kwh_per_mile = \
+                                        cloud_point['onroad_direct_oncycle_kwh_per_mile']
 
                             v = copy.copy(vehicle)
                             v.footprint_ft2 = footprint_ft2
@@ -729,11 +739,11 @@ class CostCloud(OMEGABase, CostCloudBase):
             if omega_globals.options.no_backsliding and vehicle.fueling_class != 'BEV' and \
                     vehicle.cost_curve_class != None:
                 cost_cloud = cost_cloud[cost_cloud['onroad_direct_oncycle_co2e_grams_per_mile'] <=
-                                        vehicle.onroad_direct_co2e_grams_per_mile]
+                                        vehicle.onroad_direct_oncycle_co2e_grams_per_mile]
             elif omega_globals.options.no_backsliding and vehicle.fueling_class == 'BEV' and \
                     vehicle.cost_curve_class != None:
-                cost_cloud = cost_cloud[cost_cloud['battery_sizing_onroad_direct_kwh_per_mile'] <=
-                                        vehicle.battery_sizing_onroad_direct_kwh_per_mile]
+                cost_cloud = cost_cloud[cost_cloud['onroad_direct_oncycle_kwh_per_mile'] <=
+                                        vehicle.onroad_direct_oncycle_kwh_per_mile]
         glider_costs = \
             GliderCost.calc_cost(vehicle, cost_cloud)  # includes structure_cost and glider_non_structure_cost
 

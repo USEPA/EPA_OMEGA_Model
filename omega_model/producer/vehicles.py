@@ -769,7 +769,11 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'battery_sizing_onroad_direct_kwh_per_mile', 'tractive_motor_kw',
                        'base_year_battery_kwh', 'base_year_tractive_motor_kw', 'base_year_total_emachine_kw',
                        'base_year_onroad_charge_depleting_range_mi', 'cert_engine_on_distance_frac',
-                       'onroad_engine_on_distance_frac'
+                       'onroad_engine_on_distance_frac', 'base_year_cost_curve_class',
+                       'base_year_onroad_direct_oncycle_co2e_grams_per_mile',
+                       'base_year_onroad_direct_oncycle_kwh_per_mile',
+                       'base_year_cert_direct_oncycle_co2e_grams_per_mile',
+                       'base_year_cert_direct_oncycle_kwh_per_mile'
                        )
 
     # transfer base properties
@@ -886,11 +890,13 @@ class Vehicle(OMEGABase):
         self.battery_kwh = 0
         self.total_emachine_kw = 0
         self.tractive_motor_kw = 0
-        self.onroad_charge_depleting_range_mi = 0
         self.cert_utility_factor = 0
         self.onroad_utility_factor = 0
         self.cert_engine_on_distance_frac = 0
         self.onroad_engine_on_distance_frac = 0
+        self.onroad_charge_depleting_range_mi = 0
+        self.onroad_direct_oncycle_co2e_grams_per_mile = 0
+        self.onroad_direct_oncycle_kwh_per_mile = 0
         self.battery_sizing_onroad_direct_kwh_per_mile = 0
         self.workfactor = 0
         self.gvwr_lbs = 0
@@ -898,6 +904,11 @@ class Vehicle(OMEGABase):
         self.base_year_workfactor = 0
         self.base_year_gvwr_lbs = 0
         self.base_year_gcwr_lbs = 0
+        self.base_year_cost_curve_class = ''
+        self.base_year_onroad_direct_oncycle_co2e_grams_per_mile = 0
+        self.base_year_onroad_direct_oncycle_kwh_per_mile = 0
+        self.base_year_cert_direct_oncycle_co2e_grams_per_mile = 0
+        self.base_year_cert_direct_oncycle_kwh_per_mile = 0
 
         # additional attriutes are added dynamically and may vary based on user inputs (such as off-cycle credits)
         for ccv in DecompositionAttributes.values:
@@ -1351,6 +1362,11 @@ class VehicleFinal(SQABase, Vehicle):
     base_year_tractive_motor_kw = Column(Float)  #: on-cycle tractive motor power, kW
     base_year_total_emachine_kw = Column(Float)  #: vehicle motor/generator total combined power, kW
     base_year_onroad_charge_depleting_range_mi = Column(Float)  #: charge depleting range, miles
+    base_year_cost_curve_class = Column(String)  #: base year cost curve class
+    base_year_onroad_direct_oncycle_co2e_grams_per_mile = Column(Float)  #: base year onroad direct oncycle CO2e g/mi
+    base_year_onroad_direct_oncycle_kwh_per_mile = Column(Float)  #: base year onroad direct oncycle kWh/mi
+    base_year_cert_direct_oncycle_co2e_grams_per_mile = Column(Float)  #: base year cert direct oncycle CO2e g/mi
+    base_year_cert_direct_oncycle_kwh_per_mile = Column(Float)  #: base year cert direct oncycle kWh/mi
 
     # non-numeric attributes that could change based on interpolating the frontier:
     cost_curve_class = Column(String)  #: ALPHA modeling result class
@@ -1524,7 +1540,9 @@ class VehicleFinal(SQABase, Vehicle):
                               'dual_rear_wheel', 'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
                               'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c',
                               'prior_redesign_year', 'redesign_interval', 'workfactor', 'gvwr_lbs', 'gcwr_lbs',
-                              'base_year_workfactor', 'base_year_gvwr_lbs', 'base_year_gcwr_lbs', 'application_id'] \
+                              'base_year_workfactor', 'base_year_gvwr_lbs', 'base_year_gcwr_lbs', 'application_id',
+                              'base_year_cost_curve_class',
+                              ] \
                               + VehicleFinal.dynamic_attributes
 
         # model year and registered count are required to make a full-blown VehicleFinal object, compliance_id
@@ -1585,12 +1603,23 @@ class VehicleFinal(SQABase, Vehicle):
                 dual_rear_wheel=df.loc[i, 'dual_rear_wheel'],
                 curbweight_lbs=df.loc[i, 'curbweight_lbs'],
                 footprint_ft2=df.loc[i, 'footprint_ft2'],
+                body_style=df.loc[i, 'body_style'],
+                structure_material=df.loc[i, 'structure_material'],
+                total_emachine_kw=df.loc[i, 'total_emachine_kw'],
+                tractive_motor_kw=df.loc[i, 'tractive_motor_kw'],
+                battery_kwh=df.loc[i, 'battery_gross_kwh'],
+                onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi'],
+                prior_redesign_year=df.loc[i, 'prior_redesign_year'],
+                redesign_interval=df.loc[i, 'redesign_interval'],
+                in_production=True,
+                workfactor=df.loc[i, 'workfactor'],
+                gvwr_lbs=df.loc[i, 'gvwr_lbs'],
+                gcwr_lbs=df.loc[i, 'gcwr_lbs'],
+                base_year_cost_curve_class = df.loc[i, 'cost_curve_class'],
                 base_year_eng_rated_hp=df.loc[i, 'eng_rated_hp'],
                 base_year_target_coef_a=df.loc[i, 'target_coef_a'],
                 base_year_target_coef_b=df.loc[i, 'target_coef_b'],
                 base_year_target_coef_c=df.loc[i, 'target_coef_c'],
-                body_style=df.loc[i, 'body_style'],
-                structure_material=df.loc[i, 'structure_material'],
                 base_year_reg_class_id=df.loc[i, 'reg_class_id'],
                 base_year_footprint_ft2=df.loc[i, 'footprint_ft2'],
                 base_year_curbweight_lbs=df.loc[i, 'curbweight_lbs'],
@@ -1603,20 +1632,10 @@ class VehicleFinal(SQABase, Vehicle):
                 base_year_cert_fuel_id=df.loc[i, 'cert_fuel_id'],
                 base_year_battery_kwh=df.loc[i, 'battery_kwh'],
                 base_year_total_emachine_kw=df.loc[i, 'total_emachine_kw'],
-                total_emachine_kw=df.loc[i, 'total_emachine_kw'],
                 base_year_tractive_motor_kw=df.loc[i, 'tractive_motor_kw'],
-                tractive_motor_kw=df.loc[i, 'tractive_motor_kw'],
                 base_year_onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi'],
-                battery_kwh=df.loc[i, 'battery_gross_kwh'],
-                onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi'],
                 base_year_powertrain_type=df.loc[i, 'base_year_powertrain_type'],
-                prior_redesign_year=df.loc[i, 'prior_redesign_year'],
-                redesign_interval=df.loc[i, 'redesign_interval'],
-                in_production=True,
                 base_year_product=True,
-                workfactor=df.loc[i, 'workfactor'],
-                gvwr_lbs=df.loc[i, 'gvwr_lbs'],
-                gcwr_lbs=df.loc[i, 'gcwr_lbs'],
                 base_year_gvwr_lbs=df.loc[i, 'gvwr_lbs'],
                 base_year_gcwr_lbs=df.loc[i, 'gcwr_lbs'],
             )
