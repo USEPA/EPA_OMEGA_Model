@@ -363,6 +363,11 @@ class VehicleAggregation(OMEGABase):
                 veh.body_style = row['body_style']
                 veh.drive_system = row['drive_system']
 
+                if row['base_year_powertrain_type'] in ['BEV', 'FCV']:
+                    df.loc[idx, 'rated_hp'] = row['total_emachine_kw'] / 0.746
+                else:
+                    df.loc[idx, 'rated_hp'] = row['eng_rated_hp']
+
                 if row['base_year_powertrain_type'] == 'FCV':
                     # RV map FCV to BEV for now
                     veh.base_year_powertrain_type = 'BEV'
@@ -446,8 +451,6 @@ class VehicleAggregation(OMEGABase):
 
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv',
                           columns=sorted(agg_df.columns))
-
-            agg_df['rated_hp'] = agg_df['eng_rated_hp']  # RV
 
             omega_globals.options.vehicles_df = agg_df
 
