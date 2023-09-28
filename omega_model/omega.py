@@ -312,12 +312,6 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
             producer_consumer_iteration_num = 0
             iterate_producer_consumer = True
 
-            if omega_globals.options.producer_shares_mode == 'auto':
-                # CU RV
-                omega_globals.producer_shares_mode = False
-            elif omega_globals.options.producer_shares_mode is True:
-                omega_globals.producer_shares_mode = True
-
             while iterate_producer_consumer:
                 omega_log.logwrite("Running %s:  Year=%s  Iteration=%s %s" %
                                    (omega_globals.options.session_unique_name, calendar_year,
@@ -585,7 +579,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     update_cross_subsidy_log_data(producer_decision_and_response, calendar_year, compliance_id, mcat_converged,
                                   producer_consumer_iteration_num, compliant, share_convergence_error)
 
-    if omega_globals.producer_shares_mode:
+    if omega_globals.options.producer_shares_mode:
         # force consumer shares from producer shares, after having logged raw results above
         for mcat in [k for k in producer_decision_and_response.keys() if 'consumer_abs_' in k]:
             producer_decision_and_response[mcat] = producer_decision_and_response[mcat.replace('consumer', 'producer')]
@@ -869,7 +863,7 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
         price_options_df = price_options_df.drop(multiplier_columns, axis=1, errors='ignore')
 
     if first_pass:
-        if omega_globals.producer_shares_mode:
+        if omega_globals.options.producer_shares_mode:
             multiplier_range = np.array([1.0])
         else:
             # first time through, span full range, including all 1's
@@ -1283,7 +1277,7 @@ def detect_producer_consumer_convergence(producer_decision_and_response, produce
 
     cross_subsidy_pricing_error = abs(1 - producer_decision_and_response['price_cost_ratio_total'])
     converged = cross_subsidy_pricing_error <= omega_globals.options.producer_cross_subsidy_price_tolerance or \
-                omega_globals.producer_shares_mode
+                omega_globals.options.producer_shares_mode
 
     share_convergence_error = 0
     for mc in producer_market_classes:

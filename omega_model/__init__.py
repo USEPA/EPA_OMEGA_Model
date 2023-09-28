@@ -173,7 +173,7 @@ try:
 
             # developer settings
             self.producer_market_category_ramp_limit = 0.2
-            self.producer_shares_mode = True  # 'auto'
+            self.producer_shares_mode = True
             self.producer_num_market_share_options = 3
             self.producer_num_tech_options_per_ice_vehicle = 3
             self.producer_num_tech_options_per_bev_vehicle = 1
