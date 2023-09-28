@@ -245,7 +245,7 @@ class VehicleAggregation(OMEGABase):
             from context.mass_scaling import MassScaling
             from context.body_styles import BodyStyles
 
-            omega_globals.options.CostCloud.rse_names.update(['FCV'])  # RV add 'FCV' RSE name for validation purposes for now
+            omega_globals.options.CostCloud.rse_names.update(['FCV'])  # RV FCV add 'FCV' RSE name for validation purposes for now
 
             validation_dict = {'manufacturer_id': Manufacturer.manufacturers,
                                'reg_class_id': list(legacy_reg_classes),
@@ -301,7 +301,7 @@ class VehicleAggregation(OMEGABase):
             df['base_year_powertrain_type'] = df['electrification_class'].\
                 replace({'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'FCV'})
 
-            # RV
+            # RV FCV
             df['battery_kwh'] = df[['base_year_powertrain_type']].\
                 replace({'base_year_powertrain_type': {'HEV': df['battery_gross_kwh'], 'PHEV': df['battery_gross_kwh'],
                                                        'BEV': df['battery_gross_kwh'],
@@ -318,7 +318,7 @@ class VehicleAggregation(OMEGABase):
                                                            update_df=False),
                                                        'ICE': 0}})
 
-            # RV
+            # RV FCV
             df['total_emachine_kw'] = df[['base_year_powertrain_type']].\
                 replace({'base_year_powertrain_type': {'HEV': 20,
                                              'PHEV': df['total_emachine_kw'],
@@ -326,7 +326,7 @@ class VehicleAggregation(OMEGABase):
                                              'FCV': 150 + (50 * (df['drive_system'] != 'FWD')),
                                              'ICE': 0}})
 
-            # RV
+            # RV FCV
             df['onroad_charge_depleting_range_mi'] = df[['base_year_powertrain_type']].\
                 replace({'base_year_powertrain_type': {'HEV': 0, 'PHEV': df['onroad_charge_depleting_range_mi'],
                                                        'BEV': df['onroad_charge_depleting_range_mi'],
@@ -369,7 +369,7 @@ class VehicleAggregation(OMEGABase):
                     df.loc[idx, 'rated_hp'] = row['eng_rated_hp']
 
                 if row['base_year_powertrain_type'] == 'FCV':
-                    # RV map FCV to BEV for now
+                    # RV FCV map FCV to BEV for now
                     veh.base_year_powertrain_type = 'BEV'
                     veh.cost_curve_class = 'BEV_%s' % veh.drive_system
                 else:

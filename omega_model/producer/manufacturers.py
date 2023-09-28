@@ -130,8 +130,6 @@ class Manufacturer(SQABase, OMEGABase):
 
                 Manufacturer.manufacturers = list(df['manufacturer_id'].unique())
 
-                # RV
-
         return template_errors
 
 

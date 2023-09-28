@@ -471,7 +471,6 @@ def calc_cross_subsidy_metrics(mcat, cross_subsidy_group, producer_decision, cro
         (1 - _cross_subsidy_options_and_response['average_ALT_cross_subsidized_price_%s' % mcat] /
             _cross_subsidy_options_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat])
 
-    # CU RV
     for k, v in _cross_subsidy_options_and_response.items():
         cross_subsidy_options_and_response[k] = v
 

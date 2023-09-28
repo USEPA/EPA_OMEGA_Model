@@ -1377,11 +1377,10 @@ class VehicleFinal(SQABase, Vehicle):
     tractive_motor_kw = Column(Float)  #: on-cycle tractive motor power, kW
     curbweight_lbs = Column(Float)  #: vehicle curbweight, pounds
     footprint_ft2 = Column(Float)  #: vehicle footprint, square feet
-    # RV
     base_year_eng_rated_hp = Column(Float)  #: engine rated horsepower
-    workfactor = Column(Float)
-    gvwr_lbs = Column(Float)
-    gcwr_lbs = Column(Float)
+    workfactor = Column(Float)  #: medium-duty workfactor
+    gvwr_lbs = Column(Float)  #: gross vehicle weight rating, lbs
+    gcwr_lbs = Column(Float)  #: gross combined weight rating, lbs
 
     _initial_registered_count = Column('_initial_registered_count', Float)
     projected_sales = Column(Float)  #: used to project context size class sales
@@ -1776,7 +1775,7 @@ class VehicleFinal(SQABase, Vehicle):
                     else:
                         alt_veh.base_year_total_emachine_kw = 1
                     if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
-                        alt_veh.onroad_charge_depleting_range_mi = 150  # RV
+                        alt_veh.onroad_charge_depleting_range_mi = 150  # RV MDV
                     else:
                         alt_veh.onroad_charge_depleting_range_mi = omega_globals.options.bev_range_mi
                     alt_veh.base_year_eng_rated_hp = 0
@@ -1798,7 +1797,7 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.total_emachine_kw = 0  # motor size determined during cost curve generation
                     alt_veh.tractive_motor_kw = 0
                     if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
-                        alt_veh.onroad_charge_depleting_range_mi = 25  # RV
+                        alt_veh.onroad_charge_depleting_range_mi = 25  # RV MDV
                     else:
                         alt_veh.onroad_charge_depleting_range_mi = omega_globals.options.phev_range_mi
                     alt_veh.base_year_onroad_charge_depleting_range_mi = alt_veh.onroad_charge_depleting_range_mi
@@ -1884,7 +1883,6 @@ class VehicleFinal(SQABase, Vehicle):
             print_dict(VehicleFinal.mfr_base_year_share_data)
 
     @staticmethod
-    # RV
     def set_fueling_class(veh):
         """
 
@@ -1896,7 +1894,7 @@ class VehicleFinal(SQABase, Vehicle):
         """
         if veh.base_year_powertrain_type in ['BEV', 'FCV']:
             if veh.base_year_powertrain_type == 'FCV':
-                # RV
+                # RV FCV
                 veh.in_use_fuel_id = "{'US electricity':1.0}"
                 veh.cert_fuel_id = 'electricity'
                 veh.base_year_powertrain_type = 'BEV'
