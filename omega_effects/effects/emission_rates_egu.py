@@ -73,6 +73,8 @@ Data Column Name and Description
 **CODE**
 
 """
+import pandas as pd
+
 from omega_effects.general.general_functions import read_input_file
 from omega_effects.general.input_validation import validate_template_version_info, validate_template_column_names
 
@@ -83,13 +85,14 @@ class EmissionRatesEGU:
 
     """
     def __init__(self):
-        self._data = {}
+        self._data = {}  # the input data along with pw linear interpolations of that input data
         self.cases = None
-        self._cache = {}
+        self._cache = {}  # a storehouse of calculated rates for the given session
+        self.years = None
         self.calendar_year_min = None
         self.calendar_year_max = None
         self.rate_names = None
-        self.deets = {}  # this dictionary will not include the legacy fleet
+        self.deets = {}  # all the calc details; this dictionary will not include the legacy fleet
 
     def init_from_file(self, filepath, effects_log):
         """
@@ -106,11 +109,11 @@ class EmissionRatesEGU:
         """
         # don't forget to update the module docstring with changes here
         input_template_name = 'emission_rates_egu'
-        input_template_version = 0.3
+        input_template_version = 0.4
         input_template_columns = [
             'calendar_year',
             'case',
-            'kwh_consumption_low_demand',
+            'kwh_demand',
             'kwh_generation_us',
             'pm25_grams_per_kwh',
             'nox_grams_per_kwh',
@@ -130,7 +133,8 @@ class EmissionRatesEGU:
         df = read_input_file(filepath, effects_log, skiprows=1)
         validate_template_column_names(filepath, df, input_template_columns, effects_log)
 
-        self.rate_names = [rate_name for rate_name in df.columns if 'year' not in rate_name]
+        self.rate_names = [rate_name for rate_name in df.columns if 'year' not in rate_name and 'case' not in rate_name]
+        self.years = df['calendar_year'].unique()
         self.calendar_year_min = int(min(df['calendar_year']))
         self.calendar_year_max = int(max(df['calendar_year']))
         self.cases = df['case'].unique()
@@ -142,6 +146,8 @@ class EmissionRatesEGU:
         df.set_index(rate_keys, inplace=True)
 
         self._data = df.to_dict('index')
+
+        self.interpolate_input_data()
 
     def get_emission_rate(self, session_settings, cyear,
                           session_kwh_consumption, session_kwh_generation, rate_names):
@@ -172,16 +178,15 @@ class EmissionRatesEGU:
         if cyear in self._cache:
             return self._cache[cyear]
 
-        # else:
-        kwh_demand_low = self._data[(calendar_year, 'low_demand')]['kwh_generation_us']
-        kwh_demand_high = self._data[(calendar_year, 'high_demand')]['kwh_generation_us']
-        kwh_consumption_ipm = self._data[(calendar_year, 'low_demand')]['kwh_consumption_low_demand']
+        kwh_generation_us_low = self._data[(calendar_year, 'low_demand')]['kwh_generation_us']
+        kwh_generation_us_high = self._data[(calendar_year, 'high_demand')]['kwh_generation_us']
+        kwh_demand_fleet_ipm = self._data[(calendar_year, 'low_demand')]['kwh_demand']
 
-        # back out the low-bound consumption provided to IPM to establish a base
-        kwh_base = kwh_demand_low - kwh_consumption_ipm
+        # back out the low_demand case fleet demand provided to IPM to establish a base working base
+        kwh_generation_us_base = kwh_generation_us_low - kwh_demand_fleet_ipm
 
-        # add the kwh_session to the new kwh base value to determine the US base plus omega session consumption
-        us_kwh_generation = session_kwh_generation + kwh_base
+        # add the kwh_session to the new kwh base value to determine the US generation for this session
+        kwh_generation_us_session = session_kwh_generation + kwh_generation_us_base
 
         for idx, rate_name in enumerate(rate_names):
 
@@ -190,11 +195,11 @@ class EmissionRatesEGU:
                     'session_policy': session_settings.session_policy,
                     'session_name': session_settings.session_name,
                     'calendar_year': cyear,
-                    'kwh_demand_low': kwh_demand_low,
-                    'kwh_demand_high': kwh_demand_high,
-                    'kwh_consumption_ipm': kwh_consumption_ipm,
-                    'kwh_base': kwh_base,
-                    'us_kwh_generation': us_kwh_generation,
+                    'kwh_generation_us_low': kwh_generation_us_low,
+                    'kwh_generation_us_high': kwh_generation_us_high,
+                    'kwh_demand_fleet_ipm': kwh_demand_fleet_ipm,
+                    'kwh_generation_us_base': kwh_generation_us_base,
+                    'kwh_generation_us_session': kwh_generation_us_session,
                     'fleet_kwh_consumption': session_kwh_consumption,
                     'fleet_kwh_generation': session_kwh_generation,
                     'rate_name': rate_name,
@@ -206,21 +211,51 @@ class EmissionRatesEGU:
             if calendar_year <= self.calendar_year_min:
                 rate = rate_low
             else:
-                rate = ((us_kwh_generation - kwh_demand_low) * (rate_high - rate_low) / (kwh_demand_high - kwh_demand_low)
+                rate = ((kwh_generation_us_session - kwh_generation_us_low) * (rate_high - rate_low)
+                        / (kwh_generation_us_high - kwh_generation_us_low)
                         + rate_low)
+                if not rate_low <= rate <= rate_high or not rate_high <= rate <= rate_low:
+                    rate = (rate_low + rate_high) / 2
 
             rates.append(rate)
             if rate <= 0:
-                rate = self._cache[cyear - 1][idx]
+                rate = (rate_low + rate_high) / 2
 
             self.deets[cyear, rate_name].update({
                 'rate_low': rate_low,
                 'rate_high': rate_high,
                 'rate': rate,
-                'US_inventory_grams_excl_legacy_fleet': rate * us_kwh_generation,
+                'US_inventory_grams_excl_legacy_fleet': rate * kwh_generation_us_session,
                 'analysis_fleet_inventory_grams': rate * session_kwh_generation,
             })
 
         self._cache[cyear] = rates
 
         return rates
+
+    def interpolate_input_data(self):
+        """
+
+        Returns:
+             Nothing, but it builds the data dictionary of interpolated inputs based on the limited years of input data.
+
+        """
+        for case in self.cases:
+            for idx, year in enumerate(self.years):
+                if year < self.calendar_year_max:
+                    year_1, year_2 = year, self.years[idx + 1]
+
+                    for yr in range(year_1 + 1, year_2):
+                        self._data.update({(yr, case): {
+                            'calendar_year': yr,
+                            'case': case,
+                        }})
+
+                        for rate_name in self.rate_names:
+                            value_1 = self._data[(year_1, case)][rate_name]
+                            value_2 = self._data[(year_2, case)][rate_name]
+
+                            m = (value_2 - value_1) / (year_2 - year_1)
+
+                            value_new = m * (yr - year_1) + value_1
+                            self._data[(yr, case)][rate_name] = value_new

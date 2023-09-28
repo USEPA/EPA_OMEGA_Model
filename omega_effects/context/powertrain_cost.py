@@ -79,7 +79,7 @@ class PowertrainCost:
         """
         # don't forget to update the module docstring with changes here
         input_template_name = 'powertrain_cost'
-        input_template_version = 0.2
+        input_template_version = 0.21
         input_template_columns = {
             'powertrain_type',
             'system',

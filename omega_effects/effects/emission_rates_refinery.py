@@ -66,17 +66,19 @@ class EmissionRatesRefinery:
 
     """
     def __init__(self):
-        self._data = {}
+        self.data = {}
+        self.years = None
         self.calendar_year_min = None
         self.calendar_year_max = None
         self.rate_names = []
 
-    def init_from_file(self, filepath, effects_log):
+    def init_from_file(self, session_settings, filepath, effects_log):
         """
 
         Initialize class data from input file.
 
         Args:
+            session_settings: an instance of the SessionSettings class.
             filepath: the Path object to the file.
             effects_log: an instance of the EffectsLog class.
 
@@ -105,12 +107,17 @@ class EmissionRatesRefinery:
         validate_template_column_names(filepath, df, input_template_columns, effects_log)
 
         self.rate_names = [rate_name for rate_name in df.columns if 'year' not in rate_name]
+        self.years = df['calendar_year'].unique()
         self.calendar_year_min = int(min(df['calendar_year']))
         self.calendar_year_max = int(max(df['calendar_year']))
 
         df.set_index(df['calendar_year'], inplace=True)
 
-        self._data = df.to_dict('index')
+        df.insert(0, 'session_name', '')
+
+        self.data = df.to_dict('index')
+
+        self.interpolate_input_data(session_settings)
 
     def get_emission_rate(self, calendar_year, rate_names):
         """
@@ -132,6 +139,36 @@ class EmissionRatesRefinery:
 
         rates = []
         for rate_name in rate_names:
-            rates.append(self._data[calendar_year][rate_name])
+            rates.append(self.data[calendar_year][rate_name])
 
         return rates
+
+    def interpolate_input_data(self, session_settings):
+        """
+
+        Parameters:
+            session_settings: an instance of the SessionSettings class.
+
+        Returns:
+             Nothing, but it builds the data dictionary of interpolated inputs based on the limited years of input data.
+
+        """
+        for idx, year in enumerate(self.years):
+            self.data[year]['session_name'] = session_settings.session_name
+
+            if year < self.calendar_year_max:
+                year_1, year_2 = year, self.years[idx + 1]
+
+                for yr in range(year_1 + 1, year_2):
+                    self.data.update({yr: {
+                        'session_name': session_settings.session_name,
+                        'calendar_year': yr}})
+
+                    for rate_name in self.rate_names:
+                        value_1 = self.data[year_1][rate_name]
+                        value_2 = self.data[year_2][rate_name]
+
+                        m = (value_2 - value_1) / (year_2 - year_1)
+
+                        value_new = m * (yr - year_1) + value_1
+                        self.data[yr][rate_name] = value_new
