@@ -175,7 +175,8 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
                                                              verbose=verbose)
 
         if not template_errors:
-            validation_dict = {'credit_name': ['start_stop', 'high_eff_alternator', 'ac_leakage', 'ac_efficiency'],
+            validation_dict = {'credit_name': ['start_stop', 'high_eff_alternator', 'ac_leakage', 'ac_efficiency',
+                                               'other_oc_menu_tech'],
                                'credit_group': ['menu', 'ac'],
                                'credit_destination': ['cert_direct_offcycle_co2e_grams_per_mile',
                                                       'cert_indirect_offcycle_co2e_grams_per_mile'],
