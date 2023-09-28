@@ -532,6 +532,7 @@ class CostCloud(OMEGABase, CostCloudBase):
             # RV
             tech_flags['ac_leakage'] = 1
             tech_flags['ac_efficiency'] = 1
+            tech_flags['other_oc_menu_tech'] = 1
 
             # clear all tech flags
             for tf in CostCloud.tech_flags:
