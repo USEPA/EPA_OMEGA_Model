@@ -184,10 +184,8 @@ class SessionSettings:
         self.session_name = None
 
         self.inputs_filelist = list()
-        # self.powersector_emission_rates_file = None
         self.egu_data_file = None
         self.refinery_data_file = None
-        # self.refinery_emission_rates_file = None
         self.vehicle_emission_rates_file = None
         self.safety_values_file = None
         self.fatality_rates_file = None
@@ -197,9 +195,7 @@ class SessionSettings:
         self.vehicle_annual_data_file = None
 
         self.egu_data = None
-        # self.emission_rates_egu = None
         self.refinery_data = None
-        # self.emission_rates_refinery = None
         self.emission_rates_vehicles = None
         self.safety_values = None
         self.fatality_rates = None
@@ -260,25 +256,17 @@ class SessionSettings:
 
         # Get effects-specific files from appropriate folder as specified in batch_settings.csv.
         self.egu_data_file \
-            = batch_settings.get_attribute_value(('Context EGU Data File', f'{self.session_policy}'), 'full_path')
+            = batch_settings.get_attribute_value(('Session EGU Data File', f'{self.session_policy}'), 'full_path')
 
-        # try:
-        #     self.refinery_emission_factors_file \
-        #         = batch_settings.get_attribute_value(('Context Refinery Emission Factors File', f'{self.session_policy}'), 'full_path')
-        # except Exception as e:
-        #     effects_log.logwrite(f'Refinery Emission Factors file not used, {e}')
-        # try:
         self.refinery_data_file \
-            = batch_settings.get_attribute_value(('Context Refinery Data File', f'{self.session_policy}'), 'full_path')
-        # except Exception as e:
-        #     effects_log.logwrite(f'Refinery Emission Rates file not used, {e}')
+            = batch_settings.get_attribute_value(('Session Refinery Data File', f'{self.session_policy}'), 'full_path')
 
         self.vehicle_emission_rates_file \
-            = batch_settings.get_attribute_value(('Context Vehicle Emission Rates File', f'{self.session_policy}'), 'full_path')
+            = batch_settings.get_attribute_value(('Session Vehicle Emission Rates File', f'{self.session_policy}'), 'full_path')
         self.safety_values_file \
-            = batch_settings.get_attribute_value(('Context Safety Values File', f'{self.session_policy}'), 'full_path')
+            = batch_settings.get_attribute_value(('Session Safety Values File', f'{self.session_policy}'), 'full_path')
         self.fatality_rates_file \
-            = batch_settings.get_attribute_value(('Context Fatality Rates File', f'{self.session_policy}'), 'full_path')
+            = batch_settings.get_attribute_value(('Session Fatality Rates File', f'{self.session_policy}'), 'full_path')
 
         find_string = None
         try:

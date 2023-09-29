@@ -247,17 +247,17 @@ class BatchSettings:
         self.general_inputs_for_effects_file \
             = self.get_attribute_value(('General Inputs for Effects File', 'all'), 'full_path')
         self.criteria_cost_factors_file \
-            = self.get_attribute_value(('Context Criteria Cost Factors File', 'all'), 'full_path')
+            = self.get_attribute_value(('Criteria Cost Factors File', 'all'), 'full_path')
         self.scc_cost_factors_file \
-            = self.get_attribute_value(('Context SCC Cost Factors File', 'all'), 'full_path')
+            = self.get_attribute_value(('SCC Cost Factors File', 'all'), 'full_path')
         self.energy_security_cost_factors_file \
-            = self.get_attribute_value(('Context Energy Security Cost Factors File', 'all'), 'full_path')
+            = self.get_attribute_value(('Energy Security Cost Factors File', 'all'), 'full_path')
         self.congestion_noise_cost_factors_file \
-            = self.get_attribute_value(('Context Congestion-Noise Cost Factors File', 'all'), 'full_path')
+            = self.get_attribute_value(('Congestion-Noise Cost Factors File', 'all'), 'full_path')
         self.insurance_and_taxes_cost_factors_file \
             = self.get_attribute_value(('Insurance and Taxes Cost Factors File', 'all'), 'full_path')
-        self.legacy_fleet_file = self.get_attribute_value(('Context Legacy Fleet File', 'all'), 'full_path')
-        self.cpi_deflators_file = self.get_attribute_value(('Context CPI Price Deflators File', 'all'), 'full_path')
+        self.legacy_fleet_file = self.get_attribute_value(('Legacy Fleet File', 'all'), 'full_path')
+        self.cpi_deflators_file = self.get_attribute_value(('CPI Price Deflators File', 'all'), 'full_path')
 
         self.context_session_name = self.get_attribute_value(('Session Name', 'context'), 'value')
         path_context_in = self.batch_folder / f'_{self.context_session_name}' / 'in'
