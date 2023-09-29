@@ -483,7 +483,18 @@ class Vehicles:
         """
         attribute_list = []
         for attribute_name in attribute_names:
-            attribute_list.append(self._dict[vehicle_id][attribute_name])
+            if attribute_name == 'onroad_engine_on_distance_frac':
+                if 'onroad_engine_on_distance_frac' not in self._dict[vehicle_id]:
+                    attribute_list.append(1)  # this allows running of nprm files using updated effects calcs
+                else:
+                    attribute_list.append(self._dict[vehicle_id][attribute_name])
+            elif attribute_name == 'onroad_charge_depleting_range_mi':
+                if 'onroad_charge_depleting_range_mi' not in self._dict[vehicle_id]:
+                    attribute_list.append(self._dict[vehicle_id]['charge_depleting_range_mi'])  # again, for nprm files
+                else:
+                    attribute_list.append(self._dict[vehicle_id][attribute_name])
+            else:
+                attribute_list.append(self._dict[vehicle_id][attribute_name])
         if len(attribute_list) == 1:
             return attribute_list[0]
 

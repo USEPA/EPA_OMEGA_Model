@@ -64,12 +64,13 @@ class PowertrainCost:
     def __init__(self):
         self._data = dict()
 
-    def init_from_file(self, filepath, effects_log):
+    def init_from_file(self, batch_settings, filepath, effects_log):
         """
 
         Initialize class data from input file.
 
         Args:
+            batch_settings: an instance of the BatchSettings class.
             filepath: the Path object to the file.
             effects_log: an instance of the EffectsLog class.
 
@@ -79,12 +80,21 @@ class PowertrainCost:
         """
         # don't forget to update the module docstring with changes here
         input_template_name = 'powertrain_cost'
-        input_template_version = 0.21
+        input_template_version = 0.1
         input_template_columns = {
             'powertrain_type',
-            'system',
+            'item',
             'value',
         }
+        identifier = 'item'
+        if batch_settings.powertrain_costs_fev:
+            input_template_version = 0.21
+            input_template_columns = {
+                'powertrain_type',
+                'system',
+                'value',
+            }
+            identifier = 'system'
 
         df = read_input_file(filepath, effects_log)
         validate_template_version_info(df, input_template_name, input_template_version, effects_log)
@@ -96,7 +106,7 @@ class PowertrainCost:
         df['value'] = df['value'] \
             .apply(lambda x: str.replace(x, 'max(', 'np.maximum(').replace('min(', 'np.minimum('))
 
-        df = df.loc[df['system'] == 'battery_offset', :]
+        df = df.loc[df[identifier] == 'battery_offset', :]
         powertrain_types = df['powertrain_type']
 
         for powertrain_type in powertrain_types:

@@ -222,12 +222,12 @@ def main():
                 [vehicle_inventory_details_df, session_vehicle_inventory_details_df], axis=0, ignore_index=True)
 
             session_egu_inventory_details_df = pd.DataFrame.from_dict(
-                session_settings.emission_rates_egu.deets, orient='index').reset_index(drop=True)
+                session_settings.egu_data.deets, orient='index').reset_index(drop=True)
             egu_inventory_details_df = pd.concat(
                 [egu_inventory_details_df, session_egu_inventory_details_df], axis=0, ignore_index=True)
 
             session_refinery_inventory_details_df = pd.DataFrame.from_dict(
-                session_settings.emission_rates_refinery.data, orient='index').reset_index(drop=True)
+                session_settings.refinery_data.data, orient='index').reset_index(drop=True)
             refinery_inventory_details_df = pd.concat(
                 [refinery_inventory_details_df, session_refinery_inventory_details_df], axis=0, ignore_index=True)
 

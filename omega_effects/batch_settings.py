@@ -57,6 +57,7 @@ class BatchSettings:
         self.save_vehicle_physical_effects_files = None
         self.save_vehicle_cost_effects_files = None
         self.save_input_files = False
+        self.powertrain_costs_fev = True
 
         self._dict = dict()
         self.session_dict = dict()
@@ -514,3 +515,9 @@ class BatchSettings:
         if self.save_input_files in self.true_false_dict:
             self.save_input_files = self.true_false_dict[self.save_input_files]
             effects_log.logwrite(f'{string_id} is {self.save_input_files}')
+
+        string_id = 'Powertrain Costs FEV'
+        self.powertrain_costs_fev = self._dict[(string_id, 'all')]['value']
+        if self.powertrain_costs_fev in self.true_false_dict:
+            self.powertrain_costs_fev = self.true_false_dict[self.powertrain_costs_fev]
+            effects_log.logwrite(f'{string_id} is {self.powertrain_costs_fev}')

@@ -51,3 +51,4 @@ def validate_template_column_names(filepath, df, column_names, effects_log=None)
         else:
             if effects_log:
                 effects_log.logwrite(f'Missing required {column_name} in {filepath}')
+                sys.exit()
