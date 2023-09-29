@@ -132,7 +132,7 @@ class LegacyFleet:
             'miles_per_gallon',
             'curbweight_lbs',
             'kwh_per_mile',
-            'transaction_price',
+            'transaction_price_dollars',
         ]
         validate_template_version_info(df, input_template_name, input_template_version, effects_log)
 

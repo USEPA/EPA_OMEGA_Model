@@ -145,8 +145,6 @@ def get_inputs_for_effects(batch_settings, arg=None):
             'e0_in_retail_gasoline',
             'e0_energy_density_ratio',
             'diesel_energy_density_ratio',
-            'share_of_fuel_refined_domestically',
-            'fuel_reduction_leading_to_reduced_domestic_refining',
         ]
         values = []
         for arg in args:
@@ -192,13 +190,11 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
         'battery_kwh',
         'curbweight_lbs',
         'gvwr_lbs',
-        'onroad_utility_factor',
         'onroad_engine_on_distance_frac',
     ]
 
     (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, diesel_energy_density_ratio,
-    share_of_fuel_refined_domestically, fuel_reduction_leading_to_reduced_domestic_refining) = \
-        get_inputs_for_effects(batch_settings)
+    ) = get_inputs_for_effects(batch_settings)
 
     sourcetype_name = None
 
@@ -224,7 +220,7 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
             base_year_vehicle_id, manufacturer_id, name, model_year, base_year_reg_class_id, reg_class_id, \
                 in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, footprint_ft2, workfactor, \
                 target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile, body_style, \
-                battery_kwh_per_veh, curbweight_lbs, gvwr_lbs, onroad_utility_factor, onroad_engine_on_distance_frac = \
+                battery_kwh_per_veh, curbweight_lbs, gvwr_lbs, onroad_engine_on_distance_frac = \
                 vehicle_info_dict[v['vehicle_id']]
 
             if target_co2e_grams_per_mile is not None:
@@ -252,8 +248,6 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                     'e0_share': e0_share,
                     'e0_energy_density_ratio': e0_energy_density_ratio,
                     'diesel_energy_density_ratio': diesel_energy_density_ratio,
-                    'fuel_reduction_leading_to_reduced_domestic_refining':
-                        fuel_reduction_leading_to_reduced_domestic_refining,
                     'vehicle_id': v['vehicle_id'],
                     'base_year_vehicle_id': base_year_vehicle_id,
                     'calendar_year': calendar_year,
@@ -496,8 +490,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
 
     """
     (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, diesel_energy_density_ratio,
-    share_of_fuel_refined_domestically, fuel_reduction_leading_to_reduced_domestic_refining) = \
-        get_inputs_for_effects(batch_settings)
+    ) = get_inputs_for_effects(batch_settings)
 
     sourcetype_name = None
 
@@ -522,7 +515,6 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'e0_share': e0_share,
             'e0_energy_density_ratio': e0_energy_density_ratio,
             'diesel_energy_density_ratio': diesel_energy_density_ratio,
-            'fuel_reduction_leading_to_reduced_domestic_refining': fuel_reduction_leading_to_reduced_domestic_refining,
             'vehicle_id': v['vehicle_id'],
             'base_year_vehicle_id': v['vehicle_id'],
             'calendar_year': v['calendar_year'],
