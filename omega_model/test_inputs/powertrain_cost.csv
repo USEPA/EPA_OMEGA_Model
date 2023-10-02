@@ -1,4 +1,4 @@
-input_template_name:,powertrain_cost,input_template_version:,0.1,description:,20230314 updated battery_offset values; 20230517 added phev battery offset; updated PHEV battery cost using NPRM @250K curve
+input_template_name:,context.powertrain_cost_nprm,input_template_version:,0.1,description:,20230314 updated battery_offset values; 20230517 added phev battery offset; updated PHEV battery cost using NPRM @250K curve
 powertrain_type,item,value,quantity,dollar_basis,notes
 ALL,dollars_per_cylinder,((-28.814) * CYL + 726.27) * CYL * MARKUP_ICE,,2019,
 ALL,dollars_per_liter,((400) * LITERS) * MARKUP_ICE,,2019,

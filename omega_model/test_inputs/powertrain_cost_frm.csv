@@ -1,4 +1,4 @@
-input_template_name:,powertrain_cost,input_template_version:,0.21,description:,"20230913 following KN/BE/AM mtg; 20230918 adds notes, no changes to values",,,,,
+input_template_name:,context.powertrain_cost_frm,input_template_version:,0.21,description:,"20230913 following KN/BE/AM mtg; 20230918 adds notes, no changes to values",,,,,
 powertrain_type,powertrain_subtype,system,subsystem,drive_system,engine_configuration,body_style,value,dollar_basis,Formula Notes,Notes
 BEV,-,Drive_Unit,E_Motor,FWD,-,-,(1.1097*KW_DU + 323.22) * MARKUP_BEV,2022,,FEV motor_single for RDU or DU; induction_motor_dual for FDU
 BEV,-,Drive_Unit,E_Motor,RWD,-,-,(1.1097*KW_DU + 323.22) * MARKUP_BEV,2022,,FEV motor_single for RDU or DU; induction_motor_dual for FDU

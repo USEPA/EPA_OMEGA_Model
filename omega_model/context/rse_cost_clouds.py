@@ -171,7 +171,6 @@ print('importing %s' % __file__)
 from omega_model import *
 
 from context.mass_scaling import MassScaling
-from context.powertrain_cost import PowertrainCost
 from context.glider_cost import GliderCost
 
 from policy.drive_cycle_ballast import DriveCycleBallast
@@ -723,7 +722,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                             # add powertrain costs
                             powertrain_costs = \
-                                PowertrainCost.calc_cost(vehicle, cloud_point['powertrain_type'],
+                                omega_globals.options.PowertrainCost.calc_cost(vehicle, cloud_point['powertrain_type'],
                                                          cloud_point)  # includes battery cost
 
                             powertrain_cost_terms = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',

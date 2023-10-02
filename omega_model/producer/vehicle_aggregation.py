@@ -220,7 +220,6 @@ class VehicleAggregation(OMEGABase):
         from producer.vehicles import Vehicle, VehicleFinal
         from context.new_vehicle_market import NewVehicleMarket
         from context.glider_cost import GliderCost
-        from context.powertrain_cost import PowertrainCost
         from policy.workfactor_definition import WorkFactor
         from policy.policy_fuels import PolicyFuel
 
@@ -392,7 +391,7 @@ class VehicleAggregation(OMEGABase):
                 for tech_flag, value in omega_globals.options.CostCloud.get_tech_flags(veh).items():
                     row[tech_flag] = value
 
-                powertrain_cost = sum(PowertrainCost.calc_cost(veh, veh.base_year_powertrain_type, row))
+                powertrain_cost = sum(omega_globals.options.PowertrainCost.calc_cost(veh, veh.base_year_powertrain_type, row))
 
                 # calc glider cost
                 veh.structure_material = row['structure_material']

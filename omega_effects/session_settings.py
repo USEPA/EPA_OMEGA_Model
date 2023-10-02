@@ -170,7 +170,6 @@ from omega_effects.effects.refinery_data import RefineryData
 from omega_effects.effects.emission_rates_vehicles import EmissionRatesVehicles
 from omega_effects.effects.safety_values import SafetyValues
 from omega_effects.effects.fatality_rates import FatalityRates
-from omega_effects.context.powertrain_cost import PowertrainCost
 
 
 class SessionSettings:

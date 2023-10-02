@@ -1335,6 +1335,9 @@ def import_user_definable_submodules():
     module_name = get_template_name(omega_globals.options.ice_vehicle_simulation_results_file)
     omega_globals.options.CostCloud = get_module(module_name).CostCloud
 
+    module_name = get_template_name(omega_globals.options.powertrain_cost_input_file)
+    omega_globals.options.PowertrainCost = get_module(module_name).PowertrainCost
+
     # user-definable policy modules
     # pull in reg classes before building database tables (declaring classes) that check reg class validity
     module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
@@ -1461,7 +1464,6 @@ def init_omega(session_runtime_options):
     from context.production_constraints import ProductionConstraints
     from context.mass_scaling import MassScaling
     from context.body_styles import BodyStyles
-    from context.powertrain_cost import PowertrainCost
     from context.glider_cost import GliderCost
 
     from policy.upstream_methods import UpstreamMethods
@@ -1580,7 +1582,7 @@ def init_omega(session_runtime_options):
         init_fail += ImplicitPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
                                                            verbose=verbose_init)
 
-        init_fail += PowertrainCost.init_from_file(omega_globals.options.powertrain_cost_input_file,
+        init_fail += omega_globals.options.PowertrainCost.init_from_file(omega_globals.options.powertrain_cost_input_file,
                                                    verbose=verbose_init)
 
         init_fail += GliderCost.init_from_file(omega_globals.options.glider_cost_input_file,

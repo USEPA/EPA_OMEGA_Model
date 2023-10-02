@@ -38,7 +38,6 @@ def run_postproc(iteration_log, credit_banks):
 
     """
     from producer.vehicles import VehicleFinal
-    from context.powertrain_cost import PowertrainCost
     import pandas as pd
     global vehicle_data, vehicle_annual_data
 
@@ -298,7 +297,7 @@ def run_postproc(iteration_log, credit_banks):
     if omega_globals.options.powertrain_cost_tracker:
         powertrain_costs_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name \
                                     + '_powertrain_cost_results.csv'
-        pt_cost_df = pd.DataFrame.from_dict(PowertrainCost.cost_tracker, orient='index')
+        pt_cost_df = pd.DataFrame.from_dict(omega_globals.options.PowertrainCost.cost_tracker, orient='index')
         pt_cost_df.to_csv(powertrain_costs_filename, columns=sorted(pt_cost_df.columns), index=False)
 
     return manufacturer_annual_data_table, mfr_gigawatthour_data

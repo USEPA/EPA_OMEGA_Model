@@ -1571,7 +1571,6 @@ class VehicleFinal(SQABase, Vehicle):
 
         """
         from context.new_vehicle_market import NewVehicleMarket
-        from context.powertrain_cost import PowertrainCost
 
         vehicle_shares_dict = {'total': 0}
 
@@ -1743,7 +1742,7 @@ class VehicleFinal(SQABase, Vehicle):
             if verbose:
                 print(veh)
 
-            PowertrainCost.calc_cost(veh, update_tracker=True)  # update build dict
+            omega_globals.options.PowertrainCost.calc_cost(veh, update_tracker=True)  # update build dict
 
         # Update market share and create alternative vehicles (a BEV equivalent for every ICE vehicle, etc).
         # Alternative vehicles maintain fleet utility mix across model years and prevent all future vehicles

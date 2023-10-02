@@ -155,7 +155,6 @@ if __name__ == '__main__':
         from context.new_vehicle_market import NewVehicleMarket
         from context.mass_scaling import MassScaling
         from context.body_styles import BodyStyles
-        from context.powertrain_cost import PowertrainCost
         from context.glider_cost import GliderCost
         from policy.drive_cycles import DriveCycles
         from context.ip_deflators import ImplictPriceDeflators
@@ -205,7 +204,7 @@ if __name__ == '__main__':
         init_fail += GliderCost.init_from_file(omega_globals.options.glider_cost_input_file,
                                                verbose=omega_globals.options.verbose)
 
-        init_fail += PowertrainCost.init_from_file(omega_globals.options.powertrain_cost_input_file,
+        init_fail += omega_globals.options.PowertrainCost.init_from_file(omega_globals.options.powertrain_cost_input_file,
                                                    verbose=omega_globals.options.verbose)
 
         # init drive cycles PRIOR to CostCloud since CostCloud needs the drive cycle names for validation
