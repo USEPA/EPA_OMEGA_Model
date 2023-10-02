@@ -165,7 +165,7 @@ class PowertrainCost(OMEGABase):
 
         weight_bins = (0, 3200, 3800, 4400, 5000, 5600, 6200, 14000)
         tractive_motor = 'dual'
-        if (market_class_id.__contains__('non_hauling') and vehicle.drive_system < 4) or powertrain_type == 'HEV':
+        if (market_class_id.__contains__('non_hauling') and vehicle.drive_system != 'AWD') or powertrain_type == 'HEV':
             tractive_motor = 'single'
 
         drive_system_cost = trans_cost = cyl_cost = liter_cost = 0
