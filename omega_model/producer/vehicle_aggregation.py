@@ -473,12 +473,15 @@ class VehicleAggregation(OMEGABase):
             Nothing, modifies df[col] by filling NaNs with weighted value
 
         """
-        notnans = df[col].notna()
+        fillval = 'NA'
 
-        fillval = sum(df[col].loc[notnans] * df[weight_by].loc[notnans]) / df[weight_by].loc[notnans].sum()
+        if not df.empty:
+            notnans = df[col].notna()
 
-        if update_df:
-            df[col] = df[col].fillna(fillval)
+            fillval = sum(df[col].loc[notnans] * df[weight_by].loc[notnans]) / df[weight_by].loc[notnans].sum()
+
+            if update_df:
+                df[col] = df[col].fillna(fillval)
 
         return fillval
 
