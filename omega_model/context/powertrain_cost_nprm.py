@@ -99,24 +99,6 @@ class PowertrainCost(OMEGABase):
         if powertrain_type is None:
             powertrain_type = omega_globals.options.CostCloud.get_powertrain_type(pkg_info)
 
-        return PowertrainCost.calc_cost_nprm(vehicle, powertrain_type, pkg_info, update_tracker)
-
-    @staticmethod
-    def calc_cost_nprm(vehicle, powertrain_type, pkg_info, update_tracker=False):
-        """
-        Calculate the value of the response surface equation for the given powertrain type, cost curve class (tech
-        package) for the full factorial combination of the iterable terms.
-
-        Args:
-            powertrain_type (str): e.g., 'ICE', 'BEV', 'PHEV', 'HEV', 'MHEV'
-            vehicle (Vehicle): the vehicle to calc costs for
-            pkg_info (dict-like): the necessary information for developing cost estimates.
-            update_tracker (bool): update cost tracking dict if ``True``
-
-        Returns:
-            A list of cost values indexed the same as pkg_df.
-
-        """
         update_dict = None
         market_class_id, model_year, base_year_cert_fuel_id, reg_class_id, drive_system, body_style = \
             vehicle.market_class_id, vehicle.model_year, vehicle.base_year_cert_fuel_id, vehicle.reg_class_id, \
