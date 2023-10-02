@@ -10,20 +10,23 @@
 import sys
 
 
-def validate_template_version_info(df, input_template_name, input_template_version, effects_log=None):
+def validate_template_version_info(df, input_template_version, input_template_name=None, effects_log=None):
     """
 
     Args:
         df: the DataFrame to validate.
-        input_template_name: the input template name.
         input_template_version: the input template version.
+        input_template_name: the input template name.
         effects_log: an instance of the EffectsLog class.
 
     Returns:
         Checks input template header for necessary data.
 
     """
-    for item in [input_template_name, input_template_version]:
+    items = [input_template_version]
+    if input_template_name:
+        items.append(input_template_name)
+    for item in items:
         if not str(item) in df.columns:
             if effects_log:
                 effects_log.logwrite(f'{item} is not a valid template name or version number.')
