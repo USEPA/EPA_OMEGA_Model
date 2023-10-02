@@ -260,7 +260,7 @@ class VehicleAggregation(OMEGABase):
                                'cert_fuel_id': PolicyFuel.fuel_ids,
                                'drive_system': ['FWD', 'RWD', 'AWD'],
                                'dual_rear_wheel': [0, 1],
-                               'application_id': ['SLA', 'HLA']
+                               'application_id': ['SLA', 'HLA', 'MDV']
                                }
 
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
