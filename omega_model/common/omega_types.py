@@ -6,6 +6,8 @@
 **CODE**
 
 """
+import pandas as pd
+
 print('importing %s' % __file__)
 
 import re
@@ -111,6 +113,69 @@ class OMEGABase:
         for k in attributes:
             s = s + k + ' = ' + str(self.__dict__[k]).replace('\n', ' ') + '\n'
         return s
+
+    def to_dataframe(self):
+        """
+        Generate a dataframe of object attributes as numeric values or strings
+
+        Returns:
+            A dataframe representation of the object
+
+        """
+        attributes = sorted(list(self.__dict__.keys()))
+
+        df = pd.DataFrame(columns=attributes)
+        df['__repr__'] = [self.__repr__()]
+
+        for k in attributes:
+            s = str(self.__dict__[k]).replace('\n', ' ')
+            if s.isnumeric():
+                df[k] = self.__dict__[k]
+            else:
+                df[k] = s
+
+        return df
+
+    def to_csv(self, filename, *args, **kwargs):
+        """
+        Save object as comma-separated values file.
+
+        Args:
+            filename (str): name of file
+            *args: optional positional arguments to pandas DataFrame.to_csv()
+            **kwargs: optional keyword arguments to pandas DataFrame.to_csv()
+
+        """
+        self.to_dataframe().to_csv(filename, *args, **kwargs)
+
+    def to_dict(self):
+        """
+        Generate a dict of object attributes
+
+        Returns:
+            A dict representation of the object
+
+        """
+        d = self.__dict__.copy()
+        d['__repr__'] = self.__repr__()
+
+        return d
+
+    def to_namedtuple(self):
+        """
+        Generate a named tuple of object attributes
+
+        Returns:
+            A namedtuple representation of the ojbect
+
+        """
+        from collections import namedtuple
+
+        attributes = [a for a in sorted(list(self.__dict__.keys())) if not a.startswith('_')]
+
+        ObjNamedtuple = namedtuple('%s_namedtuple' % type(self).__name__, attributes)
+
+        return ObjNamedtuple(**self.__dict__)
 
 
 class OMEGAEnum(OMEGABase):
