@@ -27,7 +27,7 @@ def get_egu_emission_rate(session_settings, calendar_year, kwh_consumption, kwh_
         'hg_grams_per_kwh',
     )
 
-    return session_settings.emission_rates_egu.get_emission_rate(
+    return session_settings.egu_data.get_emission_rate(
         session_settings, calendar_year, kwh_consumption, kwh_generation, rate_names
     )
 
@@ -45,8 +45,7 @@ def calc_egu_inventory(batch_settings, session_settings, physical_effects_dict):
 
     """
     (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, diesel_energy_density_ratio,
-    share_of_fuel_refined_domestically, fuel_reduction_leading_to_reduced_domestic_refining) = \
-        get_inputs_for_effects(batch_settings)
+    ) = get_inputs_for_effects(batch_settings)
 
     calendar_years = batch_settings.calendar_years
 
@@ -72,7 +71,7 @@ def calc_egu_inventory(batch_settings, session_settings, physical_effects_dict):
 
         for v in physical_effects_dict.values():
 
-            kwhs = v['fuel_consumption_kwh']  # TODO should this be consumption or generation?
+            kwhs = v['fuel_generation_kwh']
 
             if v['calendar_year'] == calendar_year:
 

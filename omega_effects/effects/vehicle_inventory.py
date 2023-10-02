@@ -21,7 +21,6 @@ class VehiclePhysicalData:
         self.e0_share = 0
         self.e0_energy_density_ratio = 0
         self.diesel_energy_density_ratio = 0
-        self.fuel_reduction_leading_to_reduced_domestic_refining = 0
 
         self.vehicle_id = None
         self.base_year_vehicle_id = None

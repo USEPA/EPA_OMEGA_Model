@@ -20,9 +20,11 @@ def get_refinery_emission_rate(session_settings, calendar_year):
         'co_grams_per_gallon',
         'co2_grams_per_gallon',
         'n2o_grams_per_gallon',
+        'share_of_fuel_refined_domestically',
+        'fuel_reduction_leading_to_reduced_domestic_refining',
     )
 
-    return session_settings.emission_rates_refinery.get_emission_rate(calendar_year, emission_rates)
+    return session_settings.refinery_data.get_emission_rate(calendar_year, emission_rates)
 
 
 def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, action_dict=None):
@@ -31,7 +33,7 @@ def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, ac
     Args:
         batch_settings: an instance of the BatchSettings class
         session_settings: an instance of the SessionSettings class
-        no_action (dict): the no_action physical effects
+        no_action_dict (dict): the no_action physical effects
         action_dict (dict): the action physical effects, if the current session is an action session
 
     Returns:
@@ -39,28 +41,27 @@ def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, ac
 
     Note:
         For action sessions, both the action and no_action physical effects are needed so that the fuel reductions
-        can be calculated; reduced fuel may or may not result in less refining depending on the
-        general_inputs_for_effects input setting "fuel_reduction_leading_to_reduced_domestic_refining"
+        can be calculated; reduced fuel may or may not result in less refining depending on the refinery data setting
+         for the "fuel_reduction_leading_to_reduced_domestic_refining" attribute.
 
     """
-    (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, diesel_energy_density_ratio,
-     share_of_fuel_refined_domestically, fuel_reduction_leading_to_reduced_domestic_refining) = \
-        get_inputs_for_effects(batch_settings)
-
-    # co_ref_rate = co2_ref_rate = ch4_ref_rate = n2o_ref_rate = 0
+    (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio,
+     diesel_energy_density_ratio,
+     ) = get_inputs_for_effects(batch_settings)
 
     if action_dict is None:
         
         for na in no_action_dict.values():
 
-            gallons_refined = na['petroleum_consumption_gallons'] * share_of_fuel_refined_domestically
             calendar_year = na['calendar_year']
 
-            if gallons_refined > 0:
+            if na['petroleum_consumption_gallons'] > 0:
 
-                voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co_ref_rate, co2_ref_rate, n2o_ref_rate = \
-                    get_refinery_emission_rate(session_settings, calendar_year)
+                (voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co_ref_rate, co2_ref_rate, n2o_ref_rate,
+                 share_of_fuel_refined_domestically, fuel_reduction_leading_to_reduced_domestic_refining
+                 ) = get_refinery_emission_rate(session_settings, calendar_year)
 
+                gallons_refined = na['petroleum_consumption_gallons'] * share_of_fuel_refined_domestically
                 na['domestic_refined_gallons'] = gallons_refined
                 na['voc_refinery_ustons'] = gallons_refined * voc_ref_rate / grams_per_us_ton
                 na['co_refinery_ustons'] = gallons_refined * co_ref_rate / grams_per_us_ton
@@ -82,9 +83,9 @@ def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, ac
                 na['petroleum_consumption_gallons'], na['domestic_refined_gallons'], na['name'], na['vehicle_id'],
                    na['base_year_vehicle_id'], na['calendar_year'], na['age']
             )
-
-            voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co_ref_rate, co2_ref_rate, n2o_ref_rate = \
-                get_refinery_emission_rate(session_settings, calendar_year)
+            (voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co_ref_rate, co2_ref_rate, n2o_ref_rate,
+             share_of_fuel_refined_domestically, fuel_reduction_leading_to_reduced_domestic_refining
+             ) = get_refinery_emission_rate(session_settings, calendar_year)
 
             refinery_factor = share_of_fuel_refined_domestically * fuel_reduction_leading_to_reduced_domestic_refining
             a_gallons_refined = 0

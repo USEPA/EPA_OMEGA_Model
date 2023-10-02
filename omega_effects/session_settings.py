@@ -134,28 +134,24 @@ Data Row Name and Description
 
 **Per-session settings.**
 
-:Context Powersector Emission Rates File *(str)*:
-    The relative or absolute path to the power sector emission rates file,
-    loaded by ``effects.emission_rates_egu.EmissionRatesEGU``
+:Context EGU Data File *(str)*:
+    The absolute path to the EGU data file,
+    loaded by ``effects.egu_data.EGUdata``
 
-:Context Refinery Emission Rates File:
-    The relative or absolute path to the refinery emission Rates file,
-    loaded by ``effects.emission_rates_refinery.EmissionRatesRefinery``
-
-:Context Refinery Emission Factors File *(str)*:
-    The relative or absolute path to the refinery emission factors file,
-    loaded by ``effects.emission_factors_refinery.EmissionFactorsRefinery``
+:Context Refinery Data File *(str)*:
+    The absolute path to the refinery data file,
+    loaded by ``effects.refinery_data.RefineryData``
 
 :Context Vehicle Emission Rates File *(str)*:
-    The relative or absolute path to the vehicle emission rates file,
+    The absolute path to the vehicle emission rates file,
     loaded by ``effects.emission_rates_vehicles.EmissionRatesVehicles``
 
 :Context Safety Values File *(str)*:
-    The relative or absolute path to the safety values file,
+    The absolute path to the safety values file,
     loaded by ``effects.safety_values.SafetyValues``
 
 :Context Fatality Rates File *(str)*:
-    The relative or absolute path to the fatality rates file,
+    The absolute path to the fatality rates file,
     loaded by ``effects.fatality_rates.FatalityRates``
 
 ----
@@ -169,9 +165,8 @@ from pathlib import Path
 from omega_effects.effects.vehicles import Vehicles
 from omega_effects.effects.vehicle_annual_data import VehicleAnnualData
 
-from omega_effects.effects.emission_rates_egu import EmissionRatesEGU
-from omega_effects.effects.emission_factors_refinery import EmissionFactorsRefinery
-from omega_effects.effects.emission_rates_refinery import EmissionRatesRefinery
+from omega_effects.effects.egu_data import EGUdata
+from omega_effects.effects.refinery_data import RefineryData
 from omega_effects.effects.emission_rates_vehicles import EmissionRatesVehicles
 from omega_effects.effects.safety_values import SafetyValues
 from omega_effects.effects.fatality_rates import FatalityRates
@@ -189,9 +184,8 @@ class SessionSettings:
         self.session_name = None
 
         self.inputs_filelist = list()
-        self.powersector_emission_rates_file = None
-        self.refinery_emission_factors_file = None
-        self.refinery_emission_rates_file = None
+        self.egu_data_file = None
+        self.refinery_data_file = None
         self.vehicle_emission_rates_file = None
         self.safety_values_file = None
         self.fatality_rates_file = None
@@ -200,9 +194,8 @@ class SessionSettings:
         self.vehicles_file = None
         self.vehicle_annual_data_file = None
 
-        self.emission_rates_egu = None
-        self.emission_factors_refinery = None
-        self.emission_rates_refinery = None
+        self.egu_data = None
+        self.refinery_data = None
         self.emission_rates_vehicles = None
         self.safety_values = None
         self.fatality_rates = None
@@ -262,26 +255,18 @@ class SessionSettings:
             = path_session_out / f'{batch_settings.batch_name}_{self.session_name}_vehicle_annual_data.csv'
 
         # Get effects-specific files from appropriate folder as specified in batch_settings.csv.
-        self.powersector_emission_rates_file \
-            = batch_settings.get_attribute_value(('Context Powersector Emission Rates File', f'{self.session_policy}'), 'full_path')
+        self.egu_data_file \
+            = batch_settings.get_attribute_value(('Session EGU Data File', f'{self.session_policy}'), 'full_path')
 
-        try:
-            self.refinery_emission_factors_file \
-                = batch_settings.get_attribute_value(('Context Refinery Emission Factors File', f'{self.session_policy}'), 'full_path')
-        except Exception as e:
-            effects_log.logwrite(f'Refinery Emission Factors file not used, {e}')
-        try:
-            self.refinery_emission_rates_file \
-                = batch_settings.get_attribute_value(('Context Refinery Emission Rates File', f'{self.session_policy}'), 'full_path')
-        except Exception as e:
-            effects_log.logwrite(f'Refinery Emission Rates file not used, {e}')
+        self.refinery_data_file \
+            = batch_settings.get_attribute_value(('Session Refinery Data File', f'{self.session_policy}'), 'full_path')
 
         self.vehicle_emission_rates_file \
-            = batch_settings.get_attribute_value(('Context Vehicle Emission Rates File', f'{self.session_policy}'), 'full_path')
+            = batch_settings.get_attribute_value(('Session Vehicle Emission Rates File', f'{self.session_policy}'), 'full_path')
         self.safety_values_file \
-            = batch_settings.get_attribute_value(('Context Safety Values File', f'{self.session_policy}'), 'full_path')
+            = batch_settings.get_attribute_value(('Session Safety Values File', f'{self.session_policy}'), 'full_path')
         self.fatality_rates_file \
-            = batch_settings.get_attribute_value(('Context Fatality Rates File', f'{self.session_policy}'), 'full_path')
+            = batch_settings.get_attribute_value(('Session Fatality Rates File', f'{self.session_policy}'), 'full_path')
 
         find_string = None
         try:
@@ -291,7 +276,7 @@ class SessionSettings:
             effects_log.logwrite(f'{path_session_in} does not contain a {find_string} file.')
             sys.exit()
 
-        self.init_session_classes(self.session_name, effects_log)
+        self.init_session_classes(batch_settings, self.session_name, effects_log)
 
     def init_context_classes(self, effects_log):
         """
@@ -318,10 +303,11 @@ class SessionSettings:
             effects_log.logwrite(e)
             sys.exit()
 
-    def init_session_classes(self, session_name, effects_log):
+    def init_session_classes(self, batch_settings, session_name, effects_log):
         """
 
         Args:
+            batch_settings: an instance of the BatchSettings class.
             session_name (str): the session name.
             effects_log: an instance of the EffectsLog class.
 
@@ -340,18 +326,13 @@ class SessionSettings:
             self.vehicle_annual_data.init_from_file(self.vehicle_annual_data_file, effects_log)
             self.inputs_filelist.append(self.vehicle_annual_data_file)
 
-            self.emission_rates_egu = EmissionRatesEGU()
-            self.emission_rates_egu.init_from_file(self.powersector_emission_rates_file, effects_log)
-            self.inputs_filelist.append(self.powersector_emission_rates_file)
+            self.egu_data = EGUdata()
+            self.egu_data.init_from_file(self.egu_data_file, effects_log)
+            self.inputs_filelist.append(self.egu_data_file)
 
-            if self.refinery_emission_factors_file:
-                self.emission_factors_refinery = EmissionFactorsRefinery()
-                self.emission_factors_refinery.init_from_file(self.refinery_emission_factors_file, effects_log)
-                self.inputs_filelist.append(self.refinery_emission_factors_file)
-            else:
-                self.emission_rates_refinery = EmissionRatesRefinery()
-                self.emission_rates_refinery.init_from_file(self, self.refinery_emission_rates_file, effects_log)
-                self.inputs_filelist.append(self.refinery_emission_rates_file)
+            self.refinery_data = RefineryData()
+            self.refinery_data.init_from_file(batch_settings, self, self.refinery_data_file, effects_log)
+            self.inputs_filelist.append(self.refinery_data_file)
 
             self.emission_rates_vehicles = EmissionRatesVehicles()
             self.emission_rates_vehicles.init_from_file(self.vehicle_emission_rates_file, effects_log)
@@ -366,7 +347,7 @@ class SessionSettings:
             self.inputs_filelist.append(self.fatality_rates_file)
 
             self.powertrain_cost = PowertrainCost()
-            self.powertrain_cost.init_from_file(self.powertrain_cost_file, effects_log)
+            self.powertrain_cost.init_from_file(batch_settings, self.powertrain_cost_file, effects_log)
             self.inputs_filelist.append(self.powertrain_cost_file)
 
         except Exception as e:
@@ -378,10 +359,11 @@ class SessionSettings:
         """
 
         Args:
-            folder:
-            file_id_string:
+            folder (path): the folder in which to search.
+            file_id_string (str): the string for which to search.
 
         Returns:
+            A Path object to the file.
 
         """
         files_in_folder = (entry for entry in folder.iterdir() if entry.is_file())
