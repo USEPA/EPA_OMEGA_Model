@@ -56,7 +56,7 @@ def run_postproc(iteration_log, credit_banks):
     vehicle_years = list(range(omega_globals.options.analysis_initial_year - 1,
                                omega_globals.options.analysis_final_year + 1))
 
-    # collect vehicle data in one database hit then filter it later
+    # collect vehicle data in one database hit then filter it later (list of named tuples)
     vehicle_data = omega_globals.session.query(VehicleFinal.vehicle_id, VehicleFinal.model_year,
                                                VehicleFinal.market_class_id, VehicleFinal.context_size_class,
                                                VehicleFinal.reg_class_id, VehicleFinal.cert_co2e_Mg,
