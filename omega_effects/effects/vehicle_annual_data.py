@@ -15,7 +15,9 @@ from omega_effects.general.general_functions import calc_rebound_effect
 
 class VehicleAnnualData:
     """
-    Vehicle annual data class definition
+    The VehicleAnnualData class reads the vehicle annual data file resulting from the OMEGA compliance run for a given
+    session and adjusts VMT data to account for rebound effects and context expectations that are not applied in the
+    OMEGA compliance run.
 
     """
     def __init__(self):

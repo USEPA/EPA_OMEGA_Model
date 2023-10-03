@@ -103,27 +103,6 @@ def get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg
     return rates
 
 
-def get_energysecurity_cf(batch_settings, calendar_year):
-    """
-
-    Args:
-        batch_settings: an instance of the BatchSettings class.
-        calendar_year (int): The calendar year for which energy security related factors are needed.
-
-    Returns:
-        A list of cost factors as specified in the cost_factors list for the given calendar year.
-
-    Note:
-        In the physical_effects module, oil impacts are calculated, not cost impacts; therefore the "cost factor"
-        returned is the oil import reduction as a percentage of oil demand reduction.
-
-    """
-    cost_factors = ('oil_import_reduction_as_percent_of_total_oil_demand_reduction',
-                    )
-
-    return batch_settings.energy_security_cost_factors.get_cost_factors(calendar_year, cost_factors)
-
-
 def get_inputs_for_effects(batch_settings, arg=None):
     """
 
@@ -459,10 +438,6 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                     else:
                         pass  # add additional liquid fuels (E85) if necessary
 
-                energy_security_import_factor = get_energysecurity_cf(batch_settings, calendar_year)
-                vehicle_data.update_value({
-                    'energy_security_import_factor': energy_security_import_factor,
-                })
                 key = (int(v['vehicle_id']), int(v['calendar_year']))
                 calendar_year_effects_dict[key] = calc_vehicle_inventory(vehicle_data)
 
@@ -723,10 +698,6 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                     'pure_share': pure_share,
                 })
 
-        energy_security_import_factor = get_energysecurity_cf(batch_settings, v['calendar_year'])
-        vehicle_data.update_value({
-            'energy_security_import_factor': energy_security_import_factor,
-        })
         key = (int(v['vehicle_id']), int(v['calendar_year']))
         physical_effects[key] = calc_vehicle_inventory(vehicle_data)
 

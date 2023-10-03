@@ -441,7 +441,8 @@ from omega_effects.consumer import deregionalizer
 
 class Vehicles:
     """
-    Vehicles class definition.
+    The Vehicles class reads the vehicles file resulting from the OMEGA compliance run for a given session and provides
+    methods to access the data.
 
     """
     def __init__(self):

@@ -176,9 +176,14 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
     
             # energy security benefits
             oil_barrels = physical_na['barrels_of_oil'] - physical_a['barrels_of_oil']
-            imported_oil_bbl = physical_na['barrels_of_imported_oil'] - physical_a['barrels_of_imported_oil']
-            imported_oil_bbl_per_day = physical_na['barrels_of_imported_oil_per_day'] \
-                                       - physical_a['barrels_of_imported_oil_per_day']
+            imported_oil_bbl = (
+                    physical_na['change_in_barrels_of_oil_imports'] -
+                    physical_a['change_in_barrels_of_oil_imports']
+            )
+            imported_oil_bbl_per_day = (
+                    physical_na['change_in_barrels_of_oil_imports_per_day'] -
+                    physical_a['change_in_barrels_of_oil_imports_per_day']
+            )
             energy_security_cf = get_energysecurity_cf(batch_settings, calendar_year)
             energy_security_benefit_dollars += imported_oil_bbl * energy_security_cf
     
@@ -525,8 +530,8 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 'petroleum_consumption_gallons': - oper_attrs_dict['petroleum_consumption_gallons'],
                 'domestic_refined_gallons': - oper_attrs_dict['domestic_refined_gallons'],
                 'barrels_of_oil': - oil_barrels,
-                'barrels_of_imported_oil': - imported_oil_bbl,
-                'barrels_of_imported_oil_per_day': - imported_oil_bbl_per_day,
+                'change_in_barrels_of_oil_imports': - imported_oil_bbl,
+                'change_in_barrels_of_oil_imports_per_day': - imported_oil_bbl_per_day,
                 'session_fatalities': physical_a['session_fatalities'] - physical_na['session_fatalities'],
                 'co2_vehicle_metrictons': - ghg_tons_dict['co2_vehicle_metrictons'],
                 'co2_refinery_metrictons': -ghg_tons_dict['co2_refinery_metrictons'],

@@ -27,7 +27,28 @@ def get_refinery_emission_rate(session_settings, calendar_year):
     return session_settings.refinery_data.get_emission_rate(calendar_year, emission_rates)
 
 
-def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, action_dict=None):
+def get_energysecurity_cf(batch_settings, calendar_year):
+    """
+
+    Args:
+        batch_settings: an instance of the BatchSettings class.
+        calendar_year (int): The calendar year for which energy security related factors are needed.
+
+    Returns:
+        A list of cost factors as specified in the cost_factors list for the given calendar year.
+
+    Note:
+        In the physical_effects module, oil impacts are calculated, not cost impacts; therefore the "cost factor"
+        returned here is the oil import reduction as a percentage of oil demand reduction.
+
+    """
+    cost_factors = ('oil_import_reduction_as_percent_of_total_oil_demand_reduction',
+                    )
+
+    return batch_settings.energy_security_cost_factors.get_cost_factors(calendar_year, cost_factors)
+
+
+def calc_refinery_inventory_and_oil_imports(batch_settings, session_settings, no_action_dict, action_dict=None):
     """
 
     Args:
@@ -37,12 +58,15 @@ def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, ac
         action_dict (dict): the action physical effects, if the current session is an action session
 
     Returns:
-        The passed physical effects dictionary with refinery inventories included
+        The passed physical effects dictionary with refinery inventories and oil import effects included
 
     Note:
         For action sessions, both the action and no_action physical effects are needed so that the fuel reductions
-        can be calculated; reduced fuel may or may not result in less refining depending on the refinery data setting
-         for the "fuel_reduction_leading_to_reduced_domestic_refining" attribute.
+        can be calculated; reduced fuel may or may not result in less refining and oil imports depending on the
+        refinery data setting for the "fuel_reduction_leading_to_reduced_domestic_refining" attribute and the energy
+        security cost factor setting for the "oil_import_reduction_as_percent_of_total_oil_demand_reduction" attribute.
+        Note that there are no oil import effects in the no-action session since the effects apply only to changes in
+        fuel demand.
 
     """
     (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio,
@@ -79,22 +103,25 @@ def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, ac
 
         for k, na in no_action_dict.items():
 
-            na_gallons_consumed, na_gallons_refined, name, veh_id, base_veh_id, calendar_year, age = (
-                na['petroleum_consumption_gallons'], na['domestic_refined_gallons'], na['name'], na['vehicle_id'],
-                   na['base_year_vehicle_id'], na['calendar_year'], na['age']
+            na_gallons_consumed, na_gallons_refined, na_oil_bbls, name, veh_id, base_veh_id, calendar_year, age = (
+                na['petroleum_consumption_gallons'], na['domestic_refined_gallons'], na['barrels_of_oil'], na['name'],
+                na['vehicle_id'], na['base_year_vehicle_id'], na['calendar_year'], na['age']
             )
             (voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co_ref_rate, co2_ref_rate, n2o_ref_rate,
              share_of_fuel_refined_domestically, fuel_reduction_leading_to_reduced_domestic_refining
              ) = get_refinery_emission_rate(session_settings, calendar_year)
 
             refinery_factor = share_of_fuel_refined_domestically * fuel_reduction_leading_to_reduced_domestic_refining
-            a_gallons_refined = 0
+            energy_security_import_factor = get_energysecurity_cf(batch_settings, calendar_year)
+
+            a_gallons_refined = oil_imports_change = 0
             a = None
             if na_gallons_refined != 0:
                 if k in action_dict:
                     a = action_dict[k]
                     gallons_reduced = na_gallons_consumed - a['petroleum_consumption_gallons']
                     a_gallons_refined = na_gallons_refined - gallons_reduced * refinery_factor
+                    oil_imports_change = (a['barrels_of_oil'] - na_oil_bbls) * energy_security_import_factor
                 elif name and base_veh_id and calendar_year and age in action_dict.values():
                     a = [v for v in action_dict.values()
                          if v['name'] == name
@@ -103,8 +130,11 @@ def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, ac
                          and v['age'] == age][0]
                     gallons_reduced = na_gallons_consumed - a['petroleum_consumption_gallons']
                     a_gallons_refined = na_gallons_refined - gallons_reduced * refinery_factor
+                    oil_imports_change = (a['barrels_of_oil'] - na_oil_bbls) * energy_security_import_factor
                 else:
                     pass
+
+                oil_imports_change_per_day = oil_imports_change / 365
 
                 if a:
                     a['session_policy'] = session_settings.session_policy
@@ -121,5 +151,8 @@ def calc_refinery_inventory(batch_settings, session_settings, no_action_dict, ac
                     a['co2_refinery_metrictons'] = a_gallons_refined * co2_ref_rate / grams_per_metric_ton
                     # a['ch4_refinery_metrictons'] = a_gallons_refined * ch4_ref_rate / grams_per_metric_ton
                     a['n2o_refinery_metrictons'] = a_gallons_refined * n2o_ref_rate / grams_per_metric_ton
+
+                    a['change_in_barrels_of_oil_imports'] = oil_imports_change
+                    a['change_in_barrels_of_oil_imports_per_day'] = oil_imports_change_per_day
 
         return action_dict

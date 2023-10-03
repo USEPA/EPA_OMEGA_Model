@@ -30,7 +30,7 @@ from omega_effects.effects.safety_effects import \
     calc_safety_effects, calc_legacy_fleet_safety_effects, calc_annual_avg_safety_effects
 from omega_effects.effects.physical_effects import calc_physical_effects, calc_legacy_fleet_physical_effects, \
     calc_annual_physical_effects, calc_period_consumer_physical_view
-from omega_effects.effects.refinery_inventory import calc_refinery_inventory
+from omega_effects.effects.refinery_inventory_and_oil_imports import calc_refinery_inventory_and_oil_imports
 from omega_effects.effects.egu_inventory import calc_egu_inventory
 from omega_effects.effects.total_inventory import calc_total_inventory
 from omega_effects.effects.cost_effects import calc_cost_effects, calc_annual_cost_effects, calc_period_consumer_view
@@ -112,6 +112,7 @@ def main():
         annual_costs_df = pd.DataFrame()
         my_lifetime_physical_df = pd.DataFrame()
         my_lifetime_costs_df = pd.DataFrame()
+        no_action_fleet_physical = {}
 
         effects_log.logwrite(f'\nStarting work on sessions')
         for session_num in batch_settings.session_dict:
@@ -167,16 +168,16 @@ def main():
 
             session_fleet_physical = {**analysis_fleet_physical, **legacy_fleet_physical}
 
-            # calculate refinery emission inventories
-            effects_log.logwrite(f'\nCalculating refinery inventories for {session_name}')
+            # calculate refinery emission inventories and oil import effects
+            effects_log.logwrite(f'\nCalculating refinery inventories and oil import effects for {session_name}')
             if session_settings.session_policy == 'no_action':
-                session_fleet_physical = calc_refinery_inventory(
+                session_fleet_physical = calc_refinery_inventory_and_oil_imports(
                     batch_settings, session_settings, session_fleet_physical
                 )
                 no_action_fleet_physical = session_fleet_physical.copy()
             else:
                 try:
-                    session_fleet_physical = calc_refinery_inventory(
+                    session_fleet_physical = calc_refinery_inventory_and_oil_imports(
                         batch_settings, session_settings, no_action_fleet_physical, session_fleet_physical
                     )
                 except UserWarning:
