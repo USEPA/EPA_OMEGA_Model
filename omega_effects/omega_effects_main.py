@@ -59,7 +59,7 @@ def main():
         batch_settings.get_batch_folder_and_name()
         batch_settings.get_run_id()
 
-        path_of_run_folder, path_of_code_folder = \
+        path_of_run_folder, path_of_code_folder, path_of_modified_inputs_folder = \
             set_paths.create_output_paths(
                 batch_settings.path_outputs, batch_settings.batch_name, start_time_readable, batch_settings.run_id
             )
@@ -401,6 +401,11 @@ def main():
         add_id_to_csv(path_of_run_folder / f'{start_time_readable}_vehicle_emission_rate_details.csv', output_file_id_info)
         add_id_to_csv(path_of_run_folder / f'{start_time_readable}_egu_inventory_details.csv', output_file_id_info)
         add_id_to_csv(path_of_run_folder / f'{start_time_readable}_refinery_emission_rate_details.csv', output_file_id_info)
+
+        # save modified inputs (i.e., those with adjusted dollar valuations)
+        batch_settings.criteria_cost_factors.df.to_csv(
+            path_of_modified_inputs_folder / f'{start_time_readable}_cost_factors_criteria.csv', index=False
+        )
 
     except Exception as e:
         effects_log.logwrite(f'*** {e} ***\n{traceback.format_exc()}\n', stamp=True)
