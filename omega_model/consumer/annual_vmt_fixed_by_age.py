@@ -135,7 +135,7 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
         OnroadVMT._data.clear()
 
         if verbose:
-            omega_log.logwrite(f'\nInitializing database from {filename}...')
+            omega_log.logwrite(f'\nInitializing from {filename}...')
 
         input_template_name = __name__
         input_template_version = 0.2

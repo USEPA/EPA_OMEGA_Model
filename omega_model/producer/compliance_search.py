@@ -1121,8 +1121,7 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
                         producer_decision):
     """
     Finalize vehicle production at the conclusion of the compliance search and producer-consumer market share
-    iteration.  Source ``Vehicle`` objects from the composite vehicles are converted to ``Vehicle`` objects
-    and stored in the database.  Manufacturer Annual Data is updated with the certification results in CO2e Mg
+    iteration.  Manufacturer Annual Data is updated with the certification results in CO2e Mg
 
     Args:
         calendar_year (int): the year of the compliance search
@@ -1132,7 +1131,7 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
         producer_decision (Series): the production decision as a result of the compliance search
 
     Returns:
-        Nothing, updates the OMEGA database with the finalized vehicles
+        Nothing, updates the OMEGA data with the finalized vehicles
 
     """
     from consumer import sales_volume

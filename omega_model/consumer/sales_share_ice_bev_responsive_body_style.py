@@ -701,7 +701,7 @@ class SalesShare(OMEGABase, SalesShareBase):
         SalesShare.prev_producer_decisions_and_responses = []
 
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         input_template_name = __name__
         input_template_version = 0.11
@@ -799,7 +799,7 @@ if __name__ == '__main__':
 
         
 
-        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
+        init_fail += Manufacturer.init_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)
 
         from context.onroad_fuels import OnroadFuel  # needed for in-use fuel ID

@@ -312,7 +312,7 @@ class SalesShare(OMEGABase, SalesShareBase):
         SalesShare._calibration_data.clear()
 
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         input_template_name = __name__
         input_template_version = 0.13

@@ -56,10 +56,6 @@ class Manufacturer(OMEGABase):
     **Stores information regarding manufacturers, such as manufacturer ID.**
 
     """
-    # --- database table properties ---
-    # __tablename__ = 'manufacturers'
-    # manufacturer_id = Column('manufacturer_id', String, primary_key=True)  #: manufacturer id / name
-
     manufacturers = []  #: stores a list of manufacturer names after init
 
     @staticmethod
@@ -81,7 +77,7 @@ class Manufacturer(OMEGABase):
         market_class_data[manufacturer_id].add(market_class_id)
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
+    def init_from_file(filename, verbose=False):
         """
 
         Initialize class data from input file.
@@ -100,7 +96,7 @@ class Manufacturer(OMEGABase):
 
         from policy.credit_banking import CreditBank
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         input_template_name = 'manufacturers'
         input_template_version = 0.0003
@@ -134,7 +130,6 @@ if __name__ == '__main__':
 
         init_fail = []
 
-        # pull in reg classes before building database tables (declaring classes) that check reg class validity
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
@@ -150,7 +145,7 @@ if __name__ == '__main__':
 
         
 
-        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file, 
+        init_fail += Manufacturer.init_from_file(omega_globals.options.manufacturers_file, 
                                                           verbose=omega_globals.options.verbose)
 
         if not init_fail:

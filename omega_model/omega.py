@@ -257,7 +257,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
     Returns:
          Iteration log dataframe, dict of credit bank information (iteration_log, credit_banks),
-         updates omega database with final vehicle technology and market share data
+         updates omega data with final vehicle technology and market share data
 
     """
     from producer.vehicles import Vehicle
@@ -1339,7 +1339,6 @@ def import_user_definable_submodules():
     omega_globals.options.PowertrainCost = get_module(module_name).PowertrainCost
 
     # user-definable policy modules
-    # pull in reg classes before building database tables (declaring classes) that check reg class validity
     module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
     omega_globals.options.RegulatoryClasses = get_module(module_name).RegulatoryClasses
 
@@ -1378,9 +1377,6 @@ def init_user_definable_decomposition_attributes(verbose_init):
     in a vehicle's cost curve / frontier during composition and are interpolated during decomposition.  Examples
     of decomposition attributes are individual drive cycle results and off-cycle credit values.  Technology application
     can also be tracked via optional flags in the simulated vehicles (cost cloud) data.
-
-    These values need to be determined before building the database so the dynamic fields can be added to the schema
-    via the SQLAlchemy metadata.
 
     Args:
         verbose_init (bool): if ``True`` enable additional init output to console
@@ -1423,7 +1419,7 @@ def init_user_definable_decomposition_attributes(verbose_init):
 
 def init_omega(session_runtime_options):
     """
-    Initialize OMEGA data structures and build the database.
+    Initialize OMEGA data structures.
 
     Args:
         session_runtime_options (OMEGASessionSettings): session runtime options
@@ -1447,7 +1443,6 @@ def init_omega(session_runtime_options):
 
     init_fail += import_user_definable_submodules()
 
-    # import database modules to populate ORM metadata
     from context.onroad_fuels import OnroadFuel
     from context.fuel_prices import FuelPrice
     from context.new_vehicle_market import NewVehicleMarket
@@ -1558,7 +1553,7 @@ def init_omega(session_runtime_options):
         init_fail += CreditBank.validate_ghg_credit_params_template(omega_globals.options.ghg_credit_params_file,
                                                                     verbose=verbose_init)
 
-        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
+        init_fail += Manufacturer.init_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=verbose_init)
 
         init_fail += WorkFactor.init_from_file(omega_globals.options.workfactor_definition_file, verbose=verbose_init)
@@ -1694,8 +1689,6 @@ def run_omega(session_runtime_options, standalone_run=False):
             init_fail = init_omega(copy.copy(session_runtime_options))
 
             output_folders.append(omega_globals.options.output_folder)
-
-            omega_globals.options.database_dump_folder = omega_globals.options.output_folder + '__dump' + os.sep
 
             omega_globals.options.manufacturer_gigawatthour_data = manufacturer_gigawatthour_data
 

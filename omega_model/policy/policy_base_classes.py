@@ -178,7 +178,7 @@ class OffCycleCreditsBase:
 
     """
 
-    offcycle_credit_names = []  #: list of credit names, populated during init, used to track credits across composition/decomposition and into the database, also used to check simulated vehicles for necessary columns
+    offcycle_credit_names = []  #: list of credit names, populated during init, used to track credits across composition/decomposition, also used to check simulated vehicles for necessary columns
 
     @staticmethod
     def calc_off_cycle_credits(calendar_year, vehicle, cost_cloud):

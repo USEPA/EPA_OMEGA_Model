@@ -304,9 +304,9 @@ if __name__ == '__main__':
                                                          verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            file_io.validate_folder(omega_globals.options.database_dump_folder)
+            file_io.validate_folder(omega_globals.options.output_folder)
             UtilityFactorMethods._data.to_csv(
-                omega_globals.options.database_dump_folder + os.sep + 'policy_upstream_method.csv', index=False)
+                omega_globals.options.output_folder + os.sep + 'policy_upstream_method.csv', index=False)
 
             print(UtilityFactorMethods.calc_city_utility_factor(2020, 50))
             print(UtilityFactorMethods.calc_city_utility_factor(2027, 50))

@@ -85,7 +85,6 @@ try:
             self.save_preliminary_outputs = True
             self.output_folder_base = 'out' + os.sep
             self.output_folder = self.output_folder_base
-            self.database_dump_folder = self.output_folder + '__dump' + os.sep
             self.omega_model_path = path
             self.use_prerun_context_outputs = False
             self.prerun_context_folder = ''
@@ -225,7 +224,7 @@ try:
             self.powertrain_cost_with_gpf = True
 
             # list of modules to allow verbose log files, or empty to disable:
-            self.verbose_log_modules = ['database_', 'producer_compliance_search', 'cross_subsidy_search_',
+            self.verbose_log_modules = ['producer_compliance_search', 'cross_subsidy_search_',
                                         'cv_cost_curves_', 'v_cost_curves_', 'v_cost_clouds_',
                                         'v_cloud_plots_', 'cv_cloud_plots', 'effects_']
 

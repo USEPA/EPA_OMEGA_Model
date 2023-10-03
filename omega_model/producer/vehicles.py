@@ -1461,7 +1461,6 @@ class Vehicle(OMEGABase):
         from context.mass_scaling import MassScaling
         from context.body_styles import BodyStyles
 
-        # load data into database
         for i in df.index:
             veh = Vehicle()
             veh.name=df.loc[i, 'vehicle_name']
@@ -1767,7 +1766,7 @@ class Vehicle(OMEGABase):
     @staticmethod
     def init_from_file(vehicle_onroad_calculations_file, verbose=False):
         """
-        Init vehicle database from the base year vehicles file and set up the onroad / vehicle attribute calculations.
+        Init vehicle data from the base year vehicles file and set up the onroad / vehicle attribute calculations.
         Also initializes decomposition attributes.
 
         Args:

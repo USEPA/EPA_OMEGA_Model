@@ -138,7 +138,7 @@ class MassScaling(OMEGABase):
         MassScaling._data.clear()
 
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         input_template_name = 'mass_scaling'
         input_template_version = 0.1

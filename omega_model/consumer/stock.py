@@ -15,10 +15,10 @@ vehicles_cache = dict()
 
 def get_vehicle_info(vehicle_id):
     """
-    Gets vehicle info for the given database vehicle ID
+    Gets vehicle info for the given vehicle ID
 
     Args:
-        vehicle_id (int): the database vehicle ID (e.g. 1,2,3...)
+        vehicle_id (int): the vehicle ID (e.g. 1,2,3...)
 
     Returns:
         Vehicle market_class_id, model_year, initial_registered_count

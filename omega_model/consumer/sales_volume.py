@@ -138,7 +138,6 @@ if __name__ == '__main__':
 
         init_fail = []
 
-        # pull in reg classes before building database tables (declaring classes) that check reg class validity
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
@@ -178,7 +177,7 @@ if __name__ == '__main__':
 
         
 
-        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
+        init_fail += Manufacturer.init_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)
         init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)

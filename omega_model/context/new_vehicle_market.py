@@ -431,7 +431,7 @@ class NewVehicleMarket(OMEGABase):
         NewVehicleMarket._data_by_total.clear()
 
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         NewVehicleMarket.hauling_context_size_class_info = dict()
 

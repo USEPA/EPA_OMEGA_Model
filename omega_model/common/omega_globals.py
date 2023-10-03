@@ -2,7 +2,7 @@
 
 **OMEGA global variables.**
 
-Runtime options and database connection variables to be populated during initialization.
+Runtime options to be populated during initialization.
 
 ----
 
