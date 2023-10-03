@@ -40,7 +40,7 @@ try:
 
     from common.omega_globals import *
     from common.omega_types import *
-    from common.omega_db import *
+    from common import omega_globals
     from common import file_io, omega_log
     from common.input_validation import *
     from common.omega_functions import *

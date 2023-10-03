@@ -1445,8 +1445,6 @@ def init_omega(session_runtime_options):
 
     init_fail = []
 
-    init_omega_db(omega_globals.options.verbose)
-
     init_fail += import_user_definable_submodules()
 
     # import database modules to populate ORM metadata
@@ -1487,9 +1485,6 @@ def init_omega(session_runtime_options):
 
     try:
         init_fail = init_user_definable_decomposition_attributes(verbose_init)
-
-        # instantiate database tables
-        SQABase.metadata.create_all(omega_globals.engine)
 
         # load remaining input data
 
@@ -1801,19 +1796,9 @@ def run_omega(session_runtime_options, standalone_run=False):
                     omega_globals.options.output_folder + omega_globals.options.session_unique_name +
                     '_new_vehicle_prices.csv')
 
-                # shut down the db
-                if 'database' in omega_globals.options.verbose_log_modules:
-                    dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
-
-                omega_globals.session.close()
-                omega_globals.engine.dispose()
-                omega_globals.engine = None
-                omega_globals.session = None
-
             else:
                 omega_log.logwrite(init_fail)
                 omega_log.end_logfile("\nSession Fail")
-                dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
             if omega_globals.options.run_profiler:
                 profiler.disable()
@@ -1857,7 +1842,6 @@ def run_omega(session_runtime_options, standalone_run=False):
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("### Check OMEGA log for error messages ###")
         omega_log.end_logfile("\nSession Fail")
-        dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
 
 if __name__ == "__main__":

@@ -753,7 +753,6 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
         from producer.manufacturers import Manufacturer
@@ -798,7 +797,7 @@ if __name__ == '__main__':
 
         init_fail += init_user_definable_decomposition_attributes(omega_globals.options.verbose)
 
-        SQABase.metadata.create_all(omega_globals.engine)
+        
 
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)

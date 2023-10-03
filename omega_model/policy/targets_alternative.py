@@ -283,10 +283,9 @@ if __name__ == '__main__':
 
         omega_globals.options.policy_targets_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + \
                                                     '../test_inputs/ghg_standards-alternative.csv'
-        # init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
-        # SQABase.metadata.create_all(omega_globals.engine)
+        # 
 
         from policy.incentives import Incentives
         init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
@@ -296,8 +295,6 @@ if __name__ == '__main__':
                                             verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            # dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
-
             omega_globals.options.VehicleTargets = VehicleTargets
 
             class dummyVehicle:

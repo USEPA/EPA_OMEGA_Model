@@ -63,10 +63,6 @@ def run_postproc(iteration_log, credit_banks):
 
     analysis_years = vehicle_years[1:]
 
-    # vehicles_table = dump_table_to_csv(omega_globals.options.output_folder, 'vehicles',
-    #                   omega_globals.options.session_unique_name + '_vehicles',
-    #                   omega_globals.options.verbose)
-
     vehicles_table = pd.concat([v.to_dataframe() for v in omega_globals.finalized_vehicles], ignore_index=True)
     vehicles_table.to_csv(
         omega_globals.options.output_folder + omega_globals.options.session_unique_name + '_vehicles.csv',
@@ -102,7 +98,6 @@ def run_postproc(iteration_log, credit_banks):
 
                 credit_banks[manufacturer_id] = None
 
-        omega_globals.session.flush()
     elif not omega_globals.options.consolidate_manufacturers:
         # create consolidated_OEM annual data from individual OEM annual data
         from producer.manufacturer_annual_data import ManufacturerAnnualData
@@ -124,9 +119,10 @@ def run_postproc(iteration_log, credit_banks):
                                                     mfr_data['_initial_registered_count']),
                                                 )
 
-    manufacturer_annual_data_table = dump_table_to_csv(omega_globals.options.output_folder, 'manufacturer_annual_data',
-                      omega_globals.options.session_unique_name + '_manufacturer_annual_data',
-                      omega_globals.options.verbose)
+    manufacturer_annual_data_table = pd.DataFrame(ManufacturerAnnualData._data)
+    manufacturer_annual_data_table.to_csv(omega_globals.options.output_folder +
+                                          omega_globals.options.session_unique_name + '_manufacturer_annual_data.csv',
+                                          columns=sorted(manufacturer_annual_data_table.columns))
 
     manufacturer_annual_data_table = dataframe_to_numeric(manufacturer_annual_data_table)
 

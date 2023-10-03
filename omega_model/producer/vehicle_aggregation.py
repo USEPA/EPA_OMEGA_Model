@@ -499,6 +499,5 @@ if __name__ == '__main__':
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
     except:
-        dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

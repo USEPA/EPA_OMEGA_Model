@@ -241,10 +241,9 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(omega_globals.engine)
+        
 
         omega_globals.options.market_classes_file = \
             omega_globals.options.omega_model_path + '/test_inputs/market_classes.csv'
@@ -254,8 +253,6 @@ if __name__ == '__main__':
 
         if not init_fail:
             from common.omega_functions import print_dict
-
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
             market_class_list = [
                 'hauling.ICE',

@@ -1201,8 +1201,6 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
                                         calendar_year_cert_co2e_Mg=cert_co2e_Mg,
                                         manufacturer_vehicle_cost_dollars=producer_decision['total_cost_dollars']
                                         )
-    omega_globals.session.flush()
-
     _cache.clear()
 
     return target_co2e_Mg - cert_co2e_Mg, production_battery_gigawatthours

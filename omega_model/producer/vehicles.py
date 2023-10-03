@@ -975,9 +975,6 @@ class Vehicle(OMEGABase):
         """
         self._initial_registered_count = initial_registered_count
 
-        # omega_globals.session.add(self)  # update database so vehicle_annual_data foreign key succeeds...
-        # omega_globals.session.flush()  # update vehicle_id, otherwise it's None
-
         VehicleAnnualData.update_registered_count(self,
                                                   calendar_year=int(self.model_year),
                                                   registered_count=initial_registered_count)
@@ -2499,6 +2496,5 @@ if __name__ == '__main__':
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
     except:
-        dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

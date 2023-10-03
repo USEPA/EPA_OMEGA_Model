@@ -114,8 +114,7 @@ class VehicleAnnualData(OMEGABase):
             attributes (str, [strs]): optional name of attribute(s) to retrieve instead of all data
 
         Returns:
-            A list of VehicleAnnualData objects, or a list of n-tuples of the requested attribute(s) value(s), e.g.
-            ``[(1,), (2,), (3,), ...`` which can be conveniently unpacked by ``omega_db.sql_unpack_result()``
+            A list of VehicleAnnualData dictionaries``
 
         """
         # from producer.vehicles import Vehicle
@@ -185,13 +184,9 @@ if __name__ == '__main__':
         module_name = get_template_name(omega_globals.options.market_classes_file)
         omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
 
-        init_omega_db(omega_globals.options.verbose)
-
         from producer.manufacturers import Manufacturer  # required by vehicles
         from context.onroad_fuels import OnroadFuel  # required by vehicles
         from producer.vehicles import Vehicle  # for foreign key vehicle_id
-
-        SQABase.metadata.create_all(omega_globals.engine)
 
         if not init_fail:
             pass

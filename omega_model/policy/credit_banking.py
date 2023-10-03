@@ -599,7 +599,7 @@ if __name__ == '__main__':
         #
         # init_fail = init_user_definable_decomposition_attributes(omega_globals.options.verbose)
         #
-        # SQABase.metadata.create_all(omega_globals.engine)
+        # 
         #
         # init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
         #                                         verbose=omega_globals.options.verbose)
