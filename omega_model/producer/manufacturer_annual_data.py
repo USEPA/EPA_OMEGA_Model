@@ -128,7 +128,7 @@ class ManufacturerAnnualData(OMEGABase):
                if mad['model_year'] == model_year and mad['compliance_id'] == compliance_id]
 
         if mad:
-            mad['model_year_cert_co2e_Mg'] += transaction_amount_Mg
+            mad[0]['model_year_cert_co2e_megagrams'] += transaction_amount_Mg
 
 
 if __name__ == '__main__':
