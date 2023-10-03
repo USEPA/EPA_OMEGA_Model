@@ -331,7 +331,7 @@ class MarketClassBase:
         Get vehicle market class ID based on vehicle characteristics
 
         Args:
-            vehicle (VehicleFinal): the vehicle to determine the market class of
+            vehicle (Vehicle): the vehicle to determine the market class of
 
         Returns:
             The vehicle's market class ID based on vehicle characteristics.

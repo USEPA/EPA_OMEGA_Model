@@ -25,3 +25,4 @@ locked_price_modification_data = None  #: holds price locked modification data f
 cumulative_battery_GWh = {'total': 0}  #: holds cumulative battery GWh production, by calendar year, from first pass
 share_precision = int(str.split(str(sys.float_info.epsilon), 'e-')[1])-1  #: round to the Nth digit when calculating share values in constraint dicts
 constraints = dict()  #: dict of constraint dicts by market category
+finalized_vehicles = []  #: finalized vehicles

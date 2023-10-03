@@ -148,7 +148,7 @@ if __name__ == '__main__':
         importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
 
         from producer.vehicle_aggregation import VehicleAggregation
-        from producer.vehicles import VehicleFinal, DecompositionAttributes
+        from producer.vehicles import Vehicle, DecompositionAttributes
         from producer.vehicle_annual_data import VehicleAnnualData
         from producer.manufacturers import Manufacturer  # needed for manufacturers table
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
@@ -223,11 +223,11 @@ if __name__ == '__main__':
         init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
                                                        verbose=omega_globals.options.verbose)
 
-        init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+        init_fail += Vehicle.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
                                                  verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            omega_globals.options.analysis_initial_year = int(VehicleFinal.get_max_model_year() + 1)
+            omega_globals.options.analysis_initial_year = int(Vehicle.get_max_model_year() + 1)
 
             sales_demand = context_new_vehicle_sales(omega_globals.options.analysis_initial_year)
         else:

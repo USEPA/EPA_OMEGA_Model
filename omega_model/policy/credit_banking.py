@@ -568,7 +568,7 @@ if __name__ == '__main__':
         #
         # from omega_model.omega import init_user_definable_decomposition_attributes, get_module
         # from producer.manufacturers import Manufacturer
-        # from producer.vehicles import VehicleFinal, DecompositionAttributes
+        # from producer.vehicles import Vehicle, DecompositionAttributes
         # from producer.vehicle_annual_data import VehicleAnnualData
         #
         # omega_globals.options = OMEGASessionSettings()
@@ -591,7 +591,7 @@ if __name__ == '__main__':
         # from producer.manufacturers import Manufacturer
         # from producer.manufacturer_annual_data import ManufacturerAnnualData
         # from producer.vehicle_aggregation import VehicleAggregation
-        # from producer.vehicles import VehicleFinal
+        # from producer.vehicles import Vehicle
         # from producer.vehicle_annual_data import VehicleAnnualData
         #
         # module_name = get_template_name(omega_globals.options.offcycle_credits_file)
@@ -610,7 +610,7 @@ if __name__ == '__main__':
         # init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
         #                                                verbose=verbose_init)
         #
-        # init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+        # init_fail += Vehicle.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
         #                                          verbose=omega_globals.options.verbose)
         #
         # # credit_bank = CreditBank('test_inputs/ghg_debits.csv', 'consolidated_OEM')

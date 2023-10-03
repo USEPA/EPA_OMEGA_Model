@@ -821,7 +821,7 @@ The default effects files are annual summary results by calendar year, regulator
 
 Physical Effects Calculations
 -----------------------------
-Physical effects are calculated at the vehicle level for all calendar years included in the analysis. Vehicle_ID and VMT driven by the given vehicle are pulled from the VehicleAnnualData class. Vehicle attributes are pulled from VehicleFinal class. Fuel attributes are pulled from the OnroadFuel class which draws them from the onroad_fuels input file.
+Physical effects are calculated at the vehicle level for all calendar years included in the analysis. Vehicle_ID and VMT driven by the given vehicle are pulled from the VehicleAnnualData class. Vehicle attributes are pulled from Vehicle class. Fuel attributes are pulled from the OnroadFuel class which draws them from the onroad_fuels input file.
 
 Fuel Consumption
 ----------------

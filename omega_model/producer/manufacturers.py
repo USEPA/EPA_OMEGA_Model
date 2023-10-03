@@ -59,7 +59,6 @@ class Manufacturer(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'manufacturers'
     manufacturer_id = Column('manufacturer_id', String, primary_key=True)  #: manufacturer id / name
-    vehicles = relationship('VehicleFinal', back_populates='manufacturer')  #: schema relationship to VehicleFinal data
 
     manufacturers = []  #: stores a list of manufacturer names after init
 
@@ -158,7 +157,6 @@ if __name__ == '__main__':
         omega_log.init_logfile()
 
         from context.onroad_fuels import OnroadFuel
-        from producer.vehicles import VehicleFinal
         from producer.vehicle_annual_data import VehicleAnnualData
 
         SQABase.metadata.create_all(omega_globals.engine)

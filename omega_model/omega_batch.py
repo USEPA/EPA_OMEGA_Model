@@ -148,7 +148,7 @@ Data Row Name and Description
 
 :Onroad Vehicle Calculations File *(str)*:
     The relative or absolute path to the onroad vehicle calculations (onroad gap) file,
-    loaded by ``producer.vehicles.VehicleFinal``
+    loaded by ``producer.vehicles.Vehicle``
 
 :Onroad VMT File *(str)*:
     The relative or absolute path to the onroad VMT file,

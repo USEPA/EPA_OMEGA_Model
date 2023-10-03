@@ -24,11 +24,16 @@ def get_vehicle_info(vehicle_id):
         Vehicle market_class_id, model_year, initial_registered_count
 
     """
-    from producer.vehicles import VehicleFinal
+    # from producer.vehicles import Vehicle
 
     if vehicle_id not in vehicles_cache:
-        vehicles_cache[vehicle_id] = VehicleFinal.get_vehicle_attributes(vehicle_id, ['market_class_id', 'model_year',
-                                                                                      '_initial_registered_count'])
+        # vehicles_cache[vehicle_id] = Vehicle.get_vehicle_attributes(vehicle_id, ['market_class_id', 'model_year',
+        #                                                                               '_initial_registered_count'])
+        try:
+            vehicles_cache[vehicle_id] = [(v.market_class_id, v.model_year, v.initial_registered_count)
+                                      for v in omega_globals.finalized_vehicles if v.vehicle_id == vehicle_id][0]
+        except:
+            print('wtf?')
 
     return vehicles_cache[vehicle_id]
 
@@ -73,7 +78,8 @@ def update_stock(calendar_year, compliance_id=None):
         if age == 0:
             odometer = annual_vmt
         else:
-            odometer = max(0, odometer_data[odometer_data['vehicle_id'].values == vad.vehicle_id]['odometer'].values)
+            # odometer = max(0, odometer_data[odometer_data['vehicle_id'].values == vad.vehicle_id]['odometer'].values)
+            odometer = max(0, vad['odometer'])
             odometer += annual_vmt
 
         if reregistration_factor > 0:

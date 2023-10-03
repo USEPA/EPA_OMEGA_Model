@@ -175,7 +175,11 @@ class OMEGABase:
 
         ObjNamedtuple = namedtuple('%s_namedtuple' % type(self).__name__, attributes)
 
-        return ObjNamedtuple(**self.__dict__)
+        nt_dict = dict()
+        for k in attributes:
+            nt_dict[k] = self.__dict__[k]
+
+        return ObjNamedtuple(**nt_dict)
 
 
 class OMEGAEnum(OMEGABase):

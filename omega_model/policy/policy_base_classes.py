@@ -22,7 +22,7 @@ class RegulatoryClassesBase:
         Get vehicle regulatory class based on vehicle characteristics.
 
         Args:
-            vehicle (VehicleFinal): the vehicle to determine the reg class of
+            vehicle (Vehicle): the vehicle to determine the reg class of
 
         Returns:
 

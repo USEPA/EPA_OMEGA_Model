@@ -217,7 +217,7 @@ class VehicleAggregation(OMEGABase):
         #     ``DecompositionAttributes``
 
         """
-        from producer.vehicles import Vehicle, VehicleFinal
+        from producer.vehicles import Vehicle  #, Vehicle
         from context.new_vehicle_market import NewVehicleMarket
         from context.glider_cost import GliderCost
         from policy.workfactor_definition import WorkFactor
@@ -227,7 +227,7 @@ class VehicleAggregation(OMEGABase):
 
         input_template_name = 'vehicles'
         input_template_version = 0.51
-        input_template_columns = VehicleFinal.mandatory_input_template_columns
+        input_template_columns = Vehicle.mandatory_input_template_columns
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -385,7 +385,7 @@ class VehicleAggregation(OMEGABase):
                 veh.global_cumulative_battery_GWh = omega_globals.cumulative_battery_GWh
 
                 veh.application_id = row['application_id']
-                VehicleFinal.set_fueling_class(veh)
+                Vehicle.set_fueling_class(veh)
 
                 # row tech flags needed by powertrain cost
                 for tech_flag, value in omega_globals.options.CostCloud.get_tech_flags(veh).items():

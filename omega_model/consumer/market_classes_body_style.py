@@ -108,7 +108,7 @@ class MarketClass(OMEGABase, MarketClassBase):
         Get vehicle market class ID based on vehicle characteristics
 
         Args:
-            vehicle (VehicleFinal): the vehicle to determine the market class of
+            vehicle (Vehicle): the vehicle to determine the market class of
 
         Returns:
             The vehicle's market class ID based on vehicle characteristics.
@@ -243,7 +243,7 @@ if __name__ == '__main__':
 
         from omega_model.omega import init_user_definable_decomposition_attributes, get_module
         from producer.manufacturers import Manufacturer
-        from producer.vehicles import VehicleFinal, DecompositionAttributes
+        from producer.vehicles import Vehicle, DecompositionAttributes
         from producer.vehicle_annual_data import VehicleAnnualData
 
         # set up global variables:

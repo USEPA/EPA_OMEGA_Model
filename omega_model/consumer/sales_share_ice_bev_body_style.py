@@ -310,32 +310,32 @@ class SalesShare(OMEGABase, SalesShareBase):
         # If the hauling/non_hauling shares were responsive (endogenous), methods to calculate these values would
         # be called here.
 
-        from producer.vehicles import VehicleFinal
+        from producer.vehicles import Vehicle
 
         # if omega_globals.options.generate_context_calibration_files:
         context_total_sales = NewVehicleMarket.new_vehicle_data(calendar_year)
 
-        if 'sedan_wagon' in VehicleFinal.mfr_base_year_share_data[compliance_id]:
+        if 'sedan_wagon' in Vehicle.mfr_base_year_share_data[compliance_id]:
             context_sedan_wagon_share = \
                 (NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='sedan_wagon') /
                 context_total_sales *
-                VehicleFinal.mfr_base_year_share_data[compliance_id]['sedan_wagon'])
+                Vehicle.mfr_base_year_share_data[compliance_id]['sedan_wagon'])
         else:
             context_sedan_wagon_share = 0
 
-        if 'cuv_suv_van' in VehicleFinal.mfr_base_year_share_data[compliance_id]:
+        if 'cuv_suv_van' in Vehicle.mfr_base_year_share_data[compliance_id]:
             context_cuv_suv_van_share = \
                 (NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='cuv_suv_van') /
                 context_total_sales *
-                VehicleFinal.mfr_base_year_share_data[compliance_id]['cuv_suv_van'])
+                Vehicle.mfr_base_year_share_data[compliance_id]['cuv_suv_van'])
         else:
             context_cuv_suv_van_share = 0
 
-        if 'pickup' in VehicleFinal.mfr_base_year_share_data[compliance_id]:
+        if 'pickup' in Vehicle.mfr_base_year_share_data[compliance_id]:
             context_pickup_share = \
                 (NewVehicleMarket.new_vehicle_data(calendar_year, context_body_style='pickup') /
                  context_total_sales *
-                 VehicleFinal.mfr_base_year_share_data[compliance_id]['pickup'])
+                 Vehicle.mfr_base_year_share_data[compliance_id]['pickup'])
         else:
             context_pickup_share = 0
 
@@ -459,7 +459,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         """
 
-        from producer.vehicles import VehicleFinal
+        # from producer.vehicles import Vehicle
 
         SalesShare._data.clear()
         SalesShare._calibration_data.clear()
@@ -524,7 +524,7 @@ if __name__ == '__main__':
 
         from producer.manufacturers import Manufacturer
         from producer.vehicle_aggregation import VehicleAggregation
-        from producer.vehicles import VehicleFinal, DecompositionAttributes
+        from producer.vehicles import Vehicle, DecompositionAttributes
 
         from context.mass_scaling import MassScaling
         from context.body_styles import BodyStyles
@@ -611,7 +611,7 @@ if __name__ == '__main__':
         init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
                                                        verbose=omega_globals.options.verbose)
 
-        init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+        init_fail += Vehicle.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
                                                  verbose=omega_globals.options.verbose)
 
         if not init_fail:

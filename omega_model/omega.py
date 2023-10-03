@@ -260,7 +260,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
          updates omega database with final vehicle technology and market share data
 
     """
-    from producer.vehicles import VehicleFinal
+    from producer.vehicles import Vehicle
     from policy.credit_banking import CreditBank
     from producer import compliance_search
 
@@ -268,7 +268,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
     credit_banks = dict()
 
-    for compliance_id in VehicleFinal.compliance_ids:
+    for compliance_id in Vehicle.compliance_ids:
         omega_log.logwrite("\nRunning %s Pass %d: Manufacturer=%s" % (omega_globals.options.session_unique_name,
                                                                       pass_num, compliance_id),
                            echo_console=True)
@@ -1389,11 +1389,11 @@ def init_user_definable_decomposition_attributes(verbose_init):
         List of template/input errors, else empty list on success
 
     See Also:
-        ``producer.vehicles.DecompositionAttributes``, ``producer.vehicles.VehicleFinal``
+        ``producer.vehicles.DecompositionAttributes``, ``producer.vehicles.Vehicle``
 
     """
     from policy.drive_cycles import DriveCycles
-    from producer.vehicles import VehicleFinal, DecompositionAttributes
+    from producer.vehicles import Vehicle, DecompositionAttributes
 
     init_fail = []
 
@@ -1411,19 +1411,12 @@ def init_user_definable_decomposition_attributes(verbose_init):
                                                                       verbose=verbose_init)
 
     vehicle_columns = get_template_columns(omega_globals.options.vehicles_file)
-    VehicleFinal.dynamic_columns = list(
-        set.difference(set(vehicle_columns), VehicleFinal.mandatory_input_template_columns))
-    for dc in VehicleFinal.dynamic_columns:
-        VehicleFinal.dynamic_attributes.append(make_valid_python_identifier(dc))
+    Vehicle.dynamic_columns = list(
+        set.difference(set(vehicle_columns), Vehicle.mandatory_input_template_columns))
+    for dc in Vehicle.dynamic_columns:
+        Vehicle.dynamic_attributes.append(make_valid_python_identifier(dc))
 
     DecompositionAttributes.init()
-    # dynamically add decomposition attributes (which may vary based on user inputs, such as off-cycle credits)
-    for attr in DecompositionAttributes.values + VehicleFinal.dynamic_attributes:
-        if attr not in VehicleFinal.__dict__:
-            if int(sqlalchemy.__version__.split('.')[1]) > 3:
-                sqlalchemy.ext.declarative.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
-            else:
-                sqlalchemy.ext.declarative.api.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
 
     return init_fail
 
@@ -1480,7 +1473,7 @@ def init_omega(session_runtime_options):
     from producer.manufacturers import Manufacturer
     from producer.manufacturer_annual_data import ManufacturerAnnualData
     from producer.vehicle_aggregation import VehicleAggregation
-    from producer.vehicles import VehicleFinal, DecompositionAttributes
+    from producer.vehicles import Vehicle, DecompositionAttributes
     from producer.vehicle_annual_data import VehicleAnnualData
     from producer import compliance_search
 
@@ -1594,13 +1587,13 @@ def init_omega(session_runtime_options):
             init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
                                                            verbose=verbose_init)
 
-            init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+            init_fail += Vehicle.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
                                                      verbose=verbose_init)
 
         if not init_fail:
             # initial year = initial fleet model year (latest year of data)
             omega_globals.options.analysis_initial_year = \
-                int(omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
+                max([v.model_year for v in omega_globals.finalized_vehicles]) + 1
 
             # update vehicle annual data for base year fleet
             stock.update_stock(omega_globals.options.analysis_initial_year - 1)
