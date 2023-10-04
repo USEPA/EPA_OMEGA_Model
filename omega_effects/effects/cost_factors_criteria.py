@@ -61,6 +61,7 @@ class CostFactorsCriteria:
         self._data = dict()  # private dict, cost factors criteria by calendar year
         self._cache = dict()
         self.calc_health_effects = True
+        self.df = pd.DataFrame()
 
     def init_from_file(self, filepath, batch_settings, effects_log):
         """
@@ -120,6 +121,7 @@ class CostFactorsCriteria:
             ))
 
             self._data = df.set_index(key).to_dict(orient='index')
+            self.df = df.copy()
 
         else:
             self.calc_health_effects = False
