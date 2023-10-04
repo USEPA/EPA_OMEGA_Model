@@ -25,14 +25,6 @@ omega\_model.common.input\_validation module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.common.omega\_db module
-------------------------------------
-
-.. automodule:: omega_model.common.omega_db
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 omega\_model.common.omega\_dispy module
 ---------------------------------------
 

@@ -17,6 +17,14 @@ omega\_effects.consumer.annual\_vmt\_fixed\_by\_age module
    :undoc-members:
    :show-inheritance:
 
+omega\_effects.consumer.cost\_factors\_insurance\_and\_taxes module
+-------------------------------------------------------------------
+
+.. automodule:: omega_effects.consumer.cost_factors_insurance_and_taxes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_effects.consumer.deregionalizer module
 ---------------------------------------------
 

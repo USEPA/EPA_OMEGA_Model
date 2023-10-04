@@ -41,6 +41,14 @@ omega\_model.consumer.market\_classes\_body\_style\_zevregion module
    :undoc-members:
    :show-inheritance:
 
+omega\_model.consumer.market\_classes\_ice\_bev\_phev\_body\_style module
+-------------------------------------------------------------------------
+
+.. automodule:: omega_model.consumer.market_classes_ice_bev_phev_body_style
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_model.consumer.market\_classes\_legacy\_reg\_class module
 ----------------------------------------------------------------
 
@@ -85,6 +93,14 @@ omega\_model.consumer.sales\_share\_ice\_bev\_body\_style\_zevregion module
 ---------------------------------------------------------------------------
 
 .. automodule:: omega_model.consumer.sales_share_ice_bev_body_style_zevregion
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+omega\_model.consumer.sales\_share\_ice\_bev\_phev\_body\_style module
+----------------------------------------------------------------------
+
+.. automodule:: omega_model.consumer.sales_share_ice_bev_phev_body_style
    :members:
    :undoc-members:
    :show-inheritance:

@@ -73,10 +73,18 @@ omega\_model.context.onroad\_fuels module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.context.powertrain\_cost module
---------------------------------------------
+omega\_model.context.powertrain\_cost\_frm module
+-------------------------------------------------
 
-.. automodule:: omega_model.context.powertrain_cost
+.. automodule:: omega_model.context.powertrain_cost_frm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+omega\_model.context.powertrain\_cost\_nprm module
+--------------------------------------------------
+
+.. automodule:: omega_model.context.powertrain_cost_nprm
    :members:
    :undoc-members:
    :show-inheritance:
