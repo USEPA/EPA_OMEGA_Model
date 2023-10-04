@@ -131,7 +131,7 @@ def run_postproc(iteration_log, credit_banks):
     session_results['session_name'] = omega_globals.options.session_name
 
     context_sales, total_sales, manufacturer_sales = \
-        plot_total_sales(vehicle_years, set(Vehicle.compliance_ids + list(manufacturer_ids)))
+        plot_total_sales(vehicle_years, sorted(list(set(Vehicle.compliance_ids + list(manufacturer_ids)))))
 
     session_results['sales_total'] = total_sales[1:]
     session_results['sales_context'] = context_sales
