@@ -57,4 +57,4 @@
 ,,,
 "_settings.powertrain_cost_tracker","TRUE / FALSE","True","True"
 "settings.no_backsliding","TRUE / FALSE","True","True"
-"settings.base_year_min_sales","#",1.00E+005,1.00E+005
+"settings.base_year_min_sales","#","1.00E+005","1.00E+005"
