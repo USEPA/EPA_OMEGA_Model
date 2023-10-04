@@ -1,7 +1,7 @@
 "Parameter","Type","Value",
 "Batch Settings",,,
-"Batch Name","String","test_batch",
-"Analysis Final Year","#",2024,
+"Batch Name","String","test_batch NODB 2030 NOBS Tracker",
+"Analysis Final Year","#",2030,
 "Analysis Dollar Basis","#",2022,
 ,,,
 "Batch Analysis Context Settings",,,
@@ -55,6 +55,8 @@
 "Session Postproc Settings",,,
 "Context Implicit Price Deflators File","String","implicit_price_deflators.csv","implicit_price_deflators.csv"
 ,,,
-"_settings.powertrain_cost_tracker","TRUE / FALSE","True","True"
+"settings.powertrain_cost_tracker","TRUE / FALSE","True","True"
 "settings.no_backsliding","TRUE / FALSE","True","True"
 "settings.base_year_min_sales","#","1.00E+005","1.00E+005"
+"settings.battery_GWh_limit_years","#","[2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040]","[2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040]"
+"settings.battery_GWh_limit","#","[79, 150, 261, 372, 483, 580, 720, 860, 1000, 1100, 1200, 1300, 1400, 1500, 1500, 1500, 1500, 1500, 1500]","[79, 150, 261, 372, 483, 580, 720, 860, 1000, 1100, 1200, 1300, 1400, 1500, 1500, 1500, 1500, 1500, 1500]"
