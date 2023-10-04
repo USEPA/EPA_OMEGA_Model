@@ -2,10 +2,10 @@
 "Batch Settings",,,
 "Batch Name","String","test_batch",
 "Analysis Final Year","#",2024,
-"Analysis Dollar Basis","#",2020,
+"Analysis Dollar Basis","#",2022,
 ,,,
 "Batch Analysis Context Settings",,,
-"Context Name","String","AEO2021",
+"Context Name","String","AEO2023",
 "Context Case","String","Reference case",
 "Credit Market Efficiency","#",1,
 "Context Fuel Prices File","String","context_fuel_prices.csv",
@@ -54,3 +54,7 @@
 ,,,
 "Session Postproc Settings",,,
 "Context Implicit Price Deflators File","String","implicit_price_deflators.csv","implicit_price_deflators.csv"
+,,,
+"_settings.powertrain_cost_tracker","TRUE / FALSE","True","True"
+"settings.no_backsliding","TRUE / FALSE","True","True"
+"settings.base_year_min_sales","#",1.00E+005,1.00E+005
