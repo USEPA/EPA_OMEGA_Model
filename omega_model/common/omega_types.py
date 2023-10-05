@@ -115,7 +115,7 @@ class OMEGABase:
             s = s + k + ' = ' + str(self.__dict__[k]).replace('\n', ' ') + '\n'
         return s
 
-    def to_dataframe(self):
+    def to_dataframe(self, types=None):
         """
         Generate a dataframe of object attributes as numeric values or strings
 
@@ -129,11 +129,12 @@ class OMEGABase:
         df['__repr__'] = [self.__repr__()]
 
         for k in attributes:
-            s = str(self.__dict__[k]).replace('\n', ' ')
-            if s.isnumeric():
-                df[k] = self.__dict__[k]
-            else:
-                df[k] = s
+            if types is None or type(self.__dict__[k]) in types:
+                s = str(self.__dict__[k]).replace('\n', ' ')
+                if s.isnumeric():
+                    df[k] = self.__dict__[k]
+                else:
+                    df[k] = s
 
         return df
 
@@ -149,7 +150,7 @@ class OMEGABase:
         """
         self.to_dataframe().to_csv(filename, *args, **kwargs)
 
-    def to_dict(self):
+    def to_dict(self, types=None):
         """
         Generate a dict of object attributes
 
@@ -157,8 +158,13 @@ class OMEGABase:
             A dict representation of the object
 
         """
-        d = self.__dict__.copy()
-        d['__repr__'] = self.__repr__()
+        if types:
+            d = dict()
+            for k in sorted(list(self.__dict__.keys())):
+                if type(self.__dict__[k]) in types:
+                    d[k] = self.__dict__[k]
+        else:
+            d = self.__dict__.copy()
 
         return d
 
