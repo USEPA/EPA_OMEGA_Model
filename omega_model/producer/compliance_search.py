@@ -1136,8 +1136,6 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
     """
     from consumer import sales_volume
 
-    manufacturer_new_vehicles = []
-
     # pull final vehicles from composite vehicles
     decompose_candidate_vehicles(candidate_mfr_composite_vehicles, producer_decision)
 
@@ -1152,8 +1150,6 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
                 cv.cost_curve.to_csv(filename, columns=sorted(cv.cost_curve.columns), index=False)
 
         for veh in cv.vehicle_list:
-            # transfer_vehicle_data(veh, veh_final)
-
             veh.price_modification_dollars = \
                 omega_globals.price_modification_data[veh.market_class_id]['market_class_price_modification']
 
@@ -1169,23 +1165,19 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
 
             production_battery_gigawatthours += veh.battery_kwh / 1e6 * veh.initial_registered_count
 
-            manufacturer_new_vehicles.append(veh)
-            omega_globals.finalized_vehicles.append(veh)
-
             veh.global_cumulative_battery_GWh = omega_globals.cumulative_battery_GWh
             omega_globals.options.PowertrainCost.calc_cost(veh, update_tracker=True)  # update build dict
 
+            omega_globals.finalized_vehicles.append(veh)
+
+
     # propagate pre-production vehicles
     for ppv in pre_production_vehicles:
-        veh = Vehicle()
-        transfer_vehicle_data(ppv, veh)
-        manufacturer_new_vehicles.append(veh)
+        omega_globals.finalized_vehicles.append(ppv)
 
     # save generalized costs
     sales_volume.log_new_vehicle_generalized_cost(calendar_year, compliance_id,
                                                   producer_decision['average_new_vehicle_mfr_generalized_cost'])
-
-    # omega_globals.session.add_all(manufacturer_new_vehicles)
 
     target_co2e_Mg = sum([v.target_co2e_Mg for v in omega_globals.finalized_vehicles
                           if v.compliance_id == compliance_id and v.model_year == calendar_year])
