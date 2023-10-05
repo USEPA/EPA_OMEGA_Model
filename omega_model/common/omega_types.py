@@ -6,6 +6,7 @@
 **CODE**
 
 """
+import copy
 import pandas as pd
 
 print('importing %s' % __file__)
@@ -180,6 +181,26 @@ class OMEGABase:
             nt_dict[k] = self.__dict__[k]
 
         return ObjNamedtuple(**nt_dict)
+
+    def copy(self):
+        """
+        Copy object
+
+        Returns:
+            Copy of the current object
+
+        """
+        return copy.copy(self)
+
+    def deepcopy(self):
+        """
+        Deep copy object
+
+        Returns:
+            Deep copy of the current object
+
+        """
+        return copy.deepcopy(self)
 
 
 class OMEGAEnum(OMEGABase):
