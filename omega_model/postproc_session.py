@@ -63,10 +63,11 @@ def run_postproc(iteration_log, credit_banks):
 
     analysis_years = vehicle_years[1:]
 
-    vehicles_table = pd.concat([v.to_dataframe() for v in omega_globals.finalized_vehicles], ignore_index=True)
+    vehicles_table = pd.DataFrame([v.to_dict(types=[int, float, bool, str, np.int64, np.float64])
+                                   for v in omega_globals.finalized_vehicles])
     vehicles_table.to_csv(
         omega_globals.options.output_folder + omega_globals.options.session_unique_name + '_vehicles.csv',
-        columns=sorted(vehicles_table.columns))
+        columns=sorted(vehicles_table.columns), index=False)
 
     vehicle_annual_data_df.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name
                                   + '_vehicle_annual_data.csv', columns=sorted(vehicle_annual_data_df.columns))
