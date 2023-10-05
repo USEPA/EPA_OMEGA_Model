@@ -734,63 +734,35 @@ def is_up_for_redesign(vehicle):
         int(vehicle.redesign_interval) * redesign_interval_gain
 
 
-def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
+def transfer_vehicle_data(from_vehicle, model_year):
     """
 
-    Transfer data from a Vehicle to Vehicle object, or vice versa.  Transfer from Vehicle to Vehicle
-    creates a new cost curve, based on the simulated vehicles data and policy factors for the model year.
+    Transfer data from a prior year Vehicle to a new Vehicle object.  Updates reg class ID and target CO2e g/mi based
+    on the model year and current policy.
 
     Args:
-        from_vehicle (Vehicle, Vehicle): the vehicle to convert from
-        to_vehicle (Vehicle, Vehicle): the vehicle to convert to
-        model_year (int): if provided, sets the ``to_vehicle`` model year, otherwise model year comes from the
-            ``from_vehicle``
+        from_vehicle (Vehicle): the source vehicle
+        model_year (int): sets the ``to_vehicle`` model year
 
     Returns:
-        Nothing, updates ``to_vehicle`` attributes
+        Returns new ``Vehicle`` object for the current model year
 
     """
-    base_properties = ('name', 'manufacturer_id', 'compliance_id', 'model_year', 'fueling_class',
-                       'cost_curve_class', 'reg_class_id', 'in_use_fuel_id',
-                       'cert_fuel_id', 'market_class_id', 'lifetime_VMT', 'context_size_class',
-                       'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs',
-                       'base_year_eng_rated_hp', 'footprint_ft2', 'application_id',
-                       'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c', 'body_style',
-                       'structure_material', 'base_year_powertrain_type', 'base_year_reg_class_id',
-                       'base_year_market_share', 'base_year_vehicle_id',
-                       'base_year_glider_non_structure_mass_lbs', 'base_year_cert_fuel_id',
-                       'base_year_glider_non_structure_cost_dollars', 'base_year_glider_structure_cost_dollars',
-                       'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'base_year_curbweight_lbs_to_hp',
-                       'base_year_msrp_dollars', 'battery_kwh', 'total_emachine_kw',
-                       'onroad_charge_depleting_range_mi', 'prior_redesign_year', 'redesign_interval',
-                       'in_production', 'base_year_product', 'workfactor', 'gvwr_lbs',
-                       'gcwr_lbs', 'base_year_workfactor', 'base_year_gvwr_lbs',
-                       'base_year_gcwr_lbs', 'cert_utility_factor', 'onroad_utility_factor',
-                       'battery_sizing_onroad_direct_kwh_per_mile', 'tractive_motor_kw',
-                       'base_year_battery_kwh', 'base_year_tractive_motor_kw', 'base_year_total_emachine_kw',
-                       'base_year_onroad_charge_depleting_range_mi', 'cert_engine_on_distance_frac',
-                       'onroad_engine_on_distance_frac', 'base_year_cost_curve_class',
-                       'base_year_onroad_direct_oncycle_co2e_grams_per_mile',
-                       'base_year_onroad_direct_oncycle_kwh_per_mile',
-                       'base_year_cert_direct_oncycle_co2e_grams_per_mile',
-                       'base_year_cert_direct_oncycle_kwh_per_mile'
-                       )
+    to_vehicle = from_vehicle.copy()
 
-    # transfer base properties
-    for attr in base_properties:
-        to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
+    # set unique vehicle id
+    to_vehicle.vehicle_id = Vehicle.get_next_vehicle_id()
 
-    if model_year:
-        to_vehicle.model_year = model_year
-
-    # transfer dynamic attributes
-    for attr in Vehicle.dynamic_attributes:
-        to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
+    # update model year
+    to_vehicle.model_year = model_year
 
     # assign user-definable reg class
     to_vehicle.reg_class_id = omega_globals.options.RegulatoryClasses.get_vehicle_reg_class(to_vehicle)
 
-    to_vehicle.set_target_co2e_grams_per_mile()  # varies by model year
+    # assign policy-based target for the current model year
+    to_vehicle.set_target_co2e_grams_per_mile()
+
+    return to_vehicle
 
 
 class Vehicle(OMEGABase):
@@ -811,7 +783,7 @@ class Vehicle(OMEGABase):
         ``producer.vehicles.transfer_vehicle_data()``, ``Vehicle``, ``context.CostCloud``
 
     """
-    next_vehicle_id = 0
+    _next_vehicle_id = 0
 
     _cache = dict()
 
@@ -837,8 +809,7 @@ class Vehicle(OMEGABase):
         Create a new ``Vehicle`` object
 
         """
-        self.vehicle_id = Vehicle.next_vehicle_id
-        Vehicle.set_next_vehicle_id()
+        self.vehicle_id = Vehicle.get_next_vehicle_id()
         self.name = ''
         self.manufacturer_id = None
         self.compliance_id = None
@@ -927,15 +898,26 @@ class Vehicle(OMEGABase):
         Reset vehicle IDs.  Sets ``Vehicle.next_vehicle_id`` to an initial value.
 
         """
-        Vehicle.next_vehicle_id = 0
+        Vehicle._next_vehicle_id = 0
 
     @staticmethod
-    def set_next_vehicle_id():
+    def _set_next_vehicle_id():
         """
-        Increments ``Vehicle.next_vehicle_id``.
+        Increments ``Vehicle._next_vehicle_id``.
 
         """
-        Vehicle.next_vehicle_id = Vehicle.next_vehicle_id + 1
+        Vehicle._next_vehicle_id = Vehicle._next_vehicle_id + 1
+
+    @staticmethod
+    def get_next_vehicle_id():
+        """
+        Gets vehicle id and increments ``Vehicle.next_vehicle_id``.
+
+        """
+        next_vehicle_id = Vehicle._next_vehicle_id
+        Vehicle._set_next_vehicle_id()
+
+        return next_vehicle_id
 
     @property
     def initial_registered_count(self):
