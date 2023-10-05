@@ -792,19 +792,6 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
 
     to_vehicle.set_target_co2e_grams_per_mile()  # varies by model year
 
-    # if type(from_vehicle) == Vehicle:
-    #     # finish transfer from Vehicle to Vehicle
-    #     to_vehicle.from_vehicle_id = from_vehicle.vehicle_id
-    #
-    #     to_vehicle.initial_registered_count = from_vehicle.initial_registered_count
-    #
-    #     # set dynamic attributes
-    #     for attr in DecompositionAttributes.values:
-    #         to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
-    #
-    #     to_vehicle.target_co2e_Mg = from_vehicle.target_co2e_Mg
-    #     to_vehicle.cert_co2e_Mg = from_vehicle.cert_co2e_Mg
-
 
 class Vehicle(OMEGABase):
     """
