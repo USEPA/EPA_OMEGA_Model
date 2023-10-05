@@ -130,6 +130,19 @@ class ManufacturerAnnualData(OMEGABase):
         if mad:
             mad[0]['model_year_cert_co2e_megagrams'] += transaction_amount_Mg
 
+    @staticmethod
+    def init_manufacturer_annual_data():
+        """
+        Initialize the module by clear caches.
+
+        Returns:
+            Nothing, clears cached data.
+
+        """
+        ManufacturerAnnualData._data = []
+
+        return []
+
 
 if __name__ == '__main__':
     try:

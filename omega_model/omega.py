@@ -1573,6 +1573,8 @@ def init_omega(session_runtime_options):
 
         init_fail += VehicleAnnualData.init_vehicle_annual_data()
 
+        init_fail += ManufacturerAnnualData.init_manufacturer_annual_data()
+
         if not init_fail:
             init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
                                                            verbose=verbose_init)
@@ -1658,6 +1660,7 @@ def run_omega(session_runtime_options, standalone_run=False):
         manufacturer_annual_data_table = None
         manufacturer_gigawatthour_data = None
         omega_globals.cumulative_battery_GWh = {'total': 0}
+        omega_globals.finalized_vehicles = []
 
         for omega_globals.pass_num in range(len(consolidate)):
 
