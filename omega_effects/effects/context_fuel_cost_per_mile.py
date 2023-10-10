@@ -77,9 +77,13 @@ def calc_fuel_cost_per_mile(batch_settings, session_settings):
                 # calc fuel cost per mile
                 if onroad_direct_kwh_per_mile:
                     fuel = 'US electricity'
-                    retail_price_per_kwh = \
-                        batch_settings.context_fuel_prices.get_fuel_prices(
-                            batch_settings, calendar_year, 'retail_dollars_per_unit', fuel
+                    if batch_settings.context_electricity_prices:
+                        retail_price_per_kwh = batch_settings.context_electricity_prices.get_fuel_price(
+                            calendar_year, 'retail_dollars_per_unit'
+                        )
+                    else:
+                        retail_price_per_kwh = batch_settings.context_fuel_prices.get_fuel_price(
+                            calendar_year, fuel, 'retail_dollars_per_unit'
                         )
                     refuel_efficiency_e = \
                         batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
@@ -89,8 +93,8 @@ def calc_fuel_cost_per_mile(batch_settings, session_settings):
                     fuel_dict = eval(in_use_fuel_id)
                     fuel = [fuel for fuel in fuel_dict.keys()][0]
                     retail_price_per_gallon = \
-                        batch_settings.context_fuel_prices.get_fuel_prices(
-                            batch_settings, calendar_year, 'retail_dollars_per_unit', fuel
+                        batch_settings.context_fuel_prices.get_fuel_price(
+                            calendar_year, fuel, 'retail_dollars_per_unit'
                         )
                     refuel_efficiency_l = \
                         batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')

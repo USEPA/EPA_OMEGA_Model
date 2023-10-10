@@ -684,6 +684,7 @@ class OMEGABatchObject(OMEGABase):
 
         # read context file settings
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
+        self.settings.context_electricity_prices_file = self.read_parameter('Context Electricity Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
@@ -827,6 +828,7 @@ class OMEGASessionObject(OMEGABase):
 
         # read context settings
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
+        self.settings.context_electricity_prices_file = self.read_parameter('Context Electricity Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
