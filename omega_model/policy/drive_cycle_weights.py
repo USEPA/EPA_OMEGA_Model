@@ -313,10 +313,8 @@ class DriveCycleWeights(OMEGABase):
 
             if charge_depleting_only:
                 cd_cert_direct_oncycle_kwh_per_mile = \
-                    (DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
-                                                          'cd_cert_direct_oncycle_kwh_per_mile', weighted=False) /
-                     cycle_values['usable_battery_capacity_norm'])
-
+                    DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
+                                                      'cd_cert_direct_oncycle_kwh_per_mile', weighted=False)
             else:
                 phev_cycle_values = cycle_values.copy()
 
@@ -424,7 +422,7 @@ class DriveCycleWeights(OMEGABase):
 
         phev_batt_kwh = cycle_values['battery_kwh']
         usable_battery_capacity_norm = cycle_values['usable_battery_capacity_norm']
-        phev_cd_battery_kwh = phev_batt_kwh * usable_battery_capacity_norm * usable_battery_capacity_norm
+        phev_cd_battery_kwh = phev_batt_kwh * usable_battery_capacity_norm
 
         cd_ftp_kwh_per_mile = \
             DriveCycleWeights.calc_weighted_value(calendar_year, 'PHEV', cycle_values, 'cd_ftp_kwh', weighted=False)
