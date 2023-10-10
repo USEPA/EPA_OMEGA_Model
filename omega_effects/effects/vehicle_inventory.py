@@ -234,7 +234,7 @@ def calc_vehicle_inventory(vpd):
         'onroad_miles_per_gallon': vpd.onroad_miles_per_gallon,
         'fuel_consumption_gallons': vpd.fuel_consumption_gallons,
         'petroleum_consumption_gallons': vpd.petroleum_consumption_gallons,
-        'domestic_refined_gallons': 0,
+        # 'domestic_refined_gallons': 0,
         'fuel_consumption_kwh': vpd.fuel_consumption_kwh,
         'fuel_generation_kwh': vpd.fuel_generation_kwh,
         'curbweight_lbs': vpd.curbweight_lbs,

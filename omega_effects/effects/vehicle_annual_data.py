@@ -37,7 +37,7 @@ class VehicleAnnualData:
             Nothing, but reads the appropriate input file.
 
         """
-        df = read_input_file(filepath, effects_log, index_col=0)
+        df = read_input_file(filepath, effects_log)
 
         key = pd.Series(zip(
             df['vehicle_id'],

@@ -1,7 +1,7 @@
 from omega_effects.effects.physical_effects import get_inputs_for_effects
 
 
-def get_refinery_emission_rate(session_settings, calendar_year):
+def get_refinery_data(session_settings, calendar_year):
     """
 
     Args:
@@ -12,7 +12,7 @@ def get_refinery_emission_rate(session_settings, calendar_year):
         A list of refinery emission rates as specified in the emission_rates list for the given calendar year.
 
     """
-    emission_rates = (
+    args = (
         'voc_grams_per_gallon',
         'nox_grams_per_gallon',
         'pm25_grams_per_gallon',
@@ -20,11 +20,10 @@ def get_refinery_emission_rate(session_settings, calendar_year):
         'co_grams_per_gallon',
         'co2_grams_per_gallon',
         'n2o_grams_per_gallon',
-        'share_of_fuel_refined_domestically',
         'fuel_reduction_leading_to_reduced_domestic_refining',
     )
 
-    return session_settings.refinery_data.get_emission_rate(calendar_year, emission_rates)
+    return session_settings.refinery_data.get_data(calendar_year, args)
 
 
 def get_energysecurity_cf(batch_settings, calendar_year):
@@ -73,29 +72,33 @@ def calc_refinery_inventory_and_oil_imports(batch_settings, session_settings, no
      diesel_energy_density_ratio,
      ) = get_inputs_for_effects(batch_settings)
 
+    gallons_arg = 'fuel_consumption_gallons'
+    if 'petroleum' in session_settings.refinery_data.rate_basis:
+        gallons_arg = 'petroleum_consumption_gallons'
+
     if action_dict is None:
         
         for na in no_action_dict.values():
 
             calendar_year = na['calendar_year']
 
-            if na['petroleum_consumption_gallons'] > 0:
+            if na[gallons_arg] > 0:
 
                 (voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co_ref_rate, co2_ref_rate, n2o_ref_rate,
-                 share_of_fuel_refined_domestically, fuel_reduction_leading_to_reduced_domestic_refining
-                 ) = get_refinery_emission_rate(session_settings, calendar_year)
+                 fuel_reduction_leading_to_reduced_domestic_refining
+                 ) = get_refinery_data(session_settings, calendar_year)
 
-                gallons_refined = na['petroleum_consumption_gallons'] * share_of_fuel_refined_domestically
-                na['domestic_refined_gallons'] = gallons_refined
-                na['voc_refinery_ustons'] = gallons_refined * voc_ref_rate / grams_per_us_ton
-                na['co_refinery_ustons'] = gallons_refined * co_ref_rate / grams_per_us_ton
-                na['nox_refinery_ustons'] = gallons_refined * nox_ref_rate / grams_per_us_ton
-                na['pm25_refinery_ustons'] = gallons_refined * pm25_ref_rate / grams_per_us_ton
-                na['sox_refinery_ustons'] = gallons_refined * sox_ref_rate / grams_per_us_ton
+                na_gallons = na[gallons_arg]
+                # na['domestic_refined_gallons'] = gallons_refined
+                na['voc_refinery_ustons'] = na_gallons * voc_ref_rate / grams_per_us_ton
+                na['co_refinery_ustons'] = na_gallons * co_ref_rate / grams_per_us_ton
+                na['nox_refinery_ustons'] = na_gallons * nox_ref_rate / grams_per_us_ton
+                na['pm25_refinery_ustons'] = na_gallons * pm25_ref_rate / grams_per_us_ton
+                na['sox_refinery_ustons'] = na_gallons * sox_ref_rate / grams_per_us_ton
 
-                na['co2_refinery_metrictons'] = gallons_refined * co2_ref_rate / grams_per_metric_ton
-                # na['ch4_refinery_metrictons'] = gallons_refined * ch4_ref_rate / grams_per_metric_ton
-                na['n2o_refinery_metrictons'] = gallons_refined * n2o_ref_rate / grams_per_metric_ton
+                na['co2_refinery_metrictons'] = na_gallons * co2_ref_rate / grams_per_metric_ton
+                # na['ch4_refinery_metrictons'] = na_gallons * ch4_ref_rate / grams_per_metric_ton
+                na['n2o_refinery_metrictons'] = na_gallons * n2o_ref_rate / grams_per_metric_ton
 
         return no_action_dict
 
@@ -103,24 +106,24 @@ def calc_refinery_inventory_and_oil_imports(batch_settings, session_settings, no
 
         for k, na in no_action_dict.items():
 
-            na_gallons_consumed, na_gallons_refined, na_oil_bbls, name, veh_id, base_veh_id, calendar_year, age = (
-                na['petroleum_consumption_gallons'], na['domestic_refined_gallons'], na['barrels_of_oil'], na['name'],
-                na['vehicle_id'], na['base_year_vehicle_id'], na['calendar_year'], na['age']
+            na_gallons, na_oil_bbls, name, veh_id, base_veh_id, calendar_year, age = (
+                na[gallons_arg], na['barrels_of_oil'],
+                na['name'], na['vehicle_id'], na['base_year_vehicle_id'], na['calendar_year'], na['age']
             )
             (voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co_ref_rate, co2_ref_rate, n2o_ref_rate,
-             share_of_fuel_refined_domestically, fuel_reduction_leading_to_reduced_domestic_refining
-             ) = get_refinery_emission_rate(session_settings, calendar_year)
+             fuel_reduction_leading_to_reduced_domestic_refining
+             ) = get_refinery_data(session_settings, calendar_year)
 
-            refinery_factor = share_of_fuel_refined_domestically * fuel_reduction_leading_to_reduced_domestic_refining
+            refinery_factor = fuel_reduction_leading_to_reduced_domestic_refining
             energy_security_import_factor = get_energysecurity_cf(batch_settings, calendar_year)
 
-            a_gallons_refined = oil_imports_change = 0
+            a_gallons = oil_imports_change = 0
             a = None
-            if na_gallons_refined != 0:
+            if na_gallons != 0:
                 if k in action_dict:
                     a = action_dict[k]
-                    gallons_reduced = na_gallons_consumed - a['petroleum_consumption_gallons']
-                    a_gallons_refined = na_gallons_refined - gallons_reduced * refinery_factor
+                    gallons_reduced = na_gallons - a[gallons_arg]
+                    a_gallons = na_gallons - gallons_reduced * refinery_factor
                     oil_imports_change = (a['barrels_of_oil'] - na_oil_bbls) * energy_security_import_factor
                 elif name and base_veh_id and calendar_year and age in action_dict.values():
                     a = [v for v in action_dict.values()
@@ -128,8 +131,8 @@ def calc_refinery_inventory_and_oil_imports(batch_settings, session_settings, no
                          and v['base_year_vehicle_id'] == base_veh_id
                          and v['calendar_year'] == calendar_year
                          and v['age'] == age][0]
-                    gallons_reduced = na_gallons_consumed - a['petroleum_consumption_gallons']
-                    a_gallons_refined = na_gallons_refined - gallons_reduced * refinery_factor
+                    gallons_reduced = na_gallons - a[gallons_arg]
+                    a_gallons = na_gallons - gallons_reduced * refinery_factor
                     oil_imports_change = (a['barrels_of_oil'] - na_oil_bbls) * energy_security_import_factor
                 else:
                     pass
@@ -141,16 +144,16 @@ def calc_refinery_inventory_and_oil_imports(batch_settings, session_settings, no
                     a['reg_class_id'] = na['reg_class_id']
                     a['in_use_fuel_id'] = na['in_use_fuel_id']
                     a['fueling_class'] = na['fueling_class']
-                    a['domestic_refined_gallons'] = a_gallons_refined
-                    a['voc_refinery_ustons'] = a_gallons_refined * voc_ref_rate / grams_per_us_ton
-                    a['co_refinery_ustons'] = a_gallons_refined * co_ref_rate / grams_per_us_ton
-                    a['nox_refinery_ustons'] = a_gallons_refined * nox_ref_rate / grams_per_us_ton
-                    a['pm25_refinery_ustons'] = a_gallons_refined * pm25_ref_rate / grams_per_us_ton
-                    a['sox_refinery_ustons'] = a_gallons_refined * sox_ref_rate / grams_per_us_ton
+                    # a['domestic_refined_gallons'] = a_gallons_refined
+                    a['voc_refinery_ustons'] = a_gallons * voc_ref_rate / grams_per_us_ton
+                    a['co_refinery_ustons'] = a_gallons * co_ref_rate / grams_per_us_ton
+                    a['nox_refinery_ustons'] = a_gallons * nox_ref_rate / grams_per_us_ton
+                    a['pm25_refinery_ustons'] = a_gallons * pm25_ref_rate / grams_per_us_ton
+                    a['sox_refinery_ustons'] = a_gallons * sox_ref_rate / grams_per_us_ton
 
-                    a['co2_refinery_metrictons'] = a_gallons_refined * co2_ref_rate / grams_per_metric_ton
-                    # a['ch4_refinery_metrictons'] = a_gallons_refined * ch4_ref_rate / grams_per_metric_ton
-                    a['n2o_refinery_metrictons'] = a_gallons_refined * n2o_ref_rate / grams_per_metric_ton
+                    a['co2_refinery_metrictons'] = a_gallons * co2_ref_rate / grams_per_metric_ton
+                    # a['ch4_refinery_metrictons'] = a_gallons * ch4_ref_rate / grams_per_metric_ton
+                    a['n2o_refinery_metrictons'] = a_gallons * n2o_ref_rate / grams_per_metric_ton
 
                     a['change_in_barrels_of_oil_imports'] = oil_imports_change
                     a['change_in_barrels_of_oil_imports_per_day'] = oil_imports_change_per_day
