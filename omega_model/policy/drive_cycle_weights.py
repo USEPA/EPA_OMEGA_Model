@@ -411,19 +411,20 @@ class DriveCycleWeights(OMEGABase):
     @staticmethod
     def calc_phev_utility_factors(calendar_year, cycle_values):
         """
+        Calculate PHEV utility factors
 
         Args:
-            calendar_year:
-            cycle_values:
+            calendar_year (numeric): calendar year to utility factors in
+            cycle_values (dict): holds charge-depleting and charge-sustaining cycle phase values
 
         Returns:
-
+            tuple (FTP, HWFET, US06) utility factors
         """
         from policy.utility_factors import UtilityFactorMethods
 
         phev_batt_kwh = cycle_values['battery_kwh']
         usable_battery_capacity_norm = cycle_values['usable_battery_capacity_norm']
-        phev_cd_battery_kwh = phev_batt_kwh * usable_battery_capacity_norm
+        phev_cd_battery_kwh = phev_batt_kwh * usable_battery_capacity_norm * usable_battery_capacity_norm
 
         cd_ftp_kwh_per_mile = \
             DriveCycleWeights.calc_weighted_value(calendar_year, 'PHEV', cycle_values, 'cd_ftp_kwh', weighted=False)
@@ -455,9 +456,9 @@ class DriveCycleWeights(OMEGABase):
 
         hwfet_cd_uf = UtilityFactorMethods.calc_highway_utility_factor(calendar_year, cd_hwfet_range_miles)
 
-        us06_uf = UtilityFactorMethods.calc_highway_utility_factor(calendar_year, cd_us06_range_miles)
+        us06_cd_uf = UtilityFactorMethods.calc_highway_utility_factor(calendar_year, cd_us06_range_miles)
 
-        return ftp_cd_uf, hwfet_cd_uf, us06_uf
+        return ftp_cd_uf, hwfet_cd_uf, us06_cd_uf
 
 
 if __name__ == '__main__':
