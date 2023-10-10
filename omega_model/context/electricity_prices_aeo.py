@@ -1,8 +1,8 @@
 """
 
-**Routines to load and access fuel prices from the analysis context**
+**Routines to load and access electricity prices from the analysis context**
 
-Context fuel price data includes retail and pre-tax costs in dollars per unit (e.g. $/gallon, $/kWh)
+AEO electricity price data include retail and pre-tax costs in dollars per unit (e.g. $/kWh)
 
 ----
 
@@ -11,7 +11,7 @@ Context fuel price data includes retail and pre-tax costs in dollars per unit (e
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
-The data represents fuel prices by context case, fuel type, and calendar year.
+The data represents electricity prices by context case and calendar year.
 
 File Type
     comma-separated values (CSV)
@@ -19,15 +19,15 @@ File Type
 Sample Header
     .. csv-table::
 
-       input_template_name:,context_fuel_prices,input_template_version:,0.2
+       input_template_name:,context.electricity_prices_aeo,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
         context_id,dollar_basis,case_id,fuel_id,calendar_year,retail_dollars_per_unit,pretax_dollars_per_unit
-        AEO2020,2019,Reference case,pump gasoline,2019,2.665601,2.10838
         AEO2020,2019,Reference case,US electricity,2019,0.12559407,0.10391058
+        AEO2020,2019,Reference case,US electricity,2020,0.1239522,0.10212733
 
 Data Column Name and Description
     :context_id:
@@ -58,73 +58,38 @@ Data Column Name and Description
 **CODE**
 
 """
-
 print('importing %s' % __file__)
 
 from omega_model import *
 
 
-class FuelPrice(OMEGABase):
+class ElectricityPrices(OMEGABase):
     """
     **Loads and provides access to fuel prices from the analysis context**
 
     """
-
-    _data = dict()
+    _data = {}
+    year_min = year_max = None
 
     @staticmethod
-    def get_fuel_prices(calendar_year, price_types, fuel_id):
+    def get_fuel_price(calendar_year):
         """
             Get fuel price data for fuel_id in calendar_year
 
         Args:
-            calendar_year (numeric): calendar year to get price in
-            price_types (str, [str1, str2...]): ContextFuelPrices attributes to get
-            fuel_id (str): fuel ID
+            calendar_year (numeric): calendar year for which a price is sought
 
         Returns:
-            Fuel price or tuple of fuel prices if multiple attributes were requested
-
-        Example:
-            ::
-
-                pretax_pump_gas_price_dollars_2030 =
-                ContextFuelPrices.get_fuel_prices(2030, 'pretax_dollars_per_unit', 'pump gasoline')
-
-                pump_gas_attributes_2030 =
-                ContextFuelPrices.get_fuel_prices(2030, ['retail_dollars_per_unit', 'pretax_dollars_per_unit'], 'pump gasoline')
+            Fuel price for the passed calendar year
 
         """
-        cache_key = (calendar_year, str(price_types), fuel_id)
-
-        if cache_key not in FuelPrice._data:
+        if calendar_year not in ElectricityPrices._data:
             if omega_globals.options.flat_context:
                 calendar_year = omega_globals.options.flat_context_year
             else:
-                calendar_year = max(
-                    FuelPrice._data['min_calendar_year'],
-                    min(calendar_year, FuelPrice._data['max_calendar_year'])
-                )
+                calendar_year = max(ElectricityPrices.year_min, min(calendar_year, ElectricityPrices.year_max))
 
-            if type(price_types) is not list:
-                price_types = [price_types]
-
-            prices = []
-            for pt in price_types:
-                prices.append(
-                    FuelPrice._data[
-                        omega_globals.options.context_id,
-                        omega_globals.options.context_case_id,
-                        fuel_id,
-                        calendar_year
-                    ][pt]
-                )
-            if len(prices) == 1:
-                FuelPrice._data[cache_key] = prices[0]
-            else:
-                FuelPrice._data[cache_key] = prices
-
-        return FuelPrice._data[cache_key]
+        return ElectricityPrices._data[calendar_year]['retail_dollars_per_unit']
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -140,60 +105,69 @@ class FuelPrice(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        FuelPrice._data.clear()
+        ElectricityPrices._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         # don't forget to update the module docstring with changes here
-        input_template_name = 'context_fuel_prices'
+        input_template_name = __name__
         input_template_version = 0.2
-        input_template_columns = {'context_id', 'dollar_basis', 'case_id', 'fuel_id', 'calendar_year',
-                                  'retail_dollars_per_unit', 'pretax_dollars_per_unit'}
-
-        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
-                                                         verbose=verbose)
+        input_template_columns = {
+            'context_id',
+            'dollar_basis',
+            'case_id',
+            'fuel_id',
+            'calendar_year',
+            'retail_dollars_per_unit',
+            'pretax_dollars_per_unit',
+        }
+        template_errors = validate_template_version_info(
+            filename, input_template_name, input_template_version, verbose=verbose
+        )
 
         if not template_errors:
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
-                                                             verbose=verbose)
-
+            template_errors = validate_template_column_names(
+                filename, input_template_columns, df.columns, verbose=verbose
+            )
         if not template_errors:
             from context.new_vehicle_market import NewVehicleMarket
             from context.onroad_fuels import OnroadFuel
 
             # validate columns
-            validation_dict = {'context_id': NewVehicleMarket.context_ids,
-                               'case_id': NewVehicleMarket.context_case_ids,
-                               'fuel_id': OnroadFuel.fuel_ids,
-                               }
-
+            validation_dict = {
+                'context_id': NewVehicleMarket.context_ids,
+                'case_id': NewVehicleMarket.context_case_ids,
+                'fuel_id': OnroadFuel.fuel_ids,
+            }
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
-            df = df.loc[(df['context_id'] == omega_globals.options.context_id) &
-                        (df['case_id'] == omega_globals.options.context_case_id), :]
+            df = df.loc[
+                 (df['context_id'] == omega_globals.options.context_id) &
+                 (df['case_id'] == omega_globals.options.context_case_id), :
+                 ]
             aeo_dollar_basis = df['dollar_basis'].mean()
             cols_to_convert = [col for col in df.columns if 'dollars_per_unit' in col]
 
             deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0).to_dict('index')
 
-            adjustment_factor = deflators[omega_globals.options.analysis_dollar_basis]['price_deflator'] \
-                                / deflators[aeo_dollar_basis]['price_deflator']
+            adjustment_factor = (deflators[omega_globals.options.analysis_dollar_basis]['price_deflator'] /
+                                 deflators[aeo_dollar_basis]['price_deflator']
+                                 )
 
             for col in cols_to_convert:
                 df[col] = df[col] * adjustment_factor
 
             df['dollar_basis'] = omega_globals.options.analysis_dollar_basis
+            ElectricityPrices.year_min = df['calendar_year'].min()
+            ElectricityPrices.year_max = df['calendar_year'].max()
 
             if not template_errors:
-                FuelPrice._data = df.set_index(['context_id', 'case_id', 'fuel_id', 'calendar_year']).sort_index()\
-                    .to_dict(orient='index')
-                FuelPrice._data['min_calendar_year'] = df['calendar_year'].min()
-                FuelPrice._data['max_calendar_year'] = df['calendar_year'].max()
+                ElectricityPrices._data = df.set_index('calendar_year').sort_index().to_dict(orient='index')
 
         return template_errors
 
@@ -217,19 +191,18 @@ if __name__ == '__main__':
         init_fail += NewVehicleMarket.init_from_file(
             omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)
 
-        init_fail += FuelPrice.init_from_file(omega_globals.options.context_fuel_prices_file,
-                                              verbose=omega_globals.options.verbose)
+        init_fail += ElectricityPrices.init_from_file(omega_globals.options.context_fuel_prices_file,
+                                                     verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            print(FuelPrice.get_fuel_prices(2020, 'retail_dollars_per_unit', 'pump gasoline'))
-            print(FuelPrice.get_fuel_prices(2020, 'pretax_dollars_per_unit', 'pump gasoline'))
-            print(FuelPrice.get_fuel_prices(2020, ['retail_dollars_per_unit', 'pretax_dollars_per_unit'],
-                                            'pump gasoline'))
+            print(ElectricityPrices.get_fuel_price(2020))
+            print(ElectricityPrices.get_fuel_price(2020))
+            print(ElectricityPrices.get_fuel_price(2020))
 
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)            
+            os._exit(-1)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

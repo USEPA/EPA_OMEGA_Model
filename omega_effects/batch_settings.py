@@ -10,6 +10,7 @@
 import numpy as np
 import pandas as pd
 import sys
+import importlib
 from pathlib import Path
 
 from omega_effects.general.general_functions import read_input_file
@@ -33,7 +34,7 @@ from omega_effects.context.repair_cost import RepairCost
 from omega_effects.context.refueling_cost import RefuelingCost
 
 from omega_effects.general.general_inputs_for_effects import GeneralInputsForEffects
-from omega_effects.general.input_validation import validate_template_column_names
+from omega_effects.general.input_validation import validate_template_column_names, get_module_name
 
 
 class BatchSettings:
@@ -87,6 +88,7 @@ class BatchSettings:
         self.legacy_fleet_file = None
 
         self.context_fuel_prices_file = None
+        self.context_electricity_prices_file = None
         self.context_stock_and_vmt_file = None
         self.onroad_fuels_file = None
         self.onroad_vehicle_calculations_file = None
@@ -108,6 +110,7 @@ class BatchSettings:
         self.insurance_and_taxes_cost_factors = None
 
         self.context_fuel_prices = None
+        self.context_electricity_prices = None
         self.onroad_vmt = None
         self.reregistration = None
         self.context_stock_and_vmt = None
@@ -265,7 +268,7 @@ class BatchSettings:
         self.context_stock_and_vmt_file = \
             self.get_attribute_value(('Context Stock and VMT File', 'context'), 'full_path')
 
-        find_string = None
+        find_string = find_string_e = None
         try:
             find_string = 'implicit_price_deflators'
             self.ip_deflators_file = self.find_file(path_context_in, find_string)
@@ -279,6 +282,15 @@ class BatchSettings:
         except FileNotFoundError:
             effects_log.logwrite(f'{path_context_in} does not contain a {find_string} file.')
             sys.exit()
+
+        try:
+            find_string_e = 'context_electricity_prices'
+            self.context_electricity_prices_file = self.find_file(path_context_in, find_string_e)
+        except FileNotFoundError:
+            effects_log.logwrite(
+                f'{path_context_in} does not contain a {find_string_e} file, using {find_string} file instead.'
+            )
+            self.context_electricity_prices_file = None
 
         try:
             find_string = 'onroad_fuels'
@@ -332,7 +344,7 @@ class BatchSettings:
         """
 
         Args:
-            effects_log: an instance fo the EffectsLog class.
+            effects_log: an instance of the EffectsLog class.
 
         Returns:
              Nothing, but it creates instances of classes needed for the batch.
@@ -384,6 +396,12 @@ class BatchSettings:
             self.context_fuel_prices = FuelPrice()
             self.context_fuel_prices.init_from_file(self.context_fuel_prices_file, self, effects_log)
             self.inputs_filelist.append(self.context_fuel_prices_file)
+
+            if self.context_electricity_prices_file:
+                module_name = get_module_name(self.context_electricity_prices_file, effects_log)
+                self.context_electricity_prices = importlib.import_module(module_name, package=None).ElectricityPrices()
+                self.context_electricity_prices.init_from_file(self.context_electricity_prices_file, self, effects_log)
+                self.inputs_filelist.append(self.context_electricity_prices_file)
 
             self.reregistration = Reregistration()
             self.reregistration.init_from_file(self.vehicle_reregistration_file, effects_log)

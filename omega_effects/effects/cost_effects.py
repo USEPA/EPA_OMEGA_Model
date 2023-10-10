@@ -138,22 +138,25 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
             # fuel costs _______________________________________________________________________________________________
             if v['fuel_consumption_kwh'] > 0:  # this is consumption at the wall so includes charging losses
                 electric_fuel = 'US electricity'
-                retail_price = batch_settings.context_fuel_prices.get_fuel_prices(
-                    batch_settings, v['calendar_year'], 'retail_dollars_per_unit', electric_fuel
-                )
-                pretax_price = batch_settings.context_fuel_prices.get_fuel_prices(
-                    batch_settings, v['calendar_year'], 'pretax_dollars_per_unit', electric_fuel
-                )
+                if batch_settings.context_electricity_prices:
+                    retail_price = batch_settings.context_electricity_prices.get_fuel_price(
+                        v['calendar_year'], 'retail_dollars_per_unit'
+                    )
+                else:
+                    retail_price = batch_settings.context_fuel_prices.get_fuel_price(
+                        v['calendar_year'], electric_fuel, 'retail_dollars_per_unit'
+                    )
+                pretax_price = retail_price
                 fuel_retail_cost_dollars += retail_price * v['fuel_consumption_kwh']
                 fuel_pretax_cost_dollars += pretax_price * v['fuel_consumption_kwh']
             if v['fuel_consumption_gallons'] > 0:
                 fuel_dict = eval(v['in_use_fuel_id'])
                 fuel = [item for item in fuel_dict.keys()][0]
-                retail_price = batch_settings.context_fuel_prices.get_fuel_prices(
-                    batch_settings, v['calendar_year'], 'retail_dollars_per_unit', fuel
+                retail_price = batch_settings.context_fuel_prices.get_fuel_price(
+                    v['calendar_year'], fuel, 'retail_dollars_per_unit'
                 )
-                pretax_price = batch_settings.context_fuel_prices.get_fuel_prices(
-                    batch_settings, v['calendar_year'], 'pretax_dollars_per_unit', fuel
+                pretax_price = batch_settings.context_fuel_prices.get_fuel_price(
+                    v['calendar_year'], fuel, 'pretax_dollars_per_unit'
                 )
                 fuel_retail_cost_dollars += retail_price * v['fuel_consumption_gallons']
                 fuel_pretax_cost_dollars += pretax_price * v['fuel_consumption_gallons']

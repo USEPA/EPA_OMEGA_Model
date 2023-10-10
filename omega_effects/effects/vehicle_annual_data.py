@@ -153,14 +153,17 @@ class VehicleAnnualData:
 
                     for fuel, fuel_share in fuel_dict.items():
 
-                        retail_price = \
-                            batch_settings.context_fuel_prices.get_fuel_prices(
-                                batch_settings, calendar_year, 'retail_dollars_per_unit', fuel
+                        if 'electricity' in fuel and batch_settings.context_electricity_prices:
+                            retail_price = batch_settings.context_electricity_prices.get_fuel_price(
+                                calendar_year, 'retail_dollars_per_unit'
                             )
+                        else:
+                            retail_price = batch_settings.context_fuel_prices.get_fuel_price(
+                                    calendar_year, fuel, 'retail_dollars_per_unit'
+                                )
                         # calc fuel cost per mile
                         if fuel == 'US electricity' and onroad_direct_kwh_per_mile:
-                            refuel_efficiency = \
-                                batch_settings.onroad_fuels.get_fuel_attribute(
+                            refuel_efficiency = batch_settings.onroad_fuels.get_fuel_attribute(
                                     calendar_year, fuel, 'refuel_efficiency'
                                 )
                             onroad_kwh_per_mile += onroad_direct_kwh_per_mile
@@ -169,22 +172,21 @@ class VehicleAnnualData:
                             fuel_flag += 1
 
                         elif fuel != 'US electricity' and onroad_direct_co2e_grams_per_mile:
-                            refuel_efficiency = \
-                                batch_settings.onroad_fuels.get_fuel_attribute(
+                            refuel_efficiency = batch_settings.onroad_fuels.get_fuel_attribute(
                                     calendar_year, fuel, 'refuel_efficiency'
                                 )
-                            co2_emissions_grams_per_unit \
-                                = batch_settings.onroad_fuels.get_fuel_attribute(
-                                    calendar_year, fuel, 'direct_co2e_grams_per_unit') / refuel_efficiency
-                            onroad_gallons_per_mile += \
-                                onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
+                            co2_emissions_grams_per_unit = batch_settings.onroad_fuels.get_fuel_attribute(
+                                    calendar_year, fuel, 'direct_co2e_grams_per_unit'
+                            ) / refuel_efficiency
+                            onroad_gallons_per_mile += onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
                             fuel_cpm += onroad_gallons_per_mile * retail_price
                             rebound_rate = rebound_rate_ice
                             fuel_flag += 1
 
                         # get context fuel cost per mile
-                        context_fuel_cpm_dict_key = \
-                            (int(base_year_vehicle_id), base_year_powertrain_type, int(model_year), v['age'])
+                        context_fuel_cpm_dict_key = (
+                            int(base_year_vehicle_id), base_year_powertrain_type, int(model_year), v['age']
+                        )
                         context_fuel_cpm = context_fuel_cpm_dict[context_fuel_cpm_dict_key]['fuel_cost_per_mile']
 
                         if fuel_flag == 2:
