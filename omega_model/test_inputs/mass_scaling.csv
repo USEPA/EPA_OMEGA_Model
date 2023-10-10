@@ -26,4 +26,4 @@
 "delta_glider_non_structure_mass_lbs","vehicle.body_style == 'pickup'","(18.1 * delta_footprint + 1.9 * delta_footprint * (vehicle.height_in - vehicle.ground_clearance_in)/12)",,,
 "usable_battery_capacity_norm","(vehicle.powertrain_type == 'BEV') | (vehicle.powertrain_type == 'FCV')",0.95,"placeholder",,
 "usable_battery_capacity_norm","vehicle.powertrain_type == 'HEV'",0.5,"placeholder",,
-"usable_battery_capacity_norm","vehicle.powertrain_type == 'PHEV'",0.8,"placeholder",,
+"usable_battery_capacity_norm","vehicle.powertrain_type == 'PHEV'",0.75,"as per JM 10/10/2023",,
