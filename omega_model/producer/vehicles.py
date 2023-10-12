@@ -954,7 +954,10 @@ class Vehicle(OMEGABase):
             price = 0
             fuel_dict = Eval.eval(self.in_use_fuel_id, {'__builtins__': None}, {})
             for fuel, fuel_share in fuel_dict.items():
-                price += FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel) * fuel_share
+                if 'electricity' in fuel:
+                    price += omega_globals.options.ElectricityPrices.get_fuel_price(calendar_year) * fuel_share
+                else:
+                    price += FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel) * fuel_share
 
             self._cache[cache_key] = price
 

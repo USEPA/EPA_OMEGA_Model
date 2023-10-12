@@ -90,6 +90,30 @@ def read_input_file(path, effects_log=None, usecols=None, index_col=None, skipro
         sys.exit()
 
 
+def read_input_file_template_info(path, effects_log=None):
+    """
+
+    Parameters:
+        path: Path to the specified file.\n
+        effects_log: object; an object of the EffectsLog class.
+
+    Returns:
+        A DataFrame of the desired data from the passed input file.
+
+    """
+    if path.is_file():
+        file_datetime = get_file_datetime(path)
+        if effects_log:
+            effects_log.logwrite(message=f'File {path}...found. Version {file_datetime}.')
+
+        return pd.read_csv(path, header=None, nrows=1).values.tolist()[0]
+
+    else:
+        if effects_log:
+            effects_log.logwrite(message=f'File {path}......  *** NOT FOUND ***. ')
+        sys.exit()
+
+
 def save_dict(settings, dict_to_save, save_path, row_header=None, stamp=None, index=False):
     """
 
