@@ -201,7 +201,7 @@ class WeightedTree(OMEGABase):
                 wv, child_eq_str = WeightedTree.calc_node_weighted_value(tree, child.identifier)
                 n.data.value += wv
                 eq_str += '%s + ' % child_eq_str
-            eq_str = '%s)' % eq_str[0:eq_str.rfind(']',)+1]
+            eq_str = '%s)' % eq_str[0:max(eq_str.rfind(']',), eq_str.rfind(')',))+1]
             return n.data.weighted_value, eq_str
 
     def calc_value(self, values_dict, node_id=None, weighted=False):
@@ -233,7 +233,10 @@ class WeightedTree(OMEGABase):
 
         eq_str = WeightedTree.calc_node_weighted_value(self.tree, node_id, weighted)[1]
 
-        return Eval.eval(eq_str, {'results': values_dict}), eq_str
+        try:
+            return Eval.eval(eq_str, {'results': values_dict}), eq_str
+        except:
+            print('wtf?')
 
     def show(self):
         """
