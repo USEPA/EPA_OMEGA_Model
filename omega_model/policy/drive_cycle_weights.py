@@ -151,7 +151,7 @@ class DriveCycleWeights(OMEGABase):
                                                              verbose=verbose)
 
         if not template_errors:
-            validation_dict = {'share_id': ['onroad', 'cert'],
+            validation_dict = {'share_id': ['onroad', 'cert', 'battery_sizing'],
                                'fueling_class': fueling_classes,
                                }
 
@@ -214,8 +214,11 @@ class DriveCycleWeights(OMEGABase):
             start_years = DriveCycleWeights._data[fueling_class]['start_year']
             if len(start_years[start_years <= calendar_year]) > 0:
                 calendar_year = max(start_years[start_years <= calendar_year])
-                eq_str = DriveCycleWeights._data[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
+                try:
+                    eq_str = DriveCycleWeights._data[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
                                                                       weighted=weighted)[1]
+                except:
+                    print('wtf?')
                 DriveCycleWeights._data[cache_key] = eq_str
             else:
                 raise Exception('Missing drive cycle weights for %s, %d or prior' % (fueling_class, calendar_year))
