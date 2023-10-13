@@ -14,7 +14,7 @@ File Type
 Sample Header
     .. csv-table::
 
-       input_template_name:,emission_rates_vehicles,input_template_version:,0.2
+       input_template_name:,effects.emission_rate_curves_vehicles,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
@@ -74,8 +74,6 @@ Data Column Name and Description
 from omega_effects.general.general_functions import read_input_file
 from omega_effects.general.input_validation import validate_template_version_info, validate_template_column_names
 
-_cache = dict()
-
 
 class EmissionRatesVehicles:
     """
@@ -83,10 +81,10 @@ class EmissionRatesVehicles:
 
     """
     def __init__(self):
-        self._data = dict()
-        self._cache = dict()
+        self._data = {}
+        self._cache = {}
         self.startyear_min = 0
-        self.deets = {}  # this dictionary will not include the legacy fleet
+        self.deets = {}
 
     def init_from_file(self, filepath, effects_log):
         """
@@ -102,7 +100,7 @@ class EmissionRatesVehicles:
 
         """
         # don't forget to update the module docstring with changes here
-        input_template_name = 'emission_rates_vehicles'
+        input_template_name = 'effects.emission_rate_curves_vehicles'
         input_template_version = 0.2
         input_template_columns = {
             'start_year',
@@ -159,7 +157,7 @@ class EmissionRatesVehicles:
         """
         locals_dict = locals()
         rate = 0
-        return_rates = list()
+        return_rates = []
 
         if model_year < self.startyear_min:
             model_year = self.startyear_min

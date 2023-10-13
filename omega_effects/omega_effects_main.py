@@ -217,10 +217,11 @@ def main():
                 pd.concat([my_lifetime_physical_df, session_my_period_physical_df], axis=0, ignore_index=True)
             my_lifetime_physical_df.reset_index(inplace=True, drop=True)
 
-            session_vehicle_inventory_details_df = pd.DataFrame.from_dict(
-                session_settings.emission_rates_vehicles.deets, orient='index').reset_index(drop=True)
-            vehicle_inventory_details_df = pd.concat(
-                [vehicle_inventory_details_df, session_vehicle_inventory_details_df], axis=0, ignore_index=True)
+            if session_settings.emission_rates_vehicles.deets:
+                session_vehicle_inventory_details_df = pd.DataFrame.from_dict(
+                    session_settings.emission_rates_vehicles.deets, orient='index').reset_index(drop=True)
+                vehicle_inventory_details_df = pd.concat(
+                    [vehicle_inventory_details_df, session_vehicle_inventory_details_df], axis=0, ignore_index=True)
 
             session_egu_inventory_details_df = pd.DataFrame.from_dict(
                 session_settings.egu_data.deets, orient='index').reset_index(drop=True)
@@ -365,9 +366,10 @@ def main():
         my_lifetime_costs_df.to_csv(
             path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', index=False
         )
-        vehicle_inventory_details_df.to_csv(
-            path_of_run_folder / f'{start_time_readable}_vehicle_emission_rate_details.csv', index=False
-        )
+        if session_settings.emission_rates_vehicles.deets:
+            vehicle_inventory_details_df.to_csv(
+                path_of_run_folder / f'{start_time_readable}_vehicle_emission_rate_details.csv', index=False
+            )
         egu_inventory_details_df.to_csv(
             path_of_run_folder / f'{start_time_readable}_egu_inventory_details.csv', index=False
         )
@@ -398,7 +400,8 @@ def main():
             )
         add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv', output_file_id_info)
         add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', output_file_id_info)
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_vehicle_emission_rate_details.csv', output_file_id_info)
+        if session_settings.emission_rates_vehicles.deets:
+            add_id_to_csv(path_of_run_folder / f'{start_time_readable}_vehicle_emission_rate_details.csv', output_file_id_info)
         add_id_to_csv(path_of_run_folder / f'{start_time_readable}_egu_inventory_details.csv', output_file_id_info)
         add_id_to_csv(path_of_run_folder / f'{start_time_readable}_refinery_emission_rate_details.csv', output_file_id_info)
 
