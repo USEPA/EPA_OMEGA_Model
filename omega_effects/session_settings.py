@@ -160,14 +160,16 @@ Data Row Name and Description
 
 """
 import sys
+import importlib
 from pathlib import Path
 
 from omega_effects.effects.vehicles import Vehicles
 from omega_effects.effects.vehicle_annual_data import VehicleAnnualData
+from omega_effects.general.input_validation import get_module_name
 
 from omega_effects.effects.egu_data import EGUdata
 from omega_effects.effects.refinery_data import RefineryData
-from omega_effects.effects.emission_rates_vehicles import EmissionRatesVehicles
+from omega_effects.effects.emission_rate_curves_vehicles import EmissionRatesVehicles
 from omega_effects.effects.safety_values import SafetyValues
 from omega_effects.effects.fatality_rates import FatalityRates
 from omega_effects.context.powertrain_cost import PowertrainCost
@@ -334,7 +336,9 @@ class SessionSettings:
             self.refinery_data.init_from_file(batch_settings, self, self.refinery_data_file, effects_log)
             self.inputs_filelist.append(self.refinery_data_file)
 
-            self.emission_rates_vehicles = EmissionRatesVehicles()
+            # determine what module to use for vehicle rates
+            module_name = get_module_name(self.vehicle_emission_rates_file, effects_log)
+            self.emission_rates_vehicles = importlib.import_module(module_name, package=None).EmissionRatesVehicles()
             self.emission_rates_vehicles.init_from_file(self.vehicle_emission_rates_file, effects_log)
             self.inputs_filelist.append(self.vehicle_emission_rates_file)
 
