@@ -106,7 +106,6 @@ class EmissionRatesVehicles:
             'start_year',
             'sourcetype_name',
             'reg_class_id',
-            'market_class_id',
             'in_use_fuel_id',
             'rate_name',
             'equation',
