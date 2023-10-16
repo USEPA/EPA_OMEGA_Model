@@ -1776,10 +1776,7 @@ class VehicleFinal(SQABase, Vehicle):
                         alt_veh.base_year_total_emachine_kw = 1.75
                     else:
                         alt_veh.base_year_total_emachine_kw = 1
-                    if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
-                        alt_veh.onroad_charge_depleting_range_mi = 150  # RV MDV
-                    else:
-                        alt_veh.onroad_charge_depleting_range_mi = omega_globals.options.bev_range_mi
+                    alt_veh.onroad_charge_depleting_range_mi = 0  # determined during cost curve generation
                     alt_veh.base_year_eng_rated_hp = 0
                     alt_veh.engine_cylinders = 0
                     alt_veh.engine_displacement_liters = 0
@@ -1798,10 +1795,7 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.battery_kwh = 0  # pack sizes determined by range target
                     alt_veh.total_emachine_kw = 0  # motor size determined during cost curve generation
                     alt_veh.tractive_motor_kw = 0
-                    if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
-                        alt_veh.onroad_charge_depleting_range_mi = 25  # RV MDV
-                    else:
-                        alt_veh.onroad_charge_depleting_range_mi = omega_globals.options.phev_range_mi
+                    alt_veh.onroad_charge_depleting_range_mi = 0  # determined during cost curve generation
                     alt_veh.base_year_onroad_charge_depleting_range_mi = alt_veh.onroad_charge_depleting_range_mi
                     alt_veh.base_year_eng_rated_hp = v.base_year_eng_rated_hp
                     alt_veh.engine_cylinders = v.engine_cylinders
