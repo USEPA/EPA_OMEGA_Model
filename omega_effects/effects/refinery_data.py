@@ -72,6 +72,7 @@ class RefineryData:
     """
     def __init__(self):
         self.data = {}
+        self.cache = {}
         self.years = None
         self.calendar_year_min = None
         self.calendar_year_max = None
@@ -204,8 +205,13 @@ class RefineryData:
             calendar_year = self.calendar_year_max
 
         rates = []
+        if calendar_year in self.cache:
+            return self.cache[calendar_year]
+
         for rate_name in args:
             rates.append(self.data[calendar_year][rate_name])
+
+        self.cache[calendar_year] = rates
 
         return rates
 

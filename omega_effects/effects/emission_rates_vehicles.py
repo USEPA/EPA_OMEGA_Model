@@ -68,7 +68,7 @@ class EmissionRatesVehicles:
         self._cache = {}
         self.startyear_min = 0
         self.start_years = None
-        self.deets = None
+        self.deets = {}
 
     def init_from_file(self, filepath, effects_log):
         """
@@ -140,10 +140,32 @@ class EmissionRatesVehicles:
         else:
             start_year = max([yr for yr in self.start_years if yr <= model_year])
 
-        age = min(30, age)
+        max_age_in_data_for_model_year = max([v['age'] for v in self._data.values() if v['start_year'] == start_year])
+        data_age = min(30, age, max_age_in_data_for_model_year)
 
-        for rate_name in rate_names:
-            rate = self._data[(start_year, sourcetype_name, reg_class_id, in_use_fuel_id, age)][rate_name]
-            return_rates.append(rate)
+        key = (model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age)
+        if key in self._cache:
+            return self._cache[key]
+        else:
+            for rate_name in rate_names:
+                rate = self._data[(start_year, sourcetype_name, reg_class_id, in_use_fuel_id, data_age)][rate_name]
+                return_rates.append(rate)
+
+                cache_key = (model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age, rate_name)
+                self.deets.update(
+                    {cache_key: {
+                        'session_policy': session_settings.session_policy,
+                        'session_name': session_settings.session_name,
+                        'model_year': model_year,
+                        'age': age,
+                        'reg_class_id': reg_class_id,
+                        'sourcetype_name': sourcetype_name,
+                        'in_use_fuel_id': in_use_fuel_id,
+                        'rate_name': rate_name,
+                        'rate': rate,
+                    }}
+                )
+
+            self._cache[key] = return_rates
 
         return return_rates
