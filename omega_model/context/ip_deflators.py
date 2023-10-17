@@ -165,7 +165,6 @@ if __name__ == '__main__':
         if not init_fail:
             print(ImplicitPriceDeflators.get_price_deflator(2010))
             print(ImplicitPriceDeflators.get_price_deflator(2020))
-            print(ImplicitPriceDeflators.get_price_deflator(2050))
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
