@@ -66,11 +66,11 @@ class EmissionRatesVehicles:
 
     """
     def __init__(self):
-        self._data = {}
-        self._cache = {}
+        self.data = {}
         self.startyear_min = 0
         self.start_years = None
-        self.deets = {}
+        self.deets = None
+        self.max_ages_dict = {}
         self.gasoline_rate_names = [
             'pm25_brakewear_grams_per_mile',
             'pm25_tirewear_grams_per_mile',
@@ -165,46 +165,33 @@ class EmissionRatesVehicles:
         df = read_input_file(filepath, effects_log, skiprows=1)
         validate_template_column_names(filepath, df, input_template_columns, effects_log)
 
-        rate_keys = zip(
+        keys = zip(
             df['start_year'],
             df['sourcetype_name'],
             df['reg_class_id'],
             df['in_use_fuel_id'],
             df['age'],
         )
-        df.set_index(rate_keys, inplace=True)
+        df.set_index(keys, inplace=True)
 
-        # df.insert(len(df.columns), 'rates', 0)
-
-        # for rate_key in rate_keys:
-        # for idx, row in df.iterrows():
-        #     if 'gasoline' in row['in_use_fuel_id']:
-        #         df.at[idx, 'rates'] = row[self.gasoline_rate_names].values
-        #     elif 'diesel' in row['in_use_fuel_id']:
-        #         df.at[idx, 'rates'] = row[self.diesel_rate_names].values
-        #     else:
-        #         df.at[idx, 'rates'] = row[self.bev_rate_names].values
-
-            #     df.at[idx, 'rates'] = dict(zip(
-            #         [rate for rate in self.gasoline_rate_names], row[self.gasoline_rate_names].values)
-            #     )
-            # elif 'diesel' in row['in_use_fuel_id']:
-            #     df.at[idx, 'rates'] = dict(zip(
-            #         [rate for rate in self.diesel_rate_names], row[self.diesel_rate_names].values)
-            #     )
-            # else:
-            #     df.at[idx, 'rates'] = dict(zip(
-            #         [rate for rate in self.bev_rate_names], row[self.bev_rate_names].values)
-            #     )
+        for idx, row in df.iterrows():
+            key = (
+                row['start_year'], row['sourcetype_name'], row['reg_class_id'], row['in_use_fuel_id'], row['age']
+            )
+            if 'gasoline' in row['in_use_fuel_id']:
+                self.data[key] = row[self.gasoline_rate_names].values
+            elif 'diesel' in row['in_use_fuel_id']:
+                self.data[key] = row[self.diesel_rate_names].values
+            else:
+                self.data[key] = row[self.bev_rate_names].values
 
         self.startyear_min = min(df['start_year'])
         self.start_years = df['start_year'].unique()
 
-        self._data = df.to_dict('index')
+        for start_year in self.start_years:
+            self.max_ages_dict[start_year] = max(df.loc[df['start_year'] == start_year, 'age'])
 
-    def get_emission_rate(
-            self, session_settings, model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age, *rate_names
-    ):
+    def get_emission_rate(self, session_settings, model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age):
         """
 
         Args:
@@ -214,71 +201,19 @@ class EmissionRatesVehicles:
             reg_class_id (str): the regulatory class, e.g., 'car' or 'truck'
             in_use_fuel_id (str): the liquid fuel ID, e.g., 'pump gasoline'
             age (int): vehicle age in years
-            rate_names: name of emission rate(s) to get
 
         Returns:
             A list of emission rates for the given type of vehicle of the given model_year and age.
 
         """
-        return_rates = []
         if model_year < self.startyear_min:
             start_year = self.startyear_min
         else:
             start_year = max([yr for yr in self.start_years if yr <= model_year])
 
-        max_age_in_data_for_model_year = max([v['age'] for v in self._data.values() if v['start_year'] == start_year])
+        max_age_in_data_for_model_year = self.max_ages_dict[start_year]
         data_age = min(30, age, max_age_in_data_for_model_year)
 
-        key = (model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age)
-        if key in self._cache:
-            return self._cache[key]
-        else:
-            if 'gasoline' in in_use_fuel_id:
-                rate_names = self.gasoline_rate_names
-                return_rates = self._data[(start_year, sourcetype_name, reg_class_id, in_use_fuel_id, data_age)][
-                    rate_names]
-            elif 'diesel' in in_use_fuel_id:
-                rate_names = self.diesel_rate_names
-                return_rates = self._data[(start_year, sourcetype_name, reg_class_id, in_use_fuel_id, data_age)][
-                    rate_names]
-            else:
-                rate_names = self.bev_rate_names
-                return_rates = self._data[(start_year, sourcetype_name, reg_class_id, in_use_fuel_id, data_age)][
-                    rate_names]
-        # else:
-        #     for rate_name in rate_names:
-                # rate = self._data[(start_year, sourcetype_name, reg_class_id, in_use_fuel_id, data_age)][rate_name]
-                # return_rates.append(rate)
+        rates = self.data[(start_year, sourcetype_name, reg_class_id, in_use_fuel_id, data_age)]
 
-        cache_key = (model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age)
-        self.deets.update({
-            cache_key: {
-                'session_policy': session_settings.session_policy,
-                'session_name': session_settings.session_name,
-                'model_year': model_year,
-                'age': age,
-                'reg_class_id': reg_class_id,
-                'sourcetype_name': sourcetype_name,
-                'in_use_fuel_id': in_use_fuel_id,
-                rate_names: return_rates,
-            }
-        })
-
-                # cache_key = (model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age, rate_name)
-                # self.deets.update(
-                #     {cache_key: {
-                #         'session_policy': session_settings.session_policy,
-                #         'session_name': session_settings.session_name,
-                #         'model_year': model_year,
-                #         'age': age,
-                #         'reg_class_id': reg_class_id,
-                #         'sourcetype_name': sourcetype_name,
-                #         'in_use_fuel_id': in_use_fuel_id,
-                #         'rate_name': rate_name,
-                #         'rate': rate,
-                #     }}
-                # )
-
-        self._cache[key] = return_rates
-
-        return return_rates
+        return rates

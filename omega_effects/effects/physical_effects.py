@@ -14,95 +14,6 @@ import pandas as pd
 from omega_effects.effects.vehicle_inventory import VehiclePhysicalData, calc_vehicle_inventory
 
 
-def get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg_class_id, fuel, ind_var_value):
-    """
-
-    Args:
-        session_settings: an instance of the SessionSettings class.
-        model_year (int): The model year of the specific vehicle.
-        sourcetype_name (str): The MOVES sourcetype name (e.g., 'passenger car', 'passenger truck', 'light commercial truck')
-        reg_class_id (str): The regulatory class ID of the vehicle.
-        fuel (str): The fuel ID (i.e., pump gasoline, pump diesel)
-        ind_var_value (str): The independent variable value, e.g., age or odometer
-
-    Returns:
-        A list of emission rates for the given model year vehicle in a given calendar year.
-
-    """
-    if 'gasoline' in fuel:
-        rate_names = [
-            'pm25_brakewear_grams_per_mile',
-            'pm25_tirewear_grams_per_mile',
-            'pm25_exhaust_grams_per_mile',
-            'nmog_exhaust_grams_per_mile',
-            'nmog_evap_permeation_grams_per_mile',
-            'nmog_evap_fuel_vapor_venting_grams_per_mile',
-            'nmog_evap_fuel_leaks_grams_per_mile',
-            'nmog_refueling_displacement_grams_per_gallon',
-            'nmog_refueling_spillage_grams_per_gallon',
-            'co_exhaust_grams_per_mile',
-            'nox_exhaust_grams_per_mile',
-            'sox_exhaust_grams_per_gallon',
-            'ch4_exhaust_grams_per_mile',
-            'n2o_exhaust_grams_per_mile',
-            'acetaldehyde_exhaust_grams_per_mile',
-            'acrolein_exhaust_grams_per_mile',
-            'benzene_exhaust_grams_per_mile',
-            'benzene_evap_permeation_grams_per_mile',
-            'benzene_evap_fuel_vapor_venting_grams_per_mile',
-            'benzene_evap_fuel_leaks_grams_per_mile',
-            'benzene_refueling_displacement_grams_per_gallon',
-            'benzene_refueling_spillage_grams_per_gallon',
-            'ethylbenzene_exhaust_grams_per_mile',
-            'ethylbenzene_evap_fuel_vapor_venting_grams_per_mile',
-            'ethylbenzene_evap_fuel_leaks_grams_per_mile',
-            'ethylbenzene_evap_permeation_grams_per_mile',
-            'ethylbenzene_refueling_displacement_grams_per_gallon',
-            'ethylbenzene_refueling_spillage_grams_per_gallon',
-            'formaldehyde_exhaust_grams_per_mile',
-            'naphthalene_exhaust_grams_per_mile',
-            '13_butadiene_exhaust_grams_per_mile',
-            '15pah_exhaust_grams_per_mile',
-        ]
-    elif 'diesel' in fuel:
-        rate_names = [
-            'pm25_brakewear_grams_per_mile',
-            'pm25_tirewear_grams_per_mile',
-            'pm25_exhaust_grams_per_mile',
-            'nmog_exhaust_grams_per_mile',
-            'nmog_refueling_spillage_grams_per_gallon',
-            'co_exhaust_grams_per_mile',
-            'nox_exhaust_grams_per_mile',
-            'sox_exhaust_grams_per_gallon',
-            'ch4_exhaust_grams_per_mile',
-            'n2o_exhaust_grams_per_mile',
-            'acetaldehyde_exhaust_grams_per_mile',
-            'acrolein_exhaust_grams_per_mile',
-            'benzene_exhaust_grams_per_mile',
-            'benzene_refueling_spillage_grams_per_gallon',
-            'ethylbenzene_exhaust_grams_per_mile',
-            'ethylbenzene_refueling_spillage_grams_per_gallon',
-            'formaldehyde_exhaust_grams_per_mile',
-            'naphthalene_exhaust_grams_per_mile',
-            'naphthalene_refueling_spillage_grams_per_gallon',
-            '13_butadiene_exhaust_grams_per_mile',
-            '15pah_exhaust_grams_per_mile',
-        ]
-    elif 'electric' in fuel:
-        rate_names = [
-            'pm25_brakewear_grams_per_mile',
-            'pm25_tirewear_grams_per_mile'
-        ]
-    else:
-        rate_names = []
-
-    rates = session_settings.emission_rates_vehicles.get_emission_rate(
-        session_settings, model_year, sourcetype_name, reg_class_id, fuel, ind_var_value, *rate_names
-    )
-
-    return rates
-
-
 def get_inputs_for_effects(batch_settings, arg=None):
     """
 
@@ -302,9 +213,8 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
 
                     if fueling_class == 'BEV':
                         pm25_brakewear_rate_e, pm25_tirewear_rate_e = \
-                            get_vehicle_emission_rate(
-                                session_settings, model_year, sourcetype_name, base_year_reg_class_id, fuel,
-                                ind_var_value
+                            session_settings.emission_rates_vehicles.get_emission_rate(
+                                session_settings, model_year, sourcetype_name, reg_class_id, fuel, ind_var_value
                             )
                         vehicle_data.update_value({
                             'pm25_brakewear_rate_e': pm25_brakewear_rate_e,
@@ -339,9 +249,8 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                             ethylbenzene_refuel_disp_rate, ethylbenzene_refuel_spill_rate, \
                             formaldehyde_exh_rate, naphthalene_exh_rate, \
                             butadiene13_exh_rate, pah15_exh_rate = \
-                            get_vehicle_emission_rate(
-                                session_settings, model_year, sourcetype_name, base_year_reg_class_id, fuel,
-                                ind_var_value
+                            session_settings.emission_rates_vehicles.get_emission_rate(
+                                session_settings, model_year, sourcetype_name, reg_class_id, fuel, ind_var_value
                             )
                         energy_density_ratio, pure_share = e0_energy_density_ratio, e0_share
 
@@ -397,9 +306,8 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                             ethylbenzene_exh_rate, ethylbenzene_refuel_spill_rate, \
                             formaldehyde_exh_rate, naphthalene_exh_rate, naphthalene_refuel_spill_rate, \
                             butadiene13_exh_rate, pah15_exh_rate = \
-                            get_vehicle_emission_rate(
-                                session_settings, model_year, sourcetype_name, base_year_reg_class_id, fuel,
-                                ind_var_value
+                            session_settings.emission_rates_vehicles.get_emission_rate(
+                                session_settings, model_year, sourcetype_name, reg_class_id, fuel, ind_var_value
                             )
                         energy_density_ratio, pure_share = diesel_energy_density_ratio, 1
 
@@ -576,8 +484,9 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
 
             if vse['fueling_class'] == 'BEV':
                 pm25_brakewear_rate_e, pm25_tirewear_rate_e = \
-                    get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, v['reg_class_id'], fuel,
-                                              ind_var_value)
+                    session_settings.emission_rates_vehicles.get_emission_rate(
+                        session_settings, model_year, sourcetype_name, v['reg_class_id'], fuel, ind_var_value
+                    )
                 vehicle_data.update_value({
                     'pm25_brakewear_rate_e': pm25_brakewear_rate_e,
                     'pm25_tirewear_rate_e': pm25_tirewear_rate_e,
@@ -603,7 +512,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                     ethylbenzene_leaks_rate, ethylbenzene_refuel_disp_rate, ethylbenzene_refuel_spill_rate, \
                     formaldehyde_exh_rate, naphthalene_exh_rate, \
                     butadiene13_exh_rate, pah15_exh_rate = \
-                    get_vehicle_emission_rate(
+                    session_settings.emission_rates_vehicles.get_emission_rate(
                         session_settings, model_year, sourcetype_name, v['reg_class_id'], fuel, ind_var_value
                     )
 
@@ -659,9 +568,9 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                     benzene_exh_rate, benzene_refuel_spill_rate, \
                     ethylbenzene_exh_rate, ethylbenzene_refuel_spill_rate, \
                     formaldehyde_exh_rate, naphthalene_exh_rate, naphthalene_refuel_spill_rate, \
-                    butadiene13_exh_rate, pah15_exh_rate = \
-                    get_vehicle_emission_rate(
-                        session_settings, model_year, sourcetype_name, v['reg_class_id'], fuel, ind_var_value)
+                    butadiene13_exh_rate, pah15_exh_rate = session_settings.emission_rates_vehicles.get_emission_rate(
+                    session_settings, model_year, sourcetype_name, v['reg_class_id'], fuel, ind_var_value
+                )
 
                 energy_density_ratio, pure_share = diesel_energy_density_ratio, 1
 

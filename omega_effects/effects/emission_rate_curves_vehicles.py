@@ -85,6 +85,67 @@ class EmissionRatesVehicles:
         self._cache = {}
         self.startyear_min = 0
         self.deets = {}
+        self.gasoline_rate_names = [
+            'pm25_brakewear_grams_per_mile',
+            'pm25_tirewear_grams_per_mile',
+            'pm25_exhaust_grams_per_mile',
+            'nmog_exhaust_grams_per_mile',
+            'nmog_evap_permeation_grams_per_mile',
+            'nmog_evap_fuel_vapor_venting_grams_per_mile',
+            'nmog_evap_fuel_leaks_grams_per_mile',
+            'nmog_refueling_displacement_grams_per_gallon',
+            'nmog_refueling_spillage_grams_per_gallon',
+            'co_exhaust_grams_per_mile',
+            'nox_exhaust_grams_per_mile',
+            'sox_exhaust_grams_per_gallon',
+            'ch4_exhaust_grams_per_mile',
+            'n2o_exhaust_grams_per_mile',
+            'acetaldehyde_exhaust_grams_per_mile',
+            'acrolein_exhaust_grams_per_mile',
+            'benzene_exhaust_grams_per_mile',
+            'benzene_evap_permeation_grams_per_mile',
+            'benzene_evap_fuel_vapor_venting_grams_per_mile',
+            'benzene_evap_fuel_leaks_grams_per_mile',
+            'benzene_refueling_displacement_grams_per_gallon',
+            'benzene_refueling_spillage_grams_per_gallon',
+            'ethylbenzene_exhaust_grams_per_mile',
+            'ethylbenzene_evap_fuel_vapor_venting_grams_per_mile',
+            'ethylbenzene_evap_fuel_leaks_grams_per_mile',
+            'ethylbenzene_evap_permeation_grams_per_mile',
+            'ethylbenzene_refueling_displacement_grams_per_gallon',
+            'ethylbenzene_refueling_spillage_grams_per_gallon',
+            'formaldehyde_exhaust_grams_per_mile',
+            'naphthalene_exhaust_grams_per_mile',
+            '13_butadiene_exhaust_grams_per_mile',
+            '15pah_exhaust_grams_per_mile',
+        ]
+        self.diesel_rate_names = [
+            'pm25_brakewear_grams_per_mile',
+            'pm25_tirewear_grams_per_mile',
+            'pm25_exhaust_grams_per_mile',
+            'nmog_exhaust_grams_per_mile',
+            'nmog_refueling_spillage_grams_per_gallon',
+            'co_exhaust_grams_per_mile',
+            'nox_exhaust_grams_per_mile',
+            'sox_exhaust_grams_per_gallon',
+            'ch4_exhaust_grams_per_mile',
+            'n2o_exhaust_grams_per_mile',
+            'acetaldehyde_exhaust_grams_per_mile',
+            'acrolein_exhaust_grams_per_mile',
+            'benzene_exhaust_grams_per_mile',
+            'benzene_refueling_spillage_grams_per_gallon',
+            'ethylbenzene_exhaust_grams_per_mile',
+            'ethylbenzene_refueling_spillage_grams_per_gallon',
+            'formaldehyde_exhaust_grams_per_mile',
+            'naphthalene_exhaust_grams_per_mile',
+            'naphthalene_refueling_spillage_grams_per_gallon',
+            '13_butadiene_exhaust_grams_per_mile',
+            '15pah_exhaust_grams_per_mile',
+        ]
+        self.bev_rate_names = [
+            'pm25_brakewear_grams_per_mile',
+            'pm25_tirewear_grams_per_mile'
+        ]
 
     def init_from_file(self, filepath, effects_log):
         """
@@ -137,8 +198,7 @@ class EmissionRatesVehicles:
             rate_eq = self._data[rate_key]['equation']
             self._data[rate_key].update({'equation': compile(rate_eq, '<string>', 'eval')})
 
-    def get_emission_rate(self, session_settings, model_year, sourcetype_name, reg_class_id,
-                          in_use_fuel_id, age, *rate_names):
+    def get_emission_rate(self, session_settings, model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age):
         """
 
         Args:
@@ -148,7 +208,6 @@ class EmissionRatesVehicles:
             reg_class_id (str): the regulatory class, e.g., 'car' or 'truck'
             in_use_fuel_id (str): the liquid fuel ID, e.g., 'pump gasoline'
             age (int): vehicle age in years
-            rate_names: name of emission rate(s) to get
 
         Returns:
             A list of emission rates for the given type of vehicle of the given model_year and age.
@@ -157,6 +216,13 @@ class EmissionRatesVehicles:
         locals_dict = locals()
         rate = 0
         return_rates = []
+
+        if 'gasoline' in in_use_fuel_id:
+            rate_names = self.gasoline_rate_names
+        elif 'diesel' in in_use_fuel_id:
+            rate_names = self.diesel_rate_names
+        else:
+            rate_names = self.bev_rate_names
 
         if model_year < self.startyear_min:
             model_year = self.startyear_min
