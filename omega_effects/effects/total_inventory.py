@@ -1,9 +1,27 @@
+"""
+
+Total Inventory module.
+
+----
+
+**CODE**
+
+"""
 
 
 def calc_total_inventory(physical_effects_dict):
+    """
+    Calc total inventory
+
+    Args:
+        physical_effects_dict (dict): dict of physical effects
+
+    Returns:
+        physical_effects_dict with emissions data
+
+    """
 
     for v in physical_effects_dict.values():
-
         v['voc_upstream_ustons'] = v['voc_refinery_ustons'] + v['voc_egu_ustons']
         v['co_upstream_ustons'] = v['co_refinery_ustons'] + v['co_egu_ustons']
         v['nox_upstream_ustons'] = v['nox_refinery_ustons'] + v['nox_egu_ustons']
