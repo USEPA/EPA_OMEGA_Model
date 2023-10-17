@@ -740,11 +740,11 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         if len(cost_cloud) > 1:
             if omega_globals.options.no_backsliding and vehicle.fueling_class != 'BEV' and \
-                    vehicle.cost_curve_class != None:
+                    vehicle.cost_curve_class is not None:
                 cost_cloud = cost_cloud[cost_cloud['onroad_direct_oncycle_co2e_grams_per_mile'] <=
                                         vehicle.onroad_direct_oncycle_co2e_grams_per_mile]
             elif omega_globals.options.no_backsliding and vehicle.fueling_class == 'BEV' and \
-                    vehicle.cost_curve_class != None:
+                    vehicle.cost_curve_class is not None:
                 cost_cloud = cost_cloud[cost_cloud['onroad_direct_oncycle_kwh_per_mile'] <=
                                         vehicle.onroad_direct_oncycle_kwh_per_mile]
         glider_costs = \

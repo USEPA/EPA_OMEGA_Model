@@ -1771,7 +1771,7 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.total_emachine_kw = 0  # motor size determined during cost curve generation
                     alt_veh.tractive_motor_kw = 0
                     alt_veh.base_year_tractive_motor_kw = 1
-                    if (v.drive_system == 'AWD'):
+                    if v.drive_system == 'AWD':
                         # ratio of AWD total power to tractive power
                         alt_veh.base_year_total_emachine_kw = 1.75
                     else:
