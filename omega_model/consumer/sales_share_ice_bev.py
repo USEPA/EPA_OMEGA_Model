@@ -75,6 +75,8 @@ Data Column Name and Description
 print('importing %s' % __file__)
 
 from omega_model import *
+from context.fuel_prices import FuelPrice
+from context.new_vehicle_market import NewVehicleMarket
 
 
 class SalesShare(OMEGABase, SalesShareBase):
@@ -186,7 +188,7 @@ class SalesShare(OMEGABase, SalesShareBase):
                     annual_o_m_costs = gcam_data_cy['o_m_costs']
 
                     fuel_cost_per_VMT = \
-                        FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'US electricity') * \
+                        omega_globals.options.ElectricityPrices.get_fuel_price(calendar_year) * \
                         average_kwh_pmi / recharge_efficiency
 
                     fuel_cost_per_VMT += fuel_cost * average_co2e_gpmi / carbon_intensity_gasoline / refuel_efficiency
@@ -361,11 +363,17 @@ if __name__ == '__main__':
 
         init_fail = []
 
+        from policy.policy_fuels import PolicyFuel
+        from omega_model.omega import get_module
+
         # pull in reg classes before initializing classes that check reg class validity
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
+
+        init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file,
+                                               verbose=omega_globals.options.verbose)
 
         omega_globals.options.market_classes_file = \
             omega_globals.options.omega_model_path + '/test_inputs/market_classes.csv'
@@ -379,6 +387,21 @@ if __name__ == '__main__':
         from context.onroad_fuels import OnroadFuel  # needed for in-use fuel ID
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=omega_globals.options.verbose)
+
+        init_fail += NewVehicleMarket.init_from_file(
+            omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)
+
+        module_name = get_template_name(omega_globals.options.context_electricity_prices_file)
+        omega_globals.options.ElectricityPrices = get_module(module_name).ElectricityPrices
+
+        init_fail += omega_globals.options.ElectricityPrices.init_from_file(
+            omega_globals.options.context_electricity_prices_file, verbose=omega_globals.options.verbose
+        )
+
+        # must come after NewVehicleMarket and OnroadFuel init for input validation
+        from context.fuel_prices import FuelPrice
+        init_fail += FuelPrice.init_from_file(omega_globals.options.context_fuel_prices_file,
+                                              verbose=omega_globals.options.verbose)
 
         omega_globals.options.sales_share_file = \
             omega_globals.options.omega_model_path + '/test_inputs/sales_share_params.csv'
