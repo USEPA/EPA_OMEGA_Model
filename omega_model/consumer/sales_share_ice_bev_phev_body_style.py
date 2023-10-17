@@ -318,6 +318,20 @@ class SalesShare(OMEGABase, SalesShareBase):
 
     @staticmethod
     def calc_attempted_share(row, share_col, MIN_SHARE, MAX_SHARE, N):
+        """
+        Calculate a new share for ``share_col`` that attempts to satisfy constraints.
+
+        Args:
+            row (Series): share data to be reconciled with constraints
+            share_col (str): e.g. 'consumer_share_frac_sedan_wagon.BEV'
+            MIN_SHARE (float): e.g. ``0.092226211660941``
+            MAX_SHARE (float): e.g. ``0.193144311076143``
+            N (int): number of share categories
+
+        Returns:
+            New share to try for the share identified by ``share_col``
+
+        """
         if row['change_needed'] < 0:
             share = max(MIN_SHARE, row[share_col] + row['change_needed'] / N)
         elif row['change_needed'] > 0:
