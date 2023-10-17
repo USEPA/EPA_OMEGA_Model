@@ -174,6 +174,8 @@ class ElectricityPrices(OMEGABase):
 
 if __name__ == '__main__':
     try:
+        __name__ = '%s.%s' % (file_io.get_parent_foldername(__file__), file_io.get_filename(__file__))
+
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
@@ -191,13 +193,12 @@ if __name__ == '__main__':
         init_fail += NewVehicleMarket.init_from_file(
             omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)
 
-        init_fail += ElectricityPrices.init_from_file(omega_globals.options.context_fuel_prices_file,
+        init_fail += ElectricityPrices.init_from_file(omega_globals.options.context_electricity_prices_file,
                                                      verbose=omega_globals.options.verbose)
 
         if not init_fail:
             print(ElectricityPrices.get_fuel_price(2020))
-            print(ElectricityPrices.get_fuel_price(2020))
-            print(ElectricityPrices.get_fuel_price(2020))
+            print(ElectricityPrices.get_fuel_price(2050))
 
         else:
             print(init_fail)
