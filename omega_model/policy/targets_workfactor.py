@@ -377,7 +377,7 @@ if __name__ == '__main__':
                 reg_class_id = None
                 footprint_ft2 = None
                 initial_registered_count = None
-                cert_fuel_id = "{'gasoline':1.0}"
+                cert_fuel_id = 'gasoline'
                 curbweight_lbs = 5000
                 gvwr_lbs = 7500
                 gcwr_lbs = 1000
