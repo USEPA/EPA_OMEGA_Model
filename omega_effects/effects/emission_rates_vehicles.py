@@ -54,6 +54,8 @@ Data Column Name and Description
 **CODE**
 
 """
+import pandas as pd
+
 from omega_effects.general.general_functions import read_input_file
 from omega_effects.general.input_validation import validate_template_version_info, validate_template_column_names
 
@@ -69,6 +71,67 @@ class EmissionRatesVehicles:
         self.startyear_min = 0
         self.start_years = None
         self.deets = {}
+        self.gasoline_rate_names = [
+            'pm25_brakewear_grams_per_mile',
+            'pm25_tirewear_grams_per_mile',
+            'pm25_exhaust_grams_per_mile',
+            'nmog_exhaust_grams_per_mile',
+            'nmog_evap_permeation_grams_per_mile',
+            'nmog_evap_fuel_vapor_venting_grams_per_mile',
+            'nmog_evap_fuel_leaks_grams_per_mile',
+            'nmog_refueling_displacement_grams_per_gallon',
+            'nmog_refueling_spillage_grams_per_gallon',
+            'co_exhaust_grams_per_mile',
+            'nox_exhaust_grams_per_mile',
+            'sox_exhaust_grams_per_gallon',
+            'ch4_exhaust_grams_per_mile',
+            'n2o_exhaust_grams_per_mile',
+            'acetaldehyde_exhaust_grams_per_mile',
+            'acrolein_exhaust_grams_per_mile',
+            'benzene_exhaust_grams_per_mile',
+            'benzene_evap_permeation_grams_per_mile',
+            'benzene_evap_fuel_vapor_venting_grams_per_mile',
+            'benzene_evap_fuel_leaks_grams_per_mile',
+            'benzene_refueling_displacement_grams_per_gallon',
+            'benzene_refueling_spillage_grams_per_gallon',
+            'ethylbenzene_exhaust_grams_per_mile',
+            'ethylbenzene_evap_fuel_vapor_venting_grams_per_mile',
+            'ethylbenzene_evap_fuel_leaks_grams_per_mile',
+            'ethylbenzene_evap_permeation_grams_per_mile',
+            'ethylbenzene_refueling_displacement_grams_per_gallon',
+            'ethylbenzene_refueling_spillage_grams_per_gallon',
+            'formaldehyde_exhaust_grams_per_mile',
+            'naphthalene_exhaust_grams_per_mile',
+            '13_butadiene_exhaust_grams_per_mile',
+            '15pah_exhaust_grams_per_mile',
+        ]
+        self.diesel_rate_names = [
+            'pm25_brakewear_grams_per_mile',
+            'pm25_tirewear_grams_per_mile',
+            'pm25_exhaust_grams_per_mile',
+            'nmog_exhaust_grams_per_mile',
+            'nmog_refueling_spillage_grams_per_gallon',
+            'co_exhaust_grams_per_mile',
+            'nox_exhaust_grams_per_mile',
+            'sox_exhaust_grams_per_gallon',
+            'ch4_exhaust_grams_per_mile',
+            'n2o_exhaust_grams_per_mile',
+            'acetaldehyde_exhaust_grams_per_mile',
+            'acrolein_exhaust_grams_per_mile',
+            'benzene_exhaust_grams_per_mile',
+            'benzene_refueling_spillage_grams_per_gallon',
+            'ethylbenzene_exhaust_grams_per_mile',
+            'ethylbenzene_refueling_spillage_grams_per_gallon',
+            'formaldehyde_exhaust_grams_per_mile',
+            'naphthalene_exhaust_grams_per_mile',
+            'naphthalene_refueling_spillage_grams_per_gallon',
+            '13_butadiene_exhaust_grams_per_mile',
+            '15pah_exhaust_grams_per_mile',
+        ]
+        self.bev_rate_names = [
+            'pm25_brakewear_grams_per_mile',
+            'pm25_tirewear_grams_per_mile'
+        ]
 
     def init_from_file(self, filepath, effects_log):
         """
@@ -111,6 +174,29 @@ class EmissionRatesVehicles:
         )
         df.set_index(rate_keys, inplace=True)
 
+        # df.insert(len(df.columns), 'rates', 0)
+
+        # for rate_key in rate_keys:
+        # for idx, row in df.iterrows():
+        #     if 'gasoline' in row['in_use_fuel_id']:
+        #         df.at[idx, 'rates'] = row[self.gasoline_rate_names].values
+        #     elif 'diesel' in row['in_use_fuel_id']:
+        #         df.at[idx, 'rates'] = row[self.diesel_rate_names].values
+        #     else:
+        #         df.at[idx, 'rates'] = row[self.bev_rate_names].values
+
+            #     df.at[idx, 'rates'] = dict(zip(
+            #         [rate for rate in self.gasoline_rate_names], row[self.gasoline_rate_names].values)
+            #     )
+            # elif 'diesel' in row['in_use_fuel_id']:
+            #     df.at[idx, 'rates'] = dict(zip(
+            #         [rate for rate in self.diesel_rate_names], row[self.diesel_rate_names].values)
+            #     )
+            # else:
+            #     df.at[idx, 'rates'] = dict(zip(
+            #         [rate for rate in self.bev_rate_names], row[self.bev_rate_names].values)
+            #     )
+
         self.startyear_min = min(df['start_year'])
         self.start_years = df['start_year'].unique()
 
@@ -147,25 +233,52 @@ class EmissionRatesVehicles:
         if key in self._cache:
             return self._cache[key]
         else:
-            for rate_name in rate_names:
-                rate = self._data[(start_year, sourcetype_name, reg_class_id, in_use_fuel_id, data_age)][rate_name]
-                return_rates.append(rate)
+            if 'gasoline' in in_use_fuel_id:
+                rate_names = self.gasoline_rate_names
+                return_rates = self._data[(start_year, sourcetype_name, reg_class_id, in_use_fuel_id, data_age)][
+                    rate_names]
+            elif 'diesel' in in_use_fuel_id:
+                rate_names = self.diesel_rate_names
+                return_rates = self._data[(start_year, sourcetype_name, reg_class_id, in_use_fuel_id, data_age)][
+                    rate_names]
+            else:
+                rate_names = self.bev_rate_names
+                return_rates = self._data[(start_year, sourcetype_name, reg_class_id, in_use_fuel_id, data_age)][
+                    rate_names]
+        # else:
+        #     for rate_name in rate_names:
+                # rate = self._data[(start_year, sourcetype_name, reg_class_id, in_use_fuel_id, data_age)][rate_name]
+                # return_rates.append(rate)
 
-                cache_key = (model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age, rate_name)
-                self.deets.update(
-                    {cache_key: {
-                        'session_policy': session_settings.session_policy,
-                        'session_name': session_settings.session_name,
-                        'model_year': model_year,
-                        'age': age,
-                        'reg_class_id': reg_class_id,
-                        'sourcetype_name': sourcetype_name,
-                        'in_use_fuel_id': in_use_fuel_id,
-                        'rate_name': rate_name,
-                        'rate': rate,
-                    }}
-                )
+        cache_key = (model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age)
+        self.deets.update({
+            cache_key: {
+                'session_policy': session_settings.session_policy,
+                'session_name': session_settings.session_name,
+                'model_year': model_year,
+                'age': age,
+                'reg_class_id': reg_class_id,
+                'sourcetype_name': sourcetype_name,
+                'in_use_fuel_id': in_use_fuel_id,
+                rate_names: return_rates,
+            }
+        })
 
-            self._cache[key] = return_rates
+                # cache_key = (model_year, sourcetype_name, reg_class_id, in_use_fuel_id, age, rate_name)
+                # self.deets.update(
+                #     {cache_key: {
+                #         'session_policy': session_settings.session_policy,
+                #         'session_name': session_settings.session_name,
+                #         'model_year': model_year,
+                #         'age': age,
+                #         'reg_class_id': reg_class_id,
+                #         'sourcetype_name': sourcetype_name,
+                #         'in_use_fuel_id': in_use_fuel_id,
+                #         'rate_name': rate_name,
+                #         'rate': rate,
+                #     }}
+                # )
+
+        self._cache[key] = return_rates
 
         return return_rates
