@@ -25,6 +25,22 @@ omega\_model.context.context\_base\_classes module
    :undoc-members:
    :show-inheritance:
 
+omega\_model.context.electricity\_prices\_aeo module
+----------------------------------------------------
+
+.. automodule:: omega_model.context.electricity_prices_aeo
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+omega\_model.context.electricity\_prices\_and\_charge\_shares module
+--------------------------------------------------------------------
+
+.. automodule:: omega_model.context.electricity_prices_and_charge_shares
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_model.context.fuel\_prices module
 ----------------------------------------
 
@@ -73,10 +89,18 @@ omega\_model.context.onroad\_fuels module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.context.powertrain\_cost module
---------------------------------------------
+omega\_model.context.powertrain\_cost\_frm module
+-------------------------------------------------
 
-.. automodule:: omega_model.context.powertrain_cost
+.. automodule:: omega_model.context.powertrain_cost_frm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+omega\_model.context.powertrain\_cost\_nprm module
+--------------------------------------------------
+
+.. automodule:: omega_model.context.powertrain_cost_nprm
    :members:
    :undoc-members:
    :show-inheritance:

@@ -25,6 +25,22 @@ omega\_effects.context.cpi\_price\_deflators module
    :undoc-members:
    :show-inheritance:
 
+omega\_effects.context.electricity\_prices\_aeo module
+------------------------------------------------------
+
+.. automodule:: omega_effects.context.electricity_prices_aeo
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+omega\_effects.context.electricity\_prices\_and\_charge\_shares module
+----------------------------------------------------------------------
+
+.. automodule:: omega_effects.context.electricity_prices_and_charge_shares
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_effects.context.fuel\_prices module
 ------------------------------------------
 

@@ -121,6 +121,14 @@ omega\_model.policy.upstream\_methods module
    :undoc-members:
    :show-inheritance:
 
+omega\_model.policy.utility\_factors module
+-------------------------------------------
+
+.. automodule:: omega_model.policy.utility_factors
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_model.policy.workfactor\_definition module
 -------------------------------------------------
 

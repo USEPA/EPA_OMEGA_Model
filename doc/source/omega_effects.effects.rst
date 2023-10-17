@@ -73,10 +73,26 @@ omega\_effects.effects.discounting module
    :undoc-members:
    :show-inheritance:
 
-omega\_effects.effects.emission\_factors\_refinery module
----------------------------------------------------------
+omega\_effects.effects.egu\_data module
+---------------------------------------
 
-.. automodule:: omega_effects.effects.emission_factors_refinery
+.. automodule:: omega_effects.effects.egu_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+omega\_effects.effects.egu\_inventory module
+--------------------------------------------
+
+.. automodule:: omega_effects.effects.egu_inventory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+omega\_effects.effects.emission\_rate\_curves\_vehicles module
+--------------------------------------------------------------
+
+.. automodule:: omega_effects.effects.emission_rate_curves_vehicles
    :members:
    :undoc-members:
    :show-inheritance:
@@ -129,6 +145,22 @@ omega\_effects.effects.physical\_effects module
    :undoc-members:
    :show-inheritance:
 
+omega\_effects.effects.refinery\_data module
+--------------------------------------------
+
+.. automodule:: omega_effects.effects.refinery_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+omega\_effects.effects.refinery\_inventory\_and\_oil\_imports module
+--------------------------------------------------------------------
+
+.. automodule:: omega_effects.effects.refinery_inventory_and_oil_imports
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_effects.effects.safety\_effects module
 ---------------------------------------------
 
@@ -153,6 +185,14 @@ omega\_effects.effects.sum\_social\_effects module
    :undoc-members:
    :show-inheritance:
 
+omega\_effects.effects.total\_inventory module
+----------------------------------------------
+
+.. automodule:: omega_effects.effects.total_inventory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_effects.effects.vehicle\_annual\_data module
 ---------------------------------------------------
 
@@ -161,10 +201,10 @@ omega\_effects.effects.vehicle\_annual\_data module
    :undoc-members:
    :show-inheritance:
 
-omega\_effects.effects.vehicle\_physical\_effects module
---------------------------------------------------------
+omega\_effects.effects.vehicle\_inventory module
+------------------------------------------------
 
-.. automodule:: omega_effects.effects.vehicle_physical_effects
+.. automodule:: omega_effects.effects.vehicle_inventory
    :members:
    :undoc-members:
    :show-inheritance:
