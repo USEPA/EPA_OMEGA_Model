@@ -381,7 +381,7 @@ if __name__ == '__main__':
                 curbweight_lbs = 5000
                 gvwr_lbs = 7500
                 gcwr_lbs = 1000
-                drive_system = 4
+                drive_system = 'AWD'
 
                 def get_initial_registered_count(self):
                     """
