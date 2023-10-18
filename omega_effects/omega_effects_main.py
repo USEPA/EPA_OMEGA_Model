@@ -111,8 +111,10 @@ def main():
         refinery_inventory_details_df = pd.DataFrame()
         annual_costs_df = pd.DataFrame()
         my_lifetime_physical_df = pd.DataFrame()
-        my_lifetime_costs_df = pd.DataFrame()
+        my_lifetime_costs_df_1 = pd.DataFrame()
+        my_lifetime_costs_df_2 = pd.DataFrame()
         no_action_fleet_physical = {}
+        periods_1 = periods_2 = 0
 
         effects_log.logwrite(f'\nStarting work on sessions')
         for session_num in batch_settings.session_dict:
@@ -205,11 +207,13 @@ def main():
             session_annual_physical_df = calc_annual_physical_effects(batch_settings, session_fleet_physical_df)
 
             effects_log.logwrite(f'\nCalculating model year period_duration physical effects for {session_name}')
-            session_my_period_physical_df = \
-                calc_period_consumer_physical_view(batch_settings, session_fleet_physical_df)
+            periods = batch_settings.general_inputs_for_effects.get_value('years_in_consumer_view_2')
+            session_my_period_physical_df = calc_period_consumer_physical_view(session_fleet_physical_df, periods)
 
             # for use in benefits calcs, create an annual_physical_effects_df
-            annual_physical_df = pd.concat([annual_physical_df, session_annual_physical_df], axis=0, ignore_index=True)
+            annual_physical_df = pd.concat(
+                [annual_physical_df, session_annual_physical_df], axis=0, ignore_index=True
+            )
             annual_physical_df.reset_index(inplace=True, drop=True)
 
             # for use in consumer calcs, create a my_lifetime_physical_effects_df of lifetime physical effects
@@ -250,16 +254,25 @@ def main():
             session_annual_costs_df = calc_annual_cost_effects(session_costs_df)
 
             effects_log.logwrite(f'\nCalculating model year period_duration cost effects for {session_name}')
-            session_my_period_costs_df = calc_period_consumer_view(batch_settings, session_costs_df)
+            periods_1 = batch_settings.general_inputs_for_effects.get_value('years_in_consumer_view_1')
+            periods_2 = batch_settings.general_inputs_for_effects.get_value('years_in_consumer_view_2')
+            session_my_period_costs_df_1 = calc_period_consumer_view(batch_settings, session_costs_df, periods_1)
+            session_my_period_costs_df_2 = calc_period_consumer_view(batch_settings, session_costs_df, periods_2)
 
             # for use in benefits calcs, create an annual_cost_effects_df of undiscounted annual costs
             annual_costs_df = pd.concat([annual_costs_df, session_annual_costs_df], axis=0, ignore_index=True)
             annual_costs_df.reset_index(inplace=True, drop=True)
 
             # for use in consumer calcs, create a my_lifetime_cost_effects_df of lifetime costs
-            my_lifetime_costs_df = \
-                pd.concat([my_lifetime_costs_df, session_my_period_costs_df], axis=0, ignore_index=True)
-            my_lifetime_costs_df.reset_index(inplace=True, drop=True)
+            my_lifetime_costs_df_1 = pd.concat(
+                [my_lifetime_costs_df_1, session_my_period_costs_df_1], axis=0, ignore_index=True
+            )
+            my_lifetime_costs_df_1.reset_index(inplace=True, drop=True)
+
+            my_lifetime_costs_df_2 = pd.concat(
+                [my_lifetime_costs_df_2, session_my_period_costs_df_2], axis=0, ignore_index=True
+            )
+            my_lifetime_costs_df_2.reset_index(inplace=True, drop=True)
 
         # discount annual costs ________________________________________________________________________________________
         effects_log.logwrite('\nCalculating discounted annual costs, PVs and EAVs for the batch')
@@ -267,17 +280,17 @@ def main():
         discounted_costs.discount_annual_values(batch_settings, annual_costs_df)
         discounted_costs.calc_present_values(batch_settings)
         discounted_costs.calc_annualized_values(batch_settings)
-        discounted_costs_dict = \
-            {**discounted_costs.annual_values_dict, **discounted_costs.pv_dict, **discounted_costs.eav_dict}
-
+        discounted_costs_dict = {
+            **discounted_costs.annual_values_dict, **discounted_costs.pv_dict, **discounted_costs.eav_dict
+        }
         discounted_costs_df = pd.DataFrame.from_dict(discounted_costs_dict, orient='index')
 
         # calculate annual benefits and annual physical effects deltas _________________________________________________
         effects_log.logwrite(f'\nCalculating annual benefits for the batch')
-        annual_benefits, delta_fleet_physical = \
-            calc_benefits(batch_settings, annual_physical_df, annual_costs_df,
-                          calc_health_effects=batch_settings.criteria_cost_factors.calc_health_effects)
-
+        annual_benefits, delta_fleet_physical = calc_benefits(
+            batch_settings, annual_physical_df, annual_costs_df,
+            calc_health_effects=batch_settings.criteria_cost_factors.calc_health_effects
+        )
         annual_benefits_df = pd.DataFrame.from_dict(annual_benefits, orient='index')
         annual_benefits_df.reset_index(inplace=True, drop=True)
 
@@ -290,9 +303,9 @@ def main():
         discounted_benefits.discount_annual_values(batch_settings, annual_benefits_df)
         discounted_benefits.calc_present_values(batch_settings)
         discounted_benefits.calc_annualized_values(batch_settings)
-        discounted_benefits_dict = \
-            {**discounted_benefits.annual_values_dict, **discounted_benefits.pv_dict, **discounted_benefits.eav_dict}
-
+        discounted_benefits_dict = {
+            **discounted_benefits.annual_values_dict, **discounted_benefits.pv_dict, **discounted_benefits.eav_dict
+        }
         discounted_benefits_df = pd.DataFrame.from_dict(discounted_benefits_dict, orient='index')
 
         # summarize costs, benefits and net benefits ___________________________________________________________________
@@ -334,11 +347,17 @@ def main():
             'model_year',
             'body_style',
         ]
-        if 'fueling_class' in my_lifetime_costs_df.columns:
+        if 'fueling_class' in my_lifetime_costs_df_1.columns:
             arg_sort_list.append('fueling_class')
         else:
             arg_sort_list.append('in_use_fuel_id')
-        my_lifetime_costs_df = my_lifetime_costs_df.sort_values(by=arg_sort_list)
+        if 'fueling_class' in my_lifetime_costs_df_2.columns:
+            arg_sort_list.append('fueling_class')
+        else:
+            arg_sort_list.append('in_use_fuel_id')
+
+        my_lifetime_costs_df_1 = my_lifetime_costs_df_1.sort_values(by=arg_sort_list)
+        my_lifetime_costs_df_2 = my_lifetime_costs_df_2.sort_values(by=arg_sort_list)
 
         # save files to CSV ____________________________________________________________________________________________
         annual_safety_df.to_csv(
@@ -363,8 +382,11 @@ def main():
         my_lifetime_physical_df.to_csv(
             path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv', index=False
         )
-        my_lifetime_costs_df.to_csv(
-            path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', index=False
+        my_lifetime_costs_df_1.to_csv(
+            path_of_run_folder / f'{start_time_readable}_MY_{periods_1}_period_costs.csv', index=False
+        )
+        my_lifetime_costs_df_2.to_csv(
+            path_of_run_folder / f'{start_time_readable}_MY_{periods_2}_period_costs.csv', index=False
         )
         if session_settings.emission_rates_vehicles.deets:
             vehicle_inventory_details_df.to_csv(
@@ -382,28 +404,51 @@ def main():
             f'Batch Name: {batch_settings.batch_name}', f'Effects Run: {start_time_readable}_{batch_settings.run_id}'
         ]
 
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv', output_file_id_info)
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv', output_file_id_info)
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv',
+                      output_file_id_info
+                      )
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv',
+                      output_file_id_info
+                      )
         add_id_to_csv(
             path_of_run_folder / f'{start_time_readable}_physical_effects_annual_action_minus_no_action.csv',
             output_file_id_info
         )
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv', output_file_id_info)
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_benefits_annual.csv', output_file_id_info)
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv',
+                      output_file_id_info
+                      )
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_benefits_annual.csv',
+                      output_file_id_info
+                      )
         if batch_settings.net_benefit_ghg_scope in ['global', 'both']:
             add_id_to_csv(
-                path_of_run_folder / f'{start_time_readable}_social_effects_global_ghg_annual.csv', output_file_id_info
+                path_of_run_folder / f'{start_time_readable}_social_effects_global_ghg_annual.csv',
+                output_file_id_info
             )
         if batch_settings.net_benefit_ghg_scope in ['domestic', 'both']:
             add_id_to_csv(
-                path_of_run_folder / f'{start_time_readable}_social_effects_domestic_ghg_annual.csv', output_file_id_info
+                path_of_run_folder / f'{start_time_readable}_social_effects_domestic_ghg_annual.csv',
+                output_file_id_info
             )
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv', output_file_id_info)
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_costs.csv', output_file_id_info)
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv',
+                      output_file_id_info
+                      )
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_{periods_1}_period_costs.csv',
+                      output_file_id_info
+                      )
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_{periods_2}_period_costs.csv',
+                      output_file_id_info
+                      )
         if session_settings.emission_rates_vehicles.deets:
-            add_id_to_csv(path_of_run_folder / f'{start_time_readable}_vehicle_emission_rate_details.csv', output_file_id_info)
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_egu_inventory_details.csv', output_file_id_info)
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_refinery_emission_rate_details.csv', output_file_id_info)
+            add_id_to_csv(path_of_run_folder / f'{start_time_readable}_vehicle_emission_rate_details.csv',
+                          output_file_id_info
+                          )
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_egu_inventory_details.csv',
+                      output_file_id_info
+                      )
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_refinery_emission_rate_details.csv',
+                      output_file_id_info
+                      )
 
         # save modified inputs (i.e., those with adjusted dollar valuations)
         batch_settings.criteria_cost_factors.df.to_csv(

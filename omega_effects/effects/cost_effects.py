@@ -317,12 +317,14 @@ def calc_annual_cost_effects(input_df):
     return return_df
 
 
-def calc_period_consumer_view(batch_settings, input_df):
+def calc_period_consumer_view(batch_settings, input_df, periods):
     """
 
     Args:
         batch_settings: an instance of the BatchSettings class.
         input_df: DataFrame of cost effects by vehicle in each analysis year.
+        periods (int): the number of periods (years) to include in the consumer view, set via the
+        general_inputs_for_effects_file.
 
     Returns:
         A DataFrame of cost effects by model year of available lifetime, body style and fuel type.
@@ -336,8 +338,6 @@ def calc_period_consumer_view(batch_settings, input_df):
                 attributes.append(col)
 
     # eliminate legacy_fleet and ages not desired for consumer view
-    periods = batch_settings.general_inputs_for_effects.get_value('years_in_consumer_view')
-
     # if periods = 8, then max_age should be 7 since year 1 is age=0
     max_age = periods - 1
     df = input_df.loc[(input_df['manufacturer_id'] != 'legacy_fleet') & (input_df['age'] <= max_age), :]
