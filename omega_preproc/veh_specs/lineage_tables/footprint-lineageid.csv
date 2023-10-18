@@ -629,7 +629,7 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2012,1901,Land Rover,LRX,Land Rover,1,LR4,175,1,LR4,218
 2012,1901,Land Rover,LRX,Land Rover,1,Range Rover sport,180,1,Range Rover Sport/Range Rover Sport Supercharged,221
 2012,1901,Land Rover,LRX,Land Rover,1,LR2,190,1,LR2,216
-2012,1901,Land Rover,LRX,Land Rover,1,Range Rover Evoque,200,1,Range Rover Evoque,509
+2012,1901,Land Rover,LRX,Land Rover,1,Range Rover Evoque,200,1,Range Rover Evoque,220
 2012,881,Lotus Cars Ltd,LTX,Lotus Cars Ltd,1,Evora,6,1,Evora,243
 2012,676,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE,15,1,QUATTROPORTE MODELS,247
 2012,892,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE,15,1,QUATTROPORTE MODELS,247
@@ -1124,8 +1124,8 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2013,953,Audi,ADX,Audi,1,S8,97,1,Audi S8  265/35R21,21
 2013,969,Audi,ADX,Audi,1,Q7,320,1,Audi Q7 3.0L super  255/55R18,25
 2013,969,Audi,ADX,Audi,1,Q7,320,2,Audi Q7 3.0L TDI   265/50R19,25
-2013,969,Audi,ADX,Audi,1,Q5,330,1,Audi Q7   2.0L & 3.0L   235/60R18,25
-2013,969,Audi,ADX,Audi,1,Q5 Hybrid,340,1,Audi Q7 Hybrid     235/55R19,25
+2013,969,Audi,ADX,Audi,1,Q5,330,1,Audi Q7   2.0L & 3.0L   235/60R18,24
+2013,969,Audi,ADX,Audi,1,Q5 Hybrid,340,1,Audi Q7 Hybrid     235/55R19,24
 2013,938,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,DB9,255,1,DB9,11
 2013,938,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,V8 Vantage,260,1,V8 Vantage,13
 2013,938,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,V8 Vantage S,261,1,V8 Vantage S,13
@@ -1845,7 +1845,7 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2013,1910,Land Rover,LRX,Land Rover,1,LR4,175,1,LR4,218
 2013,1910,Land Rover,LRX,Land Rover,1,Range Rover Sport,180,1,Range Rover Sport / Range Rover Sport Supercharged,221
 2013,1910,Land Rover,LRX,Land Rover,1,LR2,190,1,LR2,216
-2013,1910,Land Rover,LRX,Land Rover,1,Range Rover Evoque,200,1,Range Rover Evoque,509
+2013,1910,Land Rover,LRX,Land Rover,1,Range Rover Evoque,200,1,Range Rover Evoque,220
 2013,1910,Land Rover,LRX,Land Rover,1,Range Rover,210,1,"Range Rover (20"")",219
 2013,1910,Land Rover,LRX,Land Rover,1,Range Rover,210,2,"Range Rover (22"")/Range Rover Supercharged (all)",219
 2013,909,Lotus Cars Ltd,LTX,Lotus Cars Ltd,1,Evora,6,1,Evora,243
@@ -3143,7 +3143,7 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2014,1911,Jaguar Land Rover Limited,JLX,Land Rover,2,Land Rover LR4,175,1,"LR4(19"")",218
 2014,1911,Jaguar Land Rover Limited,JLX,Land Rover,2,Land Rover LR4,175,2,"LR4(20"")",218
 2014,1911,Jaguar Land Rover Limited,JLX,Land Rover,2,LR2,190,1,"LR2(18"")",216
-2014,1911,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,1,"Range Rover Evoque (18"")",509
+2014,1911,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,1,"Range Rover Evoque (18"")",220
 2014,1911,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,1,"Range Rover Gasoline Models (22"")",219
 2014,1911,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,2,"Range Rover Gasoline Models (21"")",219
 2014,1911,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,3,"Range Rover Gasoline Models (20"")",219
@@ -4543,17 +4543,17 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,195,1,"Discovery Sport 18""",216
 2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,195,2,"Discovery Sport 19""",216
 2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,195,3,"Discovery Sport 20""",216
-2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,1,"Evoque 18""",509
-2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,2,"Evoque 19""",509
-2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,3,"Evoque 20""",509
+2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,1,"Evoque 18""",220
+2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,2,"Evoque 19""",220
+2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,3,"Evoque 20""",220
 2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,1,"Range Rover 3.0 19""",219
 2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,2,"Range Rover 3.0 20""",219
 2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,3,"Range Rover 3.0 22""",219
 2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover FFV,211,1,"Range Rover 5.0 21""",219
 2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover FFV,211,2,"Range Rover 5.0 22""",219
-2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,1,"Range Rover 3.0 LWB 19""",220
-2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,2,"Range Rover 3.0 LWB 20""",220
-2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,3,"Range Rover 3.0 LWB 22""",220
+2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,1,"Range Rover 3.0 LWB 19""",219
+2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,2,"Range Rover 3.0 LWB 20""",219
+2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,3,"Range Rover 3.0 LWB 22""",219
 2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover L FFV,216,1,"Range Rover 5.0 LWB 21""",219
 2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover L FFV,216,2,"Range Rover 5.0 LWB 22""",219
 2015,1914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,1,"Range Rover Sport 3.0 and Range Rover Sport SVR 21""",221
@@ -6023,9 +6023,9 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,195,1,Discovery Sport 18'',216
 2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,195,2,Discovery Sport 19'',216
 2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,195,3,Discovery Sport  20'',216
-2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,1,Evoque 18'',509
-2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,2,Evoque 19'',509
-2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,3,Evoque  20'',509
+2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,1,Evoque 18'',220
+2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,2,Evoque 19'',220
+2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,3,Evoque  20'',220
 2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,1,Range Rover 5.0 21'',219
 2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,2,Range Rover 5.0 22'',219
 2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,3,Range Rover 3.0 19'',219
@@ -6034,8 +6034,8 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover TDV6,212,1,Range Rover Diesel 19'',219
 2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover TDV6,212,2,Range Rover  Diesel 20'',219
 2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover TDV6,212,3,Range Rover  Diesel 22'',219
-2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,1,Range Rover 5.0 LWB 21'',220
-2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,2,Range Rover 5.0 LWB 22'',220
+2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,1,Range Rover 5.0 LWB 21'',219
+2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,2,Range Rover 5.0 LWB 22'',219
 2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,1,Range Rover Sport SVR 21'',221
 2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,2,Range Rover Sport SVR 22'',221
 2016,2013,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,3,Range Rover Sport 5.0 20'',221
@@ -7576,18 +7576,18 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,195,1,"Discovery Sport 2.0L 18"" Tire size is 235/60R18",216
 2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,195,2,"Discovery Sport 2.0L 19"" Tire size is 235/55R19",216
 2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,195,3,"Discovery Sport 2.0L 20"" Tire size is 245/45R20",216
-2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,1,"Evoque 2.0L 18"" and Evoque Coupe 2.0L 18"" Front & rear tire size is 235/60R18",509
-2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,2,"Evoque 2.0L 19"" and Evoque Coupe 2.0L 19"" Front & rear tire size is 235/55R19",509
-2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,3,"Evoque 2.0L 20"" and Evoque Coupe 2.0L 20"" Front & rear tire size is 245/45R20",509
-2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,1,"Evoque Convertible 2.0L 18"" Front & rear tire size is 235/60R18",509
-2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,2,"Evoque Convertible 2.0L 19"" Front & rear tire size is 235/55R19",509
-2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,3,"Evoque Convertible 2.0L 20"" Front & rear tire size is 245/45R20",509
+2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,1,"Evoque 2.0L 18"" and Evoque Coupe 2.0L 18"" Front & rear tire size is 235/60R18",220
+2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,2,"Evoque 2.0L 19"" and Evoque Coupe 2.0L 19"" Front & rear tire size is 235/55R19",220
+2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,3,"Evoque 2.0L 20"" and Evoque Coupe 2.0L 20"" Front & rear tire size is 245/45R20",220
+2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,1,"Evoque Convertible 2.0L 18"" Front & rear tire size is 235/60R18",220
+2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,2,"Evoque Convertible 2.0L 19"" Front & rear tire size is 235/55R19",220
+2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,3,"Evoque Convertible 2.0L 20"" Front & rear tire size is 245/45R20",220
 2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,1,"Range Rover 3.0L 21"" and Range Rover 3.0L Diesel 21"" and Range Rover 5.0L 21"" Front and rear tire size is 275/45R21",219
 2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,2,"Range Rover 3.0L 19"" and Range Rover 3.0L Diesel 19"" Front and rear tire size is 235/65R19",219
 2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,3,"Range Rover 3.0L 20"" and Range Rover 3.0L Diesel 20"" Front and rear tire size is 255/55R20",219
 2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,4,"Range Rover 5.0L 22"" and Range Rover (PZEV) 3.0L 22"" and Range Rover 3.0L Diesel 22"" Front and rear tire size 275/40R22",219
-2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,1,"Range Rover LWB 5.0L 21"" Front and reat tire size 275/45R21",220
-2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,2,"Range Rover LWB 5.0L 22""  Front and rear tire size is 275/40R22",220
+2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,1,"Range Rover LWB 5.0L 21"" Front and reat tire size 275/45R21",219
+2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,2,"Range Rover LWB 5.0L 22""  Front and rear tire size is 275/40R22",219
 2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,1,"Range Rover Sport 5.0L 21"" and Range Rover Sport 3.0L 21"" and Range Rover Sport 3.0L Diesel 21"" Front and rear tire size is 275/45R21",221
 2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,2,"Range Rover Sport 5.0L 20"" and Range Rover Sport 3.0L 20"" and Range Rover Sport 3.0L Diesel 20"" Front and rear tire size is 255/55R20",221
 2017,3169,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,3,"Range Rover Sport 5.0L 22"" Front and rear tire size 295/40R22",221
@@ -9318,19 +9318,19 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,195,1,"18"" Discovery Sport 2.0L (236HP)",216
 2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,195,2,"19"" Discovery Sport 2.0L (236HP and 296HP)",216
 2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,195,3,"20"" Discovery Sport 2.0L (236HP and 296HP)",216
-2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,1,"18"" Evoque 5-door 2.0L (237HP)",509
-2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,2,"19"" Evoque 5-door 2.0L (237HP and 286HP)",509
-2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,3,"20"" Evoque 5-door 2.0L (237HP and 286HP)",509
-2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,1,"18"" Evoque Convertible 2.0L",509
-2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,2,"19"" Evoque Convertible 2.0L",509
-2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,3,"20"" Evoque Convertible 2.0L",509
+2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,1,"18"" Evoque 5-door 2.0L (237HP)",220
+2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,2,"19"" Evoque 5-door 2.0L (237HP and 286HP)",220
+2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,200,3,"20"" Evoque 5-door 2.0L (237HP and 286HP)",220
+2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,1,"18"" Evoque Convertible 2.0L",220
+2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,2,"19"" Evoque Convertible 2.0L",220
+2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,3,"20"" Evoque Convertible 2.0L",220
 2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,1,"19"" Range Rover 3.0L Gasoline and Range Rover 3.0L Diesel",219
 2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,2,"20"" Range Rover 3.0L Gasoline and Range Rover 3.0L Diesel and Range Rover 5.0L Supercharged",219
 2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,3,"21"" Range Rover 3.0L Gasoline and Range Rover 3.0L Diesel and Range Rover 5.0L Supercharged and Range Rover 5.0L SVAB Dynamic",219
 2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,4,"22"" Range Rover 3.0L Gasoline and Range Rover 3.0L Diesel and Range Rover 5.0L Supercharged and Range Rover 5.0L SVAB Dynamic",219
-2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,1,"20"" Range Rover Supercharged 5.0L LWB",220
-2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,2,"21"" Range Rover Supercharged 5.0L LWB and Range Rover SVAB 5.0L LWB",220
-2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,3,"22"" Range Rover Supercharged 5.0L LWB and Range Rover SVAB 5.0L LWB",220
+2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,1,"20"" Range Rover Supercharged 5.0L LWB",219
+2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,2,"21"" Range Rover Supercharged 5.0L LWB and Range Rover SVAB 5.0L LWB",219
+2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,3,"22"" Range Rover Supercharged 5.0L LWB and Range Rover SVAB 5.0L LWB",219
 2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,1,"19"" Range Rover Sport 3.0L Gasoline and Range Rover Sport 3.0L Diesel",221
 2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,2,"20"" Range Rover Sport 3.0L Gasoline and Range Rover Sport 3.0L Diesel and Range Rover Sport 5.0L Supercharged",221
 2018,3171,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,3,"21"" Range Rover Sport 3.0L Gasoline and Range Rover Sport 3.0L Diesel and Range Rover Sport 5.0L Supercharged and Range Rover Sport SVR 5.0L",221
@@ -10564,7 +10564,7 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,2988,Subaru Corporation,FJX,Subaru,1,FORESTER AWD,95,1,"Forester, small SUV",358
 2019,2988,Subaru Corporation,FJX,Subaru,1,ASCENT,100,1,"Ascent, standard SUV",489
 2019,2988,Subaru Corporation,FJX,Subaru,1,ASCENT LIMITED/TOURING,105,1,"Ascent Limited/Touring, standard SUV",489
-2019,2868,Subaru Corporation,FJX,Subaru,1,S209,200,1,S209,-9
+2019,2868,Subaru Corporation,FJX,Subaru,1,S209,200,1,S209,99999
 2019,3234,Ford Motor Company,FMX,Ford,1,FUSION POLICE RESPONDER HEV,5,1,FUSION POLICE 20HEVP CVMF 4 DOOR SEDAN,132
 2019,3234,Ford Motor Company,FMX,Ford,1,FUSION SPECIAL SVC VEHICLE PHEV,6,1,FUSION POL PHEV 20PHEP AV4F 4 DOOR SEDAN,132
 2019,3234,Ford Motor Company,FMX,Ford,1,FUSION HYBRID TAXI,7,1,FUSION TAXI HEV 20HEV CVMF 4 DOOR SEDAN,132
@@ -11029,14 +11029,14 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,196,1,"18"" Discovery Sport 2.0L (236HP)",216
 2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,196,2,"19"" Discovery Sport 2.0L (236HP)",216
 2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,196,3,"20"" Discovery Sport 2.0L (236HP)",216
-2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque 286HP,200,1,"19"" Evoque 5-door 2.0L (286HP)",509
-2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque 286HP,200,2,"20"" Evoque 5-door 2.0L (286HP)",509
-2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,1,"18"" Evoque Convertible 2.0L",509
-2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,2,"19"" Evoque Convertible 2.0L",509
-2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,3,"20"" Evoque Convertible 2.0L",509
-2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque 237HP,202,1,"18"" Evoque 5-door 2.0L (237HP)",509
-2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque 237HP,202,2,"19"" Evoque 5-door 2.0L (237HP)",509
-2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque 237HP,202,3,"20"" Evoque 5-door 2.0L (237HP)",509
+2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque 286HP,200,1,"19"" Evoque 5-door 2.0L (286HP)",220
+2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque 286HP,200,2,"20"" Evoque 5-door 2.0L (286HP)",220
+2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,1,"18"" Evoque Convertible 2.0L",220
+2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,2,"19"" Evoque Convertible 2.0L",220
+2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque Cabriolet,201,3,"20"" Evoque Convertible 2.0L",220
+2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque 237HP,202,1,"18"" Evoque 5-door 2.0L (237HP)",220
+2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque 237HP,202,2,"19"" Evoque 5-door 2.0L (237HP)",220
+2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque 237HP,202,3,"20"" Evoque 5-door 2.0L (237HP)",220
 2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover SVA,210,1,"19"" Range Rover 3.0L Gasoline and Range Rover 3.0L Diesel",219
 2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover SVA,210,2,"20"" Range Rover 3.0L Gasoline and Range Rover 3.0L Diesel",219
 2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover SVA,210,3,"21"" Range Rover 3.0L Gasoline and Range Rover 3.0L Diesel and Range Rover 5.0L SVAB Dynamic",219
@@ -11046,11 +11046,11 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,211,3,"[ATM=1.60]Twenty One Inch (21"") - 2019MY Range Rover PHEV (398HP)",219
 2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,211,4,"[ATM=1.00]Twenty One Inch (21"") - 2019MY Range Rover 5.0 Supercharged (518HP)",219
 2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,211,5,"[ATM=1.00]Twenty Two Inch (22"") - 2019MY Range Rover 5.0 Supercharged (518HP)",219
-2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,215,1,"21"" Range Rover Supercharged SVAutobiography 5.0L LWB (557HP)",220
-2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,215,2,"22"" Range Rover Supercharged SVAutobiography 5.0L LWB (557HP)",220
-2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,216,1,"20"" Range Rover Supercharged 5.0L LWB (518HP)",220
-2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,216,2,"21"" Range Rover Supercharged 5.0L LWB (518HP) and Range Rover Autobiography 5.0L LWB (518HP)",220
-2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,216,3,"22"" Range Rover Supercharged 5.0L LWB (518HP) and Range Rover Autobiography 5.0L LWB (518HP)",220
+2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,215,1,"21"" Range Rover Supercharged SVAutobiography 5.0L LWB (557HP)",219
+2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,215,2,"22"" Range Rover Supercharged SVAutobiography 5.0L LWB (557HP)",219
+2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,216,1,"20"" Range Rover Supercharged 5.0L LWB (518HP)",219
+2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,216,2,"21"" Range Rover Supercharged 5.0L LWB (518HP) and Range Rover Autobiography 5.0L LWB (518HP)",219
+2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,216,3,"22"" Range Rover Supercharged 5.0L LWB (518HP) and Range Rover Autobiography 5.0L LWB (518HP)",219
 2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover SV Coupe,217,1,"21"" Range Rover SV Coupe 5.0L (557HP)",219
 2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover SV Coupe,217,2,"22"" Range Rover SV Coupe 5.0L (557HP)",219
 2019,3176,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,1,"[ATM=1.00]19"" Range Rover Sport 3.0L Gasoline (340HP) and Range Rover Sport 3.0L Diesel",221
@@ -12762,29 +12762,29 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Evoque MHEV,204,1,"Range Rover Evoque 5 Dr (290 hp) MHEV 2.0L(TC) AWD A9 18""",220
 2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Evoque MHEV,204,2,"Range Rover Evoque 5 Dr (290 hp) MHEV 2.0L(TC) AWD A9 20""",220
 2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Evoque MHEV,204,3,"Range Rover Evoque 5 Dr (290 hp) MHEV 2.0L(TC) AWD A9 21""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,1,"Range Rover 3.0L (TC) Diesel AWD A8 19""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,2,"Range Rover 3.0L (TC) Diesel AWD A8 20"" & Range Rover Supercharged 5.0L(SC) AWD A8 20""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,3,"Range Rover 3.0L(TC) Diesel AWD A8 21"" & Range Rover Supercharged (518hp) 5.0L(SC) AWD A8 21""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,4,"Range Rover 3.0L(TC) Diesel AWD A8 22"" & Range Rover Supercharged (518hp) 5.0L(SC) AWD A8 & 22""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover SVA,211,1,"Range Rover SVA (557hp) 5.0L(SC) AWD A8 21""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover SVA,211,2,"Range Rover SVA (557hp) 5.0L(SC) AWD A8 22""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,1,"Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD A8 20""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,2,"Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD A8 21""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,3,"Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD A8 22""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,216,1,"Range Rover SVAB LWB 5.0L(SC) (518 hp) AWD A8 21""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,216,2,"Range Rover SVAB LWB 5.0L(SC) (518 hp) AWD A8 22""",220
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,1,"Range Rover 3.0L (TC) Diesel AWD A8 19""",219
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,2,"Range Rover 3.0L (TC) Diesel AWD A8 20"" & Range Rover Supercharged 5.0L(SC) AWD A8 20""",219
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,3,"Range Rover 3.0L(TC) Diesel AWD A8 21"" & Range Rover Supercharged (518hp) 5.0L(SC) AWD A8 21""",219
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,4,"Range Rover 3.0L(TC) Diesel AWD A8 22"" & Range Rover Supercharged (518hp) 5.0L(SC) AWD A8 & 22""",219
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover SVA,211,1,"Range Rover SVA (557hp) 5.0L(SC) AWD A8 21""",219
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover SVA,211,2,"Range Rover SVA (557hp) 5.0L(SC) AWD A8 22""",219
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,1,"Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD A8 20""",219
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,2,"Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD A8 21""",219
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,3,"Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD A8 22""",219
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,216,1,"Range Rover SVAB LWB 5.0L(SC) (518 hp) AWD A8 21""",219
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,216,2,"Range Rover SVAB LWB 5.0L(SC) (518 hp) AWD A8 22""",219
 2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,1,"Range Rover Sport 3.0L(TC) Diesel AWD A8 19""",221
 2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,2,"Range Rover Sport 3.0L(TC) Diesel AWD A8 20""",221
 2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,3,"Range Rover Sport Supercharged 5.0L(SC) AWD A8 21"" & Range Rover Sport 3.0L(TC) Diesel AWD A8 21""",221
 2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,4,"Range Rover Sport 3.0L(TC) Diesel AWD A8 22"" & Range Rover Sport Supercharged 5.0L(SC) AWD A8 22""",221
 2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport SVR,221,1,"Range Rover Sport SVR 5.0L(SC) AWD A8 21""",221
 2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport SVR,221,2,"Range Rover Sport SVR 5.0L(SC) AWD A8 22""",221
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover PHEV,223,1,"Range Rover I-4 2.0L PHEV AWD A8 20""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover PHEV,223,2,"Range Rover I-4 2.0L PHEV AWD A8 21""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover MHEV,224,1,"Range Rover I-6 3.0L (355hp) MHEV AWD A8 19""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover MHEV,224,2,"Range Rover I-6 3.0L (355/395hp) MHEV AWD A8 20""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover MHEV,224,3,"Range Rover I-6 3.0L (355/395hp) MHEV AWD A8 21""",220
-2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover MHEV,224,4,"Range Rover I-6 3.0L (355/395hp) MHEV AWD A8 22""",220
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover PHEV,223,1,"Range Rover I-4 2.0L PHEV AWD A8 20""",219
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover PHEV,223,2,"Range Rover I-4 2.0L PHEV AWD A8 21""",219
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover MHEV,224,1,"Range Rover I-6 3.0L (355hp) MHEV AWD A8 19""",219
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover MHEV,224,2,"Range Rover I-6 3.0L (355/395hp) MHEV AWD A8 20""",219
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover MHEV,224,3,"Range Rover I-6 3.0L (355/395hp) MHEV AWD A8 21""",219
+2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover MHEV,224,4,"Range Rover I-6 3.0L (355/395hp) MHEV AWD A8 22""",219
 2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport MHEV,225,1,"Range Rover Sport MHEV 3.0L I-6 AWD (355 hp) 19""",221
 2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport MHEV,225,2,"Range Rover Sport MHEV 3.0L I-6 AWD (355 hp) 20""",221
 2020,3544,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport MHEV,225,3,"Range Rover Sport MHEV 3.0L I-6 AWD (355 hp/395 hp) 21""",221
@@ -14096,8 +14096,8 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2021,3833,Ford Motor Company,FMX,Ford,1,BRONCO 4WD,24,4,BRONCO 4WD 2.7G-4 SM10S4 4 DOOR,561
 2021,3833,Ford Motor Company,FMX,Ford,1,BRONCO 4WD,24,5,BRONCO 4WD 23ETDI M7S4 4 DOOR,561
 2021,3833,Ford Motor Company,FMX,Ford,1,BRONCO 4WD,24,6,BRONCO 4WD 23ETDI SM10S4 4 DOOR,561
-2021,3833,Ford Motor Company,FMX,Ford,1,BRONCO SPORT 4WD,25,1,BRONCO SPORT 4WD 2.0TDI SS8SM4 4 DOOR,561
-2021,3833,Ford Motor Company,FMX,Ford,1,BRONCO SPORT 4WD,25,2,BRONCO SPORT 4WD 15DITC A8SSM4 4 DOOR,561
+2021,3833,Ford Motor Company,FMX,Ford,1,BRONCO SPORT 4WD,25,1,BRONCO SPORT 4WD 2.0TDI SS8SM4 4 DOOR,589
+2021,3833,Ford Motor Company,FMX,Ford,1,BRONCO SPORT 4WD,25,2,BRONCO SPORT 4WD 15DITC A8SSM4 4 DOOR,589
 2021,3833,Ford Motor Company,FMX,Ford,1,BRONCO BLACK DIAMOND 4WD,26,1,BRONCO B DIAMOND 23ETDI M7S4 2 DOOR,561
 2021,3833,Ford Motor Company,FMX,Ford,1,BRONCO BLACK DIAMOND 4WD,26,2,BRONCO B DIAMOND 23ETDI SM10S4 2 DOOR,561
 2021,3833,Ford Motor Company,FMX,Ford,1,BRONCO BLACK DIAMOND 4WD,26,3,BRONCO B DIAMOND 23ETDI M7S4 4 DOOR,561
@@ -14556,11 +14556,11 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,4,Range Rover 3.0L(TC) Diesel AWD 22 inch tire &amp; Range Rover Supercharged (518hp) 5.0L(SC) AWD &amp; 22 inch tire,219
 2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover SVA,211,1,Range Rover SVA (557hp) 5.0L(SC) AWD 21 inch tire,219
 2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover SVA,211,2,Range Rover SVA (557hp) 5.0L(SC) AWD 22 inch tire,219
-2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,1,Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD 20 inch tire,220
-2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,2,Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD 21 inch tire,220
-2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,3,Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD 22 inch tire,220
-2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,216,1,Range Rover SVAB LWB 5.0L(SC) (518 hp) AWD 21 inch tire,220
-2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,216,2,Range Rover SVAB LWB 5.0L(SC) (518 hp) AWD 22 inch tire,220
+2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,1,Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD 20 inch tire,219
+2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,2,Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD 21 inch tire,219
+2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,3,Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD 22 inch tire,219
+2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,216,1,Range Rover SVAB LWB 5.0L(SC) (518 hp) AWD 21 inch tire,219
+2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,216,2,Range Rover SVAB LWB 5.0L(SC) (518 hp) AWD 22 inch tire,219
 2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,1,Range Rover Sport 3.0L(TC) Diesel AWD A8 19 inch tire,221
 2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,2,Range Rover Sport 3.0L(TC) Diesel AWD A8 20 inch tire,221
 2021,3914,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,3,Range Rover Sport Supercharged 5.0L(SC) AWD A8 21 inch tire &amp; Range Rover Sport 3.0L(TC) Diesel AWD A8 21 inch tire,221
@@ -14679,28 +14679,28 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2021,3737,Kia Corporation,KMX,KIA,1,Sorento FWD,829,3,Sorento FWD 2.5T 20inch,208
 2021,3737,Kia Corporation,KMX,KIA,1,Sorento Hybrid,830,1,Sorento Hybrid 17inch,208
 2021,3901,Lotus Cars Ltd,LTX,Lotus Cars Ltd,1,Evora GT,7,1,Evora GT,243
-2021,3634,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE TROFEO,31,2,Quattroporte Trofeo rev1,247
 2021,3809,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE TROFEO,31,2,Quattroporte Trofeo rev1,247
-2021,3634,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI TROFEO,32,2,Ghibli Trofeo rev1,245
+2021,3634,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE TROFEO,31,2,Quattroporte Trofeo rev1,247
 2021,3809,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI TROFEO,32,2,Ghibli Trofeo rev1,245
-2021,3634,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE S Q4,33,1,Quattroporte S Q4,247
+2021,3634,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI TROFEO,32,2,Ghibli Trofeo rev1,245
 2021,3809,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE S Q4,33,1,Quattroporte S Q4,247
-2021,3634,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI S Q4,35,1,Ghibli S Q4,245
+2021,3634,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE S Q4,33,1,Quattroporte S Q4,247
 2021,3809,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI S Q4,35,1,Ghibli S Q4,245
-2021,3634,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI,36,1,Ghibli,245
+2021,3634,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI S Q4,35,1,Ghibli S Q4,245
 2021,3809,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI,36,1,Ghibli,245
-2021,3634,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE S,37,1,Quattroporte S,247
+2021,3634,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI,36,1,Ghibli,245
 2021,3809,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE S,37,1,Quattroporte S,247
-2021,3634,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI S,38,1,Ghibli S,245
+2021,3634,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE S,37,1,Quattroporte S,247
 2021,3809,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI S,38,1,Ghibli S,245
-2021,3635,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE S,40,1,Levante S,469
+2021,3634,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI S,38,1,Ghibli S,245
 2021,3817,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE S,40,1,Levante S,469
-2021,3635,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE,41,1,Levante,469
+2021,3635,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE S,40,1,Levante S,469
 2021,3817,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE,41,1,Levante,469
-2021,3635,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE GTS,45,1,Levante GTS,469
+2021,3635,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE,41,1,Levante,469
 2021,3817,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE GTS,45,1,Levante GTS,469
-2021,3635,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE TROFEO,46,2,Levante Trofeo rev1,469
+2021,3635,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE GTS,45,1,Levante GTS,469
 2021,3817,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE TROFEO,46,2,Levante Trofeo rev1,469
+2021,3635,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE TROFEO,46,2,Levante Trofeo rev1,469
 2021,3905,Mercedes Benz,MBX,Mercedes-Benz,1,C 300 4MATIC,106,1,C 300 4MATIC (1- 225/50 R17),263
 2021,3905,Mercedes Benz,MBX,Mercedes-Benz,1,C 300 4MATIC,106,2,C 300 4MATIC (2- 245/40 R18-22R-R86),263
 2021,3905,Mercedes Benz,MBX,Mercedes-Benz,1,C 300 4MATIC,106,3,C 300 4MATIC (3- 245/40 R18-RSJ-RSK),263
@@ -15832,8 +15832,8 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2022,4081,Ford Motor Company,FMX,Ford,1,BRONCO 4WD,24,4,BRONCO 2.7G-4 SM10S4 4 DOOR Long,561
 2022,4081,Ford Motor Company,FMX,Ford,1,BRONCO 4WD,24,5,BRONCO 23ETDI M7S4 4 DOOR Long,561
 2022,4081,Ford Motor Company,FMX,Ford,1,BRONCO 4WD,24,6,BRONCO 23ETDI SM10S4 4 DOOR Long,561
-2022,4081,Ford Motor Company,FMX,Ford,1,BRONCO SPORT 4WD,25,1,BRONCO SPORT 2.0TDI SS8SM4 4 DOOR Reg,561
-2022,4081,Ford Motor Company,FMX,Ford,1,BRONCO SPORT 4WD,25,2,BRONCO SPORT 15DITC A8SSM4 4 DOOR Reg,561
+2022,4081,Ford Motor Company,FMX,Ford,1,BRONCO SPORT 4WD,25,1,BRONCO SPORT 2.0TDI SS8SM4 4 DOOR Reg,589
+2022,4081,Ford Motor Company,FMX,Ford,1,BRONCO SPORT 4WD,25,2,BRONCO SPORT 15DITC A8SSM4 4 DOOR Reg,589
 2022,4081,Ford Motor Company,FMX,Ford,1,BRONCO BLACK DIAMOND 4WD,26,1,BRONCO 23ETDI M7S4 2 DOOR Short,561
 2022,4081,Ford Motor Company,FMX,Ford,1,BRONCO BLACK DIAMOND 4WD,26,2,BRONCO 23ETDI SM10S4 2 DOOR Short,561
 2022,4081,Ford Motor Company,FMX,Ford,1,BRONCO BLACK DIAMOND 4WD,26,3,BRONCO 23ETDI M7S4 4 DOOR Long,561
@@ -16349,21 +16349,21 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,196,2,Discovery Sport (246 hp) 2.0L(TC) AWD 19-inch tire,216
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,196,3,Discovery Sport (246 hp) 2.0L(TC) AWD 20-inch tire,216
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Discovery Sport,196,4,Discovery Sport (246 hp) 2.0L(TC) AWD 21-inch tire,216
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,204,1,Range Rover Evoque (246 hp) 2.0L(TC) AWD 18-inch tire,509
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,204,2,Range Rover Evoque (246 hp) 2.0L(TC) AWD 20-inch tire,509
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,204,3,Range Rover Evoque (246 hp) 2.0L(TC) AWD 21-inch tire,509
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque MHEV,205,1,Range Rover Evoque P300 (296 hp) 2.0L(TC) AWD 20-inch tire,509
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque MHEV,205,2,Range Rover Evoque P300 (296 hp) 2.0L(TC) AWD 21-inch tire,509
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,204,1,Range Rover Evoque (246 hp) 2.0L(TC) AWD 18-inch tire,220
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,204,2,Range Rover Evoque (246 hp) 2.0L(TC) AWD 20-inch tire,220
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque,204,3,Range Rover Evoque (246 hp) 2.0L(TC) AWD 21-inch tire,220
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque MHEV,205,1,Range Rover Evoque P300 (296 hp) 2.0L(TC) AWD 20-inch tire,220
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Evoque MHEV,205,2,Range Rover Evoque P300 (296 hp) 2.0L(TC) AWD 21-inch tire,220
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,1,Range Rover Supercharged 5.0L(SC) AWD 20-inch tire,219
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,2,Range Rover Supercharged (518hp) 5.0L(SC) AWD 21-inch tire,219
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover,210,3,Range Rover Supercharged (518hp) 5.0L(SC) AWD 22-inch tire,219
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover SVA,211,1,Range Rover SVA (557hp) 5.0L(SC) AWD 21-inch tire,219
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover SVA,211,2,Range Rover SVA (557hp) 5.0L(SC) AWD 22-inch tire,219
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,1,Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD 20-inch tire,220
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,2,Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD 21-inch tire,220
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,3,Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD 22-inch tire,220
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,216,1,Range Rover SVAB LWB 5.0L(SC) (518 hp) AWD 21-inch tire,220
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,216,2,Range Rover SVAB LWB 5.0L(SC) (518 hp) AWD 22-inch tire,220
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,1,Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD 20-inch tire,219
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,2,Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD 21-inch tire,219
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB,215,3,Range Rover Supercharged LWB 5.0L(SC) (518 hp) AWD 22-inch tire,219
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,216,1,Range Rover SVAB LWB 5.0L(SC) (518 hp) AWD 21-inch tire,219
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover LWB SVA,216,2,Range Rover SVAB LWB 5.0L(SC) (518 hp) AWD 22-inch tire,219
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,1,Range Rover Sport Supercharged 5.0L(SC) AWD A8 21-inch tire,221
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport,220,2,Range Rover Sport Supercharged 5.0L(SC) AWD A8 22-inch tire,221
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,Range Rover Sport SVR,221,1,Range Rover Sport SVR 5.0L(SC) AWD 21-inch tire,221
@@ -16399,15 +16399,15 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover P400 MHEV,306,1,NEW Range Rover SWB L460 3.0L (395hp) MHEV AWD 21-inch tire,219
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover P400 MHEV,306,2,NEW Range Rover SWB L460 3.0L (395hp) MHEV AWD 22-inch tire,219
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover P400 MHEV,306,3,NEW Range Rover SWB L460 3.0L (395hp) MHEV AWD 23-inch tire,219
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover P400 LWB MHEV,307,1,NEW Range Rover LWB L460 3.0L (395hp) MHEV AWD 21-inch tire,220
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover P400 LWB MHEV,307,2,NEW Range Rover LWB L460 3.0L (395hp) MHEV AWD 22-inch tire,220
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover P400 LWB MHEV,307,3,NEW Range Rover LWB L460 3.0L (395hp) MHEV AWD 23-inch tire,220
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover P400 LWB MHEV,307,1,NEW Range Rover LWB L460 3.0L (395hp) MHEV AWD 21-inch tire,219
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover P400 LWB MHEV,307,2,NEW Range Rover LWB L460 3.0L (395hp) MHEV AWD 22-inch tire,219
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover P400 LWB MHEV,307,3,NEW Range Rover LWB L460 3.0L (395hp) MHEV AWD 23-inch tire,219
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover,312,1,NEW Range Rover SWB L460 4.4L (530hp) V8 AWD 21-inch tire,219
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover,312,2,NEW Range Rover SWB L460 4.4L (530hp) V8 AWD 22-inch tire,219
 2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover,312,3,NEW Range Rover SWB L460 4.4L (530hp) V8 AWD 23-inch tire,219
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover LWB,313,1,NEW Range Rover LWB L460 4.4L (530hp) V8 AWD 21-inch tire,220
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover LWB,313,2,NEW Range Rover LWB L460 4.4L (530hp) V8 AWD 22-inch tire,220
-2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover LWB,313,3,NEW Range Rover LWB L460 4.4L (530hp) V8 AWD 23-inch tire,220
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover LWB,313,1,NEW Range Rover LWB L460 4.4L (530hp) V8 AWD 21-inch tire,219
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover LWB,313,2,NEW Range Rover LWB L460 4.4L (530hp) V8 AWD 22-inch tire,219
+2022,4136,Jaguar Land Rover Limited,JLX,Land Rover,2,New Range Rover LWB,313,3,NEW Range Rover LWB L460 4.4L (530hp) V8 AWD 23-inch tire,219
 2022,4136,Jaguar Land Rover Limited,JLX,Jaguar,3,I-PACE EV400 (20 inch tires),11,1,I-PACE EV400 Core 20 inch tire,485
 2022,4136,Jaguar Land Rover Limited,JLX,Jaguar,3,I-PACE EV400 SDS,12,1,I-PACE EV400 SDS AWD 18 inch tire,485
 2022,4136,Jaguar Land Rover Limited,JLX,Jaguar,3,I-PACE EV400 (22 inch tire),18,1,I-PACE EV400 Core 22 inch tire,485
@@ -16498,32 +16498,32 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2022,4203,"Lucid USA, Inc.",LMU,Lucid USA Inc.,2,"Air G Touring AWD w/19"" wheels",5,1,All information already included above,570
 2022,4203,"Lucid USA, Inc.",LMU,Lucid USA Inc.,2,"Air G Touring AWD w/21"" wheels",6,1,All information already included above,570
 2022,4203,"Lucid USA, Inc.",LMU,Lucid USA Inc.,2,Air GT P AWD w/21&quot; wheels,8,1,All information already included above,570
-2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE TROFEO,31,1,Quattroporte Trofeo MY22,247
 2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE TROFEO,31,1,Quattroporte Trofeo MY22,247
-2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI TROFEO,32,1,Ghibli Trofeo MY22,245
+2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE TROFEO,31,1,Quattroporte Trofeo MY22,247
 2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI TROFEO,32,1,Ghibli Trofeo MY22,245
-2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE MODENA AWD,33,1,Quattroporte Modena AWD MY22,247
+2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI TROFEO,32,1,Ghibli Trofeo MY22,245
 2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE MODENA AWD,33,1,Quattroporte Modena AWD MY22,247
-2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI MODENA AWD,35,1,Ghibli Modena AWD MY22,245
+2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE MODENA AWD,33,1,Quattroporte Modena AWD MY22,247
 2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI MODENA AWD,35,1,Ghibli Modena AWD MY22,245
-2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI GT,36,1,Ghibli GT MY22,245
+2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI MODENA AWD,35,1,Ghibli Modena AWD MY22,245
 2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI GT,36,1,Ghibli GT MY22,245
-2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE MODENA RWD,37,1,Quattroporte Modena RWD MY22,247
+2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI GT,36,1,Ghibli GT MY22,245
 2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE MODENA RWD,37,1,Quattroporte Modena RWD MY22,247
-2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI MODENA RWD,38,1,Ghibli Modena RWD MY22,245
+2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE MODENA RWD,37,1,Quattroporte Modena RWD MY22,247
 2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI MODENA RWD,38,1,Ghibli Modena RWD MY22,245
-2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE GT,39,1,Quattroporte GT MY22,247
+2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,GHIBLI MODENA RWD,38,1,Ghibli Modena RWD MY22,245
 2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE GT,39,1,Quattroporte GT MY22,247
-2022,4037,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE MODENA,40,1,Levante Modena MY22,469
+2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,QUATTROPORTE GT,39,1,Quattroporte GT MY22,247
 2022,4130,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE MODENA,40,1,Levante Modena MY22,469
-2022,4037,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE GT,41,1,Levante GT MY22,469
+2022,4037,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE MODENA,40,1,Levante Modena MY22,469
 2022,4130,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE GT,41,1,Levante GT MY22,469
-2022,4037,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE MODENA V8,45,1,Levante Modena V8 MY22,469
+2022,4037,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE GT,41,1,Levante GT MY22,469
 2022,4130,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE MODENA V8,45,1,Levante Modena V8 MY22,469
-2022,4037,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE TROFEO,46,1,Levante Trofeo MY22,469
+2022,4037,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE MODENA V8,45,1,Levante Modena V8 MY22,469
 2022,4130,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE TROFEO,46,1,Levante Trofeo MY22,469
-2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,MC20,50,1,MC20 MY22,578
+2022,4037,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE TROFEO,46,1,Levante Trofeo MY22,469
 2022,4129,"Maserati North America, Inc.",MAX,MASERATI,1,MC20,50,1,MC20 MY22,578
+2022,4057,"Maserati North America, Inc.",MAX,MASERATI,1,MC20,50,1,MC20 MY22,578
 2022,4218,Mercedes Benz,MBX,Mercedes-Benz,1,GLC 300,111,1,GLC 300 (1- 235/60 R18),272
 2022,4218,Mercedes Benz,MBX,Mercedes-Benz,1,GLC 300,111,2,GLC 300 (2- 235/55 R19),272
 2022,4218,Mercedes Benz,MBX,Mercedes-Benz,1,GLC 300,111,3,GLC 300 (3- 255/45 R20),272
