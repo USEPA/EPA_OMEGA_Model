@@ -383,10 +383,10 @@ def main():
             path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv', index=False
         )
         my_lifetime_costs_df_1.to_csv(
-            path_of_run_folder / f'{start_time_readable}_MY_{periods_1}_period_costs.csv', index=False
+            path_of_run_folder / f'{start_time_readable}_MY_{int(periods_1)}_period_costs.csv', index=False
         )
         my_lifetime_costs_df_2.to_csv(
-            path_of_run_folder / f'{start_time_readable}_MY_{periods_2}_period_costs.csv', index=False
+            path_of_run_folder / f'{start_time_readable}_MY_{int(periods_2)}_period_costs.csv', index=False
         )
         if session_settings.emission_rates_vehicles.deets:
             vehicle_inventory_details_df.to_csv(
@@ -433,10 +433,10 @@ def main():
         add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv',
                       output_file_id_info
                       )
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_{periods_1}_period_costs.csv',
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_{int(periods_1)}_period_costs.csv',
                       output_file_id_info
                       )
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_{periods_2}_period_costs.csv',
+        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_{int(periods_2)}_period_costs.csv',
                       output_file_id_info
                       )
         if session_settings.emission_rates_vehicles.deets:
