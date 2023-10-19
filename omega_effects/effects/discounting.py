@@ -59,7 +59,7 @@ class Discounting:
         cost_accrual = batch_settings.cost_accrual
 
         self.fuel_arg = 'fueling_class'
-        if 'medium' in [item for item in annual_values_df['reg_class_id']]:
+        if ('car' or 'truck') not in [item for item in annual_values_df['reg_class_id']]:
             self.fuel_arg = 'in_use_fuel_id'
 
         emission_dr25 = '2.5'

@@ -214,6 +214,14 @@ class EmissionRatesVehicles:
         max_age_in_data_for_model_year = self.max_ages_dict[start_year]
         data_age = min(30, age, max_age_in_data_for_model_year)
 
-        rates = self.data[(start_year, sourcetype_name, reg_class_id, in_use_fuel_id, data_age)]
+        if (start_year, sourcetype_name, reg_class_id, in_use_fuel_id, data_age) in self.data:
+            rates = self.data[(start_year, sourcetype_name, reg_class_id, in_use_fuel_id, data_age)]
+        else:  # this sets to 0 the rates for which there may not have been source data (e.g., BEVs prior to 2025)
+            if 'gasoline' in in_use_fuel_id:
+                rates = len(self.gasoline_rate_names) * [0]
+            elif 'diesel' in in_use_fuel_id:
+                rates = len(self.diesel_rate_names) * [0]
+            else:
+                rates = len(self.bev_rate_names) * [0]
 
         return rates
