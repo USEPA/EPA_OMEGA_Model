@@ -231,6 +231,7 @@ class LegacyFleet:
             calendar_year (int): the calendar year.
 
         Returns:
+            The transaction price of the vehicle.
 
         """
         price = [v['transaction_price_dollars'] for v in self._legacy_fleet.values()

@@ -60,8 +60,8 @@ class BatchSettings:
         self.save_input_files = False
         self.powertrain_costs_fev = True
 
-        self._dict = dict()
-        self.session_dict = dict()
+        self._dict = {}
+        self.session_dict = {}
         self.vehicles_base_year = 0
         self.analysis_initial_year = 0
         self.analysis_final_year = 0
@@ -75,7 +75,7 @@ class BatchSettings:
         self.vmt_rebound_rate_bev = None
         self.net_benefit_ghg_scope = 'global'  # default value; change via batch file ('domestic' and 'both' are options)
 
-        self.inputs_filelist = list()
+        self.inputs_filelist = []
         self.maintenance_costs_file = None
         self.repair_costs_file = None
         self.refueling_costs_file = None
@@ -120,7 +120,7 @@ class BatchSettings:
         self.ip_deflators = None
         self.cpi_deflators = None
 
-        self.true_false_dict = dict({
+        self.true_false_dict = {
             True: True,
             False: False,
             'True': True,
@@ -139,7 +139,7 @@ class BatchSettings:
             'N': False,
             'n': False,
             np.nan: None
-        })
+        }
 
     def init_from_file(self, filepath):
         """

@@ -352,7 +352,7 @@ def calc_period_consumer_view(batch_settings, input_df, periods):
     df.reset_index(inplace=True, drop=True)
 
     # groupby model year, body_style, powertrain and fuel
-    if 'medium' in [item for item in input_df['reg_class_id']]:
+    if ('car' or 'truck') not in [item for item in input_df['reg_class_id']]:
         groupby_cols = ['session_policy', 'session_name', 'discount_rate', 'model_year', 'body_style', 'in_use_fuel_id']
     else:
         groupby_cols = ['session_policy', 'session_name', 'discount_rate', 'model_year', 'body_style', 'fueling_class']
