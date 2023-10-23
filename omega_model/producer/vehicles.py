@@ -734,6 +734,27 @@ def is_up_for_redesign(vehicle):
         int(vehicle.redesign_interval) * redesign_interval_gain
 
 
+def update_dynamic_attributes(vehicle):
+    """
+    Update vehicle dynamic attributes
+
+    Args:
+        vehicle(Vehicle): the source vehicle
+
+    Returns:
+        Nothing, updates vehicle dynamic attributes
+
+    See Also ``transfer_vehicle_data()``
+
+    """
+    # assign user-definable reg class
+    vehicle.reg_class_id = omega_globals.options.RegulatoryClasses.get_vehicle_reg_class(vehicle)
+
+    # assign policy-based target for the current model year
+    vehicle.set_target_co2e_grams_per_mile()
+
+
+
 def transfer_vehicle_data(from_vehicle, model_year):
     """
 
@@ -756,11 +777,8 @@ def transfer_vehicle_data(from_vehicle, model_year):
     # update model year
     to_vehicle.model_year = model_year
 
-    # assign user-definable reg class
-    to_vehicle.reg_class_id = omega_globals.options.RegulatoryClasses.get_vehicle_reg_class(to_vehicle)
-
-    # assign policy-based target for the current model year
-    to_vehicle.set_target_co2e_grams_per_mile()
+    # update dynamic attributes
+    update_dynamic_attributes(to_vehicle)
 
     return to_vehicle
 

@@ -1134,6 +1134,7 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
 
     """
     from consumer import sales_volume
+    from producer.vehicles import update_dynamic_attributes
 
     # pull final vehicles from composite vehicles
     decompose_candidate_vehicles(candidate_mfr_composite_vehicles, producer_decision)
@@ -1149,6 +1150,8 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
                 cv.cost_curve.to_csv(filename, columns=sorted(cv.cost_curve.columns), index=False)
 
         for veh in cv.vehicle_list:
+            update_dynamic_attributes(veh)
+
             veh.price_modification_dollars = \
                 omega_globals.price_modification_data[veh.market_class_id]['market_class_price_modification']
 
