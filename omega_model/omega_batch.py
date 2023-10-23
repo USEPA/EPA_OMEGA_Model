@@ -608,7 +608,7 @@ class OMEGABatchObject(OMEGABase):
         for session_num in range(0, len(self.dataframe.columns)):
             df_ff_dimensions_vector = fullfact_dimensions_vectors[session_num]
             df_ff_matrix = np.int_(doe.fullfact(df_ff_dimensions_vector))
-            num_expanded_columns = np.product(df_ff_dimensions_vector)
+            num_expanded_columns = np.prod(df_ff_dimensions_vector)
             # expand variations and write to dfx
             for variation_index in range(0, num_expanded_columns):
                 column_name = self.dataframe.loc['Session Name'][session_num]
