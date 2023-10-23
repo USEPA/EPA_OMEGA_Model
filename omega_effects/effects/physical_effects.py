@@ -14,116 +14,6 @@ import pandas as pd
 from omega_effects.effects.vehicle_inventory import VehiclePhysicalData, calc_vehicle_inventory
 
 
-def get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, reg_class_id, fuel, ind_var_value):
-    """
-
-    Args:
-        session_settings: an instance of the SessionSettings class.
-        model_year (int): The model year of the specific vehicle.
-        sourcetype_name (str): The MOVES sourcetype name (e.g., 'passenger car', 'passenger truck', 'light commercial truck')
-        reg_class_id (str): The regulatory class ID of the vehicle.
-        fuel (str): The fuel ID (i.e., pump gasoline, pump diesel)
-        ind_var_value (str): The independent variable value, e.g., age or odometer
-
-    Returns:
-        A list of emission rates for the given model year vehicle in a given calendar year.
-
-    """
-    if 'gasoline' in fuel:
-        rate_names = [
-            'pm25_brakewear_grams_per_mile',
-            'pm25_tirewear_grams_per_mile',
-            'pm25_exhaust_grams_per_mile',
-            'nmog_exhaust_grams_per_mile',
-            'nmog_evap_permeation_grams_per_gallon',
-            'nmog_evap_fuel_vapor_venting_grams_per_gallon',
-            'nmog_evap_fuel_leaks_grams_per_gallon',
-            'nmog_refueling_displacement_grams_per_gallon',
-            'nmog_refueling_spillage_grams_per_gallon',
-            'co_exhaust_grams_per_mile',
-            'nox_exhaust_grams_per_mile',
-            'sox_exhaust_grams_per_gallon',
-            'ch4_exhaust_grams_per_mile',
-            'n2o_exhaust_grams_per_mile',
-            'acetaldehyde_exhaust_grams_per_mile',
-            'acrolein_exhaust_grams_per_mile',
-            'benzene_exhaust_grams_per_mile',
-            'benzene_evap_permeation_grams_per_gallon',
-            'benzene_evap_fuel_vapor_venting_grams_per_gallon',
-            'benzene_evap_fuel_leaks_grams_per_gallon',
-            'benzene_refueling_displacement_grams_per_gallon',
-            'benzene_refueling_spillage_grams_per_gallon',
-            'ethylbenzene_exhaust_grams_per_mile',
-            'ethylbenzene_evap_fuel_vapor_venting_grams_per_gallon',
-            'ethylbenzene_evap_fuel_leaks_grams_per_gallon',
-            'ethylbenzene_evap_permeation_grams_per_gallon',
-            'ethylbenzene_refueling_displacement_grams_per_gallon',
-            'ethylbenzene_refueling_spillage_grams_per_gallon',
-            'formaldehyde_exhaust_grams_per_mile',
-            'naphthalene_exhaust_grams_per_mile',
-            '13_butadiene_exhaust_grams_per_mile',
-            '15pah_exhaust_grams_per_mile',
-        ]
-    elif 'diesel' in fuel:
-        rate_names = [
-            'pm25_brakewear_grams_per_mile',
-            'pm25_tirewear_grams_per_mile',
-            'pm25_exhaust_grams_per_mile',
-            'nmog_exhaust_grams_per_mile',
-            'nmog_refueling_spillage_grams_per_gallon',
-            'co_exhaust_grams_per_mile',
-            'nox_exhaust_grams_per_mile',
-            'sox_exhaust_grams_per_gallon',
-            'ch4_exhaust_grams_per_mile',
-            'n2o_exhaust_grams_per_mile',
-            'acetaldehyde_exhaust_grams_per_mile',
-            'acrolein_exhaust_grams_per_mile',
-            'benzene_exhaust_grams_per_mile',
-            'benzene_refueling_spillage_grams_per_gallon',
-            'ethylbenzene_exhaust_grams_per_mile',
-            'ethylbenzene_refueling_spillage_grams_per_gallon',
-            'formaldehyde_exhaust_grams_per_mile',
-            'naphthalene_exhaust_grams_per_mile',
-            'naphthalene_refueling_spillage_grams_per_gallon',
-            '13_butadiene_exhaust_grams_per_mile',
-            '15pah_exhaust_grams_per_mile',
-        ]
-    elif 'electric' in fuel:
-        rate_names = [
-            'pm25_brakewear_grams_per_mile',
-            'pm25_tirewear_grams_per_mile'
-        ]
-    else:
-        rate_names = []
-
-    rates = session_settings.emission_rates_vehicles.get_emission_rate(
-        session_settings, model_year, sourcetype_name, reg_class_id, fuel, ind_var_value, *rate_names
-    )
-
-    return rates
-
-
-def get_energysecurity_cf(batch_settings, calendar_year):
-    """
-
-    Args:
-        batch_settings: an instance of the BatchSettings class.
-        calendar_year (int): The calendar year for which energy security related factors are needed.
-
-    Returns:
-        A list of cost factors as specified in the cost_factors list for the given calendar year.
-
-    Note:
-        In the physical_effects module, oil impacts are calculated, not cost impacts; therefore the "cost factor"
-        returned is the oil import reduction as a percentage of oil demand reduction.
-
-    """
-    cost_factors = ('oil_import_reduction_as_percent_of_total_oil_demand_reduction',
-                    )
-
-    return batch_settings.energy_security_cost_factors.get_cost_factors(calendar_year, cost_factors)
-
-
 def get_inputs_for_effects(batch_settings, arg=None):
     """
 
@@ -323,9 +213,8 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
 
                     if fueling_class == 'BEV':
                         pm25_brakewear_rate_e, pm25_tirewear_rate_e = \
-                            get_vehicle_emission_rate(
-                                session_settings, model_year, sourcetype_name, base_year_reg_class_id, fuel,
-                                ind_var_value
+                            session_settings.emission_rates_vehicles.get_emission_rate(
+                                session_settings, model_year, sourcetype_name, reg_class_id, fuel, ind_var_value
                             )
                         vehicle_data.update_value({
                             'pm25_brakewear_rate_e': pm25_brakewear_rate_e,
@@ -360,9 +249,8 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                             ethylbenzene_refuel_disp_rate, ethylbenzene_refuel_spill_rate, \
                             formaldehyde_exh_rate, naphthalene_exh_rate, \
                             butadiene13_exh_rate, pah15_exh_rate = \
-                            get_vehicle_emission_rate(
-                                session_settings, model_year, sourcetype_name, base_year_reg_class_id, fuel,
-                                ind_var_value
+                            session_settings.emission_rates_vehicles.get_emission_rate(
+                                session_settings, model_year, sourcetype_name, reg_class_id, fuel, ind_var_value
                             )
                         energy_density_ratio, pure_share = e0_energy_density_ratio, e0_share
 
@@ -418,9 +306,8 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                             ethylbenzene_exh_rate, ethylbenzene_refuel_spill_rate, \
                             formaldehyde_exh_rate, naphthalene_exh_rate, naphthalene_refuel_spill_rate, \
                             butadiene13_exh_rate, pah15_exh_rate = \
-                            get_vehicle_emission_rate(
-                                session_settings, model_year, sourcetype_name, base_year_reg_class_id, fuel,
-                                ind_var_value
+                            session_settings.emission_rates_vehicles.get_emission_rate(
+                                session_settings, model_year, sourcetype_name, reg_class_id, fuel, ind_var_value
                             )
                         energy_density_ratio, pure_share = diesel_energy_density_ratio, 1
 
@@ -459,10 +346,6 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                     else:
                         pass  # add additional liquid fuels (E85) if necessary
 
-                energy_security_import_factor = get_energysecurity_cf(batch_settings, calendar_year)
-                vehicle_data.update_value({
-                    'energy_security_import_factor': energy_security_import_factor,
-                })
                 key = (int(v['vehicle_id']), int(v['calendar_year']))
                 calendar_year_effects_dict[key] = calc_vehicle_inventory(vehicle_data)
 
@@ -601,8 +484,9 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
 
             if vse['fueling_class'] == 'BEV':
                 pm25_brakewear_rate_e, pm25_tirewear_rate_e = \
-                    get_vehicle_emission_rate(session_settings, model_year, sourcetype_name, v['reg_class_id'], fuel,
-                                              ind_var_value)
+                    session_settings.emission_rates_vehicles.get_emission_rate(
+                        session_settings, model_year, sourcetype_name, v['reg_class_id'], fuel, ind_var_value
+                    )
                 vehicle_data.update_value({
                     'pm25_brakewear_rate_e': pm25_brakewear_rate_e,
                     'pm25_tirewear_rate_e': pm25_tirewear_rate_e,
@@ -628,7 +512,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                     ethylbenzene_leaks_rate, ethylbenzene_refuel_disp_rate, ethylbenzene_refuel_spill_rate, \
                     formaldehyde_exh_rate, naphthalene_exh_rate, \
                     butadiene13_exh_rate, pah15_exh_rate = \
-                    get_vehicle_emission_rate(
+                    session_settings.emission_rates_vehicles.get_emission_rate(
                         session_settings, model_year, sourcetype_name, v['reg_class_id'], fuel, ind_var_value
                     )
 
@@ -684,9 +568,9 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                     benzene_exh_rate, benzene_refuel_spill_rate, \
                     ethylbenzene_exh_rate, ethylbenzene_refuel_spill_rate, \
                     formaldehyde_exh_rate, naphthalene_exh_rate, naphthalene_refuel_spill_rate, \
-                    butadiene13_exh_rate, pah15_exh_rate = \
-                    get_vehicle_emission_rate(
-                        session_settings, model_year, sourcetype_name, v['reg_class_id'], fuel, ind_var_value)
+                    butadiene13_exh_rate, pah15_exh_rate = session_settings.emission_rates_vehicles.get_emission_rate(
+                    session_settings, model_year, sourcetype_name, v['reg_class_id'], fuel, ind_var_value
+                )
 
                 energy_density_ratio, pure_share = diesel_energy_density_ratio, 1
 
@@ -723,10 +607,6 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                     'pure_share': pure_share,
                 })
 
-        energy_security_import_factor = get_energysecurity_cf(batch_settings, v['calendar_year'])
-        vehicle_data.update_value({
-            'energy_security_import_factor': energy_security_import_factor,
-        })
         key = (int(v['vehicle_id']), int(v['calendar_year']))
         physical_effects[key] = calc_vehicle_inventory(vehicle_data)
 
@@ -793,12 +673,13 @@ def calc_annual_physical_effects(batch_settings, input_df):
     return return_df
 
 
-def calc_period_consumer_physical_view(batch_settings, input_df):
+def calc_period_consumer_physical_view(input_df, periods):
     """
 
     Args:
-        batch_settings: an instance of the BatchSettings class.
         input_df: DataFrame of physical effects by vehicle in each analysis year.
+        periods (int): the number of periods (years) to include in the consumer view, set via the
+        general_inputs_for_effects_file.
 
     Returns:
         A DataFrame of physical effects by model year of available lifetime, body style and fuel type.
@@ -814,8 +695,6 @@ def calc_period_consumer_physical_view(batch_settings, input_df):
                 attributes.append(col)
 
     # eliminate legacy_fleet and ages not desired for consumer view
-    periods = batch_settings.general_inputs_for_effects.get_value('years_in_consumer_view')
-
     # if periods = 8, then max_age should be 7 since year 1 is age=0
     max_age = periods - 1
     df = input_df.loc[(input_df['manufacturer_id'] != 'legacy_fleet') & (input_df['age'] <= max_age), :]

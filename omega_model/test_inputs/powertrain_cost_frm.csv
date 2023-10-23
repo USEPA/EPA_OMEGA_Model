@@ -1,9 +1,9 @@
-input_template_name:,context.powertrain_cost_frm,input_template_version:,0.21,description:,"20230913 following KN/BE/AM mtg; 20230918 adds notes, no changes to values",,,,,
+input_template_name:,context.powertrain_cost_frm,input_template_version:,0.21,description:,"20230913 following KN/BE/AM mtg; 20230918 adds notes, no changes to values; 20231011 adds inverter costs on HEV/PHEV & adjusts motor shares",,,,,
 powertrain_type,powertrain_subtype,system,subsystem,drive_system,engine_configuration,body_style,value,dollar_basis,Formula Notes,Notes
 BEV,-,Drive_Unit,E_Motor,FWD,-,-,(1.1097*KW_DU + 323.22) * MARKUP_BEV,2022,,FEV motor_single for RDU or DU; induction_motor_dual for FDU
 BEV,-,Drive_Unit,E_Motor,RWD,-,-,(1.1097*KW_DU + 323.22) * MARKUP_BEV,2022,,FEV motor_single for RDU or DU; induction_motor_dual for FDU
 BEV,-,Drive_Unit,E_Motor,AWD,-,-,((0.77*KW_FDU+225.33) + (1.1097*KW_RDU + 323.22)) * MARKUP_BEV,2022,,FEV motor_single for RDU or DU; induction_motor_dual for FDU
-BEV,-,KW_RDU_share,E_Motor,-,-,-,(0.65) * 1,,,EPA
+BEV,-,KW_RDU_share,E_Motor,-,-,-,(0.65) * 1,,,EPA; share to rear drive motor vs front drive motor in AWD
 BEV,-,Drive_Unit,Inverter,FWD,-,-,(1.26 * KW_DU + 559) * MARKUP_BEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
 BEV,-,Drive_Unit,Inverter,RWD,-,-,(1.26 * KW_DU + 559) * MARKUP_BEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
 BEV,-,Drive_Unit,Inverter,AWD,-,-,((1.26 * KW_FDU + 559) + (1.26 * KW_RDU + 559)) * MARKUP_BEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
@@ -47,8 +47,12 @@ BEV,-,Thermal,Coolant_Circuit_Cooling_Heating,AWD,-,pickup,709.81 * MARKUP_BEV,2
 BEV,-,Thermal,Coolant_Circuit_Cooling_Heating,AWD,-,sedan,456.71 * MARKUP_BEV,2022,,FEV
 BEV,-,Thermal,Coolant_Circuit_Cooling_Heating,AWD,-,cuv_suv,602.00 * MARKUP_BEV,2022,,FEV
 BEV,-,Thermal,HVAC,-,-,-,551.79 * MARKUP_BEV,2022,,Glider structural and non-structual
-HEV,P2,Drive_Unit,Inverter,AWD,-,-,(1.26 * KW_P4 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
-HEV,PS,Drive_Unit,Inverter,AWD,-,-,(1.26 * KW_P4 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,P2,Drive_Unit,Inverter,FWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,P2,Drive_Unit,Inverter,RWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,P2,Drive_Unit,Inverter,AWD,-,-,((1.26 * KW_P2 + 559) + (1.26 * KW_P4 + 559)) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal; 1 inverter per motor
+HEV,PS,Drive_Unit,Inverter,FWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,PS,Drive_Unit,Inverter,RWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,PS,Drive_Unit,Inverter,AWD,-,-,((1.26 * KW_P2 + 559) + (1.26 * KW_P4 + 559)) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal; 1 inverter per motor
 HEV,P2,Drive_Unit,Gearbox,AWD,-,sedan,281 * MARKUP_HEV,2022,,FEV single_speed_gearbox_dual
 HEV,P2,Drive_Unit,Gearbox,AWD,-,cuv_suv,339.37 * MARKUP_HEV,2022,,FEV single_speed_gearbox_dual
 HEV,P2,Drive_Unit,Gearbox,AWD,-,pickup,544.28 * MARKUP_HEV,2022,,FEV single_speed_gearbox_dual
@@ -130,7 +134,7 @@ HEV,P2,Transmission,AT,AWD,-,-,(140.11 * GEARS + 1.73 * KW_P2 + 178 + 1.1097 * K
 HEV,PS,Transmission,eCVT,FWD,-,-,1587.77 * MARKUP_HEV,2022,,"FEV E-CVT includes geartrain, e-motor"
 HEV,PS,Transmission,eCVT,RWD,-,-,1587.77 * MARKUP_HEV,2022,,"FEV E-CVT includes geartrain, e-motor"
 HEV,PS,Transmission,eCVT,AWD,-,-,(1587.77 + 1.1097 * KW_P4 + 323) * MARKUP_HEV,2022,,"FEV E-CVT includes geartrain, e-motor plus FEV BEV DU e-motor cost for P4 on AWD"
-HEV,-,KW_P2_share,E_Motor,-,-,-,(0.75) * 1,,,EPA
+HEV,-,KW_P2_share,E_Motor,-,-,-,(0.5) * 1,,,EPA; share to P2 motor vs P4 motor in AWD
 ICE,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,FWD,-,pickup,60.31 * MARKUP_ICE,2022,,FEV
 ICE,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,FWD,-,sedan,50.26 * MARKUP_ICE,2022,,FEV
 ICE,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,FWD,-,cuv_suv,50.26 * MARKUP_ICE,2022,,FEV
@@ -190,16 +194,22 @@ ICE,-,Thermal,Coolant_Circuit_Cooling_Heating,-,V,sedan,346.09 * MARKUP_ICE,2022
 ICE,-,Thermal,Coolant_Circuit_Cooling_Heating,-,I,cuv_suv,308.68 * MARKUP_ICE,2022,,FEV
 ICE,-,Thermal,Coolant_Circuit_Cooling_Heating,-,V,cuv_suv,346.09 * MARKUP_ICE,2022,,FEV
 ICE,-,Thermal,HVAC,-,-,-,472.76 * MARKUP_ICE,2022,,Glider structural and non-structual
-HEV,P0,Drive_Unit,Inverter,AWD,-,-,(1.26 * KW_P4 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,P0,Drive_Unit,Inverter,FWD,-,-,(1.26 * KW_P0 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,P0,Drive_Unit,Inverter,RWD,-,-,(1.26 * KW_P0 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,P0,Drive_Unit,Inverter,AWD,-,-,(1.26 * KW_P0 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
 HEV,P0,Drive_Unit,Gearbox,AWD,-,sedan,281 * MARKUP_HEV,2022,,FEV single_speed_gearbox_dual
 HEV,P0,Drive_Unit,Gearbox,AWD,-,cuv_suv,339.37 * MARKUP_HEV,2022,,FEV single_speed_gearbox_dual
 HEV,P0,Drive_Unit,Gearbox,AWD,-,pickup,544.28 * MARKUP_HEV,2022,,FEV single_speed_gearbox_dual
 HEV,P0,Transmission,AT,FWD,-,-,(140.11 * GEARS + 1.73 * KW_P0 + 178) * MARKUP_HEV,2022,,FEV HAT cost
 HEV,P0,Transmission,AT,RWD,-,-,(140.11 * GEARS + 1.73 * KW_P0 + 178) * MARKUP_HEV,2022,,FEV HAT cost
-HEV,P0,Transmission,AT,AWD,-,-,(140.11 * GEARS + 1.73 * KW_P0 + 178 + 1.1097 * KW_P4 + 323) * MARKUP_HEV,2022,,FEV HAT cost plus FEV BEV DU e-motor cost for P4
-HEV,-,KW_P0_share,E_Motor,-,-,-,(0.75) * 1,,,EPA
-PHEV,P2,Drive_Unit,Inverter,AWD,-,-,(1.26 * KW_P4 + 559) * MARKUP_PHEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
-PHEV,PS,Drive_Unit,Inverter,AWD,-,-,(1.26 * KW_P4 + 559) * MARKUP_PHEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,P0,Transmission,AT,AWD,-,-,(140.11 * GEARS + 1.73 * KW_P0 + 178) * MARKUP_HEV,2022,,FEV HAT cost
+HEV,-,KW_P0_share,E_Motor,-,-,-,(1.0) * 1,,,EPA; share to P0 motor for all P0 (there is no second motor)
+PHEV,P2,Drive_Unit,Inverter,FWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_PHEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+PHEV,P2,Drive_Unit,Inverter,RWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_PHEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+PHEV,P2,Drive_Unit,Inverter,AWD,-,-,((1.26 * KW_P2 + 559) + (1.26 * KW_P4 + 559)) * MARKUP_PHEV,2022,,FEV inverter_dual and induction_inverter_dual are equal; 1 inverter per motor
+PHEV,PS,Drive_Unit,Inverter,FWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_PHEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+PHEV,PS,Drive_Unit,Inverter,RWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_PHEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+PHEV,PS,Drive_Unit,Inverter,AWD,-,-,((1.26 * KW_P2 + 559) + (1.26 * KW_P4 + 559)) * MARKUP_PHEV,2022,,FEV inverter_dual and induction_inverter_dual are equal; 1 inverter per motor
 PHEV,P2,Drive_Unit,Gearbox,AWD,-,sedan,281 * MARKUP_PHEV,2022,,FEV single_speed_gearbox_dual
 PHEV,P2,Drive_Unit,Gearbox,AWD,-,cuv_suv,339.37 * MARKUP_PHEV,2022,,FEV single_speed_gearbox_dual
 PHEV,P2,Drive_Unit,Gearbox,AWD,-,pickup,544.28 * MARKUP_PHEV,2022,,FEV single_speed_gearbox_dual
@@ -282,7 +292,7 @@ PHEV,P2,Transmission,AT,AWD,-,-,(140.11 * GEARS + 1.73 * KW_P2 + 178 + 1.1097 * 
 PHEV,PS,Transmission,eCVT,FWD,-,-,1587.77 * MARKUP_PHEV,2022,,"FEV E-CVT includes geartrain, e-motor"
 PHEV,PS,Transmission,eCVT,RWD,-,-,1587.77 * MARKUP_PHEV,2022,,"FEV E-CVT includes geartrain, e-motor"
 PHEV,PS,Transmission,eCVT,AWD,-,-,(1587.77 + 1.1097 * KW_P4 + 323) * MARKUP_PHEV,2022,,"FEV E-CVT includes geartrain, e-motor plus FEV BEV DU e-motor cost for P4 on AWD"
-PHEV,-,KW_P2_share,E_Motor,-,-,-,(0.65) * 1,,,EPA
+PHEV,-,KW_P2_share,E_Motor,-,-,-,(0.5) * 1,,,EPA; share to P2 motor vs P4 motor in AWD
 ICE,-,Driveline,start_stop,-,-,-,200 * MARKUP_ICE,2022,,FEV AT+BSG cost less the AT portion; used for ICE with start-stop
 ICE,-,Transmission,AT,FWD,-,-,(140.11 * GEARS + 52.674) * MARKUP_ICE,2022,,FEV AT
 ICE,-,Transmission,AT,RWD,-,-,(140.11 * GEARS + 52.674) * MARKUP_ICE,2022,,FEV AT

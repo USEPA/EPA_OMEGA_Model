@@ -548,7 +548,10 @@ class CostCloud(OMEGABase, CostCloudBase):
                 if vehicle.powertrain_type == 'PHEV':
                     vehicle.onroad_charge_depleting_range_mi = omega_globals.options.phev_range_mi
                 elif vehicle.powertrain_type == 'BEV':
-                    vehicle.onroad_charge_depleting_range_mi = omega_globals.options.bev_range_mi
+                    if vehicle.reg_class_id == 'mediumduty' and vehicle.body_style == 'cuv_suv':
+                        vehicle.onroad_charge_depleting_range_mi = omega_globals.options.bev_mdv_van_range_mi
+                    else:
+                        vehicle.onroad_charge_depleting_range_mi = omega_globals.options.bev_range_mi
 
             for structure_material in structure_materials:
                 for footprint_ft2 in vehicle_footprints:
@@ -737,11 +740,11 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         if len(cost_cloud) > 1:
             if omega_globals.options.no_backsliding and vehicle.fueling_class != 'BEV' and \
-                    vehicle.cost_curve_class != None:
+                    vehicle.cost_curve_class is not None:
                 cost_cloud = cost_cloud[cost_cloud['onroad_direct_oncycle_co2e_grams_per_mile'] <=
                                         vehicle.onroad_direct_oncycle_co2e_grams_per_mile]
             elif omega_globals.options.no_backsliding and vehicle.fueling_class == 'BEV' and \
-                    vehicle.cost_curve_class != None:
+                    vehicle.cost_curve_class is not None:
                 cost_cloud = cost_cloud[cost_cloud['onroad_direct_oncycle_kwh_per_mile'] <=
                                         vehicle.onroad_direct_oncycle_kwh_per_mile]
         glider_costs = \

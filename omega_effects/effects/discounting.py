@@ -59,7 +59,7 @@ class Discounting:
         cost_accrual = batch_settings.cost_accrual
 
         self.fuel_arg = 'fueling_class'
-        if 'medium' in [item for item in annual_values_df['reg_class_id']]:
+        if ('car' or 'truck') not in [item for item in annual_values_df['reg_class_id']]:
             self.fuel_arg = 'in_use_fuel_id'
 
         emission_dr25 = '2.5'
@@ -91,8 +91,8 @@ class Discounting:
         update_dict = {}
         for v in dict_of_values.values():
 
-            session_policy, calendar_year, reg_class_id, fuel_id = \
-                v['session_policy'], v['calendar_year'], v['reg_class_id'], v[self.fuel_arg]
+            session_policy, calendar_year, reg_class_id, in_use_fuel_id, fueling_class = (
+                v['session_policy'], v['calendar_year'], v['reg_class_id'], v['in_use_fuel_id'], v['fueling_class'])
             series = 'AnnualValue'
 
             for social_discrate in self.social_discrates:
@@ -117,7 +117,10 @@ class Discounting:
                             discount_value(arg_value, emission_discrate, calendar_year, discount_to_year, cost_accrual)
                         rate_dict.update({arg: discounted_value})
 
-                update_dict[(session_policy, calendar_year, reg_class_id, fuel_id, social_discrate, series)] = rate_dict
+                update_dict[
+                    (session_policy, calendar_year, reg_class_id, in_use_fuel_id, fueling_class,
+                     social_discrate, series)
+                ] = rate_dict
 
         dict_of_values.update(update_dict)
 
@@ -137,24 +140,35 @@ class Discounting:
 
         for v in self.annual_values_dict.values():
 
-            session_policy, calendar_year, reg_class_id, fuel_id, discount_rate = \
-                v['session_policy'], v['calendar_year'], v['reg_class_id'], v[self.fuel_arg], v['discount_rate']
+            session_policy, calendar_year, reg_class_id, in_use_fuel_id, fueling_class, discount_rate = (
+                v['session_policy'], v['calendar_year'], v['reg_class_id'], v['in_use_fuel_id'],
+                v['fueling_class'], v['discount_rate']
+            )
 
             if discount_rate != 0:
 
                 if calendar_year <= discount_to_year:
-                    pv_dict_key = (session_policy, calendar_year, reg_class_id, fuel_id, discount_rate, 'PresentValue')
+                    pv_dict_key = (
+                        session_policy, calendar_year, reg_class_id, in_use_fuel_id, fueling_class, discount_rate,
+                        'PresentValue'
+                    )
                     self.pv_dict.update({pv_dict_key: v.copy()})
 
                 else:
-                    pv_dict_key = (session_policy, calendar_year, reg_class_id, fuel_id, discount_rate, 'PresentValue')
+                    pv_dict_key = (
+                        session_policy, calendar_year, reg_class_id, in_use_fuel_id, fueling_class, discount_rate,
+                        'PresentValue'
+                    )
                     self.pv_dict.update({pv_dict_key: v.copy()})
                     for arg in self.all_monetized_args:
-                        arg_value = self.pv_dict[
-                            (session_policy, calendar_year - 1, reg_class_id, fuel_id, discount_rate, 'PresentValue')
-                        ][arg]
-                        arg_value += v[arg]
-                        self.pv_dict[pv_dict_key].update({arg: arg_value})
+                        if (session_policy, calendar_year - 1, reg_class_id, in_use_fuel_id, fueling_class, discount_rate, 'PresentValue') in self.pv_dict:
+                            arg_value = self.pv_dict[
+                                (session_policy, calendar_year - 1, reg_class_id, in_use_fuel_id, fueling_class,
+                                 discount_rate, 'PresentValue')
+                            ][arg]
+                            arg_value += v[arg]
+
+                            self.pv_dict[pv_dict_key].update({arg: arg_value})
 
                 self.pv_dict[pv_dict_key]['series'] = 'PresentValue'
 
@@ -175,10 +189,15 @@ class Discounting:
 
         for v in self.pv_dict.values():
 
-            session_policy, calendar_year, reg_class_id, fuel_id, discount_rate = \
-                v['session_policy'], v['calendar_year'], v['reg_class_id'], v[self.fuel_arg], v['discount_rate']
+            session_policy, calendar_year, reg_class_id, in_use_fuel_id, fueling_class, discount_rate = (
+                v['session_policy'], v['calendar_year'], v['reg_class_id'], v['in_use_fuel_id'],
+                v['fueling_class'], v['discount_rate']
+            )
 
-            eav_dict_key = (session_policy, calendar_year, reg_class_id, fuel_id, discount_rate, 'AnnualizedValue')
+            eav_dict_key = (
+                session_policy, calendar_year, reg_class_id, in_use_fuel_id, fueling_class, discount_rate,
+                'AnnualizedValue'
+            )
             self.eav_dict[eav_dict_key] = v.copy()
             self.eav_dict[eav_dict_key]['series'] = 'AnnualizedValue'
 

@@ -10,6 +10,19 @@
 import pandas as pd
 
 
+def calc_delta(dict_na, dict_a, arg):
+
+    if dict_na:
+        if dict_a:
+            return dict_a[arg] - dict_na[arg]
+        else:
+            return - dict_na[arg]
+    elif dict_a:
+        return dict_a[arg]
+    else:
+        return 0
+
+
 def calc_social_effects(costs_df, benefits_df, ghg_scope, calc_health_effects=False):
     """
 
@@ -23,6 +36,17 @@ def calc_social_effects(costs_df, benefits_df, ghg_scope, calc_health_effects=Fa
         A summary effects DataFrame with additional columns summing costs and benefits.
 
     """
+    policies = costs_df['session_policy'].unique()
+    action_policies = [policy for policy in policies if 'no_action' not in policy]
+    calendar_years = costs_df['calendar_year'].unique()
+    reg_class_ids = costs_df['reg_class_id'].unique()
+    in_use_fuel_ids = costs_df['in_use_fuel_id'].unique()
+    ice_fuel_ids = [fuel for fuel in in_use_fuel_ids if 'electricity' not in fuel]
+    fueling_classes = costs_df['fueling_class'].unique()
+    ice_fueling_classes = [fuel_class for fuel_class in fueling_classes if 'BEV' not in fuel_class]
+    discount_rates = costs_df['discount_rate'].unique()
+    social_rates = [rate for rate in discount_rates if rate != 0]
+
     dfc = costs_df.copy()
     dfc.set_index(pd.Series(zip(
         dfc['session_policy'],
@@ -191,25 +215,78 @@ def calc_social_effects(costs_df, benefits_df, ghg_scope, calc_health_effects=Fa
         }
 
     costs_dict = dfc.to_dict(orient='index')
-    delta_costs_dict = dict()
-    for k, v in costs_dict.items():
-        session_policy, calendar_year, series, discount_rate, reg_class_id, in_use_fuel_id, fueling_class = k
-        if session_policy != 'no_action':
-            no_action_key = \
-                ('no_action', calendar_year, series, discount_rate, reg_class_id, in_use_fuel_id, fueling_class)
-            costs_na = costs_dict[no_action_key]
-            costs_a = costs_dict[k]
+    delta_costs_dict = {}
 
-            delta_costs_dict[k] = dict()
-            costs = 0
-            for arg in non_net_benefit_cost_attributes:
-                delta_costs_dict[k][arg] = costs_a[arg] - costs_na[arg]
-            for arg in net_benefit_cost_attributes:
-                delta_costs_dict[k][arg] = costs_a[arg] - costs_na[arg]
-                costs += costs_a[arg] - costs_na[arg]
-            delta_costs_dict[k]['sum_of_cost_dollars'] = costs
+    for policy in action_policies:
+        for calendar_year in calendar_years:
+            for reg_class_id in reg_class_ids:
+                for in_use_fuel_id in in_use_fuel_ids:
+                    for fueling_class in fueling_classes:
+                        if ((fueling_class in ice_fueling_classes and in_use_fuel_id in ice_fuel_ids) or
+                                (fueling_class == 'BEV' and 'electricity' in in_use_fuel_id)):
+
+                            series = 'AnnualValue'
+                            for discount_rate in discount_rates:
+                                key_a = (
+                                    policy, calendar_year, series, discount_rate,
+                                    reg_class_id, in_use_fuel_id, fueling_class
+                                )
+                                key_na = (
+                                    'no_action', calendar_year, series, discount_rate,
+                                    reg_class_id, in_use_fuel_id, fueling_class
+                                )
+                                if key_a in costs_dict:
+                                    costs_a = costs_dict[key_a]
+                                else:
+                                    costs_a = None
+                                if key_na in costs_dict:
+                                    costs_na = costs_dict[key_na]
+                                else:
+                                    costs_na = None
+
+                                delta_costs_dict[key_a] = {}
+                                costs = 0
+                                for arg in non_net_benefit_cost_attributes:
+                                    delta_costs_dict[key_a][arg] = calc_delta(costs_na, costs_a, arg)
+                                for arg in net_benefit_cost_attributes:
+                                    delta_costs_dict[key_a][arg] = calc_delta(costs_na, costs_a, arg)
+                                    costs += calc_delta(costs_na, costs_a, arg)
+                                delta_costs_dict[key_a]['sum_of_cost_dollars'] = costs
+
+                            for series in ['PresentValue', 'AnnualizedValue']:
+                                for discount_rate in social_rates:
+                                    key_a = (
+                                        policy, calendar_year, series, discount_rate,
+                                        reg_class_id, in_use_fuel_id, fueling_class
+                                    )
+                                    key_na = (
+                                        'no_action', calendar_year, series, discount_rate,
+                                        reg_class_id, in_use_fuel_id, fueling_class
+                                    )
+                                    if key_a in costs_dict:
+                                        costs_a = costs_dict[key_a]
+                                    else:
+                                        costs_a = None
+                                    if key_na in costs_dict:
+                                        costs_na = costs_dict[key_na]
+                                    else:
+                                        costs_na = None
+
+                                    delta_costs_dict[key_a] = {}
+                                    costs = 0
+                                    for arg in non_net_benefit_cost_attributes:
+                                        delta_costs_dict[key_a][arg] = calc_delta(costs_na, costs_a, arg)
+                                    for arg in net_benefit_cost_attributes:
+                                        delta_costs_dict[key_a][arg] = calc_delta(costs_na, costs_a, arg)
+                                        costs += calc_delta(costs_na, costs_a, arg)
+                                    delta_costs_dict[key_a]['sum_of_cost_dollars'] = costs
 
     delta_costs_df = pd.DataFrame.from_dict(delta_costs_dict, orient='index').reset_index(drop=True)
+
+    # now resort the benefits DataFrame to be consistent with delta_costs_df to facilitate concatenation
+    dfb.sort_values(by=[
+        'session_policy', 'calendar_year', 'reg_class_id', 'in_use_fuel_id', 'fueling_class', 'series', 'discount_rate'
+    ], inplace=True)
     dfb.reset_index(drop=True, inplace=True)
     summary_effects_df = pd.concat([dfb, delta_costs_df], axis=1)
 

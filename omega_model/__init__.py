@@ -106,6 +106,7 @@ try:
             self.sales_share_calibration_file = None
             self.generate_context_calibration_files = True
             self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
+            self.context_electricity_prices_file = path + 'test_inputs/context_electricity_prices_aeo.csv'
             self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods_zero.csv'
             self.utility_factor_methods_file = path + 'test_inputs/policy_utility_factor_methods.csv'
             self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
@@ -163,6 +164,7 @@ try:
             self.phev_battery_kwh = None  # 'RSE' -> use RSE, None -> use range calc, otherwise use scalar value
             self.phev_range_mi = 50
             self.bev_range_mi = 300
+            self.bev_mdv_van_range_mi = 150
             self.bev_of_ice_rlhp60_scaler = 1.0
 
             self.ip_deflators_file = path + 'test_inputs/implicit_price_deflators.csv'
@@ -262,6 +264,7 @@ try:
             self.MarketClass = None
             self.CostCloud = None
             self.PowertrainCost = None
+            self.ElectricityPrices = None
 
             self.notification_destination = None
             self.notification_email = None

@@ -62,7 +62,6 @@ class VehiclePhysicalData:
         self.gvwr_lbs = 0
 
         self.session_fatalities = 0
-        self.energy_security_import_factor = 0
         self.energy_density_ratio = 0
         self.pure_share = 0
 
@@ -197,8 +196,6 @@ def calc_vehicle_inventory(vpd):
     # calc energy security related attributes and comparisons to year_for_compares
     vpd.petroleum_consumption_gallons = vpd.fuel_consumption_gallons * vpd.pure_share
     oil_bbl = vpd.petroleum_consumption_gallons * vpd.energy_density_ratio / vpd.gal_per_bbl
-    imported_oil_bbl = oil_bbl * vpd.energy_security_import_factor
-    imported_oil_bbl_per_day = imported_oil_bbl / 365
 
     results_dict = {
         'session_policy': vpd.session_policy,
@@ -237,15 +234,15 @@ def calc_vehicle_inventory(vpd):
         'onroad_miles_per_gallon': vpd.onroad_miles_per_gallon,
         'fuel_consumption_gallons': vpd.fuel_consumption_gallons,
         'petroleum_consumption_gallons': vpd.petroleum_consumption_gallons,
-        'domestic_refined_gallons': 0,
+        # 'domestic_refined_gallons': 0,
         'fuel_consumption_kwh': vpd.fuel_consumption_kwh,
         'fuel_generation_kwh': vpd.fuel_generation_kwh,
         'curbweight_lbs': vpd.curbweight_lbs,
         'gvwr_lbs': vpd.gvwr_lbs,
 
         'barrels_of_oil': oil_bbl,
-        'barrels_of_imported_oil': imported_oil_bbl,
-        'barrels_of_imported_oil_per_day': imported_oil_bbl_per_day,
+        'change_in_barrels_of_oil_imports': 0,
+        'change_in_barrels_of_oil_imports_per_day': 0,
 
         'session_fatalities': vpd.session_fatalities,
 

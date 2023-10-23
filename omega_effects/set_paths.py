@@ -107,8 +107,10 @@ class SetPaths:
         path_of_run_folder.mkdir(exist_ok=False)
         path_of_code_folder = path_of_run_folder / 'code'
         path_of_code_folder.mkdir(exist_ok=False)
+        path_of_modified_inputs_folder = path_of_run_folder / 'modified_inputs'
+        path_of_modified_inputs_folder.mkdir(exist_ok=False)
 
-        return path_of_run_folder, path_of_code_folder
+        return path_of_run_folder, path_of_code_folder, path_of_modified_inputs_folder
 
     @staticmethod
     def path_of_batch_settings_csv():

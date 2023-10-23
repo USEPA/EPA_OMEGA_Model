@@ -155,7 +155,8 @@ if __name__ == '__main__':
         from context.body_styles import BodyStyles
         from context.glider_cost import GliderCost
         from policy.drive_cycles import DriveCycles
-        from context.ip_deflators import ImplictPriceDeflators
+        from policy.policy_fuels import PolicyFuel
+        from context.ip_deflators import ImplicitPriceDeflators
         from omega_model.omega import init_user_definable_decomposition_attributes, get_module
 
         module_name = get_template_name(omega_globals.options.policy_targets_file)
@@ -173,15 +174,23 @@ if __name__ == '__main__':
         module_name = get_template_name(omega_globals.options.sales_share_file)
         omega_globals.options.SalesShare = get_module(module_name).SalesShare
 
+        module_name = get_template_name(omega_globals.options.powertrain_cost_input_file)
+        omega_globals.options.PowertrainCost = get_module(module_name).PowertrainCost
+
         init_fail += init_user_definable_decomposition_attributes(omega_globals.options.verbose)
 
         
 
         init_fail += Manufacturer.init_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)
+
         init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)
+
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
+                                               verbose=omega_globals.options.verbose)
+
+        init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file,
                                                verbose=omega_globals.options.verbose)
 
         init_fail += omega_globals.options.SalesShare.init_from_file(omega_globals.options.sales_share_file,
@@ -196,7 +205,7 @@ if __name__ == '__main__':
         init_fail += NewVehicleMarket.init_from_file(
             omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)
 
-        init_fail += ImplictPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
+        init_fail += ImplicitPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
                                                           verbose=omega_globals.options.verbose)
 
         init_fail += GliderCost.init_from_file(omega_globals.options.glider_cost_input_file,

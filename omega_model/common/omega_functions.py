@@ -191,8 +191,13 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=True):
     cloud = cloud.drop(columns=cloud_non_numeric_columns, errors='ignore')
 
     if cloud[y_key].values.max() == cloud[y_key].values.min() or \
-        cloud[x_key].values.max() == cloud[x_key].values.min():
+            cloud[x_key].values.max() == cloud[x_key].values.min():
         cloud = cloud.drop_duplicates([x_key, y_key])
+
+        if cloud[x_key].values.max() == cloud[x_key].values.min():
+            cloud = cloud.loc[[cloud[y_key].idxmin()]]
+        elif cloud[y_key].values.max() == cloud[y_key].values.min():
+            cloud = cloud.loc[[cloud[x_key].idxmax()]]
 
     if len(cloud) > 1:
         frontier_pts = []

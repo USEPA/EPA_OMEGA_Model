@@ -151,7 +151,7 @@ class DriveCycleWeights(OMEGABase):
                                                              verbose=verbose)
 
         if not template_errors:
-            validation_dict = {'share_id': ['onroad', 'cert'],
+            validation_dict = {'share_id': ['onroad', 'cert', 'battery_sizing'],
                                'fueling_class': fueling_classes,
                                }
 
@@ -214,8 +214,11 @@ class DriveCycleWeights(OMEGABase):
             start_years = DriveCycleWeights._data[fueling_class]['start_year']
             if len(start_years[start_years <= calendar_year]) > 0:
                 calendar_year = max(start_years[start_years <= calendar_year])
-                eq_str = DriveCycleWeights._data[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
+                try:
+                    eq_str = DriveCycleWeights._data[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
                                                                       weighted=weighted)[1]
+                except:
+                    print('wtf?')
                 DriveCycleWeights._data[cache_key] = eq_str
             else:
                 raise Exception('Missing drive cycle weights for %s, %d or prior' % (fueling_class, calendar_year))
@@ -313,10 +316,8 @@ class DriveCycleWeights(OMEGABase):
 
             if charge_depleting_only:
                 cd_cert_direct_oncycle_kwh_per_mile = \
-                    (DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
-                                                          'cd_cert_direct_oncycle_kwh_per_mile', weighted=False) /
-                     cycle_values['usable_battery_capacity_norm'])
-
+                    DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
+                                                      'cd_cert_direct_oncycle_kwh_per_mile', weighted=False)
             else:
                 phev_cycle_values = cycle_values.copy()
 
@@ -411,13 +412,14 @@ class DriveCycleWeights(OMEGABase):
     @staticmethod
     def calc_phev_utility_factors(calendar_year, cycle_values):
         """
+        Calculate PHEV utility factors
 
         Args:
-            calendar_year:
-            cycle_values:
+            calendar_year (numeric): calendar year to utility factors in
+            cycle_values (dict): holds charge-depleting and charge-sustaining cycle phase values
 
         Returns:
-
+            tuple (FTP, HWFET, US06) utility factors
         """
         from policy.utility_factors import UtilityFactorMethods
 
@@ -455,9 +457,9 @@ class DriveCycleWeights(OMEGABase):
 
         hwfet_cd_uf = UtilityFactorMethods.calc_highway_utility_factor(calendar_year, cd_hwfet_range_miles)
 
-        us06_uf = UtilityFactorMethods.calc_highway_utility_factor(calendar_year, cd_us06_range_miles)
+        us06_cd_uf = UtilityFactorMethods.calc_highway_utility_factor(calendar_year, cd_us06_range_miles)
 
-        return ftp_cd_uf, hwfet_cd_uf, us06_uf
+        return ftp_cd_uf, hwfet_cd_uf, us06_cd_uf
 
 
 if __name__ == '__main__':

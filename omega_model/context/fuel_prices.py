@@ -95,26 +95,30 @@ class FuelPrice(OMEGABase):
                 ContextFuelPrices.get_fuel_prices(2030, ['retail_dollars_per_unit', 'pretax_dollars_per_unit'], 'pump gasoline')
 
         """
-
         cache_key = (calendar_year, str(price_types), fuel_id)
 
         if cache_key not in FuelPrice._data:
             if omega_globals.options.flat_context:
                 calendar_year = omega_globals.options.flat_context_year
             else:
-                calendar_year = max(FuelPrice._data['min_calendar_year'],
-                                    min(calendar_year, FuelPrice._data['max_calendar_year']))
+                calendar_year = max(
+                    FuelPrice._data['min_calendar_year'],
+                    min(calendar_year, FuelPrice._data['max_calendar_year'])
+                )
 
             if type(price_types) is not list:
                 price_types = [price_types]
 
             prices = []
             for pt in price_types:
-                prices.append(FuelPrice._data[omega_globals.options.context_id,
-                                              omega_globals.options.context_case_id,
-                                              fuel_id,
-                                              calendar_year][pt])
-
+                prices.append(
+                    FuelPrice._data[
+                        omega_globals.options.context_id,
+                        omega_globals.options.context_case_id,
+                        fuel_id,
+                        calendar_year
+                    ][pt]
+                )
             if len(prices) == 1:
                 FuelPrice._data[cache_key] = prices[0]
             else:

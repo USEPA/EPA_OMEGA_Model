@@ -89,10 +89,10 @@ omega\_effects.effects.egu\_inventory module
    :undoc-members:
    :show-inheritance:
 
-omega\_effects.effects.emission\_factors\_refinery module
----------------------------------------------------------
+omega\_effects.effects.emission\_rate\_curves\_vehicles module
+--------------------------------------------------------------
 
-.. automodule:: omega_effects.effects.emission_factors_refinery
+.. automodule:: omega_effects.effects.emission_rate_curves_vehicles
    :members:
    :undoc-members:
    :show-inheritance:
@@ -153,10 +153,10 @@ omega\_effects.effects.refinery\_data module
    :undoc-members:
    :show-inheritance:
 
-omega\_effects.effects.refinery\_inventory module
--------------------------------------------------
+omega\_effects.effects.refinery\_inventory\_and\_oil\_imports module
+--------------------------------------------------------------------
 
-.. automodule:: omega_effects.effects.refinery_inventory
+.. automodule:: omega_effects.effects.refinery_inventory_and_oil_imports
    :members:
    :undoc-members:
    :show-inheritance:

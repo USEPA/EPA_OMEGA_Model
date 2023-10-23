@@ -162,7 +162,7 @@ class WeightedTree(OMEGABase):
         return tree_errors
 
     @staticmethod
-    def calc_node_weighted_value(tree, node_id):
+    def calc_node_weighted_value(tree, node_id, weighted=True):
         """
         Calculate node weighted value.
         If the node has no children then the weighted value is the node's weighted value, see ``WeightedNode`` above.
@@ -172,9 +172,10 @@ class WeightedTree(OMEGABase):
         Args:
             tree (treelib.Tree): the tree to query
             node_id (str): the id of the node to query
+            weighted (bool): if ``True`` then return weighted value string, else return node value string
 
         Returns:
-            Node weighted value
+            tuple: (node weighted value, equation string)
 
         """
         if not tree.children(node_id):
@@ -192,7 +193,7 @@ class WeightedTree(OMEGABase):
         else:
             n = tree.get_node(node_id)
             n.data.value = 0
-            if n.data.weight != 1 and n.data.weight is not None:
+            if n.data.weight != 1 and n.data.weight is not None and weighted:
                 eq_str = '%.20f * (' % n.data.weight
             else:
                 eq_str = '('
@@ -200,7 +201,7 @@ class WeightedTree(OMEGABase):
                 wv, child_eq_str = WeightedTree.calc_node_weighted_value(tree, child.identifier)
                 n.data.value += wv
                 eq_str += '%s + ' % child_eq_str
-            eq_str = '%s)' % eq_str[0:eq_str.rfind(']',)+1]
+            eq_str = '%s)' % eq_str[0:max(eq_str.rfind(']',), eq_str.rfind(')',))+1]
             return n.data.weighted_value, eq_str
 
     def calc_value(self, values_dict, node_id=None, weighted=False):
@@ -230,13 +231,12 @@ class WeightedTree(OMEGABase):
         if node_id is None:
             node_id = self.tree.root
 
-        value, eq_str = WeightedTree.calc_node_weighted_value(self.tree, node_id)
+        eq_str = WeightedTree.calc_node_weighted_value(self.tree, node_id, weighted)[1]
 
-        if weighted:
-            eq_str = '%f * %s' % (self.tree.get_node(node_id).data.weight, node_id)
-            return self.tree.get_node(node_id).data.weighted_value, eq_str
-        else:
-            return self.tree.get_node(node_id).data.value, eq_str
+        try:
+            return Eval.eval(eq_str, {'results': values_dict}), eq_str
+        except:
+            print('wtf?')
 
     def show(self):
         """

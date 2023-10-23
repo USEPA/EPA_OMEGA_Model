@@ -176,7 +176,7 @@ class SalesShare(OMEGABase, SalesShareBase):
                                                             'refuel_efficiency')
         annual_o_m_costs = gcam_data_cy['o_m_costs']
 
-        fuel_cost_per_VMT = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'US electricity') \
+        fuel_cost_per_VMT = omega_globals.options.ElectricityPrices.get_fuel_price(calendar_year) \
                             * average_kwh_pmi / recharge_efficiency
 
         fuel_cost_per_VMT += fuel_cost * average_co2e_gpmi / carbon_intensity_gasoline / refuel_efficiency
@@ -318,6 +318,20 @@ class SalesShare(OMEGABase, SalesShareBase):
 
     @staticmethod
     def calc_attempted_share(row, share_col, MIN_SHARE, MAX_SHARE, N):
+        """
+        Calculate a new share for ``share_col`` that attempts to satisfy constraints.
+
+        Args:
+            row (Series): share data to be reconciled with constraints
+            share_col (str): e.g. 'consumer_share_frac_sedan_wagon.BEV'
+            MIN_SHARE (float): e.g. ``0.092226211660941``
+            MAX_SHARE (float): e.g. ``0.193144311076143``
+            N (int): number of share categories
+
+        Returns:
+            New share to try for the share identified by ``share_col``
+
+        """
         if row['change_needed'] < 0:
             share = max(MIN_SHARE, row[share_col] + row['change_needed'] / N)
         elif row['change_needed'] > 0:
@@ -583,7 +597,8 @@ if __name__ == '__main__':
         from context.fuel_prices import FuelPrice
 
         from policy.drive_cycles import DriveCycles
-        from context.ip_deflators import ImplictPriceDeflators
+        from policy.policy_fuels import PolicyFuel
+        from context.ip_deflators import ImplicitPriceDeflators
 
         from omega_model.omega import init_user_definable_decomposition_attributes, get_module
 
@@ -595,9 +610,15 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
+        init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file,
+                                               verbose=omega_globals.options.verbose)
+
         # pull in market classes before initializing classes that check market class validity
         omega_globals.options.market_classes_file = \
-            omega_globals.options.omega_model_path + '/test_inputs/market_classes-body_style.csv'
+            omega_globals.options.omega_model_path + '/test_inputs/market_classes_ice_bev_phev-body_style.csv'
+
+        omega_globals.options.sales_share_file = \
+            omega_globals.options.omega_model_path + '/test_inputs/sales_share_params_ice_bev_phev_body_style.csv'
 
         module_name = get_template_name(omega_globals.options.market_classes_file)
         omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
@@ -612,6 +633,9 @@ if __name__ == '__main__':
 
         module_name = get_template_name(omega_globals.options.sales_share_file)
         omega_globals.options.SalesShare = get_module(module_name).SalesShare
+
+        module_name = get_template_name(omega_globals.options.powertrain_cost_input_file)
+        omega_globals.options.PowertrainCost = get_module(module_name).PowertrainCost
 
         init_fail += init_user_definable_decomposition_attributes(omega_globals.options.verbose)
 
@@ -640,7 +664,7 @@ if __name__ == '__main__':
         init_fail += FuelPrice.init_from_file(omega_globals.options.context_fuel_prices_file,
                                               verbose=omega_globals.options.verbose)
 
-        init_fail += ImplictPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
+        init_fail += ImplicitPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
                                                           verbose=omega_globals.options.verbose)
 
         init_fail += GliderCost.init_from_file(omega_globals.options.glider_cost_input_file,

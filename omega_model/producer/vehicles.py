@@ -969,7 +969,10 @@ class Vehicle(OMEGABase):
             price = 0
             fuel_dict = Eval.eval(self.in_use_fuel_id, {'__builtins__': None}, {})
             for fuel, fuel_share in fuel_dict.items():
-                price += FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel) * fuel_share
+                if 'electricity' in fuel:
+                    price += omega_globals.options.ElectricityPrices.get_fuel_price(calendar_year) * fuel_share
+                else:
+                    price += FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel) * fuel_share
 
             self._cache[cache_key] = price
 
@@ -1616,15 +1619,12 @@ class Vehicle(OMEGABase):
                     alt_veh.total_emachine_kw = 0  # motor size determined during cost curve generation
                     alt_veh.tractive_motor_kw = 0
                     alt_veh.base_year_tractive_motor_kw = 1
-                    if (v.drive_system == 'AWD'):
+                    if v.drive_system == 'AWD':
                         # ratio of AWD total power to tractive power
                         alt_veh.base_year_total_emachine_kw = 1.75
                     else:
                         alt_veh.base_year_total_emachine_kw = 1
-                    if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
-                        alt_veh.onroad_charge_depleting_range_mi = 150  # RV MDV
-                    else:
-                        alt_veh.onroad_charge_depleting_range_mi = omega_globals.options.bev_range_mi
+                    alt_veh.onroad_charge_depleting_range_mi = 0  # determined during cost curve generation
                     alt_veh.base_year_eng_rated_hp = 0
                     alt_veh.engine_cylinders = 0
                     alt_veh.engine_displacement_liters = 0
@@ -1644,10 +1644,7 @@ class Vehicle(OMEGABase):
                     alt_veh.battery_kwh = 0  # pack sizes determined by range target
                     alt_veh.total_emachine_kw = 0  # motor size determined during cost curve generation
                     alt_veh.tractive_motor_kw = 0
-                    if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
-                        alt_veh.onroad_charge_depleting_range_mi = 25  # RV MDV
-                    else:
-                        alt_veh.onroad_charge_depleting_range_mi = omega_globals.options.phev_range_mi
+                    alt_veh.onroad_charge_depleting_range_mi = 0  # determined during cost curve generation
                     alt_veh.base_year_onroad_charge_depleting_range_mi = alt_veh.onroad_charge_depleting_range_mi
                     alt_veh.base_year_eng_rated_hp = v.base_year_eng_rated_hp
                     alt_veh.engine_cylinders = v.engine_cylinders

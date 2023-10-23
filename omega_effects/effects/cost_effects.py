@@ -138,22 +138,25 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
             # fuel costs _______________________________________________________________________________________________
             if v['fuel_consumption_kwh'] > 0:  # this is consumption at the wall so includes charging losses
                 electric_fuel = 'US electricity'
-                retail_price = batch_settings.context_fuel_prices.get_fuel_prices(
-                    batch_settings, v['calendar_year'], 'retail_dollars_per_unit', electric_fuel
-                )
-                pretax_price = batch_settings.context_fuel_prices.get_fuel_prices(
-                    batch_settings, v['calendar_year'], 'pretax_dollars_per_unit', electric_fuel
-                )
+                if batch_settings.context_electricity_prices:
+                    retail_price = batch_settings.context_electricity_prices.get_fuel_price(
+                        v['calendar_year'], 'retail_dollars_per_unit'
+                    )
+                else:
+                    retail_price = batch_settings.context_fuel_prices.get_fuel_price(
+                        v['calendar_year'], electric_fuel, 'retail_dollars_per_unit'
+                    )
+                pretax_price = retail_price
                 fuel_retail_cost_dollars += retail_price * v['fuel_consumption_kwh']
                 fuel_pretax_cost_dollars += pretax_price * v['fuel_consumption_kwh']
             if v['fuel_consumption_gallons'] > 0:
                 fuel_dict = eval(v['in_use_fuel_id'])
                 fuel = [item for item in fuel_dict.keys()][0]
-                retail_price = batch_settings.context_fuel_prices.get_fuel_prices(
-                    batch_settings, v['calendar_year'], 'retail_dollars_per_unit', fuel
+                retail_price = batch_settings.context_fuel_prices.get_fuel_price(
+                    v['calendar_year'], fuel, 'retail_dollars_per_unit'
                 )
-                pretax_price = batch_settings.context_fuel_prices.get_fuel_prices(
-                    batch_settings, v['calendar_year'], 'pretax_dollars_per_unit', fuel
+                pretax_price = batch_settings.context_fuel_prices.get_fuel_price(
+                    v['calendar_year'], fuel, 'pretax_dollars_per_unit'
                 )
                 fuel_retail_cost_dollars += retail_price * v['fuel_consumption_gallons']
                 fuel_pretax_cost_dollars += pretax_price * v['fuel_consumption_gallons']
@@ -314,12 +317,14 @@ def calc_annual_cost_effects(input_df):
     return return_df
 
 
-def calc_period_consumer_view(batch_settings, input_df):
+def calc_period_consumer_view(batch_settings, input_df, periods):
     """
 
     Args:
         batch_settings: an instance of the BatchSettings class.
         input_df: DataFrame of cost effects by vehicle in each analysis year.
+        periods (int): the number of periods (years) to include in the consumer view, set via the
+        general_inputs_for_effects_file.
 
     Returns:
         A DataFrame of cost effects by model year of available lifetime, body style and fuel type.
@@ -333,8 +338,6 @@ def calc_period_consumer_view(batch_settings, input_df):
                 attributes.append(col)
 
     # eliminate legacy_fleet and ages not desired for consumer view
-    periods = batch_settings.general_inputs_for_effects.get_value('years_in_consumer_view')
-
     # if periods = 8, then max_age should be 7 since year 1 is age=0
     max_age = periods - 1
     df = input_df.loc[(input_df['manufacturer_id'] != 'legacy_fleet') & (input_df['age'] <= max_age), :]
@@ -349,7 +352,7 @@ def calc_period_consumer_view(batch_settings, input_df):
     df.reset_index(inplace=True, drop=True)
 
     # groupby model year, body_style, powertrain and fuel
-    if 'medium' in [item for item in input_df['reg_class_id']]:
+    if ('car' or 'truck') not in [item for item in input_df['reg_class_id']]:
         groupby_cols = ['session_policy', 'session_name', 'discount_rate', 'model_year', 'body_style', 'in_use_fuel_id']
     else:
         groupby_cols = ['session_policy', 'session_name', 'discount_rate', 'model_year', 'body_style', 'fueling_class']

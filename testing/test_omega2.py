@@ -1,3 +1,15 @@
+"""
+
+test_omega2.py
+
+Routines to automatically run all module self-tests and record the result.
+
+----
+
+**CODE**
+
+"""
+
 test_omega2_output_folder = 'out'
 test_omega2_results_file = '__test_omega2_results.txt'
 

@@ -79,7 +79,7 @@ class PowertrainCost:
 
         """
         # don't forget to update the module docstring with changes here
-        input_template_name = 'powertrain_cost'
+        # input_template_name = 'powertrain_cost'
         input_template_version = 0.1
         input_template_columns = {
             'powertrain_type',
@@ -97,7 +97,7 @@ class PowertrainCost:
             identifier = 'system'
 
         df = read_input_file(filepath, effects_log)
-        validate_template_version_info(df, input_template_name, input_template_version, effects_log)
+        validate_template_version_info(df, input_template_version, input_template_name=None, effects_log=effects_log)
 
         # read in the data portion of the input file
         df = read_input_file(filepath, effects_log, skiprows=1)

@@ -61,6 +61,7 @@ class CostFactorsCriteria:
         self._data = dict()  # private dict, cost factors criteria by calendar year
         self._cache = dict()
         self.calc_health_effects = True
+        self.df = pd.DataFrame()
 
     def init_from_file(self, filepath, batch_settings, effects_log):
         """
@@ -98,7 +99,9 @@ class CostFactorsCriteria:
         }
 
         df = read_input_file(filepath, effects_log)
-        validate_template_version_info(df, input_template_name, input_template_version, effects_log)
+        validate_template_version_info(
+            df, input_template_version, input_template_name=input_template_name, effects_log=effects_log
+        )
 
         # read in the data portion of the input file
         df = read_input_file(filepath, effects_log, skiprows=1)
@@ -118,6 +121,7 @@ class CostFactorsCriteria:
             ))
 
             self._data = df.set_index(key).to_dict(orient='index')
+            self.df = df.copy()
 
         else:
             self.calc_health_effects = False

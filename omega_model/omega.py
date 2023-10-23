@@ -1338,6 +1338,9 @@ def import_user_definable_submodules():
     module_name = get_template_name(omega_globals.options.powertrain_cost_input_file)
     omega_globals.options.PowertrainCost = get_module(module_name).PowertrainCost
 
+    module_name = get_template_name(omega_globals.options.context_electricity_prices_file)
+    omega_globals.options.ElectricityPrices = get_module(module_name).ElectricityPrices
+
     # user-definable policy modules
     module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
     omega_globals.options.RegulatoryClasses = get_module(module_name).RegulatoryClasses
@@ -1507,6 +1510,10 @@ def init_omega(session_runtime_options):
         # must come after NewVehicleMarket and OnroadFuel init for input validation
         init_fail += FuelPrice.init_from_file(omega_globals.options.context_fuel_prices_file,
                                               verbose=verbose_init)
+
+        init_fail += omega_globals.options.ElectricityPrices.init_from_file(
+            omega_globals.options.context_electricity_prices_file, verbose=verbose_init
+        )
 
         init_fail += BodyStyles.init_from_file(omega_globals.options.body_styles_file,
                                                verbose=verbose_init)

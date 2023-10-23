@@ -19,21 +19,21 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        calendar_year,co_ustons,co2_ustons,n2o_ustons,n590_ustons,nh3_ustons,nox_ustons,pm10_ustons,pm25_ustons,sox_ustons,voc_ustons,co_emission_apportionment_gasoline,co2_emission_apportionment_gasoline,n2o_emission_apportionment_gasoline,n590_emission_apportionment_gasoline,nh3_emission_apportionment_gasoline,nox_emission_apportionment_gasoline,pm10_emission_apportionment_gasoline,pm25_emission_apportionment_gasoline,sox_emission_apportionment_gasoline,voc_emission_apportionment_gasoline,co_emission_apportionment_diesel,co2_emission_apportionment_diesel,n2o_emission_apportionment_diesel,n590_emission_apportionment_diesel,nh3_emission_apportionment_diesel,nox_emission_apportionment_diesel,pm10_emission_apportionment_diesel,pm25_emission_apportionment_diesel,sox_emission_apportionment_diesel,voc_emission_apportionment_diesel,retail_gasoline_gallons,diesel_gallons,e0_gallons,fuel_reduction_leading_to_reduced_domestic_refining,share_of_fuel_refined_domestically
-        2030,50462.97861,179019969.9,1529.019319,3.785179636,2956.138021,75349.63788,20162.0694,17737.65461,22955.33617,57273.72581,0.602405743,0.591,0.582657883,0,0,0.609500939,0.620268794,0.620404538,0.596420189,0.570155224,0.057134474,0.061,0.062889415,0,0,0.05570409,0.054043799,0.053464368,0.058421274,0.058337953,1.06E+11,40994637600,95400000000,0.96,1
-        2035,50497.76358,179497794.8,1533.100448,3.792387328,2959.758688,75483.7425,20186.34113,17759.06091,22996.09832,57297.53722,0.602405743,0.591,0.582657883,0,0,0.609500939,0.620268794,0.620404538,0.596420189,0.570155224,0.057134474,0.061,0.062889415,0,0,0.05570409,0.054043799,0.053464368,0.058421274,0.058337953,95739161297,38925071208,86165245167,0.96,1
-        2040,50829.41372,180908447.2,1545.148906,3.818696712,2974.205209,76168.63053,20319.4776,17883.352,23133.89863,57416.13093,0.602405743,0.591,0.582657883,0,0,0.609500939,0.620268794,0.620404538,0.596420189,0.570155224,0.057134474,0.061,0.062889415,0,0,0.05570409,0.054043799,0.053464368,0.058421274,0.058337953,90309519467,38045783960,81278567520,0.96,1
-        2045,51266.15504,183618187.9,1568.292949,3.864572756,2994.751015,76944.91407,20504.4112,18054.04705,23316.37403,57608.23559,0.602405743,0.591,0.582657883,0,0,0.609500939,0.620268794,0.620404538,0.596420189,0.570155224,0.057134474,0.061,0.062889415,0,0,0.05570409,0.054043799,0.053464368,0.058421274,0.058337953,88839748081,38098041450,79955773273,0.96,1
-        2050,51793.53884,186521729.1,1593.092253,3.917621474,3015.069294,77829.83767,20718.07605,18253.15804,23501.20676,57829.42994,0.602405743,0.591,0.582657883,0,0,0.609500939,0.620268794,0.620404538,0.596420189,0.570155224,0.057134474,0.061,0.062889415,0,0,0.05570409,0.054043799,0.053464368,0.058421274,0.058337953,90647428047,38546346116,81582685242,0.96,1
+        calendar_year,onroad_fuel_refinery_co_ustons,onroad_fuel_refinery_co2_ustons,onroad_fuel_refinery_n2o_ustons,onroad_fuel_refinery_nox_ustons,onroad_fuel_refinery_pm25_ustons,onroad_fuel_refinery_sox_ustons,onroad_fuel_refinery_voc_ustons,co_emission_apportionment_gasoline,co2_emission_apportionment_gasoline,n2o_emission_apportionment_gasoline,nox_emission_apportionment_gasoline,pm25_emission_apportionment_gasoline,sox_emission_apportionment_gasoline,voc_emission_apportionment_gasoline,co_emission_apportionment_diesel,co2_emission_apportionment_diesel,n2o_emission_apportionment_diesel,nox_emission_apportionment_diesel,pm25_emission_apportionment_diesel,sox_emission_apportionment_diesel,voc_emission_apportionment_diesel,retail_gasoline_gallons,diesel_gallons,e85_gallons,fuel_reduction_leading_to_reduced_domestic_refining
+        2030,50462.97861,179019969.9,1529.019319,75349.63788,17737.65461,22955.33617,57273.72581,0.602405743,0.591,0.582657883,0.609500939,0.620404538,0.596420189,0.570155224,0.057134474,0.061,0.062889415,0.05570409,0.053464368,0.058421274,0.058337953,1.17966E+11,40994637600,206103638,0.5
+        2035,50497.76358,179497794.8,1533.100448,75483.7425,17759.06091,22996.09832,57297.53722,0.602405743,0.591,0.582657883,0.609500939,0.620404538,0.596420189,0.570155224,0.057134474,0.061,0.062889415,0.05570409,0.053464368,0.058421274,0.058337953,1.06377E+11,38925071208,165308759.5,0.5
+        2040,50829.41372,180908447.2,1545.148906,76168.63053,17883.352,23133.89863,57416.13093,0.602405743,0.591,0.582657883,0.609500939,0.620404538,0.596420189,0.570155224,0.057134474,0.061,0.062889415,0.05570409,0.053464368,0.058421274,0.058337953,1.00344E+11,38045783960,150253520.5,0.5
+        2045,51266.15504,183618187.9,1568.292949,76944.91407,18054.04705,23316.37403,57608.23559,0.602405743,0.591,0.582657883,0.609500939,0.620404538,0.596420189,0.570155224,0.057134474,0.061,0.062889415,0.05570409,0.053464368,0.058421274,0.058337953,98710831201,38098041450,132802951.8,0.5
+        2050,51793.53884,186521729.1,1593.092253,77829.83767,18253.15804,23501.20676,57829.42994,0.602405743,0.591,0.582657883,0.609500939,0.620404538,0.596420189,0.570155224,0.057134474,0.061,0.062889415,0.05570409,0.053464368,0.058421274,0.058337953,1.00719E+11,38546346116,129761431.6,0.5
 
 Data Column Name and Description
 
     :calendar_year:
         The calendar year for which the data are applicable.
 
-    :pollutant_id_ustons:
-        The pollutant_id inventory in US (short) tons where pollutant_id can be co, co2, n2o, n590, nh3, nox, pm10,
-        pm25, sox, voc. These inventories were generated for air quality modeling (AQM) and are inputs to OMEGA.
+    :onroad_fuel_refinery_pollutant_id_ustons:
+        The pollutant_id inventory in US (short) tons where pollutant_id can be co, co2, n2o, nox, pm25, sox, voc.
+        These inventories represent emissions from refineries that refine onroad fuel.
 
     :pollutant_id_emission_apportionment_gasoline:
         The portion of refinery emissions attributable to the pollutant_id when refining gasoline.
@@ -42,19 +42,16 @@ Data Column Name and Description
         The portion of refinery emissions attributable to the pollutant_id when refining diesel.
 
     :retail_gasoline_gallons:
-        The retail gasoline gallons used in generating the AQM refinery inventory data.
+        The retail gasoline gallons used in generating refinery emission rates.
 
     :diesel_gallons:
-        The diesel gallons used in generating the AQM refinery inventory data.
+        The diesel gallons used in generating refinery emission rates.
 
-    :e0_gallons:
-        The petroleum portion of the retail gasoline gallons used in generating the AQM refinery inventory data.
+    :e85_gallons:
+        The ethanol gallons used in generating refinery emission rates.
 
     :fuel_reduction_leading_to_reduced_domestic_refining:
         The share of fuel savings that result in reduced domestic refining.
-
-    :share_of_fuel_refined_domestically:
-        The share of the AQM refinery inventory gallons considered to have been refined domestically within OMEGA.
 
 ----
 
@@ -75,10 +72,12 @@ class RefineryData:
     """
     def __init__(self):
         self.data = {}
+        self.cache = {}
         self.years = None
         self.calendar_year_min = None
         self.calendar_year_max = None
         self.rate_names = []
+        self.rate_basis = 'liquid_fuel_gallons'  # 'liquid_fuel_gallons' or 'petroleum_gallons' should be entered
         self.pollutant_ids = [
             'co',
             'co2',
@@ -108,8 +107,10 @@ class RefineryData:
         input_template_name = 'refinery_data'
         input_template_version = 0.1
 
+        prefixes = [
+            'onroad_fuel_refinery',
+        ]
         suffixes = [
-            'ustons',
             'emission_apportionment_gasoline',
             'emission_apportionment_diesel',
         ]
@@ -117,15 +118,19 @@ class RefineryData:
             'calendar_year',
             'retail_gasoline_gallons',
             'diesel_gallons',
-            'e0_gallons',
+            'e85_gallons',
             'fuel_reduction_leading_to_reduced_domestic_refining',
-            'share_of_fuel_refined_domestically',
         ]
+        for prefix, pollutant_id in product(prefixes, self.pollutant_ids):
+            input_template_columns.append(f'{prefix}_{pollutant_id}_ustons')
+
         for pollutant_id, suffix in product(self.pollutant_ids, suffixes):
             input_template_columns.append(f'{pollutant_id}_{suffix}')
 
         df = read_input_file(filepath, effects_log)
-        validate_template_version_info(df, input_template_name, input_template_version, effects_log)
+        validate_template_version_info(
+            df, input_template_version, input_template_name=input_template_name, effects_log=effects_log
+        )
 
         # read in the data portion of the input file
         df = read_input_file(filepath, effects_log, skiprows=1)
@@ -133,12 +138,18 @@ class RefineryData:
 
         df_rates = self.calc_rates(batch_settings, df)
         df_rates = pd.concat([df_rates, df['fuel_reduction_leading_to_reduced_domestic_refining']], axis=1)
-        df_rates = pd.concat([df_rates, df['share_of_fuel_refined_domestically']], axis=1)
 
         self.rate_names = [rate_name for rate_name in df_rates.columns if 'year' not in rate_name]
         self.years = df_rates['calendar_year'].unique()
         self.calendar_year_min = int(min(df_rates['calendar_year']))
         self.calendar_year_max = int(max(df_rates['calendar_year']))
+
+        # for pollutant_id in self.pollutant_ids:  # including all_refinery will double count when joining LD & MD
+        #     s = pd.Series(
+        #         df[f'all_refinery_{pollutant_id}_ustons'] - df[f'onroad_fuel_refinery_{pollutant_id}_ustons'],
+        #         name=f'excluded_refinery_{pollutant_id}_ustons',
+        #     )
+        #     df_rates = pd.concat([df_rates, s], axis=1)
 
         df_rates.set_index(df_rates['calendar_year'], inplace=True)
 
@@ -160,20 +171,22 @@ class RefineryData:
 
         """
         grams_per_uston = batch_settings.general_inputs_for_effects.get_value('grams_per_us_ton')
-        df.insert(0, 'petroleum_gallons', df['e0_gallons'] + df['diesel_gallons'])
+        e0_share = batch_settings.general_inputs_for_effects.get_value('e0_in_retail_gasoline')
+        df.insert(0, 'liquid_fuel_gallons', df['retail_gasoline_gallons'] + df['diesel_gallons'] + df['e85_gallons'])
+        df.insert(0, 'petroleum_gallons', df['retail_gasoline_gallons'] * e0_share + df['diesel_gallons'])
         df_rates = pd.DataFrame(df['calendar_year'])
         for pollutant_id in self.pollutant_ids:
             apportionment = (df[f'{pollutant_id}_emission_apportionment_gasoline'] +
                              df[f'{pollutant_id}_emission_apportionment_diesel'])
             rates = pd.Series(
-                df[f'{pollutant_id}_ustons'] * grams_per_uston * apportionment / df['petroleum_gallons'],
+                df[f'onroad_fuel_refinery_{pollutant_id}_ustons'] * grams_per_uston * apportionment / df[self.rate_basis],
                 name=f'{pollutant_id}_grams_per_gallon'
             )
             df_rates = pd.concat([df_rates, rates], axis=1)
 
         return df_rates
 
-    def get_emission_rate(self, calendar_year, rate_names):
+    def get_data(self, calendar_year, args):
         """
 
         Get emission rates by calendar year
@@ -192,8 +205,13 @@ class RefineryData:
             calendar_year = self.calendar_year_max
 
         rates = []
-        for rate_name in rate_names:
+        if calendar_year in self.cache:
+            return self.cache[calendar_year]
+
+        for rate_name in args:
             rates.append(self.data[calendar_year][rate_name])
+
+        self.cache[calendar_year] = rates
 
         return rates
 

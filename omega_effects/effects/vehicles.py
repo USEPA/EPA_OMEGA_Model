@@ -441,7 +441,8 @@ from omega_effects.consumer import deregionalizer
 
 class Vehicles:
     """
-    Vehicles class definition.
+    The Vehicles class reads the vehicles file resulting from the OMEGA compliance run for a given session and provides
+    methods to access the data.
 
     """
     def __init__(self):
@@ -460,7 +461,7 @@ class Vehicles:
             Nothing, but reads the appropriate input file.
 
         """
-        df = read_input_file(filepath, effects_log, index_col=0)
+        df = read_input_file(filepath, effects_log, index_col='vehicle_id')
 
         df = deregionalizer.deregionalize_entries(df, 'market_class_id', 'r1nonzev', 'r2zev')
         df = deregionalizer.deregionalize_entries(df, 'body_style', 'r1nonzev', 'r2zev')

@@ -127,7 +127,9 @@ class EmissionRatesEGU:
             'hcl_grams_per_kwh',
         ]
         df = read_input_file(filepath, effects_log)
-        validate_template_version_info(df, input_template_name, input_template_version, effects_log)
+        validate_template_version_info(
+            df, input_template_version, input_template_name=input_template_name, effects_log=effects_log
+        )
 
         # read in the data portion of the input file
         df = read_input_file(filepath, effects_log, skiprows=1)

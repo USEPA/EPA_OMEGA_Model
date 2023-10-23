@@ -134,7 +134,9 @@ class LegacyFleet:
             'kwh_per_mile',
             'transaction_price_dollars',
         ]
-        validate_template_version_info(df, input_template_name, input_template_version, effects_log)
+        validate_template_version_info(
+            df, input_template_version, input_template_name=input_template_name, effects_log=effects_log
+        )
 
         # read in the data portion of the input file
         df = read_input_file(filepath, effects_log, skiprows=1)
@@ -229,6 +231,7 @@ class LegacyFleet:
             calendar_year (int): the calendar year.
 
         Returns:
+            The transaction price of the vehicle.
 
         """
         price = [v['transaction_price_dollars'] for v in self._legacy_fleet.values()
