@@ -116,9 +116,10 @@ class RefineryData:
         ]
         input_template_columns = [
             'calendar_year',
-            'retail_gasoline_gallons',
-            'diesel_gallons',
-            'e85_gallons',
+            'retail_gasoline_million_barrels_per_day',
+            'diesel_million_barrels_per_day',
+            'other_million_barrels_per_day',
+            'net_exports_million_barrels_per_day',
             'fuel_reduction_leading_to_reduced_domestic_refining',
         ]
         for prefix, pollutant_id in product(prefixes, self.pollutant_ids):
@@ -171,18 +172,80 @@ class RefineryData:
 
         """
         grams_per_uston = batch_settings.general_inputs_for_effects.get_value('grams_per_us_ton')
-        e0_share = batch_settings.general_inputs_for_effects.get_value('e0_in_retail_gasoline')
-        df.insert(0, 'liquid_fuel_gallons', df['retail_gasoline_gallons'] + df['diesel_gallons'] + df['e85_gallons'])
-        df.insert(0, 'petroleum_gallons', df['retail_gasoline_gallons'] * e0_share + df['diesel_gallons'])
         df_rates = pd.DataFrame(df['calendar_year'])
-        for pollutant_id in self.pollutant_ids:
-            apportionment = (df[f'{pollutant_id}_emission_apportionment_gasoline'] +
-                             df[f'{pollutant_id}_emission_apportionment_diesel'])
-            rates = pd.Series(
-                df[f'onroad_fuel_refinery_{pollutant_id}_ustons'] * grams_per_uston * apportionment / df[self.rate_basis],
-                name=f'{pollutant_id}_grams_per_gallon'
-            )
-            df_rates = pd.concat([df_rates, rates], axis=1)
+
+        domestic_refining = pd.Series(df[[
+            'retail_gasoline_million_barrels_per_day',
+            'diesel_million_barrels_per_day',
+            'other_million_barrels_per_day',
+        ]].sum(axis=1), name='domestic_refining_million_barrels_per_day')
+
+        domestic_demand_share_gasoline = pd.Series(
+            df['retail_gasoline_million_barrels_per_day'] / domestic_refining, name='domestic_demand_share_gasoline'
+        )
+        domestic_demand_share_diesel = pd.Series(
+            df['diesel_million_barrels_per_day'] / domestic_refining, name='domestic_demand_share_diesel'
+        )
+        domestic_demand_share_other = pd.Series(
+            df['other_million_barrels_per_day'] / domestic_refining, name='domestic_demand_share_other'
+        )
+        net_exports_gasoline = pd.Series(
+            df['net_exports_million_barrels_per_day'] * domestic_demand_share_gasoline,
+            name='net_exports_gasoline_million_barrels_per_day'
+        )
+        net_exports_diesel = pd.Series(
+            df['net_exports_million_barrels_per_day'] * domestic_demand_share_diesel,
+            name='net_exports_diesel_million_barrels_per_day'
+        )
+        net_exports_other = pd.Series(
+            df['net_exports_million_barrels_per_day'] * domestic_demand_share_other,
+            name='net_exports_other_million_barrels_per_day'
+        )
+        domestic_refined_gasoline = pd.Series(
+            df['retail_gasoline_million_barrels_per_day'] + net_exports_gasoline,
+            name='domestic_refined_gasoline_million_barrels_per_day'
+        )
+        domestic_refined_diesel = pd.Series(
+            df['diesel_million_barrels_per_day'] + net_exports_diesel,
+            name='domestic_refined_diesel_million_barrels_per_day'
+        )
+        domestic_refined_other = pd.Series(
+            df['other_million_barrels_per_day'] + net_exports_other,
+            name='domestic_refined_other_million_barrels_per_day'
+        )
+        df_rates = pd.concat([
+            df_rates, domestic_refined_gasoline, domestic_refined_diesel, domestic_refined_other
+        ], axis=1
+        )
+        for fuel in ['gasoline', 'diesel']:
+            for pollutant_id in self.pollutant_ids:
+
+                apportionment = df[f'{pollutant_id}_emission_apportionment_{fuel}']
+                rates = pd.Series(
+                    df[f'onroad_fuel_refinery_{pollutant_id}_ustons'] * apportionment * pow(10, 9) /
+                    (df_rates[f'domestic_refined_{fuel}_million_barrels_per_day'] * pow(10, 6) * 42 * 365),
+                    name=f'{fuel}_{pollutant_id}_ustons_per_billion_gallons'
+                )
+                df_rates = pd.concat([df_rates, rates], axis=1)
+
+                rates = pd.Series(
+                    df_rates[f'{fuel}_{pollutant_id}_ustons_per_billion_gallons'] * grams_per_uston / pow(10, 9),
+                    name=f'{fuel}_{pollutant_id}_grams_per_gallon'
+                )
+                df_rates = pd.concat([df_rates, rates], axis=1)
+
+        # e0_share = batch_settings.general_inputs_for_effects.get_value('e0_in_retail_gasoline')
+        # df.insert(0, 'liquid_fuel_gallons', df['retail_gasoline_gallons'] + df['diesel_gallons'] + df['e85_gallons'])
+        # df.insert(0, 'petroleum_gallons', df['retail_gasoline_gallons'] * e0_share + df['diesel_gallons'])
+        # df_rates = pd.DataFrame(df['calendar_year'])
+        # for pollutant_id in self.pollutant_ids:
+        #     apportionment = (df[f'{pollutant_id}_emission_apportionment_gasoline'] +
+        #                      df[f'{pollutant_id}_emission_apportionment_diesel'])
+        #     rates = pd.Series(
+        #         df[f'onroad_fuel_refinery_{pollutant_id}_ustons'] * grams_per_uston * apportionment / df[self.rate_basis],
+        #         name=f'{pollutant_id}_grams_per_gallon'
+        #     )
+        #     df_rates = pd.concat([df_rates, rates], axis=1)
 
         return df_rates
 
