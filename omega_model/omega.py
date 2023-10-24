@@ -1762,6 +1762,8 @@ def run_omega(session_runtime_options, standalone_run=False):
                 iteration_log, credit_banks = \
                     run_producer_consumer(omega_globals.pass_num, manufacturer_annual_data_table)
 
+                omega_log.logwrite('Simulation elapsed time %.2f' % (time.time() - session_runtime_options.start_time))
+
                 if omega_globals.options.notification_destination and omega_globals.options.notification_email \
                         and omega_globals.options.notification_password:
                     send_text(omega_globals.options.notification_destination,
