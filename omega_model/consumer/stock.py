@@ -33,7 +33,7 @@ def get_vehicle_info(vehicle_id):
             vehicles_cache[vehicle_id] = [(v.market_class_id, v.model_year, v.initial_registered_count)
                                       for v in omega_globals.finalized_vehicles if v.vehicle_id == vehicle_id][0]
         except:
-            print('wtf?')
+            print('stock.py exception !!!')
 
     return vehicles_cache[vehicle_id]
 

@@ -236,7 +236,7 @@ class WeightedTree(OMEGABase):
         try:
             return Eval.eval(eq_str, {'results': values_dict}), eq_str
         except:
-            print('wtf?')
+            print('omega trees exception !!!')
 
     def show(self):
         """
