@@ -766,7 +766,8 @@ def generate_constrained_nearby_shares(columns, combo, half_range_frac, num_step
 
     columns = no_alt_columns + alt_columns
 
-    if all([min_constraints[c] == max_constraints[c] for c in columns]):
+    if all([min_constraints[c] == max_constraints[c] or
+            max_constraints[c] - min_constraints[c] <= np.power(10.0, -machine_resolution/2) for c in columns]):
         dfx = pd.DataFrame()
         for c in columns[:-1]:
             dfx[c] = np.atleast_1d(max_constraints[c])
