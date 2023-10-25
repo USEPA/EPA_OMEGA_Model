@@ -607,7 +607,8 @@ class CostCloud(OMEGABase, CostCloudBase):
                                     cloud_point = vehicle.calc_battery_sizing_onroad_direct_kWh_per_mile(cloud_point)
 
                                     if vehicle.powertrain_type == 'PHEV' and \
-                                            omega_globals.options.phev_battery_kwh == 'RSE':
+                                            (omega_globals.options.phev_battery_kwh == 'RSE' or
+                                             cloud_point['battery_sizing_onroad_direct_kwh_per_mile'] == 0):
                                         # use nominal size from RSE
                                         battery_kwh = cloud_point['hev_batt_kwh']
                                     elif vehicle.powertrain_type == 'PHEV' and \
