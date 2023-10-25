@@ -218,7 +218,7 @@ class DriveCycleWeights(OMEGABase):
                     eq_str = DriveCycleWeights._data[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
                                                                       weighted=weighted)[1]
                 except:
-                    print('wtf?')
+                    print('drive cycle weights exception !!!')
                 DriveCycleWeights._data[cache_key] = eq_str
             else:
                 raise Exception('Missing drive cycle weights for %s, %d or prior' % (fueling_class, calendar_year))
