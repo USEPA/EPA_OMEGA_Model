@@ -463,7 +463,8 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                             production_min = dict()
                             production_max = dict()
                             for nmc in node_market_classes:
-                                if omega_globals.pass_num == 0:
+                                if omega_globals.pass_num == 0 or \
+                                        omega_globals.options.second_pass_production_constraints:
                                     min_production_share = ProductionConstraints.get_minimum_share(calendar_year, nmc)
                                     required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, nmc)
                                     production_min[nmc] = max(min_production_share, required_zev_share)

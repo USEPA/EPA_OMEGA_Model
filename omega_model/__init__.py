@@ -184,6 +184,7 @@ try:
             self.verbose = False
             self.iterate_producer_consumer = True
             self.no_backsliding = False
+            self.second_pass_production_constraints = False
 
             self.footprint_min_scaler = 1/1.05
             self.footprint_max_scaler = 1.05
