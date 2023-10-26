@@ -1664,12 +1664,12 @@ def run_omega(session_runtime_options, standalone_run=False):
 
     try:
 
-        manufacturer_annual_data_table = None
-        manufacturer_gigawatthour_data = None
-        omega_globals.cumulative_battery_GWh = {'total': 0}
-        omega_globals.finalized_vehicles = []
-
         for omega_globals.pass_num in range(len(consolidate)):
+
+            manufacturer_annual_data_table = None
+            manufacturer_gigawatthour_data = None
+            omega_globals.cumulative_battery_GWh = {'total': 0}
+            omega_globals.finalized_vehicles = []
 
             session_runtime_options.consolidate_manufacturers = consolidate[omega_globals.pass_num]
 
