@@ -113,8 +113,8 @@ def run_postproc(iteration_log, credit_banks):
             ManufacturerAnnualData. \
                 create_manufacturer_annual_data(model_year=calendar_year,
                                                 compliance_id=manufacturer_id,
-                                                target_co2e_Mg=sum(mfr_data['target_co2e_megagrams']),
-                                                calendar_year_cert_co2e_Mg=sum(mfr_data['cert_co2e_megagrams']),
+                                                target_co2e_Mg=sum(mfr_data['target_co2e_Mg']),
+                                                calendar_year_cert_co2e_Mg=sum(mfr_data['cert_co2e_Mg']),
                                                 manufacturer_vehicle_cost_dollars=sum(
                                                     mfr_data['new_vehicle_mfr_cost_dollars'] *
                                                     mfr_data['_initial_registered_count']),
