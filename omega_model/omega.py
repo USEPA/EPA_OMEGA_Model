@@ -1592,7 +1592,7 @@ def init_omega(session_runtime_options):
         if not init_fail:
             # initial year = initial fleet model year (latest year of data)
             omega_globals.options.analysis_initial_year = \
-                max([v.model_year for v in omega_globals.finalized_vehicles]) + 1
+                min([v.model_year for v in omega_globals.finalized_vehicles]) + 1
 
             # update vehicle annual data for base year fleet
             stock.update_stock(omega_globals.options.analysis_initial_year - 1)
