@@ -170,31 +170,6 @@ def main():
 
             session_fleet_physical = {**analysis_fleet_physical, **legacy_fleet_physical}
 
-            # calculate refinery emission inventories and oil import effects
-            effects_log.logwrite(f'\nCalculating refinery inventories and oil import effects for {session_name}')
-            if session_settings.session_policy == 'no_action':
-                session_fleet_physical = calc_refinery_inventory_and_oil_imports(
-                    batch_settings, session_settings, session_fleet_physical
-                )
-                no_action_fleet_physical = session_fleet_physical.copy()
-            else:
-                try:
-                    session_fleet_physical = calc_refinery_inventory_and_oil_imports(
-                        batch_settings, session_settings, no_action_fleet_physical, session_fleet_physical
-                    )
-                except UserWarning:
-                    effects_log.logwrite(f'\nThe no_action policy must immediately follow the Context and precede any'
-                                         f'action policies in the batch input file')
-                    sys.exit()
-
-            # calculate egu emission inventories
-            effects_log.logwrite(f'Calculating EGU inventories for {session_name}')
-            session_fleet_physical = calc_egu_inventory(batch_settings, session_settings, session_fleet_physical)
-
-            # calculate final (total) inventories
-            effects_log.logwrite(f'Calculating total inventories for {session_name}')
-            session_fleet_physical = calc_total_inventory(session_fleet_physical)
-
             session_fleet_physical_df = \
                 pd.DataFrame.from_dict(session_fleet_physical, orient='index').reset_index(drop=True)
 
@@ -284,6 +259,17 @@ def main():
             **discounted_costs.annual_values_dict, **discounted_costs.pv_dict, **discounted_costs.eav_dict
         }
         discounted_costs_df = pd.DataFrame.from_dict(discounted_costs_dict, orient='index')
+
+        # calculate refinery, egu and total emissions using the annual_physical_df DataFrame ___________________________
+        effects_log.logwrite(f'\nCalculating refinery inventories and oil import effects for the batch')
+        annual_physical_df = calc_refinery_inventory_and_oil_imports(
+            batch_settings, session_settings, annual_physical_df
+            )
+        effects_log.logwrite(f'Calculating EGU inventories for the batch')
+        annual_physical_df = calc_egu_inventory(batch_settings, session_settings, annual_physical_df)
+
+        effects_log.logwrite(f'Calculating total inventories for the batch')
+        annual_physical_df = calc_total_inventory(annual_physical_df)
 
         # calculate annual benefits and annual physical effects deltas _________________________________________________
         effects_log.logwrite(f'\nCalculating annual benefits for the batch')
