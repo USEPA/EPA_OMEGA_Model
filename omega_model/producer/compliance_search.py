@@ -1153,6 +1153,13 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
                 cv.cost_curve.to_csv(filename, columns=sorted(cv.cost_curve.columns), index=False)
 
         for veh in cv.vehicle_list:
+            if veh.base_year_vehicle_id == omega_globals.options.canary_byvid and \
+                    (not omega_globals.options.log_vehicle_cloud_years or
+                     veh.model_year in omega_globals.options.log_vehicle_cloud_years):
+                veh.to_csv('%s_%s_%s%d_%d_finalized_Vehicle.csv' %
+                           (omega_globals.options.session_name, veh.compliance_id, veh.fueling_class,
+                            veh.base_year_vehicle_id, veh.model_year))
+
             veh_final = VehicleFinal()
             transfer_vehicle_data(veh, veh_final)
 
@@ -1175,6 +1182,13 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
 
             veh_final.global_cumulative_battery_GWh = omega_globals.cumulative_battery_GWh
             omega_globals.options.PowertrainCost.calc_cost(veh_final, update_tracker=True)  # update build dict
+
+            if veh_final.base_year_vehicle_id == omega_globals.options.canary_byvid and \
+                    (not omega_globals.options.log_vehicle_cloud_years or
+                     veh_final.model_year in omega_globals.options.log_vehicle_cloud_years):
+                veh_final.to_csv('%s_%s_%s%d_%d_finalized_VehicleFinal.csv' %
+                                 (omega_globals.options.session_name, veh_final.compliance_id, veh_final.fueling_class,
+                                  veh_final.base_year_vehicle_id, veh_final.model_year))
 
     # propagate pre-production vehicles
     for ppv in pre_production_vehicles:

@@ -711,6 +711,24 @@ def calc_vehicle_frontier(vehicle):
     """
     cost_cloud = omega_globals.options.CostCloud.get_cloud(vehicle)
     vehicle.calc_cost_curve(cost_cloud)
+
+    if vehicle.base_year_vehicle_id == omega_globals.options.canary_byvid and \
+            (not omega_globals.options.log_vehicle_cloud_years or
+             vehicle.model_year in omega_globals.options.log_vehicle_cloud_years):
+        vehicle.to_csv('%s_%s_%s%d_%d_vehicle.csv' %
+                       (omega_globals.options.session_name, vehicle.compliance_id, vehicle.fueling_class,
+                        vehicle.base_year_vehicle_id, vehicle.model_year))
+
+        cc = cost_cloud.transpose().sort_index()
+        cc.to_csv('%s_%s_%s%d_%d_cost_cloud.csv' %
+                  (omega_globals.options.session_name, vehicle.compliance_id, vehicle.fueling_class,
+                   vehicle.base_year_vehicle_id, vehicle.model_year))
+
+        cc = vehicle.cost_curve.transpose().sort_index()
+        cc.to_csv('%s_%s_%s%d_%d_cost_curve.csv' %
+                  (omega_globals.options.session_name, vehicle.compliance_id, vehicle.fueling_class,
+                   vehicle.base_year_vehicle_id, vehicle.model_year))
+
     return vehicle
 
 

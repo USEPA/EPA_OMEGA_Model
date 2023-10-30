@@ -707,7 +707,8 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                             # informative data for troubleshooting:
                             if omega_globals.options.log_vehicle_cloud_years == 'all' or \
-                                    vehicle.model_year in omega_globals.options.log_vehicle_cloud_years:
+                                    vehicle.model_year in omega_globals.options.log_vehicle_cloud_years or \
+                                    vehicle.base_year_vehicle_id == omega_globals.options.canary_byvid:
                                 cloud_point['vehicle_id'] = vehicle.vehicle_id
                                 cloud_point['vehicle_base_year_id'] = vehicle.base_year_vehicle_id
                                 cloud_point['vehicle_name'] = vehicle.name
