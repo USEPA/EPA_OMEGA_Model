@@ -239,6 +239,8 @@ try:
 
             self.verbose_postproc = ['iteration_']
 
+            self.canary_byvid = -1
+
             # = 'all' or list of years to log, empty list to disable logging:
             self.log_vehicle_cloud_years = []
 

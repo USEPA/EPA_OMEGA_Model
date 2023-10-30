@@ -138,17 +138,23 @@ class OMEGABase:
 
         return df
 
-    def to_csv(self, filename, *args, **kwargs):
+    def to_csv(self, filename, transpose=True, *args, **kwargs):
         """
         Save object as comma-separated values file.
 
         Args:
             filename (str): name of file
+            transpose (bool): tranpose dataframe if ``True``
             *args: optional positional arguments to pandas DataFrame.to_csv()
             **kwargs: optional keyword arguments to pandas DataFrame.to_csv()
 
         """
-        self.to_dataframe().to_csv(filename, *args, **kwargs)
+        df = self.to_dataframe()
+
+        if transpose:
+            df = df.transpose()
+
+        df.to_csv(filename, *args, columns=sorted(df.columns), **kwargs)
 
     def to_dict(self, types=None):
         """
