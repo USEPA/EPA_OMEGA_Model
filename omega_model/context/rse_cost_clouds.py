@@ -723,6 +723,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 cloud_point['vehicle_mot_rated_kw'] = vehicle.total_emachine_kw
                                 cloud_point['rlhp20'] = rlhp20
                                 cloud_point['rlhp60'] = rlhp60
+                                cloud_point['hp_etw'] = HP_ETW
 
                             # add powertrain costs
                             powertrain_costs = \
