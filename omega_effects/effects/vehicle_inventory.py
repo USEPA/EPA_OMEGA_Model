@@ -241,9 +241,6 @@ def calc_vehicle_inventory(vpd):
         'gvwr_lbs': vpd.gvwr_lbs,
 
         'barrels_of_oil': oil_bbl,
-        'change_in_barrels_of_oil_imports': 0,
-        'change_in_barrels_of_oil_imports_per_day': 0,
-
         'session_fatalities': vpd.session_fatalities,
 
         'nmog_exhaust_ustons': nmog_exh_ustons,
@@ -274,55 +271,6 @@ def calc_vehicle_inventory(vpd):
         'ch4_vehicle_metrictons': ch4_veh_metrictons,
         'n2o_vehicle_metrictons': n2o_veh_metrictons,
         'co2_vehicle_metrictons': co2_veh_metrictons,
-
-        'voc_refinery_ustons': 0,
-        'co_refinery_ustons': 0,
-        'nox_refinery_ustons': 0,
-        'pm25_refinery_ustons': 0,
-        'sox_refinery_ustons': 0,
-
-        'voc_egu_ustons': 0,
-        'co_egu_ustons': 0,
-        'nox_egu_ustons': 0,
-        'pm25_egu_ustons': 0,
-        'sox_egu_ustons': 0,
-        'hcl_egu_ustons': 0,
-        'hg_egu_ustons': 0,
-
-        'voc_upstream_ustons': 0,
-        'co_upstream_ustons': 0,
-        'nox_upstream_ustons': 0,
-        'pm25_upstream_ustons': 0,
-        'sox_upstream_ustons': 0,
-
-        'ch4_refinery_metrictons': 0,
-        'n2o_refinery_metrictons': 0,
-        'co2_refinery_metrictons': 0,
-
-        'ch4_egu_metrictons': 0,
-        'n2o_egu_metrictons': 0,
-        'co2_egu_metrictons': 0,
-
-        'ch4_upstream_metrictons': 0,
-        'n2o_upstream_metrictons': 0,
-        'co2_upstream_metrictons': 0,
-
-        'nmog_and_voc_total_ustons': 0,
-        'co_total_ustons': 0,
-        'nox_total_ustons': 0,
-        'pm25_total_ustons': 0,
-        'sox_total_ustons': 0,
-        'acetaldehyde_total_ustons': 0,
-        'acrolein_total_ustons': 0,
-        'benzene_total_ustons': 0,
-        'ethylbenzene_total_ustons': 0,
-        'formaldehyde_total_ustons': 0,
-        'naphthalene_total_ustons': 0,
-        '13_butadiene_total_ustons': 0,
-        '15pah_total_ustons': 0,
-        'co2_total_metrictons': 0,
-        'ch4_total_metrictons': 0,
-        'n2o_total_metrictons': 0,
     }
 
     return results_dict
