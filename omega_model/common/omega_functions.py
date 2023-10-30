@@ -190,13 +190,13 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=True):
     # drop non-numeric columns so dtypes don't become "object"
     cloud = cloud.drop(columns=cloud_non_numeric_columns, errors='ignore')
 
-    if cloud[y_key].values.max() == cloud[y_key].values.min() or \
-            cloud[x_key].values.max() == cloud[x_key].values.min():
+    if max(cloud[y_key].values) == min(cloud[y_key].values) or \
+            max(cloud[x_key].values) == min(cloud[x_key].values):
         cloud = cloud.drop_duplicates([x_key, y_key])
 
-        if cloud[x_key].values.max() == cloud[x_key].values.min():
+        if max(cloud[x_key].values) == min(cloud[x_key].values):
             cloud = cloud.loc[[cloud[y_key].idxmin()]]
-        elif cloud[y_key].values.max() == cloud[y_key].values.min():
+        elif max(cloud[y_key].values) == min(cloud[y_key].values):
             cloud = cloud.loc[[cloud[x_key].idxmax()]]
 
     if len(cloud) > 1:
@@ -208,10 +208,10 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=True):
             x_sign = 1
 
         # normalize data (helps with up-slope frontier)
-        cloud['y_norm'] = ((cloud[y_key].values - cloud[y_key].values.min()) /
-                          (cloud[y_key].values.max() - cloud[y_key].values.min()))
-        cloud['x_norm'] = x_sign * ((cloud[x_key].values - cloud[x_key].values.min()) /
-                          (cloud[x_key].values.max() - cloud[x_key].values.min()))
+        cloud['y_norm'] = ((cloud[y_key].values - min(cloud[y_key].values)) /
+                          (max(cloud[y_key].values) - min(cloud[y_key].values)))
+        cloud['x_norm'] = x_sign * ((cloud[x_key].values - min(cloud[x_key].values)) /
+                          (max(cloud[x_key].values) - min(cloud[x_key].values)))
 
         x_key = 'x_norm'
         y_key = 'y_norm'
@@ -221,7 +221,7 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=True):
         frontier_pts.append(cloud.loc[idxmin])
         min_frontier_factor = 0
 
-        if cloud[x_key].values.min() != cloud[x_key].values.max():
+        if min(cloud[x_key].values) != max(cloud[x_key].values):
             while pd.notna(idxmin) and (min_frontier_factor <= 0 or allow_upslope) \
                     and not np.isinf(min_frontier_factor) and not cloud.empty:
 
@@ -234,11 +234,11 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=True):
 
                 if not cloud.empty:
                     calc_frontier_factor_down(cloud, prior_x, prior_y, x_key, y_key)
-                    min_frontier_factor = cloud['frontier_factor'].values.min()
+                    min_frontier_factor = min(cloud['frontier_factor'].values)
 
                     if min_frontier_factor > 0 and allow_upslope:
                         calc_frontier_factor_up(cloud, prior_x, prior_y, x_key, y_key)
-                        min_frontier_factor = cloud['frontier_factor'].values.min()
+                        min_frontier_factor = min(cloud['frontier_factor'].values)
 
                 if not cloud.empty:
                     idxmin = get_idxmin(cloud, min_frontier_factor, x_key)
