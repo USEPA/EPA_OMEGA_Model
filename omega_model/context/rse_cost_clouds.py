@@ -707,7 +707,8 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                             # informative data for troubleshooting:
                             if omega_globals.options.log_vehicle_cloud_years == 'all' or \
-                                    vehicle.model_year in omega_globals.options.log_vehicle_cloud_years:
+                                    vehicle.model_year in omega_globals.options.log_vehicle_cloud_years or \
+                                    vehicle.base_year_vehicle_id == omega_globals.options.canary_byvid:
                                 cloud_point['vehicle_id'] = vehicle.vehicle_id
                                 cloud_point['vehicle_base_year_id'] = vehicle.base_year_vehicle_id
                                 cloud_point['vehicle_name'] = vehicle.name
@@ -723,6 +724,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 cloud_point['vehicle_mot_rated_kw'] = vehicle.total_emachine_kw
                                 cloud_point['rlhp20'] = rlhp20
                                 cloud_point['rlhp60'] = rlhp60
+                                cloud_point['hp_etw'] = HP_ETW
 
                             # add powertrain costs
                             powertrain_costs = \

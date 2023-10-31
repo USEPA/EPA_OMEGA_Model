@@ -672,7 +672,7 @@ class CompositeVehicle(OMEGABase):
             A float, max value from the cost curve interpolation axis
 
         """
-        return self.cost_curve[cost_curve_interp_key].values.max()
+        return max(self.cost_curve[cost_curve_interp_key].values)
 
     def get_min_cost_curve_index(self):
         """
@@ -682,7 +682,7 @@ class CompositeVehicle(OMEGABase):
             A float, min value from the cost curve interpolation axis
 
         """
-        return self.cost_curve[cost_curve_interp_key].values.min()
+        return min(self.cost_curve[cost_curve_interp_key].values)
 
     def get_weighted_attribute(self, attribute_name):
         """
@@ -711,6 +711,24 @@ def calc_vehicle_frontier(vehicle):
     """
     cost_cloud = omega_globals.options.CostCloud.get_cloud(vehicle)
     vehicle.calc_cost_curve(cost_cloud)
+
+    if vehicle.base_year_vehicle_id == omega_globals.options.canary_byvid and \
+            (not omega_globals.options.log_vehicle_cloud_years or
+             vehicle.model_year in omega_globals.options.log_vehicle_cloud_years):
+        vehicle.to_csv('%s_%s_%s%d_%d_vehicle.csv' %
+                       (omega_globals.options.session_name, vehicle.compliance_id, vehicle.fueling_class,
+                        vehicle.base_year_vehicle_id, vehicle.model_year))
+
+        cc = cost_cloud.transpose().sort_index()
+        cc.to_csv('%s_%s_%s%d_%d_cost_cloud.csv' %
+                  (omega_globals.options.session_name, vehicle.compliance_id, vehicle.fueling_class,
+                   vehicle.base_year_vehicle_id, vehicle.model_year))
+
+        cc = vehicle.cost_curve.transpose().sort_index()
+        cc.to_csv('%s_%s_%s%d_%d_cost_curve.csv' %
+                  (omega_globals.options.session_name, vehicle.compliance_id, vehicle.fueling_class,
+                   vehicle.base_year_vehicle_id, vehicle.model_year))
+
     return vehicle
 
 
@@ -1193,10 +1211,11 @@ class Vehicle(OMEGABase):
         allow_upslope = False
 
         # special handling for the case where all cost_curve_interp_key values are the same value, e.g. 0
-        if cost_cloud[cost_curve_interp_key].values.min() == cost_cloud[cost_curve_interp_key].values.max():
+        # if cost_cloud[cost_curve_interp_key].values.min() == cost_cloud[cost_curve_interp_key].values.max():
+        if min(cost_cloud[cost_curve_interp_key].values) == max(cost_cloud[cost_curve_interp_key].values):
             # try to take lowest generalized cost point
-            cost_curve = cost_cloud[cost_cloud['new_vehicle_mfr_generalized_cost_dollars'] == cost_cloud[
-                'new_vehicle_mfr_generalized_cost_dollars'].values.min()]
+            cost_curve = cost_cloud[cost_cloud['new_vehicle_mfr_generalized_cost_dollars'] == min(cost_cloud[
+                'new_vehicle_mfr_generalized_cost_dollars'].values)]
 
             # if somehow more than one point, just take the first one...
             if len(cost_curve) > 1:
