@@ -19,7 +19,7 @@ class Discounting:
     """
     def __init__(self):
 
-        self.social_discrates = [0.03, 0.07]
+        self.social_discrates = []
 
         self.annual_values_dict = {}
         self.pv_dict = {}
@@ -57,6 +57,8 @@ class Discounting:
         dict_of_values = annual_values_df.to_dict(orient='index')
         discount_to_year = batch_settings.discount_values_to_year
         cost_accrual = batch_settings.cost_accrual
+
+        self.social_discrates = batch_settings.general_inputs_for_effects.get_value('social_discount_rates')
 
         self.fuel_arg = 'fueling_class'
         if ('car' or 'truck') not in [item for item in annual_values_df['reg_class_id']]:

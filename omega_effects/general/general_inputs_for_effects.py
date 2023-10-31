@@ -146,6 +146,8 @@ class GeneralInputsForEffects:
             The value of the given attribute.
 
         """
-        attribute_value = self._data[attribute]['value']
+        # note that eval is used here since list-like entry for social discount rates causes all entries to be objects
+        attribute_value = eval(self._data[attribute]['value'])
 
         return attribute_value
+
