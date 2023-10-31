@@ -74,11 +74,13 @@ class Discounting:
         monetized_args_dr3 = [arg for arg in self.all_monetized_args if f'_{emission_dr3}' in arg]
         monetized_args_dr5 = [arg for arg in self.all_monetized_args if f'_{emission_dr5}' in arg]
         monetized_args_dr7 = [arg for arg in self.all_monetized_args if f'_{emission_dr7}' in arg]
-        self.monetized_non_emission_args = [arg for arg in self.all_monetized_args
-                                       if arg not in monetized_args_dr25
-                                       and arg not in monetized_args_dr3
-                                       and arg not in monetized_args_dr5
-                                       and arg not in monetized_args_dr7]
+        self.monetized_non_emission_args = [
+            arg for arg in self.all_monetized_args
+            if arg not in monetized_args_dr25
+               and arg not in monetized_args_dr3
+               and arg not in monetized_args_dr5
+               and arg not in monetized_args_dr7
+        ]
         id_args = [k for k, v in nested_dict.items() if '_dollars' not in k]
 
         self.rate_list_dict = {
