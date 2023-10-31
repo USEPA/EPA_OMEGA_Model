@@ -1,4 +1,4 @@
-input_template_name:,context.powertrain_cost_frm,input_template_version:,0.21,description:,"20230913 following KN/BE/AM mtg; 20230918 adds notes, no changes to values; 20231011 adds inverter costs on HEV/PHEV & adjusts motor shares",,,,,
+input_template_name:,context.powertrain_cost_frm,input_template_version:,0.21,description:,"20231030 adds ANL battery cost curves, NMC vs LFP shares, battery learning for 2036+ set to 1.5pct",,,,,
 powertrain_type,powertrain_subtype,system,subsystem,drive_system,engine_configuration,body_style,value,dollar_basis,Formula Notes,Notes
 BEV,-,Drive_Unit,E_Motor,FWD,-,-,(1.1097*KW_DU + 323.22) * MARKUP_BEV,2022,,FEV motor_single for RDU or DU; induction_motor_dual for FDU
 BEV,-,Drive_Unit,E_Motor,RWD,-,-,(1.1097*KW_DU + 323.22) * MARKUP_BEV,2022,,FEV motor_single for RDU or DU; induction_motor_dual for FDU
@@ -319,9 +319,18 @@ ALL,-,Driveline,ac_efficiency,-,-,-,(40) * MARKUP_ICE,2010,,NPRM
 ALL,-,Driveline,ac_leakage,-,-,-,(63) * MARKUP_ICE,2010,,NPRM
 ALL,-,Exhaust,diesel_aftertreatment_system,-,-,-,(700) * LITERS * MARKUP_ICE,2020,HD2027 NPRM,NPRM
 ALL,-,Engine,diesel_engine_cost_scaler,-,-,-,(1.5) * 1,,"diesel engine cost = (engine_cylinder_cost + engine_displacement_cost) * diesel_engine_cost_scaler; i.e., 1.5 times the gasoline engine cost of equivalent size",NPRM
-BEV,-,Electrical_Power_Supply,HV_Battery,-,-,-,261.61 * (KWH ** -0.184) * KWH * MARKUP_BEV,2019,KWH denotes gross kWh; coefficients denote 250K production volume,NPRM
-PHEV,-,Electrical_Power_Supply,HV_Battery,-,-,-,658.48 * (KWH ** -0.45) * KWH * MARKUP_PHEV,2019,KWH denotes gross kWh; coefficients denote 250K production volume,NPRM
-HEV,-,Electrical_Power_Supply,HV_Battery,-,-,-,936.1 * (KWH ** -0.802) * KWH * MARKUP_HEV,2019,20221028 MSa,NPRM
+BEV,-,Electrical_Power_Supply,HV_Battery_NMC,-,-,-,(128.9 + 1480 / (KWH ** 1.164) - 5.278 * (MODEL_YEAR - 2023) * e ** (-0.0129 * (MODEL_YEAR - 2023))) * KWH * MARKUP_BEV,2022,KWH denotes gross kWh,ANL 20231030
+BEV,-,Electrical_Power_Supply,HV_Battery_LFP,-,-,-,(120.6 + 1535 / (KWH ** 1.148) - 10.04 * (MODEL_YEAR - 2023) * e ** (-0.08346 * (MODEL_YEAR - 2023))) * KWH * MARKUP_BEV,2022,KWH denotes gross kWh,ANL 20231030
+BEV,-,NMC_share,HV_Battery,-,-,-,"{2022: 1, 2023: 1, 2024: 1, 2025: 1, 2026: 1, 2027: 1, 2028: 1, 2029: 1, 2030: 1, 2031: 1, 2032: 1}",,,cost curve weighting where last entry is used for all years going forward
+BEV,-,learning,HV_Battery,-,-,-,"(1 - 0.015) ** (max(CALENDAR_YEAR, 2035) - 2035)",,,calendar year entry is set to 2035 in-code for model years 2023 thru 2035 and then equals model year thereafter
+PHEV,-,Electrical_Power_Supply,HV_Battery_NMC,-,-,-,(128.9 + 1480 / (KWH ** 1.164) - 5.278 * (MODEL_YEAR - 2023) * e ** (-0.0129 * (MODEL_YEAR - 2023))) * KWH * MARKUP_PHEV,2022,KWH denotes gross kWh,ANL 20231030
+PHEV,-,Electrical_Power_Supply,HV_Battery_LFP,-,-,-,(120.6 + 1535 / (KWH ** 1.148) - 10.04 * (MODEL_YEAR - 2023) * e ** (-0.08346 * (MODEL_YEAR - 2023))) * KWH * MARKUP_PHEV,2022,KWH denotes gross kWh,ANL 20231030
+PHEV,-,NMC_share,HV_Battery,-,-,-,"{2022: 1, 2023: 1, 2024: 1, 2025: 1, 2026: 1, 2027: 1, 2028: 1, 2029: 1, 2030: 1, 2031: 1, 2032: 1}",,,cost curve weighting where last entry is used for all years going forward
+PHEV,-,learning,HV_Battery,-,-,-,"(1 - 0.015) ** (max(CALENDAR_YEAR, 2035) - 2035)",,,calendar year entry is set to 2023 in-code for model years 2023 thru 2035 and then equals model year thereafter
+HEV,-,Electrical_Power_Supply,HV_Battery_NMC,-,-,-,(122.9 + 509.6 / (KWH ** 0.7649) - 4.443 * (MODEL_YEAR - 2023) * e ** (0.01018 * (MODEL_YEAR - 2023))) * KWH * MARKUP_HEV,2022,KWH denotes gross kWh,ANL 20231030
+HEV,-,Electrical_Power_Supply,HV_Battery_LFP,-,-,-,(0) * KWH * MARKUP_HEV,2022,KWH denotes gross kWh,ANL 20231030
+HEV,-,NMC_share,HV_Battery,-,-,-,"{2022: 1, 2023: 1, 2024: 1, 2025: 1, 2026: 1, 2027: 1, 2028: 1, 2029: 1, 2030: 1, 2031: 1, 2032: 1}",,,cost curve weighting where last entry is used for all years going forward
+HEV,-,learning,HV_Battery,-,-,-,"(1 - 0.015) ** (max(CALENDAR_YEAR, 2035) - 2035)",,,calendar year entry is set to 2023 in-code for model years 2023 thru 2035 and then equals model year thereafter
 BEV,-,battery_offset,-,-,-,-,"{""dollars_per_kwh"": {2023: -27, 2024: -31.5, 2025: -36, 2026: -40.5, 2027: -45, 2028: -45, 2029: -45, 2030: -33.75, 2031: -22.50, 2032: -11.25, 2033: -0}}",,,NPRM
 PHEV,-,battery_offset,-,-,-,-,"{""dollars_per_kwh"": {2023: -27, 2024: -31.5, 2025: -36, 2026: -40.5, 2027: -45, 2028: -45, 2029: -45, 2030: -33.75, 2031: -22.50, 2032: -11.25, 2033: -0}}",,,NPRM
 ALL,-,learning_rate,-,-,-,-,(-0.245) * 1,,,NPRM
@@ -330,8 +339,6 @@ ICE,-,legacy_sales_learning_scaler,-,-,-,-,(100) * 1,,,NPRM
 PEV,-,legacy_sales_learning_scaler,-,-,-,-,(8) * 1,,,NPRM
 ICE,-,sales_scaler,-,-,-,-,(1.5) * 1,,,NPRM
 PEV,-,sales_scaler,-,-,-,-,(6.6) * 1,,,NPRM
-PEV,-,battery_GWh_learning_curve,-,-,-,-,(4.1917 * CUMULATIVE_GWH ** -0.225) ,,,NPRM
-PEV,-,cumulative_GWh_LD_noIRA,-,-,-,-,"{""GWh"": {2022: 26, 2023: 110, 2024: 265, 2025: 500, 2026: 818, 2027: 1132, 2028: 1433, 2029: 1744, 2030: 2075, 2031: 2410, 2032: 2758}}",,D:\TSh\omega\runs\2023_03_01_15_39_43_central_3alts_20230301\_NTR-noIRA\out\2023_03_01_15_39_43_central_3alts_20230301_NTR-noIRA_summary_results.csv,NPRM
 BEV,-,markup,-,-,-,-,(1.5) * 1,,,NPRM
 HEV,-,markup,-,-,-,-,(1.5) * 1,,,NPRM
 PHEV,-,markup,-,-,-,-,(1.5) * 1,,,NPRM
