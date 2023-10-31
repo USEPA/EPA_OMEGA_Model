@@ -53,6 +53,7 @@ Data Column Name and Description
 
 """
 print('importing %s' % __file__)
+from math import e
 import pandas as pd
 
 from common.omega_types import *
@@ -107,7 +108,7 @@ class PowertrainCost(OMEGABase):
                 vehicle.drive_system, vehicle.body_style
 
         learning_pev_battery_scaling_factor, learning_factor_ice, learning_factor_pev, locals_dict = \
-            get_learning_factors(vehicle, locals_dict)
+            get_learning_factors(vehicle, locals_dict, powertrain_type)
 
         KWH = KW = KW_OBC = KW_DU = KW_FDU = KW_RDU = KW_P2 = KW_P4 = 0
         trans = CYL = engine_config = LITERS = powertrain_subtype = None
@@ -219,8 +220,9 @@ class PowertrainCost(OMEGABase):
 
             battery_cost = battery_offset = 0
             if powertrain_type in ['HEV', 'PHEV']:
-                battery_cost = calc_battery_cost(locals_dict, learning_pev_battery_scaling_factor, powertrain_type)
-
+                battery_cost = calc_battery_cost(
+                    locals_dict, learning_pev_battery_scaling_factor, powertrain_type, vehicle.model_year
+                )
                 if powertrain_type == 'PHEV' and omega_globals.options.powertrain_cost_with_ira:
                     battery_offset = calc_battery_offset(locals_dict, vehicle, powertrain_type, KWH)
 
@@ -277,8 +279,9 @@ class PowertrainCost(OMEGABase):
 
             charge_cord_cost = calc_charge_cord_cost(locals_dict, learning_factor_pev, powertrain_type)
 
-            battery_cost = calc_battery_cost(locals_dict, learning_pev_battery_scaling_factor, powertrain_type)
-
+            battery_cost = calc_battery_cost(
+                locals_dict, learning_pev_battery_scaling_factor, powertrain_type, vehicle.model_year
+            )
             battery_offset = 0
             if omega_globals.options.powertrain_cost_with_ira:
                 battery_offset = calc_battery_offset(locals_dict, vehicle, powertrain_type, KWH)
@@ -456,55 +459,30 @@ class PowertrainCost(OMEGABase):
         return template_errors
 
 
-def get_learning_factors(v, locals_dict):
+def get_learning_factors(v, locals_dict, powertrain_type):
     """
     Get learning factors for use in estimating powertrain costs.
 
     Args:
         v (Vehicle): the Vehicle object
         locals_dict (dict): local attributes
+        powertrain_type (str): e.g., 'BEV', 'PHEV', 'HEV'
 
     Returns:
         Learning factors for ICE, PEV, and high-voltage batteries for use in calculating powertrain costs; locals_dict
         is also returned with updated local attributes.
 
     """
-    if v.model_year <= 2025 or v.global_cumulative_battery_GWh['total'] == 0 \
-            or v.global_cumulative_battery_GWh[v.model_year - 1] == 0:
-        learning_pev_battery_scaling_factor = 1
-    else:
-        cost_key = ('PEV', '-', 'battery_GWh_learning_curve', '-', '-', '-', '-')
-        if v.reg_class_id != 'mediumduty':
-            cumulative_gwh = v.global_cumulative_battery_GWh[v.model_year - 1]
-            locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh})
-            learning_pev_battery_scaling_factor = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
+    battery_learning_factor = 0
+    if powertrain_type in ['HEV', 'PHEV', 'BEV']:
+        calendar_year = v.model_year
+        if v.model_year <= 2025:
+            calendar_year = 2023
 
-            while learning_pev_battery_scaling_factor > 1:
-                cumulative_gwh *= 1.1
-                locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh})
-                learning_pev_battery_scaling_factor = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
+        locals_dict.update({'CALENDAR_YEAR': calendar_year})
 
-        else:
-            ld_dict_key = ('PEV', '-', 'cumulative_GWh_LD_noIRA', '-', '-', '-', '-')
-            cumulative_GWh_ld_dict = eval(_cache[ld_dict_key]['value'], {'np': np}, locals_dict)
-
-            if v.model_year - 1 in cumulative_GWh_ld_dict['GWh']:
-                gwh = cumulative_GWh_ld_dict['GWh'][v.model_year - 1]
-                cumulative_gwh = v.global_cumulative_battery_GWh[v.model_year - 1]
-                locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh + gwh})
-                learning_pev_battery_scaling_factor = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
-
-                while learning_pev_battery_scaling_factor > 1:
-                    cumulative_gwh *= 1.1
-                    locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh})
-                    learning_pev_battery_scaling_factor = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
-
-            else:
-                year = max(yr for yr in cumulative_GWh_ld_dict['GWh'])
-                gwh = cumulative_GWh_ld_dict['GWh'][year]
-                cumulative_gwh = v.global_cumulative_battery_GWh[v.model_year - 1]
-                locals_dict.update({'CUMULATIVE_GWH': cumulative_gwh + gwh})
-                learning_pev_battery_scaling_factor = eval(_cache[cost_key]['value'], {'np': np}, locals_dict)
+        key = (powertrain_type, '-', 'learning', 'HV_Battery', '-', '-', '-')
+        battery_learning_factor = eval(_cache[key]['value'], {'np': np}, locals_dict)
 
     # non-battery learning
     learning_rate = eval(_cache['ALL', '-', 'learning_rate', '-', '-', '-', '-']['value'], {'np': np}, locals_dict)
@@ -525,7 +503,7 @@ def get_learning_factors(v, locals_dict):
         learning_factor_ice = 1 / learning_factor_ice
         learning_factor_pev = 1 / learning_factor_pev
 
-    return learning_pev_battery_scaling_factor, learning_factor_ice, learning_factor_pev, locals_dict
+    return battery_learning_factor, learning_factor_ice, learning_factor_pev, locals_dict
 
 
 def get_markups(locals_dict):
@@ -1228,7 +1206,7 @@ def calc_gearbox_cost(
     return gearbox_cost
 
 
-def calc_battery_cost(locals_dict, learning_factor, powertrain_type):
+def calc_battery_cost(locals_dict, learning_factor, powertrain_type, model_year):
     """
     Calculate the high voltage battery pack cost on electrified vehicles.
 
@@ -1236,15 +1214,39 @@ def calc_battery_cost(locals_dict, learning_factor, powertrain_type):
         locals_dict (dict): local attributes
         learning_factor (float): the learning factor to use
         powertrain_type (str): e.g., 'BEV', 'PHEV', 'HEV'
+        model_year (int): the model year of the vehicle
 
     Returns:
         The high voltage battery pack cost
 
     """
-    cost_key = (powertrain_type, '-', 'Electrical_Power_Supply', 'HV_Battery', '-', '-', '-')
+    MODEL_YEAR = model_year
+    if model_year <= 2025:
+        MODEL_YEAR = 2023
+    elif model_year >= 2035:
+        MODEL_YEAR = 2035
+
+    locals_dict.update({'MODEL_YEAR': MODEL_YEAR})
+
+    cost_key = (powertrain_type, '-', 'Electrical_Power_Supply', 'HV_Battery_NMC', '-', '-', '-')
     adj_factor = _cache[cost_key]['dollar_adjustment']
-    battery_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) \
-                   * adj_factor * learning_factor
+    battery_cost_nmc = eval(_cache[cost_key]['value'], {'np': np, 'e': e}, locals_dict) \
+                       * adj_factor * learning_factor
+
+    cost_key = (powertrain_type, '-', 'Electrical_Power_Supply', 'HV_Battery_LFP', '-', '-', '-')
+    adj_factor = _cache[cost_key]['dollar_adjustment']
+    battery_cost_lfp = eval(_cache[cost_key]['value'], {'np': np, 'e': e}, locals_dict) \
+                       * adj_factor * learning_factor
+
+    nmc_share_dict = eval(
+        _cache[powertrain_type, '-', 'NMC_share', 'HV_Battery', '-', '-', '-']['value'], {'np': np}, locals_dict
+    )
+    if model_year in nmc_share_dict:
+        nmc_share = nmc_share_dict[model_year]
+    else:
+        nmc_share = nmc_share_dict[max(nmc_share_dict.keys())]
+
+    battery_cost = battery_cost_nmc * nmc_share + battery_cost_lfp * (1 - nmc_share)
 
     return battery_cost
 

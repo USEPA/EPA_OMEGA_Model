@@ -1,3 +1,5 @@
+import pandas as pd
+
 from omega_effects.effects.physical_effects import get_inputs_for_effects
 
 
@@ -32,12 +34,13 @@ def get_egu_emission_rate(session_settings, calendar_year, kwh_consumption, kwh_
     )
 
 
-def calc_egu_inventory(batch_settings, session_settings, physical_effects_dict):
+def calc_egu_inventory(batch_settings, session_settings, annual_physical_df):  #, physical_effects_dict):
     """
 
     Args:
         batch_settings: an instance of the BatchSettings class
         session_settings: an instance of the SessionSettings class
+        annual_physical_df (DataFrame): a DataFrame of annual physical effects
         physical_effects_dict (dict): the physical effects for which to calculate EGU inventories
 
     Returns:
@@ -49,10 +52,20 @@ def calc_egu_inventory(batch_settings, session_settings, physical_effects_dict):
 
     calendar_years = batch_settings.calendar_years
 
+    keys = pd.Series(zip(
+        annual_physical_df['session_policy'],
+        annual_physical_df['calendar_year'],
+        annual_physical_df['reg_class_id'],
+        annual_physical_df['in_use_fuel_id'],
+        annual_physical_df['fueling_class'],
+    ))
+    df = annual_physical_df.set_index(keys)
+    sessions_dict = df.to_dict('index')
+
     for calendar_year in calendar_years:
 
         vad = [
-            v for v in physical_effects_dict.values()
+            v for v in sessions_dict.values()
             if v['calendar_year'] == calendar_year and v['fuel_consumption_kwh'] != 0
         ]
 
@@ -69,22 +82,39 @@ def calc_egu_inventory(batch_settings, session_settings, physical_effects_dict):
                 session_settings, calendar_year, fuel_consumption_kwh_annual, fuel_generation_kwh_annual
             )
 
-        for v in physical_effects_dict.values():
+        for k, v in sessions_dict.items():
 
             kwhs = v['fuel_generation_kwh']
 
             if v['calendar_year'] == calendar_year:
+                voc_egu_ustons = kwhs * voc_egu_rate / grams_per_us_ton
+                co_egu_ustons = kwhs * co_egu_rate / grams_per_us_ton
+                nox_egu_ustons = kwhs * nox_egu_rate / grams_per_us_ton
+                pm25_egu_ustons = kwhs * pm25_egu_rate / grams_per_us_ton
+                sox_egu_ustons = kwhs * sox_egu_rate / grams_per_us_ton
+                hcl_egu_ustons = kwhs * hcl_egu_rate / grams_per_us_ton
+                hg_egu_ustons = kwhs * hg_egu_rate / grams_per_us_ton
 
-                v['voc_egu_ustons'] = kwhs * voc_egu_rate / grams_per_us_ton
-                v['co_egu_ustons'] = kwhs * co_egu_rate / grams_per_us_ton
-                v['nox_egu_ustons'] = kwhs * nox_egu_rate / grams_per_us_ton
-                v['pm25_egu_ustons'] = kwhs * pm25_egu_rate / grams_per_us_ton
-                v['sox_egu_ustons'] = kwhs * sox_egu_rate / grams_per_us_ton
-                v['hcl_egu_ustons'] = kwhs * hcl_egu_rate / grams_per_us_ton
-                v['hg_egu_ustons'] = kwhs * hg_egu_rate / grams_per_us_ton
+                co2_egu_metrictons = kwhs * co2_egu_rate / grams_per_metric_ton
+                ch4_egu_metrictons = kwhs * ch4_egu_rate / grams_per_metric_ton
+                n2o_egu_metrictons = kwhs * n2o_egu_rate / grams_per_metric_ton
 
-                v['co2_egu_metrictons'] = kwhs * co2_egu_rate / grams_per_metric_ton
-                v['ch4_egu_metrictons'] = kwhs * ch4_egu_rate / grams_per_metric_ton
-                v['n2o_egu_metrictons'] = kwhs * n2o_egu_rate / grams_per_metric_ton
+                update_dict = {
+                    'voc_egu_ustons': voc_egu_ustons,
+                    'co_egu_ustons': co_egu_ustons,
+                    'nox_egu_ustons': nox_egu_ustons,
+                    'pm25_egu_ustons': pm25_egu_ustons,
+                    'sox_egu_ustons': sox_egu_ustons,
+                    'hcl_egu_ustons': hcl_egu_ustons,
+                    'hg_egu_ustons': hg_egu_ustons,
+                    'co2_egu_metrictons': co2_egu_metrictons,
+                    'ch4_egu_metrictons': ch4_egu_metrictons,
+                    'n2o_egu_metrictons': n2o_egu_metrictons,
+                }
+                for attribute_name, attribute_value in update_dict.items():
+                    sessions_dict[k][attribute_name] = attribute_value
 
-    return physical_effects_dict
+    df = pd.DataFrame(sessions_dict).transpose()
+    df.reset_index(drop=True, inplace=True)
+
+    return df
