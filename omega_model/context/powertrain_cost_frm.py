@@ -601,6 +601,8 @@ def get_powertrain_subtype(cost_curve_class):
         return 'P0'
     elif 'P2_' in cost_curve_class:
         return 'P2'
+    elif 'P2P4_' in cost_curve_class:
+        return 'P2'
     elif 'PS_' in cost_curve_class:
         return 'PS'
     else:
