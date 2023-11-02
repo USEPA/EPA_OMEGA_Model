@@ -83,6 +83,8 @@ class MassScaling(OMEGABase):
                and usable_battery_capacity_norm for the given vehicle
 
         """
+        from math import e
+
         null_structure_mass_lbs = 0
         structure_mass_lbs = 0
         battery_mass_lbs = 0
