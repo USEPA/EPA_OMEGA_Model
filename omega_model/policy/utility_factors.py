@@ -204,7 +204,11 @@ class UtilityFactorMethods(OMEGABase):
         method = UtilityFactorMethods._cache[cache_key + '_method']
         norm_dist = UtilityFactorMethods._cache[cache_key + '_norm_dist']
 
-        return method(miles, norm_dist)
+        try:
+            return method(miles, norm_dist)
+        except:
+            # extreme cases may blow up, return 0 for now
+            return 0
 
     @staticmethod
     def calc_highway_utility_factor(calendar_year, miles):
