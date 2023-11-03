@@ -49,6 +49,8 @@ Data Column Name and Description
 
 """
 
+from math import e
+
 print('importing %s' % __file__)
 
 from omega_model import *
@@ -83,7 +85,6 @@ class MassScaling(OMEGABase):
                and usable_battery_capacity_norm for the given vehicle
 
         """
-        from math import e
 
         null_structure_mass_lbs = 0
         structure_mass_lbs = 0
@@ -96,27 +97,27 @@ class MassScaling(OMEGABase):
 
         locals_dict = locals()
         for condition_equation in MassScaling._data['null_structure_mass_lbs']['condition_equation']:
-            null_structure_mass_lbs += Eval.eval(condition_equation, {'np': np}, locals_dict)
+            null_structure_mass_lbs += Eval.eval(condition_equation, {'np': np, 'e': e}, locals_dict)
 
         locals_dict = locals()
         for condition_equation in MassScaling._data['structure_mass_lbs']['condition_equation']:
-            structure_mass_lbs += Eval.eval(condition_equation, {'np': np}, locals_dict)
+            structure_mass_lbs += Eval.eval(condition_equation, {'np': np, 'e': e}, locals_dict)
 
         # locals_dict = locals()
         for condition_equation in MassScaling._data['battery_mass_lbs']['condition_equation']:
-            battery_mass_lbs += Eval.eval(condition_equation, {'np': np}, locals_dict)
+            battery_mass_lbs += Eval.eval(condition_equation, {'np': np, 'e': e}, locals_dict)
 
         # locals_dict = locals()
         for condition_equation in MassScaling._data['powertrain_mass_lbs']['condition_equation']:
-            powertrain_mass_lbs += Eval.eval(condition_equation, {'np': np}, locals_dict)
+            powertrain_mass_lbs += Eval.eval(condition_equation, {'np': np, 'e': e}, locals_dict)
 
         # locals_dict = locals()
         for condition_equation in MassScaling._data['delta_glider_non_structure_mass_lbs']['condition_equation']:
-            delta_glider_non_structure_mass_lbs += Eval.eval(condition_equation, {'np': np}, locals_dict)
+            delta_glider_non_structure_mass_lbs += Eval.eval(condition_equation, {'np': np, 'e': e}, locals_dict)
 
         # locals_dict = locals()
         for condition_equation in MassScaling._data['usable_battery_capacity_norm']['condition_equation']:
-            usable_battery_capacity_norm += Eval.eval(condition_equation, {'np': np}, locals_dict)
+            usable_battery_capacity_norm += Eval.eval(condition_equation, {'np': np, 'e': e}, locals_dict)
 
         usable_battery_capacity_norm += (usable_battery_capacity_norm == 0)  # zeros -> 1.0s by default
 

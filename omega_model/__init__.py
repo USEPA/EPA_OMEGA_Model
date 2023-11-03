@@ -119,7 +119,7 @@ try:
             self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_bev.csv'
             self.phev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_phev.csv'
 
-            self.powertrain_cost_input_file = path + 'test_inputs/powertrain_cost.csv'
+            self.powertrain_cost_input_file = path + 'test_inputs/powertrain_cost_frm.csv'
             self.glider_cost_input_file = path + 'test_inputs/glider_cost.csv'
             self.body_styles_file = path + 'test_inputs/body_styles.csv'
             self.mass_scaling_file = path + 'test_inputs/mass_scaling.csv'
@@ -159,7 +159,7 @@ try:
             self.calc_effects = 'No'  # options are 'No', 'Physical' and 'Physical and Costs' as strings
 
             # Note that the implicit_price_deflator.csv input file must contain data for this entry:
-            self.analysis_dollar_basis = 2020
+            self.analysis_dollar_basis = 2022
 
             self.allow_ice_of_bev = False
             self.phev_battery_kwh = None  # 'RSE' -> use RSE, None -> use range calc, otherwise use scalar value
@@ -214,6 +214,10 @@ try:
 
             self.battery_GWh_limit_years = [2020]
             self.battery_GWh_limit = [1e9]
+            self.nmc_share_BEV = {2022: 1}
+            self.nmc_share_PHEV = {2022: 1}
+            self.nmc_share_HEV = {2022: 1}
+            self.battery_cost_constant_thru = 2025
 
             self.kwh_per_mile_scale_years = [2020]
             self.kwh_per_mile_scale = [1.0]
