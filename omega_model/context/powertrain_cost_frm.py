@@ -125,6 +125,8 @@ class PowertrainCost(OMEGABase):
         cost_curve_class = pkg_info['cost_curve_class']
         if powertrain_type in ['HEV', 'PHEV']:
             powertrain_subtype = get_powertrain_subtype(cost_curve_class)
+            if 'MDV_P2P4' in cost_curve_class:
+                drive_system = 'AWD'
 
         if powertrain_type in ['BEV', 'HEV', 'PHEV']:
             KW_OBC = get_obc_power(pkg_info, powertrain_type)
@@ -603,6 +605,8 @@ def get_powertrain_subtype(cost_curve_class):
         return 'P2'
     elif 'P2P4_' in cost_curve_class:
         return 'P2'
+    elif 'SPP4_' in cost_curve_class:
+        return 'PS'
     elif 'PS_' in cost_curve_class:
         return 'PS'
     else:
@@ -1223,7 +1227,7 @@ def calc_battery_cost(locals_dict, learning_factor, powertrain_type, model_year)
 
     """
     MODEL_YEAR = model_year
-    if model_year <= 2025:
+    if model_year <= omega_globals.options.battery_cost_constant_thru:
         MODEL_YEAR = 2023
     elif model_year >= 2035:
         MODEL_YEAR = 2035
@@ -1240,11 +1244,15 @@ def calc_battery_cost(locals_dict, learning_factor, powertrain_type, model_year)
     battery_cost_lfp = eval(_cache[cost_key]['value'], {'np': np, 'e': e}, locals_dict) \
                        * adj_factor * learning_factor
 
-    nmc_share_dict = eval(
-        _cache[powertrain_type, '-', 'NMC_share', 'HV_Battery', '-', '-', '-']['value'], {'np': np}, locals_dict
-    )
-    if model_year in nmc_share_dict:
-        nmc_share = nmc_share_dict[model_year]
+    if powertrain_type == 'BEV':
+        nmc_share_dict = omega_globals.options.nmc_share_BEV
+    elif powertrain_type == 'PHEV':
+        nmc_share_dict = omega_globals.options.nmc_share_PHEV
+    else:
+        nmc_share_dict = omega_globals.options.nmc_share_HEV
+
+    if int(model_year) in nmc_share_dict:
+        nmc_share = nmc_share_dict[int(model_year)]
     else:
         nmc_share = nmc_share_dict[max(nmc_share_dict.keys())]
 
