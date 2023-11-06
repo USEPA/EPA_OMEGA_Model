@@ -103,9 +103,9 @@ class PowertrainCost(OMEGABase):
         update_dict = {}
         locals_dict = locals()
 
-        market_class_id, model_year, base_year_cert_fuel_id, reg_class_id, drive_system, body_style = \
-            vehicle.market_class_id, vehicle.model_year, vehicle.base_year_cert_fuel_id, vehicle.reg_class_id, \
-                vehicle.drive_system, vehicle.body_style
+        market_class_id, model_year, base_year_cert_fuel_id, cert_fuel_id, reg_class_id, drive_system, body_style = \
+            (vehicle.market_class_id, vehicle.model_year, vehicle.base_year_cert_fuel_id, vehicle.cert_fuel_id,
+             vehicle.reg_class_id, vehicle.drive_system, vehicle.body_style)
 
         learning_pev_battery_scaling_factor, learning_factor_ice, learning_factor_pev, locals_dict = \
             get_learning_factors(vehicle, locals_dict, powertrain_type)
@@ -144,7 +144,7 @@ class PowertrainCost(OMEGABase):
 
             # set some needed attributes
             gasoline_flag = True
-            if 'diesel' in base_year_cert_fuel_id:
+            if 'diesel' in cert_fuel_id:
                 diesel_flag, gasoline_flag = True, False
             trans, GEARS = get_trans(pkg_info)
             CYL, LITERS, engine_config = get_engine_deets(pkg_info)
@@ -312,6 +312,7 @@ class PowertrainCost(OMEGABase):
                 'reg_class_id': reg_class_id,
                 'market_class_id': market_class_id,
                 'base_year_cert_fuel_id': base_year_cert_fuel_id,
+                'cert_fuel_id': cert_fuel_id,
                 'body_style': body_style,
                 'drive_system': vehicle.drive_system,
                 'powertrain_type': powertrain_type,
