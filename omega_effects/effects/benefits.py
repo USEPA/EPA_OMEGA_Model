@@ -49,7 +49,7 @@ def get_scc_cf(batch_settings, calendar_year):
         'n2o_domestic_3.95_USD_per_metricton',
     )
 
-    return batch_settings.scc_cost_factors.get_cost_factors(calendar_year, cost_factors)
+    return batch_settings.scghg_cost_factors.get_cost_factors(calendar_year, cost_factors)
 
 
 def get_cap_cf(batch_settings, calendar_year, source_id):
