@@ -96,27 +96,56 @@ class MassScaling(OMEGABase):
 
         locals_dict = locals()
         for condition_equation in MassScaling._data['null_structure_mass_lbs']['condition_equation']:
-            null_structure_mass_lbs += Eval.eval(condition_equation, {'np': np}, locals_dict)
+            null_structure_mass_lbs += Eval.eval(condition_equation, {'np': np, 'e': e}, locals_dict)
 
         locals_dict = locals()
         for condition_equation in MassScaling._data['structure_mass_lbs']['condition_equation']:
-            structure_mass_lbs += Eval.eval(condition_equation, {'np': np}, locals_dict)
+            structure_mass_lbs += Eval.eval(condition_equation, {'np': np, 'e': e}, locals_dict)
 
         # locals_dict = locals()
-        for condition_equation in MassScaling._data['battery_mass_lbs']['condition_equation']:
-            battery_mass_lbs += Eval.eval(condition_equation, {'np': np}, locals_dict)
+        nmc_share_dict_bev = omega_globals.options.nmc_share_BEV
+        nmc_share_dict_phev = omega_globals.options.nmc_share_PHEV
+
+        try:
+            nmc_model_year = int(vehicle.model_year[0])
+        except:
+            nmc_model_year = vehicle.model_year
+
+        if nmc_model_year in nmc_share_dict_bev:
+            nmc_share_bev = nmc_share_dict_bev[nmc_model_year]
+        else:
+            nmc_share_bev = nmc_share_dict_bev[max(nmc_share_dict_bev.keys())]
+
+        if nmc_model_year in nmc_share_dict_phev:
+            nmc_share_phev = nmc_share_dict_phev[nmc_model_year]
+        else:
+            nmc_share_phev = nmc_share_dict_phev[max(nmc_share_dict_phev.keys())]
+
+        for condition_equation_nmc in MassScaling._data['battery_mass_nmc_lbs']['condition_equation']:
+            # BEV batteries, NMC share
+            battery_mass_lbs += Eval.eval(condition_equation_nmc, {'np': np, 'e': e}, locals_dict) * nmc_share_bev * (vehicle.powertrain_type == 'BEV')
+            # PHEV batteries, NMC share
+            battery_mass_lbs += Eval.eval(condition_equation_nmc, {'np': np, 'e': e}, locals_dict) * nmc_share_phev * (vehicle.powertrain_type == 'PHEV')
+
+        for condition_equation_lfp in MassScaling._data['battery_mass_lfp_lbs']['condition_equation']:
+            # BEV batteries, LFP share
+            battery_mass_lbs += Eval.eval(condition_equation_lfp, {'np': np, 'e': e}, locals_dict) * (1 - nmc_share_bev) * (vehicle.powertrain_type == 'BEV')
+            # PHEV batteries, LFP share
+            battery_mass_lbs += Eval.eval(condition_equation_lfp, {'np': np, 'e': e}, locals_dict) * (1 - nmc_share_phev) * (vehicle.powertrain_type == 'PHEV')
+            # HEV batteries, all assumed to be LFP
+            battery_mass_lbs += Eval.eval(condition_equation_lfp, {'np': np, 'e': e}, locals_dict) * (vehicle.powertrain_type == 'HEV')
 
         # locals_dict = locals()
         for condition_equation in MassScaling._data['powertrain_mass_lbs']['condition_equation']:
-            powertrain_mass_lbs += Eval.eval(condition_equation, {'np': np}, locals_dict)
+            powertrain_mass_lbs += Eval.eval(condition_equation, {'np': np, 'e': e}, locals_dict)
 
         # locals_dict = locals()
         for condition_equation in MassScaling._data['delta_glider_non_structure_mass_lbs']['condition_equation']:
-            delta_glider_non_structure_mass_lbs += Eval.eval(condition_equation, {'np': np}, locals_dict)
+            delta_glider_non_structure_mass_lbs += Eval.eval(condition_equation, {'np': np, 'e': e}, locals_dict)
 
         # locals_dict = locals()
         for condition_equation in MassScaling._data['usable_battery_capacity_norm']['condition_equation']:
-            usable_battery_capacity_norm += Eval.eval(condition_equation, {'np': np}, locals_dict)
+            usable_battery_capacity_norm += Eval.eval(condition_equation, {'np': np, 'e': e}, locals_dict)
 
         usable_battery_capacity_norm += (usable_battery_capacity_norm == 0)  # zeros -> 1.0s by default
 
@@ -140,7 +169,7 @@ class MassScaling(OMEGABase):
         MassScaling._data.clear()
 
         if verbose:
-            omega_log.logwrite('\nInitializing from %s...' % filename)
+            omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'mass_scaling'
         input_template_version = 0.1
@@ -158,7 +187,7 @@ class MassScaling(OMEGABase):
 
         if not template_errors:
             validation_dict = {'mass_term': ['structure_materials', 'null_structure_mass_lbs', 'structure_mass_lbs',
-                                             'battery_mass_lbs', 'powertrain_mass_lbs',
+                                             'battery_mass_nmc_lbs', 'battery_mass_lfp_lbs', 'powertrain_mass_lbs',
                                              'delta_glider_non_structure_mass_lbs', 'usable_battery_capacity_norm'],
                                }
 
@@ -172,7 +201,7 @@ class MassScaling(OMEGABase):
                 .apply(lambda x: str.replace(x, 'max(', 'np.maximum(').replace('min(', 'np.minimum('))
 
             for term in ['null_structure_mass_lbs', 'structure_mass_lbs',
-                         'battery_mass_lbs', 'powertrain_mass_lbs', 'delta_glider_non_structure_mass_lbs',
+                         'battery_mass_nmc_lbs', 'battery_mass_lfp_lbs', 'powertrain_mass_lbs', 'delta_glider_non_structure_mass_lbs',
                          'usable_battery_capacity_norm']:
                 MassScaling._data[term] = df[df['mass_term'] == term].set_index('mass_term').to_dict(orient='list')
 
