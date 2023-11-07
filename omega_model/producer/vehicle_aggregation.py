@@ -268,7 +268,9 @@ class VehicleAggregation(OMEGABase):
 
             global aggregation_columns
             # if not omega_globals.options.consolidate_manufacturers:
-            aggregation_columns += ['manufacturer_id']
+            if 'manufacturer_id' not in aggregation_columns:
+                aggregation_columns += ['manufacturer_id']
+
             omega_globals.manufacturer_aggregation = True
 
             # potentially drop low-volume vehicles
