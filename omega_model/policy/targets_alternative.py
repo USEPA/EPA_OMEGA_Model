@@ -69,7 +69,6 @@ if __name__ == '__main__':
 
     init_fail = []
 
-    # pull in reg classes before building database tables (declaring classes) that check reg class validity
     module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
     omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
     init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
@@ -240,7 +239,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
         VehicleTargets._data.clear()
 
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         input_template_name = __name__
         input_template_version = 0.11
@@ -283,10 +282,9 @@ if __name__ == '__main__':
 
         omega_globals.options.policy_targets_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + \
                                                     '../test_inputs/ghg_standards-alternative.csv'
-        # init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
-        # SQABase.metadata.create_all(omega_globals.engine)
+        # 
 
         from policy.incentives import Incentives
         init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
@@ -296,8 +294,6 @@ if __name__ == '__main__':
                                             verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            # dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
-
             omega_globals.options.VehicleTargets = VehicleTargets
 
             class dummyVehicle:

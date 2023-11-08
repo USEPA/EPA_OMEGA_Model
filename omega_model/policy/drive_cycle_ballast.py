@@ -102,7 +102,7 @@ class DriveCycleBallast(OMEGABase):
         DriveCycleBallast._data.clear()
 
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         input_template_name = 'drive_cycle_ballast'
         input_template_version = 0.1

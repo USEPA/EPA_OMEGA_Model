@@ -175,9 +175,9 @@ if __name__ == '__main__':
                                                        verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            file_io.validate_folder(omega_globals.options.database_dump_folder)
+            file_io.validate_folder(omega_globals.options.output_folder)
             PriceModifications._data.to_csv(
-                omega_globals.options.database_dump_folder + os.sep + 'vehicle_price_modifications.csv', index=False)
+                omega_globals.options.output_folder + os.sep + 'vehicle_price_modifications.csv', index=False)
 
             print(PriceModifications.get_price_modification(2020, 'hauling.BEV'))
             print(PriceModifications.get_price_modification(2020, 'non_hauling.BEV'))

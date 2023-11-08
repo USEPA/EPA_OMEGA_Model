@@ -136,10 +136,10 @@ class NewVehicleMarket(OMEGABase):
     _data_by_total = dict()  # private dict, total sales
 
     context_based_total_sales = dict()
-    context_size_class_info_by_nrmc = dict()  #: dict of dicts: information about which context size classes are in which non-responsive market categories as well as what share of the size class is within the non-responsive category.  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
-    base_year_context_size_class_sales = dict()  #: dict: sales totals for each context size class represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
-    base_year_other_sales = dict()  #: dict: sales totals by other categories represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
-    manufacturer_base_year_sales_data = dict()  #: dict: sales totals by various categories by manufacturer represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
+    context_size_class_info_by_nrmc = dict()  #: dict of dicts: information about which context size classes are in which non-responsive market categories as well as what share of the size class is within the non-responsive category.  Populated by vehicles.py in Vehicle.init_vehicles_from_file()
+    base_year_context_size_class_sales = dict()  #: dict: sales totals for each context size class represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in Vehicle.init_vehicles_from_file()
+    base_year_other_sales = dict()  #: dict: sales totals by other categories represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in Vehicle.init_vehicles_from_file()
+    manufacturer_base_year_sales_data = dict()  #: dict: sales totals by various categories by manufacturer represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in Vehicle.init_vehicles_from_file()
     _context_new_vehicle_generalized_costs = dict()  # private dict,  stores total sales-weighted new vehicle generalized costs for use in determining overall sales response as a function of new vehicle generalized cost
     _session_new_vehicle_generalized_costs = dict()  # private dict,  stores total sales-weighted new vehicle generalized costs for the current session
 
@@ -431,7 +431,7 @@ class NewVehicleMarket(OMEGABase):
         NewVehicleMarket._data_by_total.clear()
 
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         NewVehicleMarket.hauling_context_size_class_info = dict()
 

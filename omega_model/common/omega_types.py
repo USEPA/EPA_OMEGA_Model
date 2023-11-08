@@ -6,6 +6,7 @@
 **CODE**
 
 """
+import copy
 import pandas as pd
 
 print('importing %s' % __file__)
@@ -114,7 +115,7 @@ class OMEGABase:
             s = s + k + ' = ' + str(self.__dict__[k]).replace('\n', ' ') + '\n'
         return s
 
-    def to_dataframe(self):
+    def to_dataframe(self, types=None):
         """
         Generate a dataframe of object attributes as numeric values or strings
 
@@ -128,11 +129,12 @@ class OMEGABase:
         df['__repr__'] = [self.__repr__()]
 
         for k in attributes:
-            s = str(self.__dict__[k]).replace('\n', ' ')
-            if s.isnumeric():
-                df[k] = self.__dict__[k]
-            else:
-                df[k] = s
+            if types is None or type(self.__dict__[k]) in types:
+                s = str(self.__dict__[k]).replace('\n', ' ')
+                if s.isnumeric():
+                    df[k] = self.__dict__[k]
+                else:
+                    df[k] = s
 
         return df
 
@@ -154,7 +156,7 @@ class OMEGABase:
 
         df.to_csv(filename, *args, columns=sorted(df.columns), **kwargs)
 
-    def to_dict(self):
+    def to_dict(self, types=None):
         """
         Generate a dict of object attributes
 
@@ -162,8 +164,13 @@ class OMEGABase:
             A dict representation of the object
 
         """
-        d = self.__dict__.copy()
-        d['__repr__'] = self.__repr__()
+        if types:
+            d = dict()
+            for k in sorted(list(self.__dict__.keys())):
+                if type(self.__dict__[k]) in types:
+                    d[k] = self.__dict__[k]
+        else:
+            d = self.__dict__.copy()
 
         return d
 
@@ -181,7 +188,31 @@ class OMEGABase:
 
         ObjNamedtuple = namedtuple('%s_namedtuple' % type(self).__name__, attributes)
 
-        return ObjNamedtuple(**self.__dict__)
+        nt_dict = dict()
+        for k in attributes:
+            nt_dict[k] = self.__dict__[k]
+
+        return ObjNamedtuple(**nt_dict)
+
+    def copy(self):
+        """
+        Copy object
+
+        Returns:
+            Copy of the current object
+
+        """
+        return copy.copy(self)
+
+    def deepcopy(self):
+        """
+        Deep copy object
+
+        Returns:
+            Deep copy of the current object
+
+        """
+        return copy.deepcopy(self)
 
 
 class OMEGAEnum(OMEGABase):

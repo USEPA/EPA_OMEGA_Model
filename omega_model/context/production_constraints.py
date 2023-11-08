@@ -219,9 +219,9 @@ if __name__ == '__main__':
                                                           verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            file_io.validate_folder(omega_globals.options.database_dump_folder)
+            file_io.validate_folder(omega_globals.options.output_folder)
             ProductionConstraints._data.to_csv(
-                omega_globals.options.database_dump_folder + os.sep + 'production_constraints.csv', index=False)
+                omega_globals.options.output_folder + os.sep + 'production_constraints.csv', index=False)
 
             print(ProductionConstraints.get_minimum_share(2020, 'hauling.BEV'))
             print(ProductionConstraints.get_minimum_share(2020, 'non_hauling.BEV'))

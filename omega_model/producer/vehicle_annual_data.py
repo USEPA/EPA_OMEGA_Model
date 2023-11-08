@@ -72,7 +72,7 @@ class VehicleAnnualData(OMEGABase):
         Update vehicle registered count and / or create initial vehicle annual data table entry.
 
         Args:
-            vehicle (VehicleFinal): the vehicle whose count is being updated
+            vehicle (Vehicle): the vehicle whose count is being updated
             calendar_year (int): the calendar year to update registered count it
             registered_count (float): number of vehicle that are still in service (registered)
 
@@ -90,7 +90,7 @@ class VehicleAnnualData(OMEGABase):
                                            registered_count)
             VehicleAnnualData.add_all(vad)
         else:
-            vad['registered_count'] = registered_count
+            vad[0]['registered_count'] = registered_count
 
     @staticmethod
     def get_calendar_years():
@@ -114,11 +114,10 @@ class VehicleAnnualData(OMEGABase):
             attributes (str, [strs]): optional name of attribute(s) to retrieve instead of all data
 
         Returns:
-            A list of VehicleAnnualData objects, or a list of n-tuples of the requested attribute(s) value(s), e.g.
-            ``[(1,), (2,), (3,), ...`` which can be conveniently unpacked by ``omega_db.sql_unpack_result()``
+            A list of VehicleAnnualData dictionaries``
 
         """
-        from producer.vehicles import VehicleFinal
+        # from producer.vehicles import Vehicle
 
         if attributes is None and compliance_id is None:
             result = [v for v in VehicleAnnualData._data
@@ -176,7 +175,6 @@ if __name__ == '__main__':
 
         init_fail = []
 
-        # pull in reg classes before building database tables (declaring classes) that check reg class validity
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
@@ -185,13 +183,9 @@ if __name__ == '__main__':
         module_name = get_template_name(omega_globals.options.market_classes_file)
         omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
 
-        init_omega_db(omega_globals.options.verbose)
-
         from producer.manufacturers import Manufacturer  # required by vehicles
         from context.onroad_fuels import OnroadFuel  # required by vehicles
-        from producer.vehicles import VehicleFinal  # for foreign key vehicle_id
-
-        SQABase.metadata.create_all(omega_globals.engine)
+        from producer.vehicles import Vehicle  # for foreign key vehicle_id
 
         if not init_fail:
             pass

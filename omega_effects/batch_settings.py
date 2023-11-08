@@ -17,7 +17,7 @@ from omega_effects.general.general_functions import read_input_file
 from omega_effects.context.ip_deflators import ImplicitPriceDeflators
 from omega_effects.context.cpi_price_deflators import CPIPriceDeflators
 from omega_effects.effects.cost_factors_criteria import CostFactorsCriteria
-from omega_effects.effects.cost_factors_scc import CostFactorsSCC
+from omega_effects.effects.cost_factors_scghg import CostFactorsSCGHG
 from omega_effects.effects.cost_factors_energysecurity import CostFactorsEnergySecurity
 from omega_effects.effects.cost_factors_congestion_noise import CostFactorsCongestionNoise
 from omega_effects.effects.legacy_fleet import LegacyFleet
@@ -81,7 +81,7 @@ class BatchSettings:
         self.refueling_costs_file = None
         self.general_inputs_for_effects_file = None
         self.criteria_cost_factors_file = None
-        self.scc_cost_factors_file = None
+        self.scghg_cost_factors_file = None
         self.energy_security_cost_factors_file = None
         self.congestion_noise_cost_factors_file = None
         self.insurance_and_taxes_cost_factors_file = None
@@ -104,7 +104,7 @@ class BatchSettings:
         self.refueling_cost = None
         self.general_inputs_for_effects = None
         self.criteria_cost_factors = None
-        self.scc_cost_factors = None
+        self.scghg_cost_factors = None
         self.energy_security_cost_factors = None
         self.congestion_noise_cost_factors = None
         self.insurance_and_taxes_cost_factors = None
@@ -251,8 +251,8 @@ class BatchSettings:
             = self.get_attribute_value(('General Inputs for Effects File', 'all'), 'full_path')
         self.criteria_cost_factors_file \
             = self.get_attribute_value(('Criteria Cost Factors File', 'all'), 'full_path')
-        self.scc_cost_factors_file \
-            = self.get_attribute_value(('SCC Cost Factors File', 'all'), 'full_path')
+        self.scghg_cost_factors_file \
+            = self.get_attribute_value(('SCGHG Cost Factors File', 'all'), 'full_path')
         self.energy_security_cost_factors_file \
             = self.get_attribute_value(('Energy Security Cost Factors File', 'all'), 'full_path')
         self.congestion_noise_cost_factors_file \
@@ -381,9 +381,9 @@ class BatchSettings:
             self.criteria_cost_factors.init_from_file(self.criteria_cost_factors_file, self, effects_log)
             self.inputs_filelist.append(self.criteria_cost_factors_file)
 
-            self.scc_cost_factors = CostFactorsSCC()
-            self.scc_cost_factors.init_from_file(self.scc_cost_factors_file, self, effects_log)
-            self.inputs_filelist.append(self.scc_cost_factors_file)
+            self.scghg_cost_factors = CostFactorsSCGHG()
+            self.scghg_cost_factors.init_from_file(self.scghg_cost_factors_file, self, effects_log)
+            self.inputs_filelist.append(self.scghg_cost_factors_file)
 
             self.energy_security_cost_factors = CostFactorsEnergySecurity()
             self.energy_security_cost_factors.init_from_file(self.energy_security_cost_factors_file, self, effects_log)

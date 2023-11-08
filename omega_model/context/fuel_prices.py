@@ -42,7 +42,7 @@ Data Column Name and Description
 
     :fuel_id:
         The name of the vehicle in-use fuel, must be in the table loaded by ``class fuels.Fuel`` and consistent with
-        the base year vehicles file (column ``in_use_fuel_id``) loaded by ``class vehicles.VehicleFinal``
+        the base year vehicles file (column ``in_use_fuel_id``) loaded by ``class vehicles.Vehicle``
 
     :calendar_year:
         The calendar year of the fuel costs
@@ -143,7 +143,7 @@ class FuelPrice(OMEGABase):
         FuelPrice._data.clear()
 
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         # don't forget to update the module docstring with changes here
         input_template_name = 'context_fuel_prices'

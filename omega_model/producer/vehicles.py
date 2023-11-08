@@ -737,7 +737,7 @@ def is_up_for_redesign(vehicle):
         Return ``True`` if vehicle is available for production and/or redesign
 
     Args:
-        vehicle (VehicleFinal, Vehicle): the vehicle object
+        vehicle (Vehicle, Vehicle): the vehicle object
 
     Returns:
         ``True`` if vehicle is at or past its redesign interval
@@ -752,84 +752,61 @@ def is_up_for_redesign(vehicle):
         int(vehicle.redesign_interval) * redesign_interval_gain
 
 
-def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
+def update_dynamic_attributes(vehicle):
     """
-
-    Transfer data from a VehicleFinal to Vehicle object, or vice versa.  Transfer from VehicleFinal to Vehicle
-    creates a new cost curve, based on the simulated vehicles data and policy factors for the model year.
+    Update vehicle dynamic attributes
 
     Args:
-        from_vehicle (VehicleFinal, Vehicle): the vehicle to convert from
-        to_vehicle (Vehicle, VehicleFinal): the vehicle to convert to
-        model_year (int): if provided, sets the ``to_vehicle`` model year, otherwise model year comes from the
-            ``from_vehicle``
+        vehicle(Vehicle): the source vehicle
 
     Returns:
-        Nothing, updates ``to_vehicle`` attributes
+        Nothing, updates vehicle dynamic attributes
+
+    See Also ``transfer_vehicle_data()``
 
     """
-    base_properties = ('name', 'manufacturer_id', 'compliance_id', 'model_year', 'fueling_class',
-                       'cost_curve_class', 'reg_class_id', 'in_use_fuel_id',
-                       'cert_fuel_id', 'market_class_id', 'lifetime_VMT', 'context_size_class',
-                       'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs',
-                       'base_year_eng_rated_hp', 'footprint_ft2', 'application_id',
-                       'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c', 'body_style',
-                       'structure_material', 'base_year_powertrain_type', 'base_year_reg_class_id',
-                       'base_year_market_share', 'base_year_vehicle_id',
-                       'base_year_glider_non_structure_mass_lbs', 'base_year_cert_fuel_id',
-                       'base_year_glider_non_structure_cost_dollars', 'base_year_glider_structure_cost_dollars',
-                       'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'base_year_curbweight_lbs_to_hp',
-                       'base_year_msrp_dollars', 'battery_kwh', 'total_emachine_kw',
-                       'onroad_charge_depleting_range_mi', 'prior_redesign_year', 'redesign_interval',
-                       'in_production', 'base_year_product', 'workfactor', 'gvwr_lbs',
-                       'gcwr_lbs', 'base_year_workfactor', 'base_year_gvwr_lbs',
-                       'base_year_gcwr_lbs', 'cert_utility_factor', 'onroad_utility_factor',
-                       'battery_sizing_onroad_direct_kwh_per_mile', 'tractive_motor_kw',
-                       'base_year_battery_kwh', 'base_year_tractive_motor_kw', 'base_year_total_emachine_kw',
-                       'base_year_onroad_charge_depleting_range_mi', 'cert_engine_on_distance_frac',
-                       'onroad_engine_on_distance_frac', 'base_year_cost_curve_class',
-                       'base_year_onroad_direct_oncycle_co2e_grams_per_mile',
-                       'base_year_onroad_direct_oncycle_kwh_per_mile',
-                       'base_year_cert_direct_oncycle_co2e_grams_per_mile',
-                       'base_year_cert_direct_oncycle_kwh_per_mile'
-                       )
-
-    # transfer base properties
-    for attr in base_properties:
-        to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
-
-    if model_year:
-        to_vehicle.model_year = model_year
-
-    # transfer dynamic attributes
-    for attr in VehicleFinal.dynamic_attributes:
-        to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
-
     # assign user-definable reg class
-    to_vehicle.reg_class_id = omega_globals.options.RegulatoryClasses.get_vehicle_reg_class(to_vehicle)
+    vehicle.reg_class_id = omega_globals.options.RegulatoryClasses.get_vehicle_reg_class(vehicle)
 
-    to_vehicle.set_target_co2e_grams_per_mile()  # varies by model year
+    # assign policy-based target for the current model year
+    vehicle.set_target_co2e_grams_per_mile()
 
-    if type(from_vehicle) == Vehicle:
-        # finish transfer from Vehicle to VehicleFinal
-        to_vehicle.from_vehicle_id = from_vehicle.vehicle_id
 
-        to_vehicle.initial_registered_count = from_vehicle.initial_registered_count
 
-        # set dynamic attributes
-        for attr in DecompositionAttributes.values:
-            to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
+def transfer_vehicle_data(from_vehicle, model_year):
+    """
 
-        to_vehicle.target_co2e_Mg = from_vehicle.target_co2e_Mg
-        to_vehicle.cert_co2e_Mg = from_vehicle.cert_co2e_Mg
+    Transfer data from a prior year Vehicle to a new Vehicle object.  Updates reg class ID and target CO2e g/mi based
+    on the model year and current policy.
+
+    Args:
+        from_vehicle (Vehicle): the source vehicle
+        model_year (int): sets the ``to_vehicle`` model year
+
+    Returns:
+        Returns new ``Vehicle`` object for the current model year
+
+    """
+    to_vehicle = from_vehicle.copy()
+
+    # set unique vehicle id
+    to_vehicle.vehicle_id = Vehicle.get_next_vehicle_id()
+
+    # update model year
+    to_vehicle.model_year = model_year
+
+    # update dynamic attributes
+    update_dynamic_attributes(to_vehicle)
+
+    return to_vehicle
 
 
 class Vehicle(OMEGABase):
     """
     **Implements "candidate" or "working" vehicles for use during the producer compliance search.**
 
-    ``Vehicle`` objects are initialized from ``VehicleFinal`` objects and then appropriate attributes are transferred
-    from ``Vehicle`` objects to ``VehicleFinal`` objects at the conclusion of the producer search and producer-consumer
+    ``Vehicle`` objects are initialized from ``Vehicle`` objects and then appropriate attributes are transferred
+    from ``Vehicle`` objects to ``Vehicle`` objects at the conclusion of the producer search and producer-consumer
     iteration.
 
     Each ``Vehicle`` object has a unique ``cost_curve`` (and potentially ``cost_cloud``) that tracks multiple aspects
@@ -839,20 +816,36 @@ class Vehicle(OMEGABase):
     vary from one model year to the next and technology costs may decrease over time.
 
     See Also:
-        ``producer.vehicles.transfer_vehicle_data()``, ``VehicleFinal``, ``context.CostCloud``
+        ``producer.vehicles.transfer_vehicle_data()``, ``Vehicle``, ``context.CostCloud``
 
     """
-    next_vehicle_id = 0
+    _next_vehicle_id = 0
 
     _cache = dict()
+
+    compliance_ids = set()  #: the set of compliance IDs (manufacturer IDs or 'consolidated_OEM')
+    mfr_base_year_share_data = dict()  #: dict of base year market shares by compliance ID and various categories, used to project future vehicle sales based on the context
+
+    # mandatory input file columns, the rest can be optional numeric columns:
+    mandatory_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id',
+                                        'context_size_class', 'electrification_class', 'cost_curve_class',
+                                        'in_use_fuel_id', 'cert_fuel_id', 'sales', 'footprint_ft2', 'eng_rated_hp',
+                                        'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs',
+                                        'gvwr_lbs', 'gcwr_lbs', 'target_coef_a', 'target_coef_b', 'target_coef_c',
+                                        'body_style', 'msrp_dollars', 'structure_material', 'prior_redesign_year',
+                                        'redesign_interval', 'application_id', 'battery_gross_kwh',
+                                        'tractive_motor_kw',
+                                        'total_emachine_kw', }
+
+    dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
+    dynamic_attributes = []  #: list of dynamic attribute names, from dynamic_columns
 
     def __init__(self):
         """
         Create a new ``Vehicle`` object
 
         """
-        self.vehicle_id = Vehicle.next_vehicle_id
-        Vehicle.set_next_vehicle_id()
+        self.vehicle_id = Vehicle.get_next_vehicle_id()
         self.name = ''
         self.manufacturer_id = None
         self.compliance_id = None
@@ -868,7 +861,7 @@ class Vehicle(OMEGABase):
         self.in_use_fuel_id = None
         self.cert_fuel_id = None
         self.market_class_id = None
-        self.initial_registered_count = 0
+        self._initial_registered_count = 0
         self.projected_sales = 0
         self.cost_curve = None
         self.cost_curve_non_numeric_data = None
@@ -887,7 +880,7 @@ class Vehicle(OMEGABase):
         self.in_production = False
         self.body_style = ''
         self.structure_material = ''
-        self.base_year_product = False
+        self.base_year_product = 0
         self.base_year_powertrain_type = ''
         self.base_year_reg_class_id = None
         self.base_year_cert_fuel_id = None
@@ -932,7 +925,7 @@ class Vehicle(OMEGABase):
         for ccv in DecompositionAttributes.values:
             self.__setattr__(ccv, 0)
 
-        for dc in VehicleFinal.dynamic_columns:
+        for dc in Vehicle.dynamic_columns:
             self.__setattr__(dc, 0)
 
     @staticmethod
@@ -941,15 +934,55 @@ class Vehicle(OMEGABase):
         Reset vehicle IDs.  Sets ``Vehicle.next_vehicle_id`` to an initial value.
 
         """
-        Vehicle.next_vehicle_id = 0
+        Vehicle._next_vehicle_id = 0
 
     @staticmethod
-    def set_next_vehicle_id():
+    def _set_next_vehicle_id():
         """
-        Increments ``Vehicle.next_vehicle_id``.
+        Increments ``Vehicle._next_vehicle_id``.
 
         """
-        Vehicle.next_vehicle_id = Vehicle.next_vehicle_id + 1
+        Vehicle._next_vehicle_id = Vehicle._next_vehicle_id + 1
+
+    @staticmethod
+    def get_next_vehicle_id():
+        """
+        Gets vehicle id and increments ``Vehicle.next_vehicle_id``.
+
+        """
+        next_vehicle_id = Vehicle._next_vehicle_id
+        Vehicle._set_next_vehicle_id()
+
+        return next_vehicle_id
+
+    @property
+    def initial_registered_count(self):
+        """
+        Get the vehicle initial registered count
+
+        Returns:
+            The vehicle initial registered count
+
+        """
+        return self._initial_registered_count
+
+    @initial_registered_count.setter
+    def initial_registered_count(self, initial_registered_count):
+        """
+        Setter for vehicle initial registered count
+
+        Args:
+            initial_registered_count (numeric): the vehicle initial registered count
+
+        Returns:
+            Nothing, updates vehicle initial registered count
+
+        """
+        self._initial_registered_count = initial_registered_count
+
+        VehicleAnnualData.update_registered_count(self,
+                                                  calendar_year=int(self.model_year),
+                                                  registered_count=initial_registered_count)
 
     def retail_fuel_price_dollars_per_unit(self, calendar_year=None):
         """
@@ -1299,6 +1332,45 @@ class Vehicle(OMEGABase):
 
         self.cost_curve = cost_curve
 
+    @staticmethod
+    def assign_vehicle_market_class_ID(vehicle):
+        """
+        Assign market class ID to the given vehicle and update manufacturer market class data.
+
+        Args:
+            vehicle (Vehicle): the vehicle to assign a market class ID to
+
+        Returns:
+            Nothing, updates vehicle market class ID and manufacturer market class data
+
+        """
+        from producer.manufacturers import Manufacturer
+        vehicle.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(vehicle)
+        # vehicle.manufacturer.update_market_class_data(vehicle.compliance_id, vehicle.market_class_id)
+        Manufacturer.update_market_class_data(vehicle.compliance_id, vehicle.market_class_id)
+
+    @staticmethod
+    def set_fueling_class(veh):
+        """
+
+        Args:
+            veh:
+
+        Returns:
+
+        """
+        if veh.base_year_powertrain_type in ['BEV', 'FCV']:
+            if veh.base_year_powertrain_type == 'FCV':
+                # RV FCV
+                veh.in_use_fuel_id = "{'US electricity':1.0}"
+                veh.cert_fuel_id = 'electricity'
+                veh.base_year_powertrain_type = 'BEV'
+            veh.fueling_class = 'BEV'
+        elif veh.base_year_powertrain_type == 'PHEV':
+            veh.fueling_class = 'PHEV'
+        else:
+            veh.fueling_class = 'ICE'
+
     @property
     def fueling_class_reg_class_id(self):
         """
@@ -1310,235 +1382,26 @@ class Vehicle(OMEGABase):
         """
         return '%s.%s' % (self.fueling_class, self.reg_class_id)
 
-
-class VehicleFinal(SQABase, Vehicle):
-    """
-    **Loads the base year vehicle data and stores finalized vehicles in the database.**
-
-    Finalized vehicles are those ultimately produced by the manufacturer and are the basis for the effect and cost
-    calculations performed after the compliance modeling.
-
-    """
-    # --- database table properties ---
-    __tablename__ = 'vehicles'
-    __table_args__ = {'extend_existing': True}  # fix sphinx-apidoc crash
-    vehicle_id = Column(Integer, primary_key=True)  #: unique vehicle ID, database table primary key
-    from_vehicle_id = Column(String)  #: transferred vehicle ID from Vehicle object
-    name = Column(String)  #: vehicle name
-    manufacturer_id = Column(String, ForeignKey('manufacturers.manufacturer_id'))  #: vehicle manufacturer ID
-    compliance_id = Column(String)  #: compliance ID, may be the manufacturer ID or 'consolidated_OEM'
-    manufacturer = relationship('Manufacturer', back_populates='vehicles')  #: SQLAlchemy relationship link to manufacturer table
-
-    model_year = Column(Numeric)  #: vehicle model year
-    fueling_class = Column(Enum(*fueling_classes, validate_strings=True))  #: fueling class, e.g. 'BEV', 'ICE'
-    reg_class_id = Column(String)  #: regulatory class assigned according the active policy
-    context_size_class = Column(String)  #: context size class, used to project future vehicle sales based on the context
-    target_co2e_grams_per_mile = Column(Float)  #: cert target CO2e g/mi, as determined by the active policy
-    lifetime_VMT = Column('lifetime_vmt', Float)  #: lifetime VMT, used to calculate CO2e Mg
-    cert_co2e_Mg = Column('cert_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
-    target_co2e_Mg = Column('target_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
-    in_use_fuel_id = Column(String)  #: in-use / onroad fuel ID
-    cert_fuel_id = Column(String)  #: cert fuel ID
-    market_class_id = Column(String)  #: market class ID, as determined by the consumer subpackage
-    unibody_structure = Column(Float)  #: unibody structure flag, e.g. 0,1
-    drive_system = Column(String)  #: drive system, 'FWD', 'RWD', 'AWD'
-    application_id = Column(String)  #: application ID 'SLA' -> standard load application, 'HLA' -> high load application
-    dual_rear_wheel = Column(Float)  #: dual_rear_wheel, 0=No, 1=Yes
-    body_style = Column(String)  #: vehicle body style, e.g. 'sedan'
-    base_year_powertrain_type = Column(String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
-    onroad_charge_depleting_range_mi = Column(Float)  #: vehicle charge-depleting range, miles
-    cert_utility_factor = Column(Float)  #: PHEV cert utility factor
-    onroad_utility_factor = Column(Float)  #: PHEV onroad utility factor
-    cert_engine_on_distance_frac = Column(Float)  #: PHEV cert engine-on distance frac
-    onroad_engine_on_distance_frac = Column(Float)  #: PHEV onroad engine-on disance frac
-    battery_sizing_onroad_direct_kwh_per_mile = Column(Float)  #: battery-sizing onroad direct kWh/mi
-    prior_redesign_year = Column(Float)  #: prior redesign year
-    redesign_interval = Column(Float)  #: redesign interval
-    in_production = Column(Boolean)  #: True if vehicle is in production
-    price_modification_dollars = Column(Float)  #: vehicle price modification (i.e. incentive value) in dollars
-    modified_cross_subsidized_price_dollars = Column(Float)  #: vehicle modified cross subsidized price in dollars
-    price_dollars = Column(Float)  #: vehicle price in dollars
-    market_class_cross_subsidy_multiplier = Column(Float)  #: vehicle market class cross subsidy multiplier
-
-    # "base year properties" - things that may change over time but we want to retain the original values
-    base_year_product = Column(Boolean)  #: True if vehicle was in production in base year
-    base_year_reg_class_id = Column(Enum(*legacy_reg_classes, validate_strings=True))  #: base year regulatory class, historical data
-    base_year_vehicle_id = Column(Float)  #: base year vehicle id from vehicles.csv
-    base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
-    model_year_prevalence = Column(Float)  #: used to maintain market share relationships within context size classes during market projection
-    base_year_glider_non_structure_mass_lbs = Column(Float)  #: base year non-structure mass lbs (i.e. "content")
-    base_year_glider_non_structure_cost_dollars = Column(Float)  #: base year glider non-structure cost dollars
-    base_year_glider_structure_cost_dollars = Column(Float)  #: base year glider structure cost dollars
-    base_year_footprint_ft2 = Column(Float)  #: base year vehicle footprint, square feet
-    base_year_curbweight_lbs = Column(Float)  #: base year vehicle curbweight, pounds
-    base_year_curbweight_lbs_to_hp = Column(Float)  #: base year curbweight to power ratio (pounds per hp)
-    base_year_msrp_dollars = Column(Float)  #: base year Manufacturer Suggested Retail Price (dollars)
-    base_year_target_coef_a = Column(Float)  #: roadload A coefficient, lbs
-    base_year_target_coef_b = Column(Float)  #: roadload B coefficient, lbs/mph
-    base_year_target_coef_c = Column(Float)  #: roadload C coefficient, lbs/mph^2
-    base_year_workfactor = Column(Float)
-    base_year_gvwr_lbs = Column(Float)
-    base_year_gcwr_lbs = Column(Float)
-    base_year_cert_fuel_id = Column(String)
-    base_year_battery_kwh = Column(Float)  #: vehicle propulsion battery kWh
-    base_year_tractive_motor_kw = Column(Float)  #: on-cycle tractive motor power, kW
-    base_year_total_emachine_kw = Column(Float)  #: vehicle motor/generator total combined power, kW
-    base_year_onroad_charge_depleting_range_mi = Column(Float)  #: charge depleting range, miles
-    base_year_cost_curve_class = Column(String)  #: base year cost curve class
-    base_year_onroad_direct_oncycle_co2e_grams_per_mile = Column(Float)  #: base year onroad direct oncycle CO2e g/mi
-    base_year_onroad_direct_oncycle_kwh_per_mile = Column(Float)  #: base year onroad direct oncycle kWh/mi
-    base_year_cert_direct_oncycle_co2e_grams_per_mile = Column(Float)  #: base year cert direct oncycle CO2e g/mi
-    base_year_cert_direct_oncycle_kwh_per_mile = Column(Float)  #: base year cert direct oncycle kWh/mi
-
-    # non-numeric attributes that could change based on interpolating the frontier:
-    cost_curve_class = Column(String)  #: ALPHA modeling result class
-    structure_material = Column(String)  #: vehicle body structure material, e.g. 'steel'
-    # numeric attributes that can change based on interpolating the frontier:
-    battery_kwh = Column(Float)  #: vehicle propulsion battery kWh
-    total_emachine_kw = Column(Float)  #: vehicle motor/generator total combined power, kW
-    tractive_motor_kw = Column(Float)  #: on-cycle tractive motor power, kW
-    curbweight_lbs = Column(Float)  #: vehicle curbweight, pounds
-    footprint_ft2 = Column(Float)  #: vehicle footprint, square feet
-    base_year_eng_rated_hp = Column(Float)  #: engine rated horsepower
-    workfactor = Column(Float)  #: medium-duty workfactor
-    gvwr_lbs = Column(Float)  #: gross vehicle weight rating, lbs
-    gcwr_lbs = Column(Float)  #: gross combined weight rating, lbs
-
-    _initial_registered_count = Column('_initial_registered_count', Float)
-    projected_sales = Column(Float)  #: used to project context size class sales
-
-    # --- static properties ---
-    compliance_ids = set()  #: the set of compliance IDs (manufacturer IDs or 'consolidated_OEM')
-    mfr_base_year_share_data = dict()  #: dict of base year market shares by compliance ID and various categories, used to project future vehicle sales based on the context
-
-    # these are used to validate vehicles.csv:
-    # mandatory input file columns, the rest can be optional numeric columns:
-    mandatory_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id',
-                                        'context_size_class', 'electrification_class', 'cost_curve_class',
-                                        'in_use_fuel_id', 'cert_fuel_id', 'sales', 'footprint_ft2', 'eng_rated_hp',
-                                        'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs',
-                                        'gvwr_lbs', 'gcwr_lbs', 'target_coef_a', 'target_coef_b', 'target_coef_c',
-                                        'body_style', 'msrp_dollars', 'structure_material', 'prior_redesign_year',
-                                        'redesign_interval', 'application_id', 'battery_gross_kwh', 'tractive_motor_kw',
-                                        'total_emachine_kw', }
-
-    dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
-    dynamic_attributes = []  #: list of dynamic attribute names, from dynamic_columns
-
-    # **additional attributes are dynamically added from DecompositionAttributes.values during omega2.init_omega()**
-
-    @property
-    def initial_registered_count(self):
+    def create_vehicle_clone(vehicle):
         """
-        Get the vehicle initial registered count
-
-        Returns:
-            The vehicle initial registered count
-
-        """
-        return self._initial_registered_count
-
-    @initial_registered_count.setter
-    def initial_registered_count(self, initial_registered_count):
-        """
-        Setter for vehicle initial registered count
+        Create vehicle clone.
 
         Args:
-            initial_registered_count (numeric): the vehicle initial registered count
+            vehicle (Vehicle): the vehicle to clone
 
         Returns:
-            Nothing, updates vehicle initial registered count
+            Cloned vehicle
 
         """
-        self._initial_registered_count = initial_registered_count
+        alt_veh = vehicle.clone_vehicle(vehicle)  # create alternative powertrain clone of vehicle
+        alt_veh.in_production = is_up_for_redesign(alt_veh)
+        alt_veh.base_year_product = 0
 
-        omega_globals.session.add(self)  # update database so vehicle_annual_data foreign key succeeds...
-        omega_globals.session.flush()  # update vehicle_id, otherwise it's None
+        alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
+        alt_veh.cert_direct_co2e_grams_per_mile = 0
+        alt_veh.cert_direct_kwh_per_mile = 0
 
-        VehicleAnnualData.update_registered_count(self,
-                                                  calendar_year=int(self.model_year),
-                                                  registered_count=initial_registered_count)
-
-    @staticmethod
-    def get_max_model_year():
-        """
-        Get the maximum model year present in the base year vehicle data, used to set the analysis initial year
-
-        Returns:
-            The maximum model year present in the base year vehicle data
-
-        """
-        return omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()
-
-    @staticmethod
-    def get_compliance_vehicles(calendar_year, compliance_id):
-        """
-        Get vehicles by year and compliance ID.  Used at the beginning of the producer compliance search to pull in
-        the prior year vehicles
-
-        Args:
-            calendar_year (int): the calendar year (model year) to pull vehicles from
-            compliance_id (str): manufacturer name, or 'consolidated_OEM'
-
-        Returns:
-            A list of ``VehicleFinal`` objects for the given year and compliance ID
-
-        """
-        return omega_globals.session.query(VehicleFinal). \
-            filter(VehicleFinal.compliance_id == compliance_id). \
-            filter(VehicleFinal.model_year == calendar_year).all()
-
-    @staticmethod
-    def get_vehicle_attributes(vehicle_id, attributes):
-        """
-        A generic 'getter' to retrieve one or more ``VehicleFinal`` object attributes
-
-        Args:
-            vehicle_id (int): the vehicle ID
-            attributes (str, [strs]): the name or list of names of vehicle attributes to get
-
-        Returns:
-            The value(s) of the requested attribute(s)
-
-        """
-        if type(attributes) is not list:
-            attributes = [attributes]
-        attrs = VehicleFinal.get_class_attributes(attributes)
-        return omega_globals.session.query(*attrs).filter(VehicleFinal.vehicle_id == vehicle_id).one()
-
-    @staticmethod
-    def calc_target_co2e_Mg(model_year, compliance_id):
-        """
-        Calculate the total cert target CO2e Mg for the given model year and compliance ID
-
-        Args:
-            model_year (int): the model year of the cert target
-            compliance_id (str): manufacturer name, or 'consolidated_OEM'
-
-        Returns:
-            The sum of vehicle cert target CO2e Mg for the given model year and compliance ID
-
-        """
-        return omega_globals.session.query(func.sum(VehicleFinal.target_co2e_Mg)). \
-            filter(VehicleFinal.compliance_id == compliance_id). \
-            filter(VehicleFinal.model_year == model_year).scalar()
-
-    @staticmethod
-    def calc_cert_co2e_Mg(model_year, compliance_id):
-        """
-        Calculate the total cert CO2e Mg for the given model year and compliance ID
-
-        Args:
-            model_year (int): the model year of the cert Mg
-            compliance_id (str): manufacturer name, or 'consolidated_OEM'
-
-        Returns:
-            The sum of vehicle cert CO2e Mg for the given model year and compliance ID
-
-        """
-        return omega_globals.session.query(func.sum(VehicleFinal.cert_co2e_Mg)). \
-            filter(VehicleFinal.compliance_id == compliance_id). \
-            filter(VehicleFinal.model_year == model_year).scalar()
+        return alt_veh
 
     @staticmethod
     def clone_vehicle(vehicle):
@@ -1546,10 +1409,10 @@ class VehicleFinal(SQABase, Vehicle):
         Make a "clone" of a vehicle, used to create alternate powertrain versions of vehicles in the base year fleet
 
         Args:
-            vehicle (VehicleFinal): the vehicle to clone
+            vehicle (Vehicle): the vehicle to clone
 
         Returns:
-            A new ``VehicleFinal`` object with non-powertrain attributes copied from the given vehicle
+            A new ``Vehicle`` object with non-powertrain attributes copied from the given vehicle
 
         """
         inherit_properties = ['name', 'manufacturer_id', 'compliance_id',
@@ -1564,13 +1427,14 @@ class VehicleFinal(SQABase, Vehicle):
                               'base_year_workfactor', 'base_year_gvwr_lbs', 'base_year_gcwr_lbs', 'application_id',
                               'base_year_cost_curve_class',
                               ] \
-                              + VehicleFinal.dynamic_attributes
+                              + Vehicle.dynamic_attributes
 
-        # model year and registered count are required to make a full-blown VehicleFinal object, compliance_id
+        # model year and registered count are required to make a full-blown Vehicle object, compliance_id
         # is required for vehicle annual data init
-        veh = VehicleFinal(model_year=vehicle.model_year,
-                           compliance_id=vehicle.compliance_id,
-                           initial_registered_count=1)
+        veh = Vehicle()
+        veh.model_year = vehicle.model_year
+        veh.compliance_id = vehicle.compliance_id
+        veh.initial_registered_count = 1
 
         # get the rest of the attributes from the list
         for p in inherit_properties:
@@ -1596,7 +1460,7 @@ class VehicleFinal(SQABase, Vehicle):
 
         vehicle_shares_dict = {'total': 0}
 
-        VehicleFinal.compliance_ids = set()
+        Vehicle.compliance_ids = set()
         vehicles_list = []
 
         if verbose:
@@ -1606,63 +1470,62 @@ class VehicleFinal(SQABase, Vehicle):
         from context.mass_scaling import MassScaling
         from context.body_styles import BodyStyles
 
-        # load data into database
         for i in df.index:
-            veh = VehicleFinal(
-                name=df.loc[i, 'vehicle_name'],
-                vehicle_id=i,
-                manufacturer_id=df.loc[i, 'manufacturer_id'],
-                model_year=df.loc[i, 'model_year'],
-                context_size_class=df.loc[i, 'context_size_class'],
-                cost_curve_class=df.loc[i, 'cost_curve_class'],
-                in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
-                cert_fuel_id=df.loc[i, 'cert_fuel_id'],
-                unibody_structure=df.loc[i, 'unibody_structure'],
-                drive_system=df.loc[i, 'drive_system'],
-                application_id=df.loc[i, 'application_id'],
-                dual_rear_wheel=df.loc[i, 'dual_rear_wheel'],
-                curbweight_lbs=df.loc[i, 'curbweight_lbs'],
-                footprint_ft2=df.loc[i, 'footprint_ft2'],
-                body_style=df.loc[i, 'body_style'],
-                structure_material=df.loc[i, 'structure_material'],
-                total_emachine_kw=df.loc[i, 'total_emachine_kw'],
-                tractive_motor_kw=df.loc[i, 'tractive_motor_kw'],
-                battery_kwh=df.loc[i, 'battery_gross_kwh'],
-                onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi'],
-                prior_redesign_year=df.loc[i, 'prior_redesign_year'],
-                redesign_interval=df.loc[i, 'redesign_interval'],
-                in_production=True,
-                workfactor=df.loc[i, 'workfactor'],
-                gvwr_lbs=df.loc[i, 'gvwr_lbs'],
-                gcwr_lbs=df.loc[i, 'gcwr_lbs'],
-                base_year_cost_curve_class = df.loc[i, 'cost_curve_class'],
-                base_year_eng_rated_hp=df.loc[i, 'eng_rated_hp'],
-                base_year_target_coef_a=df.loc[i, 'target_coef_a'],
-                base_year_target_coef_b=df.loc[i, 'target_coef_b'],
-                base_year_target_coef_c=df.loc[i, 'target_coef_c'],
-                base_year_reg_class_id=df.loc[i, 'reg_class_id'],
-                base_year_footprint_ft2=df.loc[i, 'footprint_ft2'],
-                base_year_curbweight_lbs=df.loc[i, 'curbweight_lbs'],
-                base_year_msrp_dollars=df.loc[i, 'msrp_dollars'],
-                base_year_glider_non_structure_mass_lbs=df.loc[i, 'glider_non_structure_mass_lbs'],
-                base_year_glider_non_structure_cost_dollars=df.loc[i, 'glider_non_structure_cost_dollars'],
-                base_year_glider_structure_cost_dollars=df.loc[i, 'glider_structure_cost_dollars'],
-                base_year_workfactor=df.loc[i, 'workfactor'],
-                base_year_vehicle_id=i,  # i.e. aggregated_vehicles.csv index number...
-                base_year_cert_fuel_id=df.loc[i, 'cert_fuel_id'],
-                base_year_battery_kwh=df.loc[i, 'battery_kwh'],
-                base_year_total_emachine_kw=df.loc[i, 'total_emachine_kw'],
-                base_year_tractive_motor_kw=df.loc[i, 'tractive_motor_kw'],
-                base_year_onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi'],
-                base_year_powertrain_type=df.loc[i, 'base_year_powertrain_type'],
-                base_year_product=True,
-                base_year_gvwr_lbs=df.loc[i, 'gvwr_lbs'],
-                base_year_gcwr_lbs=df.loc[i, 'gcwr_lbs'],
-            )
+            veh = Vehicle()
+            veh.name=df.loc[i, 'vehicle_name']
+            veh.vehicle_id=i
+            veh.manufacturer_id=df.loc[i, 'manufacturer_id']
+            veh.model_year=df.loc[i, 'model_year']
+            veh.context_size_class=df.loc[i, 'context_size_class']
+            veh.cost_curve_class=df.loc[i, 'cost_curve_class']
+            veh.in_use_fuel_id=df.loc[i, 'in_use_fuel_id']
+            veh.cert_fuel_id=df.loc[i, 'cert_fuel_id']
+            veh.unibody_structure=df.loc[i, 'unibody_structure']
+            veh.drive_system=df.loc[i, 'drive_system']
+            veh.application_id=df.loc[i, 'application_id']
+            veh.dual_rear_wheel=df.loc[i, 'dual_rear_wheel']
+            veh.curbweight_lbs=df.loc[i, 'curbweight_lbs']
+            veh.footprint_ft2=df.loc[i, 'footprint_ft2']
+            veh.body_style=df.loc[i, 'body_style']
+            veh.structure_material=df.loc[i, 'structure_material']
+            veh.total_emachine_kw=df.loc[i, 'total_emachine_kw']
+            veh.tractive_motor_kw=df.loc[i, 'tractive_motor_kw']
+            veh.battery_kwh=df.loc[i, 'battery_gross_kwh']
+            veh.onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi']
+            veh.prior_redesign_year=df.loc[i, 'prior_redesign_year']
+            veh.redesign_interval=df.loc[i, 'redesign_interval']
+            veh.in_production=True
+            veh.workfactor=df.loc[i, 'workfactor']
+            veh.reg_class_id=df.loc[i, 'reg_class_id']
+            veh.gvwr_lbs=df.loc[i, 'gvwr_lbs']
+            veh.gcwr_lbs=df.loc[i, 'gcwr_lbs']
+            veh.base_year_cost_curve_class = df.loc[i, 'cost_curve_class']
+            veh.base_year_eng_rated_hp=df.loc[i, 'eng_rated_hp']
+            veh.base_year_target_coef_a=df.loc[i, 'target_coef_a']
+            veh.base_year_target_coef_b=df.loc[i, 'target_coef_b']
+            veh.base_year_target_coef_c=df.loc[i, 'target_coef_c']
+            veh.base_year_reg_class_id=df.loc[i, 'reg_class_id']
+            veh.base_year_footprint_ft2=df.loc[i, 'footprint_ft2']
+            veh.base_year_curbweight_lbs=df.loc[i, 'curbweight_lbs']
+            veh.base_year_msrp_dollars=df.loc[i, 'msrp_dollars']
+            veh.base_year_glider_non_structure_mass_lbs=df.loc[i, 'glider_non_structure_mass_lbs']
+            veh.base_year_glider_non_structure_cost_dollars=df.loc[i, 'glider_non_structure_cost_dollars']
+            veh.base_year_glider_structure_cost_dollars=df.loc[i, 'glider_structure_cost_dollars']
+            veh.base_year_workfactor=df.loc[i, 'workfactor']
+            veh.base_year_vehicle_id=i  # i.e. aggregated_vehicles.csv index number...
+            veh.base_year_cert_fuel_id=df.loc[i, 'cert_fuel_id']
+            veh.base_year_battery_kwh=df.loc[i, 'battery_kwh']
+            veh.base_year_total_emachine_kw=df.loc[i, 'total_emachine_kw']
+            veh.base_year_tractive_motor_kw=df.loc[i, 'tractive_motor_kw']
+            veh.base_year_onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi']
+            veh.base_year_powertrain_type=df.loc[i, 'base_year_powertrain_type']
+            veh.base_year_product=1
+            veh.base_year_gvwr_lbs=df.loc[i, 'gvwr_lbs']
+            veh.base_year_gcwr_lbs=df.loc[i, 'gcwr_lbs']
 
             electrification_class = df.loc[i, 'electrification_class']
 
-            for attr, dc in zip(VehicleFinal.dynamic_attributes, VehicleFinal.dynamic_columns):
+            for attr, dc in zip(Vehicle.dynamic_attributes, Vehicle.dynamic_columns):
                 veh.__setattr__(attr, df.loc[i, dc])
 
             if omega_globals.options.consolidate_manufacturers:
@@ -1673,17 +1536,17 @@ class VehicleFinal(SQABase, Vehicle):
             if not omega_globals.manufacturer_aggregation:
                 veh.manufacturer_id = 'consolidated_OEM'
 
-            VehicleFinal.compliance_ids.add(veh.compliance_id)
+            Vehicle.compliance_ids.add(veh.compliance_id)
 
             # update initial registered count >after< setting compliance id, it's required for vehicle annual data
             veh.initial_registered_count = df.loc[i, 'sales']
 
-            VehicleFinal.set_fueling_class(veh)
+            Vehicle.set_fueling_class(veh)
 
-            veh.cert_direct_oncycle_co2e_grams_per_mile = None
-            veh.cert_direct_co2e_grams_per_mile = None
-            veh.cert_co2e_grams_per_mile = None
-            veh.cert_direct_kwh_per_mile = None
+            veh.cert_direct_oncycle_co2e_grams_per_mile = 0 #None
+            veh.cert_direct_co2e_grams_per_mile = 0 # None
+            veh.cert_co2e_grams_per_mile = 0 # None
+            veh.cert_direct_kwh_per_mile = 0 # None
 
             veh.onroad_direct_co2e_grams_per_mile = 0
             veh.onroad_direct_kwh_per_mile = 0
@@ -1705,7 +1568,7 @@ class VehicleFinal(SQABase, Vehicle):
             vehicles_list.append(veh)
 
             # assign user-definable market class
-            VehicleFinal.assign_vehicle_market_class_ID(veh)
+            Vehicle.assign_vehicle_market_class_ID(veh)
 
             non_responsive_market_category = \
                 omega_globals.options.MarketClass.get_non_responsive_market_category(veh.market_class_id)
@@ -1766,6 +1629,9 @@ class VehicleFinal(SQABase, Vehicle):
 
             omega_globals.options.PowertrainCost.calc_cost(veh, update_tracker=True)  # update build dict
 
+            # omega_globals.finalized_vehicles.append(veh.to_namedtuple())
+            omega_globals.finalized_vehicles.append(veh)
+
         # Update market share and create alternative vehicles (a BEV equivalent for every ICE vehicle, etc).
         # Alternative vehicles maintain fleet utility mix across model years and prevent all future vehicles
         # from becoming midsize car BEVs, for example, just because that's the dominant BEV in the base year
@@ -1777,7 +1643,7 @@ class VehicleFinal(SQABase, Vehicle):
             if v.base_year_powertrain_type != 'BEV' or omega_globals.options.allow_ice_of_bev:
                 if v.base_year_powertrain_type == 'ICE':
                     # create BEV of ICE
-                    alt_veh = VehicleFinal.create_vehicle_clone(v)
+                    alt_veh = Vehicle.create_vehicle_clone(v)
                     alt_veh.fueling_class = 'BEV'
                     alt_veh.base_year_powertrain_type = 'BEV'
                     alt_veh.name = 'BEV of ' + v.name
@@ -1799,10 +1665,11 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.base_year_eng_rated_hp = 0
                     alt_veh.engine_cylinders = 0
                     alt_veh.engine_displacement_liters = 0
-                    VehicleFinal.assign_vehicle_market_class_ID(alt_veh)
+                    Vehicle.assign_vehicle_market_class_ID(alt_veh)
+                    omega_globals.finalized_vehicles.append(alt_veh)
 
                     # create PHEV of ICE
-                    alt_veh = VehicleFinal.create_vehicle_clone(v)
+                    alt_veh = Vehicle.create_vehicle_clone(v)
                     alt_veh.fueling_class = 'PHEV'
                     alt_veh.base_year_powertrain_type = 'PHEV'
                     alt_veh.name = 'PHEV of ' + v.name
@@ -1819,11 +1686,12 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.base_year_eng_rated_hp = v.base_year_eng_rated_hp
                     alt_veh.engine_cylinders = v.engine_cylinders
                     alt_veh.engine_displacement_liters = v.engine_displacement_liters
-                    VehicleFinal.assign_vehicle_market_class_ID(alt_veh)
+                    Vehicle.assign_vehicle_market_class_ID(alt_veh)
+                    omega_globals.finalized_vehicles.append(alt_veh)
 
                 elif v.base_year_powertrain_type == 'BEV':
                     # create ICE of BEV
-                    alt_veh = VehicleFinal.create_vehicle_clone(v)
+                    alt_veh = Vehicle.create_vehicle_clone(v)
                     alt_veh.fueling_class = 'ICE'
                     alt_veh.base_year_powertrain_type = 'ICE'
                     alt_veh.name = 'ICE of ' + v.name
@@ -1839,7 +1707,8 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.battery_kwh = 0
                     alt_veh.engine_cylinders = None
                     alt_veh.engine_displacement_liters = None
-                    VehicleFinal.assign_vehicle_market_class_ID(alt_veh)
+                    Vehicle.assign_vehicle_market_class_ID(alt_veh)
+                    omega_globals.finalized_vehicles.append(alt_veh)
 
         for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
             for csc in NewVehicleMarket.context_size_class_info_by_nrmc[nrmc]:
@@ -1847,13 +1716,13 @@ class VehicleFinal(SQABase, Vehicle):
                     NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['total'] / vehicle_shares_dict[csc]
 
         # calculate manufacturer base year context size class shares
-        VehicleFinal.compliance_ids = sorted(list(VehicleFinal.compliance_ids))
+        Vehicle.compliance_ids = sorted(list(Vehicle.compliance_ids))
 
-        VehicleFinal.mfr_base_year_share_data = dict()
-        for compliance_id in VehicleFinal.compliance_ids:
+        Vehicle.mfr_base_year_share_data = dict()
+        for compliance_id in Vehicle.compliance_ids:
             for size_class in NewVehicleMarket.base_year_context_size_class_sales:
-                if compliance_id not in VehicleFinal.mfr_base_year_share_data:
-                    VehicleFinal.mfr_base_year_share_data[compliance_id] = dict()
+                if compliance_id not in Vehicle.mfr_base_year_share_data:
+                    Vehicle.mfr_base_year_share_data[compliance_id] = dict()
 
                 key = compliance_id + '_' + size_class
 
@@ -1867,14 +1736,14 @@ class VehicleFinal(SQABase, Vehicle):
                                                  NewVehicleMarket.manufacturer_base_year_sales_data[key] /
                                                  NewVehicleMarket.base_year_context_size_class_sales[size_class]))
 
-                VehicleFinal.mfr_base_year_share_data[compliance_id][size_class] = \
+                Vehicle.mfr_base_year_share_data[compliance_id][size_class] = \
                     NewVehicleMarket.manufacturer_base_year_sales_data[key] / \
                     NewVehicleMarket.base_year_context_size_class_sales[size_class]
 
-        for compliance_id in VehicleFinal.compliance_ids:
+        for compliance_id in Vehicle.compliance_ids:
             for other in NewVehicleMarket.base_year_other_sales:
-                if compliance_id not in VehicleFinal.mfr_base_year_share_data:
-                    VehicleFinal.mfr_base_year_share_data[compliance_id] = dict()
+                if compliance_id not in Vehicle.mfr_base_year_share_data:
+                    Vehicle.mfr_base_year_share_data[compliance_id] = dict()
 
                 key = compliance_id + '_' + other
 
@@ -1888,78 +1757,19 @@ class VehicleFinal(SQABase, Vehicle):
                                                  NewVehicleMarket.manufacturer_base_year_sales_data[key] /
                                                  NewVehicleMarket.base_year_other_sales[other]))
 
-                VehicleFinal.mfr_base_year_share_data[compliance_id][other] = \
+                Vehicle.mfr_base_year_share_data[compliance_id][other] = \
                     NewVehicleMarket.manufacturer_base_year_sales_data[key] / \
                     NewVehicleMarket.base_year_other_sales[other]
 
         if verbose:
             print_dict(NewVehicleMarket.base_year_context_size_class_sales)
             print_dict(NewVehicleMarket.base_year_other_sales)
-            print_dict(VehicleFinal.mfr_base_year_share_data)
-
-    @staticmethod
-    def set_fueling_class(veh):
-        """
-
-        Args:
-            veh:
-
-        Returns:
-
-        """
-        if veh.base_year_powertrain_type in ['BEV', 'FCV']:
-            if veh.base_year_powertrain_type == 'FCV':
-                # RV FCV
-                veh.in_use_fuel_id = "{'US electricity':1.0}"
-                veh.cert_fuel_id = 'electricity'
-                veh.base_year_powertrain_type = 'BEV'
-            veh.fueling_class = 'BEV'
-        elif veh.base_year_powertrain_type == 'PHEV':
-            veh.fueling_class = 'PHEV'
-        else:
-            veh.fueling_class = 'ICE'
-
-    @staticmethod
-    def assign_vehicle_market_class_ID(vehicle):
-        """
-        Assign market class ID to the given vehicle and update manufacturer market class data.
-
-        Args:
-            vehicle (VehicleFinal): the vehicle to assign a market class ID to
-
-        Returns:
-            Nothing, updates vehicle market class ID and manufacturer market class data
-
-        """
-        vehicle.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(vehicle)
-        vehicle.manufacturer.update_market_class_data(vehicle.compliance_id, vehicle.market_class_id)
-
-    @staticmethod
-    def create_vehicle_clone(vehicle):
-        """
-        Create vehicle clone.
-
-        Args:
-            vehicle (VehicleFinal): the vehicle to clone
-
-        Returns:
-            Cloned vehicle
-
-        """
-        alt_veh = vehicle.clone_vehicle(vehicle)  # create alternative powertrain clone of vehicle
-        alt_veh.in_production = is_up_for_redesign(alt_veh)
-        alt_veh.base_year_product = False
-
-        alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
-        alt_veh.cert_direct_co2e_grams_per_mile = 0
-        alt_veh.cert_direct_kwh_per_mile = 0
-
-        return alt_veh
+            print_dict(Vehicle.mfr_base_year_share_data)
 
     @staticmethod
     def init_from_file(vehicle_onroad_calculations_file, verbose=False):
         """
-        Init vehicle database from the base year vehicles file and set up the onroad / vehicle attribute calculations.
+        Init vehicle data from the base year vehicles file and set up the onroad / vehicle attribute calculations.
         Also initializes decomposition attributes.
 
         Args:
@@ -1978,12 +1788,699 @@ class VehicleFinal(SQABase, Vehicle):
 
         DecompositionAttributes.init()   # offcycle_credits must be initalized first
 
-        VehicleFinal.init_vehicles_from_dataframe(omega_globals.options.vehicles_df, verbose=verbose)
+        Vehicle.init_vehicles_from_dataframe(omega_globals.options.vehicles_df, verbose=verbose)
 
         _init_fail += VehicleOnroadCalculations.init_vehicle_attribute_calculations_from_file(
             vehicle_onroad_calculations_file, clear_cache=True, verbose=verbose)
 
         return _init_fail
+
+
+# class VehicleFinal(SQABase, Vehicle):
+#     """
+#     **Loads the base year vehicle data and stores finalized vehicles in the database.**
+#
+#     Finalized vehicles are those ultimately produced by the manufacturer and are the basis for the effect and cost
+#     calculations performed after the compliance modeling.
+#
+#     """
+#     # --- database table properties ---
+#     __tablename__ = 'vehicles'
+#     __table_args__ = {'extend_existing': True}  # fix sphinx-apidoc crash
+#     vehicle_id = Column(Integer, primary_key=True)  #: unique vehicle ID, database table primary key
+#     from_vehicle_id = Column(String)  #: transferred vehicle ID from Vehicle object
+#     name = Column(String)  #: vehicle name
+#     manufacturer_id = Column(String, ForeignKey('manufacturers.manufacturer_id'))  #: vehicle manufacturer ID
+#     compliance_id = Column(String)  #: compliance ID, may be the manufacturer ID or 'consolidated_OEM'
+#     manufacturer = relationship('Manufacturer', back_populates='vehicles')  #: SQLAlchemy relationship link to manufacturer table
+#
+#     model_year = Column(Numeric)  #: vehicle model year
+#     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))  #: fueling class, e.g. 'BEV', 'ICE'
+#     reg_class_id = Column(String)  #: regulatory class assigned according the active policy
+#     context_size_class = Column(String)  #: context size class, used to project future vehicle sales based on the context
+#     target_co2e_grams_per_mile = Column(Float)  #: cert target CO2e g/mi, as determined by the active policy
+#     lifetime_VMT = Column('lifetime_vmt', Float)  #: lifetime VMT, used to calculate CO2e Mg
+#     cert_co2e_Mg = Column('cert_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
+#     target_co2e_Mg = Column('target_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
+#     in_use_fuel_id = Column(String)  #: in-use / onroad fuel ID
+#     cert_fuel_id = Column(String)  #: cert fuel ID
+#     market_class_id = Column(String)  #: market class ID, as determined by the consumer subpackage
+#     unibody_structure = Column(Float)  #: unibody structure flag, e.g. 0,1
+#     drive_system = Column(String)  #: drive system, 'FWD', 'RWD', 'AWD'
+#     application_id = Column(String)  #: application ID 'SLA' -> standard load application, 'HLA' -> high load application
+#     dual_rear_wheel = Column(Float)  #: dual_rear_wheel, 0=No, 1=Yes
+#     body_style = Column(String)  #: vehicle body style, e.g. 'sedan'
+#     base_year_powertrain_type = Column(String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
+#     onroad_charge_depleting_range_mi = Column(Float)  #: vehicle charge-depleting range, miles
+#     cert_utility_factor = Column(Float)  #: PHEV cert utility factor
+#     onroad_utility_factor = Column(Float)  #: PHEV onroad utility factor
+#     cert_engine_on_distance_frac = Column(Float)  #: PHEV cert engine-on distance frac
+#     onroad_engine_on_distance_frac = Column(Float)  #: PHEV onroad engine-on disance frac
+#     battery_sizing_onroad_direct_kwh_per_mile = Column(Float)  #: battery-sizing onroad direct kWh/mi
+#     prior_redesign_year = Column(Float)  #: prior redesign year
+#     redesign_interval = Column(Float)  #: redesign interval
+#     in_production = Column(Boolean)  #: True if vehicle is in production
+#     price_modification_dollars = Column(Float)  #: vehicle price modification (i.e. incentive value) in dollars
+#     modified_cross_subsidized_price_dollars = Column(Float)  #: vehicle modified cross subsidized price in dollars
+#     price_dollars = Column(Float)  #: vehicle price in dollars
+#     market_class_cross_subsidy_multiplier = Column(Float)  #: vehicle market class cross subsidy multiplier
+#
+#     # "base year properties" - things that may change over time but we want to retain the original values
+#     base_year_product = Column(Boolean)  #: True if vehicle was in production in base year
+#     base_year_reg_class_id = Column(Enum(*legacy_reg_classes, validate_strings=True))  #: base year regulatory class, historical data
+#     base_year_vehicle_id = Column(Float)  #: base year vehicle id from vehicles.csv
+#     base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
+#     model_year_prevalence = Column(Float)  #: used to maintain market share relationships within context size classes during market projection
+#     base_year_glider_non_structure_mass_lbs = Column(Float)  #: base year non-structure mass lbs (i.e. "content")
+#     base_year_glider_non_structure_cost_dollars = Column(Float)  #: base year glider non-structure cost dollars
+#     base_year_glider_structure_cost_dollars = Column(Float)  #: base year glider structure cost dollars
+#     base_year_footprint_ft2 = Column(Float)  #: base year vehicle footprint, square feet
+#     base_year_curbweight_lbs = Column(Float)  #: base year vehicle curbweight, pounds
+#     base_year_curbweight_lbs_to_hp = Column(Float)  #: base year curbweight to power ratio (pounds per hp)
+#     base_year_msrp_dollars = Column(Float)  #: base year Manufacturer Suggested Retail Price (dollars)
+#     base_year_target_coef_a = Column(Float)  #: roadload A coefficient, lbs
+#     base_year_target_coef_b = Column(Float)  #: roadload B coefficient, lbs/mph
+#     base_year_target_coef_c = Column(Float)  #: roadload C coefficient, lbs/mph^2
+#     base_year_workfactor = Column(Float)
+#     base_year_gvwr_lbs = Column(Float)
+#     base_year_gcwr_lbs = Column(Float)
+#     base_year_cert_fuel_id = Column(String)
+#     base_year_battery_kwh = Column(Float)  #: vehicle propulsion battery kWh
+#     base_year_tractive_motor_kw = Column(Float)  #: on-cycle tractive motor power, kW
+#     base_year_total_emachine_kw = Column(Float)  #: vehicle motor/generator total combined power, kW
+#     base_year_onroad_charge_depleting_range_mi = Column(Float)  #: charge depleting range, miles
+#     base_year_cost_curve_class = Column(String)  #: base year cost curve class
+#     base_year_onroad_direct_oncycle_co2e_grams_per_mile = Column(Float)  #: base year onroad direct oncycle CO2e g/mi
+#     base_year_onroad_direct_oncycle_kwh_per_mile = Column(Float)  #: base year onroad direct oncycle kWh/mi
+#     base_year_cert_direct_oncycle_co2e_grams_per_mile = Column(Float)  #: base year cert direct oncycle CO2e g/mi
+#     base_year_cert_direct_oncycle_kwh_per_mile = Column(Float)  #: base year cert direct oncycle kWh/mi
+#
+#     # non-numeric attributes that could change based on interpolating the frontier:
+#     cost_curve_class = Column(String)  #: ALPHA modeling result class
+#     structure_material = Column(String)  #: vehicle body structure material, e.g. 'steel'
+#     # numeric attributes that can change based on interpolating the frontier:
+#     battery_kwh = Column(Float)  #: vehicle propulsion battery kWh
+#     total_emachine_kw = Column(Float)  #: vehicle motor/generator total combined power, kW
+#     tractive_motor_kw = Column(Float)  #: on-cycle tractive motor power, kW
+#     curbweight_lbs = Column(Float)  #: vehicle curbweight, pounds
+#     footprint_ft2 = Column(Float)  #: vehicle footprint, square feet
+#     base_year_eng_rated_hp = Column(Float)  #: engine rated horsepower
+#     workfactor = Column(Float)  #: medium-duty workfactor
+#     gvwr_lbs = Column(Float)  #: gross vehicle weight rating, lbs
+#     gcwr_lbs = Column(Float)  #: gross combined weight rating, lbs
+#
+#     _initial_registered_count = Column('_initial_registered_count', Float)
+#     projected_sales = Column(Float)  #: used to project context size class sales
+#
+#     # --- static properties ---
+#     compliance_ids = set()  #: the set of compliance IDs (manufacturer IDs or 'consolidated_OEM')
+#     mfr_base_year_share_data = dict()  #: dict of base year market shares by compliance ID and various categories, used to project future vehicle sales based on the context
+#
+#     # these are used to validate vehicles.csv:
+#     # mandatory input file columns, the rest can be optional numeric columns:
+#     mandatory_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id',
+#                                         'context_size_class', 'electrification_class', 'cost_curve_class',
+#                                         'in_use_fuel_id', 'cert_fuel_id', 'sales', 'footprint_ft2', 'eng_rated_hp',
+#                                         'unibody_structure', 'drive_system', 'dual_rear_wheel', 'curbweight_lbs',
+#                                         'gvwr_lbs', 'gcwr_lbs', 'target_coef_a', 'target_coef_b', 'target_coef_c',
+#                                         'body_style', 'msrp_dollars', 'structure_material', 'prior_redesign_year',
+#                                         'redesign_interval', 'application_id', 'battery_gross_kwh', 'tractive_motor_kw',
+#                                         'total_emachine_kw', }
+#
+#     dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
+#     dynamic_attributes = []  #: list of dynamic attribute names, from dynamic_columns
+#
+#     # **additional attributes are dynamically added from DecompositionAttributes.values during omega2.init_omega()**
+#
+#     @property
+#     def initial_registered_count(self):
+#         """
+#         Get the vehicle initial registered count
+#
+#         Returns:
+#             The vehicle initial registered count
+#
+#         """
+#         return self._initial_registered_count
+#
+#     @initial_registered_count.setter
+#     def initial_registered_count(self, initial_registered_count):
+#         """
+#         Setter for vehicle initial registered count
+#
+#         Args:
+#             initial_registered_count (numeric): the vehicle initial registered count
+#
+#         Returns:
+#             Nothing, updates vehicle initial registered count
+#
+#         """
+#         self._initial_registered_count = initial_registered_count
+#
+#         omega_globals.session.add(self)  # update database so vehicle_annual_data foreign key succeeds...
+#         omega_globals.session.flush()  # update vehicle_id, otherwise it's None
+#
+#         VehicleAnnualData.update_registered_count(self,
+#                                                   calendar_year=int(self.model_year),
+#                                                   registered_count=initial_registered_count)
+#
+#     @staticmethod
+#     def get_max_model_year():
+#         """
+#         Get the maximum model year present in the base year vehicle data, used to set the analysis initial year
+#
+#         Returns:
+#             The maximum model year present in the base year vehicle data
+#
+#         """
+#         return omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()
+#
+#     @staticmethod
+#     def get_compliance_vehicles(calendar_year, compliance_id):
+#         """
+#         Get vehicles by year and compliance ID.  Used at the beginning of the producer compliance search to pull in
+#         the prior year vehicles
+#
+#         Args:
+#             calendar_year (int): the calendar year (model year) to pull vehicles from
+#             compliance_id (str): manufacturer name, or 'consolidated_OEM'
+#
+#         Returns:
+#             A list of ``VehicleFinal`` objects for the given year and compliance ID
+#
+#         """
+#         return omega_globals.session.query(VehicleFinal). \
+#             filter(VehicleFinal.compliance_id == compliance_id). \
+#             filter(VehicleFinal.model_year == calendar_year).all()
+#
+#     @staticmethod
+#     def get_vehicle_attributes(vehicle_id, attributes):
+#         """
+#         A generic 'getter' to retrieve one or more ``VehicleFinal`` object attributes
+#
+#         Args:
+#             vehicle_id (int): the vehicle ID
+#             attributes (str, [strs]): the name or list of names of vehicle attributes to get
+#
+#         Returns:
+#             The value(s) of the requested attribute(s)
+#
+#         """
+#         if type(attributes) is not list:
+#             attributes = [attributes]
+#         attrs = VehicleFinal.get_class_attributes(attributes)
+#         return omega_globals.session.query(*attrs).filter(VehicleFinal.vehicle_id == vehicle_id).one()
+#
+#     @staticmethod
+#     def calc_target_co2e_Mg(model_year, compliance_id):
+#         """
+#         Calculate the total cert target CO2e Mg for the given model year and compliance ID
+#
+#         Args:
+#             model_year (int): the model year of the cert target
+#             compliance_id (str): manufacturer name, or 'consolidated_OEM'
+#
+#         Returns:
+#             The sum of vehicle cert target CO2e Mg for the given model year and compliance ID
+#
+#         """
+#         return omega_globals.session.query(func.sum(VehicleFinal.target_co2e_Mg)). \
+#             filter(VehicleFinal.compliance_id == compliance_id). \
+#             filter(VehicleFinal.model_year == model_year).scalar()
+#
+#     @staticmethod
+#     def calc_cert_co2e_Mg(model_year, compliance_id):
+#         """
+#         Calculate the total cert CO2e Mg for the given model year and compliance ID
+#
+#         Args:
+#             model_year (int): the model year of the cert Mg
+#             compliance_id (str): manufacturer name, or 'consolidated_OEM'
+#
+#         Returns:
+#             The sum of vehicle cert CO2e Mg for the given model year and compliance ID
+#
+#         """
+#         return omega_globals.session.query(func.sum(VehicleFinal.cert_co2e_Mg)). \
+#             filter(VehicleFinal.compliance_id == compliance_id). \
+#             filter(VehicleFinal.model_year == model_year).scalar()
+#
+#     @staticmethod
+#     def clone_vehicle(vehicle):
+#         """
+#         Make a "clone" of a vehicle, used to create alternate powertrain versions of vehicles in the base year fleet
+#
+#         Args:
+#             vehicle (VehicleFinal): the vehicle to clone
+#
+#         Returns:
+#             A new ``VehicleFinal`` object with non-powertrain attributes copied from the given vehicle
+#
+#         """
+#         inherit_properties = ['name', 'manufacturer_id', 'compliance_id',
+#                               'reg_class_id', 'context_size_class', 'unibody_structure', 'body_style',
+#                               'base_year_reg_class_id', 'base_year_market_share', 'base_year_vehicle_id',
+#                               'curbweight_lbs', 'base_year_glider_non_structure_mass_lbs', 'base_year_cert_fuel_id',
+#                               'base_year_glider_non_structure_cost_dollars', 'base_year_glider_structure_cost_dollars',
+#                               'footprint_ft2', 'base_year_footprint_ft2', 'base_year_curbweight_lbs', 'drive_system',
+#                               'dual_rear_wheel', 'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
+#                               'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c',
+#                               'prior_redesign_year', 'redesign_interval', 'workfactor', 'gvwr_lbs', 'gcwr_lbs',
+#                               'base_year_workfactor', 'base_year_gvwr_lbs', 'base_year_gcwr_lbs', 'application_id',
+#                               'base_year_cost_curve_class',
+#                               ] \
+#                               + VehicleFinal.dynamic_attributes
+#
+#         # model year and registered count are required to make a full-blown VehicleFinal object, compliance_id
+#         # is required for vehicle annual data init
+#         veh = VehicleFinal(model_year=vehicle.model_year,
+#                            compliance_id=vehicle.compliance_id,
+#                            initial_registered_count=1)
+#
+#         # get the rest of the attributes from the list
+#         for p in inherit_properties:
+#             veh.__setattr__(p, vehicle.__getattribute__(p))
+#
+#         return veh
+#
+#     @staticmethod
+#     def init_vehicles_from_dataframe(df, verbose=False):
+#         """
+#
+#         Load data from the base year vehicle dataframe
+#
+#         Args:
+#             df (DataFrame): dataframe of aggregated vehicle data
+#             verbose (bool): enable additional console and logfile output if True
+#
+#         Returns:
+#             List of template/input errors, else empty list on success
+#
+#         """
+#         from context.new_vehicle_market import NewVehicleMarket
+#
+#         vehicle_shares_dict = {'total': 0}
+#
+#         VehicleFinal.compliance_ids = set()
+#         vehicles_list = []
+#
+#         if verbose:
+#             omega_log.logwrite('\nInitializing vehicle data ...')
+#
+#         from producer.manufacturers import Manufacturer
+#         from context.mass_scaling import MassScaling
+#         from context.body_styles import BodyStyles
+#
+#         # load data into database
+#         for i in df.index:
+#             veh = VehicleFinal(
+#                 name=df.loc[i, 'vehicle_name'],
+#                 vehicle_id=i,
+#                 manufacturer_id=df.loc[i, 'manufacturer_id'],
+#                 model_year=df.loc[i, 'model_year'],
+#                 context_size_class=df.loc[i, 'context_size_class'],
+#                 cost_curve_class=df.loc[i, 'cost_curve_class'],
+#                 in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
+#                 cert_fuel_id=df.loc[i, 'cert_fuel_id'],
+#                 unibody_structure=df.loc[i, 'unibody_structure'],
+#                 drive_system=df.loc[i, 'drive_system'],
+#                 application_id=df.loc[i, 'application_id'],
+#                 dual_rear_wheel=df.loc[i, 'dual_rear_wheel'],
+#                 curbweight_lbs=df.loc[i, 'curbweight_lbs'],
+#                 footprint_ft2=df.loc[i, 'footprint_ft2'],
+#                 body_style=df.loc[i, 'body_style'],
+#                 structure_material=df.loc[i, 'structure_material'],
+#                 total_emachine_kw=df.loc[i, 'total_emachine_kw'],
+#                 tractive_motor_kw=df.loc[i, 'tractive_motor_kw'],
+#                 battery_kwh=df.loc[i, 'battery_gross_kwh'],
+#                 onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi'],
+#                 prior_redesign_year=df.loc[i, 'prior_redesign_year'],
+#                 redesign_interval=df.loc[i, 'redesign_interval'],
+#                 in_production=True,
+#                 workfactor=df.loc[i, 'workfactor'],
+#                 reg_class_id=df.loc[i, 'reg_class_id'],
+#                 gvwr_lbs=df.loc[i, 'gvwr_lbs'],
+#                 gcwr_lbs=df.loc[i, 'gcwr_lbs'],
+#                 base_year_cost_curve_class = df.loc[i, 'cost_curve_class'],
+#                 base_year_eng_rated_hp=df.loc[i, 'eng_rated_hp'],
+#                 base_year_target_coef_a=df.loc[i, 'target_coef_a'],
+#                 base_year_target_coef_b=df.loc[i, 'target_coef_b'],
+#                 base_year_target_coef_c=df.loc[i, 'target_coef_c'],
+#                 base_year_reg_class_id=df.loc[i, 'reg_class_id'],
+#                 base_year_footprint_ft2=df.loc[i, 'footprint_ft2'],
+#                 base_year_curbweight_lbs=df.loc[i, 'curbweight_lbs'],
+#                 base_year_msrp_dollars=df.loc[i, 'msrp_dollars'],
+#                 base_year_glider_non_structure_mass_lbs=df.loc[i, 'glider_non_structure_mass_lbs'],
+#                 base_year_glider_non_structure_cost_dollars=df.loc[i, 'glider_non_structure_cost_dollars'],
+#                 base_year_glider_structure_cost_dollars=df.loc[i, 'glider_structure_cost_dollars'],
+#                 base_year_workfactor=df.loc[i, 'workfactor'],
+#                 base_year_vehicle_id=i,  # i.e. aggregated_vehicles.csv index number...
+#                 base_year_cert_fuel_id=df.loc[i, 'cert_fuel_id'],
+#                 base_year_battery_kwh=df.loc[i, 'battery_kwh'],
+#                 base_year_total_emachine_kw=df.loc[i, 'total_emachine_kw'],
+#                 base_year_tractive_motor_kw=df.loc[i, 'tractive_motor_kw'],
+#                 base_year_onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi'],
+#                 base_year_powertrain_type=df.loc[i, 'base_year_powertrain_type'],
+#                 base_year_product=True,
+#                 base_year_gvwr_lbs=df.loc[i, 'gvwr_lbs'],
+#                 base_year_gcwr_lbs=df.loc[i, 'gcwr_lbs'],
+#             )
+#
+#             electrification_class = df.loc[i, 'electrification_class']
+#
+#             for attr, dc in zip(VehicleFinal.dynamic_attributes, VehicleFinal.dynamic_columns):
+#                 veh.__setattr__(attr, df.loc[i, dc])
+#
+#             if omega_globals.options.consolidate_manufacturers:
+#                 veh.compliance_id = 'consolidated_OEM'
+#             else:
+#                 veh.compliance_id = veh.manufacturer_id
+#
+#             if not omega_globals.manufacturer_aggregation:
+#                 veh.manufacturer_id = 'consolidated_OEM'
+#
+#             VehicleFinal.compliance_ids.add(veh.compliance_id)
+#
+#             # update initial registered count >after< setting compliance id, it's required for vehicle annual data
+#             veh.initial_registered_count = df.loc[i, 'sales']
+#
+#             VehicleFinal.set_fueling_class(veh)
+#
+#             veh.cert_direct_oncycle_co2e_grams_per_mile = 0 #None
+#             veh.cert_direct_co2e_grams_per_mile = 0 # None
+#             veh.cert_co2e_grams_per_mile = 0 # None
+#             veh.cert_direct_kwh_per_mile = 0 # None
+#
+#             veh.onroad_direct_co2e_grams_per_mile = 0
+#             veh.onroad_direct_kwh_per_mile = 0
+#
+#             if veh.base_year_powertrain_type in ['BEV', 'FCV']:
+#                 rated_hp = veh.base_year_total_emachine_kw / 0.746
+#             else:
+#                 rated_hp = veh.base_year_eng_rated_hp
+#
+#             veh.base_year_curbweight_lbs_to_hp = veh.curbweight_lbs / rated_hp
+#
+#             vehicle_shares_dict['total'] += veh.initial_registered_count
+#
+#             if veh.context_size_class not in vehicle_shares_dict:
+#                 vehicle_shares_dict[veh.context_size_class] = 0
+#
+#             vehicle_shares_dict[veh.context_size_class] += veh.initial_registered_count
+#
+#             vehicles_list.append(veh)
+#
+#             # assign user-definable market class
+#             VehicleFinal.assign_vehicle_market_class_ID(veh)
+#
+#             non_responsive_market_category = \
+#                 omega_globals.options.MarketClass.get_non_responsive_market_category(veh.market_class_id)
+#
+#             if non_responsive_market_category not in NewVehicleMarket.context_size_class_info_by_nrmc:
+#                 NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category] = dict()
+#
+#             if veh.context_size_class not in \
+#                     NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category]:
+#                 NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category][veh.context_size_class] = \
+#                     {'total': veh.initial_registered_count, 'share': 0}
+#             else:
+#                 NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category][veh.context_size_class]['total'] += \
+#                     veh.initial_registered_count
+#
+#             # update base year sales data by context size class (used for specifically for sales projections)
+#             if veh.context_size_class not in NewVehicleMarket.base_year_context_size_class_sales:
+#                 NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] = \
+#                     veh.initial_registered_count
+#             else:
+#                 NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] += \
+#                     veh.initial_registered_count
+#
+#             key = veh.compliance_id + '_' + veh.context_size_class
+#             if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
+#                 NewVehicleMarket.manufacturer_base_year_sales_data[key] = veh.initial_registered_count
+#             else:
+#                 NewVehicleMarket.manufacturer_base_year_sales_data[key] += veh.initial_registered_count
+#
+#             # update base year sales data by market class id
+#             if veh.market_class_id not in NewVehicleMarket.base_year_other_sales:
+#                 NewVehicleMarket.base_year_other_sales[veh.market_class_id] = veh.initial_registered_count
+#             else:
+#                 NewVehicleMarket.base_year_other_sales[veh.market_class_id] += veh.initial_registered_count
+#
+#             key = veh.compliance_id + '_' + veh.market_class_id
+#             if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
+#                 NewVehicleMarket.manufacturer_base_year_sales_data[key] = veh.initial_registered_count
+#             else:
+#                 NewVehicleMarket.manufacturer_base_year_sales_data[key] += veh.initial_registered_count
+#
+#             # update base year sales data by market category
+#             for market_category in veh.market_class_id.split('.'):
+#                 if market_category not in NewVehicleMarket.base_year_other_sales:
+#                     NewVehicleMarket.base_year_other_sales[market_category] = veh.initial_registered_count
+#                 else:
+#                     NewVehicleMarket.base_year_other_sales[market_category] += veh.initial_registered_count
+#
+#             for market_category in veh.market_class_id.split('.'):
+#                 key = veh.compliance_id + '_' + market_category
+#                 if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
+#                     NewVehicleMarket.manufacturer_base_year_sales_data[key] = veh.initial_registered_count
+#                 else:
+#                     NewVehicleMarket.manufacturer_base_year_sales_data[key] += veh.initial_registered_count
+#
+#             if verbose:
+#                 print(veh)
+#
+#             omega_globals.options.PowertrainCost.calc_cost(veh, update_tracker=True)  # update build dict
+#
+#             # omega_globals.finalized_vehicles.append(veh.to_namedtuple())
+#             omega_globals.finalized_vehicles.append(veh)
+#
+#         # Update market share and create alternative vehicles (a BEV equivalent for every ICE vehicle, etc).
+#         # Alternative vehicles maintain fleet utility mix across model years and prevent all future vehicles
+#         # from becoming midsize car BEVs, for example, just because that's the dominant BEV in the base year
+#         # fleet
+#         for v in vehicles_list:
+#             v.base_year_market_share = v.initial_registered_count / vehicle_shares_dict['total']
+#             # print(v.name, v.base_year_powertrain_type, v.fueling_class)
+#
+#             if v.base_year_powertrain_type != 'BEV' or omega_globals.options.allow_ice_of_bev:
+#                 if v.base_year_powertrain_type == 'ICE':
+#                     # create BEV of ICE
+#                     alt_veh = VehicleFinal.create_vehicle_clone(v)
+#                     alt_veh.fueling_class = 'BEV'
+#                     alt_veh.base_year_powertrain_type = 'BEV'
+#                     alt_veh.name = 'BEV of ' + v.name
+#                     for tf in omega_globals.options.CostCloud.tech_flags:
+#                         alt_veh.__setattr__(tf, None)
+#                     alt_veh.bev = 1
+#                     alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
+#                     alt_veh.cert_fuel_id = 'electricity'
+#                     alt_veh.battery_kwh = 0  # pack sizes determined by range target
+#                     alt_veh.total_emachine_kw = 0  # motor size determined during cost curve generation
+#                     alt_veh.tractive_motor_kw = 0
+#                     alt_veh.base_year_tractive_motor_kw = 1
+#                     if (v.drive_system == 'AWD'):
+#                         # ratio of AWD total power to tractive power
+#                         alt_veh.base_year_total_emachine_kw = 1.75
+#                     else:
+#                         alt_veh.base_year_total_emachine_kw = 1
+#                     if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
+#                         alt_veh.onroad_charge_depleting_range_mi = 150  # RV MDV
+#                     else:
+#                         alt_veh.onroad_charge_depleting_range_mi = omega_globals.options.bev_range_mi
+#                     alt_veh.base_year_eng_rated_hp = 0
+#                     alt_veh.engine_cylinders = 0
+#                     alt_veh.engine_displacement_liters = 0
+#                     VehicleFinal.assign_vehicle_market_class_ID(alt_veh)
+#
+#                     # create PHEV of ICE
+#                     alt_veh = VehicleFinal.create_vehicle_clone(v)
+#                     alt_veh.fueling_class = 'PHEV'
+#                     alt_veh.base_year_powertrain_type = 'PHEV'
+#                     alt_veh.name = 'PHEV of ' + v.name
+#                     for tf in omega_globals.options.CostCloud.tech_flags:
+#                         alt_veh.__setattr__(tf, None)
+#                     alt_veh.phev = 1
+#                     alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
+#                     alt_veh.cert_fuel_id = 'gasoline'
+#                     alt_veh.battery_kwh = 0  # pack sizes determined by range target
+#                     alt_veh.total_emachine_kw = 0  # motor size determined during cost curve generation
+#                     alt_veh.tractive_motor_kw = 0
+#                     if alt_veh.base_year_reg_class_id == 'mediumduty' and alt_veh.body_style == 'cuv_suv':
+#                         alt_veh.onroad_charge_depleting_range_mi = 25  # RV MDV
+#                     else:
+#                         alt_veh.onroad_charge_depleting_range_mi = omega_globals.options.phev_range_mi
+#                     alt_veh.base_year_onroad_charge_depleting_range_mi = alt_veh.onroad_charge_depleting_range_mi
+#                     alt_veh.base_year_eng_rated_hp = v.base_year_eng_rated_hp
+#                     alt_veh.engine_cylinders = v.engine_cylinders
+#                     alt_veh.engine_displacement_liters = v.engine_displacement_liters
+#                     VehicleFinal.assign_vehicle_market_class_ID(alt_veh)
+#
+#                 elif v.base_year_powertrain_type == 'BEV':
+#                     # create ICE of BEV
+#                     alt_veh = VehicleFinal.create_vehicle_clone(v)
+#                     alt_veh.fueling_class = 'ICE'
+#                     alt_veh.base_year_powertrain_type = 'ICE'
+#                     alt_veh.name = 'ICE of ' + v.name
+#                     for tf in omega_globals.options.CostCloud.tech_flags:
+#                         alt_veh.__setattr__(tf, None)
+#                     alt_veh.ice = 1
+#                     alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
+#                     alt_veh.cert_fuel_id = 'gasoline'
+#                     alt_veh.base_year_eng_rated_hp = v.total_emachine_kw / 0.746
+#                     alt_veh.total_emachine_kw = 0
+#                     alt_veh.tractive_motor_kw = 0
+#                     alt_veh.onroad_charge_depleting_range_mi = 0
+#                     alt_veh.battery_kwh = 0
+#                     alt_veh.engine_cylinders = None
+#                     alt_veh.engine_displacement_liters = None
+#                     VehicleFinal.assign_vehicle_market_class_ID(alt_veh)
+#
+#         for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
+#             for csc in NewVehicleMarket.context_size_class_info_by_nrmc[nrmc]:
+#                 NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['share'] = \
+#                     NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['total'] / vehicle_shares_dict[csc]
+#
+#         # calculate manufacturer base year context size class shares
+#         VehicleFinal.compliance_ids = sorted(list(VehicleFinal.compliance_ids))
+#
+#         VehicleFinal.mfr_base_year_share_data = dict()
+#         for compliance_id in VehicleFinal.compliance_ids:
+#             for size_class in NewVehicleMarket.base_year_context_size_class_sales:
+#                 if compliance_id not in VehicleFinal.mfr_base_year_share_data:
+#                     VehicleFinal.mfr_base_year_share_data[compliance_id] = dict()
+#
+#                 key = compliance_id + '_' + size_class
+#
+#                 if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
+#                     NewVehicleMarket.manufacturer_base_year_sales_data[key] = 0
+#
+#                 if verbose:
+#                     print('%s: %s / %s: %.2f' % (key,
+#                                                  NewVehicleMarket.manufacturer_base_year_sales_data[key],
+#                                                  NewVehicleMarket.base_year_context_size_class_sales[size_class],
+#                                                  NewVehicleMarket.manufacturer_base_year_sales_data[key] /
+#                                                  NewVehicleMarket.base_year_context_size_class_sales[size_class]))
+#
+#                 VehicleFinal.mfr_base_year_share_data[compliance_id][size_class] = \
+#                     NewVehicleMarket.manufacturer_base_year_sales_data[key] / \
+#                     NewVehicleMarket.base_year_context_size_class_sales[size_class]
+#
+#         for compliance_id in VehicleFinal.compliance_ids:
+#             for other in NewVehicleMarket.base_year_other_sales:
+#                 if compliance_id not in VehicleFinal.mfr_base_year_share_data:
+#                     VehicleFinal.mfr_base_year_share_data[compliance_id] = dict()
+#
+#                 key = compliance_id + '_' + other
+#
+#                 if key not in NewVehicleMarket.manufacturer_base_year_sales_data:
+#                     NewVehicleMarket.manufacturer_base_year_sales_data[key] = 0
+#
+#                 if verbose:
+#                     print('%s: %s / %s: %.2f' % (key,
+#                                                  NewVehicleMarket.manufacturer_base_year_sales_data[key],
+#                                                  NewVehicleMarket.base_year_other_sales[other],
+#                                                  NewVehicleMarket.manufacturer_base_year_sales_data[key] /
+#                                                  NewVehicleMarket.base_year_other_sales[other]))
+#
+#                 VehicleFinal.mfr_base_year_share_data[compliance_id][other] = \
+#                     NewVehicleMarket.manufacturer_base_year_sales_data[key] / \
+#                     NewVehicleMarket.base_year_other_sales[other]
+#
+#         if verbose:
+#             print_dict(NewVehicleMarket.base_year_context_size_class_sales)
+#             print_dict(NewVehicleMarket.base_year_other_sales)
+#             print_dict(VehicleFinal.mfr_base_year_share_data)
+#
+#     @staticmethod
+#     def set_fueling_class(veh):
+#         """
+#
+#         Args:
+#             veh:
+#
+#         Returns:
+#
+#         """
+#         if veh.base_year_powertrain_type in ['BEV', 'FCV']:
+#             if veh.base_year_powertrain_type == 'FCV':
+#                 # RV FCV
+#                 veh.in_use_fuel_id = "{'US electricity':1.0}"
+#                 veh.cert_fuel_id = 'electricity'
+#                 veh.base_year_powertrain_type = 'BEV'
+#             veh.fueling_class = 'BEV'
+#         elif veh.base_year_powertrain_type == 'PHEV':
+#             veh.fueling_class = 'PHEV'
+#         else:
+#             veh.fueling_class = 'ICE'
+#
+#     @staticmethod
+#     def assign_vehicle_market_class_ID(vehicle):
+#         """
+#         Assign market class ID to the given vehicle and update manufacturer market class data.
+#
+#         Args:
+#             vehicle (VehicleFinal): the vehicle to assign a market class ID to
+#
+#         Returns:
+#             Nothing, updates vehicle market class ID and manufacturer market class data
+#
+#         """
+#         from producer.manufacturers import Manufacturer
+#         vehicle.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(vehicle)
+#         # vehicle.manufacturer.update_market_class_data(vehicle.compliance_id, vehicle.market_class_id)
+#         Manufacturer.update_market_class_data(vehicle.compliance_id, vehicle.market_class_id)
+#
+#     @staticmethod
+#     def create_vehicle_clone(vehicle):
+#         """
+#         Create vehicle clone.
+#
+#         Args:
+#             vehicle (VehicleFinal): the vehicle to clone
+#
+#         Returns:
+#             Cloned vehicle
+#
+#         """
+#         alt_veh = vehicle.clone_vehicle(vehicle)  # create alternative powertrain clone of vehicle
+#         alt_veh.in_production = is_up_for_redesign(alt_veh)
+#         alt_veh.base_year_product = 0
+#
+#         alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
+#         alt_veh.cert_direct_co2e_grams_per_mile = 0
+#         alt_veh.cert_direct_kwh_per_mile = 0
+#
+#         return alt_veh
+#
+#     @staticmethod
+#     def init_from_file(vehicle_onroad_calculations_file, verbose=False):
+#         """
+#         Init vehicle database from the base year vehicles file and set up the onroad / vehicle attribute calculations.
+#         Also initializes decomposition attributes.
+#
+#         Args:
+#             vehicle_onroad_calculations_file (str): the name of the vehicle onroad calculations
+#                 (vehicle attribute calculations) file
+#             verbose (bool): enable additional console and logfile output if True
+#
+#         Returns:
+#             List of template/input errors, else empty list on success
+#
+#         See Also:
+#             ``VehicleAttributeCalculations``, ``DecompositionAttributes``
+#
+#         """
+#         _init_fail = []
+#
+#         DecompositionAttributes.init()   # offcycle_credits must be initalized first
+#
+#         VehicleFinal.init_vehicles_from_dataframe(omega_globals.options.vehicles_df, verbose=verbose)
+#
+#         _init_fail += VehicleOnroadCalculations.init_vehicle_attribute_calculations_from_file(
+#             vehicle_onroad_calculations_file, clear_cache=True, verbose=verbose)
+#
+#         return _init_fail
 
 
 if __name__ == '__main__':
@@ -2001,6 +2498,5 @@ if __name__ == '__main__':
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
     except:
-        dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

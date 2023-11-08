@@ -74,7 +74,7 @@ class BodyStyles(OMEGABase):
         BodyStyles.body_styles = []
 
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         input_template_name = 'body_styles'
         input_template_version = 0.1

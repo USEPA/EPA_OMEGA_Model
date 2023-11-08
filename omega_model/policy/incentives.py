@@ -105,7 +105,7 @@ class Incentives(OMEGABase):
         Incentives._data.clear()
 
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         # don't forget to update the module docstring with changes hereƒß
         input_template_name = 'production_multipliers'

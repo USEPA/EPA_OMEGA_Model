@@ -51,16 +51,11 @@ from omega_model import *
 market_class_data = dict()
 
 
-class Manufacturer(SQABase, OMEGABase):
+class Manufacturer(OMEGABase):
     """
     **Stores information regarding manufacturers, such as manufacturer ID.**
 
     """
-    # --- database table properties ---
-    __tablename__ = 'manufacturers'
-    manufacturer_id = Column('manufacturer_id', String, primary_key=True)  #: manufacturer id / name
-    vehicles = relationship('VehicleFinal', back_populates='manufacturer')  #: schema relationship to VehicleFinal data
-
     manufacturers = []  #: stores a list of manufacturer names after init
 
     @staticmethod
@@ -82,7 +77,7 @@ class Manufacturer(SQABase, OMEGABase):
         market_class_data[manufacturer_id].add(market_class_id)
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
+    def init_from_file(filename, verbose=False):
         """
 
         Initialize class data from input file.
@@ -101,7 +96,7 @@ class Manufacturer(SQABase, OMEGABase):
 
         from policy.credit_banking import CreditBank
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         input_template_name = 'manufacturers'
         input_template_version = 0.0003
@@ -118,16 +113,6 @@ class Manufacturer(SQABase, OMEGABase):
                                                              verbose=verbose)
 
             if not template_errors:
-                obj_list = []
-                # load data into database
-                for i in df.index:
-                    manufacturer_id = df.loc[i, 'manufacturer_id']
-                    obj_list.append(Manufacturer(
-                        manufacturer_id=manufacturer_id,
-                    ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
-
                 Manufacturer.manufacturers = list(df['manufacturer_id'].unique())
 
         return template_errors
@@ -145,7 +130,6 @@ if __name__ == '__main__':
 
         init_fail = []
 
-        # pull in reg classes before building database tables (declaring classes) that check reg class validity
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
@@ -154,20 +138,18 @@ if __name__ == '__main__':
         module_name = get_template_name(omega_globals.options.market_classes_file)
         omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
 
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
         from context.onroad_fuels import OnroadFuel
-        from producer.vehicles import VehicleFinal
         from producer.vehicle_annual_data import VehicleAnnualData
 
-        SQABase.metadata.create_all(omega_globals.engine)
+        
 
-        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file, 
+        init_fail += Manufacturer.init_from_file(omega_globals.options.manufacturers_file, 
                                                           verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            pass
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())

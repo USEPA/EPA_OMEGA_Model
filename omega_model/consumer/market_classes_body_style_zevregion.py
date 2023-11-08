@@ -114,7 +114,7 @@ class MarketClass(OMEGABase, MarketClassBase):
         Get vehicle market class ID based on vehicle characteristics
 
         Args:
-            vehicle (VehicleFinal): the vehicle to determine the market class of
+            vehicle (Vehicle): the vehicle to determine the market class of
 
         Returns:
             The vehicle's market class ID based on vehicle characteristics.
@@ -217,7 +217,7 @@ class MarketClass(OMEGABase, MarketClassBase):
         MarketClass._data.clear()
 
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         MarketClassBase._market_class_dict = dict()  # empty set market class dict, accessed by get_market_class_dict()
         MarketClassBase._market_class_tree_dict = dict()  # empty set market class tree dict accessed by get_market_class_tree()

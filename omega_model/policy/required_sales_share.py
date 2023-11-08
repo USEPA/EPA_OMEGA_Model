@@ -174,9 +174,9 @@ if __name__ == '__main__':
                                                        verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            file_io.validate_folder(omega_globals.options.database_dump_folder)
+            file_io.validate_folder(omega_globals.options.output_folder)
             RequiredSalesShare._data.to_csv(
-                omega_globals.options.database_dump_folder + os.sep + 'required_zev_shares.csv', index=False)
+                omega_globals.options.output_folder + os.sep + 'required_zev_shares.csv', index=False)
 
             print(RequiredSalesShare.get_minimum_share(2020, 'hauling.BEV'))
             print(RequiredSalesShare.get_minimum_share(2020, 'non_hauling.BEV'))

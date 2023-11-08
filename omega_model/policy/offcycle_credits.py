@@ -91,7 +91,7 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
     _offcycle_credit_groups = []  #: list of credit groups, populated during init
     _offcycle_credit_value_columns = []  #: list of columns that contain credit values, of the format ``vehicle_attribute:attribute_value``
 
-    offcycle_credit_names = []  #: list of credit names, populated during init, used to track credits across composition/decomposition and into the database, also used to check simulated vehicles for necessary columns
+    offcycle_credit_names = []  #: list of credit names, populated during init, used to track credits across composition/decomposition, also used to check simulated vehicles for necessary columns
 
     @staticmethod
     def calc_off_cycle_credits(calendar_year, vehicle, cost_cloud):
@@ -222,7 +222,6 @@ if __name__ == '__main__':
         init_fail = []
 
         import importlib
-        # pull in reg classes before building database tables (declaring classes) that check reg class validity
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(

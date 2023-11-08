@@ -40,7 +40,7 @@ try:
 
     from common.omega_globals import *
     from common.omega_types import *
-    from common.omega_db import *
+    from common import omega_globals
     from common import file_io, omega_log
     from common.input_validation import *
     from common.omega_functions import *
@@ -85,7 +85,6 @@ try:
             self.save_preliminary_outputs = True
             self.output_folder_base = 'out' + os.sep
             self.output_folder = self.output_folder_base
-            self.database_dump_folder = self.output_folder + '__dump' + os.sep
             self.omega_model_path = path
             self.use_prerun_context_outputs = False
             self.prerun_context_folder = ''
@@ -125,7 +124,7 @@ try:
             self.mass_scaling_file = path + 'test_inputs/mass_scaling.csv'
 
             self.analysis_initial_year = None
-            self.analysis_final_year = 2023
+            self.analysis_final_year = 2030
             self.logfile_prefix = 'o2log_'
             self.logfilename = ''
             self.consumer_calc_generalized_cost = None
@@ -232,7 +231,7 @@ try:
             self.powertrain_cost_with_gpf = True
 
             # list of modules to allow verbose log files, or empty to disable:
-            self.verbose_log_modules = ['database_', 'producer_compliance_search', 'cross_subsidy_search_',
+            self.verbose_log_modules = ['producer_compliance_search', 'cross_subsidy_search_',
                                         'cv_cost_curves_', 'v_cost_curves_', 'v_cost_clouds_',
                                         'v_cloud_plots_', 'cv_cloud_plots', 'effects_']
 

@@ -900,7 +900,8 @@ def create_composite_vehicles(calendar_year, compliance_id):
 
     if cache_key not in _cache:
         # pull in last year's vehicles:
-        manufacturer_prior_vehicles = VehicleFinal.get_compliance_vehicles(calendar_year - 1, compliance_id)
+        manufacturer_prior_vehicles = [v for v in omega_globals.finalized_vehicles
+                                       if v.model_year == calendar_year - 1 and v.compliance_id == compliance_id]
 
         manufacturer_vehicles = []
         pre_production_vehicles = []
@@ -909,8 +910,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
 
         # transfer prior vehicle data to this year's vehicles
         for prior_veh in manufacturer_prior_vehicles:
-            new_veh = Vehicle()
-            transfer_vehicle_data(prior_veh, new_veh, model_year=calendar_year)
+            new_veh = transfer_vehicle_data(prior_veh, model_year=calendar_year)
 
             new_veh.in_production = new_veh.in_production or is_up_for_redesign(new_veh)
             # pass global cumulative GWh as vehicle attribute so subprocess can access it
@@ -948,7 +948,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         for csc in NewVehicleMarket.base_year_context_size_class_sales:  # for each context size class
             context_based_total_sales += \
                 NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=csc) \
-                * VehicleFinal.mfr_base_year_share_data[compliance_id][csc]
+                * Vehicle.mfr_base_year_share_data[compliance_id][csc]
 
         NewVehicleMarket.context_based_total_sales[calendar_year] = context_based_total_sales
 
@@ -956,7 +956,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         for new_veh in manufacturer_vehicles:
             new_veh.model_year_prevalence = \
                 new_veh.base_year_market_share * \
-                VehicleFinal.mfr_base_year_share_data[compliance_id][new_veh.context_size_class]
+                Vehicle.mfr_base_year_share_data[compliance_id][new_veh.context_size_class]
 
         # group by context size class
         csc_dict = dict()
@@ -970,7 +970,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         for csc in csc_dict:  # for each context size class
             projection_initial_registered_count = \
                 NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=csc) \
-                * VehicleFinal.mfr_base_year_share_data[compliance_id][csc]
+                * Vehicle.mfr_base_year_share_data[compliance_id][csc]
 
             distribute_by_attribute(csc_dict[csc], projection_initial_registered_count,
                                     weight_by='model_year_prevalence',
@@ -1098,8 +1098,8 @@ def create_composite_vehicles(calendar_year, compliance_id):
         # cull branches that don't contain vehicles (e.g. missing body styles)
         keys = list(market_class_tree.keys())
         for k in keys:
-            if k not in VehicleFinal.mfr_base_year_share_data[compliance_id] or \
-                    VehicleFinal.mfr_base_year_share_data[compliance_id][k] == 0.0:
+            if k not in Vehicle.mfr_base_year_share_data[compliance_id] or \
+                    Vehicle.mfr_base_year_share_data[compliance_id][k] == 0.0:
                 market_class_tree.pop(k)
 
         _cache[cache_key] = {'composite_vehicles': composite_vehicles,
@@ -1121,8 +1121,7 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
                         producer_decision):
     """
     Finalize vehicle production at the conclusion of the compliance search and producer-consumer market share
-    iteration.  Source ``Vehicle`` objects from the composite vehicles are converted to ``VehicleFinal`` objects
-    and stored in the database.  Manufacturer Annual Data is updated with the certification results in CO2e Mg
+    iteration.  Manufacturer Annual Data is updated with the certification results in CO2e Mg
 
     Args:
         calendar_year (int): the year of the compliance search
@@ -1132,12 +1131,11 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
         producer_decision (Series): the production decision as a result of the compliance search
 
     Returns:
-        Nothing, updates the OMEGA database with the finalized vehicles
+        Nothing, updates the OMEGA data with the finalized vehicles
 
     """
     from consumer import sales_volume
-
-    manufacturer_new_vehicles = []
+    from producer.vehicles import update_dynamic_attributes
 
     # pull final vehicles from composite vehicles
     decompose_candidate_vehicles(candidate_mfr_composite_vehicles, producer_decision)
@@ -1160,51 +1158,41 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
                            (omega_globals.options.session_name, veh.compliance_id, veh.fueling_class,
                             veh.base_year_vehicle_id, veh.model_year))
 
-            veh_final = VehicleFinal()
-            transfer_vehicle_data(veh, veh_final)
+            update_dynamic_attributes(veh)
 
-            veh_final.price_modification_dollars = \
-                omega_globals.price_modification_data[veh_final.market_class_id]['market_class_price_modification']
+            veh.price_modification_dollars = \
+                omega_globals.price_modification_data[veh.market_class_id]['market_class_price_modification']
 
-            veh_final.market_class_cross_subsidy_multiplier = \
-                omega_globals.price_modification_data[veh_final.market_class_id]['market_class_multiplier']
+            veh.market_class_cross_subsidy_multiplier = \
+                omega_globals.price_modification_data[veh.market_class_id]['market_class_multiplier']
 
-            veh_final.modified_cross_subsidized_price_dollars = \
-                veh_final.new_vehicle_mfr_cost_dollars * veh_final.market_class_cross_subsidy_multiplier + \
-                veh_final.price_modification_dollars
+            veh.modified_cross_subsidized_price_dollars = \
+                veh.new_vehicle_mfr_cost_dollars * veh.market_class_cross_subsidy_multiplier + \
+                veh.price_modification_dollars
 
-            veh_final.price_dollars = \
-                veh_final.new_vehicle_mfr_cost_dollars * veh_final.market_class_cross_subsidy_multiplier
+            veh.price_dollars = \
+                veh.new_vehicle_mfr_cost_dollars * veh.market_class_cross_subsidy_multiplier
 
-            production_battery_gigawatthours += veh_final.battery_kwh / 1e6 * veh_final.initial_registered_count
+            production_battery_gigawatthours += veh.battery_kwh / 1e6 * veh.initial_registered_count
 
-            manufacturer_new_vehicles.append(veh_final)
+            veh.global_cumulative_battery_GWh = omega_globals.cumulative_battery_GWh
+            omega_globals.options.PowertrainCost.calc_cost(veh, update_tracker=True)  # update build dict
 
-            veh_final.global_cumulative_battery_GWh = omega_globals.cumulative_battery_GWh
-            omega_globals.options.PowertrainCost.calc_cost(veh_final, update_tracker=True)  # update build dict
-
-            if veh_final.base_year_vehicle_id == omega_globals.options.canary_byvid and \
-                    (not omega_globals.options.log_vehicle_cloud_years or
-                     veh_final.model_year in omega_globals.options.log_vehicle_cloud_years):
-                veh_final.to_csv('%s_%s_%s%d_%d_finalized_VehicleFinal.csv' %
-                                 (omega_globals.options.session_name, veh_final.compliance_id, veh_final.fueling_class,
-                                  veh_final.base_year_vehicle_id, veh_final.model_year))
+            omega_globals.finalized_vehicles.append(veh)
 
     # propagate pre-production vehicles
     for ppv in pre_production_vehicles:
-        veh_final = VehicleFinal()
-        transfer_vehicle_data(ppv, veh_final)
-        manufacturer_new_vehicles.append(veh_final)
+        omega_globals.finalized_vehicles.append(ppv)
 
     # save generalized costs
     sales_volume.log_new_vehicle_generalized_cost(calendar_year, compliance_id,
                                                   producer_decision['average_new_vehicle_mfr_generalized_cost'])
 
-    omega_globals.session.add_all(manufacturer_new_vehicles)
+    target_co2e_Mg = sum([v.target_co2e_Mg for v in omega_globals.finalized_vehicles
+                          if v.compliance_id == compliance_id and v.model_year == calendar_year])
 
-    target_co2e_Mg = VehicleFinal.calc_target_co2e_Mg(calendar_year, compliance_id)
-
-    cert_co2e_Mg = VehicleFinal.calc_cert_co2e_Mg(calendar_year, compliance_id)
+    cert_co2e_Mg = sum([v.cert_co2e_Mg for v in omega_globals.finalized_vehicles
+                        if v.compliance_id == compliance_id and v.model_year == calendar_year])
 
     ManufacturerAnnualData. \
         create_manufacturer_annual_data(model_year=calendar_year,
@@ -1213,8 +1201,6 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
                                         calendar_year_cert_co2e_Mg=cert_co2e_Mg,
                                         manufacturer_vehicle_cost_dollars=producer_decision['total_cost_dollars']
                                         )
-    omega_globals.session.flush()
-
     _cache.clear()
 
     return target_co2e_Mg - cert_co2e_Mg, production_battery_gigawatthours

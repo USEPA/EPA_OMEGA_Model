@@ -129,7 +129,7 @@ class OnroadFuel(OMEGABase):
         OnroadFuel._data.clear()
 
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         input_template_name = 'onroad-fuels'
         input_template_version = 0.1

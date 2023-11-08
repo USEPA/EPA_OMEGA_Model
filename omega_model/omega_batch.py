@@ -148,7 +148,7 @@ Data Row Name and Description
 
 :Onroad Vehicle Calculations File *(str)*:
     The relative or absolute path to the onroad vehicle calculations (onroad gap) file,
-    loaded by ``producer.vehicles.VehicleFinal``
+    loaded by ``producer.vehicles.Vehicle``
 
 :Onroad VMT File *(str)*:
     The relative or absolute path to the onroad VMT file,
@@ -823,7 +823,6 @@ class OMEGASessionObject(OMEGABase):
         self.settings.session_is_reference = self.num == 0
         self.settings.output_folder_base = self.name + os.sep + self.settings.output_folder
         self.settings.output_folder = self.settings.output_folder_base
-        self.settings.database_dump_folder = self.name + os.sep + self.settings.database_dump_folder
         self.settings.generate_context_calibration_files = (self.num == 0)
 
         # read context settings

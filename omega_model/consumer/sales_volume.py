@@ -134,12 +134,10 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
         init_fail = []
 
-        # pull in reg classes before building database tables (declaring classes) that check reg class validity
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
@@ -148,7 +146,7 @@ if __name__ == '__main__':
         importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
 
         from producer.vehicle_aggregation import VehicleAggregation
-        from producer.vehicles import VehicleFinal, DecompositionAttributes
+        from producer.vehicles import Vehicle, DecompositionAttributes
         from producer.vehicle_annual_data import VehicleAnnualData
         from producer.manufacturers import Manufacturer  # needed for manufacturers table
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
@@ -181,9 +179,9 @@ if __name__ == '__main__':
 
         init_fail += init_user_definable_decomposition_attributes(omega_globals.options.verbose)
 
-        SQABase.metadata.create_all(omega_globals.engine)
+        
 
-        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
+        init_fail += Manufacturer.init_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)
 
         init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
@@ -232,11 +230,11 @@ if __name__ == '__main__':
         init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
                                                        verbose=omega_globals.options.verbose)
 
-        init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+        init_fail += Vehicle.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
                                                  verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            omega_globals.options.analysis_initial_year = int(VehicleFinal.get_max_model_year() + 1)
+            omega_globals.options.analysis_initial_year = int(Vehicle.get_max_model_year() + 1)
 
             sales_demand = context_new_vehicle_sales(omega_globals.options.analysis_initial_year)
         else:

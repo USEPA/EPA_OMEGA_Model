@@ -240,9 +240,9 @@ if __name__ == '__main__':
                                                     verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            file_io.validate_folder(omega_globals.options.database_dump_folder)
+            file_io.validate_folder(omega_globals.options.output_folder)
             UpstreamMethods._data.to_csv(
-                omega_globals.options.database_dump_folder + os.sep + 'policy_fuel_upstream_values.csv', index=False)
+                omega_globals.options.output_folder + os.sep + 'policy_fuel_upstream_values.csv', index=False)
 
             print(UpstreamMethods.get_upstream_method(2020))
             print(UpstreamMethods.get_upstream_method(2027))

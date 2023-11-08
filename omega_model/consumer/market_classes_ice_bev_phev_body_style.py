@@ -112,7 +112,7 @@ class MarketClass(OMEGABase, MarketClassBase):
         Get vehicle market class ID based on vehicle characteristics
 
         Args:
-            vehicle (VehicleFinal): the vehicle to determine the market class of
+            vehicle (Vehicle): the vehicle to determine the market class of
 
         Returns:
             The vehicle's market class ID based on vehicle characteristics.
@@ -203,7 +203,7 @@ class MarketClass(OMEGABase, MarketClassBase):
         MarketClass._data.clear()
 
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         MarketClassBase._market_class_dict = dict()  # empty set market class dict, accessed by get_market_class_dict()
         MarketClassBase._market_class_tree_dict = dict()  # empty set market class tree dict accessed by get_market_class_tree()
@@ -256,7 +256,7 @@ if __name__ == '__main__':
 
         from omega_model.omega import init_user_definable_decomposition_attributes, get_module
         from producer.manufacturers import Manufacturer
-        from producer.vehicles import VehicleFinal, DecompositionAttributes
+        from producer.vehicles import Vehicle, DecompositionAttributes
         from producer.vehicle_annual_data import VehicleAnnualData
 
         # set up global variables:
@@ -264,24 +264,20 @@ if __name__ == '__main__':
 
         init_fail = []
 
-        # pull in reg classes before building database tables (declaring classes) that check reg class validity
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(omega_globals.engine)
+        
 
         init_fail += MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)
 
         if not init_fail:
             from common.omega_functions import print_dict
-
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
             market_class_list = [
                 'hauling.ICE',

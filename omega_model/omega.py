@@ -257,10 +257,10 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
     Returns:
          Iteration log dataframe, dict of credit bank information (iteration_log, credit_banks),
-         updates omega database with final vehicle technology and market share data
+         updates omega data with final vehicle technology and market share data
 
     """
-    from producer.vehicles import VehicleFinal
+    from producer.vehicles import Vehicle
     from policy.credit_banking import CreditBank
     from producer import compliance_search
 
@@ -268,7 +268,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
     credit_banks = dict()
 
-    for compliance_id in VehicleFinal.compliance_ids:
+    for compliance_id in Vehicle.compliance_ids:
         omega_log.logwrite("\nRunning %s Pass %d: Manufacturer=%s" % (omega_globals.options.session_unique_name,
                                                                       pass_num, compliance_id),
                            echo_console=True)
@@ -1342,7 +1342,6 @@ def import_user_definable_submodules():
     omega_globals.options.ElectricityPrices = get_module(module_name).ElectricityPrices
 
     # user-definable policy modules
-    # pull in reg classes before building database tables (declaring classes) that check reg class validity
     module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
     omega_globals.options.RegulatoryClasses = get_module(module_name).RegulatoryClasses
 
@@ -1382,9 +1381,6 @@ def init_user_definable_decomposition_attributes(verbose_init):
     of decomposition attributes are individual drive cycle results and off-cycle credit values.  Technology application
     can also be tracked via optional flags in the simulated vehicles (cost cloud) data.
 
-    These values need to be determined before building the database so the dynamic fields can be added to the schema
-    via the SQLAlchemy metadata.
-
     Args:
         verbose_init (bool): if ``True`` enable additional init output to console
 
@@ -1392,11 +1388,11 @@ def init_user_definable_decomposition_attributes(verbose_init):
         List of template/input errors, else empty list on success
 
     See Also:
-        ``producer.vehicles.DecompositionAttributes``, ``producer.vehicles.VehicleFinal``
+        ``producer.vehicles.DecompositionAttributes``, ``producer.vehicles.Vehicle``
 
     """
     from policy.drive_cycles import DriveCycles
-    from producer.vehicles import VehicleFinal, DecompositionAttributes
+    from producer.vehicles import Vehicle, DecompositionAttributes
 
     init_fail = []
 
@@ -1414,26 +1410,19 @@ def init_user_definable_decomposition_attributes(verbose_init):
                                                                       verbose=verbose_init)
 
     vehicle_columns = get_template_columns(omega_globals.options.vehicles_file)
-    VehicleFinal.dynamic_columns = list(
-        set.difference(set(vehicle_columns), VehicleFinal.mandatory_input_template_columns))
-    for dc in VehicleFinal.dynamic_columns:
-        VehicleFinal.dynamic_attributes.append(make_valid_python_identifier(dc))
+    Vehicle.dynamic_columns = list(
+        set.difference(set(vehicle_columns), Vehicle.mandatory_input_template_columns))
+    for dc in Vehicle.dynamic_columns:
+        Vehicle.dynamic_attributes.append(make_valid_python_identifier(dc))
 
     DecompositionAttributes.init()
-    # dynamically add decomposition attributes (which may vary based on user inputs, such as off-cycle credits)
-    for attr in DecompositionAttributes.values + VehicleFinal.dynamic_attributes:
-        if attr not in VehicleFinal.__dict__:
-            if int(sqlalchemy.__version__.split('.')[1]) > 3:
-                sqlalchemy.ext.declarative.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
-            else:
-                sqlalchemy.ext.declarative.api.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
 
     return init_fail
 
 
 def init_omega(session_runtime_options):
     """
-    Initialize OMEGA data structures and build the database.
+    Initialize OMEGA data structures.
 
     Args:
         session_runtime_options (OMEGASessionSettings): session runtime options
@@ -1455,11 +1444,8 @@ def init_omega(session_runtime_options):
 
     init_fail = []
 
-    init_omega_db(omega_globals.options.verbose)
-
     init_fail += import_user_definable_submodules()
 
-    # import database modules to populate ORM metadata
     from context.onroad_fuels import OnroadFuel
     from context.fuel_prices import FuelPrice
     from context.new_vehicle_market import NewVehicleMarket
@@ -1483,7 +1469,7 @@ def init_omega(session_runtime_options):
     from producer.manufacturers import Manufacturer
     from producer.manufacturer_annual_data import ManufacturerAnnualData
     from producer.vehicle_aggregation import VehicleAggregation
-    from producer.vehicles import VehicleFinal, DecompositionAttributes
+    from producer.vehicles import Vehicle, DecompositionAttributes
     from producer.vehicle_annual_data import VehicleAnnualData
     from producer import compliance_search
 
@@ -1497,9 +1483,6 @@ def init_omega(session_runtime_options):
 
     try:
         init_fail = init_user_definable_decomposition_attributes(verbose_init)
-
-        # instantiate database tables
-        SQABase.metadata.create_all(omega_globals.engine)
 
         # load remaining input data
 
@@ -1577,7 +1560,7 @@ def init_omega(session_runtime_options):
         init_fail += CreditBank.validate_ghg_credit_params_template(omega_globals.options.ghg_credit_params_file,
                                                                     verbose=verbose_init)
 
-        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
+        init_fail += Manufacturer.init_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=verbose_init)
 
         init_fail += WorkFactor.init_from_file(omega_globals.options.workfactor_definition_file, verbose=verbose_init)
@@ -1597,17 +1580,19 @@ def init_omega(session_runtime_options):
 
         init_fail += VehicleAnnualData.init_vehicle_annual_data()
 
+        init_fail += ManufacturerAnnualData.init_manufacturer_annual_data()
+
         if not init_fail:
             init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
                                                            verbose=verbose_init)
 
-            init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+            init_fail += Vehicle.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
                                                      verbose=verbose_init)
 
         if not init_fail:
             # initial year = initial fleet model year (latest year of data)
             omega_globals.options.analysis_initial_year = \
-                int(omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
+                min([v.model_year for v in omega_globals.finalized_vehicles]) + 1
 
             # update vehicle annual data for base year fleet
             stock.update_stock(omega_globals.options.analysis_initial_year - 1)
@@ -1685,6 +1670,8 @@ def run_omega(session_runtime_options, standalone_run=False):
 
         for omega_globals.pass_num in range(len(consolidate)):
 
+            omega_globals.finalized_vehicles = []
+
             session_runtime_options.consolidate_manufacturers = consolidate[omega_globals.pass_num]
 
             if session_runtime_options.use_prerun_context_outputs:
@@ -1713,8 +1700,6 @@ def run_omega(session_runtime_options, standalone_run=False):
             init_fail = init_omega(copy.copy(session_runtime_options))
 
             output_folders.append(omega_globals.options.output_folder)
-
-            omega_globals.options.database_dump_folder = omega_globals.options.output_folder + '__dump' + os.sep
 
             omega_globals.options.manufacturer_gigawatthour_data = manufacturer_gigawatthour_data
 
@@ -1817,19 +1802,9 @@ def run_omega(session_runtime_options, standalone_run=False):
                     omega_globals.options.output_folder + omega_globals.options.session_unique_name +
                     '_new_vehicle_prices.csv')
 
-                # shut down the db
-                if 'database' in omega_globals.options.verbose_log_modules:
-                    dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
-
-                omega_globals.session.close()
-                omega_globals.engine.dispose()
-                omega_globals.engine = None
-                omega_globals.session = None
-
             else:
                 omega_log.logwrite(init_fail)
                 omega_log.end_logfile("\nSession Fail")
-                dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
             if omega_globals.options.run_profiler:
                 profiler.disable()
@@ -1873,7 +1848,6 @@ def run_omega(session_runtime_options, standalone_run=False):
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("### Check OMEGA log for error messages ###")
         omega_log.end_logfile("\nSession Fail")
-        dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
 
 if __name__ == "__main__":

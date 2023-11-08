@@ -65,24 +65,6 @@ print('importing %s' % __file__)
 
 from omega_model import *
 from policy.workfactor_definition import WorkFactor
-# from policy.incentives import Incentives
-
-
-# if __name__ == '__main__':
-#     import importlib
-#
-#     omega_globals.options = OMEGASessionSettings()
-#
-#     init_fail = []
-#
-#     # pull in reg classes before building database tables (declaring classes) that check reg class validity
-#     module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
-#     omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
-#     init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
-#         omega_globals.options.policy_reg_classes_file)
-#
-# _cache = dict()
-
 
 class VehicleTargets(OMEGABase, VehicleTargetsBase):
     """
@@ -273,7 +255,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
         VehicleTargets._data.clear()
 
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing from %s...' % filename)
 
         input_template_name = __name__
         input_template_version = 0.1
