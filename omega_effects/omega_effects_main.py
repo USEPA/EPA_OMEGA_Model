@@ -300,12 +300,12 @@ def main():
 
         if batch_settings.net_benefit_ghg_scope in ['global', 'both']:
             social_effects_global_df = calc_social_effects(
-                discounted_costs_df, discounted_benefits_df, 'global',
+                batch_settings, discounted_costs_df, discounted_benefits_df, 'global',
                 calc_health_effects=batch_settings.criteria_cost_factors.calc_health_effects
             )
         if batch_settings.net_benefit_ghg_scope in ['domestic', 'both']:
             social_effects_domestic_df = calc_social_effects(
-                discounted_costs_df, discounted_benefits_df, 'domestic',
+                batch_settings, discounted_costs_df, discounted_benefits_df, 'domestic',
                 calc_health_effects=batch_settings.criteria_cost_factors.calc_health_effects
             )
 
@@ -440,7 +440,9 @@ def main():
         batch_settings.criteria_cost_factors.df.to_csv(
             path_of_modified_inputs_folder / f'{start_time_readable}_cost_factors_criteria.csv', index=False
         )
-
+        batch_settings.scghg_cost_factors.factors_in_analysis_dollars.to_csv(
+            path_of_modified_inputs_folder / f'{start_time_readable}_cost_factors_scghg.csv', index=False
+        )
     except Exception as e:
         effects_log.logwrite(f'*** {e} ***\n{traceback.format_exc()}\n', stamp=True)
         sys.exit()
