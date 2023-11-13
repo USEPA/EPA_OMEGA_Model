@@ -198,7 +198,9 @@ class CostCloud(OMEGABase, CostCloudBase):
                                     'ac_efficiency', 'ac_leakage', 'footprint_ft2', 'etw_lbs',
                                     'cert_utility_factor', 'onroad_utility_factor',
                                     'battery_sizing_onroad_direct_kwh_per_mile', 'tractive_motor_kw',
-                                    'cert_engine_on_distance_frac', 'onroad_engine_on_distance_frac']
+                                    'cert_engine_on_distance_frac', 'onroad_engine_on_distance_frac',
+                                    'battery_mass_lbs', 'powertrain_mass_lbs', 'delta_glider_non_structure_mass_lbs',
+                                    'glider_non_structure_mass_lbs']
 
     # for reporting powertrain cost breakdowns
     cost_cloud_cost_columns = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
@@ -704,6 +706,13 @@ class CostCloud(OMEGABase, CostCloudBase):
                             cloud_point['curbweight_lbs'] = vehicle.curbweight_lbs
                             cloud_point['etw_lbs'] = ETW
                             cloud_point['rated_hp'] = rated_hp
+                            cloud_point['battery_mass_lbs'] = battery_mass_lbs
+                            cloud_point['powertrain_mass_lbs'] = powertrain_mass_lbs
+                            cloud_point['delta_glider_non_structure_mass_lbs'] = \
+                                delta_glider_non_structure_mass_lbs
+                            cloud_point['glider_non_structure_mass_lbs'] = \
+                                vehicle.base_year_glider_non_structure_mass_lbs + \
+                                delta_glider_non_structure_mass_lbs
 
                             # informative data for troubleshooting:
                             if omega_globals.options.log_vehicle_cloud_years == 'all' or \
@@ -713,13 +722,6 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 cloud_point['vehicle_base_year_id'] = vehicle.base_year_vehicle_id
                                 cloud_point['vehicle_name'] = vehicle.name
                                 cloud_point['model_year'] = vehicle.model_year
-                                cloud_point['delta_glider_non_structure_mass_lbs'] = \
-                                    delta_glider_non_structure_mass_lbs
-                                cloud_point['glider_non_structure_mass_lbs'] = \
-                                    vehicle.base_year_glider_non_structure_mass_lbs + \
-                                    delta_glider_non_structure_mass_lbs
-                                cloud_point['battery_mass_lbs'] = battery_mass_lbs
-                                cloud_point['powertrain_mass_lbs'] = powertrain_mass_lbs
                                 cloud_point['vehicle_base_year_eng_rated_hp'] = vehicle.base_year_eng_rated_hp
                                 cloud_point['vehicle_mot_rated_kw'] = vehicle.total_emachine_kw
                                 cloud_point['rlhp20'] = rlhp20

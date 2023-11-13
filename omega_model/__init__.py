@@ -12,7 +12,7 @@ Defines class OMEGASessionSettings which control an individual simulation sessio
 """
 
 # OMEGA code version number
-code_version = "2.1.0"
+code_version = "2.2.0"
 print('loading omega version %s' % code_version)
 
 import os, sys

@@ -5,7 +5,7 @@ cd ..
 # build executable
 
 pyinstaller omega_effects/omega_effects_main.py \
-  --name OMEGA-effects-2.1.0-mac.command \
+  --name OMEGA-effects-2.2.0-mac.command \
   --paths omega_effects \
   --noconfirm \
   --onefile
