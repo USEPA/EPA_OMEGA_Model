@@ -59,38 +59,33 @@ class Discounting:
         cost_accrual = batch_settings.cost_accrual
 
         self.social_discrates = batch_settings.general_inputs_for_effects.get_value('social_discount_rates')
+        scghg_rates = batch_settings.scghg_cost_factors.scghg_rates
+        criteria_rates = None
+        calc_health_effects = batch_settings.criteria_cost_factors.calc_health_effects
+        if calc_health_effects:
+            criteria_rates = [0.03, 0.07]
 
         self.fuel_arg = 'fueling_class'
         if ('car' or 'truck') not in [item for item in annual_values_df['reg_class_id']]:
             self.fuel_arg = 'in_use_fuel_id'
 
-        emission_dr25 = '2.5'
-        emission_dr3 = '3.'
-        emission_dr5 = '5.0'
-        emission_dr7 = '7.0'
-
         # establish and distinguish attributes
         nested_dict = [n_dict for n_dict in dict_of_values.values()][0]
         self.all_monetized_args = [k for k, v in nested_dict.items() if '_dollars' in k and 'avg' not in k]
-        monetized_args_dr25 = [arg for arg in self.all_monetized_args if f'_{emission_dr25}' in arg]
-        monetized_args_dr3 = [arg for arg in self.all_monetized_args if f'_{emission_dr3}' in arg]
-        monetized_args_dr5 = [arg for arg in self.all_monetized_args if f'_{emission_dr5}' in arg]
-        monetized_args_dr7 = [arg for arg in self.all_monetized_args if f'_{emission_dr7}' in arg]
-        self.monetized_non_emission_args = [
-            arg for arg in self.all_monetized_args
-            if arg not in monetized_args_dr25
-               and arg not in monetized_args_dr3
-               and arg not in monetized_args_dr5
-               and arg not in monetized_args_dr7
-        ]
-        id_args = [k for k, v in nested_dict.items() if '_dollars' not in k]
 
-        self.rate_list_dict = {
-            0.025: monetized_args_dr25,
-            0.03: monetized_args_dr3,
-            0.05: monetized_args_dr5,
-            0.07: monetized_args_dr7,
-        }
+        emission_discrates = []
+        for rate in scghg_rates:
+            emission_discrates.append(rate)
+        if criteria_rates is not None:
+            for rate in criteria_rates:
+                emission_discrates.append(rate)
+
+        emission_discrates = sorted(list(set(emission_discrates)))
+        for emission_discrate in emission_discrates:
+            self.rate_list_dict[emission_discrate] = [arg for arg in self.all_monetized_args if f'_{emission_discrate}' in arg]
+
+        self.monetized_non_emission_args = [arg for arg in self.all_monetized_args if '_0.0' not in arg]
+        id_args = [k for k, v in nested_dict.items() if '_dollars' not in k]
 
         update_dict = {}
         for v in dict_of_values.values():

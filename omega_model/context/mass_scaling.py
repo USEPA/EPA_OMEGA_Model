@@ -107,7 +107,7 @@ class MassScaling(OMEGABase):
         nmc_share_dict_phev = omega_globals.options.nmc_share_PHEV
 
         if type(vehicle) is pd.DataFrame:
-            nmc_model_year = vehicle.model_year[0]
+            nmc_model_year = vehicle.model_year.iloc[0]
         else:
             nmc_model_year = vehicle.model_year
 
