@@ -130,7 +130,10 @@ def calc_social_effects(batch_settings, costs_df, benefits_df, ghg_scope, calc_h
     stranded_no_action_keys = {}
     for action in action_policies:
         action_keys[action] = [k for k in costs_dict if k not in no_action_keys]
-        stranded_no_action_keys[action] = [k for k in no_action_keys if k not in action_keys[action]]
+        stranded_no_action_keys[action] = [
+            k for k in no_action_keys if (action, k[1], k[2], k[3], k[4], k[5], k[6]) not in action_keys[action]
+        ]
+        # stranded_no_action_keys[action] = [k for k in no_action_keys if k not in action_keys[action]]
 
     delta_costs_dict = {}
     for action in action_policies:
