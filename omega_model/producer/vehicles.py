@@ -1624,6 +1624,14 @@ class Vehicle(OMEGABase):
                 else:
                     NewVehicleMarket.manufacturer_base_year_sales_data[key] += veh.initial_registered_count
 
+            # clear tech flags:
+            for tech_flag in omega_globals.options.CostCloud.tech_flags:
+                veh.__setattr__(tech_flag, 0)
+
+            # set tech flags based on cost curve class:
+            for tech_flag, value in omega_globals.options.CostCloud.get_tech_flags(veh).items():
+                veh.__setattr__(tech_flag, value)
+
             if verbose:
                 print(veh)
 
