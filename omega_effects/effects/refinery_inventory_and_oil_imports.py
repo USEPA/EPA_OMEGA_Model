@@ -36,7 +36,8 @@ def get_refinery_data(session_settings, calendar_year, reg_class_id, fuel):
         f'{fuel}_n2o_grams_per_gallon',
         'fuel_reduction_leading_to_reduced_domestic_refining',
         f'domestic_refined_{fuel}_million_barrels_per_day',
-        f'context_scaler_{reg_class_id}_{fuel}'
+        f'context_scaler_lmdv_{reg_class_id}_{fuel}',
+        f'context_scaler_lmdv_{fuel}',
     ]
     refinery_data = session_settings.refinery_data.get_data(calendar_year, fuel, *args)
 
@@ -155,10 +156,11 @@ def calc_refinery_inventory_and_oil_imports(batch_settings, session_settings, an
             if v['fueling_class'] != 'PHEV':
                 (voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co_ref_rate,
                  co2_ref_rate, ch4_ref_rate, n2o_ref_rate,
-                 factor, context_million_barrels_per_day, context_scaler) = get_refinery_data(
-                    session_settings, calendar_year, v['reg_class_id'], fuel
+                 factor, context_million_barrels_per_day, context_scaler_rc_fuel, context_scaler_fuel) = (
+                    get_refinery_data(session_settings, calendar_year, v['reg_class_id'], fuel)
                 )
-                context_gallons = context_million_barrels_per_day * pow(10, 6) * gal_per_bbl * 365 * context_scaler
+                context_gallons = (context_million_barrels_per_day * pow(10, 6) * gal_per_bbl * 365 *
+                                   context_scaler_rc_fuel * context_scaler_fuel)
                 session_gallons = v[gallons_arg]
 
                 voc_refinery_ustons, voc_internal_rate = calc_inventory(
