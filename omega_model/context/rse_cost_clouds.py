@@ -786,11 +786,13 @@ class CostCloud(OMEGABase, CostCloudBase):
     @staticmethod
     def get_rse_group_key(vehicle):
         """
+        Get RSE group key for the given vehicle
 
         Args:
-            vehicle:
+            vehicle (Vehicle): the vehicle
 
         Returns:
+            The RSE group key
 
         """
         if vehicle.fueling_class == 'BEV':
