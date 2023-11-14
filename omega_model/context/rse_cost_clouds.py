@@ -587,7 +587,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 # vehicle ballast is f(curbweight_lbs) for medium-duty:
                                 vehicle_ballast = DriveCycleBallast.get_ballast_lbs(vehicle)
 
-                                rated_hp = vehicle.curbweight_lbs / vehicle.base_year_curbweight_lbs_to_hp
+                                rated_hp = min(1000, vehicle.curbweight_lbs / vehicle.base_year_curbweight_lbs_to_hp)
 
                                 # set up RSE terms and run RSEs
                                 ETW = vehicle.curbweight_lbs + vehicle_ballast
