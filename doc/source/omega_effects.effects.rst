@@ -57,10 +57,10 @@ omega\_effects.effects.cost\_factors\_energysecurity module
    :undoc-members:
    :show-inheritance:
 
-omega\_effects.effects.cost\_factors\_scc module
-------------------------------------------------
+omega\_effects.effects.cost\_factors\_scghg module
+--------------------------------------------------
 
-.. automodule:: omega_effects.effects.cost_factors_scc
+.. automodule:: omega_effects.effects.cost_factors_scghg
    :members:
    :undoc-members:
    :show-inheritance:
