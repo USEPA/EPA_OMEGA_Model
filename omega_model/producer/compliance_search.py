@@ -907,6 +907,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         pre_production_vehicles = []
 
         start_time = time.time()
+        print('Start create manufacturer_vehicles ...')
 
         # transfer prior vehicle data to this year's vehicles
         for prior_veh in manufacturer_prior_vehicles:
@@ -933,7 +934,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
             for new_veh in manufacturer_vehicles:
                 calc_vehicle_frontier(new_veh)
 
-        # print('Created manufacturer_vehicles %.20f' % (time.time() - start_time))
+        print('Created manufacturer_vehicles %.20f' % (time.time() - start_time))
 
         alt_vehs = [new_veh for new_veh in manufacturer_vehicles if not new_veh.base_year_product]
         byp_vehs = [new_veh for new_veh in manufacturer_vehicles if new_veh.base_year_product]
@@ -1066,6 +1067,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         mcrc_priority_list = sorted(mcrc_priority_list, key=lambda x: x[-1], reverse=True)
 
         start_time = time.time()
+        print('Start Composite Vehicles ...')
 
         composite_vehicles = []
 
@@ -1083,7 +1085,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
             for mc, rc, alt, _ in mcrc_priority_list:
                 composite_vehicles.append(calc_composite_vehicle(mc, rc, alt, mctrc))
 
-        # print('Composite Vehicles Elapsed Time %f' % (time.time() - start_time))
+        print('Composite Vehicles Elapsed Time %f' % (time.time() - start_time))
 
         # get empty market class tree
         market_class_tree = omega_globals.options.MarketClass.get_market_class_tree()
