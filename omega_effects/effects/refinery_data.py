@@ -127,7 +127,7 @@ class RefineryData:
         """
         # don't forget to update the module docstring with changes here
         input_template_name = 'refinery_data'
-        input_template_version = 0.1
+        input_template_version = 0.11
 
         prefixes = [
             'onroad_fuel_refinery',
@@ -146,12 +146,14 @@ class RefineryData:
             'diesel_exports_million_barrels_per_day',
             'product_exports_million_barrels_per_day',
             'export_scaler',
-            'context_scaler_car_gasoline',
-            'context_scaler_truck_gasoline',
-            'context_scaler_mediumduty_gasoline',
-            'context_scaler_car_diesel',
-            'context_scaler_truck_diesel',
-            'context_scaler_mediumduty_diesel',
+            'context_scaler_lmdv_car_gasoline',
+            'context_scaler_lmdv_truck_gasoline',
+            'context_scaler_lmdv_mediumduty_gasoline',
+            'context_scaler_lmdv_car_diesel',
+            'context_scaler_lmdv_truck_diesel',
+            'context_scaler_lmdv_mediumduty_diesel',
+            'context_scaler_lmdv_gasoline',
+            'context_scaler_lmdv_diesel',
             'fuel_reduction_leading_to_reduced_domestic_refining',
         ]
         for prefix, pollutant_id in product(prefixes, self.pollutant_ids):
@@ -173,12 +175,14 @@ class RefineryData:
         df_rates = pd.concat([
             df_rates,
             df['fuel_reduction_leading_to_reduced_domestic_refining'],
-            df['context_scaler_car_gasoline'],
-            df['context_scaler_truck_gasoline'],
-            df['context_scaler_mediumduty_gasoline'],
-            df['context_scaler_car_diesel'],
-            df['context_scaler_truck_diesel'],
-            df['context_scaler_mediumduty_diesel']
+            df['context_scaler_lmdv_car_gasoline'],
+            df['context_scaler_lmdv_truck_gasoline'],
+            df['context_scaler_lmdv_mediumduty_gasoline'],
+            df['context_scaler_lmdv_car_diesel'],
+            df['context_scaler_lmdv_truck_diesel'],
+            df['context_scaler_lmdv_mediumduty_diesel'],
+            df['context_scaler_lmdv_gasoline'],
+            df['context_scaler_lmdv_diesel'],
         ], axis=1)
 
         self.rate_names = [rate_name for rate_name in df_rates.columns if 'year' not in rate_name]

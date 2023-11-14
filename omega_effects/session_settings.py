@@ -224,10 +224,16 @@ class SessionSettings:
         path_session = batch_settings.batch_folder / f'_{self.session_name}'
         path_session_out = path_session / 'out'
 
-        self.vehicles_file \
-            = path_session_out / f'{batch_settings.batch_name}_{batch_settings.context_session_name}_vehicles.csv'
-        self.vehicle_annual_data_file \
-            = path_session_out / f'{batch_settings.batch_name}_{batch_settings.context_session_name}_vehicle_annual_data.csv'
+        self.vehicles_file = batch_settings.find_file(
+            path_session_out, f'{batch_settings.context_session_name}_vehicles.csv'
+        )
+        self.vehicle_annual_data_file = batch_settings.find_file(
+            path_session_out, f'{batch_settings.context_session_name}_vehicle_annual_data.csv'
+        )
+        # self.vehicles_file \
+        #     = path_session_out / f'{batch_settings.batch_name}_{batch_settings.context_session_name}_vehicles.csv'
+        # self.vehicle_annual_data_file \
+        #     = path_session_out / f'{batch_settings.batch_name}_{batch_settings.context_session_name}_vehicle_annual_data.csv'
 
         self.init_context_classes(effects_log)
 
