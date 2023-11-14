@@ -389,7 +389,11 @@ class VehicleAggregation(OMEGABase):
                 veh.application_id = row['application_id']
                 Vehicle.set_fueling_class(veh)
 
-                # row tech flags needed by powertrain cost
+                # clear row tech flags:
+                for tech_flag in omega_globals.options.CostCloud.tech_flags:
+                    row[tech_flag] = 0
+
+                # set row tech flags needed by powertrain cost:
                 for tech_flag, value in omega_globals.options.CostCloud.get_tech_flags(veh).items():
                     row[tech_flag] = value
 
