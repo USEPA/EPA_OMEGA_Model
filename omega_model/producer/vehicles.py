@@ -72,6 +72,7 @@ For example, a ``fueling_class:BEV:/:cert_direct_kwh_per_mile->onroad_direct_kwh
 print('importing %s' % __file__)
 
 import math
+from collections.abc import Iterable
 
 from omega_model import *
 
@@ -183,12 +184,16 @@ class DecompositionAttributes(OMEGABase):
 
         if cn in cost_curve:
             if len(cost_curve) > 1:
-                return np.interp(index_value, cost_curve[index_column].values,
-                          cost_curve[cn].values)
+                if isinstance(index_value, Iterable):
+                    # true interpolation (multiple values passed as index):
+                    return np.interp(index_value, cost_curve[index_column].values, cost_curve[cn].values)
+                else:
+                    # nearest result retrieval (get final result, single value):
+                    return cost_curve[cn].loc[abs(index_value - cost_curve[index_column]).idxmin()]
             else:
                 return cost_curve[cn].item()
         else:
-            return None
+            return vehicle.__getattribute__(attribute_name)  # None
 
     @staticmethod
     def interp1d_non_numeric(vehicle, cost_curve_non_numeric_data, index_column, index_value, attribute_name):
