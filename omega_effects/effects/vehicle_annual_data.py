@@ -115,6 +115,8 @@ class VehicleAnnualData:
             'base_year_powertrain_type',
             'onroad_direct_co2e_grams_per_mile',
             'onroad_direct_kwh_per_mile',
+            'fueling_class',
+            'context_size_class',
         ]
         rebound_rate_ice = batch_settings.vmt_rebound_rate_ice
         rebound_rate_bev = batch_settings.vmt_rebound_rate_bev
@@ -133,7 +135,7 @@ class VehicleAnnualData:
 
             for v in vads:
                 if v['registered_count'] >= 1:
-
+                    age = v['age']
                     # need vehicle info once for each vehicle, not every calendar year for each vehicle
                     vehicle_id = int(v['vehicle_id'])
 
@@ -142,7 +144,7 @@ class VehicleAnnualData:
                             = session_settings.vehicles.get_vehicle_attributes(vehicle_id, *vehicle_attribute_list)
 
                     base_year_vehicle_id, manufacturer_id, model_year, in_use_fuel_id, base_year_powertrain_type, \
-                        onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
+                        onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile, fueling_class, context_size_class \
                         = vehicle_info_dict[vehicle_id]
 
                     onroad_kwh_per_mile = onroad_gallons_per_mile = fuel_cpm = 0
@@ -184,9 +186,10 @@ class VehicleAnnualData:
                             fuel_flag += 1
 
                         # get context fuel cost per mile
-                        context_fuel_cpm_dict_key = (
-                            int(base_year_vehicle_id), base_year_powertrain_type, int(model_year), v['age']
-                        )
+                        cost_per_mile_group = 'nonBEV'
+                        if fueling_class == 'BEV':
+                            cost_per_mile_group = 'BEV'
+                        context_fuel_cpm_dict_key = (cost_per_mile_group, context_size_class, int(model_year), int(age))
                         context_fuel_cpm = context_fuel_cpm_dict[context_fuel_cpm_dict_key]['fuel_cost_per_mile']
 
                         if fuel_flag == 2:
