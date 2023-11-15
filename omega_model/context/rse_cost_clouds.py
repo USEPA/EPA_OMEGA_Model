@@ -537,7 +537,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
             # clear all tech flags
             for tf in CostCloud.tech_flags:
-                vehicle.__setattr__(tf, None)
+                vehicle.__setattr__(tf, 0)
 
             # set tech flags in vehicle temporarily
             for tf in tech_flags:
@@ -779,7 +779,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         # clear all tech flags
         for tf in CostCloud.tech_flags:
-            vehicle.__setattr__(tf, None)
+            vehicle.__setattr__(tf, 0)
 
         return cost_cloud
 
