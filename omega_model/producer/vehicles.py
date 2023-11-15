@@ -1657,8 +1657,8 @@ class Vehicle(OMEGABase):
         for v in vehicles_list:
             v.base_year_market_share = v.initial_registered_count / vehicle_shares_dict['total']
 
-            if v.base_year_powertrain_type != 'BEV' or omega_globals.options.allow_ice_of_bev:
-                if v.base_year_powertrain_type == 'ICE':
+            if v.fueling_class != 'BEV' or omega_globals.options.allow_ice_of_bev:
+                if v.fueling_class == 'ICE':
                     # create BEV of ICE
                     alt_veh = Vehicle.create_vehicle_clone(v)
                     alt_veh.fueling_class = 'BEV'
@@ -1706,7 +1706,7 @@ class Vehicle(OMEGABase):
                     Vehicle.assign_vehicle_market_class_ID(alt_veh)
                     omega_globals.finalized_vehicles.append(alt_veh)
 
-                elif v.base_year_powertrain_type == 'BEV':
+                elif v.fueling_class == 'BEV':
                     # create ICE of BEV
                     alt_veh = Vehicle.create_vehicle_clone(v)
                     alt_veh.fueling_class = 'ICE'
