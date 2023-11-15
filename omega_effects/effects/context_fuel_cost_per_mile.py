@@ -10,7 +10,7 @@ subsequent sessions.
 """
 
 
-def calc_fuel_cost_per_mile(batch_settings, session_settings):
+def calc_context_fuel_cost_per_mile(batch_settings, session_settings):
     """
 
     Args:
@@ -35,6 +35,7 @@ def calc_fuel_cost_per_mile(batch_settings, session_settings):
         'body_style',
         'onroad_direct_co2e_grams_per_mile',
         'onroad_direct_kwh_per_mile',
+        '_initial_registered_count',
     ]
     # let cpm refer to cost_per_mile
     context_fuel_cpm_dict = {}
@@ -53,8 +54,6 @@ def calc_fuel_cost_per_mile(batch_settings, session_settings):
         calendar_year_fuel_cpm_dict = {}
         for v in vads:
 
-            vehicle_fuel_cpm_dict = {}
-
             # need vehicle info once for each vehicle_id, not every calendar year for each vehicle_id
             vehicle_id = int(v['vehicle_id'])
             age = int(v['age'])
@@ -65,74 +64,111 @@ def calc_fuel_cost_per_mile(batch_settings, session_settings):
 
             base_year_vehicle_id, name, model_year, base_year_reg_class_id, reg_class_id, context_size_class, \
                 in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, body_style, \
-                onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
+                onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile, registered_count \
                     = vehicle_info_dict[vehicle_id]
 
-            key = (int(base_year_vehicle_id), base_year_powertrain_type, int(model_year), int(age))
+            cost_per_mile_group = 'nonBEV'
+            if fueling_class == 'BEV':
+                cost_per_mile_group = 'BEV'
+
+            key = (cost_per_mile_group, context_size_class, int(model_year), int(age))
             if key not in calendar_year_fuel_cpm_dict:
 
-                onroad_gallons_per_mile = onroad_miles_per_gallon = fuel_cost_per_mile = 0
-                retail_price_per_kwh = retail_price_per_gallon = None
+                fuel_cost_per_mile = calc_fuel_cost_per_mile(
+                    batch_settings, calendar_year, onroad_direct_kwh_per_mile, onroad_direct_co2e_grams_per_mile,
+                    in_use_fuel_id
+                )
+                weighted_fuel_cost_per_mile = registered_count * fuel_cost_per_mile
 
-                # calc fuel cost per mile
-                if onroad_direct_kwh_per_mile:
-                    fuel = 'US electricity'
-                    if batch_settings.context_electricity_prices:
-                        retail_price_per_kwh = batch_settings.context_electricity_prices.get_fuel_price(
-                            calendar_year, 'retail_dollars_per_unit'
-                        )
-                    else:
-                        retail_price_per_kwh = batch_settings.context_fuel_prices.get_fuel_price(
-                            calendar_year, fuel, 'retail_dollars_per_unit'
-                        )
-                    refuel_efficiency_e = \
-                        batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
-                    fuel_cost_per_mile += onroad_direct_kwh_per_mile * retail_price_per_kwh / refuel_efficiency_e
-
-                if onroad_direct_co2e_grams_per_mile:
-                    fuel_dict = eval(in_use_fuel_id)
-                    fuel = [fuel for fuel in fuel_dict.keys()][0]
-                    retail_price_per_gallon = \
-                        batch_settings.context_fuel_prices.get_fuel_price(
-                            calendar_year, fuel, 'retail_dollars_per_unit'
-                        )
-                    refuel_efficiency_l = \
-                        batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
-                    co2_emissions_grams_per_unit = \
-                        batch_settings.onroad_fuels.get_fuel_attribute(
-                            calendar_year, fuel, 'direct_co2e_grams_per_unit'
-                        ) / refuel_efficiency_l
-                    onroad_gallons_per_mile += onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
-                    onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
-                    fuel_cost_per_mile += onroad_gallons_per_mile * retail_price_per_gallon
-
-                vehicle_fuel_cpm_dict.update({
+                calendar_year_fuel_cpm_dict[key] = {
                     'session_policy': session_settings.session_policy,
                     'session_name': session_settings.session_name,
-                    'base_year_vehicle_id': int(base_year_vehicle_id),
                     'calendar_year': int(calendar_year),
                     'model_year': int(model_year),
                     'age': int(age),
-                    'base_year_reg_class_id': base_year_reg_class_id,
-                    'reg_class_id': reg_class_id,
+                    'cost_per_mile_group': cost_per_mile_group,
                     'context_size_class': context_size_class,
-                    'in_use_fuel_id': in_use_fuel_id,
-                    'market_class_id': market_class_id,
-                    'fueling_class': fueling_class,
-                    'base_year_powertrain_type': base_year_powertrain_type,
-                    'body_style': body_style,
-                    'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,
-                    'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
-                    'evse_kwh_per_mile': onroad_direct_kwh_per_mile / refuel_efficiency_e,
-                    'onroad_gallons_per_mile': onroad_gallons_per_mile,
-                    'onroad_miles_per_gallon': onroad_miles_per_gallon,
-                    'retail_price_per_gallon': retail_price_per_gallon,
-                    'retail_price_per_kwh': retail_price_per_kwh,
-                    'fuel_cost_per_mile': fuel_cost_per_mile,
-                })
+                    'registered_count': registered_count,
+                    'fuel_cost_per_mile': weighted_fuel_cost_per_mile,
+                }
+            else:
+                fuel_cost_per_mile = calc_fuel_cost_per_mile(
+                    batch_settings, calendar_year, onroad_direct_kwh_per_mile, onroad_direct_co2e_grams_per_mile,
+                    in_use_fuel_id
+                )
+                weighted_fuel_cost_per_mile = calendar_year_fuel_cpm_dict[key]['fuel_cost_per_mile']
+                weighted_fuel_cost_per_mile += registered_count * fuel_cost_per_mile
+                prior_registered_count = calendar_year_fuel_cpm_dict[key]['registered_count']
+                registered_count += prior_registered_count
 
-                calendar_year_fuel_cpm_dict[key] = vehicle_fuel_cpm_dict
-
+                calendar_year_fuel_cpm_dict[key] = {
+                    'session_policy': session_settings.session_policy,
+                    'session_name': session_settings.session_name,
+                    'calendar_year': int(calendar_year),
+                    'model_year': int(model_year),
+                    'age': int(age),
+                    'cost_per_mile_group': cost_per_mile_group,
+                    'context_size_class': context_size_class,
+                    'registered_count': registered_count,
+                    'fuel_cost_per_mile': weighted_fuel_cost_per_mile,
+                }
+        for key in calendar_year_fuel_cpm_dict:
+            fuel_cost_per_mile = calendar_year_fuel_cpm_dict[key]['fuel_cost_per_mile']
+            registered_count = calendar_year_fuel_cpm_dict[key]['registered_count']
+            if registered_count != 0:
+                fuel_cost_per_mile = fuel_cost_per_mile / registered_count
+            calendar_year_fuel_cpm_dict[key]['fuel_cost_per_mile'] = fuel_cost_per_mile
         context_fuel_cpm_dict.update(calendar_year_fuel_cpm_dict)
 
     return context_fuel_cpm_dict
+
+
+def calc_fuel_cost_per_mile(
+        batch_settings, calendar_year, onroad_direct_kwh_per_mile, onroad_direct_co2e_grams_per_mile, in_use_fuel_id
+):
+    """
+
+    Args:
+        batch_settings: an instance of the BatchSettings class.
+        calendar_year(int): the calendar year needed for fuel prices.
+        onroad_direct_kwh_per_mile (float): the onroad electricity consumption.
+        onroad_direct_co2e_grams_per_mile (float): the onroad co2 grams per mile.
+        in_use_fuel_id (str): a dict-like string providing fuel id information.
+
+    Returns:
+        The fuel cost per mile in the given year for the given vehicle.
+
+    """
+    fuel_cost_per_mile = 0
+    if onroad_direct_kwh_per_mile:
+        fuel = 'US electricity'
+        if batch_settings.context_electricity_prices:
+            retail_price_per_kwh = batch_settings.context_electricity_prices.get_fuel_price(
+                calendar_year, 'retail_dollars_per_unit'
+            )
+        else:
+            retail_price_per_kwh = batch_settings.context_fuel_prices.get_fuel_price(
+                calendar_year, fuel, 'retail_dollars_per_unit'
+            )
+        refuel_efficiency_e = \
+            batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
+        fuel_cost_per_mile = onroad_direct_kwh_per_mile * retail_price_per_kwh / refuel_efficiency_e
+
+    if onroad_direct_co2e_grams_per_mile:
+        fuel_dict = eval(in_use_fuel_id)
+        fuel = [fuel for fuel in fuel_dict.keys()][0]
+        retail_price_per_gallon = \
+            batch_settings.context_fuel_prices.get_fuel_price(
+                calendar_year, fuel, 'retail_dollars_per_unit'
+            )
+        refuel_efficiency_l = \
+            batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
+        co2_emissions_grams_per_unit = \
+            batch_settings.onroad_fuels.get_fuel_attribute(
+                calendar_year, fuel, 'direct_co2e_grams_per_unit'
+            ) / refuel_efficiency_l
+        onroad_gallons_per_mile = onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
+        # onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
+        fuel_cost_per_mile += onroad_gallons_per_mile * retail_price_per_gallon
+
+    return fuel_cost_per_mile

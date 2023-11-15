@@ -119,6 +119,28 @@ class ContextStockVMT:
 
         """
         if calendar_year > self.calendar_year_max:
-            calendar_year = self.calendar_year_max
+            stock, miles = self.calc_growth(calendar_year, 'stock', 'miles')
+            return stock, miles
 
         return self._data[calendar_year]['stock'], self._data[calendar_year]['miles']
+
+    def calc_growth(self, calendar_year, *args):
+        """
+
+        Args:
+            calendar_year (int): the calendar year for which stock and vmt are sought
+
+        Returns:
+            The stock and vmt values for the passed calendar year when/if that year is beyond the input max; growth is
+            based on the input data.
+
+        """
+        results = []
+        for arg in args:
+            result = self._data[calendar_year - 1][arg] * (
+                    1 + (
+                    self._data[calendar_year - 1][arg] - self._data[calendar_year - 2][arg]
+            ) / self._data[calendar_year - 2])
+            results.append(result)
+
+        return results

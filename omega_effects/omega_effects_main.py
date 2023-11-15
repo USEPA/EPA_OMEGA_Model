@@ -25,7 +25,7 @@ from omega_effects.general.general_functions import copy_files
 from omega_effects.general.file_id_and_save import add_id_to_csv, save_file
 
 from omega_effects.effects.vmt_adjustments import AdjustmentsVMT
-from omega_effects.effects.context_fuel_cost_per_mile import calc_fuel_cost_per_mile
+from omega_effects.effects.context_fuel_cost_per_mile import calc_context_fuel_cost_per_mile
 from omega_effects.effects.safety_effects import \
     calc_safety_effects, calc_legacy_fleet_safety_effects, calc_annual_avg_safety_effects
 from omega_effects.effects.physical_effects import calc_physical_effects, calc_legacy_fleet_physical_effects, \
@@ -86,7 +86,9 @@ def main():
             effects_log.logwrite(f'{e}')
             sys.exit()
 
-        # context fuel cost per mile and vmt adjustments _______________________________________________________________
+        # context fuel cost per mile and vmt/stock adjustments _________________________________________________________
+        # vmt/stock adjustments normalize vehicle annual data to the context stock vmt input file
+        # context fuel cpm is used as a reference from which to calculate rebound vmt
         session_settings = SessionSettings()
         session_settings.get_context_session_settings(batch_settings, effects_log)
         if batch_settings.save_input_files:
@@ -96,7 +98,7 @@ def main():
         vmt_adjustments_context = AdjustmentsVMT()
         vmt_adjustments_context.calc_vmt_adjustments(batch_settings, session_settings)
 
-        context_fuel_cpm_dict = calc_fuel_cost_per_mile(batch_settings, session_settings)
+        context_fuel_cpm_dict = calc_context_fuel_cost_per_mile(batch_settings, session_settings)
         if batch_settings.save_context_fuel_cost_per_mile_file:
             effects_log.logwrite(f'Saving context fuel cost per mile file')
             context_fuel_cpm_df = pd.DataFrame.from_dict(context_fuel_cpm_dict, orient='index').reset_index(drop=True)
