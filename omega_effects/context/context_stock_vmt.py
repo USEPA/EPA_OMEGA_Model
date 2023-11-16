@@ -119,8 +119,7 @@ class ContextStockVMT:
 
         """
         if calendar_year > self.calendar_year_max:
-            stock, miles = self.calc_growth(calendar_year, 'stock', 'miles')
-            return stock, miles
+            self.calc_growth(calendar_year, 'stock', 'miles')
 
         return self._data[calendar_year]['stock'], self._data[calendar_year]['miles']
 
@@ -135,12 +134,10 @@ class ContextStockVMT:
             based on the input data.
 
         """
-        results = []
+        self._data.update({calendar_year: {}})
         for arg in args:
             result = self._data[calendar_year - 1][arg] * (
-                    1 + (
-                    self._data[calendar_year - 1][arg] - self._data[calendar_year - 2][arg]
-            ) / self._data[calendar_year - 2])
-            results.append(result)
-
-        return results
+                    1 + (self._data[calendar_year - 1][arg] - self._data[calendar_year - 2][arg]) /
+                    self._data[calendar_year - 2][arg]
+            )
+            self._data[calendar_year][arg] = result
