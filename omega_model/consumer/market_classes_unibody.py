@@ -83,20 +83,27 @@ class MarketClass(OMEGABase, MarketClassBase):
         varname_split = varname.split('.')
 
         if 'BEV' in varname_split:
-            style_dict['linestyle'] = ':'
-            style_dict['color'] = '#1ECF1E'
-            style_dict['linewidth'] = 2.5
+            style_dict['color'] = 'xkcd:azure'
         elif 'ICE' in varname_split:
-            style_dict['linestyle'] = '--'
-            style_dict['color'] = '#CF1E1E'
+            style_dict['color'] = '#FB0612'
 
         if 'non_hauling' in varname_split:
-            style_dict['color'] = '#0DBFF2'
+            style_dict['marker'] = 'o'
+            style_dict['markersize'] = 6
+            style_dict['fillstyle'] = 'full'
+            style_dict['markerfacecolor'] = 'white'
         elif 'hauling' in varname_split:
-            style_dict['color'] = '#F708F2'
+            style_dict['marker'] = '^'
+            style_dict['markersize'] = 6.5
+            style_dict['fillstyle'] = 'full'
+            style_dict['markerfacecolor'] = 'white'
 
         if varname == 'vehicle':
             style_dict['color'] = 'black'
+        elif varname == 'non_hauling':
+            style_dict['color'] = 'xkcd:cool blue'
+        elif varname == 'hauling':
+            style_dict['color'] = '#F748F2'
 
         return style_dict
 

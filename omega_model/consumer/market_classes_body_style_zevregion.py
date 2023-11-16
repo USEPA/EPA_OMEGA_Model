@@ -89,22 +89,33 @@ class MarketClass(OMEGABase, MarketClassBase):
         varname_split = varname.split('.')
 
         if 'BEV' in varname_split:
-            style_dict['linestyle'] = ':'
-            style_dict['color'] = '#1ECF1E'
-            style_dict['linewidth'] = 2.5
+            style_dict['color'] = 'xkcd:azure'
         elif 'ICE' in varname_split:
-            style_dict['linestyle'] = '--'
-            style_dict['color'] = '#CF1E1E'
+            style_dict['color'] = '#FB0612'
 
-        if 'sedan_wagon' in varname:
-            style_dict['color'] = '#0DBFF2'
-        elif 'cuv_suv_van' in varname:
-            style_dict['color'] = '#FFC700'
-        elif 'pickup' in varname:
-            style_dict['color'] = '#F708F2'
+        if 'sedan_wagon' in varname_split:
+            style_dict['marker'] = 'o'
+            style_dict['markersize'] = 6
+            style_dict['fillstyle'] = 'full'
+            style_dict['markerfacecolor'] = 'white'
+        elif 'cuv_suv_van' in varname_split:
+            style_dict['marker'] = 'x'
+            style_dict['fillstyle'] = 'full'
+            style_dict['markerfacecolor'] = 'white'
+        elif 'pickup' in varname_split:
+            style_dict['marker'] = '^'
+            style_dict['markersize'] = 6.5
+            style_dict['fillstyle'] = 'full'
+            style_dict['markerfacecolor'] = 'white'
 
         if varname == 'vehicle':
             style_dict['color'] = 'black'
+        elif varname == 'sedan_wagon':
+            style_dict['color'] = 'xkcd:cool blue'
+        elif varname == 'cuv_suv_van':
+            style_dict['color'] = '#FFb700'
+        elif varname == 'pickup':
+            style_dict['color'] = '#F748F2'
 
         return style_dict
 
