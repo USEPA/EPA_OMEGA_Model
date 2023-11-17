@@ -3,9 +3,9 @@ import numpy as np
 import datetime
 import os
 
-OMEGA_outputs = True
+OMEGA_outputs = False
 scraping_Edmunds_MSRP = False
-delete_Prod_VOL_GHG_50_State_for_safety_study_only = False
+delete_Prod_VOL_GHG_50_State_for_safety_study_only = True
 
 pd.options.mode.chained_assignment = None  # default='warn'
 # "DRIVER ONLY WITH HEAD PROTECTION CHAMBER SIDE-MOUNTED AIRBAGS",

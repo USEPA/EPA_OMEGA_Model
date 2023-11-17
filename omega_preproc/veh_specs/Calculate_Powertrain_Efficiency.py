@@ -72,8 +72,9 @@ def Calculate_Powertrain_Efficiency(ID_col, TEST_PROC_CATEGORY_col, A_col, B_col
     drivecycle_troadwork_kWhp100mi_col = pd.Series(np.zeros(len(output_table)))
     drivecycle_tractive_kWhr_col = pd.Series(np.zeros(len(output_table)))
     drivecycle_LF_col = pd.Series(np.zeros(len(output_table)))
-
+    df_tmp = output_table.loc[8131, :]
     for data_count in range (len(output_table)):
+        # print(data_count)
         TEST_PROC_CATEGORY = TEST_PROC_CATEGORY_col_new[data_count]
         if TEST_PROC_CATEGORY == 'FTP':
             drivecycle_dist_mi = FTP_dist_mi
