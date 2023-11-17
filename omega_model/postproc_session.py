@@ -1500,6 +1500,13 @@ def plot_total_sales(calendar_years, compliance_ids):
     # context_sales = np.array(
     #     [consumer.sales_volume.context_new_vehicle_sales(cy)['total'] for cy in calendar_years[1:]])
 
+    for calendar_year in calendar_years:
+        context_based_total_sales = 0
+        for csc in new_vehicle_market.NewVehicleMarket.base_year_context_size_class_sales:
+            context_based_total_sales += \
+                new_vehicle_market.NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=csc)
+        new_vehicle_market.NewVehicleMarket.context_based_total_sales[calendar_year] = context_based_total_sales
+
     # Total expected sales for vehicle types actually represented in the base year vehicles file)
     context_sales = np.array(
         [new_vehicle_market.NewVehicleMarket.context_based_total_sales[cy] for cy in calendar_years[1:]])
