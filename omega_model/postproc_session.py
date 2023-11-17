@@ -59,6 +59,9 @@ def run_postproc(iteration_log, credit_banks):
 
     # index vehicle annual data by vehicle id and age for quick access
     vehicle_annual_data_df = pd.DataFrame(VehicleAnnualData._data).set_index(['compliance_id', 'vehicle_id', 'age'])
+    vehicle_annual_data_df.sort_values('vehicle_id', inplace=True)
+    vehicle_annual_data_df.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name
+                                  + '_vehicle_annual_data.csv', columns=sorted(vehicle_annual_data_df.columns))
     vehicle_annual_data = vehicle_annual_data_df.to_dict(orient='index')
 
     analysis_years = vehicle_years[1:]
@@ -69,9 +72,6 @@ def run_postproc(iteration_log, credit_banks):
     vehicles_table.to_csv(
         omega_globals.options.output_folder + omega_globals.options.session_unique_name + '_vehicles.csv',
         columns=sorted(vehicles_table.columns), index=False)
-
-    vehicle_annual_data_df.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name
-                                  + '_vehicle_annual_data.csv', columns=sorted(vehicle_annual_data_df.columns))
 
     manufacturer_ids = sorted(vehicles_table['manufacturer_id'].unique())
 
