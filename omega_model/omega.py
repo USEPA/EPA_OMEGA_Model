@@ -243,6 +243,175 @@ def update_cross_subsidy_log_data(producer_decision_and_response, calendar_year,
     producer_decision_and_response['share_convergence_error'] = share_convergence_error
 
 
+def run_compliance_id(compliance_id, pass_num, cumulative_battery_GWh, credit_banks, manufacturer_annual_data_table,
+                      iteration_log):
+    from producer import compliance_search
+    from policy.credit_banking import CreditBank
+    from producer.vehicle_annual_data import VehicleAnnualData
+    from producer.manufacturer_annual_data import ManufacturerAnnualData
+    from context.new_vehicle_market import NewVehicleMarket
+
+    if pass_num > 0:
+        omega_globals.cumulative_battery_GWh = cumulative_battery_GWh
+        omega_globals.options.multiprocessing = False
+
+    omega_log.logwrite("\nRunning %s Pass %d: Manufacturer=%s" % (omega_globals.options.session_unique_name,
+                                                                  pass_num, compliance_id),
+                       echo_console=True)
+    analysis_end_year = omega_globals.options.analysis_final_year + 1
+    credit_banks[compliance_id] = CreditBank(
+        omega_globals.options.ghg_credit_params_file,
+        omega_globals.options.ghg_credits_file, compliance_id)
+    prior_producer_decision_and_response = None
+    for calendar_year in range(omega_globals.options.analysis_initial_year, analysis_end_year):
+
+        credit_banks[compliance_id].update_credit_age(calendar_year)
+
+        if manufacturer_annual_data_table is None or omega_globals.options.credit_market_efficiency == 0.0:
+            # strategy: use credits and pay debits over their remaining lifetime, instead of all at once:
+            strategic_target_offset_Mg = 0
+            current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
+            for c in current_credits + current_debits:
+                if c.model_year < omega_globals.options.analysis_initial_year:
+                    # allow strategic under-compliance for historical credits
+                    if c.remaining_balance_Mg < 0 or omega_globals.options.credit_market_efficiency != 0.0:
+                        strategic_target_offset_Mg += \
+                            c.remaining_balance_Mg * (1 / max(1, c.remaining_years - 1))
+                else:
+                    # don't allow strategic under-compliance for analysis year credits
+                    strategic_target_offset_Mg += \
+                        min(0, c.remaining_balance_Mg) * (1 / max(1, c.remaining_years - 1))
+        else:
+            strategic_target_offset_Mg = \
+                manufacturer_annual_data_table[(manufacturer_annual_data_table['compliance_id'] == compliance_id) &
+                                               (manufacturer_annual_data_table['model_year'] == calendar_year)][
+                    'strategic_offset'].item()
+
+        producer_decision_and_response = None
+        best_winning_combo_with_sales_response = None
+        omega_globals.locked_price_modification_data = dict()
+
+        producer_consumer_iteration_num = 0
+        iterate_producer_consumer = True
+
+        while iterate_producer_consumer:
+            omega_log.logwrite("Running %s:  Year=%s  Iteration=%s %s" %
+                               (omega_globals.options.session_unique_name, calendar_year,
+                                producer_consumer_iteration_num, compliance_id),
+                               echo_console=True)
+
+            candidate_mfr_composite_vehicles, pre_production_vehicles, producer_decision, market_class_tree, \
+                producer_compliant, GWh_limit = \
+                compliance_search.search_production_options(compliance_id, calendar_year,
+                                                            producer_decision_and_response,
+                                                            producer_consumer_iteration_num,
+                                                            strategic_target_offset_Mg,
+                                                            prior_producer_decision_and_response)
+
+            # if producer_compliant is None:
+            #     omega_log.logwrite('%%%%%% Production Constraints Violated ... %%%%%%')
+
+            # composite vehicles have been updated from producer_decision at this point
+            producer_market_classes = \
+                calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehicles, producer_decision)
+
+            calc_market_data_from_sales(candidate_mfr_composite_vehicles, producer_decision)
+
+            if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
+                for mc in sorted(omega_globals.options.MarketClass.market_classes):
+                    if 'producer_abs_share_frac_%s' % mc in producer_decision:
+                        omega_log.logwrite(
+                            ('%d producer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %.6f' %
+                            (producer_decision['producer_abs_share_frac_%s' % mc]))
+                omega_log.logwrite('')
+
+            best_winning_combo_with_sales_response, iteration_log, producer_decision_and_response = \
+                iterate_producer_cross_subsidy(calendar_year, compliance_id, best_winning_combo_with_sales_response,
+                                               candidate_mfr_composite_vehicles, iteration_log,
+                                               producer_consumer_iteration_num, producer_market_classes,
+                                               producer_decision, strategic_target_offset_Mg)
+
+            converged, share_convergence_error, cross_subsidy_pricing_error = \
+                detect_producer_consumer_convergence(producer_decision_and_response, producer_market_classes)
+
+            # decide whether to continue iterating or not
+            iterate_producer_consumer = omega_globals.options.iterate_producer_consumer \
+                                        and producer_consumer_iteration_num < \
+                                        omega_globals.options.producer_consumer_max_iterations \
+                                        and (not converged or producer_decision_and_response['total_battery_GWh']
+                                             > GWh_limit)
+
+            if iterate_producer_consumer:
+                producer_consumer_iteration_num += 1
+            else:
+                if producer_consumer_iteration_num >= omega_globals.options.producer_consumer_max_iterations:
+                    if 'p-c_max_iterations' in omega_globals.options.verbose_console_modules:
+                        omega_log.logwrite(
+                            'PRODUCER-CONSUMER MAX ITERATIONS EXCEEDED, ROLLING BACK TO BEST ITERATION',
+                            echo_console=True)
+                    producer_decision_and_response = best_winning_combo_with_sales_response
+
+        update_cross_subsidy_log_data(producer_decision_and_response, calendar_year, compliance_id, converged,
+                                      producer_consumer_iteration_num, producer_compliant, share_convergence_error)
+
+        producer_decision_and_response['cross_subsidy_iteration_num'] = -10  # tag final result
+
+        iteration_log.append(producer_decision_and_response)
+
+        total_credits_co2e_megagrams, production_battery_gigawatthours = \
+            compliance_search.finalize_production(calendar_year, compliance_id,
+                                                  candidate_mfr_composite_vehicles,
+                                                  pre_production_vehicles,
+                                                  producer_decision_and_response)
+
+        if pass_num == 0:
+            omega_globals.cumulative_battery_GWh['total'] += production_battery_gigawatthours
+            omega_globals.cumulative_battery_GWh[calendar_year] = omega_globals.cumulative_battery_GWh['total']
+
+        credit_banks[compliance_id].handle_credit(calendar_year, total_credits_co2e_megagrams)  # CU RV
+
+        omega_globals.options.SalesShare.store_producer_decision_and_response(producer_decision_and_response)
+
+        stock.update_stock(calendar_year, compliance_id)
+
+        prior_producer_decision_and_response = producer_decision_and_response
+
+    credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
+                                                   omega_globals.options.session_unique_name +
+                                                   ' %s GHG_credit_balances.csv' % compliance_id,
+                                                   columns=sorted(credit_banks[compliance_id].credit_bank.columns),
+                                                   index=False)
+
+    credit_banks[compliance_id].transaction_log.to_csv(
+        omega_globals.options.output_folder + omega_globals.options.session_unique_name +
+        ' %s GHG_credit_transactions.csv' % compliance_id,
+        columns=sorted(credit_banks[compliance_id].transaction_log.columns), index=False)
+
+    finalized_vehicles = [v for v in omega_globals.finalized_vehicles if v.compliance_id == compliance_id and
+                          v.model_year >= omega_globals.options.analysis_initial_year]
+
+    vehicle_annual_data = [vad for vad in VehicleAnnualData._data
+                           if vad['compliance_id'] == compliance_id and
+                           vad['calendar_year'] >= omega_globals.options.analysis_initial_year]
+
+    manufacturer_annual_data = [mad for mad in ManufacturerAnnualData._data
+                                if mad['compliance_id'] == compliance_id and
+                                mad['model_year'] >= omega_globals.options.analysis_initial_year]
+
+    context_new_vehicle_generalized_costs = NewVehicleMarket._context_new_vehicle_generalized_costs
+
+    session_new_vehicle_generalized_costs = NewVehicleMarket._session_new_vehicle_generalized_costs
+
+    cost_tracker = dict()
+    for k, v in omega_globals.options.PowertrainCost.cost_tracker.items():
+        if v['compliance_id'] == compliance_id:
+            cost_tracker[k] = v
+
+    return (compliance_id, finalized_vehicles, credit_banks, iteration_log, vehicle_annual_data,
+            manufacturer_annual_data, context_new_vehicle_generalized_costs, session_new_vehicle_generalized_costs,
+            cost_tracker)
+
+
 def run_producer_consumer(pass_num, manufacturer_annual_data_table):
     """
     Create producer cost-minimizing technology and market share options, in consideration of market response from
@@ -261,149 +430,72 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
     """
     from producer.vehicles import Vehicle
-    from policy.credit_banking import CreditBank
-    from producer import compliance_search
+    from producer.vehicle_annual_data import VehicleAnnualData
+    from producer.manufacturer_annual_data import ManufacturerAnnualData
+    from context.new_vehicle_market import NewVehicleMarket
 
     iteration_log = []
 
     credit_banks = dict()
 
-    for compliance_id in Vehicle.compliance_ids:
-        omega_log.logwrite("\nRunning %s Pass %d: Manufacturer=%s" % (omega_globals.options.session_unique_name,
-                                                                      pass_num, compliance_id),
-                           echo_console=True)
+    if omega_globals.options.session_is_reference and omega_globals.options.multiprocessing and pass_num > 0:
+        results = []
+        for compliance_id in Vehicle.compliance_ids:
+            results.append(omega_globals.pool.apply_async(func=run_compliance_id,
+                                                          args=[compliance_id, pass_num, credit_banks,
+                                                                omega_globals.cumulative_battery_GWh,
+                                                                manufacturer_annual_data_table, iteration_log],
+                                                          callback=None,
+                                                          error_callback=error_callback))
 
-        analysis_end_year = omega_globals.options.analysis_final_year + 1
+        compliance_id_results = [r.get() for r in results]
 
-        credit_banks[compliance_id] = CreditBank(
-            omega_globals.options.ghg_credit_params_file,
-            omega_globals.options.ghg_credits_file, compliance_id)
+        for (compliance_id, cid_finalized_vehicles, cid_credit_bank, cid_iteration_log, cid_vehicle_annual_data,
+             cid_manufacturer_annual_data, cid_context_new_vehicle_generalized_costs,
+             cid_session_new_vehicle_generalized_costs, cid_cost_tracker) in compliance_id_results:
 
-        prior_producer_decision_and_response = None
+            vid_map_dict = dict()
+            # update vehicle ids and add to omega_globals.finalized_vehicles
+            # print(cid_finalized_vehicles)
+            for v in cid_finalized_vehicles:
+                vid_map_dict[v.vehicle_id] = Vehicle.get_next_vehicle_id()
+                v.vehicle_id = vid_map_dict[v.vehicle_id]
+                # print(compliance_id, v.compliance_id, v.model_year, v.vehicle_id)
+                omega_globals.finalized_vehicles.append(v)
 
-        for calendar_year in range(omega_globals.options.analysis_initial_year, analysis_end_year):
+            # update credit banks
+            # print(cid_credit_banks)
+            credit_banks.update(cid_credit_bank)
 
-            credit_banks[compliance_id].update_credit_age(calendar_year)
+            # update iteration_log
+            # print(compliance_id, cid_iteration_log)
+            iteration_log.extend(cid_iteration_log)
 
-            if manufacturer_annual_data_table is None or omega_globals.options.credit_market_efficiency == 0.0:
-                # strategy: use credits and pay debits over their remaining lifetime, instead of all at once:
-                strategic_target_offset_Mg = 0
-                current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
-                for c in current_credits + current_debits:
-                    if c.model_year < omega_globals.options.analysis_initial_year:
-                        # allow strategic under-compliance for historical credits
-                        if c.remaining_balance_Mg < 0 or omega_globals.options.credit_market_efficiency != 0.0:
-                            strategic_target_offset_Mg += \
-                                c.remaining_balance_Mg * (1 / max(1, c.remaining_years - 1))
-                    else:
-                        # don't allow strategic under-compliance for analysis year credits
-                        strategic_target_offset_Mg += \
-                            min(0, c.remaining_balance_Mg) * (1 / max(1, c.remaining_years - 1))
-            else:
-                strategic_target_offset_Mg = \
-                    manufacturer_annual_data_table[(manufacturer_annual_data_table['compliance_id'] == compliance_id) &
-                                                   (manufacturer_annual_data_table['model_year'] == calendar_year)][
-                        'strategic_offset'].item()
+            # update vehicle ids in vehicle annual data and update VehicleAnnualData
+            for vad in cid_vehicle_annual_data:
+                if vad['vehicle_id'] in vid_map_dict:
+                    vad['vehicle_id'] = vid_map_dict[vad['vehicle_id']]
+            VehicleAnnualData._data.extend(cid_vehicle_annual_data)
 
-            producer_decision_and_response = None
-            best_winning_combo_with_sales_response = None
-            omega_globals.locked_price_modification_data = dict()
+            # update manufacturer annual data
+            ManufacturerAnnualData._data.extend(cid_manufacturer_annual_data)
 
-            producer_consumer_iteration_num = 0
-            iterate_producer_consumer = True
+            # update vehicle generalized cost data
+            NewVehicleMarket._context_new_vehicle_generalized_costs.update(cid_context_new_vehicle_generalized_costs)
+            NewVehicleMarket._session_new_vehicle_generalized_costs.update(cid_session_new_vehicle_generalized_costs)
 
-            while iterate_producer_consumer:
-                omega_log.logwrite("Running %s:  Year=%s  Iteration=%s %s" %
-                                   (omega_globals.options.session_unique_name, calendar_year,
-                                    producer_consumer_iteration_num, compliance_id),
-                                   echo_console=True)
+            # update cost tracker data
+            cost_tracker = dict()
+            for k, v in cid_cost_tracker.items():
+                if v['vehicle_id'] in vid_map_dict:
+                    v['vehicle_id'] = vid_map_dict[v['vehicle_id']]
+                    cost_tracker[(v['vehicle_id'], v['model_year'])] = v
+            omega_globals.options.PowertrainCost.cost_tracker.update(cost_tracker)
 
-                candidate_mfr_composite_vehicles, pre_production_vehicles, producer_decision, market_class_tree, \
-                    producer_compliant, GWh_limit = \
-                    compliance_search.search_production_options(compliance_id, calendar_year,
-                                                                producer_decision_and_response,
-                                                                producer_consumer_iteration_num,
-                                                                strategic_target_offset_Mg,
-                                                                prior_producer_decision_and_response)
-
-                # if producer_compliant is None:
-                #     omega_log.logwrite('%%%%%% Production Constraints Violated ... %%%%%%')
-
-                # composite vehicles have been updated from producer_decision at this point
-                producer_market_classes = \
-                    calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehicles, producer_decision)
-
-                calc_market_data_from_sales(candidate_mfr_composite_vehicles, producer_decision)
-
-                if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
-                    for mc in sorted(omega_globals.options.MarketClass.market_classes):
-                        if 'producer_abs_share_frac_%s' % mc in producer_decision:
-                            omega_log.logwrite(
-                                ('%d producer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %.6f' %
-                                (producer_decision['producer_abs_share_frac_%s' % mc]))
-                    omega_log.logwrite('')
-
-                best_winning_combo_with_sales_response, iteration_log, producer_decision_and_response = \
-                    iterate_producer_cross_subsidy(calendar_year, compliance_id, best_winning_combo_with_sales_response,
-                                                   candidate_mfr_composite_vehicles, iteration_log,
-                                                   producer_consumer_iteration_num, producer_market_classes,
-                                                   producer_decision, strategic_target_offset_Mg)
-
-                converged, share_convergence_error, cross_subsidy_pricing_error = \
-                    detect_producer_consumer_convergence(producer_decision_and_response, producer_market_classes)
-
-                # decide whether to continue iterating or not
-                iterate_producer_consumer = omega_globals.options.iterate_producer_consumer \
-                                            and producer_consumer_iteration_num < \
-                                            omega_globals.options.producer_consumer_max_iterations \
-                                            and (not converged or producer_decision_and_response['total_battery_GWh']
-                                                 > GWh_limit)
-
-                if iterate_producer_consumer:
-                    producer_consumer_iteration_num += 1
-                else:
-                    if producer_consumer_iteration_num >= omega_globals.options.producer_consumer_max_iterations:
-                        if 'p-c_max_iterations' in omega_globals.options.verbose_console_modules:
-                            omega_log.logwrite(
-                                'PRODUCER-CONSUMER MAX ITERATIONS EXCEEDED, ROLLING BACK TO BEST ITERATION',
-                                echo_console=True)
-                        producer_decision_and_response = best_winning_combo_with_sales_response
-
-            update_cross_subsidy_log_data(producer_decision_and_response, calendar_year, compliance_id, converged,
-                                          producer_consumer_iteration_num, producer_compliant, share_convergence_error)
-
-            producer_decision_and_response['cross_subsidy_iteration_num'] = -10  # tag final result
-
-            iteration_log.append(producer_decision_and_response)
-
-            total_credits_co2e_megagrams, production_battery_gigawatthours = \
-                compliance_search.finalize_production(calendar_year, compliance_id,
-                                                      candidate_mfr_composite_vehicles,
-                                                      pre_production_vehicles,
-                                                      producer_decision_and_response)
-
-            if pass_num == 0:
-                omega_globals.cumulative_battery_GWh['total'] += production_battery_gigawatthours
-                omega_globals.cumulative_battery_GWh[calendar_year] = omega_globals.cumulative_battery_GWh['total']
-
-            credit_banks[compliance_id].handle_credit(calendar_year, total_credits_co2e_megagrams)  # CU RV
-
-            omega_globals.options.SalesShare.store_producer_decision_and_response(producer_decision_and_response)
-
-            stock.update_stock(calendar_year, compliance_id)
-
-            prior_producer_decision_and_response = producer_decision_and_response
-
-        credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
-                                                       omega_globals.options.session_unique_name +
-                                                       ' %s GHG_credit_balances.csv' % compliance_id,
-                                                       columns=sorted(credit_banks[compliance_id].credit_bank.columns),
-                                                       index=False)
-
-        credit_banks[compliance_id].transaction_log.to_csv(
-            omega_globals.options.output_folder + omega_globals.options.session_unique_name +
-            ' %s GHG_credit_transactions.csv' % compliance_id,
-            columns=sorted(credit_banks[compliance_id].transaction_log.columns), index=False)
+    else:
+        for compliance_id in Vehicle.compliance_ids:
+            run_compliance_id(compliance_id, pass_num, omega_globals.cumulative_battery_GWh, credit_banks,
+                              manufacturer_annual_data_table, iteration_log)
 
     iteration_log_df = pd.DataFrame(iteration_log)
 
