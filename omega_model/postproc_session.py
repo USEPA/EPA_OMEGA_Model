@@ -59,7 +59,7 @@ def run_postproc(iteration_log, credit_banks):
 
     # index vehicle annual data by vehicle id and age for quick access
     vehicle_annual_data_df = pd.DataFrame(VehicleAnnualData._data).set_index(['compliance_id', 'vehicle_id', 'age'])
-    vehicle_annual_data_df.sort_values('vehicle_id', inplace=True)
+    vehicle_annual_data_df.sort_values(['vehicle_id', 'age'], inplace=True)
     vehicle_annual_data_df.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name
                                   + '_vehicle_annual_data.csv', columns=sorted(vehicle_annual_data_df.columns))
     vehicle_annual_data = vehicle_annual_data_df.to_dict(orient='index')
