@@ -448,12 +448,13 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
                                                           callback=None,
                                                           error_callback=error_callback))
 
-        compliance_id_results = [r.get() for r in results]
+        compliance_id_results = sorted([r.get() for r in results])
 
         for (compliance_id, cid_finalized_vehicles, cid_credit_bank, cid_iteration_log, cid_vehicle_annual_data,
              cid_manufacturer_annual_data, cid_context_new_vehicle_generalized_costs,
              cid_session_new_vehicle_generalized_costs, cid_cost_tracker) in compliance_id_results:
 
+            cid_finalized_vehicles.sort(key=lambda v: v.vehicle_id)  # sort vehicles by id
             vid_map_dict = dict()
             # update vehicle ids and add to omega_globals.finalized_vehicles
             # print(cid_finalized_vehicles)

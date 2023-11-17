@@ -65,6 +65,7 @@ def run_postproc(iteration_log, credit_banks):
 
     vehicles_table = pd.DataFrame([v.to_dict(types=[int, float, bool, str, np.int64, np.float64])
                                    for v in omega_globals.finalized_vehicles])
+    vehicles_table.sort_values('vehicle_id', inplace=True)
     vehicles_table.to_csv(
         omega_globals.options.output_folder + omega_globals.options.session_unique_name + '_vehicles.csv',
         columns=sorted(vehicles_table.columns), index=False)
