@@ -1805,6 +1805,7 @@ class Vehicle(OMEGABase):
 
         DecompositionAttributes.init()   # offcycle_credits must be initalized first
 
+        Vehicle.reset_vehicle_ids()
         Vehicle.init_vehicles_from_dataframe(omega_globals.options.vehicles_df, verbose=verbose)
 
         _init_fail += VehicleOnroadCalculations.init_vehicle_attribute_calculations_from_file(
