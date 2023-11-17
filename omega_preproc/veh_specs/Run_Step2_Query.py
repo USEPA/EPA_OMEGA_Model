@@ -760,14 +760,14 @@ for model_year in model_years:
     #     query_output.loc[query_output[_airbag] == 'yes|null-', _airbag] = 'yes|null'
     #     query_output.loc[query_output[_airbag] == 'null-', _airbag] = 'null'
 
+    if (delete_Prod_VOL_GHG_50_State_for_safety_study_only == True):
+        if ('PRODUCTION_VOLUME_GHG_50_STATE' in query_output.columns): query_output.drop(['PRODUCTION_VOLUME_GHG_50_STATE'], axis=1, inplace=True)
+        if ('PRODUCTION_VOLUME_GHG_50_STATE_Master Index' in query_output.columns): query_output.drop(['PRODUCTION_VOLUME_GHG_50_STATE_Master Index'], axis=1, inplace=True)
     query_output.to_csv(output_path + '\\' + str(model_year) + '_' + Query_filename + '_' + date_and_time + '.csv',index=False)
 
     query_output = query_output.drop(query_output.filter(regex='Master Index').columns, axis=1)
     query_output = query_output.drop(query_output.filter(regex='Edmunds').columns, axis=1)
     query_output = query_output.drop(query_output.filter(regex='OEM Towing Guide').columns, axis=1)
-    if (delete_Prod_VOL_GHG_50_State_for_safety_study_only == True) and ('PRODUCTION_VOLUME_GHG_50_STATE' in query_output.columns):
-        query_output.drop(['PRODUCTION_VOLUME_GHG_50_STATE'], axis=1, inplace=True)
-
     query_output.to_csv(output_path + '\\' + str(model_year) + Query_filename + ' ' + date_and_time + '_noduplicatecolumns.csv',index=False)
     del all_array
     del master_index_file
