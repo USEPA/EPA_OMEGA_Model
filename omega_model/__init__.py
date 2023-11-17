@@ -88,12 +88,12 @@ try:
             self.omega_model_path = path
             self.use_prerun_context_outputs = False
             self.prerun_context_folder = ''
-            self.credit_market_efficiency = 0.8
+            self.credit_market_efficiency = 1
             self.consolidate_manufacturers = None
             self.force_two_pass = False
             self.include_manufacturers_list = 'all'
             self.exclude_manufacturers_list = 'none'
-            self.base_year_min_sales = 1e5
+            self.base_year_min_sales = 0
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
             self.vehicles_file = path + 'test_inputs/vehicles.csv'
             self.vehicles_file_base_year_offset = None
