@@ -438,8 +438,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
 
     credit_banks = dict()
 
-    if ((omega_globals.options.session_is_reference or omega_globals.options.standalone_run) and
-            omega_globals.options.multiprocessing and pass_num > 0):
+    if omega_globals.options.multiprocessing and pass_num > 0:
         results = []
         for compliance_id in Vehicle.compliance_ids:
             results.append(omega_globals.pool.apply_async(func=run_compliance_id,
