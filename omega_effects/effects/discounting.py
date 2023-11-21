@@ -53,6 +53,13 @@ class Discounting:
 
             Values that occur prior to the "Discount Values to Year" input setting will not be discounted.
 
+            Criteria health benefits are generated using $/ton inputs for criteria cost factors. Annual discounted values
+            calculated here are valid only for those social discount rates that match the discount rate used in
+            generating the $/ton benefit values. In other words, annual discounted values using a 2 percent social
+            discount rate are not value if calculated using a 3 or 7 percent discount rate in generating the $/ton
+            values. That said, this does calculate those values for use in generating present and annualized values of
+            the 3 percent health benefits using a 2 percent discount rate.
+
         """
         dict_of_values = annual_values_df.to_dict(orient='index')
         discount_to_year = batch_settings.discount_values_to_year
@@ -82,7 +89,12 @@ class Discounting:
 
         emission_discrates = sorted(list(set(emission_discrates)))
         for emission_discrate in emission_discrates:
-            self.rate_list_dict[emission_discrate] = [arg for arg in self.all_monetized_args if f'_{emission_discrate}' in arg]
+            self.rate_list_dict[emission_discrate] = [
+                arg for arg in self.all_monetized_args if f'_{emission_discrate}_' in arg
+            ]
+            if emission_discrate == 0.02:
+                l = [arg for arg in self.all_monetized_args if '_0.03_' in arg and ('Wu' in arg or 'Pope' in arg)]
+                self.rate_list_dict[emission_discrate] = self.rate_list_dict[emission_discrate] + l
 
         self.monetized_non_emission_args = [arg for arg in self.all_monetized_args if '_0.0' not in arg]
         id_args = [k for k, v in nested_dict.items() if '_dollars' not in k]
@@ -110,11 +122,14 @@ class Discounting:
                     rate_dict.update({arg: discounted_value})
 
                 for emission_discrate, arg_list in self.rate_list_dict.items():
-                    for arg in arg_list:
-                        arg_value = v[arg]
-                        discounted_value = \
-                            discount_value(arg_value, emission_discrate, calendar_year, discount_to_year, cost_accrual)
-                        rate_dict.update({arg: discounted_value})
+                    if social_discrate == 0.02 and emission_discrate == 0.03:
+                        pass
+                    else:
+                        for arg in arg_list:
+                            arg_value = v[arg]
+                            discounted_value = \
+                                discount_value(arg_value, emission_discrate, calendar_year, discount_to_year, cost_accrual)
+                            rate_dict.update({arg: discounted_value})
 
                 update_dict[
                     (session_policy, calendar_year, reg_class_id, in_use_fuel_id, fueling_class,
