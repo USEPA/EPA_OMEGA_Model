@@ -269,6 +269,9 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
     credit_banks = dict()
 
     for compliance_id in Vehicle.compliance_ids:
+        if pass_num > 0:
+            omega_log.init_logfile(compliance_id)
+
         omega_log.logwrite("\nRunning %s Pass %d: Manufacturer=%s" % (omega_globals.options.session_unique_name,
                                                                       pass_num, compliance_id),
                            echo_console=True)
