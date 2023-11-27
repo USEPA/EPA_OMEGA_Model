@@ -114,9 +114,12 @@ class OMEGABatchLog(OMEGABase):
         self.logwrite(message, terminator='')
 
 
-def init_logfile():
+def init_logfile(compliance_id=None):
     """
     Create a session logfile.
+
+    Args:
+        compliance_id (str): added to log file name if provided
 
     """
     import time, datetime
@@ -125,9 +128,14 @@ def init_logfile():
 
     file_io.validate_folder(omega_globals.options.output_folder)
 
-    omega_globals.options.logfilename = '%s%s.txt' % (
-        omega_globals.options.output_folder + omega_globals.options.logfile_prefix,
-        omega_globals.options.session_unique_name)
+    if compliance_id:
+        omega_globals.options.logfilename = '%s%s_%s.txt' % (
+            omega_globals.options.output_folder + omega_globals.options.logfile_prefix,
+            omega_globals.options.session_unique_name, compliance_id)
+    else:
+        omega_globals.options.logfilename = '%s%s.txt' % (
+            omega_globals.options.output_folder + omega_globals.options.logfile_prefix,
+            omega_globals.options.session_unique_name)
 
     with open(omega_globals.options.logfilename, 'w') as log:
         log.write('OMEGA %s session %s started at %s %s\n\n' % (

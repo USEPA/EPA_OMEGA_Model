@@ -251,7 +251,9 @@ def run_compliance_id(compliance_id, pass_num, cumulative_battery_GWh, credit_ba
     from producer.manufacturer_annual_data import ManufacturerAnnualData
     from context.new_vehicle_market import NewVehicleMarket
 
+
     if pass_num > 0:
+        omega_log.init_logfile(compliance_id)
         omega_globals.cumulative_battery_GWh = cumulative_battery_GWh
         omega_globals.options.multiprocessing = False
 
