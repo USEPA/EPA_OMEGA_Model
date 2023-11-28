@@ -159,14 +159,13 @@ class EGUdata:
 
         return df_rates
 
-    def get_emission_rate(self, session_settings, cyear,
-                          session_kwh_consumption, session_kwh_generation, rate_names):
+    def get_emission_rate(self, v, cyear, session_kwh_consumption, session_kwh_generation, rate_names):
         """
 
         Get emission rates by calendar year
 
         Args:
-            session_settings: an instance of the SessionSettings class
+            v (dict): a dictionary of annual physical effects values
             cyear (int): calendar year for which to get emission rates
             session_kwh_consumption (numeric): the session kwh to use (e.g., kwh_consumption or kwh_generation; this is omega-only)
             session_kwh_generation (numeric): the session kwh generation needed to satisfy kwh_session.
@@ -185,8 +184,8 @@ class EGUdata:
         else:
             calendar_year = cyear
 
-        if cyear in self._cache:
-            return self._cache[cyear]
+        if (v['session_policy'], cyear) in self._cache:
+            return self._cache[v['session_policy'], cyear]
 
         kwh_generation_us_low = self._data[(calendar_year, 'low_demand')]['kwh_generation_us']
         kwh_generation_us_high = self._data[(calendar_year, 'high_demand')]['kwh_generation_us']
@@ -199,11 +198,11 @@ class EGUdata:
         kwh_generation_us_session = session_kwh_generation + kwh_generation_us_base
 
         for idx, rate_name in enumerate(rate_names):
+            self.deets.update({(v['session_policy'], cyear, rate_name): {}})
 
-            self.deets.update(
-                {(cyear, rate_name): {
-                    'session_policy': session_settings.session_policy,
-                    'session_name': session_settings.session_name,
+            self.deets[(v['session_policy'], cyear, rate_name)] = {
+                    'session_policy': v['session_policy'],
+                    'session_name': v['session_name'],
                     'calendar_year': cyear,
                     'kwh_generation_us_low': kwh_generation_us_low,
                     'kwh_generation_us_high': kwh_generation_us_high,
@@ -213,7 +212,7 @@ class EGUdata:
                     'fleet_kwh_consumption': session_kwh_consumption,
                     'fleet_kwh_generation': session_kwh_generation,
                     'rate_name': rate_name,
-                }})
+                }
             rate_low = self._data[(calendar_year, 'low_demand')][rate_name]
             rate_high = self._data[(calendar_year, 'high_demand')][rate_name]
 
@@ -231,15 +230,15 @@ class EGUdata:
             if rate <= 0:
                 rate = (rate_low + rate_high) / 2
 
-            self.deets[cyear, rate_name].update({
+            self.deets[v['session_policy'], cyear, rate_name].update({
                 'rate_low': rate_low,
                 'rate_high': rate_high,
                 'rate': rate,
-                'US_inventory_grams_excl_legacy_fleet': rate * kwh_generation_us_session,
+                'US_inventory_grams': rate * kwh_generation_us_session,
                 'analysis_fleet_inventory_grams': rate * session_kwh_generation,
             })
 
-        self._cache[cyear] = rates
+        self._cache[v['session_policy'], cyear] = rates
 
         return rates
 

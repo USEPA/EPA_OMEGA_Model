@@ -110,14 +110,13 @@ class RefineryData:
             'voc',
         ]
 
-    def init_from_file(self, batch_settings, session_settings, filepath, effects_log):
+    def init_from_file(self, batch_settings, filepath, effects_log):
         """
 
         Initialize class data from input file.
 
         Args:
             batch_settings: an instance of the BatchSettings class.
-            session_settings: an instance of the SessionSettings class.
             filepath: the Path object to the file.
             effects_log: an instance of the EffectsLog class.
 
@@ -192,11 +191,11 @@ class RefineryData:
 
         df_rates.set_index(df_rates['calendar_year'], inplace=True)
 
-        df_rates.insert(0, 'session_name', '')
+        # df_rates.insert(0, 'session_name', '')
 
         self.data = df_rates.to_dict('index')
 
-        self.interpolate_input_data(session_settings)
+        self.interpolate_input_data()
 
     def calc_rates(self, batch_settings, df):
         """
@@ -290,7 +289,7 @@ class RefineryData:
 
         return return_data
 
-    def interpolate_input_data(self, session_settings):
+    def interpolate_input_data(self):  #, session_settings):
         """
 
         Parameters:
@@ -301,14 +300,14 @@ class RefineryData:
 
         """
         for idx, year in enumerate(self.years):
-            self.data[year]['session_name'] = session_settings.session_name
+            # self.data[year]['session_name'] = session_settings.session_name
 
             if year < self.calendar_year_max:
                 year_1, year_2 = year, self.years[idx + 1]
 
                 for yr in range(year_1 + 1, year_2):
                     self.data.update({yr: {
-                        'session_name': session_settings.session_name,
+                        # 'session_name': session_settings.session_name,
                         'calendar_year': yr}})
 
                     for rate_name in self.rate_names:

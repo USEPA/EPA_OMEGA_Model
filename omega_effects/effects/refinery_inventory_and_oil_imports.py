@@ -12,11 +12,11 @@ import pandas as pd
 from omega_effects.effects.physical_effects import get_inputs_for_effects
 
 
-def get_refinery_data(session_settings, calendar_year, reg_class_id, fuel):
+def get_refinery_data(batch_settings, calendar_year, reg_class_id, fuel):
     """
 
     Args:
-        session_settings: an instance of the SessionSettings class.
+        batch_settings: an instance of the BatchSettings class.
         calendar_year (int): The calendar year for which a refinery emission factors are needed.
         reg_class_id (str): The reg class for which to get context scaler data, i.e., 'car', 'truck', 'mediumduty'
         fuel (str): e.g., 'gasoline' or 'diesel'
@@ -39,7 +39,7 @@ def get_refinery_data(session_settings, calendar_year, reg_class_id, fuel):
         f'context_scaler_lmdv_{reg_class_id}_{fuel}',
         f'context_scaler_lmdv_{fuel}',
     ]
-    refinery_data = session_settings.refinery_data.get_data(calendar_year, reg_class_id, fuel, *args)
+    refinery_data = batch_settings.refinery_data.get_data(calendar_year, reg_class_id, fuel, *args)
 
     return refinery_data
 
@@ -85,12 +85,11 @@ def calc_inventory(context_gallons, session_gallons, rate, impact_on_refining, d
         return rate * session_gallons / conversion
 
 
-def calc_refinery_inventory_and_oil_imports(batch_settings, session_settings, annual_physical_df):
+def calc_refinery_inventory_and_oil_imports(batch_settings, annual_physical_df):
     """
 
     Args:
         batch_settings: an instance of the BatchSettings class
-        session_settings: an instance of the SessionSettings class
         annual_physical_df (DataFrame): a DataFrame of annual physical effects
 
     Returns:
@@ -110,7 +109,7 @@ def calc_refinery_inventory_and_oil_imports(batch_settings, session_settings, an
      ) = get_inputs_for_effects(batch_settings)
 
     gallons_arg = 'fuel_consumption_gallons'
-    if 'petroleum' in session_settings.refinery_data.rate_basis:
+    if 'petroleum' in batch_settings.refinery_data.rate_basis:
         gallons_arg = 'petroleum_consumption_gallons'
 
     session_policies = annual_physical_df['session_policy'].unique()
@@ -206,7 +205,7 @@ def calc_refinery_inventory_and_oil_imports(batch_settings, session_settings, an
             (voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co_ref_rate,
              co2_ref_rate, ch4_ref_rate, n2o_ref_rate,
              factor, context_million_barrels_per_day, context_scaler_rc_fuel, context_scaler_fuel) = (
-                get_refinery_data(session_settings, calendar_year, reg_class_id, fuel)
+                get_refinery_data(batch_settings, calendar_year, reg_class_id, fuel)
             )
             context_gallons = (context_million_barrels_per_day * pow(10, 6) * gal_per_bbl * 365 *
                                context_scaler_rc_fuel * context_scaler_fuel)

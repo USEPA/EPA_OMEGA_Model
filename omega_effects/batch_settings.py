@@ -21,6 +21,10 @@ from omega_effects.effects.cost_factors_scghg import CostFactorsSCGHG
 from omega_effects.effects.cost_factors_energysecurity import CostFactorsEnergySecurity
 from omega_effects.effects.cost_factors_congestion_noise import CostFactorsCongestionNoise
 from omega_effects.effects.legacy_fleet import LegacyFleet
+from omega_effects.effects.egu_data import EGUdata
+from omega_effects.effects.refinery_data import RefineryData
+from omega_effects.effects.safety_values import SafetyValues
+from omega_effects.effects.fatality_rates import FatalityRates
 
 from omega_effects.consumer.annual_vmt_fixed_by_age import OnroadVMT
 from omega_effects.consumer.reregistration_fixed_by_age import Reregistration
@@ -97,6 +101,11 @@ class BatchSettings:
         self.ip_deflators_file = None
         self.cpi_deflators_file = None
 
+        self.egu_data_file = None
+        self.refinery_data_file = None
+        self.safety_values_file = None
+        self.fatality_rates_file = None
+
         self.context_session_name = None
 
         self.maintenance_cost = None
@@ -119,6 +128,11 @@ class BatchSettings:
         self.legacy_fleet = None
         self.ip_deflators = None
         self.cpi_deflators = None
+
+        self.egu_data = None
+        self.refinery_data = None
+        self.safety_values = None
+        self.fatality_rates = None
 
         self.true_false_dict = {
             True: True,
@@ -261,6 +275,16 @@ class BatchSettings:
             = self.get_attribute_value(('Insurance and Taxes Cost Factors File', 'all'), 'full_path')
         self.legacy_fleet_file = self.get_attribute_value(('Legacy Fleet File', 'all'), 'full_path')
         self.cpi_deflators_file = self.get_attribute_value(('CPI Price Deflators File', 'all'), 'full_path')
+
+        # Get effects-specific files from appropriate folder as specified in batch_settings.csv.
+        self.egu_data_file \
+            = self.get_attribute_value(('EGU Data File', 'all'), 'full_path')
+        self.refinery_data_file \
+            = self.get_attribute_value(('Refinery Data File', 'all'), 'full_path')
+        self.safety_values_file \
+            = self.get_attribute_value(('Safety Values File', 'all'), 'full_path')
+        self.fatality_rates_file \
+            = self.get_attribute_value(('Fatality Rates File', 'all'), 'full_path')
 
         self.context_session_name = self.get_attribute_value(('Session Name', 'context'), 'value')
         path_context_in = self.batch_folder / f'_{self.context_session_name}' / 'in'
@@ -428,6 +452,22 @@ class BatchSettings:
                 self.insurance_and_taxes_cost_factors_file, self, effects_log
             )
             self.inputs_filelist.append(self.insurance_and_taxes_cost_factors_file)
+
+            self.egu_data = EGUdata()
+            self.egu_data.init_from_file(self.egu_data_file, effects_log)
+            self.inputs_filelist.append(self.egu_data_file)
+
+            self.refinery_data = RefineryData()
+            self.refinery_data.init_from_file(self, self.refinery_data_file, effects_log)
+            self.inputs_filelist.append(self.refinery_data_file)
+
+            self.safety_values = SafetyValues()
+            self.safety_values.init_from_file(self.safety_values_file, effects_log)
+            self.inputs_filelist.append(self.safety_values_file)
+
+            self.fatality_rates = FatalityRates()
+            self.fatality_rates.init_from_file(self.fatality_rates_file, effects_log)
+            self.inputs_filelist.append(self.fatality_rates_file)
 
         except Exception as e:
             effects_log.logwrite(e)

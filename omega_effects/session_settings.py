@@ -167,11 +167,11 @@ from omega_effects.effects.vehicles import Vehicles
 from omega_effects.effects.vehicle_annual_data import VehicleAnnualData
 from omega_effects.general.input_validation import get_module_name
 
-from omega_effects.effects.egu_data import EGUdata
-from omega_effects.effects.refinery_data import RefineryData
+# from omega_effects.effects.egu_data import EGUdata
+# from omega_effects.effects.refinery_data import RefineryData
 from omega_effects.effects.emission_rate_curves_vehicles import EmissionRatesVehicles
-from omega_effects.effects.safety_values import SafetyValues
-from omega_effects.effects.fatality_rates import FatalityRates
+# from omega_effects.effects.safety_values import SafetyValues
+# from omega_effects.effects.fatality_rates import FatalityRates
 from omega_effects.context.powertrain_cost import PowertrainCost
 
 
@@ -186,21 +186,21 @@ class SessionSettings:
         self.session_name = None
 
         self.inputs_filelist = list()
-        self.egu_data_file = None
-        self.refinery_data_file = None
+        # self.egu_data_file = None
+        # self.refinery_data_file = None
         self.vehicle_emission_rates_file = None
-        self.safety_values_file = None
-        self.fatality_rates_file = None
+        # self.safety_values_file = None
+        # self.fatality_rates_file = None
         self.powertrain_cost_file = None
 
         self.vehicles_file = None
         self.vehicle_annual_data_file = None
 
-        self.egu_data = None
-        self.refinery_data = None
+        # self.egu_data = None
+        # self.refinery_data = None
         self.emission_rates_vehicles = None
-        self.safety_values = None
-        self.fatality_rates = None
+        # self.safety_values = None
+        # self.fatality_rates = None
         self.powertrain_cost = None
 
         self.vehicles = None
@@ -262,19 +262,19 @@ class SessionSettings:
         self.vehicle_annual_data_file \
             = path_session_out / f'{batch_settings.batch_name}_{self.session_name}_vehicle_annual_data.csv'
 
-        # Get effects-specific files from appropriate folder as specified in batch_settings.csv.
-        self.egu_data_file \
-            = batch_settings.get_attribute_value(('Session EGU Data File', f'{self.session_policy}'), 'full_path')
-
-        self.refinery_data_file \
-            = batch_settings.get_attribute_value(('Session Refinery Data File', f'{self.session_policy}'), 'full_path')
+        # # Get effects-specific files from appropriate folder as specified in batch_settings.csv.
+        # self.egu_data_file \
+        #     = batch_settings.get_attribute_value(('Session EGU Data File', f'{self.session_policy}'), 'full_path')
+        #
+        # self.refinery_data_file \
+        #     = batch_settings.get_attribute_value(('Session Refinery Data File', f'{self.session_policy}'), 'full_path')
 
         self.vehicle_emission_rates_file \
             = batch_settings.get_attribute_value(('Session Vehicle Emission Rates File', f'{self.session_policy}'), 'full_path')
-        self.safety_values_file \
-            = batch_settings.get_attribute_value(('Session Safety Values File', f'{self.session_policy}'), 'full_path')
-        self.fatality_rates_file \
-            = batch_settings.get_attribute_value(('Session Fatality Rates File', f'{self.session_policy}'), 'full_path')
+        # self.safety_values_file \
+        #     = batch_settings.get_attribute_value(('Session Safety Values File', f'{self.session_policy}'), 'full_path')
+        # self.fatality_rates_file \
+        #     = batch_settings.get_attribute_value(('Session Fatality Rates File', f'{self.session_policy}'), 'full_path')
 
         find_string = None
         try:
@@ -333,28 +333,28 @@ class SessionSettings:
             self.vehicle_annual_data = VehicleAnnualData()
             self.vehicle_annual_data.init_from_file(self.vehicle_annual_data_file, effects_log)
             self.inputs_filelist.append(self.vehicle_annual_data_file)
-
-            self.egu_data = EGUdata()
-            self.egu_data.init_from_file(self.egu_data_file, effects_log)
-            self.inputs_filelist.append(self.egu_data_file)
-
-            self.refinery_data = RefineryData()
-            self.refinery_data.init_from_file(batch_settings, self, self.refinery_data_file, effects_log)
-            self.inputs_filelist.append(self.refinery_data_file)
+            #
+            # self.egu_data = EGUdata()
+            # self.egu_data.init_from_file(self.egu_data_file, effects_log)
+            # self.inputs_filelist.append(self.egu_data_file)
+            #
+            # self.refinery_data = RefineryData()
+            # self.refinery_data.init_from_file(batch_settings, self, self.refinery_data_file, effects_log)
+            # self.inputs_filelist.append(self.refinery_data_file)
 
             # determine what module to use for vehicle rates
             module_name = get_module_name(self.vehicle_emission_rates_file, effects_log)
             self.emission_rates_vehicles = importlib.import_module(module_name, package=None).EmissionRatesVehicles()
             self.emission_rates_vehicles.init_from_file(self.vehicle_emission_rates_file, effects_log)
             self.inputs_filelist.append(self.vehicle_emission_rates_file)
-
-            self.safety_values = SafetyValues()
-            self.safety_values.init_from_file(self.safety_values_file, effects_log)
-            self.inputs_filelist.append(self.safety_values_file)
-
-            self.fatality_rates = FatalityRates()
-            self.fatality_rates.init_from_file(self.fatality_rates_file, effects_log)
-            self.inputs_filelist.append(self.fatality_rates_file)
+            #
+            # self.safety_values = SafetyValues()
+            # self.safety_values.init_from_file(self.safety_values_file, effects_log)
+            # self.inputs_filelist.append(self.safety_values_file)
+            #
+            # self.fatality_rates = FatalityRates()
+            # self.fatality_rates.init_from_file(self.fatality_rates_file, effects_log)
+            # self.inputs_filelist.append(self.fatality_rates_file)
 
             self.powertrain_cost = PowertrainCost()
             self.powertrain_cost.init_from_file(batch_settings, self.powertrain_cost_file, effects_log)
