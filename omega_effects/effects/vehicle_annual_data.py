@@ -10,7 +10,7 @@
 import pandas as pd
 
 from omega_effects.general.general_functions import read_input_file
-from omega_effects.general.general_functions import calc_rebound_effect
+from omega_effects.general.general_functions import calc_rebound_effect, calc_fuel_cost_per_mile
 
 
 class VehicleAnnualData:
@@ -147,83 +147,54 @@ class VehicleAnnualData:
                         onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile, fueling_class, context_size_class \
                         = vehicle_info_dict[vehicle_id]
 
-                    onroad_kwh_per_mile = onroad_gallons_per_mile = fuel_cpm = 0
+                    # onroad_kwh_per_mile = onroad_gallons_per_mile = fuel_cpm = 0
+                    rebound_rate = rebound_rate_ice
+                    if 'electricity' in in_use_fuel_id:
+                        rebound_rate = rebound_rate_bev
 
-                    rebound_rate = rebound_effect = 0
-                    fuel_dict = eval(in_use_fuel_id)
-                    fuel_flag = 0
+                    # calc fuel cost per mile
+                    fuel_cost_per_mile = calc_fuel_cost_per_mile(
+                        batch_settings, calendar_year, onroad_direct_kwh_per_mile, onroad_direct_co2e_grams_per_mile,
+                        in_use_fuel_id
+                    )
 
-                    for fuel, fuel_share in fuel_dict.items():
+                    # get context fuel cost per mile
+                    cost_per_mile_group = 'nonBEV'
+                    if fueling_class == 'BEV':
+                        cost_per_mile_group = 'BEV'
+                    context_fuel_cpm_dict_key = (cost_per_mile_group, context_size_class, int(model_year), int(age))
+                    context_fuel_cpm = context_fuel_cpm_dict[context_fuel_cpm_dict_key]['fuel_cost_per_mile']
 
-                        if 'electricity' in fuel and batch_settings.context_electricity_prices:
-                            retail_price = batch_settings.context_electricity_prices.get_fuel_price(
-                                calendar_year, 'retail_dollars_per_unit'
-                            )
-                        else:
-                            retail_price = batch_settings.context_fuel_prices.get_fuel_price(
-                                    calendar_year, fuel, 'retail_dollars_per_unit'
-                                )
-                        # calc fuel cost per mile
-                        if fuel == 'US electricity' and onroad_direct_kwh_per_mile:
-                            refuel_efficiency = batch_settings.onroad_fuels.get_fuel_attribute(
-                                    calendar_year, fuel, 'refuel_efficiency'
-                                )
-                            onroad_kwh_per_mile += onroad_direct_kwh_per_mile
-                            fuel_cpm += onroad_kwh_per_mile * retail_price / refuel_efficiency
-                            rebound_rate = rebound_rate_bev
-                            fuel_flag += 1
+                    if context_fuel_cpm > 0:
+                        rebound_effect = calc_rebound_effect(context_fuel_cpm, fuel_cost_per_mile, rebound_rate)
+                    else:
+                        rebound_effect = 0
 
-                        elif fuel != 'US electricity' and onroad_direct_co2e_grams_per_mile:
-                            refuel_efficiency = batch_settings.onroad_fuels.get_fuel_attribute(
-                                    calendar_year, fuel, 'refuel_efficiency'
-                                )
-                            co2_emissions_grams_per_unit = batch_settings.onroad_fuels.get_fuel_attribute(
-                                    calendar_year, fuel, 'direct_co2e_grams_per_unit'
-                            ) / refuel_efficiency
-                            onroad_gallons_per_mile += onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
-                            fuel_cpm += onroad_gallons_per_mile * retail_price
-                            rebound_rate = rebound_rate_ice
-                            fuel_flag += 1
+                    vmt = v['vmt'] * context_vmt_adjustment
+                    vmt_rebound = vmt * rebound_effect
 
-                        # get context fuel cost per mile
-                        cost_per_mile_group = 'nonBEV'
-                        if fueling_class == 'BEV':
-                            cost_per_mile_group = 'BEV'
-                        context_fuel_cpm_dict_key = (cost_per_mile_group, context_size_class, int(model_year), int(age))
-                        context_fuel_cpm = context_fuel_cpm_dict[context_fuel_cpm_dict_key]['fuel_cost_per_mile']
+                    vmt += vmt_rebound
+                    annual_vmt_adjusted = vmt / v['registered_count']
+                    annual_vmt_rebound = vmt_rebound / v['registered_count']
 
-                        if fuel_flag == 2:
-                            rebound_rate = rebound_rate_ice
-                        if context_fuel_cpm > 0:
-                            rebound_effect = calc_rebound_effect(context_fuel_cpm, fuel_cpm, rebound_rate)
-                        else:
-                            rebound_effect = 0
+                    if v['age'] == 0:
+                        odometer = annual_vmt_adjusted
+                    else:
+                        odometer_last_year = \
+                            self.adjusted_vads[(vehicle_id, calendar_year - 1)]['odometer']
+                        odometer = odometer_last_year + annual_vmt_adjusted
 
-                        vmt = v['vmt'] * context_vmt_adjustment
-                        vmt_rebound = vmt * rebound_effect
-
-                        vmt += vmt_rebound
-                        annual_vmt_adjusted = vmt / v['registered_count']
-                        annual_vmt_rebound = vmt_rebound / v['registered_count']
-
-                        if v['age'] == 0:
-                            odometer = annual_vmt_adjusted
-                        else:
-                            odometer_last_year = \
-                                self.adjusted_vads[(vehicle_id, calendar_year - 1)]['odometer']
-                            odometer = odometer_last_year + annual_vmt_adjusted
-
-                        update_dict = {
-                            'manufacturer_id': manufacturer_id,
-                            'vehicle_id': vehicle_id,
-                            'age': v['age'],
-                            'calendar_year': calendar_year,
-                            'registered_count': v['registered_count'],
-                            'context_vmt_adjustment': context_vmt_adjustment,
-                            'annual_vmt': annual_vmt_adjusted,
-                            'annual_vmt_rebound': annual_vmt_rebound,
-                            'odometer': odometer,
-                            'vmt': vmt,
-                            'vmt_rebound': vmt_rebound,
-                        }
-                        self.adjusted_vads[(vehicle_id, calendar_year)] = update_dict
+                    update_dict = {
+                        'manufacturer_id': manufacturer_id,
+                        'vehicle_id': vehicle_id,
+                        'age': v['age'],
+                        'calendar_year': calendar_year,
+                        'registered_count': v['registered_count'],
+                        'context_vmt_adjustment': context_vmt_adjustment,
+                        'annual_vmt': annual_vmt_adjusted,
+                        'annual_vmt_rebound': annual_vmt_rebound,
+                        'odometer': odometer,
+                        'vmt': vmt,
+                        'vmt_rebound': vmt_rebound,
+                    }
+                    self.adjusted_vads[(vehicle_id, calendar_year)] = update_dict
