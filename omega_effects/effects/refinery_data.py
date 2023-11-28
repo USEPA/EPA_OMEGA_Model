@@ -300,15 +300,12 @@ class RefineryData:
 
         """
         for idx, year in enumerate(self.years):
-            # self.data[year]['session_name'] = session_settings.session_name
 
             if year < self.calendar_year_max:
                 year_1, year_2 = year, self.years[idx + 1]
 
                 for yr in range(year_1 + 1, year_2):
-                    self.data.update({yr: {
-                        # 'session_name': session_settings.session_name,
-                        'calendar_year': yr}})
+                    self.data.update({yr: {'calendar_year': yr}})
 
                     for rate_name in self.rate_names:
                         value_1 = self.data[year_1][rate_name]

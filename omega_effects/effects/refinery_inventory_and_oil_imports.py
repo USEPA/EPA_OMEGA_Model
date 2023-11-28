@@ -189,7 +189,6 @@ def calc_refinery_inventory_and_oil_imports(batch_settings, annual_physical_df):
             v['session_policy'], v['calendar_year'], v['reg_class_id'], v['in_use_fuel_id'], v['fueling_class']
         )
         na_key = ('no_action', calendar_year, reg_class_id, in_use_fuel_id, fueling_class)
-        # fuel = [item for item in fuel_dict.keys()][0]  # fuel here will be something like 'pump gasoline'
         if 'gasoline' in in_use_fuel_id:
             fuel = 'gasoline'
         elif 'diesel' in in_use_fuel_id:

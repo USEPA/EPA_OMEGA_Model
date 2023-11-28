@@ -75,13 +75,6 @@ def calc_egu_inventory(batch_settings, annual_physical_df):  #, physical_effects
             for v in vad:
                 fuel_consumption_kwh_annual += v['fuel_consumption_kwh']
                 fuel_generation_kwh_annual += v['fuel_generation_kwh']
-            #
-            # # EGU emission rates for this calendar year to apply to electric fuel operation
-            # voc_egu_rate, co_egu_rate, nox_egu_rate, pm25_egu_rate, sox_egu_rate, \
-            #     co2_egu_rate, ch4_egu_rate, n2o_egu_rate, hcl_egu_rate, hg_egu_rate = \
-            #     get_egu_emission_rate(
-            #         session_settings, calendar_year, fuel_consumption_kwh_annual, fuel_generation_kwh_annual
-            #     )
 
             for k, v in sessions_dict.items():
 
@@ -96,7 +89,6 @@ def calc_egu_inventory(batch_settings, annual_physical_df):  #, physical_effects
 
                     kwhs = v['fuel_generation_kwh']
 
-                    # if v['calendar_year'] == calendar_year:
                     voc_egu_ustons = kwhs * voc_egu_rate / grams_per_us_ton
                     co_egu_ustons = kwhs * co_egu_rate / grams_per_us_ton
                     nox_egu_ustons = kwhs * nox_egu_rate / grams_per_us_ton

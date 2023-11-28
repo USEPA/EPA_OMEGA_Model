@@ -1,4 +1,4 @@
-input_template_name:,context.powertrain_cost_frm,input_template_version:,0.21,description:,"20231101 includes ANL battery cost curves, battery learning for 2036+ set to 1.5pct; and adds EPA-NHTSA agreed NMC_share",,,,,
+input_template_name:,context.powertrain_cost_frm,input_template_version:,0.21,description:,"20231127 new gpf cost; 20231101 includes ANL battery cost curves, battery learning for 2036+ set to 1.5pct; and adds EPA-NHTSA agreed NMC_share",,,,,
 powertrain_type,powertrain_subtype,system,subsystem,drive_system,engine_configuration,body_style,value,dollar_basis,Formula Notes,Notes
 BEV,-,Drive_Unit,E_Motor,FWD,-,-,(1.1097*KW_DU + 323.22) * MARKUP_BEV,2022,,FEV motor_single for RDU or DU; induction_motor_dual for FDU
 BEV,-,Drive_Unit,E_Motor,RWD,-,-,(1.1097*KW_DU + 323.22) * MARKUP_BEV,2022,,FEV motor_single for RDU or DU; induction_motor_dual for FDU
@@ -309,7 +309,7 @@ ALL,-,Exhaust,twc_swept_volume,-,-,-,(1.2) * 1,,Tier3,NPRM
 ALL,-,Exhaust,twc_pt_grams_per_liter,-,-,-,(0) * 1,,,NPRM
 ALL,-,Exhaust,twc_pd_grams_per_liter,-,-,-,(2) * 1,,,NPRM
 ALL,-,Exhaust,twc_rh_grams_per_liter,-,-,-,(0.11) * 1,,,NPRM
-ALL,-,Exhaust,gpf,-,-,-,(14.1940 * LITERS + 39.2867) * MARKUP_ICE,2021,from SB on 20221013,NPRM
+ALL,-,Exhaust,gpf,-,-,-,(42.269 * LITERS + 22.213) * MARKUP_ICE,2022,from SB on 20231128,SME
 ALL,-,Exhaust,twc_pgm,-,-,-,(PT_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * PT_USD_PER_OZ * OZ_PER_GRAM + PD_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * PD_USD_PER_OZ * OZ_PER_GRAM  + RH_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * RH_USD_PER_OZ * OZ_PER_GRAM) * MARKUP_ICE,,,NPRM
 ALL,-,Exhaust,troy_oz_per_gram,-,-,-,(0.0322) * 1,,,NPRM
 ALL,-,Exhaust,pt_dollars_per_oz,-,-,-,(1030) * 1,,C:\Users\TSHERWOO\OneDrive - Environmental Protection Agency (EPA)\Documents\LMDV\CostAnalysis\Copy of PGM 5-year 08-31-2022.xlsx from JMc,NPRM
