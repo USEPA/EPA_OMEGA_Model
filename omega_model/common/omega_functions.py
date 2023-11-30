@@ -542,12 +542,12 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
 
         # determine maximum allowed values
         for c in column_names:
-            other_columns = set(column_names).difference({c})
+            other_columns = sorted(list(set(column_names).difference({c})))
             max_level_dict[c] = max(0, min(max_level_dict[c], 1 - np.sum([min_level_dict[c] for c in other_columns])))
 
         # determine minimum allowed values
         for c in column_names:
-            other_columns = set(column_names).difference({c})
+            other_columns = sorted(list(set(column_names).difference({c})))
             min_level_dict[c] = min(1, max(min_level_dict[c], 1 - np.sum([max_level_dict[c] for c in other_columns])))
 
         # calculate span of values (max-min)
