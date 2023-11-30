@@ -231,6 +231,9 @@ def build_dicts(
     # sign makes this calc be action minus no_action, which is what we want for this attribute
     drive_value_benefit_dollars = - calc_delta(cost_na, cost_a, 'drive_value_cost_dollars')
 
+    # refueling benefits where lower costs in the action would be a benefit
+    refueling_benefit_dollars = calc_delta(cost_na, cost_a, 'refueling_cost_dollars')
+
     # fatalities; negative sign makes it action minus no_action_________________________________________________________
     fatalities = - calc_delta(physical_na, physical_a, 'session_fatalities')
 
@@ -445,6 +448,7 @@ def build_dicts(
 
             'energy_security_benefit_dollars': energy_security_benefit_dollars,
             'drive_value_benefit_dollars': drive_value_benefit_dollars,
+            'refueling_benefit_dollars': refueling_benefit_dollars,
         }
 
         benefits_dict_for_key.update(ghg_benefits)
