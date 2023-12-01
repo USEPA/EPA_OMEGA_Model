@@ -228,10 +228,13 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                 noise_cost_dollars += v['vmt'] * noise_cf
 
             # calc drive value relative to the context as value of rebound vmt plus the drive surplus __________________
+            cost_per_mile_group = 'nonBEV'
+            if v['fueling_class'] == 'BEV':
+                cost_per_mile_group = 'BEV'
             fuel_cpm = fuel_retail_cost_dollars / v['vmt']
-            context_fuel_cpm_dict_key = \
-                (int(v['base_year_vehicle_id']), v['base_year_powertrain_type'], int(v['model_year']), v['age']
-                 )
+            context_fuel_cpm_dict_key = (
+                cost_per_mile_group, v['context_size_class'], int(v['model_year']), int(v['age'])
+            )
             if context_fuel_cpm_dict_key in context_fuel_cpm_dict:
                 context_fuel_cpm = context_fuel_cpm_dict[context_fuel_cpm_dict_key]['fuel_cost_per_mile']
                 drive_value_cost_dollars = 0.5 * v['vmt_rebound'] * (fuel_cpm + context_fuel_cpm)

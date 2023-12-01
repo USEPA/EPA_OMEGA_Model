@@ -8,6 +8,7 @@ subsequent sessions.
 **CODE**
 
 """
+from omega_effects.general.general_functions import calc_fuel_cost_per_mile
 
 
 def calc_context_fuel_cost_per_mile(batch_settings, session_settings):
@@ -121,54 +122,3 @@ def calc_context_fuel_cost_per_mile(batch_settings, session_settings):
         context_fuel_cpm_dict.update(calendar_year_fuel_cpm_dict)
 
     return context_fuel_cpm_dict
-
-
-def calc_fuel_cost_per_mile(
-        batch_settings, calendar_year, onroad_direct_kwh_per_mile, onroad_direct_co2e_grams_per_mile, in_use_fuel_id
-):
-    """
-
-    Args:
-        batch_settings: an instance of the BatchSettings class.
-        calendar_year(int): the calendar year needed for fuel prices.
-        onroad_direct_kwh_per_mile (float): the onroad electricity consumption.
-        onroad_direct_co2e_grams_per_mile (float): the onroad co2 grams per mile.
-        in_use_fuel_id (str): a dict-like string providing fuel id information.
-
-    Returns:
-        The fuel cost per mile in the given year for the given vehicle.
-
-    """
-    fuel_cost_per_mile = 0
-    if onroad_direct_kwh_per_mile:
-        fuel = 'US electricity'
-        if batch_settings.context_electricity_prices:
-            retail_price_per_kwh = batch_settings.context_electricity_prices.get_fuel_price(
-                calendar_year, 'retail_dollars_per_unit'
-            )
-        else:
-            retail_price_per_kwh = batch_settings.context_fuel_prices.get_fuel_price(
-                calendar_year, fuel, 'retail_dollars_per_unit'
-            )
-        refuel_efficiency_e = \
-            batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
-        fuel_cost_per_mile = onroad_direct_kwh_per_mile * retail_price_per_kwh / refuel_efficiency_e
-
-    if onroad_direct_co2e_grams_per_mile:
-        fuel_dict = eval(in_use_fuel_id)
-        fuel = [fuel for fuel in fuel_dict.keys()][0]
-        retail_price_per_gallon = \
-            batch_settings.context_fuel_prices.get_fuel_price(
-                calendar_year, fuel, 'retail_dollars_per_unit'
-            )
-        refuel_efficiency_l = \
-            batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
-        co2_emissions_grams_per_unit = \
-            batch_settings.onroad_fuels.get_fuel_attribute(
-                calendar_year, fuel, 'direct_co2e_grams_per_unit'
-            ) / refuel_efficiency_l
-        onroad_gallons_per_mile = onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
-        # onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
-        fuel_cost_per_mile += onroad_gallons_per_mile * retail_price_per_gallon
-
-    return fuel_cost_per_mile

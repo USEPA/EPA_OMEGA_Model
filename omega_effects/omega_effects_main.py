@@ -204,16 +204,6 @@ def main():
                 vehicle_inventory_details_df = pd.concat(
                     [vehicle_inventory_details_df, session_vehicle_inventory_details_df], axis=0, ignore_index=True)
 
-            session_egu_inventory_details_df = pd.DataFrame.from_dict(
-                session_settings.egu_data.deets, orient='index').reset_index(drop=True)
-            egu_inventory_details_df = pd.concat(
-                [egu_inventory_details_df, session_egu_inventory_details_df], axis=0, ignore_index=True)
-
-            session_refinery_inventory_details_df = pd.DataFrame.from_dict(
-                session_settings.refinery_data.data, orient='index').reset_index(drop=True)
-            refinery_inventory_details_df = pd.concat(
-                [refinery_inventory_details_df, session_refinery_inventory_details_df], axis=0, ignore_index=True)
-
             # cost effects _____________________________________________________________________________________________
             effects_log.logwrite(f'\nCalculating cost effects for {session_name}')
             session_fleet_costs = {}
@@ -264,11 +254,14 @@ def main():
 
         # calculate refinery, egu and total emissions using the annual_physical_df DataFrame ___________________________
         effects_log.logwrite(f'\nCalculating refinery inventories and oil import effects for the batch')
-        annual_physical_df = calc_refinery_inventory_and_oil_imports(
-            batch_settings, session_settings, annual_physical_df
-            )
+        annual_physical_df = calc_refinery_inventory_and_oil_imports(batch_settings, annual_physical_df)
+        refinery_inventory_details_df = pd.DataFrame.from_dict(
+            batch_settings.refinery_data.data, orient='index').reset_index(drop=True)
+
         effects_log.logwrite(f'Calculating EGU inventories for the batch')
-        annual_physical_df = calc_egu_inventory(batch_settings, session_settings, annual_physical_df)
+        annual_physical_df = calc_egu_inventory(batch_settings, annual_physical_df)
+        egu_inventory_details_df = pd.DataFrame.from_dict(
+            batch_settings.egu_data.deets, orient='index').reset_index(drop=True)
 
         effects_log.logwrite(f'Calculating total inventories for the batch')
         annual_physical_df = calc_total_inventory(annual_physical_df)

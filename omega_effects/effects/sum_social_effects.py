@@ -82,7 +82,7 @@ def calc_social_effects(batch_settings, costs_df, benefits_df, ghg_scope, calc_h
         'noise_cost_dollars',
         'maintenance_cost_dollars',
         'repair_cost_dollars',
-        'refueling_cost_dollars',
+        # 'refueling_cost_dollars',
     ]
     non_net_benefit_cost_attributes = [
         'fuel_retail_cost_dollars',
@@ -94,6 +94,7 @@ def calc_social_effects(batch_settings, costs_df, benefits_df, ghg_scope, calc_h
     non_emission_bens = [
         'energy_security_benefit_dollars',
         'drive_value_benefit_dollars',
+        'refueling_benefit_dollars',
     ]
     sum_dict = {}
     # the if-else below is focused on benefits; costs are subtracted from benefits near the end to get net benefits

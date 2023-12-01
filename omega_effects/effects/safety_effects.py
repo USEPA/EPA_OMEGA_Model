@@ -26,11 +26,11 @@ def get_safety_values(session_settings, body_style):
     return session_settings.safety_values.get_safety_values(body_style)
 
 
-def get_fatality_rate(session_settings, model_year, age):
+def get_fatality_rate(batch_settings, model_year, age):
     """
 
     Args:
-        session_settings: an instance of the SessionSettings class.
+        batch_settings: an instance of the BatchSettings class.
         model_year (int): the model year for which a fatality rate is needed.
         age (int): vehicle age in years
 
@@ -38,7 +38,7 @@ def get_fatality_rate(session_settings, model_year, age):
         The average fatality rate for vehicles of a specific model year and age.
 
     """
-    return session_settings.fatality_rates.get_fatality_rate(model_year, age)
+    return batch_settings.fatality_rates.get_fatality_rate(model_year, age)
 
 
 def calc_lbs_changed(base_weight, final_weight):
@@ -176,8 +176,8 @@ def calc_safety_effects(batch_settings, session_settings):
                 vehicle_info_dict[v['vehicle_id']]
 
             threshold_lbs, change_per_100lbs_below, change_per_100lbs_above \
-                = get_safety_values(session_settings, body_style)
-            fatality_rate_base = get_fatality_rate(session_settings, model_year, v['age'])
+                = get_safety_values(batch_settings, body_style)
+            fatality_rate_base = get_fatality_rate(batch_settings, model_year, v['age'])
 
             lbs_changed = calc_lbs_changed(base_year_curbweight_lbs, curbweight_lbs)
 
@@ -281,11 +281,11 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
         name = batch_settings.legacy_fleet.set_legacy_fleet_name(v['vehicle_id'], v['market_class_id'], fueling_class)
 
         threshold_lbs, change_per_100lbs_below, change_per_100lbs_above = \
-            get_safety_values(session_settings, v['body_style'])
+            get_safety_values(batch_settings, v['body_style'])
 
         vehicle_safety_dict = {}
 
-        fatality_rate_base = get_fatality_rate(session_settings, model_year, v['age'])
+        fatality_rate_base = get_fatality_rate(batch_settings, model_year, v['age'])
 
         fatalities_base = fatality_rate_base * v['vmt'] / 1000000000
 
