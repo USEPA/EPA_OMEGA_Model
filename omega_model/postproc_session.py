@@ -55,7 +55,7 @@ def run_postproc(iteration_log, credit_banks):
     vehicle_years = list(range(omega_globals.options.analysis_initial_year - 1,
                                omega_globals.options.analysis_final_year + 1))
 
-    vehicle_data = [v for v in omega_globals.finalized_vehicles if v.in_production]
+    vehicle_data = sorted([v for v in omega_globals.finalized_vehicles if v.in_production], key=lambda v: v.vehicle_id)
 
     # index vehicle annual data by vehicle id and age for quick access
     vehicle_annual_data_df = pd.DataFrame(VehicleAnnualData._data).set_index(['compliance_id', 'vehicle_id', 'age'])
