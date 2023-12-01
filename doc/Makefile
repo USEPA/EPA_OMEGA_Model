@@ -6,7 +6,7 @@
 
 SOURCEDIR   = source
 BUILDDIR    = build
-DOCOPTS    	= --force --append-syspath --doc-project "Code Details" --doc-version 2.2.0 --module-first --tocfile 7_code_details
+DOCOPTS    	= --force --append-syspath --doc-project "Code Details" --doc-version 2.3.0 --module-first --tocfile 7_code_details
 BUILDOPTS   = -v -a -E
 EXCLUDES    = ../setup.py ../exe_entry.py ../omega_preproc
 
