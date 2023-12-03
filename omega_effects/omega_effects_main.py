@@ -241,6 +241,11 @@ def main():
             )
             my_lifetime_costs_df_2.reset_index(inplace=True, drop=True)
 
+            session_settings.electricity_prices.df.to_csv(
+                path_of_modified_inputs_folder / f'{start_time_readable}_electricity_prices_{session_name}.csv',
+                index=False
+            )
+
         # discount annual costs ________________________________________________________________________________________
         effects_log.logwrite('\nCalculating discounted annual costs, PVs and EAVs for the batch')
         discounted_costs = Discounting()
