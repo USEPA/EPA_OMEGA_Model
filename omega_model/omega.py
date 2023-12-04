@@ -1855,29 +1855,31 @@ def run_omega(session_runtime_options, standalone_run=False):
                 manufacturer_annual_data_table, manufacturer_gigawatthour_data = \
                     postproc_session.run_postproc(iteration_log, credit_banks)
 
-                manufacturer_gigawatthour_df = pd.DataFrame.from_dict(manufacturer_gigawatthour_data)
+                if omega_globals.pass_num == 0:
+                    # set up data for second pass
+                    manufacturer_gigawatthour_df = pd.DataFrame.from_dict(manufacturer_gigawatthour_data)
 
-                manufacturer_gigawatthour_df.to_csv(
-                    '%s/manufacturer_gigawatthour_data_%d.csv' % (omega_globals.options.output_folder_base,
-                                                                  omega_globals.options.consolidate_manufacturers),
-                    columns=sorted(manufacturer_gigawatthour_df.columns))
+                    manufacturer_gigawatthour_df.to_csv(
+                        '%s/manufacturer_gigawatthour_data_%d.csv' % (omega_globals.options.output_folder_base,
+                                                                      omega_globals.options.consolidate_manufacturers),
+                        columns=sorted(manufacturer_gigawatthour_df.columns))
 
-                cert_offset = \
-                    manufacturer_annual_data_table['calendar_year_cert_co2e_megagrams'] - \
-                    manufacturer_annual_data_table['target_co2e_megagrams']
+                    cert_offset = \
+                        manufacturer_annual_data_table['calendar_year_cert_co2e_megagrams'] - \
+                        manufacturer_annual_data_table['target_co2e_megagrams']
 
-                manufacturer_annual_data_table['cert_offset'] = cert_offset
-                manufacturer_annual_data_table['strategic_offset'] = cert_offset
+                    manufacturer_annual_data_table['cert_offset'] = cert_offset
+                    manufacturer_annual_data_table['strategic_offset'] = cert_offset
 
-                # under-achievers under-achieve less, if CME < 1.0:
-                manufacturer_annual_data_table.loc[cert_offset > 0, 'strategic_offset'] = \
-                    manufacturer_annual_data_table['strategic_offset'] * omega_globals.options.credit_market_efficiency
+                    # under-achievers under-achieve less, if CME < 1.0:
+                    manufacturer_annual_data_table.loc[cert_offset > 0, 'strategic_offset'] = \
+                        manufacturer_annual_data_table['strategic_offset'] * omega_globals.options.credit_market_efficiency
 
-                manufacturer_annual_data_table.to_csv('%s/manufacturer_annual_data_table_%d.csv' %
-                                                      (omega_globals.options.output_folder_base,
-                                                       omega_globals.options.consolidate_manufacturers),
-                                                      columns=sorted(manufacturer_annual_data_table.columns),
-                                                      index=False)
+                    manufacturer_annual_data_table.to_csv('%s/manufacturer_annual_data_table_%d.csv' %
+                                                          (omega_globals.options.output_folder_base,
+                                                           omega_globals.options.consolidate_manufacturers),
+                                                          columns=sorted(manufacturer_annual_data_table.columns),
+                                                          index=False)
 
                 # everybody out of the pool
                 if omega_globals.options.multiprocessing:
