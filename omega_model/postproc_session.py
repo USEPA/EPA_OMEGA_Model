@@ -108,8 +108,13 @@ def run_postproc(iteration_log, credit_banks):
 
         manufacturer_id = 'consolidated_OEM'
 
+        non_consolidated_madt = pd.DataFrame(ManufacturerAnnualData._data)
+
         for calendar_year in vehicle_years[1:]:
             mfr_data = vehicles_table[vehicles_table['model_year'] == calendar_year]
+
+            model_year_cert_co2e_megagrams = sum(non_consolidated_madt['model_year_cert_co2e_megagrams'].loc[
+                                                     non_consolidated_madt['model_year'] == calendar_year])
 
             ManufacturerAnnualData. \
                 create_manufacturer_annual_data(model_year=calendar_year,
@@ -119,6 +124,7 @@ def run_postproc(iteration_log, credit_banks):
                                                 manufacturer_vehicle_cost_dollars=sum(
                                                     mfr_data['new_vehicle_mfr_cost_dollars'] *
                                                     mfr_data['_initial_registered_count']),
+                                                model_year_cert_co2e_megagrams=model_year_cert_co2e_megagrams,
                                                 )
 
     manufacturer_annual_data_table = pd.DataFrame(ManufacturerAnnualData._data)
