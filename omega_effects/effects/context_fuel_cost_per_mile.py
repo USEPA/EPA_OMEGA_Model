@@ -76,8 +76,8 @@ def calc_context_fuel_cost_per_mile(batch_settings, session_settings):
             if key not in calendar_year_fuel_cpm_dict:
 
                 fuel_cost_per_mile = calc_fuel_cost_per_mile(
-                    batch_settings, calendar_year, onroad_direct_kwh_per_mile, onroad_direct_co2e_grams_per_mile,
-                    in_use_fuel_id
+                    batch_settings, session_settings, calendar_year,
+                    onroad_direct_kwh_per_mile, onroad_direct_co2e_grams_per_mile, in_use_fuel_id
                 )
                 weighted_fuel_cost_per_mile = registered_count * fuel_cost_per_mile
 
@@ -94,7 +94,7 @@ def calc_context_fuel_cost_per_mile(batch_settings, session_settings):
                 }
             else:
                 fuel_cost_per_mile = calc_fuel_cost_per_mile(
-                    batch_settings, calendar_year, onroad_direct_kwh_per_mile, onroad_direct_co2e_grams_per_mile,
+                    batch_settings, session_settings, calendar_year, onroad_direct_kwh_per_mile, onroad_direct_co2e_grams_per_mile,
                     in_use_fuel_id
                 )
                 weighted_fuel_cost_per_mile = calendar_year_fuel_cpm_dict[key]['fuel_cost_per_mile']

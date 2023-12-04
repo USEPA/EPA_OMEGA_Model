@@ -10,7 +10,7 @@
 import numpy as np
 import pandas as pd
 import sys
-import importlib
+# import importlib
 from pathlib import Path
 
 from omega_effects.general.general_functions import read_input_file
@@ -38,7 +38,7 @@ from omega_effects.context.repair_cost import RepairCost
 from omega_effects.context.refueling_cost import RefuelingCost
 
 from omega_effects.general.general_inputs_for_effects import GeneralInputsForEffects
-from omega_effects.general.input_validation import validate_template_column_names, get_module_name
+from omega_effects.general.input_validation import validate_template_column_names  #, get_module_name
 
 
 class BatchSettings:
@@ -73,8 +73,8 @@ class BatchSettings:
         self.cost_accrual = None
         self.discount_values_to_year = 0
         self.analysis_dollar_basis = 0
-        self.context_name = None
-        self.context_case = None
+        self.context_name_liquid_fuel = None
+        self.context_case_liquid_fuel = None
         self.vmt_rebound_rate_ice = None
         self.vmt_rebound_rate_bev = None
         self.net_benefit_ghg_scope = 'global'  # default value; change via batch file ('domestic' and 'both' are options)
@@ -92,7 +92,6 @@ class BatchSettings:
         self.legacy_fleet_file = None
 
         self.context_fuel_prices_file = None
-        self.context_electricity_prices_file = None
         self.context_stock_and_vmt_file = None
         self.onroad_fuels_file = None
         self.onroad_vehicle_calculations_file = None
@@ -119,7 +118,7 @@ class BatchSettings:
         self.insurance_and_taxes_cost_factors = None
 
         self.context_fuel_prices = None
-        self.context_electricity_prices = None
+        self.electricity_prices_source = None
         self.onroad_vmt = None
         self.reregistration = None
         self.context_stock_and_vmt = None
@@ -253,8 +252,9 @@ class BatchSettings:
         self.vmt_rebound_rate_bev \
             = pd.to_numeric(self.get_attribute_value(('VMT Rebound Rate BEV', 'all'), 'value'))
 
-        self.context_name = self.get_attribute_value(('Context Name', 'all'), 'value')
-        self.context_case = self.get_attribute_value(('Context Case', 'all'), 'value')
+        self.context_name_liquid_fuel = self.get_attribute_value(('Context Name Liquid Fuel', 'all'), 'value')
+        self.context_case_liquid_fuel = self.get_attribute_value(('Context Case Liquid Fuel', 'all'), 'value')
+        self.electricity_prices_source = self.get_attribute_value(('Electricity Prices', 'all'), 'value')
 
         self.net_benefit_ghg_scope = self.get_attribute_value(('SC-GHG in Net Benefits', 'all'), 'value')
 
@@ -306,15 +306,6 @@ class BatchSettings:
         except FileNotFoundError:
             effects_log.logwrite(f'{path_context_in} does not contain a {find_string} file.')
             sys.exit()
-
-        try:
-            find_string_e = 'context_electricity_prices'
-            self.context_electricity_prices_file = self.find_file(path_context_in, find_string_e)
-        except FileNotFoundError:
-            effects_log.logwrite(
-                f'{path_context_in} does not contain a {find_string_e} file, using {find_string} file instead.'
-            )
-            self.context_electricity_prices_file = None
 
         try:
             find_string = 'onroad_fuels'
@@ -420,12 +411,6 @@ class BatchSettings:
             self.context_fuel_prices = FuelPrice()
             self.context_fuel_prices.init_from_file(self.context_fuel_prices_file, self, effects_log)
             self.inputs_filelist.append(self.context_fuel_prices_file)
-
-            if self.context_electricity_prices_file:
-                module_name = get_module_name(self.context_electricity_prices_file, effects_log)
-                self.context_electricity_prices = importlib.import_module(module_name, package=None).ElectricityPrices()
-                self.context_electricity_prices.init_from_file(self.context_electricity_prices_file, self, effects_log)
-                self.inputs_filelist.append(self.context_electricity_prices_file)
 
             self.reregistration = Reregistration()
             self.reregistration.init_from_file(self.vehicle_reregistration_file, effects_log)

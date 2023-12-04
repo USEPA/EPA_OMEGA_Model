@@ -154,8 +154,8 @@ class VehicleAnnualData:
 
                     # calc fuel cost per mile
                     fuel_cost_per_mile = calc_fuel_cost_per_mile(
-                        batch_settings, calendar_year, onroad_direct_kwh_per_mile, onroad_direct_co2e_grams_per_mile,
-                        in_use_fuel_id
+                        batch_settings, session_settings, calendar_year,
+                        onroad_direct_kwh_per_mile, onroad_direct_co2e_grams_per_mile, in_use_fuel_id
                     )
 
                     # get context fuel cost per mile

@@ -166,7 +166,7 @@ from pathlib import Path
 from omega_effects.effects.vehicles import Vehicles
 from omega_effects.effects.vehicle_annual_data import VehicleAnnualData
 from omega_effects.general.input_validation import get_module_name
-from omega_effects.effects.emission_rate_curves_vehicles import EmissionRatesVehicles
+from omega_effects.context.electricity_prices import ElectricityPrices
 from omega_effects.context.powertrain_cost import PowertrainCost
 
 
@@ -186,12 +186,14 @@ class SessionSettings:
 
         self.vehicles_file = None
         self.vehicle_annual_data_file = None
+        self.electricity_prices_file = None
 
         self.emission_rates_vehicles = None
         self.powertrain_cost = None
 
         self.vehicles = None
         self.vehicle_annual_data = None
+        self.electricity_prices = None
 
     def get_context_session_settings(self, batch_settings, effects_log):
         """
@@ -217,8 +219,10 @@ class SessionSettings:
         self.vehicle_annual_data_file = batch_settings.find_file(
             path_session_out, f'{batch_settings.context_session_name}_vehicle_annual_data.csv'
         )
+        self.electricity_prices_file = batch_settings.get_attribute_value(
+            ('Context Electricity Prices', 'context'), 'full_path')
 
-        self.init_context_classes(effects_log)
+        self.init_context_classes(batch_settings, effects_log)
 
     def get_session_settings(self, batch_settings, session_num, effects_log):
         """
@@ -245,8 +249,12 @@ class SessionSettings:
         self.vehicle_annual_data_file \
             = path_session_out / f'{batch_settings.batch_name}_{self.session_name}_vehicle_annual_data.csv'
 
-        self.vehicle_emission_rates_file \
-            = batch_settings.get_attribute_value(('Session Vehicle Emission Rates File', f'{self.session_policy}'), 'full_path')
+        self.electricity_prices_file = batch_settings.get_attribute_value(
+            ('Session Electricity Prices', f'{self.session_policy}'), 'full_path')
+
+        self.vehicle_emission_rates_file = batch_settings.get_attribute_value(
+            ('Session Vehicle Emission Rates File', f'{self.session_policy}'), 'full_path'
+        )
 
         find_string = None
         try:
@@ -258,10 +266,11 @@ class SessionSettings:
 
         self.init_session_classes(batch_settings, self.session_name, effects_log)
 
-    def init_context_classes(self, effects_log):
+    def init_context_classes(self, batch_settings, effects_log):
         """
 
         Args:
+            batch_settings: an instance of the BatchSettings class.
             effects_log: an instance of the EffectsLog class.
 
         Returns:
@@ -278,6 +287,12 @@ class SessionSettings:
             self.vehicle_annual_data = VehicleAnnualData()
             self.vehicle_annual_data.init_from_file(self.vehicle_annual_data_file, effects_log)
             self.inputs_filelist.append(self.vehicle_annual_data_file)
+
+            self.electricity_prices = ElectricityPrices()
+            self.electricity_prices.init_from_file(
+                self.electricity_prices_file, batch_settings, effects_log, context=True
+            )
+            self.inputs_filelist.append(self.electricity_prices_file)
 
         except Exception as e:
             effects_log.logwrite(e)
@@ -305,6 +320,12 @@ class SessionSettings:
             self.vehicle_annual_data = VehicleAnnualData()
             self.vehicle_annual_data.init_from_file(self.vehicle_annual_data_file, effects_log)
             self.inputs_filelist.append(self.vehicle_annual_data_file)
+
+            self.electricity_prices = ElectricityPrices()
+            self.electricity_prices.init_from_file(
+                self.electricity_prices_file, batch_settings, effects_log, self, context=False
+            )
+            self.inputs_filelist.append(self.electricity_prices_file)
 
             # determine what module to use for vehicle rates
             module_name = get_module_name(self.vehicle_emission_rates_file, effects_log)

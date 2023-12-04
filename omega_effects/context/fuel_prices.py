@@ -109,8 +109,8 @@ class FuelPrice:
 
         validate_template_column_names(filepath, df, input_template_columns, effects_log)
 
-        df = df.loc[(df['context_id'] == batch_settings.context_name)
-                    & (df['case_id'] == batch_settings.context_case), :]
+        df = df.loc[(df['context_id'] == batch_settings.context_name_liquid_fuel)
+                    & (df['case_id'] == batch_settings.context_case_liquid_fuel), :]
 
         aeo_dollar_basis = df['dollar_basis'].mean()
         cols_to_convert = [col for col in df.columns if 'dollars_per_unit' in col]

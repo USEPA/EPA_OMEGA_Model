@@ -99,8 +99,8 @@ class ContextStockVMT:
 
         validate_template_column_names(filepath, df, input_template_columns, effects_log)
 
-        df = df.loc[(df['context_id'] == batch_settings.context_name)
-                    & (df['case_id'] == batch_settings.context_case), :]
+        df = df.loc[(df['context_id'] == batch_settings.context_name_liquid_fuel)
+                    & (df['case_id'] == batch_settings.context_case_liquid_fuel), :]
 
         self.calendar_year_max = max(df['calendar_year'])
 
