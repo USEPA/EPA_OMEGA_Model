@@ -159,6 +159,8 @@ def run_postproc(iteration_log, credit_banks):
 
         compliance_id = 'consolidated_OEM'
 
+        credit_banks[compliance_id] = CreditBank(omega_globals.options.ghg_credit_params_file, None, compliance_id)
+
         credit_banks[compliance_id] = CreditBank(
             omega_globals.options.ghg_credit_params_file,
             omega_globals.options.ghg_credits_file, compliance_id)
@@ -166,7 +168,7 @@ def run_postproc(iteration_log, credit_banks):
         for calendar_year in \
                 range(omega_globals.options.analysis_initial_year,
                       omega_globals.options.analysis_final_year + 1):
-            credit_banks[compliance_id].update_credit_age(calendar_year)
+            # credit_banks[compliance_id].update_credit_age(calendar_year)
 
             mad = manufacturer_annual_data_table[(manufacturer_annual_data_table['compliance_id'] == compliance_id) &
                                                  (manufacturer_annual_data_table['model_year'] == calendar_year)]
@@ -181,10 +183,10 @@ def run_postproc(iteration_log, credit_banks):
                                                        columns=sorted(credit_banks[compliance_id].credit_bank.columns),
                                                        index=False)
 
-        credit_banks[compliance_id].transaction_log.to_csv(
-            omega_globals.options.output_folder + omega_globals.options.session_unique_name +
-            ' %s GHG_credit_transactions.csv' % compliance_id,
-            columns=sorted(credit_banks[compliance_id].transaction_log.columns), index=False)
+        # credit_banks[compliance_id].transaction_log.to_csv(
+        #     omega_globals.options.output_folder + omega_globals.options.session_unique_name +
+        #     ' %s GHG_credit_transactions.csv' % compliance_id,
+        #     columns=sorted(credit_banks[compliance_id].transaction_log.columns), index=False)
 
         compliance_ids = np.append(compliance_ids, 'consolidated_OEM')
 

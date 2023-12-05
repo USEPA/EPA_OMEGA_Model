@@ -183,15 +183,19 @@ class CreditBank(OMEGABase):
             ``CreditBank.validate_ghg_credits_template()``
 
         """
-        if verbose:
-            omega_log.logwrite('\nInitializing credit bank from %s...' % ghg_credits_filename)
+        if ghg_credits_filename is not None:
+            if verbose:
+                omega_log.logwrite('\nInitializing credit bank from %s...' % ghg_credits_filename)
 
-        credit_bank = pd.read_csv(ghg_credits_filename, skiprows=1)
+            credit_bank = pd.read_csv(ghg_credits_filename, skiprows=1)
 
-        credit_bank = credit_bank.loc[credit_bank['compliance_id'] == compliance_id]
-        credit_bank = credit_bank.rename({'balance_Mg': 'beginning_balance_Mg'}, axis='columns')
-        credit_bank['ending_balance_Mg'] = credit_bank['beginning_balance_Mg']
-        credit_bank['age'] = credit_bank['calendar_year'] - credit_bank['model_year']
+            credit_bank = credit_bank.loc[credit_bank['compliance_id'] == compliance_id]
+            credit_bank = credit_bank.rename({'balance_Mg': 'beginning_balance_Mg'}, axis='columns')
+            credit_bank['ending_balance_Mg'] = credit_bank['beginning_balance_Mg']
+            credit_bank['age'] = credit_bank['calendar_year'] - credit_bank['model_year']
+        else:
+            credit_bank = pd.DataFrame(columns=['age', 'calendar_year', 'model_year',
+                                                'beginning_balance_Mg', 'ending_balance_Mg', 'compliance_id'])
 
         return credit_bank
 
