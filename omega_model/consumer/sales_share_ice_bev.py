@@ -197,7 +197,7 @@ class SalesShare(OMEGABase, SalesShareBase):
                     annualized_capital_costs = annualization_factor * total_capital_costs
                     annual_VMT = float(gcam_data_cy['annual_vmt'])
 
-                    total_non_fuel_costs_per_VMT = (annualized_capital_costs + annual_o_m_costs) / 1.383 / annual_VMT
+                    total_non_fuel_costs_per_VMT = (annualized_capital_costs + annual_o_m_costs) / annual_VMT
                     total_cost_w_fuel_per_VMT = total_non_fuel_costs_per_VMT + fuel_cost_per_VMT
                     total_cost_w_fuel_per_PMT = total_cost_w_fuel_per_VMT / gcam_data_cy['average_occupancy']
                     sales_share_numerator[market_class_id] = gcam_data_cy['share_weight'] * (

@@ -29,7 +29,8 @@ class ManufacturerAnnualData(OMEGABase):
 
     @staticmethod
     def create_manufacturer_annual_data(model_year, compliance_id, target_co2e_Mg,
-                                        calendar_year_cert_co2e_Mg, manufacturer_vehicle_cost_dollars):
+                                        calendar_year_cert_co2e_Mg, manufacturer_vehicle_cost_dollars,
+                                        model_year_cert_co2e_megagrams=None):
         """
         Create initial manufacturer compliance entry for the given year.
         Final compliance state may depend on future years via credit banking.
@@ -47,10 +48,13 @@ class ManufacturerAnnualData(OMEGABase):
             Nothing, updates class data
 
         """
+        if not model_year_cert_co2e_megagrams:
+            model_year_cert_co2e_megagrams = calendar_year_cert_co2e_Mg
+
         ManufacturerAnnualData._data.append({'compliance_id': compliance_id, 'model_year': model_year,
                                              'target_co2e_megagrams': target_co2e_Mg,
                                              'calendar_year_cert_co2e_megagrams': calendar_year_cert_co2e_Mg,
-                                             'model_year_cert_co2e_megagrams': calendar_year_cert_co2e_Mg,
+                                             'model_year_cert_co2e_megagrams': model_year_cert_co2e_megagrams,
                                              'manufacturer_vehicle_cost_dollars': manufacturer_vehicle_cost_dollars})
 
     @staticmethod
