@@ -218,9 +218,16 @@ def run_postproc(iteration_log, credit_banks):
 
             mfr_average_cost_data = plot_manufacturer_vehicle_cost(analysis_years, compliance_id)
 
-    mfr_gigawatthour_data = {'analysis_years': analysis_years}
+    gigawatthour_data = plot_vehicle_GWh(analysis_years)
+
+    mfr_gigawatthour_limit_data = {'analysis_years': analysis_years}
     for manufacturer_id in vehicles_table['manufacturer_id'].unique():
-        mfr_gigawatthour_data[manufacturer_id] = plot_vehicle_GWh(analysis_years, manufacturer_id)['vehicle']
+        mfr_gigawatthour_data = plot_vehicle_GWh(analysis_years, manufacturer_id)['vehicle']
+        for idx, ay in enumerate(analysis_years):
+            GWh_limit = \
+                (np.interp(ay, omega_globals.options.battery_GWh_limit_years, omega_globals.options.battery_GWh_limit))
+            mfr_gigawatthour_data[idx] = mfr_gigawatthour_data[idx] * GWh_limit / gigawatthour_data['vehicle'][idx]
+        mfr_gigawatthour_limit_data[manufacturer_id] = mfr_gigawatthour_data
 
     if not omega_globals.options.consolidate_manufacturers:
         for msr in mfr_market_share_results:
@@ -236,8 +243,6 @@ def run_postproc(iteration_log, credit_banks):
     average_generalized_cost_data = plot_vehicle_generalized_cost(analysis_years)
 
     megagrams_data = plot_vehicle_megagrams(analysis_years)
-
-    gigawatthour_data = plot_vehicle_GWh(analysis_years)
 
     average_cert_co2e_gpmi_data = plot_cert_co2e_gpmi(analysis_years)
 
@@ -298,7 +303,7 @@ def run_postproc(iteration_log, credit_banks):
         pt_cost_df = pd.DataFrame.from_dict(omega_globals.options.PowertrainCost.cost_tracker, orient='index')
         pt_cost_df.to_csv(powertrain_costs_filename, index=False)
 
-    return manufacturer_annual_data_table, mfr_gigawatthour_data
+    return manufacturer_annual_data_table, mfr_gigawatthour_limit_data
 
 
 def plot_effects(calendar_years, physical_effects_df):

@@ -1760,7 +1760,7 @@ def run_omega(session_runtime_options, standalone_run=False):
     try:
 
         manufacturer_annual_data_table = None
-        manufacturer_gigawatthour_data = None
+        manufacturer_gigawatthour_limit_data = None
         omega_globals.cumulative_battery_GWh = {'total': 0}
 
         for omega_globals.pass_num in range(len(consolidate)):
@@ -1796,7 +1796,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             output_folders.append(omega_globals.options.output_folder)
 
-            omega_globals.options.manufacturer_gigawatthour_data = manufacturer_gigawatthour_data
+            omega_globals.options.manufacturer_gigawatthour_data = manufacturer_gigawatthour_limit_data
 
             if not init_fail:
                 if omega_globals.options.multiprocessing:
@@ -1852,17 +1852,17 @@ def run_omega(session_runtime_options, standalone_run=False):
                               omega_globals.options.notification_email, omega_globals.options.notification_password)
 
                 # postproc session
-                manufacturer_annual_data_table, manufacturer_gigawatthour_data = \
+                manufacturer_annual_data_table, manufacturer_gigawatthour_limit_data = \
                     postproc_session.run_postproc(iteration_log, credit_banks)
 
                 if omega_globals.pass_num == 0:
                     # set up data for second pass
-                    manufacturer_gigawatthour_df = pd.DataFrame.from_dict(manufacturer_gigawatthour_data)
+                    manufacturer_gigawatthour_limit_df = pd.DataFrame.from_dict(manufacturer_gigawatthour_limit_data)
 
-                    manufacturer_gigawatthour_df.to_csv(
-                        '%s/manufacturer_gigawatthour_data_%d.csv' % (omega_globals.options.output_folder_base,
+                    manufacturer_gigawatthour_limit_df.to_csv(
+                        '%s/manufacturer_gigawatthour_limit_data_%d.csv' % (omega_globals.options.output_folder_base,
                                                                       omega_globals.options.consolidate_manufacturers),
-                        columns=sorted(manufacturer_gigawatthour_df.columns))
+                        columns=sorted(manufacturer_gigawatthour_limit_df.columns))
 
                     cert_offset = \
                         manufacturer_annual_data_table['calendar_year_cert_co2e_megagrams'] - \
