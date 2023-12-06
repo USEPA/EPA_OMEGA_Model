@@ -275,10 +275,10 @@ def run_compliance_id(compliance_id, pass_num, cumulative_battery_GWh, credit_ba
             current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
             for c in current_credits + current_debits:
                 if c.model_year < omega_globals.options.analysis_initial_year:
-                    # allow strategic under-compliance for historical credits
+                    # allow some strategic under-compliance for historical credits
                     if c.remaining_balance_Mg < 0 or omega_globals.options.credit_market_efficiency != 0.0:
                         strategic_target_offset_Mg += \
-                            c.remaining_balance_Mg * (1 / max(1, c.remaining_years - 1))
+                            0.125 * c.remaining_balance_Mg * (1 / max(1, c.remaining_years - 1))
                 else:
                     # don't allow strategic under-compliance for analysis year credits
                     strategic_target_offset_Mg += \
