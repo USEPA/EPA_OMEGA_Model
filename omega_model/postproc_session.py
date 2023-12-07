@@ -116,22 +116,22 @@ def run_postproc(iteration_log, credit_banks):
             model_year_cert_co2e_megagrams = sum(non_consolidated_madt['model_year_cert_co2e_megagrams'].loc[
                                                      non_consolidated_madt['model_year'] == calendar_year])
 
+            # initialize the starting point for the synthesized consolidated manufacturer annual data to the
+            # point where the OEMs left off (model year cert) and then trading/transfers go from there further below.
+            # This way the consolidated compliance chart makes sense.
             ManufacturerAnnualData. \
                 create_manufacturer_annual_data(model_year=calendar_year,
                                                 compliance_id=manufacturer_id,
                                                 target_co2e_Mg=sum(mfr_data['target_co2e_Mg']),
-                                                calendar_year_cert_co2e_Mg=sum(mfr_data['cert_co2e_Mg']),
+                                                calendar_year_cert_co2e_Mg=model_year_cert_co2e_megagrams,
                                                 manufacturer_vehicle_cost_dollars=sum(
                                                     mfr_data['new_vehicle_mfr_cost_dollars'] *
                                                     mfr_data['_initial_registered_count']),
                                                 model_year_cert_co2e_megagrams=model_year_cert_co2e_megagrams,
                                                 )
 
+    # pull in initial compliance data (data is final on first pass)
     manufacturer_annual_data_table = pd.DataFrame(ManufacturerAnnualData._data)
-    manufacturer_annual_data_table.to_csv(omega_globals.options.output_folder +
-                                          omega_globals.options.session_unique_name + '_manufacturer_annual_data.csv',
-                                          columns=sorted(manufacturer_annual_data_table.columns))
-
     manufacturer_annual_data_table = dataframe_to_numeric(manufacturer_annual_data_table)
 
     session_results = dict()
@@ -159,16 +159,14 @@ def run_postproc(iteration_log, credit_banks):
 
         compliance_id = 'consolidated_OEM'
 
-        credit_banks[compliance_id] = CreditBank(omega_globals.options.ghg_credit_params_file, None, compliance_id)
-
-        credit_banks[compliance_id] = CreditBank(
-            omega_globals.options.ghg_credit_params_file,
-            omega_globals.options.ghg_credits_file, compliance_id)
+        # setup consolidated_OEM without banked historical credits for now (would have to account for those used by OEMs)
+        credit_banks[compliance_id] = (
+            CreditBank(omega_globals.options.ghg_credit_params_file, None, compliance_id))
 
         for calendar_year in \
                 range(omega_globals.options.analysis_initial_year,
                       omega_globals.options.analysis_final_year + 1):
-            # credit_banks[compliance_id].update_credit_age(calendar_year)
+            credit_banks[compliance_id].update_credit_age(calendar_year)
 
             mad = manufacturer_annual_data_table[(manufacturer_annual_data_table['compliance_id'] == compliance_id) &
                                                  (manufacturer_annual_data_table['model_year'] == calendar_year)]
@@ -183,12 +181,18 @@ def run_postproc(iteration_log, credit_banks):
                                                        columns=sorted(credit_banks[compliance_id].credit_bank.columns),
                                                        index=False)
 
-        # credit_banks[compliance_id].transaction_log.to_csv(
-        #     omega_globals.options.output_folder + omega_globals.options.session_unique_name +
-        #     ' %s GHG_credit_transactions.csv' % compliance_id,
-        #     columns=sorted(credit_banks[compliance_id].transaction_log.columns), index=False)
+        credit_banks[compliance_id].transaction_log.to_csv(
+            omega_globals.options.output_folder + omega_globals.options.session_unique_name +
+            ' %s GHG_credit_transactions.csv' % compliance_id,
+            columns=sorted(credit_banks[compliance_id].transaction_log.columns), index=False)
 
         compliance_ids = np.append(compliance_ids, 'consolidated_OEM')
+
+    # save manufacturer annual data >after< any second-pass credit transfers/trading
+    manufacturer_annual_data_table = pd.DataFrame(ManufacturerAnnualData._data)  # pull in updated compliance datta
+    manufacturer_annual_data_table.to_csv(omega_globals.options.output_folder +
+                                          omega_globals.options.session_unique_name + '_manufacturer_annual_data.csv',
+                                          columns=sorted(manufacturer_annual_data_table.columns))
 
     total_calendar_year_cert_co2e_Mg = np.zeros_like(analysis_years, dtype='float')
     total_model_year_cert_co2e_Mg = np.zeros_like(analysis_years, dtype='float')
