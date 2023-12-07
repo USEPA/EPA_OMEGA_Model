@@ -751,7 +751,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
             buffered_strategic_target_offset_Mg = strategic_target_offset_Mg - \
                 production_options['total_target_co2e_megagrams'] * \
-                omega_globals.options.producer_strategic_compliance_buffer
+                np.interp(calendar_year, omega_globals.options.producer_strategic_compliance_buffer_years,
+                       omega_globals.options.producer_strategic_compliance_buffer)
 
             production_options['strategic_compliance_ratio'] = \
                 (production_options['total_cert_co2e_megagrams'] - buffered_strategic_target_offset_Mg) / \
