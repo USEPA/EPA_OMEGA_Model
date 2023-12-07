@@ -60,6 +60,7 @@ class VehiclePhysicalData:
         self.fuel_generation_kwh = 0
         self.curbweight_lbs = 0
         self.gvwr_lbs = 0
+        self.onroad_charge_depleting_range_mi = 0
 
         self.session_fatalities = 0
         self.energy_density_ratio = 0
@@ -132,43 +133,58 @@ def calc_vehicle_inventory(vpd):
 
     """
     # calc exhaust and evaporative emissions for liquid fuel operation
-    factor = vpd.vmt_liquid_fuel / vpd.grams_per_us_ton
-    pm25_exh_ustons = vpd.pm25_exh_rate * factor
-    nmog_exh_ustons = vpd.nmog_exh_rate * factor
-    co_exh_ustons = vpd.co_exh_rate * factor
-    nox_exh_ustons = vpd.nox_exh_rate * factor
-    acetaldehyde_exh_ustons = vpd.acetaldehyde_exh_rate * factor
-    acrolein_exh_ustons = vpd.acrolein_exh_rate * factor
-    benzene_exh_ustons = vpd.benzene_exh_rate * factor
-    ethylbenzene_exh_ustons = vpd.ethylbenzene_exh_rate * factor
-    formaldehyde_exh_ustons = vpd.formaldehyde_exh_rate * factor
-    naphthalene_exh_ustons = vpd.naphthalene_exh_rate * factor
-    butadiene13_exh_ustons = vpd.butadiene13_exh_rate * factor
-    pah15_exh_ustons = vpd.pah15_exh_rate * factor
+    factor_vmt = vpd.vmt_liquid_fuel / vpd.grams_per_us_ton
+    pm25_exh_ustons = vpd.pm25_exh_rate * factor_vmt
+    nmog_exh_ustons = vpd.nmog_exh_rate * factor_vmt
+    co_exh_ustons = vpd.co_exh_rate * factor_vmt
+    nox_exh_ustons = vpd.nox_exh_rate * factor_vmt
+    acetaldehyde_exh_ustons = vpd.acetaldehyde_exh_rate * factor_vmt
+    acrolein_exh_ustons = vpd.acrolein_exh_rate * factor_vmt
+    benzene_exh_ustons = vpd.benzene_exh_rate * factor_vmt
+    ethylbenzene_exh_ustons = vpd.ethylbenzene_exh_rate * factor_vmt
+    formaldehyde_exh_ustons = vpd.formaldehyde_exh_rate * factor_vmt
+    naphthalene_exh_ustons = vpd.naphthalene_exh_rate * factor_vmt
+    butadiene13_exh_ustons = vpd.butadiene13_exh_rate * factor_vmt
+    pah15_exh_ustons = vpd.pah15_exh_rate * factor_vmt
 
-    factor = vpd.fuel_consumption_gallons / vpd.grams_per_us_ton
-    sox_exh_ustons = vpd.sox_exh_rate * factor
-    nmog_evap_ustons = sum([vpd.nmog_permeation_rate,
-                            vpd.nmog_venting_rate,
-                            vpd.nmog_leaks_rate,
-                            vpd.nmog_refuel_disp_rate,
-                            vpd.nmog_refuel_spill_rate]) * factor
-    benzene_evap_ustons = sum([vpd.benzene_permeation_rate,
-                               vpd.benzene_venting_rate,
-                               vpd.benzene_leaks_rate,
-                               vpd.benzene_refuel_disp_rate,
-                               vpd.benzene_refuel_spill_rate]) * factor
-    ethylbenzene_evap_ustons = sum([vpd.ethylbenzene_permeation_rate,
-                                    vpd.ethylbenzene_venting_rate,
-                                    vpd.ethylbenzene_leaks_rate,
-                                    vpd.ethylbenzene_refuel_disp_rate,
-                                    vpd.ethylbenzene_refuel_spill_rate]) * factor
-    naphthalene_evap_ustons = vpd.naphthalene_refuel_spill_rate * factor
+    factor_gallons = vpd.fuel_consumption_gallons / vpd.grams_per_us_ton
+    sox_exh_ustons = vpd.sox_exh_rate * factor_gallons
+    nmog_evap_ustons = (sum(
+        [vpd.nmog_permeation_rate, vpd.nmog_venting_rate, vpd.nmog_leaks_rate]) * factor_vmt +
+                        sum(
+                            [vpd.nmog_refuel_disp_rate, vpd.nmog_refuel_spill_rate]) * factor_gallons
+                        )
+    benzene_evap_ustons = (sum(
+        [vpd.benzene_permeation_rate, vpd.benzene_venting_rate, vpd.benzene_leaks_rate]) * factor_vmt +
+                        sum(
+                            [vpd.benzene_refuel_disp_rate, vpd.benzene_refuel_spill_rate]) * factor_gallons
+                        )
+    ethylbenzene_evap_ustons = (sum(
+        [vpd.ethylbenzene_permeation_rate, vpd.ethylbenzene_venting_rate, vpd.ethylbenzene_leaks_rate]) * factor_vmt +
+                           sum(
+                               [vpd.ethylbenzene_refuel_disp_rate, vpd.ethylbenzene_refuel_spill_rate]) * factor_gallons
+                           )
+    # nmog_evap_ustons = sum([vpd.nmog_permeation_rate,
+    #                         vpd.nmog_venting_rate,
+    #                         vpd.nmog_leaks_rate,
+    #                         vpd.nmog_refuel_disp_rate,
+    #                         vpd.nmog_refuel_spill_rate]) * factor_gallons
+    # benzene_evap_ustons = sum([vpd.benzene_permeation_rate,
+    #                            vpd.benzene_venting_rate,
+    #                            vpd.benzene_leaks_rate,
+    #                            vpd.benzene_refuel_disp_rate,
+    #                            vpd.benzene_refuel_spill_rate]) * factor_gallons
+    # ethylbenzene_evap_ustons = sum([vpd.ethylbenzene_permeation_rate,
+    #                                 vpd.ethylbenzene_venting_rate,
+    #                                 vpd.ethylbenzene_leaks_rate,
+    #                                 vpd.ethylbenzene_refuel_disp_rate,
+    #                                 vpd.ethylbenzene_refuel_spill_rate]) * factor_gallons
+    naphthalene_evap_ustons = vpd.naphthalene_refuel_spill_rate * factor_gallons
 
-    factor = vpd.vmt_liquid_fuel / vpd.grams_per_metric_ton
-    ch4_veh_metrictons = vpd.ch4_exh_rate * factor
-    n2o_veh_metrictons = vpd.n2o_exh_rate * factor
-    co2_veh_metrictons = vpd.onroad_direct_co2e_grams_per_mile * factor
+    factor_vmt = vpd.vmt_liquid_fuel / vpd.grams_per_metric_ton
+    ch4_veh_metrictons = vpd.ch4_exh_rate * factor_vmt
+    n2o_veh_metrictons = vpd.n2o_exh_rate * factor_vmt
+    co2_veh_metrictons = vpd.onroad_direct_co2e_grams_per_mile * factor_vmt
 
     # calc vehicle inventories as exhaust plus evap (where applicable)
     nmog_veh_ustons = nmog_exh_ustons + nmog_evap_ustons
@@ -229,6 +245,7 @@ def calc_vehicle_inventory(vpd):
         'battery_kwh_per_veh': vpd.battery_kwh_per_veh,  # this is kwh/veh - used for battery tax credit
         'onroad_direct_co2e_grams_per_mile': vpd.onroad_direct_co2e_grams_per_mile,
         'onroad_direct_kwh_per_mile': vpd.onroad_direct_kwh_per_mile,
+        'onroad_charge_depleting_range_mi': vpd.onroad_charge_depleting_range_mi,
         'evse_kwh_per_mile': vpd.evse_kwh_per_mile,
         'onroad_gallons_per_mile': vpd.onroad_gallons_per_mile,
         'onroad_miles_per_gallon': vpd.onroad_miles_per_gallon,

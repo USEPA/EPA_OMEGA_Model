@@ -81,6 +81,7 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
         'curbweight_lbs',
         'gvwr_lbs',
         'onroad_engine_on_distance_frac',
+        'onroad_charge_depleting_range_mi',
     ]
 
     (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, diesel_energy_density_ratio,
@@ -110,7 +111,8 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
             base_year_vehicle_id, manufacturer_id, name, model_year, base_year_reg_class_id, reg_class_id, \
                 in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, footprint_ft2, workfactor, \
                 target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile, body_style, \
-                battery_kwh_per_veh, curbweight_lbs, gvwr_lbs, onroad_engine_on_distance_frac = \
+                battery_kwh_per_veh, curbweight_lbs, gvwr_lbs, onroad_engine_on_distance_frac, \
+                onroad_charge_depleting_range_mi = \
                 vehicle_info_dict[v['vehicle_id']]
 
             if target_co2e_grams_per_mile is not None:
@@ -166,6 +168,7 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                     'context_vmt_adjustment': v['context_vmt_adjustment'],
                     'vmt_rebound': v['vmt_rebound'],
                     'annual_vmt_rebound': v['annual_vmt_rebound'],
+                    'onroad_charge_depleting_range_mi': onroad_charge_depleting_range_mi,
                 })
 
                 # get safety effects for this vehicle
@@ -483,6 +486,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             })
 
             if vse['fueling_class'] == 'BEV':
+                onroad_charge_depleting_range = 300
                 pm25_brakewear_rate_e, pm25_tirewear_rate_e = \
                     session_settings.emission_rates_vehicles.get_emission_rate(
                         session_settings, model_year, sourcetype_name, v['reg_class_id'], fuel, ind_var_value
@@ -490,6 +494,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                 vehicle_data.update_value({
                     'pm25_brakewear_rate_e': pm25_brakewear_rate_e,
                     'pm25_tirewear_rate_e': pm25_tirewear_rate_e,
+                    'onroad_charge_depleting_range_mi': onroad_charge_depleting_range,
                 })
 
         if onroad_direct_co2e_grams_per_mile:
