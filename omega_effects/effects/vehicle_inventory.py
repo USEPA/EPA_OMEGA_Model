@@ -60,6 +60,7 @@ class VehiclePhysicalData:
         self.fuel_generation_kwh = 0
         self.curbweight_lbs = 0
         self.gvwr_lbs = 0
+        self.onroad_charge_depleting_range_mi = 0
 
         self.session_fatalities = 0
         self.energy_density_ratio = 0
@@ -229,6 +230,7 @@ def calc_vehicle_inventory(vpd):
         'battery_kwh_per_veh': vpd.battery_kwh_per_veh,  # this is kwh/veh - used for battery tax credit
         'onroad_direct_co2e_grams_per_mile': vpd.onroad_direct_co2e_grams_per_mile,
         'onroad_direct_kwh_per_mile': vpd.onroad_direct_kwh_per_mile,
+        'onroad_charge_depleting_range_mi': vpd.onroad_charge_depleting_range_mi,
         'evse_kwh_per_mile': vpd.evse_kwh_per_mile,
         'onroad_gallons_per_mile': vpd.onroad_gallons_per_mile,
         'onroad_miles_per_gallon': vpd.onroad_miles_per_gallon,
