@@ -133,6 +133,6 @@ class CPIPriceDeflators:
             adj_factor = adj_factor_numerator / self.get_price_deflator(basis_year, effects_log)
             for arg in args:
                 df_return.loc[df_return['dollar_basis'] == basis_year, arg] = df_return[arg] * adj_factor
-                df_return.loc[df_return['dollar_basis'] == basis_year, 'dollar_basis'] = analysis_dollar_basis
+            df_return.loc[df_return['dollar_basis'] == basis_year, 'dollar_basis'] = analysis_dollar_basis
 
         return df_return
