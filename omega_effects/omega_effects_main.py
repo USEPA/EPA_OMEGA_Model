@@ -46,8 +46,8 @@ def main():
     Main effects code.
 
     """
-    set_paths = SetPaths()
-    batch_settings_file = set_paths.path_of_batch_settings_csv()
+    # set_paths = SetPaths()
+    # batch_settings_file = set_paths.path_of_batch_settings_csv()
 
     start_time = time()
     start_time_readable = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -55,28 +55,30 @@ def main():
 
     try:
         batch_settings = BatchSettings()
+        batch_settings_file = batch_settings.path_of_batch_settings_csv()
         batch_settings.init_from_file(batch_settings_file)
         batch_settings.get_batch_folder_and_name()
         batch_settings.get_run_id()
 
-        path_of_run_folder, path_of_code_folder, path_of_modified_inputs_folder = \
-            set_paths.create_output_paths(
-                batch_settings.path_outputs, batch_settings.batch_name, start_time_readable, batch_settings.run_id
-            )
+        set_paths = SetPaths()
+        set_paths.create_output_paths(
+            batch_settings.path_outputs, batch_settings.batch_name, start_time_readable, batch_settings.run_id
+        )
+        set_paths.copy_code_to_destination()
 
         effects_log = EffectsLog()
-        effects_log.init_logfile(path_of_run_folder)
+        effects_log.init_logfile(set_paths.path_of_run_folder)
+        effects_log.logwrite(f'\n{batch_settings.runtime_info}\n')
         effects_log.logwrite(f'EPA OMEGA Model Effects started\n', stamp=True)
 
         batch_settings.get_runtime_options(effects_log)
         batch_settings.get_batch_settings(effects_log)
         batch_settings.init_batch_classes(effects_log)
 
-        shutil.copy2(batch_settings_file, path_of_run_folder)
-        set_paths.copy_code_to_destination(path_of_code_folder)
+        shutil.copy2(batch_settings_file, set_paths.path_of_run_folder)
 
         if batch_settings.save_input_files:
-            copy_files(batch_settings.inputs_filelist, path_of_run_folder / 'batch_inputs')
+            copy_files(batch_settings.inputs_filelist, set_paths.path_of_run_folder / 'batch_inputs')
 
         # build legacy fleet which is used for the entire batch ________________________________________________________
         effects_log.logwrite('\nBuilding legacy fleet for the batch')
@@ -92,7 +94,7 @@ def main():
         session_settings = SessionSettings()
         session_settings.get_context_session_settings(batch_settings, effects_log)
         if batch_settings.save_input_files:
-            copy_files(session_settings.inputs_filelist, path_of_run_folder / 'context_inputs')
+            copy_files(session_settings.inputs_filelist, set_paths.path_of_run_folder / 'context_inputs')
 
         effects_log.logwrite('\nCalculating context vmt adjustments and context fuel cost per mile')
         vmt_adjustments_context = AdjustmentsVMT()
@@ -102,20 +104,19 @@ def main():
         if batch_settings.save_context_fuel_cost_per_mile_file:
             effects_log.logwrite(f'Saving context fuel cost per mile file')
             context_fuel_cpm_df = pd.DataFrame.from_dict(context_fuel_cpm_dict, orient='index').reset_index(drop=True)
-            save_file(session_settings, context_fuel_cpm_df, path_of_run_folder, 'context_fuel_cost_per_mile',
-                      effects_log, extension=batch_settings.file_format)
+            save_file(
+                session_settings, context_fuel_cpm_df, set_paths.path_of_run_folder, 'context_fuel_cost_per_mile',
+                effects_log, extension=batch_settings.file_format
+            )
 
         # loop thru sessions to calc safety effects, physical effects, cost effects for each ___________________________
         annual_safety_df = pd.DataFrame()
         annual_physical_df = pd.DataFrame()
         vehicle_inventory_details_df = pd.DataFrame()
-        egu_inventory_details_df = pd.DataFrame()
-        refinery_inventory_details_df = pd.DataFrame()
         annual_costs_df = pd.DataFrame()
         my_lifetime_physical_df = pd.DataFrame()
         my_lifetime_costs_df_1 = pd.DataFrame()
         my_lifetime_costs_df_2 = pd.DataFrame()
-        no_action_fleet_physical = {}
         periods_1 = periods_2 = 0
 
         effects_log.logwrite(f'\nStarting work on sessions')
@@ -125,7 +126,7 @@ def main():
             session_settings.get_session_settings(batch_settings, session_num, effects_log)
             session_name = session_settings.session_name
             if batch_settings.save_input_files:
-                copy_files(session_settings.inputs_filelist, path_of_run_folder / f'{session_name}_inputs')
+                copy_files(session_settings.inputs_filelist, set_paths.path_of_run_folder / f'{session_name}_inputs')
 
             # vmt adjustments to vehicle annual data ___________________________________________________________________
             effects_log.logwrite(f'\nCalculating vmt adjustments for session {session_name}')
@@ -152,8 +153,10 @@ def main():
 
             if batch_settings.save_vehicle_safety_effects_files:
                 effects_log.logwrite(f'Saving safety effects file for {session_name}')
-                save_file(session_settings, session_fleet_safety_df, path_of_run_folder, 'safety_effects',
-                          effects_log, extension=batch_settings.file_format)
+                save_file(
+                    session_settings, session_fleet_safety_df, set_paths.path_of_run_folder, 'safety_effects',
+                    effects_log, extension=batch_settings.file_format
+                )
 
             effects_log.logwrite(f'\nCalculating annual safety effects for {session_name}')
             session_annual_safety_df = calc_annual_avg_safety_effects(session_fleet_safety_df)
@@ -177,8 +180,10 @@ def main():
 
             if batch_settings.save_vehicle_physical_effects_files:
                 effects_log.logwrite(f'\nSaving physical effects file for {session_name}')
-                save_file(session_settings, session_fleet_physical_df, path_of_run_folder, 'physical_effects',
-                          effects_log, extension=batch_settings.file_format)
+                save_file(
+                    session_settings, session_fleet_physical_df, set_paths.path_of_run_folder, 'physical_effects',
+                    effects_log, extension=batch_settings.file_format
+                )
 
             effects_log.logwrite(f'\nCalculating annual physical effects for {session_name}')
             session_annual_physical_df = calc_annual_physical_effects(batch_settings, session_fleet_physical_df)
@@ -202,7 +207,8 @@ def main():
                 session_vehicle_inventory_details_df = pd.DataFrame.from_dict(
                     session_settings.emission_rates_vehicles.deets, orient='index').reset_index(drop=True)
                 vehicle_inventory_details_df = pd.concat(
-                    [vehicle_inventory_details_df, session_vehicle_inventory_details_df], axis=0, ignore_index=True)
+                    [vehicle_inventory_details_df, session_vehicle_inventory_details_df], axis=0, ignore_index=True
+                )
 
             # cost effects _____________________________________________________________________________________________
             effects_log.logwrite(f'\nCalculating cost effects for {session_name}')
@@ -214,8 +220,10 @@ def main():
 
             if batch_settings.save_vehicle_cost_effects_files:
                 effects_log.logwrite(f'Saving cost effects file for {session_name}')
-                save_file(session_settings, session_costs_df, path_of_run_folder, 'cost_effects', effects_log,
-                          extension=batch_settings.file_format)
+                save_file(
+                    session_settings, session_costs_df, set_paths.path_of_run_folder, 'cost_effects', effects_log,
+                    extension=batch_settings.file_format
+                )
 
             effects_log.logwrite(f'\nCalculating annual costs effects for {session_name}')
             session_annual_costs_df = calc_annual_cost_effects(session_costs_df)
@@ -242,7 +250,7 @@ def main():
             my_lifetime_costs_df_2.reset_index(inplace=True, drop=True)
 
             session_settings.electricity_prices.df.to_csv(
-                path_of_modified_inputs_folder / f'{start_time_readable}_electricity_prices_{session_name}.csv',
+                set_paths.path_of_modified_inputs_folder / f'{start_time_readable}_electricity_prices_{session_name}.csv',
                 index=False
             )
 
@@ -347,42 +355,47 @@ def main():
 
         # save files to CSV ____________________________________________________________________________________________
         annual_safety_df.to_csv(
-            path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv', index=False
+            set_paths.path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv', index=False
         )
         annual_physical_df.to_csv(
-            path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv', index=False
+            set_paths.path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv', index=False
         )
         delta_annual_physical_df.to_csv(
-            path_of_run_folder / f'{start_time_readable}_physical_effects_annual_action_minus_no_action.csv', index=False
+            set_paths.path_of_run_folder / f'{start_time_readable}_physical_effects_annual_action_minus_no_action.csv',
+            index=False
         )
-        discounted_costs_df.to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv', index=False)
-        discounted_benefits_df.to_csv(path_of_run_folder / f'{start_time_readable}_benefits_annual.csv', index=False)
+        discounted_costs_df.to_csv(
+            set_paths.path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv', index=False
+        )
+        discounted_benefits_df.to_csv(
+            set_paths.path_of_run_folder / f'{start_time_readable}_benefits_annual.csv', index=False
+        )
         if social_effects_global_df is not None:
             social_effects_global_df.to_csv(
-                path_of_run_folder / f'{start_time_readable}_social_effects_global_ghg_annual.csv', index=False
+                set_paths.path_of_run_folder / f'{start_time_readable}_social_effects_global_ghg_annual.csv', index=False
             )
         if social_effects_domestic_df is not None:
             social_effects_domestic_df.to_csv(
-                path_of_run_folder / f'{start_time_readable}_social_effects_domestic_ghg_annual.csv', index=False
+                set_paths.path_of_run_folder / f'{start_time_readable}_social_effects_domestic_ghg_annual.csv', index=False
             )
         my_lifetime_physical_df.to_csv(
-            path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv', index=False
+            set_paths.path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv', index=False
         )
         my_lifetime_costs_df_1.to_csv(
-            path_of_run_folder / f'{start_time_readable}_MY_{int(periods_1)}_period_costs.csv', index=False
+            set_paths.path_of_run_folder / f'{start_time_readable}_MY_{int(periods_1)}_period_costs.csv', index=False
         )
         my_lifetime_costs_df_2.to_csv(
-            path_of_run_folder / f'{start_time_readable}_MY_{int(periods_2)}_period_costs.csv', index=False
+            set_paths.path_of_run_folder / f'{start_time_readable}_MY_{int(periods_2)}_period_costs.csv', index=False
         )
         if session_settings.emission_rates_vehicles.deets:
             vehicle_inventory_details_df.to_csv(
-                path_of_run_folder / f'{start_time_readable}_vehicle_emission_rate_details.csv', index=False
+                set_paths.path_of_run_folder / f'{start_time_readable}_vehicle_emission_rate_details.csv', index=False
             )
         egu_inventory_details_df.to_csv(
-            path_of_run_folder / f'{start_time_readable}_egu_inventory_details.csv', index=False
+            set_paths.path_of_run_folder / f'{start_time_readable}_egu_inventory_details.csv', index=False
         )
         refinery_inventory_details_df.to_csv(
-            path_of_run_folder / f'{start_time_readable}_refinery_emission_rate_details.csv', index=False
+            set_paths.path_of_run_folder / f'{start_time_readable}_refinery_emission_rate_details.csv', index=False
         )
 
         # add identifying info to CSV files ____________________________________________________________________________
@@ -390,58 +403,58 @@ def main():
             f'Batch Name: {batch_settings.batch_name}', f'Effects Run: {start_time_readable}_{batch_settings.run_id}'
         ]
 
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv',
+        add_id_to_csv(set_paths.path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv',
                       output_file_id_info
                       )
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv',
+        add_id_to_csv(set_paths.path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv',
                       output_file_id_info
                       )
         add_id_to_csv(
-            path_of_run_folder / f'{start_time_readable}_physical_effects_annual_action_minus_no_action.csv',
+            set_paths.path_of_run_folder / f'{start_time_readable}_physical_effects_annual_action_minus_no_action.csv',
             output_file_id_info
         )
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv',
+        add_id_to_csv(set_paths.path_of_run_folder / f'{start_time_readable}_cost_effects_annual.csv',
                       output_file_id_info
                       )
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_benefits_annual.csv',
+        add_id_to_csv(set_paths.path_of_run_folder / f'{start_time_readable}_benefits_annual.csv',
                       output_file_id_info
                       )
         if batch_settings.net_benefit_ghg_scope in ['global', 'both']:
             add_id_to_csv(
-                path_of_run_folder / f'{start_time_readable}_social_effects_global_ghg_annual.csv',
+                set_paths.path_of_run_folder / f'{start_time_readable}_social_effects_global_ghg_annual.csv',
                 output_file_id_info
             )
         if batch_settings.net_benefit_ghg_scope in ['domestic', 'both']:
             add_id_to_csv(
-                path_of_run_folder / f'{start_time_readable}_social_effects_domestic_ghg_annual.csv',
+                set_paths.path_of_run_folder / f'{start_time_readable}_social_effects_domestic_ghg_annual.csv',
                 output_file_id_info
             )
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv',
+        add_id_to_csv(set_paths.path_of_run_folder / f'{start_time_readable}_MY_period_physical_effects.csv',
                       output_file_id_info
                       )
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_{int(periods_1)}_period_costs.csv',
+        add_id_to_csv(set_paths.path_of_run_folder / f'{start_time_readable}_MY_{int(periods_1)}_period_costs.csv',
                       output_file_id_info
                       )
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_MY_{int(periods_2)}_period_costs.csv',
+        add_id_to_csv(set_paths.path_of_run_folder / f'{start_time_readable}_MY_{int(periods_2)}_period_costs.csv',
                       output_file_id_info
                       )
         if session_settings.emission_rates_vehicles.deets:
-            add_id_to_csv(path_of_run_folder / f'{start_time_readable}_vehicle_emission_rate_details.csv',
+            add_id_to_csv(set_paths.path_of_run_folder / f'{start_time_readable}_vehicle_emission_rate_details.csv',
                           output_file_id_info
                           )
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_egu_inventory_details.csv',
+        add_id_to_csv(set_paths.path_of_run_folder / f'{start_time_readable}_egu_inventory_details.csv',
                       output_file_id_info
                       )
-        add_id_to_csv(path_of_run_folder / f'{start_time_readable}_refinery_emission_rate_details.csv',
+        add_id_to_csv(set_paths.path_of_run_folder / f'{start_time_readable}_refinery_emission_rate_details.csv',
                       output_file_id_info
                       )
 
         # save modified inputs (i.e., those with adjusted dollar valuations)
         batch_settings.criteria_cost_factors.df.to_csv(
-            path_of_modified_inputs_folder / f'{start_time_readable}_cost_factors_criteria.csv', index=False
+            set_paths.path_of_modified_inputs_folder / f'{start_time_readable}_cost_factors_criteria.csv', index=False
         )
         batch_settings.scghg_cost_factors.factors_in_analysis_dollars.to_csv(
-            path_of_modified_inputs_folder / f'{start_time_readable}_cost_factors_scghg.csv', index=False
+            set_paths.path_of_modified_inputs_folder / f'{start_time_readable}_cost_factors_scghg.csv', index=False
         )
     except Exception as e:
         effects_log.logwrite(f'*** {e} ***\n{traceback.format_exc()}\n', stamp=True)
@@ -452,7 +465,7 @@ def main():
     effects_log.logwrite('Complete', stamp=True)
     effects_log.logwrite(f'Runtime = {elapsed_runtime} seconds ({elapsed_runtime_minutes} minutes)')
 
-    effects_log.logwrite(f'Output files have been saved to {path_of_run_folder}', stamp=True)
+    effects_log.logwrite(f'Output files have been saved to {set_paths.path_of_run_folder}', stamp=True)
 
 
 if __name__ == '__main__':
