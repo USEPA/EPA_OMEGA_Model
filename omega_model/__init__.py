@@ -78,161 +78,150 @@ try:
 
             path = os.path.dirname(os.path.abspath(__file__)) + os.sep
             self.inputfile_metadata = []
-            self.session_name = 'OMEGA Quick Test'
             self.session_unique_name = 'OMEGA Quick Test'
+            self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
+            self.start_time = 0
+            self.end_time = 0
+            self.output_folder_base = 'out' + os.sep
+            self.output_folder = self.output_folder_base
+            self.logfile_prefix = 'o2log_'
+            self.logfilename = ''
             self.session_is_reference = True
             self.auto_close_figures = True
             self.save_preliminary_outputs = True
-            self.output_folder_base = 'out' + os.sep
-            self.output_folder = self.output_folder_base
             self.omega_model_path = path
-            self.use_prerun_context_outputs = False
-            self.prerun_context_folder = ''
-            self.credit_market_efficiency = 1
+            self.analysis_initial_year = None
             self.consolidate_manufacturers = None
-            self.force_two_pass = False
-            self.include_manufacturers_list = 'all'
-            self.exclude_manufacturers_list = 'none'
-            self.base_year_min_sales = 0
-            self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
-            self.vehicles_file = path + 'test_inputs/vehicles.csv'
-            self.vehicles_file_base_year_offset = None
-            self.vehicles_df = pd.DataFrame()
-            self.onroad_vehicle_calculations_file = path + 'test_inputs/onroad_vehicle_calculations.csv'
-            self.onroad_fuels_file = path + 'test_inputs/onroad_fuels.csv'
-            self.context_id = 'AEO2021'
-            self.context_case_id = 'Reference case'
+            self.manufacturer_gigawatthour_data = None
+            self.generate_context_calibration_files = True
             self.context_new_vehicle_generalized_costs_file = None
             self.sales_share_calibration_file = None
-            self.generate_context_calibration_files = True
+            self.vehicles_df = pd.DataFrame()
+
+            # user context settings:
+            self.analysis_final_year = 2024
+            # Note that the implicit_price_deflator.csv input file must contain data for this entry:
+            self.analysis_dollar_basis = 2022
+            self.context_id = 'AEO2021'
+            self.context_case_id = 'Reference case'
+            self.credit_market_efficiency = 1
             self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
             self.context_electricity_prices_file = path + 'test_inputs/context_electricity_prices_aeo.csv'
-            self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods_zero.csv'
-            self.utility_factor_methods_file = path + 'test_inputs/policy_utility_factor_methods.csv'
-            self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
-            self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights.csv'
-            self.drive_cycle_ballast_file = path + 'test_inputs/drive_cycle_ballast.csv'
-            self.context_stock_vmt_file = path + 'test_inputs/context_stock_vmt.csv'
-
+            self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market-body_style.csv'
+            self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
+            self.market_classes_file = path + 'test_inputs/market_classes_ice_bev_phev-body_style.csv'
+            self.new_vehicle_price_elasticity_of_demand = -0.4
+            self.onroad_fuels_file = path + 'test_inputs/onroad_fuels.csv'
+            self.onroad_vehicle_calculations_file = path + 'test_inputs/onroad_vehicle_calculations.csv'
+            self.onroad_vmt_file = path + 'test_inputs/annual_vmt_fixed_by_age_ice_bev_phev-body_style.csv'
+            self.consumer_pricing_multiplier_max = 1.1
+            self.consumer_pricing_multiplier_min = 1/1.1
+            self.producer_generalized_cost_file = path + 'test_inputs/producer_generalized_cost-body_style.csv'
+            self.production_constraints_file = path + 'test_inputs/production_constraints-body_style.csv'
+            self.sales_share_file = path + 'test_inputs/sales_share_params_ice_bev_phev_body_style.csv'
+            self.vehicle_price_modifications_file = path + 'test_inputs/vehicle_price_modifications-body_style.csv'
+            self.vehicle_reregistration_file = path + 'test_inputs/reregistration_fixed_by_age_ice_bev_phev-body_style.csv'
             self.ice_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_ice.csv'
             self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_bev.csv'
             self.phev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_phev.csv'
-
+            self.vehicles_file = path + 'test_inputs/vehicles.csv'
             self.powertrain_cost_input_file = path + 'test_inputs/powertrain_cost_frm.csv'
             self.glider_cost_input_file = path + 'test_inputs/glider_cost.csv'
             self.body_styles_file = path + 'test_inputs/body_styles.csv'
             self.mass_scaling_file = path + 'test_inputs/mass_scaling.csv'
-
-            self.analysis_initial_year = None
-            self.analysis_final_year = 2024
-            self.logfile_prefix = 'o2log_'
-            self.logfilename = ''
-            self.consumer_calc_generalized_cost = None
-            self.policy_targets_file = path + 'test_inputs/ghg_standards-footprint_NTR-FRM-CFR-form.csv'
-            self.policy_reg_classes_file = path + 'test_inputs/regulatory_classes.csv'
-            self.production_multipliers_file = path + 'test_inputs/production_multipliers.csv'
-            self.policy_fuels_file = path + 'test_inputs/policy_fuels.csv'
-            self.ghg_credit_params_file = path + 'test_inputs/ghg_credit_params.csv'
-            self.ghg_credits_file = path + 'test_inputs/ghg_credits.csv'
             self.workfactor_definition_file = path + 'test_inputs/workfactor_definition.csv'
 
-            self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market-body_style.csv'
-            self.market_classes_file = path + 'test_inputs/market_classes_ice_bev_phev-body_style.csv'
-            self.producer_generalized_cost_file = path + 'test_inputs/producer_generalized_cost-body_style.csv'
-            self.production_constraints_file = path + 'test_inputs/production_constraints-body_style.csv'
-            self.vehicle_reregistration_file = path + 'test_inputs/reregistration_fixed_by_age_ice_bev_phev-body_style.csv'
-            self.sales_share_file = path + 'test_inputs/sales_share_params_ice_bev_phev_body_style.csv'
-            self.required_sales_share_file = path + 'test_inputs/required_sales_share-body_style.csv'
-            self.onroad_vmt_file = path + 'test_inputs/annual_vmt_fixed_by_age_ice_bev_phev-body_style.csv'
-            self.vehicle_price_modifications_file = path + 'test_inputs/vehicle_price_modifications-body_style.csv'
+            # user session settings:
+            self.session_name = 'OMEGA Quick Test'
 
+            # user policy settings:
+            self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights.csv'
+            self.drive_cycle_ballast_file = path + 'test_inputs/drive_cycle_ballast.csv'
+            self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
+            self.ghg_credit_params_file = path + 'test_inputs/ghg_credit_params.csv'
+            self.ghg_credits_file = path + 'test_inputs/ghg_credits.csv'
+            self.policy_targets_file = path + 'test_inputs/ghg_standards-footprint_NTR-FRM-CFR-form.csv'
             self.offcycle_credits_file = path + 'test_inputs/offcycle_credits.csv'
+            self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods_zero.csv'
+            self.utility_factor_methods_file = path + 'test_inputs/policy_utility_factor_methods.csv'
+            self.policy_fuels_file = path + 'test_inputs/policy_fuels.csv'
+            self.production_multipliers_file = path + 'test_inputs/production_multipliers.csv'
+            self.policy_reg_classes_file = path + 'test_inputs/regulatory_classes.csv'
+            self.required_sales_share_file = path + 'test_inputs/required_sales_share-body_style.csv'
 
-            self.consumer_pricing_num_options = 14
-            self.consumer_pricing_multiplier_min = 1/1.1
-            self.consumer_pricing_multiplier_max = 1.1
-
-            self.new_vehicle_price_elasticity_of_demand = -0.4
-            self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
-
-            self.calc_effects = 'No'  # options are 'No', 'Physical' and 'Physical and Costs' as strings
-
-            # Note that the implicit_price_deflator.csv input file must contain data for this entry:
-            self.analysis_dollar_basis = 2022
-
-            self.allow_ice_of_bev = False
-            self.phev_battery_kwh = None  # 'RSE' -> use RSE, None -> use range calc, otherwise use scalar value
-            self.phev_range_mi = 50
-            self.bev_range_mi = 300
-            self.bev_mdv_van_range_mi = 150
-            self.bev_of_ice_rlhp60_scaler = 1.0
-
+            # user postproc settings:
             self.ip_deflators_file = path + 'test_inputs/implicit_price_deflators.csv'
 
-            self.start_time = 0
-            self.end_time = 0
-
-            # developer settings
-            self.producer_market_category_ramp_limit = 0.2
-            self.producer_shares_mode = True
-            self.producer_num_market_share_options = 3
-            self.producer_num_tech_options_per_ice_vehicle = 3
-            self.producer_num_tech_options_per_bev_vehicle = 1
-            self.cost_curve_frontier_affinity_factor = 0.75
-            self.slice_tech_combo_cloud_tables = False
-            self.verbose = False
-            self.iterate_producer_consumer = True
-            self.no_backsliding = False
-            self.second_pass_production_constraints = False
-
-            self.footprint_min_scaler = 1/1.05
-            self.footprint_max_scaler = 1.05
-            self.rlhp20_min_scaler = 1.0
-            self.rlhp20_max_scaler = 1.0
-            self.rlhp60_min_scaler = 1.0
-            self.rlhp60_max_scaler = 1.0
-            self.producer_voluntary_overcompliance = False  # disable voc by default
-            # minimum benefit of overcompliance, as a fraction of compliance cost:
-            self.producer_voluntary_overcompliance_min_benefit_frac = 0.01
-            self.producer_voluntary_overcompliance_min_strategic_compliance_ratio = 0.9999  # minimal voc by default
-            self.producer_price_modification_scaler = 0.0
-            self.producer_footprint_wtp = 200
-            self.producer_consumer_max_iterations = 5
-            self.producer_consumer_convergence_tolerance = 5e-4
-            self.producer_compliance_search_min_share_range = 1e-5
-            self.producer_compliance_search_convergence_factor = 0.9
-            self.producer_compliance_search_tolerance = 1e-6
-            self.producer_compliance_search_multipoint = True
-            self.producer_cross_subsidy_price_tolerance = 5e-4
-
-            self.producer_strategic_compliance_buffer_years = [2020]
-            self.producer_strategic_compliance_buffer = [0.0]
-
-            self.run_profiler = False
-            self.multiprocessing = True and not self.run_profiler and not getattr(sys, 'frozen', False)
-            self.non_context_session_process_scaler = 1
-            self.flat_context = False
-            self.flat_context_year = 2021
-
+            # "developer" settings:
+            self.use_prerun_context_outputs = False
+            self.prerun_context_folder = ''
             self.battery_GWh_limit_years = [2020]
             self.battery_GWh_limit = [1e9]
+            self.producer_price_modification_scaler = 0.0
+            self.producer_footprint_wtp = 200
+            self.footprint_min_scaler = 1/1.05
+            self.footprint_max_scaler = 1.05
+            self.redesign_interval_gain_years = [2020]
+            self.redesign_interval_gain = [1.0]
+            self.non_context_session_process_scaler = 1
+            self.producer_shares_mode = True
+            self.producer_compliance_search_multipoint = True
+            self.powertrain_cost_with_ira = True
+            self.powertrain_cost_with_gpf = True
+            self.powertrain_cost_tracker = True
+            self.base_year_min_sales = 0
+            self.phev_range_mi = 40
+            self.bev_of_ice_rlhp60_scaler = 0.85
+            self.no_backsliding = False
             self.nmc_share_BEV = {2022: 1}
             self.nmc_share_PHEV = {2022: 1}
             self.nmc_share_HEV = {2022: 1}
             self.battery_cost_constant_thru = 2025
+            self.producer_market_category_ramp_limit = 0.2
+            self.producer_strategic_compliance_buffer_years = [2020]
+            self.producer_strategic_compliance_buffer = [0.0]
 
+            # advanced developer settings:
+            self.vehicles_file_base_year_offset = None
+            self.bev_range_mi = 300
+            self.bev_mdv_van_range_mi = 150
             self.kwh_per_mile_scale_years = [2020]
             self.kwh_per_mile_scale = [1.0]
+            self.rlhp20_min_scaler = 1.0
+            self.rlhp20_max_scaler = 1.0
+            self.rlhp60_min_scaler = 1.0
+            self.rlhp60_max_scaler = 1.0
+            self.allow_ice_of_bev = False
+            self.phev_battery_kwh = None  # 'RSE' -> use RSE, None -> use range calc, otherwise use scalar value
+            self.force_two_pass = False
+            self.include_manufacturers_list = 'all'
+            self.exclude_manufacturers_list = 'none'
+            self.cost_curve_frontier_affinity_factor = 0.75
+            self.slice_tech_combo_cloud_tables = False
+            self.verbose = False
+            self.iterate_producer_consumer = True
+            self.second_pass_production_constraints = False
+            self.producer_voluntary_overcompliance = False  # disable voc by default
+            self.flat_context = False
+            self.flat_context_year = 2021
+            self.run_profiler = False
+            self.multiprocessing = True and not self.run_profiler and not getattr(sys, 'frozen', False)
 
-            self.redesign_interval_gain_years = [2020, 2029, 2034]
-            self.redesign_interval_gain = [1.0, 1.0, 1.0]
+            # search and convergence-related developer settings:
+            self.producer_num_market_share_options = 3
+            self.producer_num_tech_options_per_ice_vehicle = 3
+            self.producer_num_tech_options_per_bev_vehicle = 1
+            self.producer_compliance_search_min_share_range = 1e-5
+            self.producer_compliance_search_convergence_factor = 0.9
+            self.producer_compliance_search_tolerance = 1e-6
+            self.producer_voluntary_overcompliance_min_benefit_frac = 0.01  #: minimum benefit of overcompliance, as a fraction of compliance cost:
+            self.producer_voluntary_overcompliance_min_strategic_compliance_ratio = 0.9999  # minimal voc by default
+            self.producer_consumer_max_iterations = 5
+            self.producer_consumer_convergence_tolerance = 5e-4
+            self.consumer_pricing_num_options = 14
+            self.producer_cross_subsidy_price_tolerance = 5e-4
 
-            self.manufacturer_gigawatthour_data = None
-
-            self.powertrain_cost_tracker = True
-            self.powertrain_cost_with_ira = True
-            self.powertrain_cost_with_gpf = True
-
+            # logging and verbosity-related settings:
             # list of modules to allow verbose log files, or empty to disable:
             self.verbose_log_modules = ['producer_compliance_search', 'cross_subsidy_search_',
                                         'cv_cost_curves_', 'v_cost_curves_', 'v_cost_clouds_',
@@ -246,7 +235,7 @@ try:
 
             self.verbose_postproc = ['iteration_']
 
-            self.canary_byvid = -1
+            self.canary_byvid = -1  #: canary base year vehicle ID
 
             # = 'all' or list of years to log, empty list to disable logging:
             self.log_vehicle_cloud_years = []
@@ -262,6 +251,8 @@ try:
 
             # list of vehicles to plot in log_producer_compliance_search_years:
             self.plot_and_log_vehicles = []  # ['ICE Large Van truck minivan 4WD']
+
+            self.calc_effects = 'No'  # options are 'No', 'Physical' and 'Physical and Costs' as strings
 
             # dynamic modules / classes
             self.RegulatoryClasses = None
