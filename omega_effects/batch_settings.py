@@ -7,10 +7,11 @@
 **CODE**
 
 """
+import sys
+import tkinter as tk
+from tkinter import filedialog
 import numpy as np
 import pandas as pd
-import sys
-# import importlib
 from pathlib import Path
 
 from omega_effects.general.general_functions import read_input_file
@@ -48,6 +49,7 @@ class BatchSettings:
 
     """
     def __init__(self):
+        self.runtime_info = None
         self.batch_df = pd.DataFrame()
         self.batch_program = None
         self.batch_folder = None
@@ -161,6 +163,8 @@ class BatchSettings:
             filepath: the Path object to the file.
 
         """
+        self.set_runtime_info()
+
         input_template_columns = [
             'parameter',
             'session_policy',
@@ -564,3 +568,32 @@ class BatchSettings:
         if self.powertrain_costs_fev in self.true_false_dict:
             self.powertrain_costs_fev = self.true_false_dict[self.powertrain_costs_fev]
             effects_log.logwrite(f'{string_id} is {self.powertrain_costs_fev}')
+
+    @staticmethod
+    def path_of_batch_settings_csv():
+        """
+
+        Returns:
+            An open-file dialog to select the batch settings file to use.
+
+        Note:
+            This method allows for a user-interactive means of selecting the desired batch settings file.
+
+        """
+        # set full path to the batch settings file
+        root = tk.Tk()
+        root.attributes("-topmost", True)
+        root.withdraw()
+
+        path_identifier = filedialog.askopenfilename(title='Select the batch settings CSV file')
+
+        path_of_csv = Path(path_identifier)
+
+        return path_of_csv
+
+    def set_runtime_info(self):
+
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            self.runtime_info = 'Running in a PyInstaller bundle'
+        else:
+            self.runtime_info = 'Running in a normal Python process'
