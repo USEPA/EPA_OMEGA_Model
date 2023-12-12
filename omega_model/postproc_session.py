@@ -230,7 +230,7 @@ def run_postproc(iteration_log, credit_banks):
         for idx, ay in enumerate(analysis_years):
             GWh_limit = \
                 (np.interp(ay, omega_globals.options.battery_GWh_limit_years, omega_globals.options.battery_GWh_limit))
-            if gigawatthour_data['vehicle'][idx] > 0:
+            if gigawatthour_data['vehicle'][idx] > 0 and omega_globals.options.relax_second_pass_GWh:
                 mfr_gigawatthour_data[idx] = mfr_gigawatthour_data[idx] * GWh_limit / gigawatthour_data['vehicle'][idx]
         mfr_gigawatthour_limit_data[manufacturer_id] = mfr_gigawatthour_data
 

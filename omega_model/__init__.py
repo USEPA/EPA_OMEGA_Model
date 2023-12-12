@@ -180,6 +180,7 @@ try:
             self.producer_market_category_ramp_limit = 0.2
             self.producer_strategic_compliance_buffer_years = [2020]
             self.producer_strategic_compliance_buffer = [0.0]
+            self.relax_second_pass_GWh = False
 
             # advanced developer settings:
             self.vehicles_file_base_year_offset = None
