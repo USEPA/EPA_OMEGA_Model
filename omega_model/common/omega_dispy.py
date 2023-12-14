@@ -219,8 +219,7 @@ def status_cb(status, node, job):
     return
 
 
-def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_num, session_name, calc_effects,
-                      retry_count=0):
+def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_num, session_name, retry_count=0):
     """
     Runs an OMEGA simulation session on a DispyNode.
 
@@ -230,16 +229,15 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
         batch_file (str): path to the batch file being run
         session_num (int): the session number to be run
         session_name (str): the name of the session being run
-        calc_effects (str): type of effects to calc, if any
         retry_count (int): retry count of the session
 
     """
     import sys, subprocess, os, time
     # build shell command
     cmd = '"{}" "{}/{}/omega_model/omega_batch.py" --bundle_path "{}" \
-            --batch_file "{}.csv" --session_num {} --calc_effects "{}" --no_validate --no_bundle'.format(
+            --batch_file "{}.csv" --session_num {} --no_validate --no_bundle'.format(
         sys.executable, network_batch_path_root, batch_name, network_batch_path_root, batch_file, session_num,
-        calc_effects).replace('/', os.sep)
+        ).replace('/', os.sep)
 
     sysprint('.')
     sysprint(cmd)
@@ -268,7 +266,7 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
     elif os.path.exists(no_result_foldername):
         if retry_count < 3:
             sysprint('@@@ Trying Session "%s" again (attempt %d)... @@@' % (session_name, retry_count + 1))
-            dispy_run_session(batch_name, network_batch_path_root, batch_file, session_num, session_name, calc_effects,
+            dispy_run_session(batch_name, network_batch_path_root, batch_file, session_num, session_name,
                               retry_count=retry_count + 1)
         else:
             sysprint('!!! Abandoning Session "%s"... !!!' % session_name)
@@ -419,7 +417,7 @@ class DispyCluster(object):
         cluster.print_status()
         cluster.shutdown()
 
-    def submit_sessions(self, batch, batch_name, batch_path, batch_file, session_list, calc_effects):
+    def submit_sessions(self, batch, batch_name, batch_path, batch_file, session_list):
         """
         Submit sessions to a DispyCluster.  Called from ``omega_batch.py``.
 
@@ -430,7 +428,6 @@ class DispyCluster(object):
             batch_file (str): the filesystem path to the batch file to run (minus the '.csv' extension),
                 e.g. '/Users/omega_user/bundle/2021_06_29_13_34_44_batch/2021_06_29_13_34_44_batch'
             session_list (iterable): a list or range of one or more sessions to run, by session number, e.g. range(1, 3)
-            calc_effects (str): the type of effects to calc, if any
 
         """
         import dispy, time, sys
@@ -467,7 +464,7 @@ class DispyCluster(object):
             else:
                 print("Submitting Session '%s' to Cluster..." % batch.sessions[session_num].name)
                 job = self.cluster.submit(batch_name, batch_path, batch_file, session_num,
-                                          batch.sessions[session_num].name, calc_effects)
+                                          batch.sessions[session_num].name)
                 if job is not None:
                     job.id = dict({'batch_name': batch_name, 'batch_path': batch_path, 'batch_file': batch_file,
                                    'session_num': session_num, 'session_name': batch.sessions[session_num].name})

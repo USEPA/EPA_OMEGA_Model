@@ -253,8 +253,6 @@ try:
             # list of vehicles to plot in log_producer_compliance_search_years:
             self.plot_and_log_vehicles = []  # ['ICE Large Van truck minivan 4WD']
 
-            self.calc_effects = 'No'  # options are 'No', 'Physical' and 'Physical and Costs' as strings
-
             # dynamic modules / classes
             self.RegulatoryClasses = None
             self.VehicleTargets = None

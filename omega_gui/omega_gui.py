@@ -783,7 +783,6 @@ class Form(QObject):
         command_line_dict['batch_file'] = input_batch_file
         command_line_dict['bundle_path'] = output_batch_directory
         command_line_dict['timestamp'] = batch_time_stamp
-        command_line_dict['calc_effects'] = 'Physical and Costs'
         if multiprocessor_mode_selected:
             command_line_dict['dispy'] = True
             command_line_dict['local'] = True
