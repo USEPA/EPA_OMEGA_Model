@@ -135,7 +135,7 @@ class MarketClass(OMEGABase, MarketClassBase):
 
         """
 
-        if vehicle.body_style == 'sedan_r1nonzev':
+        if vehicle.body_style == 'sedan_wagon_r1nonzev':
             if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
                 market_class_id = 'sedan_wagon_r1nonzev.BEV'
             elif vehicle.base_year_powertrain_type == 'PHEV':
@@ -143,7 +143,7 @@ class MarketClass(OMEGABase, MarketClassBase):
             else:
                 market_class_id = 'sedan_wagon_r1nonzev.ICE'
 
-        elif vehicle.body_style == 'cuv_suv_r1nonzev':
+        elif vehicle.body_style == 'cuv_suv_van_r1nonzev':
             if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
                 market_class_id = 'cuv_suv_van_r1nonzev.BEV'
             elif vehicle.base_year_powertrain_type == 'PHEV':
@@ -158,7 +158,7 @@ class MarketClass(OMEGABase, MarketClassBase):
                 market_class_id = 'pickup_r1nonzev.PHEV'
             else:
                 market_class_id = 'pickup_r1nonzev.ICE'
-        elif vehicle.body_style == 'sedan_r2zev':
+        elif vehicle.body_style == 'sedan_wagon_r2zev':
             if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
                 market_class_id = 'sedan_wagon_r2zev.BEV'
             elif vehicle.base_year_powertrain_type == 'PHEV':
@@ -166,7 +166,7 @@ class MarketClass(OMEGABase, MarketClassBase):
             else:
                 market_class_id = 'sedan_wagon_r2zev.ICE'
 
-        elif vehicle.body_style == 'cuv_suv_r2zev':
+        elif vehicle.body_style == 'cuv_suv_van_r2zev':
             if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
                 market_class_id = 'cuv_suv_van_r2zev.BEV'
             elif vehicle.base_year_powertrain_type == 'PHEV':
