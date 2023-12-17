@@ -14,16 +14,20 @@ File Type
 Sample Header
     .. csv-table::
 
-       input_template_name:,cost_factors_criteria,input_template_version:,0.4
+       input_template_name:,cost_factors_criteria,input_template_version:,0.5
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        calendar_year,dollar_basis,source_id,pm25_low_3.0_USD_per_uston,sox_low_3.0_USD_per_uston,nox_low_3.0_USD_per_uston,pm25_low_7.0_USD_per_uston,sox_low_7.0_USD_per_uston,nox_low_7.0_USD_per_uston,pm25_high_3.0_USD_per_uston,sox_high_3.0_USD_per_uston,nox_high_3.0_USD_per_uston,pm25_high_7.0_USD_per_uston,sox_high_7.0_USD_per_uston,nox_high_7.0_USD_per_uston
-        2025,2020,car pump gasoline,709156.4844,127863.083,7233.620573,636535.1272,114771.2217,6494.477664,1515307.974,273678.4484,15369.82202,1362598.818,246100.5307,13822.37696
-        2030,2020,car pump gasoline,813628.2611,146570.4771,8157.897937,730502.0075,131597.8376,7325.874024,1681059.868,303337.4514,16764.7674,1511757.523,272790.6288,15077.6831
-        2035,2020,car pump gasoline,938850.3917,169075.4785,9195.259845,843175.5181,151847.912,8259.336809,1890653.219,340989.946,18455.67509,1700420.74,306683.2824,16599.76534
+        calendar_year,dollar_basis,source_id,rate,study,pm25,sox,nox
+        2020,2020,car pump gasoline,0.03,Wu,0,0,0
+        2025,2020,car pump gasoline,0.03,Wu,709156.4844,127863.083,7233.620573
+        2030,2020,car pump gasoline,0.03,Wu,813628.2611,146570.4771,8157.897937
+        2035,2020,car pump gasoline,0.03,Wu,938850.3917,169075.4785,9195.259845
+        2040,2020,car pump gasoline,0.03,Wu,1060686.72,191135.9472,10073.96999
+        2045,2020,car pump gasoline,0.03,Wu,1171439.061,211302.6049,10731.06062
+        2050,2020,car pump gasoline,0.03,Wu,1268468.809,229133.7696,11165.95105
 
 Data Column Name and Description
 
@@ -37,9 +41,20 @@ Data Column Name and Description
     :source_id:
         The source of the pollutant, whether it be a gasoline car or an EGU or refinery.
 
-    :pm25_low_3.0_USD_per_uston:
-        The structure for all cost factors is pollutant_study_discount-rate_units, where study refers to the low or
-        high valuation and units are in US dollars per US ton.
+    :rate:
+        The discount rate used in generating the $/ton benefits values.
+
+    :study:
+        The study from which the values are sourced.
+
+    :pm25:
+        The dollar per US ton of PM2.5.
+
+    :sox:
+        The dollar per US ton of SOx.
+
+    :nox:
+        The dollar per US tons of NOx.
 
 ----
 
@@ -58,10 +73,15 @@ class CostFactorsCriteria:
 
     """
     def __init__(self):
-        self._data = dict()  # private dict, cost factors criteria by calendar year
-        self._cache = dict()
+        self._dict = {}
+        self._cache = {}
         self.calc_health_effects = True
         self.df = pd.DataFrame()
+        self.criteria_rates_as_strings = []
+        self.criteria_rates = []
+        self.pollutants = []
+        self.source_ids = []
+        self.studies = []
 
     def init_from_file(self, filepath, batch_settings, effects_log):
         """
@@ -79,24 +99,14 @@ class CostFactorsCriteria:
         """
         # don't forget to update the module docstring with changes here
         input_template_name = 'cost_factors_criteria'
-        input_template_version = 0.4
-        input_template_columns = {
+        input_template_version = 0.5
+        input_template_columns = [
             'calendar_year',
             'dollar_basis',
             'source_id',
-            'pm25_Wu_3.0_USD_per_uston',
-            'sox_Wu_3.0_USD_per_uston',
-            'nox_Wu_3.0_USD_per_uston',
-            'pm25_Wu_7.0_USD_per_uston',
-            'sox_Wu_7.0_USD_per_uston',
-            'nox_Wu_7.0_USD_per_uston',
-            'pm25_Pope_3.0_USD_per_uston',
-            'sox_Pope_3.0_USD_per_uston',
-            'nox_Pope_3.0_USD_per_uston',
-            'pm25_Pope_7.0_USD_per_uston',
-            'sox_Pope_7.0_USD_per_uston',
-            'nox_Pope_7.0_USD_per_uston',
-        }
+            'rate',
+            'study',
+        ]
 
         df = read_input_file(filepath, effects_log)
         validate_template_version_info(
@@ -107,20 +117,31 @@ class CostFactorsCriteria:
         df = read_input_file(filepath, effects_log, skiprows=1)
         validate_template_column_names(filepath, df, input_template_columns, effects_log)
 
+        self.pollutants = [col for col in df.columns if col not in input_template_columns]
+        self.criteria_rates_as_strings = df['rate'].astype('string').unique()
+        for item in self.criteria_rates_as_strings:
+            if len(item) > 5:
+                n = pd.to_numeric(item[:-3])
+            else:
+                n = pd.to_numeric(item)
+            self.criteria_rates.append(n)
+        self.criteria_rates = sorted(set(self.criteria_rates))
+        self.source_ids = df['source_id'].unique()
+        self.studies = df['study'].unique()
+
         if not sum(df['calendar_year']) == 0:
 
             df = df.loc[df['dollar_basis'] != 0, :]
 
-            cols_to_convert = [col for col in df.columns if 'USD_per_uston' in col]
+            df = batch_settings.cpi_deflators.adjust_dollars(batch_settings, df, effects_log, *self.pollutants)
 
-            df = batch_settings.cpi_deflators.adjust_dollars(batch_settings, df, effects_log, *cols_to_convert)
-
-            key = pd.Series(zip(
+            key = zip(
                 df['calendar_year'],
                 df['source_id'],
-            ))
-
-            self._data = df.set_index(key).to_dict(orient='index')
+                df['study'],
+                df['rate'].astype('string'),
+            )
+            self._dict = df.set_index(key).to_dict(orient='index')
             self.df = df.copy()
 
         else:
@@ -145,13 +166,16 @@ class CostFactorsCriteria:
         if cache_key not in self._cache:
 
             calendar_years \
-                = [v['calendar_year'] for k, v in self._data.items() if v['source_id'] == source_id]
+                = [v['calendar_year'] for k, v in self._dict.items() if v['source_id'] == source_id]
 
             year = max([yr for yr in calendar_years if yr <= calendar_year])
 
             factors = []
-            for cf in cost_factors:
-                factors.append(self._data[year, source_id][cf])
+            for cost_factor in cost_factors:
+                pollutant_id, study, criteria_rate = (
+                    cost_factor.split('_')[0], cost_factor.split('_')[1], cost_factor.split('_')[2]
+                )
+                factors.append(self._dict[year, source_id, study, criteria_rate][pollutant_id])
 
             if len(cost_factors) == 1:
                 self._cache[cache_key] = factors[0]

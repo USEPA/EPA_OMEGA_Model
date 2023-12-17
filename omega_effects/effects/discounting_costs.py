@@ -1,6 +1,6 @@
 """
 
-**OMEGA effects discounting module.**
+**OMEGA effects discounting module for costs.**
 
 ----
 
@@ -10,7 +10,7 @@
 import pandas as pd
 
 
-class Discounting:
+class DiscountingCosts:
     """
 
     The Discounting class discounts annual values, sums those to calculate present values and annualizes those present
@@ -27,7 +27,6 @@ class Discounting:
 
         self.all_monetized_args = []
         self.monetized_non_emission_args = []
-        self.rate_list_dict = {}
 
         self.fuel_arg = None
 
@@ -53,24 +52,12 @@ class Discounting:
 
             Values that occur prior to the "Discount Values to Year" input setting will not be discounted.
 
-            Criteria health benefits are generated using $/ton inputs for criteria cost factors. Annual discounted values
-            calculated here are valid only for those social discount rates that match the discount rate used in
-            generating the $/ton benefit values. In other words, annual discounted values using a 2 percent social
-            discount rate are not value if calculated using a 3 or 7 percent discount rate in generating the $/ton
-            values. That said, this does calculate those values for use in generating present and annualized values of
-            the 3 percent health benefits using a 2 percent discount rate.
-
         """
         dict_of_values = annual_values_df.to_dict(orient='index')
         discount_to_year = batch_settings.discount_values_to_year
         cost_accrual = batch_settings.cost_accrual
 
         self.social_discrates = batch_settings.general_inputs_for_effects.get_value('social_discount_rates')
-        scghg_rates = batch_settings.scghg_cost_factors.scghg_rates
-        criteria_rates = None
-        calc_health_effects = batch_settings.criteria_cost_factors.calc_health_effects
-        if calc_health_effects:
-            criteria_rates = [0.03, 0.07]
 
         self.fuel_arg = 'fueling_class'
         if ('car' or 'truck') not in [item for item in annual_values_df['reg_class_id']]:
@@ -79,22 +66,6 @@ class Discounting:
         # establish and distinguish attributes
         nested_dict = [n_dict for n_dict in dict_of_values.values()][0]
         self.all_monetized_args = [k for k, v in nested_dict.items() if '_dollars' in k and 'avg' not in k]
-
-        emission_discrates = []
-        for rate in scghg_rates:
-            emission_discrates.append(rate)
-        if criteria_rates is not None:
-            for rate in criteria_rates:
-                emission_discrates.append(rate)
-
-        emission_discrates = sorted(list(set(emission_discrates)))
-        for emission_discrate in emission_discrates:
-            self.rate_list_dict[emission_discrate] = [
-                arg for arg in self.all_monetized_args if f'_{emission_discrate}_' in arg
-            ]
-            if emission_discrate == 0.02:
-                l = [arg for arg in self.all_monetized_args if '_0.03_' in arg and ('Wu' in arg or 'Pope' in arg)]
-                self.rate_list_dict[emission_discrate] = self.rate_list_dict[emission_discrate] + l
 
         self.monetized_non_emission_args = [arg for arg in self.all_monetized_args if '_0.0' not in arg]
         id_args = [k for k, v in nested_dict.items() if '_dollars' not in k]
@@ -121,20 +92,9 @@ class Discounting:
                         discount_value(arg_value, social_discrate, calendar_year, discount_to_year, cost_accrual)
                     rate_dict.update({arg: discounted_value})
 
-                for emission_discrate, arg_list in self.rate_list_dict.items():
-                    if social_discrate == 0.02 and emission_discrate == 0.03:
-                        pass
-                    else:
-                        for arg in arg_list:
-                            arg_value = v[arg]
-                            discounted_value = \
-                                discount_value(arg_value, emission_discrate, calendar_year, discount_to_year, cost_accrual)
-                            rate_dict.update({arg: discounted_value})
-
-                update_dict[
-                    (session_policy, calendar_year, reg_class_id, in_use_fuel_id, fueling_class,
-                     social_discrate, series)
-                ] = rate_dict
+                update_dict[(
+                    session_policy, calendar_year, reg_class_id, in_use_fuel_id, fueling_class, social_discrate, series
+                )] = rate_dict
 
         dict_of_values.update(update_dict)
 
@@ -224,12 +184,6 @@ class Discounting:
                     annualized_value = annualize_value(present_value, discount_rate, periods, cost_accrual)
                     self.eav_dict[eav_dict_key][arg] = annualized_value
 
-                for emission_discrate, arg_list in self.rate_list_dict.items():
-                    for arg in arg_list:
-                        present_value = v[arg]
-                        annualized_value = annualize_value(present_value, emission_discrate, periods, cost_accrual)
-                        self.eav_dict[eav_dict_key][arg] = annualized_value
-
 
 def discount_model_year_values(model_year_df):
     """
@@ -250,11 +204,12 @@ def discount_model_year_values(model_year_df):
     # establish and distinguish attributes
     nested_dict = [v for v in dict_of_values.values()][0]
     my_monetized_args = [k for k, v in nested_dict.items() if '_dollars' in k and 'avg' not in k]
+    monetized_non_emission_args = [arg for arg in my_monetized_args if '_0.0' not in arg]
     non_discounted_args = [arg for arg in my_monetized_args
                            if 'vehicle' in arg
                            or 'purchase' in arg
                            or 'battery' in arg]
-    discounted_args = [arg for arg in my_monetized_args if arg not in non_discounted_args]
+    discounted_args = [arg for arg in monetized_non_emission_args if arg not in non_discounted_args]
     id_args = [k for k, v in nested_dict.items() if '_dollars' not in k]
 
     discounted_my_dict = {}
@@ -262,7 +217,7 @@ def discount_model_year_values(model_year_df):
 
         vehicle_id, calendar_year, model_year = v['vehicle_id'], v['calendar_year'], v['model_year']
 
-        for social_discrate in Discounting().social_discrates:
+        for social_discrate in DiscountingCosts().social_discrates:
             rate_dict = {}
             for arg in id_args:
                 if arg == 'discount_rate':

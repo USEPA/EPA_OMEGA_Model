@@ -25,18 +25,18 @@ def get_cap_cf(batch_settings, calendar_year, source_id):
 
     """
     cost_factors = (
-        'pm25_Wu_3.0_USD_per_uston',
-        'sox_Wu_3.0_USD_per_uston',
-        'nox_Wu_3.0_USD_per_uston',
-        'pm25_Wu_7.0_USD_per_uston',
-        'sox_Wu_7.0_USD_per_uston',
-        'nox_Wu_7.0_USD_per_uston',
-        'pm25_Pope_3.0_USD_per_uston',
-        'sox_Pope_3.0_USD_per_uston',
-        'nox_Pope_3.0_USD_per_uston',
-        'pm25_Pope_7.0_USD_per_uston',
-        'sox_Pope_7.0_USD_per_uston',
-        'nox_Pope_7.0_USD_per_uston',
+        'pm25_Wu_0.03_USD_per_uston',
+        'sox_Wu_0.03_USD_per_uston',
+        'nox_Wu_0.03_USD_per_uston',
+        'pm25_Wu_0.07_USD_per_uston',
+        'sox_Wu_0.07_USD_per_uston',
+        'nox_Wu_0.07_USD_per_uston',
+        'pm25_Pope_0.03_USD_per_uston',
+        'sox_Pope_0.03_USD_per_uston',
+        'nox_Pope_0.03_USD_per_uston',
+        'pm25_Pope_0.07_USD_per_uston',
+        'sox_Pope_0.07_USD_per_uston',
+        'nox_Pope_0.07_USD_per_uston',
     )
 
     return batch_settings.criteria_cost_factors.get_cost_factors(calendar_year, source_id, cost_factors)

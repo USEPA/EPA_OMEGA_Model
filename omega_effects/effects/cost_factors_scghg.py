@@ -55,7 +55,6 @@ class CostFactorsSCGHG:
 
     def __init__(self):
         self._dict = {}
-        self.factors = []
         self.factors_in_analysis_dollars = pd.DataFrame()
         self.scghg_rates_as_strings = []
         self.scghg_rates = []

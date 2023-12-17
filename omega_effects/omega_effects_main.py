@@ -35,7 +35,8 @@ from omega_effects.effects.egu_inventory import calc_egu_inventory
 from omega_effects.effects.total_inventory import calc_total_inventory
 from omega_effects.effects.cost_effects import calc_cost_effects, calc_annual_cost_effects, calc_period_consumer_view
 
-from omega_effects.effects.discounting import Discounting
+from omega_effects.effects.discounting_costs import DiscountingCosts
+from omega_effects.effects.discounting_benefits import DiscountingBenefits
 from omega_effects.effects.benefits import calc_benefits
 from omega_effects.effects.sum_social_effects import calc_social_effects
 
@@ -46,9 +47,6 @@ def main():
     Main effects code.
 
     """
-    # set_paths = SetPaths()
-    # batch_settings_file = set_paths.path_of_batch_settings_csv()
-
     start_time = time()
     start_time_readable = datetime.now().strftime('%Y%m%d_%H%M%S')
     effects_log = None
@@ -256,7 +254,7 @@ def main():
 
         # discount annual costs ________________________________________________________________________________________
         effects_log.logwrite('\nCalculating discounted annual costs, PVs and EAVs for the batch')
-        discounted_costs = Discounting()
+        discounted_costs = DiscountingCosts()
         discounted_costs.discount_annual_values(batch_settings, annual_costs_df)
         discounted_costs.calc_present_values(batch_settings)
         discounted_costs.calc_annualized_values(batch_settings)
@@ -293,8 +291,8 @@ def main():
 
         # discount annual benefits _____________________________________________________________________________________
         effects_log.logwrite('\nCalculating discounted annual benefits, PVs and EAVs for the batch')
-        discounted_benefits = Discounting()
-        discounted_benefits.discount_annual_values(batch_settings, annual_benefits_df)
+        discounted_benefits = DiscountingBenefits()
+        discounted_benefits.discount_annual_values(batch_settings, annual_benefits_df, effects_log)
         discounted_benefits.calc_present_values(batch_settings)
         discounted_benefits.calc_annualized_values(batch_settings)
         discounted_benefits_dict = {

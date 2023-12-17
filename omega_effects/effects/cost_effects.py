@@ -10,7 +10,7 @@ omega_effects module and other functions here are called from within the calc_co
 """
 import pandas as pd
 
-from omega_effects.effects.discounting import discount_model_year_values
+from omega_effects.effects.discounting_costs import discount_model_year_values
 
 
 def get_congestion_noise_cf(batch_settings, reg_class_id):
