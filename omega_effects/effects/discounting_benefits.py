@@ -120,7 +120,7 @@ class DiscountingBenefits:
                     for gas in batch_settings.scghg_cost_factors.gases:
                         ghg_args = [
                             arg for arg in self.all_monetized_args if
-                            str(scghg_rate) in arg and (gas in arg or 'ghg' in arg)
+                            f'_{scghg_rate}_' in arg and (gas in arg or 'ghg' in arg)
                         ]
                         for ghg_arg in ghg_args:
                             arg_value = v[ghg_arg]
@@ -138,7 +138,7 @@ class DiscountingBenefits:
                                 for pollutant in batch_settings.criteria_cost_factors.pollutants:
                                     cap_args = [
                                         arg for arg in self.all_monetized_args if
-                                        str(criteria_rate) in arg and
+                                        f'_{criteria_rate}_' in arg and
                                         (pollutant in arg or 'cap' in arg) and
                                         study in arg
                                     ]
@@ -169,7 +169,7 @@ class DiscountingBenefits:
                             for pollutant in batch_settings.criteria_cost_factors.pollutants:
                                 cap_args = [
                                     arg for arg in self.all_monetized_args if
-                                    str(criteria_rate) in arg and
+                                    f'_{criteria_rate}_' in arg and
                                     (pollutant in arg or 'cap' in arg) and
                                     study in arg
                                 ]
@@ -284,7 +284,7 @@ class DiscountingBenefits:
                     for gas in batch_settings.scghg_cost_factors.gases:
                         ghg_args = [
                             arg for arg in self.all_monetized_args if
-                            str(scghg_rate) in arg and (gas in arg or 'ghg' in arg)
+                            f'_{scghg_rate}_' in arg and (gas in arg or 'ghg' in arg)
                         ]
                         for ghg_arg in ghg_args:
                             present_value = v[ghg_arg]
@@ -298,7 +298,7 @@ class DiscountingBenefits:
                                 for pollutant in batch_settings.criteria_cost_factors.pollutants:
                                     cap_args = [
                                         arg for arg in self.all_monetized_args if
-                                        str(criteria_rate) in arg and
+                                        f'_{criteria_rate}_' in arg and
                                         (pollutant in arg or 'cap' in arg) and
                                         study in arg
                                     ]
@@ -329,7 +329,7 @@ class DiscountingBenefits:
                             for pollutant in batch_settings.criteria_cost_factors.pollutants:
                                 cap_args = [
                                     arg for arg in self.all_monetized_args if
-                                    str(criteria_rate) in arg and
+                                    f'_{criteria_rate}_' in arg and
                                     (pollutant in arg or 'cap' in arg) and
                                     study in arg
                                 ]
