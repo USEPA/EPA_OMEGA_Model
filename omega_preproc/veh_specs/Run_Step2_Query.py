@@ -3,8 +3,10 @@ import numpy as np
 import datetime
 import os
 
+global Edmunds_MY_fname
 OMEGA_outputs = False
-scraping_Edmunds_MSRP = False
+scraping_Edmunds_CURB_WEIGHT = True
+scraping_Edmunds_MSRP = True
 delete_Prod_VOL_GHG_50_State_for_safety_study_only = True
 
 pd.options.mode.chained_assignment = None  # default='warn'
@@ -52,7 +54,7 @@ def weighted_average(grp):
     #
     # return grp
 
-def scraping_Edmunds_MSRPs (omega_outputs0, df_edms):
+def scraping_Edmunds_MSRPs (omega_outputs0, df_edms, matching_column):
     omega_outputs = omega_outputs0.copy()
     # df_edms = pd.read_csv("I:/Project/Midterm Review/Trends/Trends Data/Edmunds/2022 Measurements" + '\\' + 'Edmunds_MY2022_20230721-055344.csv', encoding="ISO-8859-1")
     # omega_outputs = pd.read_csv('I:/Project/Midterm Review/Trends/Original Trends Team Data Gathering and Analysis/Tech Specifications/techspecconsolidator/Query Runs/20230815/outputs' + '\\' + \
@@ -60,7 +62,7 @@ def scraping_Edmunds_MSRPs (omega_outputs0, df_edms):
 
     df_edms['Model'].replace(regex=['F-'],value='F', inplace=True)
 
-    df_ford = df_edms.loc[df_edms['Make'] == 'Ford', :]
+    # df_ford = df_edms.loc[df_edms['Make'] == 'Ford', :]
     df_edms['Model'].replace('-', ' ', inplace=True, regex=True)
     df_edms['Model'].replace(regex=['MACH E'],value='MACH-E', inplace=True)
     df_edms['Model'].replace(regex=['CX 5'],value='CX-5', inplace=True)
@@ -78,7 +80,7 @@ def scraping_Edmunds_MSRPs (omega_outputs0, df_edms):
     _matching_steps = ['exact', 'model', 'model_trims', 'base']
     for k in range(len(_matching_steps)):
         matching_step = _matching_steps[k]
-        _models_MSRP_nulls = omega_outputs.loc[omega_outputs['MSRP'].astype(str) == 'nan', 'CARLINE_NAME_all'].unique()
+        _models_MSRP_nulls = omega_outputs.loc[omega_outputs[matching_column].astype(str) == 'nan', 'CARLINE_NAME_all'].unique()
 
         for i in range(len(_models_MSRP_nulls)):
             _modelname=_models_MSRP_nulls[i]
@@ -125,12 +127,12 @@ def scraping_Edmunds_MSRPs (omega_outputs0, df_edms):
                     if _idx_most_popular.size == 0: continue
                 try:
                     for j in range(len(_idx_most_popular)):
-                        if '(Most Popular)' in df_edms.loc[_idx_most_popular, 'MSRP'][_idx_most_popular[j]]:
+                        if '(Most Popular)' in df_edms.loc[_idx_most_popular, matching_column][_idx_most_popular[j]]:
                             _idx_msrp = _idx_most_popular[j]
                             break
 
-                    omega_outputs.loc[(omega_outputs['CARLINE_NAME_all'] == _modelname) & (omega_outputs['MSRP'].astype(str) == 'nan'), 'MSRP'] = df_edms.loc[_idx_msrp, 'MSRP'].replace(',', '').split(' ')[0]
-                    print(_maker, _modelname, omega_outputs.loc[(omega_outputs['CARLINE_NAME_all'] == _modelname), 'MSRP'][0], ' (Most Popular)')
+                    omega_outputs.loc[(omega_outputs['CARLINE_NAME_all'] == _modelname) & (omega_outputs[matching_column].astype(str) == 'nan'), matching_column] = df_edms.loc[_idx_msrp, matching_column].replace(',', '').split(' ')[0]
+                    print(_maker, _modelname, omega_outputs.loc[(omega_outputs['CARLINE_NAME_all'] == _modelname), matching_column][0], ' (Most Popular)')
                 except KeyError:
                     continue
             except KeyError:
@@ -367,6 +369,7 @@ for model_year in model_years:
     try:
         master_index_file = pd.read_csv(master_index_filepath + '\\' + master_index_filename, encoding="ISO-8859-1", \
                                     converters={'LineageID': int, 'BodyID': int, 'MODEL_YEAR': int,'Vehghg_ID': int, 'CabinID': float}).astype(str)
+        # df_master_lineageids = master_index_file[list(['Vehghg_ID', 'CAFE_MFR_CD', 'CARLINE_NAME', 'LineageID'])]
     except KeyError:
         print(master_index_filepath, master_index_filename)
 
@@ -399,6 +402,7 @@ for model_year in model_years:
     except KeyError:
         pass
 
+    print("master_index_file['LineageID'][0] = ", master_index_file['LineageID'][0])
     unique_source_info = all_array[['SourceName', 'SourceFile', 'SourceDirectory']].drop_duplicates()
     unique_source_info = unique_source_info[~pd.isnull(unique_source_info['SourceName'])]
     source_matching_categories_source = master_category_check_df.loc[master_index_source]
@@ -421,15 +425,32 @@ for model_year in model_years:
             master_index_file.rename(columns={'WHEEL_BASE_INCHES': 'WHEELBASE'}, inplace=True)
             master_index_file['WHEELBASE'] = master_index_file['WHEELBASE'].astype(float).round(decimals=0).astype(str)
 
+        # df_tmp = pd.merge(master_index_file, source_file, how='left', on=['LineageID'])
         if master_index_source != 'Master Index' and unique_sourcename == 'Master Index':
             vehghg_filepath = unique_filepath
             vehghg_filename = unique_filename
             vehghg_matching_categories = matching_categories
         if unique_sourcename != master_index_source: #If the current source is not the master index, readin the source file
-            if ('Edmunds' in unique_filename):
-                print(unique_filename)
+            #     print('model_year = ', model_year, ', unique_filename = ', unique_filename)
+            if (unique_sourcename == 'Edmunds') and ('Edmunds' not in unique_filename):
+                print('\n\n*** Error: Check the datasource file in the "input" folder ***\n\n')
             try:
                 source_file = pd.read_csv(unique_filepath+ '\\' + unique_filename, converters={'LineageID': int, 'BodyID': int}).astype(str)
+                if ('Edmunds' in unique_filename):
+                    df_edms_columns = source_file.columns
+                    df_edms_fname = unique_filename
+                if model_year <= 2016:
+                    # _drop_cols = ['WHEELBASE', 'BATTERY CAPACITY', 'EPA ELECTRICITY RANGE', 'EPA KWH/100 MI', 'EPA TIME TO CHARGE BATTERY (AT 240V)']
+                    _drop_cols = []
+                    for i in range(len(all_subarray)):
+                        if all_subarray.loc[i, 'Column Name'] not in df_edms_columns:
+                            if (all_subarray.loc[i, 'Column Name'] not in _drop_cols): _drop_cols.append(all_subarray.loc[i, 'Column Name'])
+                    for i in range(len(_drop_cols)):
+                        _idx = all_subarray.loc[all_subarray['Column Name'] == _drop_cols[i], :].index
+                        # _drop_index = [37, 38, 39, 54, 55, 56, 60, 61, 62, 63, 64, 65, 66, 67, 68]
+                        for j in range(len(_idx)):
+                            all_subarray = all_subarray.drop(_idx[j])
+                    all_subarray.reset_index(drop=True, inplace=True)
             except ValueError:
                 try:
                     source_file = pd.read_csv(unique_filepath + '\\' + unique_filename).astype(str)
@@ -463,13 +484,8 @@ for model_year in model_years:
             except KeyError:
                 pass
             try:
-                source_file['Number of Cylinders Category'][
-                    (source_file['Number of Cylinders Category'].astype(str) != 'ELE') & (
-                    source_file['Number of Cylinders Category'] != str(np.nan))] = \
-                    source_file['Number of Cylinders Category'][
-                        (source_file['Number of Cylinders Category'].astype(str) != 'ELE') & (
-                        source_file['Number of Cylinders Category'] != str(np.nan))].astype(float).astype(
-                        int).astype(str)
+                source_file['Number of Cylinders Category'][(source_file['Number of Cylinders Category'].astype(str) != 'ELE') & (source_file['Number of Cylinders Category'] != str(np.nan))] = \
+                    source_file['Number of Cylinders Category'][(source_file['Number of Cylinders Category'].astype(str) != 'ELE') & (source_file['Number of Cylinders Category'] != str(np.nan))].astype(float).astype(int).astype(str)
             except KeyError:
                 pass
 
@@ -486,29 +502,19 @@ for model_year in model_years:
                 present_matching_categories = list(set(matching_categories)-set(missing_matching_categories))
                 try:
                     # print(vehghg_filepath, vehghg_filename)
-                    vehghg_file = pd.read_csv(vehghg_filepath+'\\'+vehghg_filename,\
-                    converters={'LineageID': int, 'BodyID': int}).astype(str)
+                    vehghg_file = pd.read_csv(vehghg_filepath+'\\'+vehghg_filename, converters={'LineageID': int, 'BodyID': int}).astype(str)
                 except UnicodeDecodeError:
-                    vehghg_file = pd.read_csv(vehghg_filepath+'\\'+vehghg_filename,\
-                    converters={'LineageID': int, 'BodyID': int}, encoding = "ISO-8859-1").astype(str)
+                    vehghg_file = pd.read_csv(vehghg_filepath+'\\'+vehghg_filename, converters={'LineageID': int, 'BodyID': int}, encoding = "ISO-8859-1").astype(str)
                 try:
-                    vehghg_file['Number of Cylinders Category'][
-                        (vehghg_file['Number of Cylinders Category'].astype(str) != 'ELE') & (
-                            vehghg_file['Number of Cylinders Category'] != str(np.nan))] = \
-                        vehghg_file['Number of Cylinders Category'][
-                            (vehghg_file['Number of Cylinders Category'].astype(str) != 'ELE') & (
-                                vehghg_file['Number of Cylinders Category'] != str(np.nan))].astype(float).astype(
-                            int).astype(str)
+                    vehghg_file['Number of Cylinders Category'][(vehghg_file['Number of Cylinders Category'].astype(str) != 'ELE') & (vehghg_file['Number of Cylinders Category'] != str(np.nan))] = \
+                        vehghg_file['Number of Cylinders Category'][(vehghg_file['Number of Cylinders Category'].astype(str) != 'ELE') & (vehghg_file['Number of Cylinders Category'] != str(np.nan))].astype(float).astype(int).astype(str)
                 except KeyError:
                     pass
                 if len(present_matching_categories) > 0:
-                    master_index_file = pd.merge_ordered(\
-                        master_index_file, vehghg_file[list(present_matching_categories) + list(missing_matching_categories)], how='left', \
-                        on=list(present_matching_categories))
+                    master_index_file = pd.merge_ordered(master_index_file, vehghg_file[list(present_matching_categories) + list(missing_matching_categories)], how='left', on=list(present_matching_categories))
                 else:
                     master_index_file = pd.merge_ordered(\
-                        master_index_file, vehghg_file[list(vehghg_matching_categories) + list(missing_matching_categories)], how='left', \
-                        on=list(vehghg_matching_categories))
+                        master_index_file, vehghg_file[list(vehghg_matching_categories) + list(missing_matching_categories)], how='left', on=list(vehghg_matching_categories))
                 try:
                     master_index_file['CALC_ID'][~pd.isnull(master_index_file['CALC_ID'])] = \
                         master_index_file['CALC_ID'][~pd.isnull(master_index_file['CALC_ID'])].astype(float).astype(int).astype(str)
@@ -528,11 +534,9 @@ for model_year in model_years:
                 missing_weighitng_fields = list(set(list(pd.Series(pd.Series(all_array['AvgWtField']).unique()).dropna().reset_index(drop=True)))\
                     -set(master_index_file.columns))
                 try:
-                    vehghg_file = pd.read_csv(vehghg_filepath+'\\'+vehghg_filename,\
-                    converters={'LineageID': int, 'BodyID': int}).astype(str)
+                    vehghg_file = pd.read_csv(vehghg_filepath+'\\'+vehghg_filename, converters={'LineageID': int, 'BodyID': int}).astype(str)
                 except UnicodeDecodeError:
-                    vehghg_file = pd.read_csv(vehghg_filepath+'\\'+vehghg_filename,\
-                    converters={'LineageID': int, 'BodyID': int}, encoding = "ISO-8859-1").astype(str)
+                    vehghg_file = pd.read_csv(vehghg_filepath+'\\'+vehghg_filename, converters={'LineageID': int, 'BodyID': int}, encoding = "ISO-8859-1").astype(str)
                 try:
                     source_file['Number of Cylinders Category'][
                         (source_file['Number of Cylinders Category'].astype(str) != 'ELE') & (
@@ -544,12 +548,9 @@ for model_year in model_years:
                 except KeyError:
                     pass
                 vehghg_file[missing_weighitng_fields] = vehghg_file[missing_weighitng_fields].astype(float)
-                missing_weighting_fields_groups = vehghg_file[list(present_matching_categories)+list(missing_weighitng_fields)]\
-                    .groupby(list(present_matching_categories)).sum().reset_index()
-                missing_weighting_fields_groups[list(present_matching_categories)] = missing_weighting_fields_groups[\
-                    list(present_matching_categories)].astype(str)
-                master_index_file = pd.merge_ordered(master_index_file, missing_weighting_fields_groups, \
-                    how='left', on=list(present_matching_categories))
+                missing_weighting_fields_groups = vehghg_file[list(present_matching_categories)+list(missing_weighitng_fields)].groupby(list(present_matching_categories)).sum().reset_index()
+                missing_weighting_fields_groups[list(present_matching_categories)] = missing_weighting_fields_groups[list(present_matching_categories)].astype(str)
+                master_index_file = pd.merge_ordered(master_index_file, missing_weighting_fields_groups, how='left', on=list(present_matching_categories))
                 del vehghg_file
             try:
                 if 'WHEELBASE' in list(matching_categories):
@@ -558,22 +559,27 @@ for model_year in model_years:
                         OEM_towing_quide_unique_LineageID_list = source_file['LineageID'].unique().tolist()
 
                 try:
-                    master_index_file_with_desired_fields_all_merges = master_index_file.merge( \
-                    source_file[list(pd.Series(list(matching_categories) + list(all_subarray['Column Name'].unique())).unique())], \
-                    how='left', on=list(matching_categories)).replace([str(np.nan), ''], np.nan)
+                    if len(master_index_file['LineageID']) == 0:
+                        print("Check vehghg1 file size zero, master_index_file['LineageID']", master_index_file['LineageID'], master_index_file_with_desired_fields_all_merges['LineageID'])
+                        # master_index_file = master_index_file.merge(df_master_lineageids, how='left', on=list(['Vehghg_ID', 'CAFE_MFR_CD', 'CARLINE_NAME', 'LineageID']))
+                        # if model_year == 2016:
+                        #     _drop_cols = ['WHEELBASE', 'BATTERY CAPACITY', 'EPA ELECTRICITY RANGE', 'EPA KWH/100 MI', 'EPA TIME TO CHARGE BATTERY (AT 240V)']
+                        #     for i in range(len(_drop_cols)):
+                        #         all_subarray = all_subarray.drop(_drop_cols[i])
+                    master_index_file_with_desired_fields_all_merges = master_index_file.merge(source_file[list(pd.Series(list(matching_categories) + list(all_subarray['Column Name'].unique())).unique())], how='left', on=list(matching_categories)).replace([str(np.nan), ''], np.nan)
                 except KeyError:
                     print('Turn off the missing list in the field_mapping.csv and main_mapping_category_key.csv')
             except KeyError: #Master file is missing at least one of the data columns from the source file
                 original_source_columns = list(pd.Series(list(matching_categories)+list(all_subarray['Column Name'].unique())).unique())
                 new_source_columns = list(set(original_source_columns)-(set(original_source_columns)-set(list(source_file.columns))))
                 try:
-                    master_index_file_with_desired_fields_all_merges = master_index_file.merge( \
-                        source_file[list(new_source_columns)], how='left', on=list(matching_categories)).replace([str(np.nan), ''], np.nan)
+                    master_index_file_with_desired_fields_all_merges = master_index_file.merge(source_file[list(new_source_columns)], how='left', on=list(matching_categories)).replace([str(np.nan), ''], np.nan)
                 except KeyError:
                     print('*** Merging Error ***', matching_categories)
             del source_file
         else:
             master_index_file_with_desired_fields_all_merges = master_index_file.replace([str(np.nan), ''], np.nan)
+            # print(master_index_file_with_desired_fields_all_merges['LineageID'])
 
         for all_subarray_count in range(0, len(all_subarray)):
             query_type = all_subarray['QueryType'][all_subarray_count]
@@ -582,6 +588,7 @@ for model_year in model_years:
             information_toget_source_column_name = all_subarray['Column Name'][all_subarray_count]
             information_toget = all_subarray['Desired Field'][all_subarray_count]
 
+            # 'Curb Weight_Edmunds'
             if information_toget_source_column_name not in master_index_file_with_desired_fields_all_merges.columns:
                 print('*** ', information_toget_source_column_name, ' Not found ***')
                 continue
@@ -611,16 +618,11 @@ for model_year in model_years:
                 if query_type == 'max':
                     if bounding_field == str(np.nan) or pd.isnull(bounding_field):
                         query_output_source = master_index_file_with_desired_field_all_merges[ \
-                            list(aggregating_columns) + [information_toget_source_column_name]] \
-                            .groupby(list(aggregating_columns)).max().reset_index()
+                            list(aggregating_columns) + [information_toget_source_column_name]].groupby(list(aggregating_columns)).max().reset_index()
                     else:
                         master_index_with_boundingfield_max = master_index_file_with_desired_field_all_merges[ \
-                            list(aggregating_columns) + [bounding_field]] \
-                            .groupby(list(aggregating_columns)).max().reset_index() \
-                            .rename(columns={bounding_field: bounding_field + '_max'})
-                        query_output_source = master_index_with_boundingfield_max.merge( \
-                            master_index_file_with_desired_field_all_merges[ \
-                                list(aggregating_columns) + [bounding_field] + [information_toget_source_column_name]],
+                            list(aggregating_columns) + [bounding_field]].groupby(list(aggregating_columns)).max().reset_index().rename(columns={bounding_field: bounding_field + '_max'})
+                        query_output_source = master_index_with_boundingfield_max.merge(master_index_file_with_desired_field_all_merges[list(aggregating_columns) + [bounding_field] + [information_toget_source_column_name]],
                             how='left', \
                             left_on=list(aggregating_columns) + [bounding_field + '_max'],
                             right_on=list(aggregating_columns) + [bounding_field]) \
@@ -630,8 +632,7 @@ for model_year in model_years:
                 elif query_type == 'min':
                     if bounding_field == str(np.nan) or  pd.isnull(bounding_field):
                         query_output_source = master_index_file_with_desired_field_all_merges[ \
-                            list(aggregating_columns) + [information_toget_source_column_name]] \
-                            .groupby(list(aggregating_columns)).min().reset_index()
+                            list(aggregating_columns) + [information_toget_source_column_name]].groupby(list(aggregating_columns)).min().reset_index()
                     else:
                         master_index_with_boundingfield_min = master_index_file_with_desired_field_all_merges[ \
                             list(aggregating_columns) + [bounding_field]] \
@@ -753,12 +754,37 @@ for model_year in model_years:
     if ('DRIVE TYPE_all' in query_output.columns):
         query_output = query_output.rename({'DRIVE TYPE_all': 'Drive Sys Edmunds_all'}, axis=1)
 
-        # _airbags = query_output.columns[query_output.columns.str.contains('AIRBAG')].tolist() + ['STABILITY CONTROL_all', 'TRACTION CONTROL_all', 'TIRE PRESSURE MONITORING_all']
+    # _airbags = query_output.columns[query_output.columns.str.contains('AIRBAG')].tolist() + ['STABILITY CONTROL_all', 'TRACTION CONTROL_all', 'TIRE PRESSURE MONITORING_all']
     # for i in range(len(_airbags)):
     #     _airbag = _airbags[i]
     #     query_output.loc[query_output[_airbag] == 'null-|yes', _airbag] = 'yes|null'
     #     query_output.loc[query_output[_airbag] == 'yes|null-', _airbag] = 'yes|null'
     #     query_output.loc[query_output[_airbag] == 'null-', _airbag] = 'null'
+    if scraping_Edmunds_CURB_WEIGHT == True:
+        # df_edms['CURB WEIGHT'] = df_edms['CURB WEIGHT'].astype(float)
+        # df_tmp = query_output.loc[(query_output['Curb Weight'].astype(str) == str(np.nan)) | (query_output['Curb Weight'].astype(str) == ''), :]
+        # for i in range(len(df_tmp)):
+        #     _carline_name = df_tmp.loc[df_tmp.index[i], 'CARLINE_NAME_all']
+        #     _carline_name0 = _carline_name.split(' ')[0]
+        #     if len(_carline_name0) == 1:
+        #         _carline_name0 = _carline_name.split(' ')[0] + ' ' + _carline_name.split(' ')[1]
+        #     df_tmp1 = df_edms.loc[(df_edms['Model'].str.contains((_carline_name0), case=False, na=False)), :]
+        #     if len(df_tmp1) > 0:
+        #         _idx = df_tmp1.index
+        #         _curb_wgt = np.mean(df_tmp1.loc[_idx, 'CURB WEIGHT'])
+        #         for j in range(len(_idx)):
+        #             query_output.loc[_idx[j], 'Curb Weight'] = _curb_wgt
+        # query_output.dropna(axis = 0, how = 'all', inplace = True)
+
+        df_tmp = query_output.loc[((query_output['Curb Weight'].astype(str) == str(np.nan)) | (query_output['Curb Weight'].astype(str) == '')), :]
+        if len(df_tmp) == len(query_output):
+            print('stop')
+        if len(df_tmp) > 0:
+            for j in range(len(df_tmp.index)):
+                _idx = df_tmp.index[j]
+                if len(query_output.loc[_idx, 'CARLINE_NAME_all']) > 0:
+                    query_output.loc[_idx, 'Curb Weight'] = query_output.loc[_idx, 'ETW'] - 300
+        query_output.dropna(axis = 0, how = 'all', inplace = True)
 
     if (delete_Prod_VOL_GHG_50_State_for_safety_study_only == True):
         if ('PRODUCTION_VOLUME_GHG_50_STATE' in query_output.columns): query_output.drop(['PRODUCTION_VOLUME_GHG_50_STATE'], axis=1, inplace=True)
@@ -785,7 +811,7 @@ for model_year in model_years:
 
         if scraping_Edmunds_MSRP == True:
             df_edms = pd.read_csv("I:/Project/Midterm Review/Trends/Trends Data/Edmunds/2022 Measurements" + '\\' + 'Edmunds_MY2022_20230721-055344.csv', encoding="ISO-8859-1")
-            omega_outputs = scraping_Edmunds_MSRPs(omega_outputs, df_edms)
+            omega_outputs = scraping_Edmunds_MSRPs(omega_outputs, df_edms, 'MSRP')
 
         df_twgd = pd.read_csv('I:/Project/Midterm Review/Trends/Trends Data/OEMTowingGuide' + '\\' + 'MY2019_OEMTowingGuide_Readin.csv', encoding="ISO-8859-1")
         df_twgd.rename({df_twgd.columns[0]:'Model Year'}, axis=1, inplace=True)
