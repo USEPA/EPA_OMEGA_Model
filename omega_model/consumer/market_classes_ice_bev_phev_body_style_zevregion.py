@@ -69,7 +69,11 @@ class MarketClass(OMEGABase, MarketClassBase):
 
     linked_market_classes = {'sedan_wagon_r2zev.ICE': 'sedan_wagon_r1nonzev.ICE',
                              'cuv_suv_van_r2zev.ICE': 'cuv_suv_van_r1nonzev.ICE',
-                             'pickup_r2zev.ICE': 'pickup_r1nonzev.ICE'}
+                             'pickup_r2zev.ICE': 'pickup_r1nonzev.ICE',
+                             'sedan_wagon_r2zev.PHEV': 'sedan_wagon_r1nonzev.PHEV',
+                             'cuv_suv_van_r2zev.PHEV': 'cuv_suv_van_r1nonzev.PHEV',
+                             'pickup_r2zev.PHEV': 'pickup_r1nonzev.PHEV',
+                             }
 
     @staticmethod
     def get_linestyle(varname):
