@@ -726,7 +726,11 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             production_options.append(create_production_options_from_shares(composite_vehicles, tech_and_share_sweeps,
                                                                        context_based_total_sales))
 
-        production_options = pd.concat(production_options, ignore_index=True)
+        if len(candidate_production_decisions) > 1:
+            production_options = pd.concat(production_options, ignore_index=True)
+        else:
+            # skip unnecessary concat and associated transient memory usage
+            production_options = production_options[0]
 
         # insert code to cull production options based on policy here #
 
