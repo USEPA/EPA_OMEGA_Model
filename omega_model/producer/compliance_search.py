@@ -726,6 +726,9 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             production_options.append(create_production_options_from_shares(composite_vehicles, tech_and_share_sweeps,
                                                                        context_based_total_sales))
 
+            # try to free up some RAM here
+            tech_sweeps = share_sweeps = tech_and_share_sweeps = None
+
         if len(candidate_production_decisions) > 1:
             production_options = pd.concat(production_options, ignore_index=True)
         else:
@@ -747,9 +750,10 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         production_options['battery_GWh_limit'] = battery_GWh_limit
 
         # penalize, but don't cull, points that exceed the limit
-        invalid_pts = production_options['total_battery_GWh'] > battery_GWh_limit
+        invalid_pts = production_options['total_battery_GWh'].values > battery_GWh_limit
         production_options.loc[invalid_pts, 'total_generalized_cost_dollars'] = \
             production_options.loc[invalid_pts, 'total_generalized_cost_dollars'] * 1.25
+        invalid_pts = None  # try to free up some RAM here
 
         if production_options.empty:
             producer_compliance_possible = None
@@ -772,6 +776,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             candidate_production_decisions, compliance_possible = \
                 select_candidate_manufacturing_decisions(production_options, calendar_year, search_iteration,
                                                          producer_iteration_log, buffered_strategic_target_offset_Mg)
+
+            production_options = None  # try to free up some RAM here
 
             producer_compliance_possible |= compliance_possible
 
