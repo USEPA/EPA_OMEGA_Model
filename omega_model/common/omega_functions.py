@@ -14,6 +14,8 @@ import pandas as pd
 from pandas.api.types import is_numeric_dtype
 import numpy as np
 import common.omega_globals as omega_globals
+from collections.abc import Mapping, Container
+from sys import getsizeof
 
 # np.seterr(all='raise')  # for troubleshooting runtime warnings
 
@@ -941,6 +943,41 @@ def send_text(dest, message, email, password):
 
     # lastly quit the server
     server.quit()
+
+
+def deep_getsizeof(o, ids=set()):
+    """
+    Find the memory footprint of a Python object in bytes
+
+    This is a recursive function that drills down a Python object graph
+    like a dictionary holding nested dictionaries with lists of lists
+    and tuples and sets.
+
+    The sys.getsizeof function does a shallow size of only. It counts each
+    object inside a container as pointer only regardless of how big it
+    really is.
+
+    Args:
+        o (obj): the object
+        ids (set): used to hold object id(s)
+
+    Returns:
+        The memory footprint of the object in bytes
+
+    """
+    d = deep_getsizeof
+    if id(o) in ids:
+        return 0
+    r = getsizeof(o)
+    ids.add(id(o))
+    if isinstance(o, str) or isinstance(0, str):
+        return r
+    if isinstance(o, Mapping):
+        return r + sum(d(k, ids) + d(v, ids) for k, v in o.iteritems())
+    if isinstance(o, Container):
+        return r + sum(d(x, ids) for x in o)
+
+    return r
 
 
 if __name__ == '__main__':
