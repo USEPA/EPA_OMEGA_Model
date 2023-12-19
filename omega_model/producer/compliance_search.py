@@ -108,9 +108,14 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
             veh_cost_curve_index = candidate_production_decisions['veh_%s_cost_curve_indices' % cv.vehicle_id]
             min_value = max(veh_min_cost_curve_index, veh_cost_curve_index * (1 - tech_share_range))
             max_value = min(veh_max_cost_curve_index, veh_cost_curve_index * (1 + tech_share_range))
-            cost_curve_options = \
-                np.append(np.append(cost_curve_options,
-                                    np.linspace(min_value, max_value, num=num_tech_options)), veh_cost_curve_index)
+
+            if omega_globals.options.producer_compliance_search_multipoint:
+                cost_curve_options = \
+                    np.append(np.append(cost_curve_options,
+                                        np.linspace(min_value, max_value, num=num_tech_options)), veh_cost_curve_index)
+            else:
+                cost_curve_options = \
+                    np.append(cost_curve_options, np.linspace(min_value, max_value, num=num_tech_options))
 
             if num_tech_options == 1:
                 # CU
@@ -813,6 +818,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             # single-point search:
             candidate_production_decisions = \
                 most_strategic_points.loc[[most_strategic_points['strategic_compliance_error'].idxmin()]]
+            if len(candidate_production_decisions) > 1:
+                print('wtf??')
 
         if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
             omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,

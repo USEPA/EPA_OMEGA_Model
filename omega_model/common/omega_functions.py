@@ -785,9 +785,12 @@ def generate_constrained_nearby_shares(columns, combo, half_range_frac, num_step
             if min_val == max_val:
                 shares = np.append(shares, ASTM_round(val, machine_resolution))
             else:
-                # create new share spread and include previous value
-                shares = np.append(np.append(shares, np.linspace(min_val, max_val, num_steps)),
-                                   ASTM_round(val, machine_resolution))
+                if omega_globals.options.producer_compliance_search_multipoint:
+                    # create new share spread and include previous value
+                    shares = np.append(np.append(shares, np.linspace(min_val, max_val, num_steps)),
+                                       ASTM_round(val, machine_resolution))
+                else:
+                    shares = np.append(shares, np.linspace(min_val, max_val, num_steps))
 
             dfs.append(pd.DataFrame({k: np.unique(shares)}))
 
