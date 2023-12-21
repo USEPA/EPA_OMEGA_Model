@@ -49,6 +49,7 @@ class BatchSettings:
 
     """
     def __init__(self):
+        self.effects_package_version = '2023.12.1'
         self.runtime_info = None
         self.batch_df = pd.DataFrame()
         self.batch_program = None
@@ -594,6 +595,8 @@ class BatchSettings:
     def set_runtime_info(self):
 
         if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-            self.runtime_info = 'Running in a PyInstaller bundle'
+            self.runtime_info = \
+                f'Running in a PyInstaller bundle, OMEGA effects package {self.effects_package_version}'
         else:
-            self.runtime_info = 'Running in a normal Python process'
+            self.runtime_info = \
+                f'Running in a normal Python process, OMEGA effects package {self.effects_package_version}'
