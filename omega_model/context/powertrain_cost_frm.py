@@ -733,7 +733,7 @@ def calc_gasoline_eas_cost(vehicle, locals_dict, learning_factor):
 
     # gpf cost
     gpf_cost = 0
-    if omega_globals.options.powertrain_cost_with_gpf and vehicle.model_year > 2027:
+    if omega_globals.options.powertrain_cost_with_gpf and vehicle.model_year >= 2027:
         cost_key = ('ALL', '-', 'Exhaust', 'gpf', '-', '-', '-')
         adj_factor_gpf = _cache[cost_key]['dollar_adjustment']
         gpf_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) \
