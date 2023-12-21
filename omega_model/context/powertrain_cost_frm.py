@@ -156,7 +156,7 @@ class PowertrainCost(OMEGABase):
             eas_cost = 0
             if gasoline_flag:
                 twc_substrate, twc_washcoat, twc_canning, twc_pgm, twc_cost, gpf_cost = \
-                    calc_gasoline_eas_cost(locals_dict, learning_factor_ice)
+                    calc_gasoline_eas_cost(vehicle, locals_dict, learning_factor_ice)
                 eas_cost = twc_cost + gpf_cost
             elif diesel_flag:
                 diesel_eas_cost = calc_diesel_eas_cost(locals_dict, learning_factor_ice)
@@ -682,11 +682,12 @@ def get_engine_deets(pkg_info):
     return CYL, LITERS, engine_config
 
 
-def calc_gasoline_eas_cost(locals_dict, learning_factor):
+def calc_gasoline_eas_cost(vehicle, locals_dict, learning_factor):
     """
     Calculate exhaust aftertreatment system (eas) costs for gasoline-fueled engines.
 
     Args:
+        vehicle (Vehicle): the vehicle to calc costs for
         locals_dict (dict): local attributes
         learning_factor (float): the learning factor to use
 
@@ -732,7 +733,7 @@ def calc_gasoline_eas_cost(locals_dict, learning_factor):
 
     # gpf cost
     gpf_cost = 0
-    if omega_globals.options.powertrain_cost_with_gpf:
+    if omega_globals.options.powertrain_cost_with_gpf and vehicle.model_year > 2027:
         cost_key = ('ALL', '-', 'Exhaust', 'gpf', '-', '-', '-')
         adj_factor_gpf = _cache[cost_key]['dollar_adjustment']
         gpf_cost = eval(_cache[cost_key]['value'], {'np': np}, locals_dict) \
