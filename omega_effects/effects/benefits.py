@@ -255,6 +255,11 @@ def build_dicts(
         'n2o_egu_metrictons',
         'n2o_upstream_metrictons',
         'n2o_total_metrictons',
+        'co2e_vehicle_metrictons',
+        'co2e_refinery_metrictons',
+        'co2e_egu_metrictons',
+        'co2e_upstream_metrictons',
+        'co2e_total_metrictons',
     ]
     for ghg in ghg_list:
         ghg_tons_dict[ghg] = calc_delta(physical_na, physical_a, ghg)
@@ -269,11 +274,12 @@ def build_dicts(
 
             rate_sum = 0
             for gas in batch_settings.scghg_cost_factors.gases:
-                tons = ghg_tons_dict[f'{gas}_total_metrictons']
-                benefit = tons * scghg_cost_factors[(gas, scope, rate)]
+                if 'co2e' not in gas:
+                    tons = ghg_tons_dict[f'{gas}_total_metrictons']
+                    benefit = tons * scghg_cost_factors[(gas, scope, rate)]
 
-                ghg_benefits.update({f'{gas}_{scope}_{rate}_benefit_dollars': benefit})
-                rate_sum += benefit
+                    ghg_benefits.update({f'{gas}_{scope}_{rate}_benefit_dollars': benefit})
+                    rate_sum += benefit
 
             ghg_benefits.update({f'ghg_{scope}_{rate}_benefit_dollars': rate_sum})
 
@@ -533,6 +539,11 @@ def build_dicts(
             'n2o_egu_metrictons': -ghg_tons_dict['n2o_egu_metrictons'],
             'n2o_upstream_metrictons': - ghg_tons_dict['n2o_upstream_metrictons'],
             'n2o_total_metrictons': - ghg_tons_dict['n2o_total_metrictons'],
+            'co2e_vehicle_metrictons': - ghg_tons_dict['co2e_vehicle_metrictons'],
+            'co2e_refinery_metrictons': -ghg_tons_dict['co2e_refinery_metrictons'],
+            'co2e_egu_metrictons': -ghg_tons_dict['co2e_egu_metrictons'],
+            'co2e_upstream_metrictons': - ghg_tons_dict['co2e_upstream_metrictons'],
+            'co2e_total_metrictons': - ghg_tons_dict['co2e_total_metrictons'],
             'pm25_vehicle_ustons': - cap_tons_dict['pm25_vehicle_ustons'],
             'pm25_refinery_ustons': -cap_tons_dict['pm25_refinery_ustons'],
             'pm25_egu_ustons': -cap_tons_dict['pm25_egu_ustons'],

@@ -35,10 +35,13 @@ def get_inputs_for_effects(batch_settings, arg=None):
             'e0_in_retail_gasoline',
             'e0_energy_density_ratio',
             'diesel_energy_density_ratio',
+            'gwp_ch4',
+            'gwp_n2o',
         ]
-        values = []
-        for arg in args:
-            values.append(batch_settings.general_inputs_for_effects.get_value(arg))
+        values = batch_settings.general_inputs_for_effects.get_value(*args)
+        # values = []
+        # for arg in args:
+        #     values.append(batch_settings.general_inputs_for_effects.get_value(arg))
 
         return values
 
@@ -84,8 +87,9 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
         'onroad_charge_depleting_range_mi',
     ]
 
-    (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, diesel_energy_density_ratio,
-    ) = get_inputs_for_effects(batch_settings)
+    (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share,
+     e0_energy_density_ratio, diesel_energy_density_ratio, gwp_ch4, gwp_n2o) = get_inputs_for_effects(batch_settings)
+    gwp_list = [gwp_ch4, gwp_n2o]
 
     sourcetype_name = None
 
@@ -350,7 +354,7 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                         pass  # add additional liquid fuels (E85) if necessary
 
                 key = (int(v['vehicle_id']), int(v['calendar_year']))
-                calendar_year_effects_dict[key] = calc_vehicle_inventory(vehicle_data)
+                calendar_year_effects_dict[key] = calc_vehicle_inventory(vehicle_data, gwp_list)
 
         physical_effects_dict.update(calendar_year_effects_dict)
 
@@ -375,8 +379,9 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
         small and gets smaller with each future year making this a minor, if not acceptably negligible, impact.
 
     """
-    (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, diesel_energy_density_ratio,
-    ) = get_inputs_for_effects(batch_settings)
+    (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share,
+     e0_energy_density_ratio, diesel_energy_density_ratio, gwp_ch4, gwp_n2o) = get_inputs_for_effects(batch_settings)
+    gwp_list = [gwp_ch4, gwp_n2o]
 
     sourcetype_name = None
 
@@ -613,7 +618,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                 })
 
         key = (int(v['vehicle_id']), int(v['calendar_year']))
-        physical_effects[key] = calc_vehicle_inventory(vehicle_data)
+        physical_effects[key] = calc_vehicle_inventory(vehicle_data, gwp_list)
 
     return physical_effects
 

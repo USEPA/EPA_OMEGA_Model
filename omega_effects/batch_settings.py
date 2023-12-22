@@ -136,6 +136,9 @@ class BatchSettings:
         self.safety_values = None
         self.fatality_rates = None
 
+        self.gwp_ch4 = None
+        self.gwp_n2o = None
+
         self.true_false_dict = {
             True: True,
             False: False,
