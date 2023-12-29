@@ -75,7 +75,7 @@ def calc_social_effects(batch_settings, costs_df, benefits_df, ghg_scope, calc_h
     )), inplace=True)
 
     net_benefit_cost_attributes = [
-        'fuel_pretax_cost_dollars',
+        # 'fuel_pretax_cost_dollars',
         'vehicle_cost_dollars',
         'insurance_cost_dollars',
         'congestion_cost_dollars',
@@ -84,8 +84,14 @@ def calc_social_effects(batch_settings, costs_df, benefits_df, ghg_scope, calc_h
         'repair_cost_dollars',
         # 'refueling_cost_dollars',
     ]
-    non_net_benefit_cost_attributes = [
-        'fuel_retail_cost_dollars',
+    net_benefit_fuel_attributes = [
+        'fuel_pretax_cost_dollars'
+    ]
+    non_net_benefit_fuel_attributes = [
+        'fuel_retail_cost_dollars'
+    ]
+    non_net_benefit_cost_transfers = [
+        # 'fuel_retail_cost_dollars',
         'fuel_taxes_cost_dollars',
         'sales_taxes_cost_dollars',
         'battery_credit_dollars',
@@ -96,17 +102,23 @@ def calc_social_effects(batch_settings, costs_df, benefits_df, ghg_scope, calc_h
         'drive_value_benefit_dollars',
         'refueling_benefit_dollars',
     ]
+    dfb.insert(
+        dfb.columns.get_loc(non_emission_bens[-1]) + 1,
+        'sum_of_non_emission_benefit_dollars',
+        dfb[[*non_emission_bens]].sum(axis=1)
+    )
+
     sum_dict = {}
     # the if-else below is focused on benefits; costs are subtracted from benefits near the end to get net benefits
     if calc_health_effects:
         sum_num = 1
         for study in ['Wu', 'Pope']:
-            for rate in [0.03, 0.07]:
+            for rate in batch_settings.criteria_cost_factors.criteria_rates:
                 for scghg_rate in batch_settings.scghg_cost_factors.scghg_rates_as_strings:
                     sum_dict[sum_num] = {
                         'name': f'ghg{scghg_rate}_{ghg_scope}_cap{rate}_{study}_net_benefit_dollars',
                         'attributes': [
-                            *non_emission_bens,
+                            'sum_of_non_emission_benefit_dollars',
                             f'ghg_{ghg_scope}_{scghg_rate}_benefit_dollars',
                             f'cap_{study}_{rate}_benefit_dollars'
                         ]
@@ -118,7 +130,7 @@ def calc_social_effects(batch_settings, costs_df, benefits_df, ghg_scope, calc_h
             sum_dict[sum_num] = {
                 'name': f'ghg{scghg_rate}_{ghg_scope}_net_benefit_dollars',
                 'attributes': [
-                    *non_emission_bens,
+                    'sum_of_non_emission_benefit_dollars',
                     f'ghg_{ghg_scope}_{scghg_rate}_benefit_dollars',
                 ]
             }
@@ -134,7 +146,6 @@ def calc_social_effects(batch_settings, costs_df, benefits_df, ghg_scope, calc_h
         stranded_no_action_keys[action] = [
             k for k in no_action_keys if (action, k[1], k[2], k[3], k[4], k[5], k[6]) not in action_keys[action]
         ]
-        # stranded_no_action_keys[action] = [k for k in no_action_keys if k not in action_keys[action]]
 
     delta_costs_dict = {}
     for action in action_policies:
@@ -149,8 +160,14 @@ def calc_social_effects(batch_settings, costs_df, benefits_df, ghg_scope, calc_h
                 costs_na = None
 
             delta_costs_dict[key_a] = {}
-            costs = 0
-            for arg in non_net_benefit_cost_attributes:
+            transfers = costs = 0
+            for arg in non_net_benefit_cost_transfers:
+                delta_costs_dict[key_a][arg] = calc_delta(costs_na, costs_a, arg)
+                transfers += calc_delta(costs_na, costs_a, arg)
+            delta_costs_dict[key_a]['sum_of_transfer_dollars'] = transfers
+            for arg in non_net_benefit_fuel_attributes:
+                delta_costs_dict[key_a][arg] = calc_delta(costs_na, costs_a, arg)
+            for arg in net_benefit_fuel_attributes:
                 delta_costs_dict[key_a][arg] = calc_delta(costs_na, costs_a, arg)
             for arg in net_benefit_cost_attributes:
                 delta_costs_dict[key_a][arg] = calc_delta(costs_na, costs_a, arg)
@@ -163,8 +180,14 @@ def calc_social_effects(batch_settings, costs_df, benefits_df, ghg_scope, calc_h
             key_a = (action, calendar_year, series, discount_rate, reg_class_id, in_use_fuel_id, fueling_class)
             costs_na = costs_dict[key_na]
             costs_a = None
-            costs = 0
-            for arg in non_net_benefit_cost_attributes:
+            transfers = costs = 0
+            for arg in non_net_benefit_cost_transfers:
+                delta_costs_dict[key_a][arg] = calc_delta(costs_na, costs_a, arg)
+                transfers += calc_delta(costs_na, costs_a, arg)
+            delta_costs_dict[key_a]['sum_of_transfer_dollars'] = transfers
+            for arg in non_net_benefit_fuel_attributes:
+                delta_costs_dict[key_a][arg] = calc_delta(costs_na, costs_a, arg)
+            for arg in net_benefit_fuel_attributes:
                 delta_costs_dict[key_a][arg] = calc_delta(costs_na, costs_a, arg)
             for arg in net_benefit_cost_attributes:
                 delta_costs_dict[key_a][arg] = calc_delta(costs_na, costs_a, arg)
@@ -204,6 +227,10 @@ def calc_social_effects(batch_settings, costs_df, benefits_df, ghg_scope, calc_h
             new_col,
             summary_effects_df[[item for item in sum_dict[sum_num]['attributes']]].sum(axis=1)
         )
-        summary_effects_df[new_col] = summary_effects_df[new_col] - summary_effects_df['sum_of_cost_dollars']
+        summary_effects_df[new_col] = (
+                summary_effects_df[new_col] -
+                summary_effects_df['sum_of_cost_dollars'] -
+                summary_effects_df['fuel_pretax_cost_dollars']
+        )
 
     return summary_effects_df
