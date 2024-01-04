@@ -346,14 +346,14 @@ def calc_annual_avg_safety_effects(input_df):
         input_df: DataFrame of physical effects by vehicle.
 
     Returns:
-        A DataFrame of physical effects by calendar year.
+        A DataFrame of physical effects by calendar year, regclass, fueling class, etc.
 
     """
     attributes = [col for col in input_df.columns
                   if ('vmt' in col or 'vmt_' in col)
                   and '_vmt' not in col]
     attribute_keys_for_weighting = ['lbs']
-    attributes_to_weight = list()
+    attributes_to_weight = []
     for attribute in attribute_keys_for_weighting:
         for col in input_df:
             if attribute in col:
@@ -361,7 +361,7 @@ def calc_annual_avg_safety_effects(input_df):
 
     # weight appropriate columns by registered_count to work toward weighted averages
     temp_df = pd.DataFrame()
-    wtd_attributes = list()
+    wtd_attributes = []
     for attribute in attributes_to_weight:
         wtd_attributes.append(f'wtd_avg_{attribute}')
         s = pd.Series(input_df['registered_count'] * input_df[attribute], name=f'wtd_avg_{attribute}')
@@ -371,7 +371,7 @@ def calc_annual_avg_safety_effects(input_df):
     if 'medium' in [item for item in input_df['reg_class_id']]:  # TODO is this what is needed?
         mediumduty = 1
 
-    cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id', 'fueling_class',
+    cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'body_style', 'in_use_fuel_id', 'fueling_class',
             'registered_count', 'base_fatalities', 'session_fatalities'
             ]
     for attribute in attributes:
@@ -379,12 +379,58 @@ def calc_annual_avg_safety_effects(input_df):
     df = input_df[cols]
     df = pd.concat([df, temp_df], axis=1)
 
-    # groupby calendar year, regclass and fuel
+    # groupby calendar year, regclass, body style and fuel
     if mediumduty:
-        groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id']
+        groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'body_style', 'in_use_fuel_id']
     else:
-        groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'fueling_class']
+        groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'body_style', 'fueling_class']
 
+    return_df = df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+
+    for attribute in wtd_attributes:
+        return_df[attribute] = return_df[attribute] / return_df['registered_count']
+
+    return return_df
+
+
+def calc_annual_avg_safety_effects_by_body_style(input_df):
+    """
+
+    Args:
+        input_df: DataFrame of physical effects by vehicle.
+
+    Returns:
+        A DataFrame of physical effects by calendar year and body style.
+
+    """
+    attributes = [col for col in input_df.columns
+                  if ('vmt' in col or 'vmt_' in col)
+                  and '_vmt' not in col]
+    attribute_keys_for_weighting = ['lbs']
+    attributes_to_weight = []
+    for attribute in attribute_keys_for_weighting:
+        for col in input_df:
+            if attribute in col:
+                attributes_to_weight.append(col)
+
+    # weight appropriate columns by registered_count to work toward weighted averages
+    temp_df = pd.DataFrame()
+    wtd_attributes = []
+    for attribute in attributes_to_weight:
+        wtd_attributes.append(f'wtd_avg_{attribute}')
+        s = pd.Series(input_df['registered_count'] * input_df[attribute], name=f'wtd_avg_{attribute}')
+        temp_df = pd.concat([temp_df, s], axis=1)
+
+    cols = ['session_policy', 'session_name', 'calendar_year', 'body_style',
+            'registered_count', 'base_fatalities', 'session_fatalities'
+            ]
+    for attribute in attributes:
+        cols.append(attribute)
+    df = input_df[cols]
+    df = pd.concat([df, temp_df], axis=1)
+
+    # groupby calendar year, body style
+    groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'body_style']
     return_df = df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
 
     for attribute in wtd_attributes:
