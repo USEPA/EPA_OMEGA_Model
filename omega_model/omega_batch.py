@@ -316,6 +316,7 @@ print('importing %s' % __file__)
 
 import os, sys
 import copy
+import math
 
 # make sure top-level project folder is on the path (i.e. folder that contains omega_model)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -775,6 +776,8 @@ class OMEGASessionObject(OMEGABase):
         """
         try:
             param = self.batch.dataframe.loc[param_name][self.num]
+            if math.isnan(param) and default_value is not None:
+                param = default_value
         except:
             if default_value is None:
                 if param_name not in self.batch.dataframe:
@@ -820,6 +823,19 @@ class OMEGASessionObject(OMEGABase):
         self.settings.output_folder_base = self.name + os.sep + self.settings.output_folder
         self.settings.output_folder = self.settings.output_folder_base
         self.settings.generate_context_calibration_files = (self.num == 0)
+
+        # possibly override context scalar settings (advanced developer mode...)
+        self.settings.context_id = self.read_parameter('Context Name', self.settings.context_id)
+        self.settings.context_case_id = self.read_parameter('Context Case', self.settings.context_case_id)
+        self.settings.new_vehicle_price_elasticity_of_demand = \
+            self.read_parameter('New Vehicle Price Elasticity of Demand',
+                                self.settings.new_vehicle_price_elasticity_of_demand)
+        self.settings.consumer_pricing_multiplier_max = \
+            self.read_parameter('Producer Cross Subsidy Multiplier Max', self.settings.consumer_pricing_multiplier_max)
+        self.settings.consumer_pricing_multiplier_min = \
+            self.read_parameter('Producer Cross Subsidy Multiplier Min', self.settings.consumer_pricing_multiplier_min)
+        self.settings.credit_market_efficiency = \
+            self.read_parameter('Credit Market Efficiency', self.settings.credit_market_efficiency)
 
         # read context settings
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
