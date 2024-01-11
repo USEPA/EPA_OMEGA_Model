@@ -44,8 +44,9 @@ def calc_egu_inventory(batch_settings, annual_physical_df):  #, physical_effects
         The passed physical effects dictionary with EGU inventories included
 
     """
-    (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, diesel_energy_density_ratio,
-    ) = get_inputs_for_effects(batch_settings)
+    (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share,
+     e0_energy_density_ratio, diesel_energy_density_ratio, gwp_ch4, gwp_n2o) = get_inputs_for_effects(batch_settings)
+    gwp_list = [gwp_ch4, gwp_n2o]
 
     calendar_years = batch_settings.calendar_years
     session_policies = annual_physical_df['session_policy'].unique()
@@ -100,7 +101,9 @@ def calc_egu_inventory(batch_settings, annual_physical_df):  #, physical_effects
                     co2_egu_metrictons = kwhs * co2_egu_rate / grams_per_metric_ton
                     ch4_egu_metrictons = kwhs * ch4_egu_rate / grams_per_metric_ton
                     n2o_egu_metrictons = kwhs * n2o_egu_rate / grams_per_metric_ton
-
+                    co2e_egu_metrictons = (
+                            co2_egu_metrictons + (ch4_egu_metrictons * gwp_ch4) + (n2o_egu_metrictons * gwp_n2o)
+                    )
                     update_dict = {
                         'voc_egu_ustons': voc_egu_ustons,
                         'co_egu_ustons': co_egu_ustons,
@@ -112,6 +115,7 @@ def calc_egu_inventory(batch_settings, annual_physical_df):  #, physical_effects
                         'co2_egu_metrictons': co2_egu_metrictons,
                         'ch4_egu_metrictons': ch4_egu_metrictons,
                         'n2o_egu_metrictons': n2o_egu_metrictons,
+                        'co2e_egu_metrictons': co2e_egu_metrictons,
                     }
                     for attribute_name, attribute_value in update_dict.items():
                         sessions_dict[k][attribute_name] = attribute_value

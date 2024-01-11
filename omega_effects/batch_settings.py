@@ -49,7 +49,7 @@ class BatchSettings:
 
     """
     def __init__(self):
-        self.effects_package_version = '2023.12.1'
+        self.effects_package_version = '2024.1.1'
         self.runtime_info = None
         self.batch_df = pd.DataFrame()
         self.batch_program = None
@@ -135,6 +135,9 @@ class BatchSettings:
         self.refinery_data = None
         self.safety_values = None
         self.fatality_rates = None
+
+        self.gwp_ch4 = None
+        self.gwp_n2o = None
 
         self.true_false_dict = {
             True: True,

@@ -244,14 +244,15 @@ class SessionSettings:
         path_session_out = path_session / 'out'
 
         # Get vehicles_file and vehicle_annual_data_file from the batch/session/out folder.
-        self.vehicles_file \
-            = path_session_out / f'{batch_settings.batch_name}_{self.session_name}_vehicles.csv'
-        self.vehicle_annual_data_file \
-            = path_session_out / f'{batch_settings.batch_name}_{self.session_name}_vehicle_annual_data.csv'
-
+        self.vehicles_file = batch_settings.find_file(
+            path_session_out, f'{self.session_name}_vehicles.csv'
+        )
+        self.vehicle_annual_data_file = batch_settings.find_file(
+            path_session_out, f'{self.session_name}_vehicle_annual_data.csv'
+        )
         self.electricity_prices_file = batch_settings.get_attribute_value(
-            ('Session Electricity Prices', f'{self.session_policy}'), 'full_path')
-
+            ('Session Electricity Prices', f'{self.session_policy}'), 'full_path'
+        )
         self.vehicle_emission_rates_file = batch_settings.get_attribute_value(
             ('Session Vehicle Emission Rates File', f'{self.session_policy}'), 'full_path'
         )
@@ -259,7 +260,7 @@ class SessionSettings:
         find_string = None
         try:
             find_string = 'powertrain_cost'
-            self.powertrain_cost_file = self.find_file(path_session_in, find_string)
+            self.powertrain_cost_file = batch_settings.find_file(path_session_in, find_string)
         except FileNotFoundError:
             effects_log.logwrite(f'{path_session_in} does not contain a {find_string} file.')
             sys.exit()
@@ -340,21 +341,3 @@ class SessionSettings:
         except Exception as e:
             effects_log.logwrite(e)
             sys.exit()
-
-    @staticmethod
-    def find_file(folder, file_id_string):
-        """
-
-        Args:
-            folder (path): the folder in which to search.
-            file_id_string (str): the string for which to search.
-
-        Returns:
-            A Path object to the file.
-
-        """
-        files_in_folder = (entry for entry in folder.iterdir() if entry.is_file())
-        for file in files_in_folder:
-            filename = Path(file).name
-            if file_id_string in filename:
-                return Path(file)

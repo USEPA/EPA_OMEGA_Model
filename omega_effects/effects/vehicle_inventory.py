@@ -122,16 +122,19 @@ class VehiclePhysicalData:
             self.__setattr__(k, v)
 
 
-def calc_vehicle_inventory(vpd):
+def calc_vehicle_inventory(vpd, gwp_list):
     """
 
     Args:
         vpd: an instance of the VehiclePhysicalData class.
+        gwp_list (list): GWP values for CH4 and N2O, in that order.
 
     Returns:
         A dictionary of physical effects for the given VehiclePhysicalData class instance (vehicle).
 
     """
+    gwp_ch4, gwp_n2o = gwp_list[0], gwp_list[1]
+
     # calc exhaust and evaporative emissions for liquid fuel operation
     factor_vmt = vpd.vmt_liquid_fuel / vpd.grams_per_us_ton
     pm25_exh_ustons = vpd.pm25_exh_rate * factor_vmt
@@ -164,27 +167,13 @@ def calc_vehicle_inventory(vpd):
                            sum(
                                [vpd.ethylbenzene_refuel_disp_rate, vpd.ethylbenzene_refuel_spill_rate]) * factor_gallons
                            )
-    # nmog_evap_ustons = sum([vpd.nmog_permeation_rate,
-    #                         vpd.nmog_venting_rate,
-    #                         vpd.nmog_leaks_rate,
-    #                         vpd.nmog_refuel_disp_rate,
-    #                         vpd.nmog_refuel_spill_rate]) * factor_gallons
-    # benzene_evap_ustons = sum([vpd.benzene_permeation_rate,
-    #                            vpd.benzene_venting_rate,
-    #                            vpd.benzene_leaks_rate,
-    #                            vpd.benzene_refuel_disp_rate,
-    #                            vpd.benzene_refuel_spill_rate]) * factor_gallons
-    # ethylbenzene_evap_ustons = sum([vpd.ethylbenzene_permeation_rate,
-    #                                 vpd.ethylbenzene_venting_rate,
-    #                                 vpd.ethylbenzene_leaks_rate,
-    #                                 vpd.ethylbenzene_refuel_disp_rate,
-    #                                 vpd.ethylbenzene_refuel_spill_rate]) * factor_gallons
     naphthalene_evap_ustons = vpd.naphthalene_refuel_spill_rate * factor_gallons
 
     factor_vmt = vpd.vmt_liquid_fuel / vpd.grams_per_metric_ton
     ch4_veh_metrictons = vpd.ch4_exh_rate * factor_vmt
     n2o_veh_metrictons = vpd.n2o_exh_rate * factor_vmt
     co2_veh_metrictons = vpd.onroad_direct_co2e_grams_per_mile * factor_vmt
+    co2e_veh_metrictons = co2_veh_metrictons + (ch4_veh_metrictons * gwp_ch4) + (n2o_veh_metrictons * gwp_n2o)
 
     # calc vehicle inventories as exhaust plus evap (where applicable)
     nmog_veh_ustons = nmog_exh_ustons + nmog_evap_ustons
@@ -288,6 +277,7 @@ def calc_vehicle_inventory(vpd):
         'ch4_vehicle_metrictons': ch4_veh_metrictons,
         'n2o_vehicle_metrictons': n2o_veh_metrictons,
         'co2_vehicle_metrictons': co2_veh_metrictons,
+        'co2e_vehicle_metrictons': co2e_veh_metrictons,
     }
 
     return results_dict

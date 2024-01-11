@@ -27,7 +27,8 @@ from omega_effects.general.file_id_and_save import add_id_to_csv, save_file
 from omega_effects.effects.vmt_adjustments import AdjustmentsVMT
 from omega_effects.effects.context_fuel_cost_per_mile import calc_context_fuel_cost_per_mile
 from omega_effects.effects.safety_effects import \
-    calc_safety_effects, calc_legacy_fleet_safety_effects, calc_annual_avg_safety_effects
+    (calc_safety_effects, calc_legacy_fleet_safety_effects,
+     calc_annual_avg_safety_effects, calc_annual_avg_safety_effects_by_body_style)
 from omega_effects.effects.physical_effects import calc_physical_effects, calc_legacy_fleet_physical_effects, \
     calc_annual_physical_effects, calc_period_consumer_physical_view
 from omega_effects.effects.refinery_inventory_and_oil_imports import calc_refinery_inventory_and_oil_imports
@@ -108,7 +109,7 @@ def main():
             )
 
         # loop thru sessions to calc safety effects, physical effects, cost effects for each ___________________________
-        annual_safety_df = pd.DataFrame()
+        annual_safety_df = annual_safety_by_body_style_df = pd.DataFrame()
         annual_physical_df = pd.DataFrame()
         vehicle_inventory_details_df = pd.DataFrame()
         annual_costs_df = pd.DataFrame()
@@ -158,10 +159,19 @@ def main():
 
             effects_log.logwrite(f'\nCalculating annual safety effects for {session_name}')
             session_annual_safety_df = calc_annual_avg_safety_effects(session_fleet_safety_df)
+            session_annual_safety_by_body_style_df = (
+                calc_annual_avg_safety_effects_by_body_style(session_annual_safety_df)
+            )
 
             # create an annual_safety_effects_df
             annual_safety_df = pd.concat([annual_safety_df, session_annual_safety_df], axis=0, ignore_index=True)
             annual_safety_df.reset_index(inplace=True, drop=True)
+
+            annual_safety_by_body_style_df = pd.concat(
+                [annual_safety_by_body_style_df, session_annual_safety_by_body_style_df],
+                axis=0, ignore_index=True
+            )
+            annual_safety_by_body_style_df.reset_index(inplace=True, drop=True)
 
             # physical effects _________________________________________________________________________________________
             effects_log.logwrite(f'\nCalculating analysis fleet physical effects for {session_name}')
@@ -355,6 +365,9 @@ def main():
         annual_safety_df.to_csv(
             set_paths.path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv', index=False
         )
+        annual_safety_by_body_style_df.to_csv(
+            set_paths.path_of_run_folder / f'{start_time_readable}_safety_effects_by_body_style_summary.csv', index=False
+        )
         annual_physical_df.to_csv(
             set_paths.path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv', index=False
         )
@@ -402,6 +415,9 @@ def main():
         ]
 
         add_id_to_csv(set_paths.path_of_run_folder / f'{start_time_readable}_safety_effects_summary.csv',
+                      output_file_id_info
+                      )
+        add_id_to_csv(set_paths.path_of_run_folder / f'{start_time_readable}_safety_effects_by_body_style_summary.csv',
                       output_file_id_info
                       )
         add_id_to_csv(set_paths.path_of_run_folder / f'{start_time_readable}_physical_effects_annual.csv',

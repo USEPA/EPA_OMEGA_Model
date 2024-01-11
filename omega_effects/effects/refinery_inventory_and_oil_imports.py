@@ -104,9 +104,9 @@ def calc_refinery_inventory_and_oil_imports(batch_settings, annual_physical_df):
         fuel demand.
 
     """
-    (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio,
-     diesel_energy_density_ratio,
-     ) = get_inputs_for_effects(batch_settings)
+    (grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share,
+     e0_energy_density_ratio, diesel_energy_density_ratio, gwp_ch4, gwp_n2o) = get_inputs_for_effects(batch_settings)
+    gwp_list = [gwp_ch4, gwp_n2o]
 
     gallons_arg = 'fuel_consumption_gallons'
     if 'petroleum' in batch_settings.refinery_data.rate_basis:
@@ -197,8 +197,8 @@ def calc_refinery_inventory_and_oil_imports(batch_settings, annual_physical_df):
             fuel = None
 
         voc_refinery_ustons = co_refinery_ustons = nox_refinery_ustons = pm25_refinery_ustons = sox_refinery_ustons = 0
-        co2_refinery_metrictons = ch4_refinery_metrictons = n2o_refinery_metrictons = ice_phev_share = 0
-        context_gallons = session_gallons = oil_imports_change = oil_imports_change_per_day = 0
+        co2_refinery_metrictons = ch4_refinery_metrictons = n2o_refinery_metrictons = co2e_refinery_metrictons = 0
+        ice_phev_share = context_gallons = session_gallons = oil_imports_change = oil_imports_change_per_day = 0
 
         if fuel is not None:
             (voc_ref_rate, nox_ref_rate, pm25_ref_rate, sox_ref_rate, co_ref_rate,
@@ -236,7 +236,9 @@ def calc_refinery_inventory_and_oil_imports(batch_settings, annual_physical_df):
             n2o_refinery_metrictons = calc_inventory(
                 context_gallons, session_gallons, n2o_ref_rate, factor, delta_calc, grams_per_metric_ton
             ) * ice_phev_share
-
+            co2e_refinery_metrictons = (
+                    co2_refinery_metrictons + (ch4_refinery_metrictons * gwp_ch4) + (n2o_refinery_metrictons * gwp_n2o)
+            )
             energy_security_import_factor = get_energysecurity_cf(batch_settings, calendar_year)
             if na_key in sessions_dict:
                 oil_imports_change = (
@@ -259,6 +261,7 @@ def calc_refinery_inventory_and_oil_imports(batch_settings, annual_physical_df):
             'co2_refinery_metrictons': co2_refinery_metrictons,
             'ch4_refinery_metrictons': ch4_refinery_metrictons,
             'n2o_refinery_metrictons': n2o_refinery_metrictons,
+            'co2e_refinery_metrictons': co2e_refinery_metrictons,
             'change_in_barrels_of_oil_imports': oil_imports_change,
             'change_in_barrels_of_oil_imports_per_day': oil_imports_change_per_day,
         }

@@ -40,20 +40,8 @@ Data Column Name and Description
     Descriptive information regarding the attribute name and/or value.
 
 Data Row Name and Description:
-    :kwh_us_annual:
-        This attribute is not used in code.
-
     :gal_per_bbl:
         The number of gallons in a barrel of crude oil.
-
-    :gallons_of_gasoline_us_annual:
-        This attribute is not used in code.
-
-    :bbl_oil_us_annual:
-        This attribute is not used in code.
-
-    :year_for_compares:
-        This attribute is not used in code.
 
     :e0_in_retail_gasoline:
         The amount of petroleum-based gasoline in a gallon of retail gasoline where 'e' refers to ethanol.
@@ -70,20 +58,28 @@ Data Row Name and Description:
     :grams_per_metric_ton:
         The number of grams in a metric ton.
 
-    :share_of_fuel_refined_domestically:
-        The share of petroleum fuel refined domestically.
-
-    :fuel_reduction_leading_to_reduced_domestic_refining:
-        The share of reduced petroleum fuel consumption leading to reduced domestic refining of crude oil; if 0 then domestic
-        refining is assumed to be unaffected by reduced petroleum fuel demand; if 1 then all reduced petroleum demand
-        reduces domestic refining an equal amount.
-
-    :years_in_consumer_view:
+    :years_in_consumer_view_1:
         The number of years of a vehicle's lifetime to include in the model year lifetime, or consumer view, calculations.
+
+    :years_in_consumer_view_2:
+        An additional number of years of a vehicle's lifetime to include in the model year lifetime, or consumer view, calculations.
 
     :include_powertrain_type_in_consumer_cost_view:
         If 0 then powertrain_type (i.e., ICE/HEV/PHEV/BEV) is not included in the model year lifetime, or consumer view, sales
         weighting; if 1 then powertrain_type is included.
+
+    :social_discount_rates:
+        The discount rates to be used for discounting of costs and non-GHG pollutant benefits; the rate(s) should be entered
+        in square brackets, separated by commas and entered as decimal values, i.e., 3% and 7% should be entered as
+        [0.03, 0.07] .
+
+    :gwp_ch4:
+        The CO2 equivalent global warming potential for CH4. This is used for physical effects only as OMEGA does not apply
+        a Social Cost of CO2e value.
+
+    :gwp_n2o:
+        The CO2 equivalent global warming potential for N2O. This is used for physical effects only as OMEGA does not apply
+        a Social Cost of CO2e value.
 
 **CODE**
 
@@ -135,19 +131,22 @@ class GeneralInputsForEffects:
 
         self._data = df.set_index('item').to_dict(orient='index')
 
-    def get_value(self, attribute):
+    def get_value(self, *attributes):
         """
         Get the attribute value for the given attribute.
 
         Args:
-            attribute (str): the attribute(s) for which value(s) are sought.
+            attributes (str): the attribute(s) for which value(s) are sought.
 
         Returns:
             The value of the given attribute.
 
         """
         # note that eval is used here since list-like entry for social discount rates causes all entries to be objects
-        attribute_value = eval(self._data[attribute]['value'])
+        attribute_values = []
+        for attribute in attributes:
+            attribute_values.append(eval(self._data[attribute]['value']))
+        if len(attribute_values) == 1:
+            return attribute_values[0]
 
-        return attribute_value
-
+        return attribute_values

@@ -42,6 +42,7 @@ def calc_total_inventory(annual_physical_df):
         co2_upstream_metrictons = v['co2_refinery_metrictons'] + v['co2_egu_metrictons']
         ch4_upstream_metrictons = v['ch4_refinery_metrictons'] + v['ch4_egu_metrictons']
         n2o_upstream_metrictons = v['n2o_refinery_metrictons'] + v['n2o_egu_metrictons']
+        co2e_upstream_metrictons = v['co2e_refinery_metrictons'] + v['co2e_egu_metrictons']
 
         # sum vehicle and upstream into totals
         nmog_and_voc_total_ustons = v['nmog_vehicle_ustons'] + voc_upstream_ustons
@@ -61,6 +62,7 @@ def calc_total_inventory(annual_physical_df):
         co2_total_metrictons = v['co2_vehicle_metrictons'] + co2_upstream_metrictons
         ch4_total_metrictons = v['ch4_vehicle_metrictons'] + ch4_upstream_metrictons
         n2o_total_metrictons = v['n2o_vehicle_metrictons'] + n2o_upstream_metrictons
+        co2e_total_metrictons = v['co2e_vehicle_metrictons'] + co2e_upstream_metrictons
 
         update_dict = {
             'voc_upstream_ustons': voc_upstream_ustons,
@@ -71,6 +73,7 @@ def calc_total_inventory(annual_physical_df):
             'co2_upstream_metrictons': co2_upstream_metrictons,
             'ch4_upstream_metrictons': ch4_upstream_metrictons,
             'n2o_upstream_metrictons': n2o_upstream_metrictons,
+            'co2e_upstream_metrictons': co2e_upstream_metrictons,
             'nmog_and_voc_total_ustons': nmog_and_voc_total_ustons,
             'co_total_ustons': co_total_ustons,
             'nox_total_ustons': nox_total_ustons,
@@ -87,6 +90,7 @@ def calc_total_inventory(annual_physical_df):
             'co2_total_metrictons': co2_total_metrictons,
             'ch4_total_metrictons': ch4_total_metrictons,
             'n2o_total_metrictons': n2o_total_metrictons,
+            'co2e_total_metrictons': co2e_total_metrictons,
         }
         for attribute_name, attribute_value in update_dict.items():
             sessions_dict[k][attribute_name] = attribute_value
