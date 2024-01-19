@@ -40,6 +40,7 @@ class VehiclePhysicalData:
         self.footprint_ft2 = None
         self.workfactor = None
         self.registered_count = None
+        self.context_stock_adjustment = None
         self.context_vmt_adjustment = None
         self.annual_vmt = 0
         self.odometer = 0
@@ -60,6 +61,7 @@ class VehiclePhysicalData:
         self.fuel_generation_kwh = 0
         self.curbweight_lbs = 0
         self.gvwr_lbs = 0
+        self.weight_class = 'na'
         self.onroad_charge_depleting_range_mi = 0
 
         self.session_fatalities = 0
@@ -223,6 +225,7 @@ def calc_vehicle_inventory(vpd, gwp_list):
         'footprint_ft2': vpd.footprint_ft2,
         'workfactor': vpd.workfactor,
         'registered_count': vpd.registered_count,
+        'context_stock_adjustment': vpd.context_stock_adjustment,
         'context_vmt_adjustment': vpd.context_vmt_adjustment,
         'annual_vmt': vpd.annual_vmt,
         'odometer': vpd.odometer,
@@ -245,6 +248,7 @@ def calc_vehicle_inventory(vpd, gwp_list):
         'fuel_generation_kwh': vpd.fuel_generation_kwh,
         'curbweight_lbs': vpd.curbweight_lbs,
         'gvwr_lbs': vpd.gvwr_lbs,
+        'weight_class': vpd.weight_class,
 
         'barrels_of_oil': oil_bbl,
         'session_fatalities': vpd.session_fatalities,

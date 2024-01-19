@@ -294,6 +294,7 @@ class LegacyFleet:
                 'vehicle_id': v['vehicle_id'],
                 'age': v['age'],
                 'calendar_year': v['calendar_year'],
+                'context_stock_adjustment': context_stock_adj,
                 'registered_count': adjusted_registered_count,
                 'context_vmt_adjustment': context_vmt_adjustment,
                 'annual_vmt': annual_vmt_adjusted,

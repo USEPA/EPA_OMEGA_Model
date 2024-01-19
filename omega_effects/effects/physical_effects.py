@@ -119,6 +119,13 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                 onroad_charge_depleting_range_mi = \
                 vehicle_info_dict[v['vehicle_id']]
 
+            # weight class
+            weight_class = 'LD'
+            if reg_class_id == 'mediumduty' and gvwr_lbs <= 10000:
+                weight_class = '2b'
+            elif reg_class_id == 'mediumduty':
+                weight_class = '3'
+
             if target_co2e_grams_per_mile is not None:
                 fuel_dict = eval(in_use_fuel_id)
                 fuel = [item for item in fuel_dict.keys()][0]
@@ -151,6 +158,7 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                     'age': int(v['age']),
                     'name': name,
                     'registered_count': v['registered_count'],
+                    # 'context_stock_adjustment': v['context_stock_adjustment'],
                     'base_year_reg_class_id': base_year_reg_class_id,
                     'reg_class_id': reg_class_id,
                     'manufacturer_id': manufacturer_id,
@@ -165,6 +173,7 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                     'battery_kwh': battery_kwh,
                     'curbweight_lbs': curbweight_lbs,
                     'gvwr_lbs': gvwr_lbs,
+                    'weight_class': weight_class,
                     'vmt': v['vmt'],
                     'vmt_liquid_fuel': vmt_liquid_fuel,
                     'annual_vmt': v['annual_vmt'],
@@ -411,11 +420,13 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'calendar_year': v['calendar_year'],
             'model_year': model_year,
             'age': v['age'],
+            'curbweight_lbs': v['curbweight_lbs'],
             'vmt': v['vmt'],
             'vmt_liquid_fuel': vmt_liquid_fuel,
             'annual_vmt': v['annual_vmt'],
             'odometer': v['odometer'],
             'context_vmt_adjustment': v['context_vmt_adjustment'],
+            'context_stock_adjustment': v['context_stock_adjustment'],
             'body_style': v['body_style'],
             'registered_count': v['registered_count'],
             'reg_class_id': v['reg_class_id'],
