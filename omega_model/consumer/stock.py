@@ -18,7 +18,7 @@ def get_vehicle_info(vehicle_id):
     Gets vehicle info for the given vehicle ID
 
     Args:
-        vehicle_id (int): the vehicle ID (e.g. 1,2,3...)
+        vehicle_id (str): the vehicle ID (e.g. 'OEM_42')
 
     Returns:
         Vehicle market_class_id, model_year, initial_registered_count
@@ -27,8 +27,6 @@ def get_vehicle_info(vehicle_id):
     # from producer.vehicles import Vehicle
 
     if vehicle_id not in vehicles_cache:
-        # vehicles_cache[vehicle_id] = Vehicle.get_vehicle_attributes(vehicle_id, ['market_class_id', 'model_year',
-        #                                                                               '_initial_registered_count'])
         try:
             vehicles_cache[vehicle_id] = [(v.market_class_id, v.model_year, v.initial_registered_count)
                                       for v in omega_globals.finalized_vehicles if v.vehicle_id == vehicle_id][0]
@@ -78,7 +76,6 @@ def update_stock(calendar_year, compliance_id=None):
         if age == 0:
             odometer = annual_vmt
         else:
-            # odometer = max(0, odometer_data[odometer_data['vehicle_id'].values == vad.vehicle_id]['odometer'].values)
             odometer = max(0, vad['odometer'])
             odometer += annual_vmt
 
@@ -116,7 +113,7 @@ def update_stock(calendar_year, compliance_id=None):
                 odometer += annual_vmt
 
                 vad_list.append(VehicleAnnualData.create(calendar_year=calendar_year,
-                                  vehicle_id=int(vehicle_id),
+                                  vehicle_id=vehicle_id,
                                   compliance_id=compliance_id,
                                   age=age,
                                   registered_count=registered_count,

@@ -32,7 +32,7 @@ class VehicleAnnualData(OMEGABase):
 
         Args:
             calendar_year (int): the calendar year
-            vehicle_id (int): the vehicle id number
+            vehicle_id (str): the vehicle id
             compliance_id (str): manufacturer name, or 'consolidated_OEM'
             age (int): vehicle age in years
             registered_count (float): the registered count of the given vehicle
@@ -135,7 +135,7 @@ class VehicleAnnualData(OMEGABase):
 
         Args:
             calendar_year (int): calendar to get data for
-            vehicle_id (int): the vehicle_id
+            vehicle_id (str): the vehicle_id
             attribute_name (str): the attribute_name for which a value is sought
 
         Returns:
@@ -185,7 +185,7 @@ if __name__ == '__main__':
 
         from producer.manufacturers import Manufacturer  # required by vehicles
         from context.onroad_fuels import OnroadFuel  # required by vehicles
-        from producer.vehicles import Vehicle  # for foreign key vehicle_id
+        from producer.vehicles import Vehicle  # for vehicle_id
 
         if not init_fail:
             pass

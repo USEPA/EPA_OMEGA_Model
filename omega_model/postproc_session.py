@@ -55,11 +55,14 @@ def run_postproc(iteration_log, credit_banks):
     vehicle_years = list(range(omega_globals.options.analysis_initial_year - 1,
                                omega_globals.options.analysis_final_year + 1))
 
-    vehicle_data = sorted([v for v in omega_globals.finalized_vehicles if v.in_production], key=lambda v: v.vehicle_id)
+    vehicle_data = sorted([v for v in omega_globals.finalized_vehicles if v.in_production])
 
     # index vehicle annual data by vehicle id and age for quick access
-    vehicle_annual_data_df = pd.DataFrame(VehicleAnnualData._data).set_index(['compliance_id', 'vehicle_id', 'age'])
-    vehicle_annual_data_df.sort_values(['vehicle_id', 'age'], inplace=True)
+    vehicle_annual_data_df = pd.DataFrame(VehicleAnnualData._data)
+    vehicle_annual_data_df['mfr'] = vehicle_annual_data_df['vehicle_id'].apply(lambda x: x.split('_')[0])
+    vehicle_annual_data_df['num'] = vehicle_annual_data_df['vehicle_id'].apply(lambda x: int(x.split('_')[1]))
+    vehicle_annual_data_df = vehicle_annual_data_df.sort_values(by=['mfr', 'num']).drop(['mfr', 'num'], axis=1)
+    vehicle_annual_data_df = vehicle_annual_data_df.set_index(['compliance_id', 'vehicle_id', 'age'])
     vehicle_annual_data_df.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name
                                   + '_vehicle_annual_data.csv', columns=sorted(vehicle_annual_data_df.columns))
     vehicle_annual_data = vehicle_annual_data_df.to_dict(orient='index')
@@ -67,8 +70,7 @@ def run_postproc(iteration_log, credit_banks):
     analysis_years = vehicle_years[1:]
 
     vehicles_table = pd.DataFrame([v.to_dict(types=[int, float, bool, str, np.int64, np.float64])
-                                   for v in omega_globals.finalized_vehicles])
-    vehicles_table.sort_values('vehicle_id', inplace=True)
+                                   for v in sorted(omega_globals.finalized_vehicles)])
     vehicles_table.to_csv(
         omega_globals.options.output_folder + omega_globals.options.session_unique_name + '_vehicles.csv',
         columns=sorted(vehicles_table.columns), index=False)

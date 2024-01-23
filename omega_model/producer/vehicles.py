@@ -400,7 +400,7 @@ class CompositeVehicle(OMEGABase):
 
         Args:
             vehicles_list ([Vehicle, ...]: list of one or more ``Vehicle`` objects
-            verbose (bool): enable additional console and logfile output if ``True``
+            vehicle_id (str): the vehicle id
             calc_composite_cost_curve (bool): if ``True`` then calculate the composite cost curve
             weight_by (str): name of the ``Vehicle`` attribute to weight by, e.g. 'initial_registered_count' or
             'base_year_market_share'
@@ -795,7 +795,7 @@ def transfer_vehicle_data(from_vehicle, model_year):
     to_vehicle = from_vehicle.copy()
 
     # set unique vehicle id
-    to_vehicle.vehicle_id = Vehicle.get_next_vehicle_id()
+    to_vehicle.vehicle_id = Vehicle.get_next_vehicle_id(to_vehicle.manufacturer_id)
 
     # update model year
     to_vehicle.model_year = model_year
@@ -824,7 +824,7 @@ class Vehicle(OMEGABase):
         ``producer.vehicles.transfer_vehicle_data()``, ``Vehicle``, ``context.CostCloud``
 
     """
-    _next_vehicle_id = 0
+    _next_vehicle_ids = dict()
 
     _cache = dict()
 
@@ -845,9 +845,12 @@ class Vehicle(OMEGABase):
     dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
     dynamic_attributes = []  #: list of dynamic attribute names, from dynamic_columns
 
-    def __init__(self):
+    def __init__(self, manufacturer_id):
         """
         Create a new ``Vehicle`` object
+
+        Args:
+            manufacturer_id (str): manufacturer id, e.g. 'consolidated_OEM', 'Ford', etc
 
         """
         self._initial_registered_count = 0  #: vehicle initial registered count (i.e. sales)
@@ -874,7 +877,7 @@ class Vehicle(OMEGABase):
         self.in_production = False  #: ``True`` if vehicle is in production
         self.in_use_fuel_id = None  #: in-use / onroad fuel ID
         self.lifetime_VMT = 0  #: lifetime VMT, used to calculate CO2e Mg
-        self.manufacturer_id = None  #: vehicle manufacturer ID
+        self.manufacturer_id = manufacturer_id  #: vehicle manufacturer ID
         self.market_class_id = None  #: market class ID, as determined by the consumer subpackage
         self.market_class_cross_subsidy_multiplier = 0  #: vehicle market class cross subsidy multiplier
         self.model_year = None  #: vehicle model year
@@ -898,7 +901,7 @@ class Vehicle(OMEGABase):
         self.total_emachine_kw = 0  #: vehicle motor/generator total combined power, kW
         self.tractive_motor_kw = 0  #: on-cycle tractive motor power, kW
         self.unibody_structure = 1  #: unibody structure flag, e.g. 0,1
-        self.vehicle_id = Vehicle.get_next_vehicle_id()  #: unique vehicle ID, database table primary key
+        self.vehicle_id = Vehicle.get_next_vehicle_id(manufacturer_id)  #: unique vehicle ID
         self.workfactor = 0  #: medium-duty workfactor
 
         # base year vehicle attributes, used to track changes from original vehicle
@@ -939,30 +942,58 @@ class Vehicle(OMEGABase):
         for dc in Vehicle.dynamic_columns:
             self.__setattr__(dc, 0)
 
+    def __lt__(self, other):
+        """
+            "less-than" function for sorting vehicle lists by ``vehicle_id``
+
+        Args:
+            other (Vehicle): the comparison vehicle
+
+        Returns:
+            ``True`` if ``self.vehicle_id`` is less than ``other.vehicle_id``
+
+        """
+        self_mfr_id, self_id = self.vehicle_id.split('_')
+        other_mfr_id, other_id = other.vehicle_id.split('_')
+        if self_mfr_id == other_mfr_id:
+            return int(self_id) < int(other_id)
+        else:
+            return self_mfr_id < other_mfr_id
+
     @staticmethod
     def reset_vehicle_ids():
         """
         Reset vehicle IDs.  Sets ``Vehicle.next_vehicle_id`` to an initial value.
 
         """
-        Vehicle._next_vehicle_id = 0
+        Vehicle._next_vehicle_ids = dict()
 
     @staticmethod
-    def _set_next_vehicle_id():
+    def _set_next_vehicle_id(manufacturer_id):
         """
-        Increments ``Vehicle._next_vehicle_id``.
+        Increments ``Vehicle._next_vehicle_id`` for the given manufacturer
+
+        Args:
+            manufacturer_id (str): manufacturer id, e.g. 'consolidated_OEM', 'Ford', etc
 
         """
-        Vehicle._next_vehicle_id = Vehicle._next_vehicle_id + 1
+        Vehicle._next_vehicle_ids[manufacturer_id] = Vehicle._next_vehicle_ids[manufacturer_id] + 1
 
     @staticmethod
-    def get_next_vehicle_id():
+    def get_next_vehicle_id(manufacturer_id):
         """
         Gets vehicle id and increments ``Vehicle.next_vehicle_id``.
 
+        Args:
+            manufacturer_id (str): manufacturer id, e.g. 'consolidated_OEM', 'Ford', etc
+
         """
-        next_vehicle_id = Vehicle._next_vehicle_id
-        Vehicle._set_next_vehicle_id()
+        if manufacturer_id not in Vehicle._next_vehicle_ids:
+            Vehicle._next_vehicle_ids[manufacturer_id] = 0
+
+        next_vehicle_id = '%s_%d' % (manufacturer_id, Vehicle._next_vehicle_ids[manufacturer_id])
+
+        Vehicle._set_next_vehicle_id(manufacturer_id)
 
         return next_vehicle_id
 
@@ -1426,7 +1457,7 @@ class Vehicle(OMEGABase):
             A new ``Vehicle`` object with non-powertrain attributes copied from the given vehicle
 
         """
-        inherit_properties = ['name', 'manufacturer_id', 'compliance_id',
+        inherit_properties = ['name', 'compliance_id',
                               'reg_class_id', 'context_size_class', 'unibody_structure', 'body_style',
                               'base_year_reg_class_id', 'base_year_market_share', 'base_year_vehicle_id',
                               'curbweight_lbs', 'base_year_glider_non_structure_mass_lbs', 'base_year_cert_fuel_id',
@@ -1442,7 +1473,7 @@ class Vehicle(OMEGABase):
 
         # model year and registered count are required to make a full-blown Vehicle object, compliance_id
         # is required for vehicle annual data init
-        veh = Vehicle()
+        veh = Vehicle(vehicle.manufacturer_id)
         veh.model_year = vehicle.model_year
         veh.compliance_id = vehicle.compliance_id
         veh.initial_registered_count = 1
@@ -1482,10 +1513,10 @@ class Vehicle(OMEGABase):
         from context.body_styles import BodyStyles
 
         for i in df.index:
-            veh = Vehicle()
+            veh = Vehicle(df.loc[i, 'manufacturer_id'])
             veh.name=df.loc[i, 'vehicle_name']
-            veh.vehicle_id=i
-            veh.manufacturer_id=df.loc[i, 'manufacturer_id']
+            # veh.vehicle_id=i
+            # veh.manufacturer_id=df.loc[i, 'manufacturer_id']
             veh.model_year=df.loc[i, 'model_year']
             veh.context_size_class=df.loc[i, 'context_size_class']
             veh.cost_curve_class=df.loc[i, 'cost_curve_class']

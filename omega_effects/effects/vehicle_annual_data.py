@@ -137,7 +137,7 @@ class VehicleAnnualData:
                 if v['registered_count'] >= 1:
                     age = v['age']
                     # need vehicle info once for each vehicle, not every calendar year for each vehicle
-                    vehicle_id = int(v['vehicle_id'])
+                    vehicle_id = v['vehicle_id']
 
                     if vehicle_id not in vehicle_info_dict:
                         vehicle_info_dict[vehicle_id] \

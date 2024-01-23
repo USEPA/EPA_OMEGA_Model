@@ -202,7 +202,7 @@ def calc_safety_effects(batch_settings, session_settings):
                 'session_policy': session_settings.session_policy,
                 'session_name': session_settings.session_name,
                 'vehicle_id': v['vehicle_id'],
-                'base_year_vehicle_id': int(base_year_vehicle_id),
+                'base_year_vehicle_id': base_year_vehicle_id,
                 'manufacturer_id': manufacturer_id,
                 'name': name,
                 'calendar_year': calendar_year,

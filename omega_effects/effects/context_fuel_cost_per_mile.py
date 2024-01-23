@@ -56,7 +56,7 @@ def calc_context_fuel_cost_per_mile(batch_settings, session_settings):
         for v in vads:
 
             # need vehicle info once for each vehicle_id, not every calendar year for each vehicle_id
-            vehicle_id = int(v['vehicle_id'])
+            vehicle_id = v['vehicle_id']
             age = int(v['age'])
 
             if vehicle_id not in vehicle_info_dict:

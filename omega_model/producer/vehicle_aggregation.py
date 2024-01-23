@@ -196,8 +196,6 @@ class VehicleAggregation(OMEGABase):
     **Implements aggregation of detailed vehicle data into compliance vehicles.**
 
     """
-    next_vehicle_id = 0
-
     def __init__(self):
         pass
 
@@ -359,7 +357,7 @@ class VehicleAggregation(OMEGABase):
 
             for idx, row in df.iterrows():
                 # calc powertrain cost
-                veh = Vehicle()
+                veh = Vehicle(row['manufacturer_id'])
                 veh.model_year = row['model_year']
                 veh.body_style = row['body_style']
                 veh.drive_system = row['drive_system']

@@ -456,28 +456,16 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
              cid_manufacturer_annual_data, cid_context_new_vehicle_generalized_costs,
              cid_session_new_vehicle_generalized_costs, cid_cost_tracker) in compliance_id_results:
 
-            cid_finalized_vehicles.sort(key=lambda v: v.vehicle_id)  # sort vehicles by id
-            vid_map_dict = dict()
-            # update vehicle ids and add to omega_globals.finalized_vehicles
-            # print(cid_finalized_vehicles)
-            for v in cid_finalized_vehicles:
-                vid_map_dict[v.vehicle_id] = Vehicle.get_next_vehicle_id()
-                v.vehicle_id = vid_map_dict[v.vehicle_id]
-                # print(compliance_id, v.compliance_id, v.model_year, v.vehicle_id)
-                omega_globals.finalized_vehicles.append(v)
+            cid_finalized_vehicles.sort()
+            omega_globals.finalized_vehicles.extend(cid_finalized_vehicles)
 
             # update credit banks
-            # print(cid_credit_banks)
             credit_banks.update(cid_credit_bank)
 
             # update iteration_log
-            # print(compliance_id, cid_iteration_log)
             iteration_log.extend(cid_iteration_log)
 
-            # update vehicle ids in vehicle annual data and update VehicleAnnualData
-            for vad in cid_vehicle_annual_data:
-                if vad['vehicle_id'] in vid_map_dict:
-                    vad['vehicle_id'] = vid_map_dict[vad['vehicle_id']]
+            # update VehicleAnnualData
             VehicleAnnualData._data.extend(cid_vehicle_annual_data)
 
             # update manufacturer annual data
@@ -488,12 +476,7 @@ def run_producer_consumer(pass_num, manufacturer_annual_data_table):
             NewVehicleMarket._session_new_vehicle_generalized_costs.update(cid_session_new_vehicle_generalized_costs)
 
             # update cost tracker data
-            cost_tracker = dict()
-            for k, v in cid_cost_tracker.items():
-                if v['vehicle_id'] in vid_map_dict:
-                    v['vehicle_id'] = vid_map_dict[v['vehicle_id']]
-                    cost_tracker[(v['vehicle_id'], v['model_year'])] = v
-            omega_globals.options.PowertrainCost.cost_tracker.update(cost_tracker)
+            omega_globals.options.PowertrainCost.cost_tracker.update(cid_cost_tracker)
 
     else:
         for compliance_id in Vehicle.compliance_ids:
