@@ -26,7 +26,7 @@ class VehicleAnnualData(OMEGABase):
     _data = []
 
     @staticmethod
-    def create(calendar_year, vehicle_id, compliance_id, age, registered_count=0, annual_vmt=0, odometer=0, vmt=0):
+    def create(calendar_year, vehicle_id, compliance_id, age, reg_class_id, registered_count=0, annual_vmt=0, odometer=0, vmt=0):
         """
         Create a dict of the given values.
 
@@ -35,6 +35,7 @@ class VehicleAnnualData(OMEGABase):
             vehicle_id (str): the vehicle id
             compliance_id (str): manufacturer name, or 'consolidated_OEM'
             age (int): vehicle age in years
+            reg_class_id (str): reg class id, e.g. 'car', 'truck', etc
             registered_count (float): the registered count of the given vehicle
             annual_vmt (float): annual vehicle miles travelled
             odometer (float): the accumulate vehicle miles travelled of the given vehicle
@@ -45,8 +46,8 @@ class VehicleAnnualData(OMEGABase):
 
         """
         return {'calendar_year': calendar_year, 'compliance_id': compliance_id, 'vehicle_id': vehicle_id,
-                'age': age, 'registered_count': registered_count, 'annual_vmt': annual_vmt, 'odometer': odometer,
-                'vmt': vmt}
+                'age': age, 'reg_class_id': reg_class_id, 'registered_count': registered_count,
+                'annual_vmt': annual_vmt, 'odometer': odometer, 'vmt': vmt}
 
     @staticmethod
     def add_all(vad_list):
@@ -87,7 +88,7 @@ class VehicleAnnualData(OMEGABase):
 
         if not vad:
             vad = VehicleAnnualData.create(int(calendar_year), vehicle.vehicle_id, vehicle.compliance_id, age,
-                                           registered_count)
+                                           vehicle.reg_class_id, registered_count)
             VehicleAnnualData.add_all(vad)
         else:
             vad[0]['registered_count'] = registered_count
