@@ -65,10 +65,18 @@ omega\_effects.effects.cost\_factors\_scghg module
    :undoc-members:
    :show-inheritance:
 
-omega\_effects.effects.discounting module
------------------------------------------
+omega\_effects.effects.discounting\_benefits module
+---------------------------------------------------
 
-.. automodule:: omega_effects.effects.discounting
+.. automodule:: omega_effects.effects.discounting_benefits
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+omega\_effects.effects.discounting\_costs module
+------------------------------------------------
+
+.. automodule:: omega_effects.effects.discounting_costs
    :members:
    :undoc-members:
    :show-inheritance:
