@@ -28,7 +28,7 @@ def get_vehicle_info(vehicle_id):
 
     if vehicle_id not in vehicles_cache:
         try:
-            vehicles_cache[vehicle_id] = [(v.market_class_id, v.model_year, v.initial_registered_count)
+            vehicles_cache[vehicle_id] = [(v.market_class_id, v.model_year, v.initial_registered_count, v.reg_class_id)
                                       for v in omega_globals.finalized_vehicles if v.vehicle_id == vehicle_id][0]
         except:
             print('stock.py exception !!!')
@@ -62,7 +62,7 @@ def update_stock(calendar_year, compliance_id=None):
     # omega_globals.session.add_all(this_years_vehicle_annual_data)
     # UPDATE vehicle annual data for this year's stock
     for vad in this_years_vehicle_annual_data:
-        market_class_id, model_year, initial_registered_count = get_vehicle_info(vad['vehicle_id'])
+        market_class_id, model_year, initial_registered_count, reg_class_id = get_vehicle_info(vad['vehicle_id'])
         age = calendar_year - model_year
 
         reregistration_factor = omega_globals.options.Reregistration.\
@@ -84,6 +84,7 @@ def update_stock(calendar_year, compliance_id=None):
             vad['annual_vmt'] = annual_vmt
             vad['odometer'] = odometer
             vad['vmt'] = annual_vmt * registered_count
+            vad['reg_class_id'] = reg_class_id
 
     if not last_years_vehicle_annual_data:
         prior_year_vehicle_data = []
@@ -95,7 +96,7 @@ def update_stock(calendar_year, compliance_id=None):
     # CREATE vehicle annual data for last year's stock, now one year older:
     if prior_year_vehicle_data:
         for vehicle_id, prior_odometer in prior_year_vehicle_data:
-            market_class_id, model_year, initial_registered_count = get_vehicle_info(vehicle_id)
+            market_class_id, model_year, initial_registered_count, reg_class_id = get_vehicle_info(vehicle_id)
             age = int(calendar_year - model_year)
 
             reregistration_factor = omega_globals.options.Reregistration.\
@@ -117,6 +118,7 @@ def update_stock(calendar_year, compliance_id=None):
                                   compliance_id=compliance_id,
                                   age=age,
                                   registered_count=registered_count,
+                                  reg_class_id=reg_class_id,
                                   annual_vmt=annual_vmt,
                                   odometer=odometer,
                                   vmt=annual_vmt * registered_count))
