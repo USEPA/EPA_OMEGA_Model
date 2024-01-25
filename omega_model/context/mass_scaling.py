@@ -237,6 +237,7 @@ if __name__ == '__main__':
                     Dummy Vehicle class
 
                 """
+                model_year = 2024
                 body_style = 'sedan'
                 base_year_footprint_ft2 = 20
                 footprint_ft2 = 22

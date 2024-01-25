@@ -319,7 +319,9 @@ if __name__ == '__main__':
 
         omega_log.init_logfile()
 
-        
+        omega_globals.options.market_classes_file = \
+            (omega_globals.options.omega_model_path +
+             '/test_inputs/market_classes_ice_bev_phev-body_style_zevregions.csv')
 
         init_fail += MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)

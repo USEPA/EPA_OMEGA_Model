@@ -234,9 +234,11 @@ if __name__ == '__main__':
                                                  verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            omega_globals.options.analysis_initial_year = int(Vehicle.get_max_model_year() + 1)
+            omega_globals.options.analysis_initial_year = 2024
 
             sales_demand = context_new_vehicle_sales(omega_globals.options.analysis_initial_year)
+
+            print_dict(sales_demand)
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())

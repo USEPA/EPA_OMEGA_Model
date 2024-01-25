@@ -743,9 +743,9 @@ if __name__ == '__main__':
                 mcd['average_new_vehicle_mfr_cost_%s' % mcat] = [35000, 25000]
                 mcd['average_footprint_ft2_%s' % mcat] = [45, 45]
 
-            share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'Ford',
-                                                  mcd.loc[0, :], mcd, 'sedan_wagon',
-                                                  ['sedan_wagon.ICE', 'sedan_wagon.BEV'])
+            # share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'Ford',
+            #                                       mcd.loc[0, :], mcd, 'sedan_wagon',
+            #                                       ['sedan_wagon.ICE', 'sedan_wagon.BEV'])
 
         else:
             print(init_fail)

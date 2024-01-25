@@ -621,8 +621,6 @@ if __name__ == '__main__':
 
         init_fail += init_user_definable_decomposition_attributes(omega_globals.options.verbose)
 
-        
-
         init_fail += Manufacturer.init_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)
 
@@ -665,42 +663,42 @@ if __name__ == '__main__':
                                         omega_globals.options.phev_vehicle_simulation_results_file,
                                         verbose=omega_globals.options.verbose)
 
-        init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
-                                                       verbose=omega_globals.options.verbose)
-
-        init_fail += Vehicle.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
-                                                 verbose=omega_globals.options.verbose)
-
-        if not init_fail:
-            omega_globals.options.analysis_initial_year = 2021
-            omega_globals.options.analysis_final_year = 2035
-
-            # test market shares at different CO2e and price levels
-            mcd = pd.DataFrame()
-            for mc in omega_globals.options.MarketClass.market_classes:
-                mcd['average_ALT_modified_cross_subsidized_price_%s' % mc] = [35000, 25000]
-                mcd['average_ALT_onroad_direct_kwh_pmi_%s' % mc] = [.300, .300]
-                mcd['average_onroad_direct_kwh_pmi_%s' % mc] = [0.250, 0.250]
-                mcd['average_ALT_onroad_direct_co2e_gpmi_%s' % mc] = [125, 150]
-                mcd['average_onroad_direct_co2e_gpmi_%s' % mc] = [125, 150]
-                mcd['average_ALT_retail_fuel_price_dollars_per_unit_%s' % mc] = [2.75, 3.25]
-                mcd['producer_abs_share_frac_%s' % mc] = [1/len(omega_globals.options.MarketClass.market_classes),
-                                                          1/len(omega_globals.options.MarketClass.market_classes)]
-                mcd['average_rated_hp_%s' % mc] = [250, 175]
-                mcd['average_curbweight_lbs_%s' % mc] = [3500, 3750]
-
-            for mcat in omega_globals.options.MarketClass.market_categories:
-                mcd['average_new_vehicle_mfr_cost_%s' % mcat] = [35000, 25000]
-                mcd['average_footprint_ft2_%s' % mcat] = [45, 45]
-
-            share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'Ford', mcd.loc[0, :],
-                                                  mcd, 'sedan_wagon_r1nonzev',
-                                                  ['sedan_wagon_r1nonzev.ICE', 'sedan_wagon_r1nonzev.BEV'])
-
-        else:
-            print(init_fail)
-            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+        # init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
+        #                                                verbose=omega_globals.options.verbose)
+        #
+        # init_fail += Vehicle.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+        #                                          verbose=omega_globals.options.verbose)
+        #
+        # if not init_fail:
+        #     omega_globals.options.analysis_initial_year = 2021
+        #     omega_globals.options.analysis_final_year = 2035
+        #
+        #     # test market shares at different CO2e and price levels
+        #     mcd = pd.DataFrame()
+        #     for mc in omega_globals.options.MarketClass.market_classes:
+        #         mcd['average_ALT_modified_cross_subsidized_price_%s' % mc] = [35000, 25000]
+        #         mcd['average_ALT_onroad_direct_kwh_pmi_%s' % mc] = [.300, .300]
+        #         mcd['average_onroad_direct_kwh_pmi_%s' % mc] = [0.250, 0.250]
+        #         mcd['average_ALT_onroad_direct_co2e_gpmi_%s' % mc] = [125, 150]
+        #         mcd['average_onroad_direct_co2e_gpmi_%s' % mc] = [125, 150]
+        #         mcd['average_ALT_retail_fuel_price_dollars_per_unit_%s' % mc] = [2.75, 3.25]
+        #         mcd['producer_abs_share_frac_%s' % mc] = [1/len(omega_globals.options.MarketClass.market_classes),
+        #                                                   1/len(omega_globals.options.MarketClass.market_classes)]
+        #         mcd['average_rated_hp_%s' % mc] = [250, 175]
+        #         mcd['average_curbweight_lbs_%s' % mc] = [3500, 3750]
+        #
+        #     for mcat in omega_globals.options.MarketClass.market_categories:
+        #         mcd['average_new_vehicle_mfr_cost_%s' % mcat] = [35000, 25000]
+        #         mcd['average_footprint_ft2_%s' % mcat] = [45, 45]
+        #
+        #     share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'Ford', mcd.loc[0, :],
+        #                                           mcd, 'sedan_wagon_r1nonzev',
+        #                                           ['sedan_wagon_r1nonzev.ICE', 'sedan_wagon_r1nonzev.BEV'])
+        #
+        # else:
+        #     print(init_fail)
+        #     print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
+        #     os._exit(-1)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)
