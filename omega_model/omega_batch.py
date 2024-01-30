@@ -822,7 +822,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.session_is_reference = self.num == 0
         self.settings.output_folder_base = self.name + os.sep + self.settings.output_folder
         self.settings.output_folder = self.settings.output_folder_base
-        self.settings.generate_context_calibration_files = (self.num == 0)
+        self.settings.generate_context_calibration_files = self.settings.session_is_reference
 
         # possibly override context scalar settings (advanced developer mode...)
         self.settings.context_id = self.read_parameter('Context Name', self.settings.context_id)
