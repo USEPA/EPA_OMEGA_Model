@@ -99,7 +99,7 @@ try:
             self.vehicles_df = pd.DataFrame()  #: used to store base year vehicle data as a result of vehicle aggregation
 
             # user context settings:
-            self.analysis_final_year = 2024  #: must be >= analysis_initial_year
+            self.analysis_final_year = 2024  #: must be >= ``analysis_initial_year``
             # Note that the implicit_price_deflator.csv input file must contain data for this entry:
             self.analysis_dollar_basis = 2022  #: the 'dollar year' of analysis ouputs, for comparing costs adjusted for inflation/deflation
             self.context_id = 'AEO2021'  #: id of the context data used for the context session, e.g. 'AEO2021'
@@ -115,7 +115,7 @@ try:
             self.onroad_vehicle_calculations_file = path + 'test_inputs/onroad_vehicle_calculations.csv'  #: path the onroad vehicle calculations file, used by the ``Vehicle`` class
             self.onroad_vmt_file = path + 'test_inputs/annual_vmt_fixed_by_age_ice_bev_phev-body_style.csv'  #: path the onroad annual vehicle miles travelled file, used by the user-definable ``OnroadVMT`` class
             self.consumer_pricing_multiplier_max = 1.1  #: maximum market class price multiplier during producer cross-subsidy
-            self.consumer_pricing_multiplier_min = 1/1.1  #: minimum market class price multiplier during producer cross-subsidy (ideally should be 1/consumer_pricing_multiplier_max)
+            self.consumer_pricing_multiplier_min = 1/1.1  #: minimum market class price multiplier during producer cross-subsidy (ideally should be ``1/consumer_pricing_multiplier_max``)
             self.producer_generalized_cost_file = path + 'test_inputs/producer_generalized_cost-body_style.csv'  #: path to the producer generalized cost file, used by the user-definable ``ProducerGeneralizedCost`` class
             self.production_constraints_file = path + 'test_inputs/production_constraints-body_style.csv'  #: path to the production constraings file, used by ``context.production_constraints``
             self.sales_share_file = path + 'test_inputs/sales_share_params_ice_bev_phev_body_style.csv'  #: path to the sales share file, used by the user-definable ``SalesShare`` class
@@ -163,7 +163,7 @@ try:
             self.footprint_max_scaler = 1.05  #: vehicle footprint maximum scaler in producer footprint sweep as part of composite vehicle cost cloud generation
             self.redesign_interval_gain_years = [2020]  #: used in combination with ``redesign_interval_gain`` to allow modification of vehicle redesign cadence if desired
             self.redesign_interval_gain = [1.0]  #: used in combination with ``redesign_interval_gain_years`` to allow modification of vehicle redesign cadence if desired
-            self.non_context_session_process_scaler = 1  #: used to modify the number of processes used by non-context sessions when multiprocessing, (e.g. 2 = used 1/2 the default number of processes)
+            self.non_context_session_process_scaler = 1  #: used to modify the number of processes used by non-context sessions when multiprocessing, (e.g. 2 = use 1/2 the default number of processes)
             self.producer_shares_mode = True  #: if ``True`` then consumer share response is ignored.  Used for development, troubleshooting, or quicker runtime during testing
             self.producer_compliance_search_multipoint = True #: if ``True`` then the producer compliance search will simultaneously approach compliance from points above and below compliance (if possible)
             self.powertrain_cost_with_ira = True  #: if ``True`` then Inflation Reduction Act incentives will apply to powertrain costs
@@ -193,10 +193,10 @@ try:
             self.rlhp60_min_scaler = 1.0  #: minimum roadload horsepower at 60 MPH scaler when sweeping RLHP60
             self.rlhp60_max_scaler = 1.0  #: maximum roadload horsepower at 60 MPH scaler when sweeping RLHP60
             self.allow_ice_of_bev = False  #: if ``True`` then base year BEVs will have ICE-equivalent alternative powertrain vehicles available starting at first redesign
-            self.phev_battery_kwh = None  #: 'RSE' => use RSE, None => use range calc, otherwise use scalar value to size PHEV battery capacity
+            self.phev_battery_kwh = None  #: ``'RSE'`` => use RSE, ``None`` => use range calc, otherwise use scalar value to size PHEV battery capacity
             self.force_two_pass = False  #: can be used to force two pass (consolidated and non-consolidated compliance passes) as desired
-            self.include_manufacturers_list = 'all'  #: 'all' to include all base year vehicle manufacturers, else list of manufacturers to include, e.g. ['Ford', 'Honda', ...]
-            self.exclude_manufacturers_list = 'none'  #: 'none' to include all base year vehicle manufacturers, else list of manufacturers to exclude, e.g. ['Ferrari', 'Bugatti', ...]
+            self.include_manufacturers_list = 'all'  #: ``'all'`` to include all base year vehicle manufacturers, else list of manufacturers to include, e.g. ``['Ford', 'Honda', ...]``
+            self.exclude_manufacturers_list = 'none'  #: ``'none'`` to include all base year vehicle manufacturers, else list of manufacturers to exclude, e.g. ``['Ferrari', 'Bugatti', ...]``
             self.cost_curve_frontier_affinity_factor = 0.75  #: used in calculation cloud frontiers, lower values generate a more 'approximate' fit to the cloud and a lower number of points on the frontier, higher values generate a tighter fit and generally more points
             self.slice_tech_combo_cloud_tables = False  #: if ``True`` then only save producer search production options data within +- 20% of the target Mg, used in combination with ``log_producer_compliance_search_years`` and ``verbose_log_modules``
             self.verbose = False  #: if ``True`` then enable optional console outputs
@@ -238,15 +238,15 @@ try:
 
             self.canary_byvid = -1  #: canary base year vehicle ID, for development or troubleshooting
 
-            self.log_vehicle_cloud_years = []  #: = 'all' or list of years to log, empty list to disable logging
+            self.log_vehicle_cloud_years = []  #: = ``'all'`` or list of years to log, empty list to disable logging
 
-            self.log_producer_compliance_search_years = []  #: = 'all' or list of years to log, empty list to disable logging
+            self.log_producer_compliance_search_years = []  #: = ``'all'`` or list of years to log, empty list to disable logging
 
-            self.log_consumer_iteration_years = [2050]  #: = 'all' or list of years to log, empty list to disable logging
+            self.log_consumer_iteration_years = [2050]  #: = ``'all'`` or list of years to log, empty list to disable logging
 
-            self.log_producer_decision_and_response_years = []  #: = 'all' or list of years to log, empty list to disable logging
+            self.log_producer_decision_and_response_years = []  #: = ``'all'`` or list of years to log, empty list to disable logging
 
-            self.plot_and_log_vehicles = []  #: list of vehicles to plot in log_producer_compliance_search_years, by namem e.g. ['ICE Large Van truck minivan 4WD']
+            self.plot_and_log_vehicles = []  #: list of vehicles to plot in log_producer_compliance_search_years, by namem e.g. ``['ICE Large Van truck minivan 4WD']``
 
             # dynamic modules / classes
             self.RegulatoryClasses = None  #: reference to user-definable RegulatoryClasses class
