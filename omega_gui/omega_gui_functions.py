@@ -4,7 +4,7 @@ Contains functions used by the GUI.
 
 """
 
-from PySide2.QtWidgets import QFileDialog
+from PySide6.QtWidgets import QFileDialog
 import yaml  # installed by PyYAML
 
 import pandas
@@ -110,7 +110,7 @@ def directory_dialog(file_name, file_type, file_dialog_title):
     dialog = QFileDialog()
     dialog.selectFile(file_name)
     dialog.setWindowTitle(file_dialog_title)
-    dialog.setFileMode(QFileDialog.DirectoryOnly)
+    dialog.setFileMode(QFileDialog.Directory)
     dialog.setNameFilter(file_type)
     dialog.setViewMode(QFileDialog.Detail)
     # temp = dialog.selectedFiles()

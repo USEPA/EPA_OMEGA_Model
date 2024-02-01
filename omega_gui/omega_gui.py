@@ -20,15 +20,15 @@ import psutil
 
 import multitimer
 
-from PySide2.QtGui import QIcon, QColor, QTextOption
-from PySide2.QtWidgets import QWidget, QMessageBox
+from PySide6.QtGui import QIcon, QColor, QTextOption
+from PySide6.QtWidgets import QWidget, QMessageBox
 # from playsound import playsound
 
 # PyCharm indicates the next statement is not used but is needed for the compile process to satisfy PySide2.QtUiTools.
-import PySide2.QtXml
-from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import QApplication
-from PySide2.QtCore import QFile, QObject
+import PySide6.QtXml
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QFile, QObject
 
 from datetime import datetime
 
@@ -532,7 +532,7 @@ class Form(QObject):
             now = datetime.now()
             date_time = now.strftime("%m/%d/%Y %H:%M:%S")
             text = date_time + "  " + text
-        # if color != 'black':
+        # if color != "black":
         self.window.event_monitor_result.setTextColor(QColor(color))
         self.window.event_monitor_result.append(text)
 
@@ -637,19 +637,19 @@ class Form(QObject):
 
             temp1 = "Configuration Loaded.\n"
             temp1 = temp1 + "Model Run Enabled."
-            self.event_monitor(temp1, 'black', '')
+            self.event_monitor(temp1, "black", '')
         elif not configuration_file_valid and input_batch_file_valid and output_batch_directory_valid:
             # self.clear_wizard()
             temp1 = "Configuration has changed.  Save Configuration File if desired."
-            self.event_monitor(temp1, 'black', '')
+            self.event_monitor(temp1, "black", '')
             temp1 = "Configuration Loaded.\n"
             temp1 = temp1 + "Model Run Enabled."
-            self.event_monitor(temp1, 'black', '')
+            self.event_monitor(temp1, "black", '')
             configuration_file_valid = True
         elif not configuration_file_valid and (not input_batch_file_valid or not output_batch_directory_valid):
             # self.clear_wizard()
             temp1 = "Elements in the Configuration are invalid:"
-            self.event_monitor(temp1, 'black', '')
+            self.event_monitor(temp1, "black", '')
             if not input_batch_file_valid:
                 temp2 = "Input Batch File Invalid:\n    [" + input_batch_file + "]"
                 self.event_monitor(temp2, 'red', 'dt')
@@ -695,16 +695,16 @@ class Form(QObject):
             self.window.multiprocessor_checkbox.setEnabled(1)  # Enable multiprocessor checkbox if running
             message = "Multiprocessor Mode Available\n" \
                 "----------"
-            # self.event_monitor(message, 'black', '')
+            # self.event_monitor(message, "black", '')
         else:
             # self.window.multiprocessor_checkbox.setEnabled(0)  # Disable multiprocessor checkbox if not running
             message = "Multiprocessor Mode Not Available\n" \
                 "----------"
-            # self.event_monitor(message, 'black', '')
+            # self.event_monitor(message, "black", '')
 
         # Prime the wizard
         # self.clear_wizard()
-        self.event_monitor(wizard_init, 'black', '')
+        self.event_monitor(wizard_init, "black", '')
         # Create 'scenario' dictionary for later reference
         scenario = {'input_batch_file': {'input_batch_file': 'null'},
                     'output_batch_directory': {'output_batch_directory': 'null'},

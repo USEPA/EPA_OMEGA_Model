@@ -174,10 +174,10 @@ def textbox_stylesheet():
 
     :return: String containing stylesheet.
     """
-
     stylesheet = """
-        QTextEdit { border: 1px solid; border-radius:6px; background-color: palette(base);  }
+        QTextEdit { border: 1px solid; border-radius:6px; background-color: white; color: black}
      """
+
     return stylesheet
 
 
