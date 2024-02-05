@@ -287,9 +287,9 @@ class NewVehicleMarket(OMEGABase):
 
         Args:
             calendar_year (numeric): calendar year
-            context_size_class (str): optional context size class, e.g. 'Small Crossover'
-            context_reg_class (str): optional context reg class, e.g. 'car' or 'truck'
-            context_body_style (str): e.g. 'sedan_wagon'
+            context_size_class (str | None): optional context size class, e.g. 'Small Crossover'
+            context_reg_class (str | None): optional context reg class, e.g. 'car' or 'truck'
+            context_body_style (str | None): e.g. 'sedan_wagon'
             value (str): the column name of the context value to sum
 
         Returns:

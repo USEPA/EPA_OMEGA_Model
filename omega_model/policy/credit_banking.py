@@ -126,7 +126,8 @@ class CreditBank(OMEGABase):
         Initialize credit bank data from input file, call after validating ghg_credits and ghg_params templates.
 
         Args:
-            ghg_credits_filename (str): name of input file containing pre-existing credit info
+            ghg_credit_params_filename (str): name of the GHG credit parameters input file
+            ghg_credits_filename (str | None): name of input file containing pre-existing credit info
             compliance_id (str): name of manufacturer, e.g. 'consolidated_OEM'
             verbose (bool): enable additional console and logfile output if True
 
@@ -148,7 +149,7 @@ class CreditBank(OMEGABase):
         Read GHG credit parameters input file.  Call after ``validate_ghg_credit_params_template()``.
 
         Args:
-            ghg_credit_params_filename (str): name of the input file
+            ghg_credit_params_filename (str): name of the GHG credit parameters input file
             verbose (bool): enable additional console and logfile output if True
 
         Returns:

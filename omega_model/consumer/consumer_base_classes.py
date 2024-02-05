@@ -274,7 +274,7 @@ class MarketClassBase:
             market_class_dict (dict): dict of dicts of market classes
             market_class_id (str): dot separated market class name e.g. 'hauling.BEV', possibly with reg class suffix
                 e.g. 'non_hauling.ICE.car' depending on the market_class_dict
-            obj (object): object to place in a list in the appropriate leaf, as in a CompositeVehicle
+            obj (obj): object to place in a list in the appropriate leaf, as in a CompositeVehicle
 
         Returns:
             Nothing, modifies ``market_class_dict`` data

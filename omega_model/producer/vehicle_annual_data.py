@@ -55,7 +55,7 @@ class VehicleAnnualData(OMEGABase):
         Add all vehicle annual data records to the class data set.
 
         Args:
-            vad_list (list): list of vehicle annual data dicts
+            vad_list (dict | list): dict or list of vehicle annual data dicts
 
         Returns:
             Nothing, updates ``VehicleAnnualData._data``
