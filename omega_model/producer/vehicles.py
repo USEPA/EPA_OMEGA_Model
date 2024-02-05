@@ -218,9 +218,9 @@ class DecompositionAttributes(OMEGABase):
                     'veh_%s_%s' % (vehicle.vehicle_id, index_column)]
                 cost_curve_non_numeric_data.reset_index(inplace=True)
 
-            interp_index = np.interp(index_value,
+            interp_index = float(np.interp(index_value,
                                   cost_curve_non_numeric_data[index_column],
-                                  cost_curve_non_numeric_data.index)
+                                  cost_curve_non_numeric_data.index))
 
             if interp_index <= 0:
                 value = cost_curve_non_numeric_data[attribute_name].iloc[0]
@@ -1424,6 +1424,7 @@ class Vehicle(OMEGABase):
         """
         return '%s.%s' % (self.fueling_class, self.reg_class_id)
 
+    @staticmethod
     def create_vehicle_clone(vehicle):
         """
         Create vehicle clone.
