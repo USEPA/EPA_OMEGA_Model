@@ -1272,6 +1272,7 @@ def calc_battery_offset(locals_dict, v, powertrain_type, battery_kwh):
         locals_dict (dict): local attributes
         v (Vehicle): the Vehicle object
         powertrain_type (str): e.g., 'BEV', 'PHEV'
+        battery_kwh (float): battery pack gross capacity, kWh
 
     Returns:
         The high voltage battery pack cost offset

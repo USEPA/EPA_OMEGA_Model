@@ -43,6 +43,7 @@ class ManufacturerAnnualData(OMEGABase):
                 produced in the model year
             manufacturer_vehicle_cost_dollars (numeric): total manufacturer vehicle cost
                 (sum of vehicle sales X vehicle cost)
+            model_year_cert_co2e_megagrams (numeric): manufacturer model year cert CO2e Mg, if known, else ``None``
 
         Returns:
             Nothing, updates class data
