@@ -32,8 +32,7 @@ pyDOE2
 # for reading excel files (omega_preproc):
 openpyxl
 
-# for omega_gui (PySide2 is INTEL only):
-PySide2 ; platform_machine=="x86_64"
-multitimer ; platform_machine=="x86_64"
-playsound ; platform_machine=="x86_64"
-PyYAML ; platform_machine=="x86_64"
+PySide6
+multitimer
+playsound
+PyYAML
