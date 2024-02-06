@@ -880,7 +880,7 @@ class Vehicle(OMEGABase):
         self.manufacturer_id = manufacturer_id  #: vehicle manufacturer ID
         self.market_class_id = None  #: market class ID, as determined by the consumer subpackage
         self.market_class_cross_subsidy_multiplier = 0  #: vehicle market class cross subsidy multiplier
-        self.model_year = None  #: vehicle model year
+        self.model_year = 0  #: vehicle model year
         self.model_year_prevalence = 0  #: used to maintain market share relationships within context size classes during market projection
         self.modified_cross_subsidized_price_dollars = 0  #: vehicle modified cross subsidized price in dollars
         self.name = ''  #: vehicle name
