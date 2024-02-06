@@ -1566,7 +1566,7 @@ class Vehicle(OMEGABase):
             veh.base_year_gvwr_lbs=df.loc[i, 'gvwr_lbs']
             veh.base_year_gcwr_lbs=df.loc[i, 'gcwr_lbs']
 
-            electrification_class = df.loc[i, 'electrification_class']
+            # electrification_class = df.loc[i, 'electrification_class']
 
             for attr, dc in zip(Vehicle.dynamic_attributes, Vehicle.dynamic_columns):
                 veh.__setattr__(attr, df.loc[i, dc])

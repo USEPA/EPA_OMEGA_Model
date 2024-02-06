@@ -334,8 +334,8 @@ class VehicleAggregation(OMEGABase):
                                                            update_df=False),
                                                        'ICE': 0}})
 
-            import time
-            start_time = time.time()
+            # import time
+            # start_time = time.time()
             # print('starting iterrows')
 
             df['base_year_footprint_ft2'] = df['footprint_ft2']

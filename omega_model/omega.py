@@ -1795,7 +1795,7 @@ def run_omega(session_runtime_options, standalone_run=False):
                         num_processes = \
                             max(1, int(num_processes / omega_globals.options.non_context_session_process_scaler))
 
-                    start_time = time.time()
+                    # start_time = time.time()
                     omega_globals.pool = Pool(processes=num_processes,
                                               initializer=omega.init_omega, initargs=[omega_globals.options])
 
