@@ -82,8 +82,6 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
 
     # Generate tech options (CO2e g/mi levels)
     for cv in composite_vehicles:
-        incremented = False
-
         if share_range == 1.0:
             cv.tech_option_iteration_num = 0  # reset vehicle tech option progression
 
@@ -98,10 +96,9 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
         if candidate_production_decisions is not None:
             cost_curve_options = np.array([])
 
-            if ((candidate_production_decisions['veh_%s_sales' % cv.vehicle_id] > 0) or (cv.tech_option_iteration_num > 0)) and \
-                    not incremented:
+            if ((candidate_production_decisions['veh_%s_sales' % cv.vehicle_id] > 0) or
+                    (cv.tech_option_iteration_num > 0)):
                 cv.tech_option_iteration_num += 1
-                incremented = True
 
             tech_share_range = omega_globals.options.producer_compliance_search_convergence_factor ** \
                                cv.tech_option_iteration_num
