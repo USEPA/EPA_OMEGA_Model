@@ -339,4 +339,4 @@ if __name__ == "__main__":
         print(test_enum['space_force'])
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)

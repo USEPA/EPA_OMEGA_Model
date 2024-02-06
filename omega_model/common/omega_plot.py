@@ -160,4 +160,4 @@ if __name__ == '__main__':
         fig, ax = fplothg([1, 2, 3], [4, 5, 6], 'r-')
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)

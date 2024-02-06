@@ -350,7 +350,7 @@ if __name__ == '__main__':
 
             omega_globals.options.VehicleTargets = VehicleTargets
 
-            class dummyVehicle:
+            class VehicleDummy:
                 """
                 Dummy Vehicle class.
 
@@ -374,14 +374,14 @@ if __name__ == '__main__':
                     """
                     return self.initial_registered_count
 
-            car_vehicle = dummyVehicle()
+            car_vehicle = VehicleDummy()
             car_vehicle.model_year = 2021
             car_vehicle.reg_class_id = 'mediumduty'
             car_vehicle.footprint_ft2 = 41
             car_vehicle.initial_registered_count = 1
             car_vehicle.fueling_class = 'BEV'
 
-            truck_vehicle = dummyVehicle()
+            truck_vehicle = VehicleDummy()
             truck_vehicle.model_year = 2021
             truck_vehicle.reg_class_id = 'mediumduty'
             truck_vehicle.footprint_ft2 = 41
@@ -413,8 +413,8 @@ if __name__ == '__main__':
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+            sys.exit(-1)
     except:
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)

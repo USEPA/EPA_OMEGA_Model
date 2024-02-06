@@ -1635,7 +1635,7 @@ if __name__ == '__main__':
             import traceback
 
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+            sys.exit(-1)
 
     else:
         parser.parse_args(['--help'])

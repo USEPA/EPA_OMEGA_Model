@@ -1937,4 +1937,4 @@ if __name__ == "__main__":
         run_omega(OMEGASessionSettings(), standalone_run=True)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)

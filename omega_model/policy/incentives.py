@@ -147,7 +147,7 @@ if __name__ == '__main__':
                                                verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            class dummyVehicle:
+            class VehicleDummy:
                 """
                 Dummy Vehicle class.
 
@@ -155,13 +155,13 @@ if __name__ == '__main__':
                 model_year = 2020
                 fueling_class = 'BEV'
 
-            v = dummyVehicle()
+            v = VehicleDummy()
             print(Incentives.get_production_multiplier(v))
 
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)            
+            sys.exit(-1)            
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)

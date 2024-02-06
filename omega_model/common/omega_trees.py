@@ -251,4 +251,4 @@ if __name__ == "__main__":
         pass  # TODO: write module test here
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)
