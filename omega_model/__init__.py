@@ -229,7 +229,7 @@ try:
                                         'v_cloud_plots_', 'cv_cloud_plots', 'effects_']  #: used to enable verbose log file outputs for various modules
 
             # list of modules to allow verbose console output, or empty to disable
-            self.verbose_console_modules = ['producer_compliance_search',
+            self.verbose_console_modules = ['producer_compliance_search_',
                                             'p-c_shares_and_costs', 'p-c_max_iterations_',
                                             'cross_subsidy_search_', 'cross_subsidy_multipliers_',
                                             'cross_subsidy_convergence_']  #: used to enable verbose console outputs for various modules
