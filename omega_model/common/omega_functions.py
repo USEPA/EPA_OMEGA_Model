@@ -482,11 +482,11 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
     given constraints
 
     Args:
-        column_names: list of column names
-        num_levels: number of values in the column with the lowest span (min value minus max value)
-        min_constraints: a scalar value or dict of minimum value constraints with column names as keys
-        max_constraints: a scalar value or dict of maximum value constraints with column names as keys
-        verbose: if True then the resulting partition will be printed
+        column_names (list | int): list of column names or number of columns
+        num_levels (int): number of values in the column with the lowest span (min value minus max value)
+        min_constraints (int | dict): a scalar value or dict of minimum value constraints with column names as keys
+        max_constraints (int | dict): a scalar value or dict of maximum value constraints with column names as keys
+        verbose (bool): if ``True`` then the resulting partition will be printed
 
     Returns:
         A dataframe of the resulting partition
@@ -506,11 +506,8 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
 
     if cache_key not in partition_dict:
 
-        if type(column_names) is list:
-            num_columns = len(column_names)
-        else:
-            num_columns = column_names
-            column_names = [i for i in range(num_columns)]
+        if type(column_names) is int:
+            column_names = [i for i in range(column_names)]
 
         min_level_dict = dict()
         if min_constraints is None:
