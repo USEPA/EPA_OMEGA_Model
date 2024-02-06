@@ -165,7 +165,7 @@ try:
             self.redesign_interval_gain = [1.0]  #: used in combination with ``redesign_interval_gain_years`` to allow modification of vehicle redesign cadence if desired
             self.non_context_session_process_scaler = 1  #: used to modify the number of processes used by non-context sessions when multiprocessing, (e.g. 2 = use 1/2 the default number of processes)
             self.producer_shares_mode = True  #: if ``True`` then consumer share response is ignored.  Used for development, troubleshooting, or quicker runtime during testing
-            self.producer_compliance_search_multipoint = True #: if ``True`` then the producer compliance search will simultaneously approach compliance from points above and below compliance (if possible)
+            self.producer_compliance_search_multipoint = True  #: if ``True`` then the producer compliance search will simultaneously approach compliance from points above and below compliance (if possible)
             self.powertrain_cost_with_ira = True  #: if ``True`` then Inflation Reduction Act incentives will apply to powertrain costs
             self.powertrain_cost_with_gpf = True  #: if ``True`` then gasoline particulate filter costs will apply to powertrain costs
             self.powertrain_cost_tracker = True  #: if ``True`` then detailed powertrain cost outputs will be generated

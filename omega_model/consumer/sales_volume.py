@@ -179,8 +179,6 @@ if __name__ == '__main__':
 
         init_fail += init_user_definable_decomposition_attributes(omega_globals.options.verbose)
 
-        
-
         init_fail += Manufacturer.init_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)
 

@@ -240,7 +240,6 @@ class CostCloud(OMEGABase, CostCloudBase):
                                   'cert_fuel_id', 'trx10', 'trx11', 'trx12', 'trx21', 'trx22',
                                   'ecvt', 'ice', 'fcv', 'phev', 'drive_system', 'application_id'}
 
-
         # input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -352,7 +351,6 @@ class CostCloud(OMEGABase, CostCloudBase):
             # validate drive cycle columns
             from policy.drive_cycles import DriveCycles
             drive_cycle_columns = set.difference(set(df.columns), input_template_columns)
-
 
             if not all([dc in DriveCycles.drive_cycle_names for dc in drive_cycle_columns]):
                 template_errors.append('Invalid drive cycle column in %s' % filename)

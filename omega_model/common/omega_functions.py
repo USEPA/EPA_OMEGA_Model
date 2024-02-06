@@ -424,7 +424,7 @@ def print_dict(dict_in, num_tabs=0, to_string=False):
             keys = dict_in.keys()
 
         for k in keys:
-            if type(dict_in[k]) == list:
+            if type(dict_in[k]) is list:
                 if dict_in[k]:
                     s += '\t' * num_tabs + str(k) + ':' + str(dict_in[k]) + '\n'
                 else:
@@ -942,7 +942,7 @@ def send_text(dest, message, email, password):
     server.quit()
 
 
-def deep_getsizeof(o, ids=set()):
+def deep_getsizeof(o, ids=None):
     """
     Find the memory footprint of a Python object in bytes
 
@@ -962,6 +962,9 @@ def deep_getsizeof(o, ids=set()):
         The memory footprint of the object in bytes
 
     """
+    if ids is None:
+        ids = set()
+
     d = deep_getsizeof
     if id(o) in ids:
         return 0

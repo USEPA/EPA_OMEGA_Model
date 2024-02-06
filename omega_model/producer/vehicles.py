@@ -175,7 +175,7 @@ class DecompositionAttributes(OMEGABase):
             A float or numeric Array of values and each index value
 
         """
-        if type(vehicle) != CompositeVehicle:
+        if type(vehicle) is not CompositeVehicle:
             prefix = 'veh_%s_' % vehicle.vehicle_id
         else:
             prefix = ''
@@ -753,8 +753,8 @@ def is_up_for_redesign(vehicle):
                   omega_globals.options.redesign_interval_gain_years,
                   omega_globals.options.redesign_interval_gain)
 
-    return bool(vehicle.model_year - int(vehicle.prior_redesign_year) >= \
-        int(vehicle.redesign_interval) * redesign_interval_gain)
+    return bool(vehicle.model_year - int(vehicle.prior_redesign_year) >=
+                int(vehicle.redesign_interval) * redesign_interval_gain)
 
 
 def update_dynamic_attributes(vehicle):
@@ -775,7 +775,6 @@ def update_dynamic_attributes(vehicle):
 
     # assign policy-based target for the current model year
     vehicle.set_target_co2e_grams_per_mile()
-
 
 
 def transfer_vehicle_data(from_vehicle, model_year):
@@ -1131,7 +1130,6 @@ class Vehicle(OMEGABase):
                                                           charge_depleting_only=True)[0]
 
         cloud['nominal_onroad_direct_co2e_grams_per_mile'] = 0  # needed for PHEV even though not needed for this calc
-
 
         # calc onroad_direct values
         VehicleOnroadCalculations.perform_onroad_calculations(self, cloud)
@@ -1515,56 +1513,56 @@ class Vehicle(OMEGABase):
 
         for i in df.index:
             veh = Vehicle(df.loc[i, 'manufacturer_id'])
-            veh.name=df.loc[i, 'vehicle_name']
-            # veh.vehicle_id=i
-            # veh.manufacturer_id=df.loc[i, 'manufacturer_id']
-            veh.model_year=df.loc[i, 'model_year']
-            veh.context_size_class=df.loc[i, 'context_size_class']
-            veh.cost_curve_class=df.loc[i, 'cost_curve_class']
-            veh.in_use_fuel_id=df.loc[i, 'in_use_fuel_id']
-            veh.cert_fuel_id=df.loc[i, 'cert_fuel_id']
-            veh.unibody_structure=df.loc[i, 'unibody_structure']
-            veh.drive_system=df.loc[i, 'drive_system']
-            veh.application_id=df.loc[i, 'application_id']
-            veh.dual_rear_wheel=df.loc[i, 'dual_rear_wheel']
-            veh.curbweight_lbs=df.loc[i, 'curbweight_lbs']
-            veh.footprint_ft2=df.loc[i, 'footprint_ft2']
-            veh.body_style=df.loc[i, 'body_style']
-            veh.structure_material=df.loc[i, 'structure_material']
-            veh.total_emachine_kw=df.loc[i, 'total_emachine_kw']
-            veh.tractive_motor_kw=df.loc[i, 'tractive_motor_kw']
-            veh.battery_kwh=df.loc[i, 'battery_gross_kwh']
-            veh.onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi']
-            veh.prior_redesign_year=df.loc[i, 'prior_redesign_year']
-            veh.redesign_interval=df.loc[i, 'redesign_interval']
-            veh.in_production=True
-            veh.workfactor=df.loc[i, 'workfactor']
-            veh.reg_class_id=df.loc[i, 'reg_class_id']
-            veh.gvwr_lbs=df.loc[i, 'gvwr_lbs']
-            veh.gcwr_lbs=df.loc[i, 'gcwr_lbs']
+            veh.name = df.loc[i, 'vehicle_name']
+            # veh.vehicle_id = i
+            # veh.manufacturer_id = df.loc[i, 'manufacturer_id']
+            veh.model_year = df.loc[i, 'model_year']
+            veh.context_size_class = df.loc[i, 'context_size_class']
+            veh.cost_curve_class = df.loc[i, 'cost_curve_class']
+            veh.in_use_fuel_id = df.loc[i, 'in_use_fuel_id']
+            veh.cert_fuel_id = df.loc[i, 'cert_fuel_id']
+            veh.unibody_structure = df.loc[i, 'unibody_structure']
+            veh.drive_system = df.loc[i, 'drive_system']
+            veh.application_id = df.loc[i, 'application_id']
+            veh.dual_rear_wheel = df.loc[i, 'dual_rear_wheel']
+            veh.curbweight_lbs = df.loc[i, 'curbweight_lbs']
+            veh.footprint_ft2 = df.loc[i, 'footprint_ft2']
+            veh.body_style = df.loc[i, 'body_style']
+            veh.structure_material = df.loc[i, 'structure_material']
+            veh.total_emachine_kw = df.loc[i, 'total_emachine_kw']
+            veh.tractive_motor_kw = df.loc[i, 'tractive_motor_kw']
+            veh.battery_kwh = df.loc[i, 'battery_gross_kwh']
+            veh.onroad_charge_depleting_range_mi = df.loc[i, 'onroad_charge_depleting_range_mi']
+            veh.prior_redesign_year = df.loc[i, 'prior_redesign_year']
+            veh.redesign_interval = df.loc[i, 'redesign_interval']
+            veh.in_production = True
+            veh.workfactor = df.loc[i, 'workfactor']
+            veh.reg_class_id = df.loc[i, 'reg_class_id']
+            veh.gvwr_lbs = df.loc[i, 'gvwr_lbs']
+            veh.gcwr_lbs = df.loc[i, 'gcwr_lbs']
             veh.base_year_cost_curve_class = df.loc[i, 'cost_curve_class']
-            veh.base_year_eng_rated_hp=df.loc[i, 'eng_rated_hp']
-            veh.base_year_target_coef_a=df.loc[i, 'target_coef_a']
-            veh.base_year_target_coef_b=df.loc[i, 'target_coef_b']
-            veh.base_year_target_coef_c=df.loc[i, 'target_coef_c']
-            veh.base_year_reg_class_id=df.loc[i, 'reg_class_id']
-            veh.base_year_footprint_ft2=df.loc[i, 'footprint_ft2']
-            veh.base_year_curbweight_lbs=df.loc[i, 'curbweight_lbs']
-            veh.base_year_msrp_dollars=df.loc[i, 'msrp_dollars']
-            veh.base_year_glider_non_structure_mass_lbs=df.loc[i, 'glider_non_structure_mass_lbs']
-            veh.base_year_glider_non_structure_cost_dollars=df.loc[i, 'glider_non_structure_cost_dollars']
-            veh.base_year_glider_structure_cost_dollars=df.loc[i, 'glider_structure_cost_dollars']
-            veh.base_year_workfactor=df.loc[i, 'workfactor']
-            veh.base_year_vehicle_id=i  # i.e. aggregated_vehicles.csv index number...
-            veh.base_year_cert_fuel_id=df.loc[i, 'cert_fuel_id']
-            veh.base_year_battery_kwh=df.loc[i, 'battery_kwh']
-            veh.base_year_total_emachine_kw=df.loc[i, 'total_emachine_kw']
-            veh.base_year_tractive_motor_kw=df.loc[i, 'tractive_motor_kw']
-            veh.base_year_onroad_charge_depleting_range_mi=df.loc[i, 'onroad_charge_depleting_range_mi']
-            veh.base_year_powertrain_type=df.loc[i, 'base_year_powertrain_type']
-            veh.base_year_product=1
-            veh.base_year_gvwr_lbs=df.loc[i, 'gvwr_lbs']
-            veh.base_year_gcwr_lbs=df.loc[i, 'gcwr_lbs']
+            veh.base_year_eng_rated_hp = df.loc[i, 'eng_rated_hp']
+            veh.base_year_target_coef_a = df.loc[i, 'target_coef_a']
+            veh.base_year_target_coef_b = df.loc[i, 'target_coef_b']
+            veh.base_year_target_coef_c = df.loc[i, 'target_coef_c']
+            veh.base_year_reg_class_id = df.loc[i, 'reg_class_id']
+            veh.base_year_footprint_ft2 = df.loc[i, 'footprint_ft2']
+            veh.base_year_curbweight_lbs = df.loc[i, 'curbweight_lbs']
+            veh.base_year_msrp_dollars = df.loc[i, 'msrp_dollars']
+            veh.base_year_glider_non_structure_mass_lbs = df.loc[i, 'glider_non_structure_mass_lbs']
+            veh.base_year_glider_non_structure_cost_dollars = df.loc[i, 'glider_non_structure_cost_dollars']
+            veh.base_year_glider_structure_cost_dollars = df.loc[i, 'glider_structure_cost_dollars']
+            veh.base_year_workfactor = df.loc[i, 'workfactor']
+            veh.base_year_vehicle_id = i  # i.e. aggregated_vehicles.csv index number...
+            veh.base_year_cert_fuel_id = df.loc[i, 'cert_fuel_id']
+            veh.base_year_battery_kwh = df.loc[i, 'battery_kwh']
+            veh.base_year_total_emachine_kw = df.loc[i, 'total_emachine_kw']
+            veh.base_year_tractive_motor_kw = df.loc[i, 'tractive_motor_kw']
+            veh.base_year_onroad_charge_depleting_range_mi = df.loc[i, 'onroad_charge_depleting_range_mi']
+            veh.base_year_powertrain_type = df.loc[i, 'base_year_powertrain_type']
+            veh.base_year_product = 1
+            veh.base_year_gvwr_lbs = df.loc[i, 'gvwr_lbs']
+            veh.base_year_gcwr_lbs = df.loc[i, 'gcwr_lbs']
 
             # electrification_class = df.loc[i, 'electrification_class']
 
@@ -1586,10 +1584,10 @@ class Vehicle(OMEGABase):
 
             Vehicle.set_fueling_class(veh)
 
-            veh.cert_direct_oncycle_co2e_grams_per_mile = 0 #None
-            veh.cert_direct_co2e_grams_per_mile = 0 # None
-            veh.cert_co2e_grams_per_mile = 0 # None
-            veh.cert_direct_kwh_per_mile = 0 # None
+            veh.cert_direct_oncycle_co2e_grams_per_mile = 0
+            veh.cert_direct_co2e_grams_per_mile = 0
+            veh.cert_co2e_grams_per_mile = 0
+            veh.cert_direct_kwh_per_mile = 0
 
             veh.onroad_direct_co2e_grams_per_mile = 0
             veh.onroad_direct_kwh_per_mile = 0

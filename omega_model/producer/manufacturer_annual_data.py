@@ -159,8 +159,6 @@ if __name__ == '__main__':
 
         from manufacturers import Manufacturer  # required by vehicles
 
-        
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         sys.exit(-1)

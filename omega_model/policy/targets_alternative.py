@@ -160,7 +160,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             co2_gpmi = VehicleTargets.calc_target_co2e_gpmi(vehicle)
 
             if sales_variants is not None:
-                if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
+                if not (type(sales_variants) is pd.Series) or (type(sales_variants) is np.ndarray):
                     sales = np.array(sales_variants)
                 else:
                     sales = sales_variants
@@ -204,12 +204,12 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             vehicle.lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_id, vehicle_model_year)
 
             if co2_gpmi_variants is not None:
-                if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
+                if not (type(sales_variants) is pd.Series) or (type(sales_variants) is np.ndarray):
                     sales = np.array(sales_variants)
                 else:
                     sales = sales_variants
 
-                if not (type(co2_gpmi_variants) == pd.Series) or (type(co2_gpmi_variants) == np.ndarray):
+                if not (type(co2_gpmi_variants) is pd.Series) or (type(co2_gpmi_variants) is np.ndarray):
                     co2_gpmi = np.array(co2_gpmi_variants)
                 else:
                     co2_gpmi = co2_gpmi_variants

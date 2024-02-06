@@ -1265,7 +1265,7 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
     """
     production_options = tech_and_share_combinations
 
-    is_series = type(production_options) == pd.Series
+    is_series = type(production_options) is pd.Series
 
     total_battery_GWh = 0
     total_NO_ALT_battery_GWh = 0

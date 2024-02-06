@@ -249,8 +249,6 @@ if __name__ == '__main__':
 
         omega_log.init_logfile()
 
-        
-
         omega_globals.options.market_classes_file = \
             omega_globals.options.omega_model_path + '/test_inputs/market_classes_legacy_reg_class.csv'
 

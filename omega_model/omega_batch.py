@@ -622,7 +622,7 @@ class OMEGABatchObject(OMEGABase):
                             if (expanded_session_num == 0) or (param_index >= session_params_start_index):
                                 # copy all data for df_column 0 (includes batchsettings) or
                                 # just session settings for subsequent columns
-                                if type(self.dataframe.loc[param_name][session_num]) == tuple:
+                                if type(self.dataframe.loc[param_name][session_num]) is tuple:
                                     # index tuple and get this variations element
                                     value = self.dataframe.loc[param_name][session_num][ff_param_indices[param_index]]
                                 else:
@@ -800,8 +800,8 @@ class OMEGASessionObject(OMEGABase):
 
         """
         self.num = session_num
-        self.enabled = session_num == 0 or \
-                       validate_predefined_input(self.read_parameter('Enable Session'), true_false_dict)
+        self.enabled = (session_num == 0 or
+                        validate_predefined_input(self.read_parameter('Enable Session'), true_false_dict))
         self.name = self.read_parameter('Session Name')
         self.output_path = OMEGASessionSettings().output_folder
 
@@ -979,7 +979,7 @@ class OMEGASessionObject(OMEGABase):
 
         # read arbitrary backdoor setttings...
         backdoor_settings = [i.replace('settings.', '') for i in self.batch.dataframe.index
-                             if type(i) == str and i.startswith('settings.')]
+                             if type(i) is str and i.startswith('settings.')]
 
         attributes = sorted(list(self.settings.__dict__.keys()))
         for bo in backdoor_settings:

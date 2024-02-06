@@ -143,8 +143,6 @@ if __name__ == '__main__':
         from context.onroad_fuels import OnroadFuel
         from producer.vehicle_annual_data import VehicleAnnualData
 
-        
-
         init_fail += Manufacturer.init_from_file(omega_globals.options.manufacturers_file, 
                                                           verbose=omega_globals.options.verbose)
 

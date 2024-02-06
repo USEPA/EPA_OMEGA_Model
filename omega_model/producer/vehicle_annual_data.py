@@ -61,7 +61,7 @@ class VehicleAnnualData(OMEGABase):
             Nothing, updates ``VehicleAnnualData._data``
 
         """
-        if type(vad_list) == list:
+        if type(vad_list) is list:
             for vad in vad_list:
                 VehicleAnnualData._data.append(vad)
         else:

@@ -125,7 +125,6 @@ class MarketClass(OMEGABase, MarketClassBase):
 
         return style_dict
 
-
     @staticmethod
     def get_vehicle_market_class(vehicle):
         """
