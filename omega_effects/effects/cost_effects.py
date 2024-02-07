@@ -66,6 +66,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
     vehicle_info_dict = {}
     refueling_bev_dict = {}
     refueling_liquid_dict = {}
+    cumulative_maint_cost_dict = {}
 
     for v in session_fleet_physical.values():
 
@@ -158,7 +159,17 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
             # maintenance costs ________________________________________________________________________________________
             slope, intercept = get_maintenance_cost(batch_settings, powertrain_type)
             maintenance_cost_per_mile = slope * v['odometer'] + intercept
-            maintenance_cost_dollars = maintenance_cost_per_mile * v['vmt']
+            cumulative_maintenance_cost_thru_now = 0.5 * v['odometer'] * maintenance_cost_per_mile
+            if v['vehicle_id'] in cumulative_maint_cost_dict:
+                maintenance_cost_this_year = (
+                        cumulative_maintenance_cost_thru_now - cumulative_maint_cost_dict[v['vehicle_id']]
+                )
+                cumulative_maint_cost_dict[v['vehicle_id']] = cumulative_maintenance_cost_thru_now
+            else:
+                maintenance_cost_this_year = cumulative_maintenance_cost_thru_now
+                cumulative_maint_cost_dict[v['vehicle_id']] = maintenance_cost_this_year
+
+            maintenance_cost_dollars = maintenance_cost_this_year * v['registered_count']
 
             # repair costs _____________________________________________________________________________________________
             if 'car' in v['name']:

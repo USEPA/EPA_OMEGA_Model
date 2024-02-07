@@ -70,7 +70,7 @@ class MaintenanceCost:
 
     """
     def __init__(self):
-        self._data = dict()
+        self._data = {}
 
     def init_from_file(self, filepath, batch_settings, effects_log):
         """
