@@ -194,7 +194,7 @@ class Form(QObject):
         self.window.project_description.setStyleSheet(stylesheet)
 
         # Load stylesheet for list boxes
-        stylesheet = listbox_stylesheet()
+        # stylesheet = listbox_stylesheet()
         # self.window.list_graphs_1.setStyleSheet(stylesheet)
         # self.window.list_graphs_2.setStyleSheet(stylesheet)
 
@@ -216,7 +216,7 @@ class Form(QObject):
         self.window.intro_label.setStyleSheet(stylesheet)
 
         # Load stylesheet for checkboxes
-        stylesheet = checkbox_stylesheet()
+        # stylesheet = checkbox_stylesheet()
         # self.window.multiprocessor_checkbox.setStyleSheet(stylesheet)
 
         # Timer start
@@ -690,17 +690,17 @@ class Form(QObject):
         self.event_monitor(message, color, 'dt')
         self.event_monitor(event_separator, color, '')
 
-        # Check if dispy is running.
-        if is_running("dispynode.py"):
-            self.window.multiprocessor_checkbox.setEnabled(1)  # Enable multiprocessor checkbox if running
-            message = "Multiprocessor Mode Available\n" \
-                "----------"
-            # self.event_monitor(message, "black", '')
-        else:
-            # self.window.multiprocessor_checkbox.setEnabled(0)  # Disable multiprocessor checkbox if not running
-            message = "Multiprocessor Mode Not Available\n" \
-                "----------"
-            # self.event_monitor(message, "black", '')
+        # # Check if dispy is running.
+        # if is_running("dispynode.py"):
+        #     self.window.multiprocessor_checkbox.setEnabled(1)  # Enable multiprocessor checkbox if running
+        #     message = "Multiprocessor Mode Available\n" \
+        #         "----------"
+        #     self.event_monitor(message, "black", '')
+        # else:
+        #     # self.window.multiprocessor_checkbox.setEnabled(0)  # Disable multiprocessor checkbox if not running
+        #     message = "Multiprocessor Mode Not Available\n" \
+        #         "----------"
+        #     self.event_monitor(message, "black", '')
 
         # Prime the wizard
         # self.clear_wizard()
@@ -1019,7 +1019,7 @@ class Form(QObject):
         # self.window.select_plot_3.setEnabled(enable)
 
         # if enable == 1:
-            # Check if dispy is running.
+        #    # Check if dispy is running.
         #     if is_running("dispynode.py"):
         #         self.window.multiprocessor_checkbox.setEnabled(1)  # Enable multiprocessor checkbox if running
         #     else:
@@ -1043,7 +1043,7 @@ class Form(QObject):
         if file_name == "":
             self.window.list_graphs_1.clear()
             self.window.list_graphs_2.clear()
-            return()
+            return
 
         plot_select_directory_path = file_name
         plot_select_directory_name = os.path.basename(os.path.normpath(file_name))
@@ -1062,7 +1062,7 @@ class Form(QObject):
         if not os.path.exists(input_file):
             self.window.list_graphs_1.clear()
             self.window.list_graphs_2.clear()
-            return()
+            return
         plot_data_df1 = pandas.read_csv(input_file)
         plot_data_df1.drop_duplicates(subset=['session_name'], inplace=True)
         for index, row in plot_data_df1.iterrows():
@@ -1092,7 +1092,7 @@ class Form(QObject):
         if not os.path.exists(input_file):
             self.window.list_graphs_1.clear()
             self.window.list_graphs_2.clear()
-            return()
+            return
         plot_data_df1 = pandas.read_csv(input_file)
         plot_data_df1.drop_duplicates(subset=['session_name'], inplace=True)
         for index, row in plot_data_df1.iterrows():
@@ -1147,6 +1147,9 @@ def status_bar():
 
 # Run the function 'status_bar' in 1 second intervals
 timer = multitimer.MultiTimer(interval=1, function=status_bar)
+
+app = None
+form = None
 
 
 def run_gui():

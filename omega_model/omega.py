@@ -251,7 +251,6 @@ def run_compliance_id(compliance_id, pass_num, cumulative_battery_GWh, credit_ba
     from producer.manufacturer_annual_data import ManufacturerAnnualData
     from context.new_vehicle_market import NewVehicleMarket
 
-
     if pass_num > 0:
         omega_log.init_logfile(compliance_id)
         omega_globals.cumulative_battery_GWh = cumulative_battery_GWh
@@ -1795,7 +1794,7 @@ def run_omega(session_runtime_options, standalone_run=False):
                         num_processes = \
                             max(1, int(num_processes / omega_globals.options.non_context_session_process_scaler))
 
-                    start_time = time.time()
+                    # start_time = time.time()
                     omega_globals.pool = Pool(processes=num_processes,
                                               initializer=omega.init_omega, initargs=[omega_globals.options])
 
@@ -1937,4 +1936,4 @@ if __name__ == "__main__":
         run_omega(OMEGASessionSettings(), standalone_run=True)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)

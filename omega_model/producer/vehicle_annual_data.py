@@ -61,7 +61,7 @@ class VehicleAnnualData(OMEGABase):
             Nothing, updates ``VehicleAnnualData._data``
 
         """
-        if type(vad_list) == list:
+        if type(vad_list) is list:
             for vad in vad_list:
                 VehicleAnnualData._data.append(vad)
         else:
@@ -193,7 +193,7 @@ if __name__ == '__main__':
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+            sys.exit(-1)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)

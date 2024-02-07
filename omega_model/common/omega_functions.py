@@ -424,7 +424,7 @@ def print_dict(dict_in, num_tabs=0, to_string=False):
             keys = dict_in.keys()
 
         for k in keys:
-            if type(dict_in[k]) == list:
+            if type(dict_in[k]) is list:
                 if dict_in[k]:
                     s += '\t' * num_tabs + str(k) + ':' + str(dict_in[k]) + '\n'
                 else:
@@ -482,11 +482,11 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
     given constraints
 
     Args:
-        column_names: list of column names
-        num_levels: number of values in the column with the lowest span (min value minus max value)
-        min_constraints: a scalar value or dict of minimum value constraints with column names as keys
-        max_constraints: a scalar value or dict of maximum value constraints with column names as keys
-        verbose: if True then the resulting partition will be printed
+        column_names (list | int): list of column names or number of columns
+        num_levels (int): number of values in the column with the lowest span (min value minus max value)
+        min_constraints (int | dict): a scalar value or dict of minimum value constraints with column names as keys
+        max_constraints (int | dict): a scalar value or dict of maximum value constraints with column names as keys
+        verbose (bool): if ``True`` then the resulting partition will be printed
 
     Returns:
         A dataframe of the resulting partition
@@ -506,11 +506,8 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
 
     if cache_key not in partition_dict:
 
-        if type(column_names) is list:
-            num_columns = len(column_names)
-        else:
-            num_columns = column_names
-            column_names = [i for i in range(num_columns)]
+        if type(column_names) is int:
+            column_names = [i for i in range(column_names)]
 
         min_level_dict = dict()
         if min_constraints is None:
@@ -945,7 +942,7 @@ def send_text(dest, message, email, password):
     server.quit()
 
 
-def deep_getsizeof(o, ids=set()):
+def deep_getsizeof(o, ids=None):
     """
     Find the memory footprint of a Python object in bytes
 
@@ -965,6 +962,9 @@ def deep_getsizeof(o, ids=set()):
         The memory footprint of the object in bytes
 
     """
+    if ids is None:
+        ids = set()
+
     d = deep_getsizeof
     if id(o) in ids:
         return 0
@@ -997,4 +997,4 @@ if __name__ == '__main__':
         import os
         import traceback
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)

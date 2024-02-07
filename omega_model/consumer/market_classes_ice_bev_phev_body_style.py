@@ -115,7 +115,6 @@ class MarketClass(OMEGABase, MarketClassBase):
 
         return style_dict
 
-
     @staticmethod
     def get_vehicle_market_class(vehicle):
         """
@@ -281,8 +280,6 @@ if __name__ == '__main__':
 
         omega_log.init_logfile()
 
-        
-
         init_fail += MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)
 
@@ -321,7 +318,7 @@ if __name__ == '__main__':
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+            sys.exit(-1)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)

@@ -269,8 +269,6 @@ if __name__ == '__main__':
 
         omega_log.init_logfile()
 
-        
-
         omega_globals.options.market_classes_file = \
             omega_globals.options.omega_model_path + '/test_inputs/market_classes-body_style.csv'
 
@@ -312,7 +310,7 @@ if __name__ == '__main__':
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+            sys.exit(-1)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)

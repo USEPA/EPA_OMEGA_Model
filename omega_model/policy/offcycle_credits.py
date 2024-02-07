@@ -244,13 +244,13 @@ if __name__ == '__main__':
                                                     verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            # class dummyVehicle:
+            # class VehicleDummy:
             #     model_year = 2020
             #     reg_class_id = 'car'
             #     cost_curve_class = 'ice_MPW_LRL'
             #     cost_cloud = omega_globals.options.CostCloud.get_cloud(self)
             #
-            # vehicle = dummyVehicle()
+            # vehicle = VehicleDummy()
             #
             # OffCycleCredits.calc_off_cycle_credits(vehicle.model_year, vehicle, vehicle.cost_cloud)
             pass
@@ -258,7 +258,7 @@ if __name__ == '__main__':
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)            
+            sys.exit(-1)            
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)

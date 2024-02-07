@@ -82,8 +82,6 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
 
     # Generate tech options (CO2e g/mi levels)
     for cv in composite_vehicles:
-        incremented = False
-
         if share_range == 1.0:
             cv.tech_option_iteration_num = 0  # reset vehicle tech option progression
 
@@ -98,10 +96,9 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
         if candidate_production_decisions is not None:
             cost_curve_options = np.array([])
 
-            if ((candidate_production_decisions['veh_%s_sales' % cv.vehicle_id] > 0) or (cv.tech_option_iteration_num > 0)) and \
-                    not incremented:
+            if ((candidate_production_decisions['veh_%s_sales' % cv.vehicle_id] > 0) or
+                    (cv.tech_option_iteration_num > 0)):
                 cv.tech_option_iteration_num += 1
-                incremented = True
 
             tech_share_range = omega_globals.options.producer_compliance_search_convergence_factor ** \
                                cv.tech_option_iteration_num
@@ -268,24 +265,24 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
     else:
         abs_share_column_names = ['producer_abs_share_frac_' + c for c in children]
 
-    if node_name == '' and share_range == 1.0 and consumer_response is not None and \
-            consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']:
-        # omega_log.logwrite('%%%%%% Production Constraints Violated, Modifying Constraints %%%%%%')
-
-        if consumer_response['total_ALT_battery_GWh'] > 0:
-            constraint_ratio = max(0, 0.99 * ((consumer_response['battery_GWh_limit'] -
-                                   consumer_response['total_NO_ALT_battery_GWh']) /
-                                   consumer_response['total_ALT_battery_GWh']))
-        else:
-            constraint_ratio = 0
-
-        # omega_log.logwrite('*** constraint ratio %f, %f, %f, %f, %f->%f' %
-        #       (constraint_ratio,
-        #        consumer_response['battery_GWh_limit'],
-        #        consumer_response['total_battery_GWh'],
-        #        consumer_response['total_NO_ALT_battery_GWh'],
-        #        consumer_response['total_ALT_battery_GWh'],
-        #        consumer_response['total_ALT_battery_GWh'] * constraint_ratio))
+    # if node_name == '' and share_range == 1.0 and consumer_response is not None and \
+    #         consumer_response['total_battery_GWh'] > consumer_response['battery_GWh_limit']:
+    #     # omega_log.logwrite('%%%%%% Production Constraints Violated, Modifying Constraints %%%%%%')
+    #
+    #     # if consumer_response['total_ALT_battery_GWh'] > 0:
+    #     #     constraint_ratio = max(0, 0.99 * ((consumer_response['battery_GWh_limit'] -
+    #     #                            consumer_response['total_NO_ALT_battery_GWh']) /
+    #     #                            consumer_response['total_ALT_battery_GWh']))
+    #     # else:
+    #     #     constraint_ratio = 0
+    #     #
+    #     # omega_log.logwrite('*** constraint ratio %f, %f, %f, %f, %f->%f' %
+    #     #       (constraint_ratio,
+    #     #        consumer_response['battery_GWh_limit'],
+    #     #        consumer_response['total_battery_GWh'],
+    #     #        consumer_response['total_NO_ALT_battery_GWh'],
+    #     #        consumer_response['total_ALT_battery_GWh'],
+    #     #        consumer_response['total_ALT_battery_GWh'] * constraint_ratio))
 
     responsive_children = [s in omega_globals.options.MarketClass.responsive_market_categories for s in children if
                            market_class_dict[s]]
@@ -1268,7 +1265,7 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
     """
     production_options = tech_and_share_combinations
 
-    is_series = type(production_options) == pd.Series
+    is_series = type(production_options) is pd.Series
 
     total_battery_GWh = 0
     total_NO_ALT_battery_GWh = 0
@@ -1746,4 +1743,4 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)

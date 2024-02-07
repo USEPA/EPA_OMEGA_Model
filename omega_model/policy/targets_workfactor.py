@@ -66,6 +66,7 @@ print('importing %s' % __file__)
 from omega_model import *
 from policy.workfactor_definition import WorkFactor
 
+
 class VehicleTargets(OMEGABase, VehicleTargetsBase):
     """
     **Implements vehicle workfactor-based GHG targets (CO2e g/mi).**
@@ -172,7 +173,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             co2_gpmi = VehicleTargets.calc_target_co2e_gpmi(vehicle)
 
             if sales_variants is not None:
-                if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
+                if not (type(sales_variants) is pd.Series) or (type(sales_variants) is np.ndarray):
                     sales = np.array(sales_variants)
                 else:
                     sales = sales_variants
@@ -217,12 +218,12 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
                 = VehicleTargets.calc_cert_useful_life_vmt(vehicle.reg_class_id, model_year, vehicle.cert_fuel_id)
 
             if co2_gpmi_variants is not None:
-                if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
+                if not (type(sales_variants) is pd.Series) or (type(sales_variants) is np.ndarray):
                     sales = np.array(sales_variants)
                 else:
                     sales = sales_variants
 
-                if not (type(co2_gpmi_variants) == pd.Series) or (type(co2_gpmi_variants) == np.ndarray):
+                if not (type(co2_gpmi_variants) is pd.Series) or (type(co2_gpmi_variants) is np.ndarray):
                     co2_gpmi = np.array(co2_gpmi_variants)
                 else:
                     co2_gpmi = co2_gpmi_variants
@@ -350,7 +351,7 @@ if __name__ == '__main__':
 
             omega_globals.options.VehicleTargets = VehicleTargets
 
-            class dummyVehicle:
+            class VehicleDummy:
                 """
                 Dummy Vehicle class.
 
@@ -374,14 +375,14 @@ if __name__ == '__main__':
                     """
                     return self.initial_registered_count
 
-            car_vehicle = dummyVehicle()
+            car_vehicle = VehicleDummy()
             car_vehicle.model_year = 2021
             car_vehicle.reg_class_id = 'mediumduty'
             car_vehicle.footprint_ft2 = 41
             car_vehicle.initial_registered_count = 1
             car_vehicle.fueling_class = 'BEV'
 
-            truck_vehicle = dummyVehicle()
+            truck_vehicle = VehicleDummy()
             truck_vehicle.model_year = 2021
             truck_vehicle.reg_class_id = 'mediumduty'
             truck_vehicle.footprint_ft2 = 41
@@ -413,8 +414,8 @@ if __name__ == '__main__':
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+            sys.exit(-1)
     except:
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)

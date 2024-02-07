@@ -165,7 +165,7 @@ try:
             self.redesign_interval_gain = [1.0]  #: used in combination with ``redesign_interval_gain_years`` to allow modification of vehicle redesign cadence if desired
             self.non_context_session_process_scaler = 1  #: used to modify the number of processes used by non-context sessions when multiprocessing, (e.g. 2 = use 1/2 the default number of processes)
             self.producer_shares_mode = True  #: if ``True`` then consumer share response is ignored.  Used for development, troubleshooting, or quicker runtime during testing
-            self.producer_compliance_search_multipoint = True #: if ``True`` then the producer compliance search will simultaneously approach compliance from points above and below compliance (if possible)
+            self.producer_compliance_search_multipoint = True  #: if ``True`` then the producer compliance search will simultaneously approach compliance from points above and below compliance (if possible)
             self.powertrain_cost_with_ira = True  #: if ``True`` then Inflation Reduction Act incentives will apply to powertrain costs
             self.powertrain_cost_with_gpf = True  #: if ``True`` then gasoline particulate filter costs will apply to powertrain costs
             self.powertrain_cost_tracker = True  #: if ``True`` then detailed powertrain cost outputs will be generated
@@ -229,7 +229,7 @@ try:
                                         'v_cloud_plots_', 'cv_cloud_plots', 'effects_']  #: used to enable verbose log file outputs for various modules
 
             # list of modules to allow verbose console output, or empty to disable
-            self.verbose_console_modules = ['producer_compliance_search',
+            self.verbose_console_modules = ['producer_compliance_search_',
                                             'p-c_shares_and_costs', 'p-c_max_iterations_',
                                             'cross_subsidy_search_', 'cross_subsidy_multipliers_',
                                             'cross_subsidy_convergence_']  #: used to enable verbose console outputs for various modules
@@ -267,4 +267,4 @@ try:
 
 except:
     print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-    os._exit(-1)
+    sys.exit(-1)

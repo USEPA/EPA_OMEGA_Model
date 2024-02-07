@@ -112,7 +112,7 @@ class PowertrainCost(OMEGABase):
 
         KWH = KW = KW_OBC = KW_DU = KW_FDU = KW_RDU = KW_P2 = KW_P4 = 0
         trans = CYL = engine_config = LITERS = powertrain_subtype = None
-        twc_substrate= twc_washcoat = twc_canning = twc_pgm = twc_cost = gpf_cost = diesel_eas_cost = eas_cost = 0
+        twc_substrate = twc_washcoat = twc_canning = twc_pgm = twc_cost = gpf_cost = diesel_eas_cost = eas_cost = 0
         engine_cost = engine_block_cost = cegr_cost = gdi_cost = turb_cost = deac_pd_cost = deac_fc_cost = atk2_cost = 0
         fuel_storage_cost = non_eas_exhaust_cost = exhaust_cost = 0
         lv_battery_cost = start_stop_cost = trans_cost = high_eff_alt_cost = lv_harness_cost = 0

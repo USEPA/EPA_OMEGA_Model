@@ -252,14 +252,14 @@ if __name__ == '__main__':
 
             veh = Vehicle()
 
-            structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs,\
+            structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs, \
                 usable_battery_capacity_norm = \
                 MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp,
                                             veh.battery_kwh, veh.footprint_ft2)
             print(structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs)
 
             veh.base_year_powertrain_type = 'BEV'
-            structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs,\
+            structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs, \
                 usable_battery_capacity_norm = \
                 MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp,
                                             veh.battery_kwh, veh.footprint_ft2)
@@ -267,7 +267,7 @@ if __name__ == '__main__':
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+            sys.exit(-1)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)

@@ -65,4 +65,4 @@ if __name__ == "__main__":
 
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)

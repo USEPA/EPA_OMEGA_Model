@@ -215,7 +215,7 @@ class VehicleAggregation(OMEGABase):
         #     ``DecompositionAttributes``
 
         """
-        from producer.vehicles import Vehicle  #, Vehicle
+        from producer.vehicles import Vehicle
         from context.new_vehicle_market import NewVehicleMarket
         from context.glider_cost import GliderCost
         from policy.workfactor_definition import WorkFactor
@@ -334,8 +334,8 @@ class VehicleAggregation(OMEGABase):
                                                            update_df=False),
                                                        'ICE': 0}})
 
-            import time
-            start_time = time.time()
+            # import time
+            # start_time = time.time()
             # print('starting iterrows')
 
             df['base_year_footprint_ft2'] = df['footprint_ft2']
@@ -344,10 +344,10 @@ class VehicleAggregation(OMEGABase):
 
             df['powertrain_type'] = df['base_year_powertrain_type']  # required for mass_scaling calcs
 
-            df['structure_mass_lbs'], df['battery_mass_lbs'], df['powertrain_mass_lbs'], \
-            df['delta_glider_non_structure_mass_lbs'], df['usable_battery_capacity_norm'] = \
-                MassScaling.calc_mass_terms(df, df['structure_material'], df['eng_rated_hp'],
-                                            df['battery_kwh'], df['footprint_ft2'])
+            (df['structure_mass_lbs'], df['battery_mass_lbs'], df['powertrain_mass_lbs'],
+             df['delta_glider_non_structure_mass_lbs'], df['usable_battery_capacity_norm']) = (
+                MassScaling.calc_mass_terms(df, df['structure_material'], df['eng_rated_hp'], df['battery_kwh'],
+                                            df['footprint_ft2']))
 
             df.insert(len(df.columns), 'workfactor', 0)
 
@@ -501,7 +501,7 @@ if __name__ == '__main__':
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+            sys.exit(-1)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+        sys.exit(-1)
