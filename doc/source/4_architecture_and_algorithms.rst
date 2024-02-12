@@ -810,14 +810,14 @@ context inputs as shown in :numref:`effects_module_figure`.
     * Impacts of greenhouse gas pollutants
     * Congestion, noise, and safety costs
 
-The Effects Module generates: physical effects, cost effects, safety effects, benefits and social effects. In general, the cost effects and benefits output files build upon the physical effects output file in conjunction with several of the context input files. Those context input files are the cost factor and emission rate input files. For example, the benefits file would present CO2-related benefits as the CO2 cost factor (a social cost of carbon per metric ton value set in the input file) multiplied by the emission impacts of CO2 (or other GHG) calculated using physical effects. Similarly, fuel costs would be calculated as fuel prices (dollars/gallon as provided in the input file) multiplied by gallons consumed as presented in the physical effects file.
+The Effects Module generates: physical effects, cost effects, safety effects, benefits and social effects. In general, the cost effects and benefits output files build upon the physical effects output file in conjunction with several of the context input files. Those context input files are the cost factors, vehicle emission rate inputs and upstream emission source data files. For example, the benefits file would present CO2-related benefits as the CO2 cost factor (a social cost of GHG per metric ton value set in the input file) multiplied by the emission impacts of CO2 (or other GHG) calculated using physical effects. Similarly, fuel costs would be calculated as fuel prices (dollars/gallon as provided in the input file) multiplied by gallons consumed as presented in the physical effects file.
 
-One attribute appears in both the cost effects and the benefits files. That attribute is the drive value which is the economic value of the increased owner/operator surplus provided by added driving and is estimated as one half of the product of the decline in vehicle operating costs per vehicle-mile and the resulting increase in the annual number of miles driven via the rebound effect, plus the cost of driving those round miles. Since the drive value is calculated using a change in operating costs, the new operating costs must be compared to another operating cost. Drive value is calculated as a cost and presented in the cost effects file as the drive surplus plus the fuel costs associated with driving any rebound miles. Drive value is then calculated as a
-benefit by calculating the the drive value cost in an action scenario relative to the no-action scenario. If the drive value cost is greater in the action scenario, a positive drive value benefit will be the result while a lower drive value cost in the action scenario would represent a negative benefit, or disbenefit.
+One attribute appears in both the cost effects and the benefits files. That attribute is the drive value which is the economic value of the increased owner/operator surplus provided by added driving and is estimated as one half of the product of the decline in vehicle operating costs per vehicle-mile and the resulting increase in the annual number of miles driven via the rebound effect, plus the cost of driving those rebound miles. Since the drive value is calculated using a change in operating costs, the new operating costs must be compared to another operating cost. Drive value is calculated as a cost and presented in the cost effects file as the drive surplus plus the fuel costs associated with driving any rebound miles. Drive value is then calculated as a
+benefit by calculating the drive value cost in an action scenario relative to the no-action scenario. If the drive value cost is greater in the action scenario, a positive drive value benefit will be the result while a lower drive value cost in the action scenario would represent a negative benefit, or disbenefit.
 
 Importantly, the cost factor inputs (as OMEGA calls them) have been generated using several discount rates. The values calculated using each of the different discount rates should not be added to one another. In other words, PM costs calculated using a 3 percent discount rate and a 7 percent discount rate should never be added together. Similarly, climate costs calculated using a 3 percent discount rate and a 2.5 percent discount rate should never be added. This does not necessarily hold true when adding criteria air pollutant costs and climate costs when it is acceptable to add costs using different discount rates. Lastly, when discounting future values, the same discount rate must be used as was used in generating the cost factors.
 
-The default effects files are annual summary results by calendar year, regulatory class and fuel type. If desired, vehicle-level output files can be selected via the runtime_options.csv file that controls the effects. The vehicle-level output files can be very large depending on the number of vehicles, length of vehicle life and number of calendar years included in the run. Files can be saved in a compressed 'parquet' format for use with Python's pandas library to minimize file sizes.
+The default effects files are annual summary results by calendar year, regulatory class and fuel type. If desired, vehicle-level output files can be selected via the runtime_options.csv file that controls the effects. The vehicle-level output files can be very large depending on the number of vehicles, length of vehicle life and number of calendar years included in the run. Files can be saved in a compressed 'parquet' format for use with Python's pandas library to minimize file sizes, however, the parquet format is available only when running via OMEGA code and not when running via an executable bundle.
 
 Physical Effects Calculations
 -----------------------------
@@ -832,32 +832,31 @@ Liquid fuel consumption and electricity consumption are calculated for a given V
 .. Math::
     :label: ice_fuel_consumption
 
-    FuelConsumption_{gallons}=VMT_{liquid fuel} * \frac{(CO_{2} grams/mile)_{onroad, direct}} {(CO_{2} grams/gallon) * TransmissionEfficiency}
+    FuelConsumption_{gallons}=VMT * \frac{(CO_{2} grams/mile)_{onroad, direct}} {(CO_{2} grams/gallon)}
 
 Where:
 
-* :math:`VMT_{liquid fuel}=VMT * FuelShare_{liquid fuel}`
+* :math:`VMT=Vehicle Miles Traveled`
 * :math:`(CO_{2} grams/mile)_{onroad, direct}` is calculated within OMEGA and accounts for any credits that do not improve fuel consumption and test-to-onroad gaps
 * :math:`(CO_{2} grams/gallon)` is the :math:`CO_{2}` content of the in-use, or retail, fuel
-* :math:`TransmissionEfficiency` is the efficiency of liquid fuel transmission as set by the user
 
 **Electricity consumption**
 
 .. Math::
     :label: bev_fuel_consumption
 
-    FuelConsumption_{kWh}=VMT_{electricity} * \frac{(kWh/mile)_{onroad, direct}} {TransmissionEfficiency}
+    FuelConsumption_{kWh}=VMT * \frac{(kWh/mile)_{onroad, direct}} {RefuelEfficiency}
 
 Where:
 
-* :math:`VMT_{electricity}=VMT * FuelShare_{electricity}`
+* :math:`VMT=Vehicle Miles Traveled`
 * :math:`(kWh/mile)_{onroad, direct}` is calculated within OMEGA and accounts for any credits that do not improve fuel consumption and test-to-onroad gaps
-* :math:`TransmissionEfficiency` is the efficiency of the power grid as set by the user
+* :math:`RefuelEfficiency` is the efficiency of the energy transfer from the charge point to the battery as set by the user
 
 .. note:: Multi-fuel vehicle fuel consumption
 
     Multi-fuel vehicles consume both electricity and liquid fuel. Consumption of both is calculated for such vehicles and emission effects such
-    as upstream and tailpipe emissions are calculated uniquely for both fuels.
+    as upstream and vehicle emissions are calculated uniquely for both fuels.
 
 Emission Inventories
 --------------------
@@ -873,7 +872,7 @@ Emission inventories are calculated for a given Vehicle ID as:
 Where:
 
 * :math:`Pollutant` would be any of the criteria air pollutants such as VOC, PM2.5, NOx, etc., with the exception of :math:`SO_{2}`
-* :math:`VMT_{liquid fuel}=VMT * FuelShare_{liquid fuel}`
+* :math:`VMT_{liquid fuel}=VMT * onroad_engine_on_distance_frac` (which is calculated interanlly in OMEGA)
 * :math:`(grams/mile)_{Pollutant}` is an emission rate from the vehicle emission rates input file
 * :math:`grams/US ton` = 907,185
 
@@ -900,7 +899,7 @@ Where:
 Where:
 
 * :math:`Pollutant` would be either :math:`CH_{4}` or :math:`N_{2}O`
-* :math:`VMT_{liquid fuel}=VMT * FuelShare_{liquid fuel}`
+* :math:`VMT_{liquid fuel}=VMT * onroad_engine_on_distance_frac`
 * :math:`(grams/mile)_{Pollutant}` is an emission rate from the emission rates input file
 * :math:`grams/Metric ton` = 1,000,000
 
@@ -913,7 +912,7 @@ Where:
 
 Where:
 
-* :math:`VMT_{liquid fuel}=VMT * FuelShare_{liquid fuel}`
+* :math:`VMT_{liquid fuel}=VMT * onroad_engine_on_distance_frac`
 * :math:`(CO_{2} grams/mile)_{onroad, direct}` is calculated within OMEGA and accounts for any credits that do not improve fuel consumption and test-to-onroad gaps
 * :math:`grams/Metric ton` = 1,000,000
 
@@ -979,12 +978,12 @@ Where:
     :label: upstream_ghg_tons
 
     & UpstreamEmissions_{Pollutant, Metric tons} \\
-    & =\frac{FC_{kWh} * (grams/kWh)_{Pollutant, EGU} + FC_{gallons} * (grams/gallon)_{Pollutant, Refinery}} {grams/Metric ton}
+    & =\frac{FG_{kWh} * (grams/kWh)_{Pollutant, EGU} + FC_{gallons} * (grams/gallon)_{Pollutant, Refinery}} {grams/Metric ton}
 
 Where:
 
 * :math:`Pollutant` would be any of the GHGs such as CO2, CH4, N2O
-* :math:`FC_{kWh}` is :math:`FuelConsumption_{kWh}` calculated by equation :math:numref:`bev_fuel_consumption`
+* :math:`FG_{kWh}` is :math:`FuelConsumption_{kWh}` calculated by equation :math:numref:`bev_fuel_consumption` divided by the grid transmission efficiency as set by the user
 * :math:`(grams/kWh)_{Pollutant, EGU}` is the Electricity Generating Unit (or Power Sector) emission factor for the given Pollutant
 * :math:`FC_{gallons}` is :math:`FuelConsumption_{gallons}` calculated by equation :math:numref:`ice_fuel_consumption`
 * :math:`(grams/gallon)_{Pollutant, Refinery}` is the Refinery emission rate for the given pollutant
