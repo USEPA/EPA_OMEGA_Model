@@ -174,7 +174,7 @@ def calc_vehicle_inventory(vpd, gwp_list):
     factor_vmt = vpd.vmt_liquid_fuel / vpd.grams_per_metric_ton
     ch4_veh_metrictons = vpd.ch4_exh_rate * factor_vmt
     n2o_veh_metrictons = vpd.n2o_exh_rate * factor_vmt
-    co2_veh_metrictons = vpd.onroad_direct_co2e_grams_per_mile * factor_vmt
+    co2_veh_metrictons = vpd.onroad_direct_co2e_grams_per_mile * vpd.vmt / vpd.grams_per_us_ton
     co2e_veh_metrictons = co2_veh_metrictons + (ch4_veh_metrictons * gwp_ch4) + (n2o_veh_metrictons * gwp_n2o)
 
     # calc vehicle inventories as exhaust plus evap (where applicable)

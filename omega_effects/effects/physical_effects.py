@@ -362,7 +362,7 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                     else:
                         pass  # add additional liquid fuels (E85) if necessary
 
-                key = (int(v['vehicle_id']), int(v['calendar_year']))
+                key = (v['vehicle_id'], int(v['calendar_year']))
                 calendar_year_effects_dict[key] = calc_vehicle_inventory(vehicle_data, gwp_list)
 
         physical_effects_dict.update(calendar_year_effects_dict)
@@ -416,7 +416,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'e0_energy_density_ratio': e0_energy_density_ratio,
             'diesel_energy_density_ratio': diesel_energy_density_ratio,
             'vehicle_id': v['vehicle_id'],
-            'base_year_vehicle_id': v['vehicle_id'],
+            'base_year_vehicle_id': v['vehicle_number'],
             'calendar_year': v['calendar_year'],
             'model_year': model_year,
             'age': v['age'],
@@ -628,7 +628,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
                     'pure_share': pure_share,
                 })
 
-        key = (int(v['vehicle_id']), int(v['calendar_year']))
+        key = (v['vehicle_id'], int(v['calendar_year']))
         physical_effects[key] = calc_vehicle_inventory(vehicle_data, gwp_list)
 
     return physical_effects

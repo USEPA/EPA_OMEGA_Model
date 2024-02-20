@@ -83,7 +83,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
             powertrain_type = None
 
             if v['vehicle_id'] not in vehicle_info_dict:
-                if v['vehicle_id'] < batch_settings.legacy_fleet.legacy_fleet_vehicle_id_start:
+                if (v['vehicle_id'], v['calendar_year']) not in batch_settings.legacy_fleet.adjusted_legacy_fleet:
                     attribute_list = [
                         'new_vehicle_mfr_cost_dollars',
                         'price_dollars',

@@ -81,6 +81,8 @@ Data Column Name and Description
 **CODE**
 
 """
+import pandas as pd
+
 from omega_effects.general.general_functions import read_input_file
 from omega_effects.general.input_validation import validate_template_version_info, validate_template_column_names
 
@@ -96,10 +98,11 @@ class LegacyFleet:
 
         """
         self._data = {}  # the legacy_fleet_file data
-        self._legacy_fleet = {}  # the built legacy fleet for the analysis
-        self.adjusted_legacy_fleet = {}
+        self._legacy_fleet = {}  # the built legacy fleet ready for adjustments
+        self.adjusted_legacy_fleet = {}  # the adjusted legacy fleet for use in the analysis
         self.legacy_fleet_calendar_year_max = 0
         self.legacy_fleet_vehicle_id_start = pow(10, 6)
+        self.legacy_fleet_vehicle_numbers = []
 
     def init_from_file(self, filepath, vehicles_base_year, effects_log):
         """
@@ -153,7 +156,11 @@ class LegacyFleet:
         df['model_year'] = df['calendar_year'] - df['age']
 
         # add attributes that are populated in build_legacy_fleet_for_analysis
-        df.insert(0, 'vehicle_id', self.legacy_fleet_vehicle_id_start)
+        vehicle_ids = []
+        for idx, row in df.iterrows():
+            vehicle_ids.append('Legacy Fleet_' + str(self.legacy_fleet_vehicle_id_start) + '_' + row['reg_class_id'])
+        df.insert(0, 'vehicle_number', self.legacy_fleet_vehicle_id_start)
+        df.insert(0, 'vehicle_id', vehicle_ids)
         df.insert(len(df.columns), 'annual_vmt', 0)
         df.insert(len(df.columns), 'odometer', 0)
         df.insert(len(df.columns), 'vmt', 0)
@@ -208,9 +215,14 @@ class LegacyFleet:
 
                 else:
                     vehicle_id_increment += 1
+                    vehicle_number = self.legacy_fleet_vehicle_id_start + vehicle_id_increment
+                    self.legacy_fleet_vehicle_numbers.append(vehicle_number)
                     annual_vmt = batch_settings.onroad_vmt.get_vmt(calendar_year, market_class_id, new_age)
-                    if v['vehicle_id'] == self.legacy_fleet_vehicle_id_start:
-                        self._data[k].update({'vehicle_id': v['vehicle_id'] + vehicle_id_increment})
+                    if v['vehicle_number'] == self.legacy_fleet_vehicle_id_start:
+                        self._data[k].update({
+                            'vehicle_id': f'Legacy Fleet_{vehicle_number}_{reg_class_id}',
+                            'vehicle_number': vehicle_number,
+                        })
 
                     update_dict = v.copy()
                     update_dict['age'] = new_age
@@ -291,6 +303,7 @@ class LegacyFleet:
                 odometer_adjusted = odometer_last_year + annual_vmt_adjusted
 
             update_dict = {
+                'vehicle_number': v['vehicle_number'],
                 'vehicle_id': v['vehicle_id'],
                 'age': v['age'],
                 'calendar_year': v['calendar_year'],

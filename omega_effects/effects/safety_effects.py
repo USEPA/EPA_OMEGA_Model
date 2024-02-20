@@ -241,7 +241,7 @@ def calc_safety_effects(batch_settings, session_settings):
                 'base_fatalities': fatalities_base,
                 'session_fatalities': fatalities_session,
             })
-            calendar_year_safety_dict[int(v['vehicle_id']), int(calendar_year)] = vehicle_safety_dict
+            calendar_year_safety_dict[v['vehicle_id'], int(calendar_year)] = vehicle_safety_dict
 
         safety_effects_dict.update(calendar_year_safety_dict)
 
@@ -293,7 +293,7 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
             'session_policy': session_settings.session_policy,
             'session_name': session_settings.session_name,
             'vehicle_id': v['vehicle_id'],
-            'base_year_vehicle_id': v['vehicle_id'],
+            'base_year_vehicle_id': v['vehicle_number'],
             'manufacturer_id': manufacturer_id,
             'name': name,
             'calendar_year': int(v['calendar_year']),
@@ -333,7 +333,7 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
             'session_fatalities': fatalities_base,
         }
         )
-        key = (int(v['vehicle_id']), int(v['calendar_year']))
+        key = (v['vehicle_id'], int(v['calendar_year']))
         legacy_fleet_safety_effects_dict[key] = vehicle_safety_dict
 
     return legacy_fleet_safety_effects_dict
