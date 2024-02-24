@@ -200,7 +200,7 @@ def run_postproc(iteration_log, credit_banks):
         compliance_ids = np.append(compliance_ids, 'consolidated_OEM')
 
     # save manufacturer annual data >after< any second-pass credit transfers/trading
-    manufacturer_annual_data_table = pd.DataFrame(ManufacturerAnnualData._data)  # pull in updated compliance datta
+    manufacturer_annual_data_table = pd.DataFrame(ManufacturerAnnualData._data)  # pull in updated compliance data
     manufacturer_annual_data_table.to_csv(omega_globals.options.output_folder +
                                           omega_globals.options.session_unique_name + '_manufacturer_annual_data.csv',
                                           columns=sorted(manufacturer_annual_data_table.columns))
@@ -222,7 +222,6 @@ def run_postproc(iteration_log, credit_banks):
             session_results['%s_model_year_cert_co2e_Mg' % compliance_id] = model_year_cert_co2e_Mg
 
     for compliance_id in Vehicle.compliance_ids:
-
         if 'iteration' in omega_globals.options.verbose_postproc:
             plot_iteration(iteration_log, compliance_id)
 
