@@ -1608,7 +1608,7 @@ def plot_manufacturer_compliance(calendar_years, compliance_id, credit_history):
     model_year_cert_co2e_Mg = ManufacturerAnnualData.get_model_year_cert_co2e_Mg(compliance_id)
     total_cost_billions = ManufacturerAnnualData.get_total_cost_billions(compliance_id)
     # compliance chart
-    ax1, fig = plot_compliance(calendar_years, target_co2e_Mg, calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg)
+    ax1, fig = plot_compliance(calendar_years, compliance_id, target_co2e_Mg, calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg)
     label_xyt(ax1, 'Year', 'CO2e [Mg]', '%s %s\nCert and Compliance Versus Year\n Total Cost $%.2f Billion' % (
         compliance_id, omega_globals.options.session_unique_name, total_cost_billions))
 
@@ -1645,12 +1645,13 @@ def plot_manufacturer_compliance(calendar_years, compliance_id, credit_history):
     return calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg, target_co2e_Mg
 
 
-def plot_compliance(calendar_years, target_co2e_Mg, calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg):
+def plot_compliance(calendar_years, compliance_id, target_co2e_Mg, calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg):
     """
     Plot compliance target Mg, calendar year cert Mg and model year compliance Mg
 
     Args:
         calendar_years (list): list of years to plot
+        compliance_id (str): manufacturer name, or 'consolidated_OEM'
         target_co2e_Mg (list): list of target co2e Mg
         calendar_year_cert_co2e_Mg (list): list of calendar year cert co2e Mg
         model_year_cert_co2e_Mg (list): list of model year compliance co2e Mg
@@ -1659,7 +1660,10 @@ def plot_compliance(calendar_years, target_co2e_Mg, calendar_year_cert_co2e_Mg, 
     fig, ax1 = fplothg(calendar_years, target_co2e_Mg, 'o-', reuse_figure=omega_globals.options.auto_close_figures)
     ax1.plot(calendar_years, calendar_year_cert_co2e_Mg, 'r.-')
     ax1.plot(calendar_years, model_year_cert_co2e_Mg, '-')
-    ax1.legend(['target_co2e_Mg', 'calendar_year_cert_co2e_Mg', 'model_year_cert_co2e_Mg'])
+    if compliance_id == 'consolidated_OEM' and omega_globals.pass_num > 0:
+        ax1.legend(['target_co2e_Mg', 'model_year_pre_trading_cert_co2e_Mg', 'model_year_cert_co2e_Mg'])
+    else:
+        ax1.legend(['target_co2e_Mg', 'calendar_year_cert_co2e_Mg', 'model_year_cert_co2e_Mg'])
     return ax1, fig
 
 
