@@ -61,6 +61,14 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
     Returns:
         A dictionary of cost effects for each vehicle in each analysis year.
 
+    Notes:
+        The average purchase price will include possible battery tax credits and reflects the expected price of a
+        vehicle on the dealer lot. The average price modification reflects possible purchase tax credits which would
+        be deducted from the average purchase price to reflect out-of-pocket purchase costs. Insurance, sales taxes,
+        and any other cost tied to the value of a vehicle use the average purchase price in applicable calculations. An
+        exception to that would be repair costs which are tied to the manufacturer cost and not purchase prices. The
+        manufacturer cost includes applicable battery tax credits which may reduce the cost to the manufacturer.
+
     """
     costs_dict = {}
     vehicle_info_dict = {}

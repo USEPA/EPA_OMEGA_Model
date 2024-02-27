@@ -39,9 +39,6 @@ def get_inputs_for_effects(batch_settings, arg=None):
             'gwp_n2o',
         ]
         values = batch_settings.general_inputs_for_effects.get_value(*args)
-        # values = []
-        # for arg in args:
-        #     values.append(batch_settings.general_inputs_for_effects.get_value(arg))
 
         return values
 
