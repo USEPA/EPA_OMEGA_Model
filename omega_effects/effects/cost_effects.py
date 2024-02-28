@@ -67,7 +67,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
         be deducted from the average purchase price to reflect out-of-pocket purchase costs. Insurance, sales taxes,
         and any other cost tied to the value of a vehicle use the average purchase price in applicable calculations. An
         exception to that would be repair costs which are tied to the manufacturer cost and not purchase prices. The
-        manufacturer cost includes applicable battery tax credits which may reduce the cost to the manufacturer.
+        manufacturer cost excludes cost reductions via applicable battery tax credits.
 
     """
     costs_dict = {}
@@ -75,6 +75,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
     refueling_bev_dict = {}
     refueling_liquid_dict = {}
     cumulative_maint_cost_dict = {}
+    cost_per_vehicle_no45x_dict = {}
 
     for v in session_fleet_physical.values():
 
@@ -82,6 +83,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
 
             mfr_cost_dollars = purchase_price_dollars = purchase_credit_dollars = battery_cost_dollars = 0
             avg_mfr_cost = avg_purchase_price = avg_purchase_credit = battery_cost_dollars_per_kwh = 0
+            modified_xsub_price_dollars = vehicle_cost_dollars_no45x = cost_per_vehicle_no45x = 0
             fuel_retail_cost_dollars = fuel_pretax_cost_dollars = 0
             congestion_cost_dollars = noise_cost_dollars = 0
             maintenance_cost_dollars = repair_cost_dollars = 0
@@ -96,6 +98,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                         'new_vehicle_mfr_cost_dollars',
                         'price_dollars',
                         'price_modification_dollars',
+                        'modified_cross_subsidized_price_dollars',
                         'battery_cost',
                         'onroad_charge_depleting_range_mi',
                     ]
@@ -104,14 +107,20 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
 
                 else:
                     price_data = batch_settings.legacy_fleet.get_legacy_fleet_price(v['vehicle_id'], v['calendar_year'])
-                    avg_mfr_cost, avg_purchase_price, avg_purchase_credit = 3 * [price_data]
+                    avg_mfr_cost, avg_purchase_price, avg_purchase_credit, avg_modified_xsub_price = 4 * [price_data]
                     battery_cost = 0  # this won't matter for legacy fleet since calculated only for age==0
                     charge_depleting_range = 0
+                    cost_per_vehicle_no45x_dict[v['vehicle_id']] = avg_mfr_cost
                     if v['base_year_powertrain_type'] == 'BEV':
                         charge_depleting_range = 300  # this is for legacy fleet only
 
                     vehicle_info_dict[v['vehicle_id']] = [
-                        avg_mfr_cost, avg_purchase_price, avg_purchase_credit, battery_cost, charge_depleting_range
+                        avg_mfr_cost,
+                        avg_purchase_price,
+                        avg_purchase_credit,
+                        avg_modified_xsub_price,
+                        battery_cost,
+                        charge_depleting_range,
                     ]
 
                 if 'BEV' in v['name']:
@@ -125,8 +134,8 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
 
                 vehicle_info_dict[v['vehicle_id']].append(powertrain_type)
 
-            [avg_mfr_cost, avg_purchase_price, avg_purchase_credit, battery_cost, charge_depleting_range,
-             powertrain_type
+            [avg_mfr_cost, avg_purchase_price, avg_purchase_credit, avg_modified_xsub_price, battery_cost,
+             charge_depleting_range, powertrain_type
              ] = vehicle_info_dict[v['vehicle_id']]
 
             # tech costs, only for age=0 _______________________________________________________________________________
@@ -134,6 +143,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                 mfr_cost_dollars = v['registered_count'] * avg_mfr_cost
                 purchase_price_dollars = v['registered_count'] * avg_purchase_price
                 purchase_credit_dollars = v['registered_count'] * avg_purchase_credit
+                modified_xsub_price_dollars = v['registered_count'] * avg_modified_xsub_price
                 battery_cost_dollars = v['registered_count'] * battery_cost
                 if v['battery_kwh'] > 0:
                     battery_cost_dollars_per_kwh = battery_cost_dollars / v['battery_kwh']
@@ -143,6 +153,8 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                         session_settings.powertrain_cost.get_battery_tax_offset(
                             v['model_year'], v['battery_kwh'], powertrain_type
                         )
+                vehicle_cost_dollars_no45x = mfr_cost_dollars - battery_credit_dollars
+                cost_per_vehicle_no45x_dict[v['vehicle_id']] = vehicle_cost_dollars_no45x / v['registered_count']
 
             # fuel costs _______________________________________________________________________________________________
             if v['fuel_consumption_kwh'] > 0:  # this is consumption at the wall so includes charging losses
@@ -194,8 +206,9 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
             else:
                 operating_veh_type = repair_type = 'suv'
 
+            cost_per_vehicle_no45x = cost_per_vehicle_no45x_dict[v['vehicle_id']]
             repair_cost_per_mile = batch_settings.repair_cost.calc_repair_cost_per_mile(
-                avg_mfr_cost, powertrain_type, repair_type, v['age']
+                cost_per_vehicle_no45x, powertrain_type, repair_type, v['age']
             )
             repair_cost_dollars = repair_cost_per_mile * v['vmt']
 
@@ -279,11 +292,13 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                 'vmt': v['vmt'],
                 'battery_kwh': v['battery_kwh'],
                 'vehicle_cost_dollars': mfr_cost_dollars,
+                'vehicle_cost_dollars_no45X': vehicle_cost_dollars_no45x,
                 'battery_cost_dollars': battery_cost_dollars,
                 'battery_cost_per_kWh': battery_cost_dollars_per_kwh,
                 'battery_credit_dollars': battery_credit_dollars,
                 'purchase_price_dollars': purchase_price_dollars,
                 'purchase_credit_dollars': purchase_credit_dollars,
+                'modified_xsub_price_dollars': modified_xsub_price_dollars,
                 'sales_taxes_cost_dollars': sales_tax_dollars,
                 'insurance_cost_dollars': insurance_cost_dollars,
                 'fuel_retail_cost_dollars': fuel_retail_cost_dollars,

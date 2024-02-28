@@ -76,7 +76,7 @@ def calc_social_effects(batch_settings, costs_df, benefits_df, ghg_scope, calc_h
 
     net_benefit_cost_attributes = [
         # 'fuel_pretax_cost_dollars',
-        'vehicle_cost_dollars',
+        'vehicle_cost_dollars_no45X',
         'insurance_cost_dollars',
         'congestion_cost_dollars',
         'noise_cost_dollars',
