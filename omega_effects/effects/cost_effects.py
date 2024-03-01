@@ -123,6 +123,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                         charge_depleting_range,
                     ]
 
+                # use name to set powertrain type - important to use name for legacy fleet
                 if 'BEV' in v['name']:
                     powertrain_type = 'BEV'
                 elif 'PHEV' in v['name']:
@@ -411,7 +412,12 @@ def calc_period_consumer_view(batch_settings, input_df, periods):
         if attribute in ['sales', 'registered_count']:
             pass
         elif attribute in [
-            'vehicle_cost_dollars', 'purchase_price_dollars', 'purchase_credit_dollars', 'sales_taxes_cost_dollars'
+            'vehicle_cost_dollars_no45X',
+            'vehicle_cost_dollars',
+            'purchase_price_dollars',
+            'purchase_credit_dollars',
+            'modified_xsub_price_dollars',
+            'sales_taxes_cost_dollars',
         ]:
             s = pd.Series(return_df[attribute] / return_df['sales'], name=f'{attribute}_per_period')
             return_df = pd.concat([return_df, s], axis=1)
