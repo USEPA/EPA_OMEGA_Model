@@ -140,6 +140,7 @@ def calc_safety_effects(batch_settings, session_settings):
         'market_class_id',
         'fueling_class',
         'base_year_powertrain_type',
+        'powertrain_type',
         'footprint_ft2',
         'workfactor',
         'body_style',
@@ -170,9 +171,9 @@ def calc_safety_effects(batch_settings, session_settings):
                 vehicle_info_dict[v['vehicle_id']] \
                     = session_settings.vehicles.get_vehicle_attributes(v['vehicle_id'], *vehicle_attribute_list)
 
-            base_year_vehicle_id, manufacturer_id, name, model_year, base_year_reg_class_id, reg_class_id, size_class, \
-                in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, footprint, workfactor, \
-                body_style, base_year_curbweight_lbs, curbweight_lbs = \
+            (base_year_vehicle_id, manufacturer_id, name, model_year, base_year_reg_class_id, reg_class_id, size_class,
+                in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, powertrain_type,
+                footprint, workfactor, body_style, base_year_curbweight_lbs, curbweight_lbs) = \
                 vehicle_info_dict[v['vehicle_id']]
 
             threshold_lbs, change_per_100lbs_below, change_per_100lbs_above \
@@ -215,6 +216,7 @@ def calc_safety_effects(batch_settings, session_settings):
                 'market_class_id': market_class_id,
                 'fueling_class': fueling_class,
                 'base_year_powertrain_type': base_year_powertrain_type,
+                'powertrain_type': powertrain_type,
                 'registered_count': v['registered_count'],
                 'context_vmt_adjustment': v['context_vmt_adjustment'],
                 'annual_vmt': v['annual_vmt'],
@@ -279,6 +281,7 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
             fueling_class = base_year_powertrain_type = 'PHEV'
 
         name = batch_settings.legacy_fleet.set_legacy_fleet_name(v['vehicle_id'], v['market_class_id'], fueling_class)
+        powertrain_type = batch_settings.legacy_fleet.set_legacy_fleet_powertrain_type(v['market_class_id'])
 
         threshold_lbs, change_per_100lbs_below, change_per_100lbs_above = \
             get_safety_values(batch_settings, v['body_style'])
@@ -306,6 +309,7 @@ def calc_legacy_fleet_safety_effects(batch_settings, session_settings):
             'market_class_id': v['market_class_id'],
             'fueling_class': fueling_class,
             'base_year_powertrain_type': base_year_powertrain_type,
+            'powertrain_type': powertrain_type,
             'registered_count': registered_count,
             'context_vmt_adjustment': v['context_vmt_adjustment'],
             'annual_vmt': v['annual_vmt'],

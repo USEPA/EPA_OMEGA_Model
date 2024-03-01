@@ -36,6 +36,7 @@ class VehiclePhysicalData:
         self.market_class_id = None
         self.fueling_class = None
         self.base_year_powertrain_type = None
+        self.powertrain_type = None
         self.body_style = None
         self.footprint_ft2 = None
         self.workfactor = None
@@ -221,6 +222,7 @@ def calc_vehicle_inventory(vpd, gwp_list):
         'market_class_id': vpd.market_class_id,
         'fueling_class': vpd.fueling_class,
         'base_year_powertrain_type': vpd.base_year_powertrain_type,
+        'powertrain_type': vpd.powertrain_type,
         'body_style': vpd.body_style,
         'footprint_ft2': vpd.footprint_ft2,
         'workfactor': vpd.workfactor,

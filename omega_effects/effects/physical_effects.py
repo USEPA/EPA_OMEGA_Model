@@ -71,6 +71,7 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
         'market_class_id',
         'fueling_class',
         'base_year_powertrain_type',
+        'powertrain_type',
         'footprint_ft2',
         'workfactor',
         'target_co2e_grams_per_mile',
@@ -109,11 +110,12 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                 vehicle_info_dict[v['vehicle_id']] \
                     = session_settings.vehicles.get_vehicle_attributes(v['vehicle_id'], *vehicle_attribute_list)
 
-            base_year_vehicle_id, manufacturer_id, name, model_year, base_year_reg_class_id, reg_class_id, \
-                in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, footprint_ft2, workfactor, \
-                target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile, body_style, \
-                battery_kwh_per_veh, curbweight_lbs, gvwr_lbs, onroad_engine_on_distance_frac, \
-                onroad_charge_depleting_range_mi = \
+            (base_year_vehicle_id, manufacturer_id, name, model_year, base_year_reg_class_id, reg_class_id,
+                in_use_fuel_id, market_class_id, fueling_class, base_year_powertrain_type, powertrain_type,
+                footprint_ft2, workfactor, target_co2e_grams_per_mile,
+                onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile, body_style,
+                battery_kwh_per_veh, curbweight_lbs, gvwr_lbs, onroad_engine_on_distance_frac,
+                onroad_charge_depleting_range_mi) = \
                 vehicle_info_dict[v['vehicle_id']]
 
             # weight class
@@ -163,6 +165,7 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                     'market_class_id': market_class_id,
                     'fueling_class': fueling_class,
                     'base_year_powertrain_type': base_year_powertrain_type,
+                    'powertrain_type': powertrain_type,
                     'body_style': body_style,
                     'footprint_ft2': footprint_ft2,
                     'workfactor': workfactor,
@@ -194,9 +197,9 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                 elif base_year_reg_class_id == 'truck':
                     sourcetype_name = 'passenger truck'
                 elif base_year_reg_class_id == 'mediumduty' and 'cuv' in body_style:
-                    sourcetype_name = 'passenger truck'  # TODO is this right?
+                    sourcetype_name = 'passenger truck'
                 elif base_year_reg_class_id == 'mediumduty' and 'pickup' in body_style:
-                    sourcetype_name = 'light commercial truck'  # TODO is this right?
+                    sourcetype_name = 'light commercial truck'
                 else:
                     print('Improper sourcetype_name for vehicle emission rates.')
 
@@ -207,12 +210,11 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
 
                 # calc fuel consumption and update emission rates
                 if onroad_direct_kwh_per_mile:
-                    refuel_efficiency = \
-                        batch_settings.onroad_fuels.get_fuel_attribute(calendar_year, 'US electricity',
-                                                                       'refuel_efficiency')
+                    refuel_efficiency = batch_settings.onroad_fuels.get_fuel_attribute(
+                        calendar_year, 'US electricity', 'refuel_efficiency'
+                    )
                     fuel_consumption_kwh = v['vmt'] * onroad_direct_kwh_per_mile / refuel_efficiency
-                    transmission_efficiency = \
-                        batch_settings.onroad_fuels.get_fuel_attribute(
+                    transmission_efficiency = batch_settings.onroad_fuels.get_fuel_attribute(
                             calendar_year, 'US electricity', 'transmission_efficiency'
                         )
                     fuel_generation_kwh = fuel_consumption_kwh / transmission_efficiency
@@ -460,6 +462,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'name': vse['name'],
             'fueling_class': vse['fueling_class'],
             'base_year_powertrain_type': vse['base_year_powertrain_type'],
+            'powertrain_type': vse['powertrain_type'],
         })
 
         if v['reg_class_id'] == 'car':

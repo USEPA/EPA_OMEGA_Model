@@ -90,7 +90,6 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
             refueling_cost_dollars = drive_value_cost_dollars = 0
             battery_credit_dollars = 0
             discount_rate = 0
-            powertrain_type = None
 
             if v['vehicle_id'] not in vehicle_info_dict:
                 if (v['vehicle_id'], v['calendar_year']) not in batch_settings.legacy_fleet.adjusted_legacy_fleet:
@@ -101,6 +100,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                         'modified_cross_subsidized_price_dollars',
                         'battery_cost',
                         'onroad_charge_depleting_range_mi',
+                        'powertrain_type',
                     ]
                     vehicle_info_dict[v['vehicle_id']] = \
                         session_settings.vehicles.get_vehicle_attributes(v['vehicle_id'], *attribute_list)
@@ -111,7 +111,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                     battery_cost = 0  # this won't matter for legacy fleet since calculated only for age==0
                     charge_depleting_range = 0
                     cost_per_vehicle_no45x_dict[v['vehicle_id']] = avg_mfr_cost
-                    if v['base_year_powertrain_type'] == 'BEV':
+                    if v['powertrain_type'] == 'BEV':
                         charge_depleting_range = 300  # this is for legacy fleet only
 
                     vehicle_info_dict[v['vehicle_id']] = [
@@ -121,19 +121,8 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                         avg_modified_xsub_price,
                         battery_cost,
                         charge_depleting_range,
+                        v['powertrain_type'],
                     ]
-
-                # use name to set powertrain type - important to use name for legacy fleet
-                if 'BEV' in v['name']:
-                    powertrain_type = 'BEV'
-                elif 'PHEV' in v['name']:
-                    powertrain_type = 'PHEV'
-                elif 'HEV' in v['name']:
-                    powertrain_type = 'HEV'
-                else:
-                    powertrain_type = 'ICE'
-
-                vehicle_info_dict[v['vehicle_id']].append(powertrain_type)
 
             [avg_mfr_cost, avg_purchase_price, avg_purchase_credit, avg_modified_xsub_price, battery_cost,
              charge_depleting_range, powertrain_type

@@ -348,3 +348,29 @@ class LegacyFleet:
             _name = f'cuv_suv:{fueling_class}:{vehicle_id}'
 
         return _name
+
+    @staticmethod
+    def set_legacy_fleet_powertrain_type(market_class_id):
+        """
+
+        Args:
+            market_class_id (str): the legacy fleet market class id
+
+        Returns:
+            A powertrain type for the vehicle primarily for use in cost_effects, repair cost calculations which looks for
+            'car' or 'Pickup' in the name attribute
+
+        Note:
+            This method is called in safety_effects.calc_legacy_fleet_safety_effects
+
+        """
+        if 'ICE' in market_class_id:
+            powertrain_type = 'ICE'
+        elif 'BEV' in market_class_id:
+            powertrain_type = 'BEV'
+        elif 'PHEV' in market_class_id:
+            powertrain_type = 'PHEV'
+        else:
+            powertrain_type = 'HEV'
+
+        return powertrain_type
