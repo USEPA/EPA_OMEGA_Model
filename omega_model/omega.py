@@ -1754,7 +1754,7 @@ def run_omega(session_runtime_options, standalone_run=False):
             if session_runtime_options.use_prerun_context_outputs:
                 session_runtime_options.context_new_vehicle_generalized_costs_file = \
                     '%s%scontext_new_vehicle_prices_%d.csv' % \
-                    (session_runtime_options.prerun_context_folder, os.sep,
+                    (session_runtime_options.prerun_context_folder.rstrip(' '), os.sep,
                      session_runtime_options.consolidate_manufacturers)
             else:
                 session_runtime_options.context_new_vehicle_generalized_costs_file = \
@@ -1763,7 +1763,7 @@ def run_omega(session_runtime_options, standalone_run=False):
             if session_runtime_options.use_prerun_context_outputs:
                 session_runtime_options.sales_share_calibration_file = \
                     '%s%scontext_sales_share_calibration_%d.csv' % \
-                    (session_runtime_options.prerun_context_folder, os.sep,
+                    (session_runtime_options.prerun_context_folder.rstrip(' '), os.sep,
                      session_runtime_options.consolidate_manufacturers)
             else:
                 session_runtime_options.sales_share_calibration_file = \
