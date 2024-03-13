@@ -22,7 +22,7 @@ Batch Input Files and Loaders
 
         Parameter,Loaded By
         Context Fuel Prices File, :any:`omega_model/context/fuel_prices.py<omega_model.context.fuel_prices>`
-        Context Electrcity Prices File, ``user_definable`` e.g. :any:`omega_model/context/fuel_prices.py<omega_model.context.electricity_prices_aeo>`
+        Context Electricity Prices File, ``user_definable`` e.g. :any:`omega_model/context/fuel_prices.py<omega_model.context.electricity_prices_aeo>`
         Context New Vehicle Market File, :any:`omega_model/context/new_vehicle_market.py<omega_model.context.new_vehicle_market>`
         Manufacturers File, :any:`omega_model/producer/manufacturers.py<omega_model.producer.manufacturers>`
         Market Classes File, ``user_definable`` e.g. :any:`omega_model/consumer/market_classes_unibody.py<omega_model.consumer.market_classes_unibody>`
@@ -33,7 +33,6 @@ Batch Input Files and Loaders
         Production Constraints File, :any:`omega_model/context/production_constraints.py<omega_model.context.production_constraints>`
         Sales Share File, ``user_definable`` e.g. :any:`omega_model/consumer/sales_share_ice_bev_phev_body_style.py<omega_model.consumer.sales_share_ice_bev_phev_body_style>`
         Vehicle Price Modifications File, :any:`omega_model/context/price_modifications.py<omega_model.context.price_modifications>`
-...
         Vehicle Reregistration File, ``user_definable`` e.g. :any:`omega_model/consumer/reregistration_fixed_by_age.py<omega_model.consumer.reregistration_fixed_by_age>`
         ICE Vehicle Simulation Results File, ``user_definable`` e.g. :any:`omega_model/context/rse_cost_clouds.py<omega_model.context.rse_cost_clouds>`
         BEV Vehicle Simulation Results File, ``user_definable`` e.g. :any:`omega_model/context/rse_cost_clouds.py<omega_model.context.rse_cost_clouds>`

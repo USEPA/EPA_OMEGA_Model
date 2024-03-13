@@ -15,7 +15,7 @@ File Type
 Sample Header
     .. csv-table::
 
-       input_template_name:,drive_cycle_ballast,input_template_version:,0.1
+       input_template_name:,drive_cycle_ballast,input_template_version:,0.1,notes:,20230104
 
 Sample Data Columns
     .. csv-table::

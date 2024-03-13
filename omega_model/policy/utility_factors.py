@@ -19,23 +19,33 @@ File Type
 Sample Header
     .. csv-table::
 
-       input_template_name:,policy_fuel_upstream_methods,input_template_version:,0.2
+       input_template_name:,utility_factor_methods,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        start_year,upstream_calculation_method
-        2020,upstream_xev_ice_delta
-        2025,upstream_actual
+        start_year,city_method,city_norm_dist,highway_method,highway_norm_dist
+        0,FUF,583,FUF,583
+        2012,cityFUF,399,highwayFUF,399
+        2031,FUF,583,FUF,583
 
 Data Column Name and Description
 
 :start_year:
     Start year of the upstream calculation method, method applies until the next available start year
 
-:upstream_calculation_method:
-    The name of the function to call within ``upstream_methods.py``
+:city_method:
+    Method name to call for calculating 'city' (FTP) utility factor
+
+:city_norm_dist:
+    Normalizing distance to use in calculating 'city' utility factor
+
+:highway_method:
+    Method name to call for calculating 'highway' (HWFET, US06) utility factor
+
+:highway_norm_dist:
+    Normalizing distance to use in calculating 'highway' utility factor
 
 **CODE**
 

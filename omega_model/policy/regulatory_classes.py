@@ -19,21 +19,21 @@ File Type
 Template Header
     .. csv-table::
 
-        input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
+        input_template_name:,``[module_name]``,input_template_version:,``[template_version]``,``[other]``
 
 Sample Header
     .. csv-table::
 
-       input_template_name:, policy.regulatory_classes, input_template_version:, 0.1
+       input_template_name:,policy.regulatory_classes,input_template_version:,0.1,notes:,20221019 Added mediumduty reg class
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
         reg_class_id,description
-        car,'cars' as defined by the regulations
-        truck,'trucks' as defined by the regulations
-        mediumduty,'2b3' as defined by the regulations
+        car,cars as defined by the regulations
+        truck,trucks as defined by the regulations
+        mediumduty,medium duty as defined by the regulations
 
 Data Column Name and Description
 
