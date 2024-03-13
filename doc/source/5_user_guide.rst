@@ -22,6 +22,7 @@ Batch Input Files and Loaders
 
         Parameter,Loaded By
         Context Fuel Prices File, :any:`omega_model/context/fuel_prices.py<omega_model.context.fuel_prices>`
+        Context Electrcity Prices File, ``user_definable`` e.g. :any:`omega_model/context/fuel_prices.py<omega_model.context.electricity_prices_aeo>`
         Context New Vehicle Market File, :any:`omega_model/context/new_vehicle_market.py<omega_model.context.new_vehicle_market>`
         Manufacturers File, :any:`omega_model/producer/manufacturers.py<omega_model.producer.manufacturers>`
         Market Classes File, ``user_definable`` e.g. :any:`omega_model/consumer/market_classes_unibody.py<omega_model.consumer.market_classes_unibody>`
@@ -37,7 +38,7 @@ Batch Input Files and Loaders
         BEV Vehicle Simulation Results File, ``user_definable`` e.g. :any:`omega_model/context/rse_cost_clouds.py<omega_model.context.rse_cost_clouds>`
         PHEV Vehicle Simulation Results File, ``user_definable`` e.g. :any:`omega_model/context/rse_cost_clouds.py<omega_model.context.rse_cost_clouds>`
         Vehicles File, :any:`omega_model/producer/vehicle_aggregation.py<omega_model.producer.vehicle_aggregation>`
-        Powertrain Cost File, :any:`omega_model/context/powertrain_cost.py<omega_model.context.powertrain_cost>`
+        Powertrain Cost File, ``user_definable`` e.g. :any:`omega_model/context/powertrain_cost_frm.py<omega_model.context.powertrain_cost_frm>`
         Glider Cost File, :any:`omega_model/context/glider_cost.py<omega_model.context.glider_cost>`
         Body Styles File, :any:`omega_model/context/body_styles.py<omega_model.context.body_styles>`
         Mass Scaling File, :any:`omega_model/context/mass_scaling.py<omega_model.context.mass_scaling>`
@@ -56,6 +57,7 @@ Batch Input Files and Loaders
         Production Multipliers File, :any:`omega_model/policy/incentives.py<omega_model.policy.incentives>`
         Regulatory Classes File, ``user_definable`` e.g. :any:`omega_model/policy/regulatory_classes.py<omega_model.policy.regulatory_classes>`
         Required Sales Share File, :any:`omega_model/policy/required_sales_share.py<omega_model.policy.required_sales_share>`
+        Policy Utility Factor Methods File, :any:`omega_model/policy/utility_factors.py<omega_model.policy.utility_factors>`
         ,
         Session Postproc Settings,
         Context Implicit Price Deflators File, :any:`omega_model/context/ip_deflators.py<omega_model.context.ip_deflators>`
