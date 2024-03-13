@@ -291,7 +291,10 @@ class SalesShare(OMEGABase, SalesShareBase):
             reconciliation_df['change_needed'] = 1 - reconciliation_df[share_columns].sum(axis=1)
 
             for share_name, share_col in zip(share_names, share_columns):
-                reconciliation_df[share_col] = reconciliation_df.apply(SalesShare.calc_attempted_share, args=(share_col, min_constraints[share_name], max_constraints[share_name], N), axis=1)
+                reconciliation_df[share_col] = (
+                    reconciliation_df.apply(SalesShare.calc_attempted_share,
+                                            args=(share_col, min_constraints[share_name], max_constraints[share_name],
+                                                  N), axis=1))
 
             reconciliation_df['sum'] = reconciliation_df[share_columns].sum(axis=1)
             # reconciliation_df.to_csv('rdf_%s.csv' % N)
