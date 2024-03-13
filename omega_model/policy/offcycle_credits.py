@@ -30,7 +30,7 @@ Template Header
 Sample Header
     .. csv-table::
 
-       input_template_name:,policy.offcycle_credits,input_template_version:,0.11
+       input_template_name:,policy.offcycle_credits,input_template_version:,0.11,description:,20231106
 
 The data header consists of ``start_year``, ``credit_name``, ``credit_group``, ``credit_destination`` columns
 followed by zero or more reg class columns, as needed.
@@ -45,11 +45,11 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        start_year,credit_name,credit_group,credit_destination,reg_class_id:car,reg_class_id:truck
-        2020,start_stop,menu,cert_direct_offcycle_co2e_grams_per_mile,2.5,4.4
-        2020,high_eff_alternator,menu,cert_direct_offcycle_co2e_grams_per_mile,2.7,2.7
-        2020,ac_leakage,ac,cert_indirect_offcycle_co2e_grams_per_mile,13.8,17.2
-        2020,ac_efficiency,ac,cert_direct_offcycle_co2e_grams_per_mile,5,7.2
+        start_year,credit_name,credit_group,credit_destination,fueling_class_reg_class_id:ICE.car,fueling_class_reg_class_id:ICE.truck,fueling_class_reg_class_id:BEV.car,fueling_class_reg_class_id:BEV.truck,fueling_class_reg_class_id:PHEV.car,fueling_class_reg_class_id:PHEV.truck
+        2020,start_stop,menu,cert_direct_offcycle_co2e_grams_per_mile,2.5,4.4,0,0,2.5,4.4
+        2020,other_oc_menu_tech,menu,cert_direct_offcycle_co2e_grams_per_mile,7.5,5.6,5.3,7,7.5,5.6
+        2020,ac_leakage,ac,cert_indirect_offcycle_co2e_grams_per_mile,13.8,17.2,13.8,17.2,13.8,17.2
+        2020,ac_efficiency,ac,cert_direct_offcycle_co2e_grams_per_mile,5,7.2,5,7.2,5,7.2
 
 Data Column Name and Description
 
@@ -68,7 +68,7 @@ Data Column Name and Description
 
 **Optional Columns**
 
-:``reg_class_id:{reg_class_id}``:
+:``fueling_class_reg_class_id:{fueling_class_reg_class_id}``:
     The value of the credits.  Credits are specified as positive numbers and are subtracted from the cert results
     to determine a compliance result
 

@@ -22,12 +22,12 @@ File Type
 Template Header
     .. csv-table::
 
-        input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
+        input_template_name:,``[module_name]``,input_template_version:,``[template_version]``,``[other]``
 
 Sample Header
     .. csv-table::
 
-       input_template_name:,policy.targets_footprint,input_template_version:,0.11
+       input_template_name:,policy.targets_footprint,input_template_version:,0.11,Notes:,20230208_yoy_b_to2032_C_b50_74_m0p35_T_b50_83_m1p38
 
 Sample Data Columns
     .. csv-table::

@@ -66,7 +66,8 @@ Sample Data Columns
         :widths: auto
 
         calendar_year,model_year,compliance_id,balance_Mg
-        2019,2016,USA Motors,151139573
+        2022,2017,consolidated_OEM,10551149
+        2022,2018,consolidated_OEM,21602835
 
 Data Column Name and Description
 

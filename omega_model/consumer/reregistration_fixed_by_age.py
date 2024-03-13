@@ -27,12 +27,12 @@ Sample Data Columns
         :widths: auto
 
         start_model_year,age,market_class_id,reregistered_proportion
-        1970,0,non_hauling.BEV,1
-        1970,1,non_hauling.BEV,0.987841531
-        1970,2,non_hauling.BEV,0.976587217
-        1970,0,hauling.ICE,1
-        1970,1,hauling.ICE,0.977597055
-        1970,2,hauling.ICE,0.962974697
+        1970,0,sedan_wagon.BEV,1
+        1970,1,sedan_wagon.BEV,0.987841531
+        1970,2,sedan_wagon.BEV,0.976587217
+        1970,0,cuv_suv_van.ICE,1
+        1970,1,cuv_suv_van.ICE,0.987841531
+        1970,2,cuv_suv_van.ICE,0.976587217
 
 Data Column Name and Description
 

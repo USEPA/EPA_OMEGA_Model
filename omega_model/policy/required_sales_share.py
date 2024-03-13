@@ -20,7 +20,7 @@ File Type
 Sample Header
     .. csv-table::
 
-       input_template_name:,required_sales_share,input_template_version:,0.2
+       input_template_name:,required_sales_share,input_template_version:,0.2,notes:,20230222 no ZEV mandate
 
 The data header consists of a ``start_year`` column followed by zero or more required sales share columns.
 
@@ -28,8 +28,8 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        start_year,hauling.BEV:minimum_share,non_hauling.BEV:minimum_share
-        2020,0.05,0.1
+        start_year,sedan_wagon.BEV:minimum_share,cuv_suv_van.BEV:minimum_share,pickup.BEV:minimum_share
+        2020,0,0,0
 
 Data Column Name and Description
 

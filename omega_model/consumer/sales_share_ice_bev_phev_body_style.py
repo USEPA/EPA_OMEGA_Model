@@ -23,7 +23,7 @@ Template Header
 Sample Header
     .. csv-table::
 
-       input_template_name:,consumer.sales_share_ice_bev_body_style,input_template_version:,0.11
+       input_template_name:,consumer.sales_share_ice_bev_phev_body_style,input_template_version:,0.11
 
 Sample Data Columns
     .. csv-table::
@@ -33,6 +33,8 @@ Sample Data Columns
         sedan_wagon.BEV,2020,12000,5,0.142,0.1,1600,1.58,-8
         sedan_wagon.BEV,2021,12000,5,0.142,0.1,1600,1.58,-8
         sedan_wagon.BEV,2022,12000,5,0.168,0.1,1600,1.58,-8
+        sedan_wagon.ICE,2020,12000,5,1,0.1,2000,1.58,-8
+        sedan_wagon.PHEV,2020,12000,5,1,0.1,2000,1.58,-8
 
 Data Column Name and Description
 
@@ -291,7 +293,10 @@ class SalesShare(OMEGABase, SalesShareBase):
             reconciliation_df['change_needed'] = 1 - reconciliation_df[share_columns].sum(axis=1)
 
             for share_name, share_col in zip(share_names, share_columns):
-                reconciliation_df[share_col] = reconciliation_df.apply(SalesShare.calc_attempted_share, args=(share_col, min_constraints[share_name], max_constraints[share_name], N), axis=1)
+                reconciliation_df[share_col] = (
+                    reconciliation_df.apply(SalesShare.calc_attempted_share,
+                                            args=(share_col, min_constraints[share_name], max_constraints[share_name],
+                                                  N), axis=1))
 
             reconciliation_df['sum'] = reconciliation_df[share_columns].sum(axis=1)
             # reconciliation_df.to_csv('rdf_%s.csv' % N)

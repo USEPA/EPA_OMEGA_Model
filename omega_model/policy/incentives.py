@@ -19,7 +19,7 @@ File Type
 Sample Header
     .. csv-table::
 
-       input_template_name:,production_multipliers,input_template_version:,0.21
+       input_template_name:,production_multipliers,input_template_version:,0.21,description:,20230208 2021 final rulemaking production_multipliers
 
 Sample Data Columns
     .. csv-table::

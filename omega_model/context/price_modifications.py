@@ -33,8 +33,8 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        start_year,hauling.BEV:price_modification_dollars,non_hauling.BEV:price_modification_dollars
-        2020,-7500,-5000
+        start_year,sedan_wagon.BEV:price_modification_dollars,cuv_suv_van.BEV:price_modification_dollars,pickup.BEV:price_modification_dollars
+        2020,-7500,-5000,0
 
 Data Column Name and Description
 

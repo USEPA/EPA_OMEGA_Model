@@ -22,6 +22,7 @@ Batch Input Files and Loaders
 
         Parameter,Loaded By
         Context Fuel Prices File, :any:`omega_model/context/fuel_prices.py<omega_model.context.fuel_prices>`
+        Context Electricity Prices File, ``user_definable`` e.g. :any:`omega_model/context/fuel_prices.py<omega_model.context.electricity_prices_aeo>`
         Context New Vehicle Market File, :any:`omega_model/context/new_vehicle_market.py<omega_model.context.new_vehicle_market>`
         Manufacturers File, :any:`omega_model/producer/manufacturers.py<omega_model.producer.manufacturers>`
         Market Classes File, ``user_definable`` e.g. :any:`omega_model/consumer/market_classes_unibody.py<omega_model.consumer.market_classes_unibody>`
@@ -30,14 +31,14 @@ Batch Input Files and Loaders
         Onroad VMT File, ``user_definable`` e.g. :any:`omega_model/consumer/annual_vmt_fixed_by_age.py<omega_model.consumer.annual_vmt_fixed_by_age>`
         Producer Generalized Cost File, ``user_definable`` e.g. :any:`omega_model/producer/producer_generalized_cost.py<omega_model.producer.producer_generalized_cost>`
         Production Constraints File, :any:`omega_model/context/production_constraints.py<omega_model.context.production_constraints>`
-        Sales Share File, ``user_definable`` e.g. :any:`omega_model/consumer/sales_share_ice_bev.py<omega_model.consumer.sales_share_ice_bev>`
+        Sales Share File, ``user_definable`` e.g. :any:`omega_model/consumer/sales_share_ice_bev_phev_body_style.py<omega_model.consumer.sales_share_ice_bev_phev_body_style>`
         Vehicle Price Modifications File, :any:`omega_model/context/price_modifications.py<omega_model.context.price_modifications>`
         Vehicle Reregistration File, ``user_definable`` e.g. :any:`omega_model/consumer/reregistration_fixed_by_age.py<omega_model.consumer.reregistration_fixed_by_age>`
         ICE Vehicle Simulation Results File, ``user_definable`` e.g. :any:`omega_model/context/rse_cost_clouds.py<omega_model.context.rse_cost_clouds>`
         BEV Vehicle Simulation Results File, ``user_definable`` e.g. :any:`omega_model/context/rse_cost_clouds.py<omega_model.context.rse_cost_clouds>`
         PHEV Vehicle Simulation Results File, ``user_definable`` e.g. :any:`omega_model/context/rse_cost_clouds.py<omega_model.context.rse_cost_clouds>`
         Vehicles File, :any:`omega_model/producer/vehicle_aggregation.py<omega_model.producer.vehicle_aggregation>`
-        Powertrain Cost File, :any:`omega_model/context/powertrain_cost.py<omega_model.context.powertrain_cost>`
+        Powertrain Cost File, ``user_definable`` e.g. :any:`omega_model/context/powertrain_cost_frm.py<omega_model.context.powertrain_cost_frm>`
         Glider Cost File, :any:`omega_model/context/glider_cost.py<omega_model.context.glider_cost>`
         Body Styles File, :any:`omega_model/context/body_styles.py<omega_model.context.body_styles>`
         Mass Scaling File, :any:`omega_model/context/mass_scaling.py<omega_model.context.mass_scaling>`
@@ -56,9 +57,7 @@ Batch Input Files and Loaders
         Production Multipliers File, :any:`omega_model/policy/incentives.py<omega_model.policy.incentives>`
         Regulatory Classes File, ``user_definable`` e.g. :any:`omega_model/policy/regulatory_classes.py<omega_model.policy.regulatory_classes>`
         Required Sales Share File, :any:`omega_model/policy/required_sales_share.py<omega_model.policy.required_sales_share>`
-        ,
-        Session Postproc Settings,
-        Context Implicit Price Deflators File, :any:`omega_model/context/ip_deflators.py<omega_model.context.ip_deflators>`
+        Policy Utility Factor Methods File, :any:`omega_model/policy/utility_factors.py<omega_model.policy.utility_factors>`
 
 Simulation Context
     The context inputs apply to all sessions within a batch.  Multiple batch files must be defined to run multiple contexts.

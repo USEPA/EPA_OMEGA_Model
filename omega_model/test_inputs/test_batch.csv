@@ -52,6 +52,3 @@ Production Multipliers File,String,production_multipliers.csv,production_multipl
 Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
 Required Sales Share File,String,required_sales_share-body_style.csv,required_sales_share-body_style.csv
 Policy Utility Factor Methods File,String,policy_utility_factor_methods.csv,policy_utility_factor_methods.csv
-,,,
-Session Postproc Settings,,,
-Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implicit_price_deflators.csv

@@ -21,15 +21,17 @@ File Type
 Sample Header
     .. csv-table::
 
-       input_template_name:,vehicles,input_template_version:,0.50,notes:,20220926 Added fields for prior_redesign_year and redesign_interval to 20220819 ver from base_year_compilation_LD_2b3_20220926.xlsx
+       input_template_name:,vehicles,input_template_version:,0.51,notes:,"From 0904. Rev 1211, Maserati now in Stellantis"
+
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        vehicle_name,manufacturer_id,model_year,reg_class_id,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs,unibody_structure,body_style,structure_material,prior_redesign_year,redesign_interval,drive_system,alvw_lbs,gvwr_lbs,gcwr_lbs,curbweight_lbs,dual_rear_wheel,long_bed_8ft,engine_cylinders,engine_displacement_liters,high_eff_alternator,start_stop,ice,hev,phev,bev,fcv,deac_pd,deac_fc,cegr,atk2,gdi,turb12,turb11,gas_fuel,diesel_fuel,awd,fwd,trx10,trx11,trx12,trx21,trx22,ecvt,target_coef_a,target_coef_b,target_coef_c
-        DB11 V12,Aston Martin Lagonda,2019,car,Minicompact,N,TDS_TRX22_SS0,{'pump gasoline':1.0},{'gasoline':1.0},118,,,50,600,14.6,4500,186,77.26666667,50.53333333,3.5,110.4,81,311230,4,,,1,sedan,steel,2014,5,2,,,,3933,0,,12,5.2,0,0,1,0,0,0,0,1,0,0,0,0,1,0,1,0,,,,,,,,,40.94,0.0169,0.0271
-        Grand Cherokee 4X4,FCA,2019,truck,Large Crossover,N,GDI_TRX22_SS1,{'pump gasoline':1.0},{'gasoline':1.0},155936,,,51.1,295,17.2,5000,189.8,76.5,68.82,8.6,114.71,140.5,43538.5,5,,,1,cuv_suv,steel,2014,5,4,5662.35,6500,,4824.7,0,,6,3.6,0,1,1,0,0,0,0,0,0,1,0,0,0,0,1,0,,,,,,,,,51.46511874,-0.260687329,0.036235437
+        vehicle_name,manufacturer_id,model_year,reg_class_id,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,footprint_ft2,eng_rated_hp,battery_gross_kwh,tractive_motor_kw,total_emachine_kw,onroad_charge_depleting_range_mi,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs,unibody_structure,body_style,structure_material,prior_redesign_year,redesign_interval,drive_system,alvw_lbs,gvwr_lbs,gcwr_lbs,curbweight_lbs,dual_rear_wheel,long_bed_8ft,engine_cylinders,engine_displacement_liters,target_coef_a,target_coef_b,target_coef_c,application_id
+        DB11 V12,Aston Martin Lagonda,2022,car,Minicompact,N,ICE_SLA_RWD_TDS_TRX21R_SS0,{'pump gasoline':1.0},gasoline,16,50,630,,,,,14.6,4500,,,,,110.4,,233200,,,,1,sedan,steel,2017,5,RWD,,,,,0,,12,5.2,40.94,0.0169,0.0271,SLA
+        GRAND WAGONEER 4X4,Stellantis,2022,truck,Large Crossover,N,ICE_HLA_AWD_GDI_DEAC_D_TRX21R_SS0,{'pump gasoline':1.0},gasoline,14728,58.6,471,,,,,21.39841471,6500,,,,,123,,35350,,,,1,cuv_suv,steel,2016,5,AWD,,,,,0,,8,6.4,66.03,-0.0009,0.03824,HLA
+        MODEL Y LONG RANGE AWD,Tesla,2022,truck,Large Crossover,EV,BEV_AWD,{'US electricity':1.0},electricity,130272,51.1,0,80.5,200,291,330,11.4,4750,,,,,113.8,,50490,,,,1,cuv_suv,steel,2012,5,AWD,,,,,0,,0,0,34.26,0.3191,0.0142,SLA
 
 Data Column Name and Description
 
@@ -77,6 +79,18 @@ Data Column Name and Description
 
     :eng_rated_hp:
         Vehicle engine rated power (horsepower)
+
+    :battery_gross_kwh:
+        Propulsion battery gross capacity (kWh)
+
+    :tractive_motor_kw:
+        Tractive motor rated power (kW)
+
+    :total_emachine_kw:
+        Total emachine rated power: tractive motor(s) + generator(s) (kW)
+
+    :onroad_charge_depleting_range_mi:
+        Onroad charge depleting range (miles)
 
     :unibody_structure:
         Vehicle body structure; 1 = unibody, 0 = body-on-frame
@@ -126,6 +140,9 @@ Data Column Name and Description
     :engine_displacement_liters:
         Engine displacement (liters)
 
+    :application_id:
+        'SLA' = Standard Load Application, 'HLA' = High Load Application, 'MDV' = Medium-duty Vehicle
+
     **OPTIONAL COLUMNS**
         These columns become object attributes that may be used to determine vehicle regulatory class
         (e.g. 'car','truck') based on the simulated policy, or they may be used for other purposes.
@@ -172,7 +189,10 @@ Data Column Name and Description
     :alvw_lbs:
         Average loaded vehicle weight (pounds)
 
-----
+    :long_bed_8ft:
+        = 1 if pickup truck has an 8' long bed
+
+---
 
 **CODE**
 
