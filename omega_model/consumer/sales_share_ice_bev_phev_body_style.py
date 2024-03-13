@@ -23,7 +23,7 @@ Template Header
 Sample Header
     .. csv-table::
 
-       input_template_name:,consumer.sales_share_ice_bev_body_style,input_template_version:,0.11
+       input_template_name:,consumer.sales_share_ice_bev_phev_body_style,input_template_version:,0.11
 
 Sample Data Columns
     .. csv-table::
@@ -33,6 +33,8 @@ Sample Data Columns
         sedan_wagon.BEV,2020,12000,5,0.142,0.1,1600,1.58,-8
         sedan_wagon.BEV,2021,12000,5,0.142,0.1,1600,1.58,-8
         sedan_wagon.BEV,2022,12000,5,0.168,0.1,1600,1.58,-8
+        sedan_wagon.ICE,2020,12000,5,1,0.1,2000,1.58,-8
+        sedan_wagon.PHEV,2020,12000,5,1,0.1,2000,1.58,-8
 
 Data Column Name and Description
 

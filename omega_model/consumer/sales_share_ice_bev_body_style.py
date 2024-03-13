@@ -33,6 +33,7 @@ Sample Data Columns
         sedan_wagon.BEV,2020,12000,5,0.142,0.1,1600,1.58,-8
         sedan_wagon.BEV,2021,12000,5,0.142,0.1,1600,1.58,-8
         sedan_wagon.BEV,2022,12000,5,0.168,0.1,1600,1.58,-8
+        sedan_wagon.ICE,2020,12000,5,1,0.1,2000,1.58,-8
 
 Data Column Name and Description
 

@@ -36,8 +36,8 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        start_year,hauling.BEV:minimum_share,non_hauling.BEV:minimum_share,hauling.BEV:maximum_share,non_hauling.BEV:maximum_share
-        2020,0.001,0.001,0.1,0.97
+        start_year,sedan_wagon.BEV:minimum_share,cuv_suv_van.BEV:minimum_share,pickup.BEV:minimum_share,sedan_wagon.BEV:maximum_share,cuv_suv_van.BEV:maximum_share,pickup.BEV:maximum_share
+        2020,0,0,0,1,1,1
 
 Data Column Name and Description
 

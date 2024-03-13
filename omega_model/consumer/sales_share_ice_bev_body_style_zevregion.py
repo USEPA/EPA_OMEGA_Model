@@ -18,12 +18,12 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
+       input_template_name:,``[module_name]``,input_template_version:,``[template_version]``,``[other]``
 
 Sample Header
     .. csv-table::
 
-       input_template_name:,consumer.sales_share_ice_bev_body_style_zevregion,input_template_version:,0.11
+       input_template_name:,consumer.sales_share_ice_bev_body_style_zevregion,input_template_version:,0.11,notes:,20230228 ice_bev_pu_b0p4_k1p0_x02031-cuv_b2p0_k1p0_x02029_nu8p0-sdn_b0p4_k1p0_x02020_nu1p0 w zevregions
 
 Sample Data Columns
     .. csv-table::
@@ -33,6 +33,7 @@ Sample Data Columns
         sedan_wagon_r1nonzev.BEV,2020,12000,5,0.5,0.1,1600,1.58,-8
         sedan_wagon_r1nonzev.BEV,2021,12000,5,0.599,0.1,1600,1.58,-8
         sedan_wagon_r1nonzev.BEV,2022,12000,5,0.69,0.1,1600,1.58,-8
+        sedan_wagon_r1nonzev.ICE,2020,12000,5,1,0.1,2000,1.58,-8
 
 Data Column Name and Description
 

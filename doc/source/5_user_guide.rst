@@ -31,8 +31,9 @@ Batch Input Files and Loaders
         Onroad VMT File, ``user_definable`` e.g. :any:`omega_model/consumer/annual_vmt_fixed_by_age.py<omega_model.consumer.annual_vmt_fixed_by_age>`
         Producer Generalized Cost File, ``user_definable`` e.g. :any:`omega_model/producer/producer_generalized_cost.py<omega_model.producer.producer_generalized_cost>`
         Production Constraints File, :any:`omega_model/context/production_constraints.py<omega_model.context.production_constraints>`
-        Sales Share File, ``user_definable`` e.g. :any:`omega_model/consumer/sales_share_ice_bev.py<omega_model.consumer.sales_share_ice_bev>`
+        Sales Share File, ``user_definable`` e.g. :any:`omega_model/consumer/sales_share_ice_bev_phev_body_style.py<omega_model.consumer.sales_share_ice_bev_phev_body_style>`
         Vehicle Price Modifications File, :any:`omega_model/context/price_modifications.py<omega_model.context.price_modifications>`
+...
         Vehicle Reregistration File, ``user_definable`` e.g. :any:`omega_model/consumer/reregistration_fixed_by_age.py<omega_model.consumer.reregistration_fixed_by_age>`
         ICE Vehicle Simulation Results File, ``user_definable`` e.g. :any:`omega_model/context/rse_cost_clouds.py<omega_model.context.rse_cost_clouds>`
         BEV Vehicle Simulation Results File, ``user_definable`` e.g. :any:`omega_model/context/rse_cost_clouds.py<omega_model.context.rse_cost_clouds>`
@@ -58,9 +59,6 @@ Batch Input Files and Loaders
         Regulatory Classes File, ``user_definable`` e.g. :any:`omega_model/policy/regulatory_classes.py<omega_model.policy.regulatory_classes>`
         Required Sales Share File, :any:`omega_model/policy/required_sales_share.py<omega_model.policy.required_sales_share>`
         Policy Utility Factor Methods File, :any:`omega_model/policy/utility_factors.py<omega_model.policy.utility_factors>`
-        ,
-        Session Postproc Settings,
-        Context Implicit Price Deflators File, :any:`omega_model/context/ip_deflators.py<omega_model.context.ip_deflators>`
 
 Simulation Context
     The context inputs apply to all sessions within a batch.  Multiple batch files must be defined to run multiple contexts.

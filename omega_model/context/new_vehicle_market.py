@@ -31,7 +31,7 @@ File Type
 Sample Header
     .. csv-table::
 
-       input_template_name:,context_new_vehicle_market,input_template_version:,0.22
+       input_template_name:,context_new_vehicle_market,input_template_version:,0.22,``[other]``
 
 Sample Data Columns
     .. csv-table::

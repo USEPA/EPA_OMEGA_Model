@@ -15,7 +15,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
+       input_template_name:,``[module_name]``,input_template_version:,``[template_version]``,``[other]``
 
 Sample Header
     .. csv-table::

@@ -18,21 +18,23 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,``[template_version]``
+       input_template_name:,``[module_name]``,input_template_version:,``[template_version]``,``[other]``
 
 Sample Header
     .. csv-table::
 
-       input_template_name:,consumer.sales_share_ice_bev_body_style,input_template_version:,0.11
+       input_template_name:,consumer.sales_share_ice_bev_phev_body_style_zevregion,input_template_version:,0.11,notes:,20240222 trial 20
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
         market_class_id,start_year,annual_vmt,price_amortization_period,share_weight,discount_rate,o_m_costs,average_occupancy,logit_exponent_mu
-        sedan_wagon.BEV,2020,12000,5,0.142,0.1,1600,1.58,-8
-        sedan_wagon.BEV,2021,12000,5,0.142,0.1,1600,1.58,-8
-        sedan_wagon.BEV,2022,12000,5,0.168,0.1,1600,1.58,-8
+        sedan_wagon_r1nonzev.BEV,2022,15000,7,0.69,0.1,1600,1.58,-8
+        sedan_wagon_r1nonzev.BEV,2023,15000,7,0.77,0.1,1600,1.58,-8
+        sedan_wagon_r1nonzev.BEV,2024,15000,7,0.83,0.1,1600,1.58,-8
+        sedan_wagon_r1nonzev.ICE,2022,15000,7,1,0.1,2000,1.58,-8
+        sedan_wagon_r1nonzev.PHEV,2022,15000,7,0.08,0.1,1800,1.58,-8
 
 Data Column Name and Description
 

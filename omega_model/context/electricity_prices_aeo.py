@@ -9,17 +9,22 @@ AEO electricity price data include retail and pre-tax costs in dollars per unit 
 **INPUT FILE FORMAT**
 
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
-rows.
+rows.  The template header uses a dynamic format.
 
 The data represents electricity prices by context case and calendar year.
 
 File Type
     comma-separated values (CSV)
 
+Template Header
+    .. csv-table::
+
+       input_template_name:,``[module_name]``,input_template_version:,``[template_version]``,``[other]``
+
 Sample Header
     .. csv-table::
 
-       input_template_name:,context.electricity_prices_aeo,input_template_version:,0.2
+       input_template_name:,context.electricity_prices_aeo,input_template_version:,0.2,description:,20230602-130256_run
 
 Sample Data Columns
     .. csv-table::
