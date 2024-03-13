@@ -11,7 +11,7 @@ Save Vehicle-Level Cost Effects Files,all,FALSE,,enter True or False - these fil
 Format for Vehicle-Level Output Files,all,csv,,enter 'csv' for large Excel-readable files 'parquet' for compressed files usable in Pandas
 Powertrain Costs FEV,all,TRUE,,enter TRUE or FALSE (must be consistent with the compliance run)
 BATCH SETTINGS,,,,
-batch_folder,all,,C:\omega\compliance,
+batch_folder,all,,C:\omega\compliance\<batch folder>,
 Vehicles File Base Year,all,2022,,this should be consistent with the OMEGA compliance run
 Analysis Final Year,all,2055,,this should be <= the value used in the OMEGA compliance run
 Cost Accrual,all,end-of-year,,

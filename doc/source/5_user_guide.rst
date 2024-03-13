@@ -285,15 +285,15 @@ Running the OMEGA Effects Executable
 
 7)	In the effects_inputs folder, find 2 batch settings files: one for light-duty (batch_settings_effects_ld.csv) and one for medium-duty (batch_settings_effects_md.csv).
 
-8)	In cell B3 of the batch settings file, enter a run ID if desired (e.g., NPRM, test, etc.). This run ID will be included as part of the output folder name. The default value is omega_effects.
+8)	In cell C3 of the batch settings file, enter a run ID if desired (e.g., NPRM, test, etc.). This run ID will be included as part of the output folder name. The default value is omega_effects.
 
-9)	In cell D4, enter the path of the save folder (e.g., "C:/omega/effects"). The output folder will be saved to this folder. The output folder will be named using other entries in the batch file and the run ID set in step 8.
+9)	In cell D5, enter the path of the save folder (e.g., "C:/omega/effects"). The output folder will be saved to this folder. The output folder will be named using other entries in the batch file and the run ID set in step 8.
 
-10)	Other options in Column B can be set to TRUE or FALSE, but please read the notes associated with each.
+10)	Other options in Column C can be set to TRUE or FALSE, but please read the notes associated with each.
 
-11)	In cell D12 of the batch settings file, enter the full path to the folder that contains your OMEGA compliance run results. This is important since the OMEGA Effects will look to this folder to find the needed vehicles.csv and vehicle_annual_data.csv files generated for each session in your OMEGA compliance run.
+11)	In cell D14 of the batch settings file, enter the full path to the folder that contains your OMEGA compliance run results. This is important since the OMEGA Effects will look to this folder to find the needed vehicles.csv and vehicle_annual_data.csv files generated for each session in your OMEGA compliance run.
 
-12)	Most values in column C can be left as is. There must be a context session name in cell C34. If your context session name is different, then set cell C34 accordingly. The same is true of subsequent session names in column C. If you do not want your effects outputs to include a session that exists in your OMEGA compliance run folder, simply set the session name to None.
+12)	Most values in column C can be left as is. There must be a context session name in cell C42. If your context session name is different, then set cell C42 accordingly. The same is true of subsequent session names in column C. If you do not want your effects outputs to include a session that exists in your OMEGA compliance run folder, simply set the session name to None.
 
 13)	Remaining entries in Column D should then point to the “effects_inputs” folder on your local machine. Filenames can probably be left as is unless you are using files with different names.
 
