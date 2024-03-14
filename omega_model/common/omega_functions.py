@@ -17,8 +17,6 @@ import common.omega_globals as omega_globals
 from collections.abc import Mapping, Container
 from sys import getsizeof
 
-# np.seterr(all='raise')  # for troubleshooting runtime warnings
-
 
 def get_ip_address():
     """
@@ -257,7 +255,7 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False, invert_x_axis=True):
 
     # CU
 
-    return frontier_df  # was frontier_df.copy()
+    return frontier_df
 
 
 def get_idxmin(cloud, min_frontier_factor, x_key):

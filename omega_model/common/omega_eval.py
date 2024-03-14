@@ -34,6 +34,7 @@ class Eval(OMEGABase):
             local_vars (mapping): dict/mapping of local variables
 
         Returns:
+            The value of the evaluated expression
 
         """
         if source not in cls._compiled_source:
