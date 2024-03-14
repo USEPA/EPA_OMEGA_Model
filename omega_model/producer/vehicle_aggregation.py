@@ -241,8 +241,6 @@ class VehicleAggregation(OMEGABase):
         from policy.workfactor_definition import WorkFactor
         from policy.policy_fuels import PolicyFuel
 
-        # omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
-
         input_template_name = 'vehicles'
         input_template_version = 0.51
         input_template_columns = Vehicle.mandatory_input_template_columns
@@ -311,11 +309,11 @@ class VehicleAggregation(OMEGABase):
             VehicleAggregation.weighted_fillna(df, 'ground_clearance_in')
             VehicleAggregation.weighted_fillna(df, 'height_in')
 
-            df['gvwr_lbs'] = df['gvwr_lbs'].fillna(df['etw_lbs'] + 700)  # RV: placeholder BDE
-            df['gcwr_lbs'] = df['gcwr_lbs'].fillna(10000)  # RV: placeholder BDE
-            df['curbweight_lbs'] = df['curbweight_lbs'].fillna(df['etw_lbs'] - 300)  # RV: placeholder BDE
-            df['dual_rear_wheel'] = df['dual_rear_wheel'].fillna(0)  # RV: placeholder BDE
-            df['alvw_lbs'] = df['alvw_lbs'].fillna((df['etw_lbs'] + df['gvwr_lbs']) / 2)  # RV: placeholder BDE
+            df['gvwr_lbs'] = df['gvwr_lbs'].fillna(df['etw_lbs'] + 700)  # RV
+            df['gcwr_lbs'] = df['gcwr_lbs'].fillna(10000)  # RV
+            df['curbweight_lbs'] = df['curbweight_lbs'].fillna(df['etw_lbs'] - 300)  # RV
+            df['dual_rear_wheel'] = df['dual_rear_wheel'].fillna(0)  # RV
+            df['alvw_lbs'] = df['alvw_lbs'].fillna((df['etw_lbs'] + df['gvwr_lbs']) / 2)  # RV
 
             df['base_year_powertrain_type'] = df['electrification_class'].\
                 replace({'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'FCV'})
@@ -353,10 +351,6 @@ class VehicleAggregation(OMEGABase):
                                                            df[df['electrification_class'] == 'EV'], 'onroad_charge_depleting_range_mi',
                                                            update_df=False),
                                                        'ICE': 0}})
-
-            # import time
-            # start_time = time.time()
-            # print('starting iterrows')
 
             df['base_year_footprint_ft2'] = df['footprint_ft2']
 
@@ -458,8 +452,6 @@ class VehicleAggregation(OMEGABase):
 
             df['glider_non_structure_mass_lbs'] = df['curbweight_lbs'] - df['powertrain_mass_lbs'] \
                                                   - df['structure_mass_lbs'] - df['battery_mass_lbs']
-
-            # print('done %.2f' % (time.time() - start_time))
 
             df.to_csv(omega_globals.options.output_folder + 'costed_vehicles.csv', columns=sorted(df.columns))
 

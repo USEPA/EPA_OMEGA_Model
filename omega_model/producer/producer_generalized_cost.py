@@ -107,7 +107,6 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
             ProducerGeneralizedCost. \
                 get_producer_generalized_cost_attributes(vehicle.market_class_id, ('fuel_years', 'annual_vmt'))
 
-        # cost_cloud = vehicle.cost_cloud
         vehicle_cost = cost_cloud[cost_name]
         vehicle_co2e_grams_per_mile = cost_cloud[co2_name]
         vehicle_direct_kwh_per_mile = cost_cloud[kwh_name] / OnroadFuel.get_fuel_attribute(vehicle.model_year,

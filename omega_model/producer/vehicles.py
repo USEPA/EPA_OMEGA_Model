@@ -665,7 +665,6 @@ class CompositeVehicle(OMEGABase):
             A float or numeric Array of new vehicle manufacturer costs
 
         """
-
         return DecompositionAttributes.interp1d(self, self.cost_curve, cost_curve_interp_key, query_points,
                                                 attribute_name)
 
@@ -863,7 +862,7 @@ class Vehicle(OMEGABase):
         self.cert_utility_factor = 0  #: PHEV cert utility factor (weighted average)
         self.compliance_id = None  #: compliance ID, may be the manufacturer ID or 'consolidated_OEM'
         self.context_size_class = None  #: context size class, used to project future vehicle sales based on the context
-        self.cost_curve = None
+        self.cost_curve = None  #: the vehicle cost curve (tech frontier)
         self.cost_curve_class = None  #: vehicle simulation (e.g. ALPHA) modeling result class
         self.cost_curve_non_numeric_data = None
         self.curbweight_lbs = 0  #: vehicle curbweight, pounds
@@ -1111,11 +1110,13 @@ class Vehicle(OMEGABase):
 
     def calc_battery_sizing_onroad_direct_kWh_per_mile(self, cloud):
         """
+        Calculate the battery-sizing onroad direct vehicle kWh/mi
 
         Args:
-            cloud:
+            cloud (DataFrame): vehicle cost cloud
 
         Returns:
+            ``cloud`` with updated values
 
         """
         drive_cycle_weight_year = VehicleOnroadCalculations.battery_sizing_drive_cycle_weight_year
@@ -1138,11 +1139,13 @@ class Vehicle(OMEGABase):
 
     def calc_cert_and_onroad_values(self, cloud):
         """
+        Calculate cert and onroad CO2e g/mi, kWh/mi engine-on distance frac and other values.
 
         Args:
-            cloud:
+            cloud (DataFrame): vehicle cost cloud
 
         Returns:
+            ``cloud`` with updated values
 
         """
         # calculate onroad values -------------------------------------------------------------------------------------
@@ -1248,7 +1251,8 @@ class Vehicle(OMEGABase):
 
         return cloud
 
-    """
+    def calc_cost_curve(self, cost_cloud):
+        """
         Create a frontier ("cost curve") from a vehicle's cloud of simulated vehicle points ("cost cloud") based
         on the current policy and vehicle attributes.  The cost values are a function of the producer generalized cost
         and the CO2e values are a function of the simulated vehicle data and the policy.
@@ -1265,17 +1269,6 @@ class Vehicle(OMEGABase):
 
         Returns:
             None, updates vehicle.cost_curve with vehicle tecnhology frontier / cost curve as a DataFrame.
-
-        """
-    def calc_cost_curve(self, cost_cloud):
-        """
-        Calculate vehicle cost curve from cost cloud.
-
-        Args:
-            cost_cloud (dataframe): cloud of costed powertrain variants
-
-        Returns:
-            Nothing, updates vehicle ``cost_curve`` attribute
 
         """
         # cull cost_cloud points here, based on producer constraints or whatever #
@@ -1386,30 +1379,31 @@ class Vehicle(OMEGABase):
         """
         from producer.manufacturers import Manufacturer
         vehicle.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(vehicle)
-        # vehicle.manufacturer.update_market_class_data(vehicle.compliance_id, vehicle.market_class_id)
         Manufacturer.update_market_class_data(vehicle.compliance_id, vehicle.market_class_id)
 
     @staticmethod
-    def set_fueling_class(veh):
+    def set_fueling_class(vehicle):
         """
+        Set vehicle fueling class.
 
         Args:
-            veh:
+            vehicle (Vehicle): the vehicle to assign a fueling class to
 
         Returns:
+            Nothing, updates the vehicle's fueling_class attribute
 
         """
-        if veh.base_year_powertrain_type in ['BEV', 'FCV']:
-            if veh.base_year_powertrain_type == 'FCV':
+        if vehicle.base_year_powertrain_type in ['BEV', 'FCV']:
+            if vehicle.base_year_powertrain_type == 'FCV':
                 # RV FCV
-                veh.in_use_fuel_id = "{'US electricity':1.0}"
-                veh.cert_fuel_id = 'electricity'
-                veh.base_year_powertrain_type = 'BEV'
-            veh.fueling_class = 'BEV'
-        elif veh.base_year_powertrain_type == 'PHEV':
-            veh.fueling_class = 'PHEV'
+                vehicle.in_use_fuel_id = "{'US electricity':1.0}"
+                vehicle.cert_fuel_id = 'electricity'
+                vehicle.base_year_powertrain_type = 'BEV'
+            vehicle.fueling_class = 'BEV'
+        elif vehicle.base_year_powertrain_type == 'PHEV':
+            vehicle.fueling_class = 'PHEV'
         else:
-            veh.fueling_class = 'ICE'
+            vehicle.fueling_class = 'ICE'
 
     @property
     def fueling_class_reg_class_id(self):
@@ -1514,8 +1508,6 @@ class Vehicle(OMEGABase):
         for i in df.index:
             veh = Vehicle(df.loc[i, 'manufacturer_id'])
             veh.name = df.loc[i, 'vehicle_name']
-            # veh.vehicle_id = i
-            # veh.manufacturer_id = df.loc[i, 'manufacturer_id']
             veh.model_year = df.loc[i, 'model_year']
             veh.context_size_class = df.loc[i, 'context_size_class']
             veh.cost_curve_class = df.loc[i, 'cost_curve_class']
@@ -1563,8 +1555,6 @@ class Vehicle(OMEGABase):
             veh.base_year_product = 1
             veh.base_year_gvwr_lbs = df.loc[i, 'gvwr_lbs']
             veh.base_year_gcwr_lbs = df.loc[i, 'gcwr_lbs']
-
-            # electrification_class = df.loc[i, 'electrification_class']
 
             for attr, dc in zip(Vehicle.dynamic_attributes, Vehicle.dynamic_columns):
                 veh.__setattr__(attr, df.loc[i, dc])
