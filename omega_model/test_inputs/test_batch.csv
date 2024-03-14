@@ -44,7 +44,7 @@ Drive Cycle Ballast File,String,drive_cycle_ballast.csv,drive_cycle_ballast.csv
 Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
 GHG Credit Params File,String,ghg_credit_params.csv,ghg_credit_params.csv
 GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
-GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-alternative.csv
+GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-0.csv
 Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
 Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv,policy_fuel_upstream_methods.csv
 Policy Fuels File,String,policy_fuels.csv,policy_fuels.csv
@@ -52,3 +52,4 @@ Production Multipliers File,String,production_multipliers.csv,production_multipl
 Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
 Required Sales Share File,String,required_sales_share-body_style.csv,required_sales_share-body_style.csv
 Policy Utility Factor Methods File,String,policy_utility_factor_methods.csv,policy_utility_factor_methods.csv
+Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implicit_price_deflators.csv

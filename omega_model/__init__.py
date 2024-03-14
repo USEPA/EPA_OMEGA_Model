@@ -140,9 +140,9 @@ try:
             self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'  #: path to drive cycles file, used by ``policy.drive_cycles``
             self.ghg_credit_params_file = path + 'test_inputs/ghg_credit_params.csv'  #: path to GHG credit params file, used by ``policy.credit_banking``
             self.ghg_credits_file = path + 'test_inputs/ghg_credits.csv'  #: path to GHG credits file, used by ``policy.credit_banking``
-            self.policy_targets_file = path + 'test_inputs/ghg_standards-footprint_NTR-FRM-CFR-form.csv'  #: path to policy target definitions file, used by user-definable ``VehicleTargets`` class
+            self.policy_targets_file = path + 'test_inputs/ghg_standards-footprint.csv'  #: path to policy target definitions file, used by user-definable ``VehicleTargets`` class
             self.offcycle_credits_file = path + 'test_inputs/offcycle_credits.csv'  #: path to offcycle credits file, used by user-definable ``OffCycleCredits`` class
-            self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods_zero.csv'  #: path to upstream methods file, used by ``policy.upstream_methods``
+            self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods.csv'  #: path to upstream methods file, used by ``policy.upstream_methods``
             self.utility_factor_methods_file = path + 'test_inputs/policy_utility_factor_methods.csv'  #: path to utility factor methods file, used by ``policy.utility_factors``
             self.policy_fuels_file = path + 'test_inputs/policy_fuels.csv'  #: path to policy fuels file, used by ``policy.policy_fuels``
             self.production_multipliers_file = path + 'test_inputs/production_multipliers.csv'  #: path to production multipliers file, used by ``policy.incentives``

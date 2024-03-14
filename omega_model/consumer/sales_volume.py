@@ -26,7 +26,7 @@ def context_new_vehicle_sales(calendar_year):
         dict of vehicle sales by non-responsive market category, and ``total``
 
     """
-    #  PHASE0: hauling/non, EV/ICE, We don't need shared/private for beta
+    #  PHASE0: body style, BEV/ICE, We don't need shared/private for beta
 
     if calendar_year not in _cache:
         from context.new_vehicle_market import NewVehicleMarket

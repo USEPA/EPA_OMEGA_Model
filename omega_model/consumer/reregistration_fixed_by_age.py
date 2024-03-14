@@ -43,7 +43,7 @@ Data Column Name and Description
     Vehicle age, in years
 
 :market_class_id:
-    Vehicle market class ID, e.g. 'hauling.ICE'
+    Vehicle market class ID, e.g. 'sedan_wagon.ICE'
 
 :reregistered_proportion:
     The fraction of vehicles re-registered, [0..1]
@@ -72,7 +72,7 @@ class Reregistration(OMEGABase, ReregistrationBase):
 
         Args:
             model_year (int): the model year of the re-registration data
-            market_class_id (str): market class id, e.g. 'hauling.ICE'
+            market_class_id (str): market class id, e.g. 'sedan_wagon.ICE'
             age (int): vehicle age in years
 
         Returns:
