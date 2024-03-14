@@ -180,7 +180,6 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             else:
                 sales = vehicle.initial_registered_count
 
-            # return co2_gpmi * vehicle.lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
             return co2_gpmi * vehicle.lifetime_VMT * sales / pow(10, 6)
 
         else:
@@ -231,7 +230,6 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
                 sales = vehicle.initial_registered_count
                 co2_gpmi = vehicle.cert_co2e_grams_per_mile
 
-            # return co2_gpmi * vehicle.lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
             return co2_gpmi * vehicle.lifetime_VMT * sales / pow(10, 6)
         else:
             raise Exception(f'Missing GHG CO2e g/mi target parameters for {vehicle.reg_class_id}, '

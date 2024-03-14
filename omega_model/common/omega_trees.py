@@ -33,7 +33,6 @@ class _OMEGANode(OMEGABase):
         self.ghg_credit_bank = ghg_credit_bank
         self.vehicle_list = vehicle_list
         self.path_cost = path_cost
-        # self.stock = None     # do we need to track the entire stock as well?  Or only if PMT affects sales?
 
 
 class WeightedNode(OMEGABase):

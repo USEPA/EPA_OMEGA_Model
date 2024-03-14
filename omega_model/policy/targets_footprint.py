@@ -131,7 +131,6 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
                     target_co2e_gpmi = vehicle.footprint_ft2 * coefficients['c_coeff'] + coefficients['d_coeff']
 
                 VehicleTargets._data[cache_key] = target_co2e_gpmi
-                # return target_co2e_gpmi
             else:
                 raise Exception('Missing GHG CO2e g/mi target parameters for %s, %d or prior'
                                 % (vehicle.reg_class_id, vehicle.model_year))

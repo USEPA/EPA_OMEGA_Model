@@ -43,7 +43,7 @@ Data Column Name and Description
     Vehicle age, in years
 
 :market_class_id:
-    Vehicle market class ID, e.g. 'hauling.ICE'
+    Vehicle market class ID, e.g. 'sedan_wagon.ICE'
 
 :reregistered_proportion:
     The fraction of vehicles re-registered, [0..1]
@@ -72,7 +72,7 @@ class Reregistration(OMEGABase, ReregistrationBase):
 
         Args:
             model_year (int): the model year of the re-registration data
-            market_class_id (str): market class id, e.g. 'hauling.ICE'
+            market_class_id (str): market class id, e.g. 'sedan_wagon.ICE'
             age (int): vehicle age in years
 
         Returns:
@@ -137,8 +137,6 @@ class Reregistration(OMEGABase, ReregistrationBase):
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
-            # Reregistration._data = df.set_index(['market_class_id', 'age']).sort_index().to_dict(orient='index')
-
             # convert dataframe to dict keyed by market class ID, age, and start year
             Reregistration._data = df.set_index(['market_class_id', 'age', 'start_model_year']).\
                 sort_index().to_dict(orient='index')

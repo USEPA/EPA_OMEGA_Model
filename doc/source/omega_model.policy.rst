@@ -89,14 +89,6 @@ omega\_model.policy.required\_sales\_share module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.policy.targets\_alternative module
------------------------------------------------
-
-.. automodule:: omega_model.policy.targets_alternative
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 omega\_model.policy.targets\_footprint module
 ---------------------------------------------
 

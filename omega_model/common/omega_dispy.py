@@ -123,18 +123,14 @@ def job_cb(job):  # gets called for: (DispyJob.Finished, DispyJob.Terminated, Di
     if status == dispy.DispyJob.Finished:
         if dispy_debug:
             sysprint('---- Job Finished %s: %s\n' % (job_id_str, job.result))
-        # if job.result is False:
-        #     restart_job(job)
 
     elif status == dispy.DispyJob.Terminated:
         if dispy_debug:
             sysprint('---- Job Terminated %s job exeption = %s\n' % (str(job_id_str), str(job.exception)))
-        # restart_job(job)
 
     elif status == dispy.DispyJob.Abandoned:
         if dispy_debug:
             sysprint('---- Job Abandoned %s : Exception %s\n' % (job_id_str, job.exception))
-        # restart_job(job)
 
     else:
         if dispy_debug:
@@ -251,7 +247,7 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
     fail_foldername = os.path.join(network_batch_path_root, batch_name, '#FAIL_' + session_name)
     weird_foldername = os.path.join(network_batch_path_root, batch_name, '#WEIRD_' + session_name)
 
-    time.sleep(1)  # wait for summary file to finish writing?
+    time.sleep(1)  # wait for summary file to finish writing
 
     if os.path.exists(success_foldername):
         sysprint('::: dispy_run_session Completed, Session "%s" :::' % session_name)
@@ -302,7 +298,6 @@ class DispyCluster(object):
         if options.dispy_scheduler is not None:
             self.scheduler_node = options.dispy_scheduler
         else:
-            # self.scheduler_node = '204.47.182.182'
             self.scheduler_node = '204.47.184.69'
         if self.options.dispy_debug:
             self.loglevel = dispy.logger.DEBUG

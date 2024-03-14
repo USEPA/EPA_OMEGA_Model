@@ -25,7 +25,7 @@ Batch Input Files and Loaders
         Context Electricity Prices File, ``user_definable`` e.g. :any:`omega_model/context/fuel_prices.py<omega_model.context.electricity_prices_aeo>`
         Context New Vehicle Market File, :any:`omega_model/context/new_vehicle_market.py<omega_model.context.new_vehicle_market>`
         Manufacturers File, :any:`omega_model/producer/manufacturers.py<omega_model.producer.manufacturers>`
-        Market Classes File, ``user_definable`` e.g. :any:`omega_model/consumer/market_classes_unibody.py<omega_model.consumer.market_classes_unibody>`
+        Market Classes File, ``user_definable`` e.g. :any:`omega_model/consumer/market_classes_ice_bev_phev_body_style.py<omega_model.consumer.market_classes_ice_bev_phev_body_style>`
         Onroad Fuels File, :any:`omega_model/context/onroad_fuels.py<omega_model.context.onroad_fuels>`
         Onroad Vehicle Calculations File, :any:`omega_model/producer/vehicles.py<omega_model.producer.vehicles>`
         Onroad VMT File, ``user_definable`` e.g. :any:`omega_model/consumer/annual_vmt_fixed_by_age.py<omega_model.consumer.annual_vmt_fixed_by_age>`

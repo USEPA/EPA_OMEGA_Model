@@ -22,19 +22,22 @@ Template Header
 Sample Header
     .. csv-table::
 
-        input_template_name:,consumer.annual_vmt_fixed_by_age,input_template_version:,0.2
+        input_template_name:,consumer.annual_vmt_fixed_by_age,input_template_version:,0.2,notes:,20221116 vmt schedule by body style
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
         start_year,age,market_class_id,annual_vmt
-        2019,0,non_hauling.BEV,14699.55515
-        2019,1,non_hauling.BEV,14251.70373
-        2019,2,non_hauling.BEV,14025.35397
-        2019,0,hauling.ICE,15973.88982
-        2019,1,hauling.ICE,15404.1216
-        2019,2,hauling.ICE,14840.93011
+        2019,0,sedan_wagon.BEV,15922
+        2019,1,sedan_wagon.BEV,15379
+        2019,2,sedan_wagon.BEV,14864
+        2019,0,pickup.ICE,18964
+        2019,1,pickup.ICE,17986
+        2019,2,pickup.ICE,17076
+        2019,0,cuv_suv_van.PHEV,16234
+        2019,1,cuv_suv_van.PHEV,15805
+        2019,2,cuv_suv_van.PHEV,15383
 
 :start_year:
     Start year of annual VMT data, values apply until the next available start year
@@ -43,7 +46,7 @@ Sample Data Columns
     Vehicle age, in years
 
 :market_class_id:
-    Vehicle market class ID, e.g. 'hauling.ICE'
+    Vehicle market class ID, e.g. 'sedan_wagon.ICE'
 
 :annual_vmt:
     Vehicle miles travelled per year at the given age for the given market class ID
@@ -73,7 +76,7 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
 
         Args:
             calendar_year (int): calendar year of the VMT data
-            market_class_id (str): market class id, e.g. 'hauling.ICE'
+            market_class_id (str): market class id, e.g. 'sedan_wagon.ICE'
             age (int): vehicle age in years
 
         Returns:
@@ -100,7 +103,7 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
         Get the cumulative VMT for the given market class and age
 
         Args:
-            market_class_id (str): market class id, e.g. 'hauling.ICE'
+            market_class_id (str): market class id, e.g. 'sedan_wagon.ICE'
             age (int): vehicle age in years
 
         Returns:
@@ -157,8 +160,6 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
                 template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
             if not template_errors:
-                # OnroadVMT._data = df.set_index(['market_class_id','age']).sort_index().to_dict(orient='index')
-
                 # convert dataframe to dict keyed by market class ID, age, and start year
                 OnroadVMT._data = df.set_index(['market_class_id', 'age', 'start_year']).sort_index().to_dict(
                     orient='index')

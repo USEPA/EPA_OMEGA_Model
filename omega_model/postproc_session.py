@@ -864,7 +864,6 @@ def plot_vehicle_cost(calendar_years):
 
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s\nAverage Vehicle Cost  by Market Class v Year' % omega_globals.options.session_unique_name)
-    # ax1.set_ylim(15e3, 80e3)
     ax1.legend(market_classes)
     fig.savefig(
         omega_globals.options.output_folder + '%s ALL V Cost Mkt Cls.png' % omega_globals.options.session_unique_name)
@@ -964,7 +963,6 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s %s\nAverage Vehicle Cost  by Market Class v Year'
               % (compliance_id, omega_globals.options.session_unique_name))
-    # ax1.set_ylim(15e3, 80e3)
     ax1.legend(market_classes)
     fig.savefig(omega_globals.options.output_folder + '%s %s V Cost Mkt Cls.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
@@ -1461,7 +1459,6 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s %s\nContext Size Class Absolute Market Shares'
               % (compliance_id, omega_globals.options.session_unique_name))
-    # ax1.legend(NewVehicleMarket.base_year_context_size_class_sales.keys(), ncol=2, loc='upper center')
     ax1.legend(labels, ncol=2, loc='upper center')
     fig.savefig(omega_globals.options.output_folder + '%s %s CSC Shares.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
@@ -1476,7 +1473,6 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s %s\nReg Class Absolute Market Shares'
               % (compliance_id, omega_globals.options.session_unique_name))
-    # ax1.legend(omega_globals.options.RegulatoryClasses.reg_classes, ncol=2, loc='upper center')
     ax1.legend(labels, ncol=2, loc='upper center')
     fig.savefig(omega_globals.options.output_folder + '%s %s RC Shares.png'
                 % (omega_globals.options.session_unique_name, compliance_id))

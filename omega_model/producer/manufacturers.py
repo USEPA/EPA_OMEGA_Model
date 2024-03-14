@@ -43,10 +43,6 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-# initial_credit_bank = dict()
-
-# _cache = dict()
-
 
 market_class_data = dict()
 
@@ -90,7 +86,6 @@ class Manufacturer(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        # _cache.clear()
         global market_class_data
         market_class_data = dict()
 

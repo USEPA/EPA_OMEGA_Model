@@ -64,8 +64,6 @@ class MassScaling(OMEGABase):
 
     structure_materials = []
 
-    # drive_cycle_names = []  #: list of available drive cycles (may not all be used, depends on the simulated vehicles data)
-
     @staticmethod
     def calc_mass_terms(vehicle, structure_material, eng_rated_hp, battery_kwh, footprint_ft2):
         """

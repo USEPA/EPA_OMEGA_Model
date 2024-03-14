@@ -102,7 +102,7 @@ class SalesShare(OMEGABase, SalesShareBase):
         Determine if gcam supports the given market class ID.
 
         Args:
-            market_class_id (str): market class id, e.g. 'hauling.ICE'
+            market_class_id (str): market class id, e.g. 'sedan_wagon.ICE'
 
         Returns:
             ``True`` if gcam has parameters for the given market class ID
@@ -116,7 +116,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         Args:
             calendar_year (int): the year to get parameters for
-            market_class_id (str): market class id, e.g. 'hauling.ICE'
+            market_class_id (str): market class id, e.g. 'sedan_wagon.ICE'
 
         Returns:
             GCAM parameters for the given calendar year and market class
@@ -144,14 +144,14 @@ class SalesShare(OMEGABase, SalesShareBase):
             calendar_year (int): calendar year to calculate market shares in
             market_class_data (DataFrame): DataFrame with 'average_ALT_modified_cross_subsidized_price_MC' columns,
                 where MC = market class ID
-            market_class_id (str}: e.g. 'hauling.ICE'
+            market_class_id (str}: e.g. 'sedan_wagon.ICE'
             producer_decision (Series): selected producer compliance option with
                 'average_ALT_retail_fuel_price_dollars_per_unit_MC',
                 'average_ALT_onroad_direct_co2e_gpmi_MC', 'average_ALT_onroad_direct_kwh_pmi_MC' attributes,
                 where MC = market class ID
 
         Returns:
-            Consumer cost in $/mi
+            Consumer generalized cost in $/passenger-mile
 
         """
         fuel_cost = producer_decision['average_ALT_retail_fuel_price_dollars_per_unit_%s' % market_class_id]
@@ -183,7 +183,6 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         fuel_cost_per_VMT += fuel_cost * average_co2e_gpmi / carbon_intensity_gasoline / refuel_efficiency
 
-        # consumer_generalized_cost_dollars = total_capital_costs
         annualized_capital_costs = annualization_factor * total_capital_costs
         annual_VMT = float(gcam_data_cy['annual_vmt'])
         total_non_fuel_costs_per_VMT = (annualized_capital_costs + annual_o_m_costs) / annual_VMT
@@ -207,8 +206,8 @@ class SalesShare(OMEGABase, SalesShareBase):
             market_class_data (DataFrame): DataFrame with 'average_ALT_modified_cross_subsidized_price_MC' columns,
                 where MC = market class ID
             calendar_year (int): calendar year to calculate market shares in
-            parent_market_class (str): e.g. 'non_hauling'
-            child_market_classes ([strs]): e.g. ['non_hauling.BEV', 'non_hauling.ICE']
+            parent_market_class (str): e.g. 'sedan_wagon'
+            child_market_classes ([strs]): e.g. ['sedan_wagon.BEV', 'sedan_wagon.ICE']
 
         Returns:
             A copy of ``market_class_data`` with demanded ICE/BEV share columns by market class, e.g.
@@ -265,16 +264,6 @@ class SalesShare(OMEGABase, SalesShareBase):
                     market_class_data['consumer_share_frac_%s' % market_class_id] = demanded_share
                     market_class_data['consumer_abs_share_frac_%s' % market_class_id] = demanded_absolute_share
 
-                    # # distribute absolute shares to ALT / NO_ALT, NO_ALT first:
-                    # for alt in ['NO_ALT', 'ALT']:
-                    #     share_id = 'consumer_abs_share_frac_%s.%s' % (market_class_id, alt)
-                    #     if alt == 'NO_ALT':
-                    #         market_class_data[share_id] = \
-                    #             min_constraints[share_id.replace('consumer', 'producer')] * parent_share
-                    #         demanded_absolute_share -= market_class_data[share_id]
-                    #     else:
-                    #         market_class_data[share_id] = demanded_absolute_share
-
         reconciliation_df = pd.DataFrame()
         abs_share_columns = []
         share_columns = []
@@ -296,7 +285,6 @@ class SalesShare(OMEGABase, SalesShareBase):
                 reconciliation_df[share_col] = reconciliation_df.apply(SalesShare.calc_attempted_share, args=(share_col, min_constraints[share_name], max_constraints[share_name], N), axis=1)
 
             reconciliation_df['sum'] = reconciliation_df[share_columns].sum(axis=1)
-            # reconciliation_df.to_csv('rdf_%s.csv' % N)
 
             if all(reconciliation_df['sum'] == 1):
                 break
@@ -360,8 +348,8 @@ class SalesShare(OMEGABase, SalesShareBase):
                 where MC = market class ID
             market_class_data (DataFrame): DataFrame with 'average_ALT_modified_cross_subsidized_price_MC' columns,
                 where MC = market class ID
-            mc_parent (str): e.g. '' for the total market, 'hauling' or 'non_hauling', etc
-            mc_pair ([strs]): e.g. '['hauling', 'non_hauling'] or ['hauling.ICE', 'hauling.BEV'], etc
+            mc_parent (str): e.g. '' for the total market, 'pickup' or 'sedan_wagon', etc
+            mc_pair ([strs]): e.g. '['pickup', 'sedan_wagon'] or ['pickup.ICE', 'pickup.BEV'], etc
 
         Returns:
             A copy of ``market_class_data`` with demanded share columns by market class, e.g.
@@ -373,9 +361,9 @@ class SalesShare(OMEGABase, SalesShareBase):
         # calculate the absolute market shares by traversing the market class tree and calling appropriate
         # share-calculation methods at each level
 
-        # for the sake of the demo, the consumer hauling and non_hauling absolute shares are taken from the producer,
+        # for now, the consumer body style absolute shares are taken from the producer,
         # which gets them from the context size class projections and the makeup of the base year fleet.
-        # If the hauling/non_hauling shares were responsive (endogenous), methods to calculate these values would
+        # If the body style shares were responsive (endogenous), methods to calculate these values would
         # be called here.
 
         from producer.vehicles import Vehicle
@@ -456,7 +444,7 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         if all([SalesShare.gcam_supports_market_class(mc) for mc in mc_pair]):
             if len(mc_pair) > 1:
-                # calculate desired ICE/BEV shares within hauling/non_hauling using methods based on the GCAM model:
+                # calculate desired ICE/BEV shares within body style using methods based on the GCAM model:
                 market_class_data = SalesShare.calc_shares_gcam(producer_decision, market_class_data, calendar_year,
                                                             mc_parent, mc_pair)
             else:
@@ -742,10 +730,6 @@ if __name__ == '__main__':
             for mcat in omega_globals.options.MarketClass.market_categories:
                 mcd['average_new_vehicle_mfr_cost_%s' % mcat] = [35000, 25000]
                 mcd['average_footprint_ft2_%s' % mcat] = [45, 45]
-
-            # share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'Ford',
-            #                                       mcd.loc[0, :], mcd, 'sedan_wagon',
-            #                                       ['sedan_wagon.ICE', 'sedan_wagon.BEV'])
 
         else:
             print(init_fail)

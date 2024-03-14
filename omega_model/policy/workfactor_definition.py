@@ -62,7 +62,7 @@ class WorkFactor(OMEGABase):
 
     """
     _cache = dict()  # the input file equations
-    start_years = dict()
+    start_years = dict()  #: dict of start years by drive system type
     _data = dict()  # private dict, work factors by year
 
     @staticmethod

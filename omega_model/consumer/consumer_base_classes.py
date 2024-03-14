@@ -24,7 +24,7 @@ class ReregistrationBase:
 
         Args:
             model_year (int): the model year of the re-registration data
-            market_class_id (str): market class id, e.g. 'hauling.ICE'
+            market_class_id (str): market class id, e.g. 'sedan_wagon.ICE'
             age (int): vehicle age in years
 
         Returns:
@@ -64,7 +64,7 @@ class AnnualVMTBase:
 
         Args:
             calendar_year (int): calendar year of the VMT data
-            market_class_id (str): market class id, e.g. 'hauling.ICE'
+            market_class_id (str): market class id, e.g. 'sedan_wagon.ICE'
             age (int): vehicle age in years
 
         Returns:
@@ -111,8 +111,8 @@ class SalesShareBase:
             market_class_data (DataFrame): DataFrame with 'average_fuel_price_MC',
                 'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'
                 columns, where MC = market class ID
-            mc_parent (str): e.g. '' for the total market, 'hauling' or 'non_hauling', etc
-            mc_pair ([strs]): e.g. '['hauling', 'non_hauling'] or ['hauling.ICE', 'hauling.BEV'], etc
+            mc_parent (str): e.g. '' for the total market, 'pickup' or 'sedan_wagon', etc
+            mc_pair ([strs]): e.g. '['pickup', 'sedan_wagon'] or ['pickup.ICE', 'pickup.BEV'], etc
 
         Returns:
             A copy of ``market_class_data`` with demanded ICE/BEV share columns by market class, e.g.
@@ -218,14 +218,14 @@ class MarketClassBase:
         Returns a nested dictionary of market classes from a dot-formatted list of market class names.
 
         Args:
-            market_class_list ([strs]): list of dot-separted market class names e.g. ['hauling.BEV', 'hauling.ICE'] etc
+            market_class_list ([strs]): list of dot-separted market class names e.g. ['pickup.BEV', 'pickup.ICE'] etc
             market_class_dict (dict, dict of dicts): recursive input and also the output data structure
             by_reg_class (bool): if true then leaves are lists in reg class dicts,
                 otherwise leaves are lists by market segment
 
         Returns:
             Market class tree represented as a dict or dict of dicts, with an empty list at each leaf.
-            e.g. ``{'non_hauling': {'BEV': [], 'ICE': []}, 'hauling': {'BEV': [], 'ICE': []}}``
+            e.g. ``{'sedan_wagon': {'BEV': [], 'ICE': []}, 'pickup': {'BEV': [], 'ICE': []}}``
 
         """
         if market_class_dict is None:
@@ -272,8 +272,8 @@ class MarketClassBase:
 
         Args:
             market_class_dict (dict): dict of dicts of market classes
-            market_class_id (str): dot separated market class name e.g. 'hauling.BEV', possibly with reg class suffix
-                e.g. 'non_hauling.ICE.car' depending on the market_class_dict
+            market_class_id (str): dot separated market class name e.g. 'pickup.BEV', possibly with reg class suffix
+                e.g. 'sedan_wagon.ICE.car' depending on the market_class_dict
             obj (obj): object to place in a list in the appropriate leaf, as in a CompositeVehicle
 
         Returns:
@@ -347,7 +347,7 @@ class MarketClassBase:
         Returns the non-responsive market category of the given market class ID
 
         Args:
-            market_class_id (str): market class ID, e.g. 'hauling.ICE'
+            market_class_id (str): market class ID, e.g. 'sedan_wagon.ICE'
 
         Returns:
             The non-responsive market category of the given market class ID
@@ -363,7 +363,7 @@ class MarketClassBase:
         Validate market class ID
 
         Args:
-            market_class_id (str): market class ID, e.g. 'hauling.ICE'
+            market_class_id (str): market class ID, e.g. 'sedan_wagon.ICE'
 
         Returns:
             Error message in a list if market_class_id is not valid

@@ -135,7 +135,7 @@ class NewVehicleMarket(OMEGABase):
     _data_by_bs = dict()  # private dict, sales by context body style
     _data_by_total = dict()  # private dict, total sales
 
-    context_based_total_sales = dict()
+    context_based_total_sales = dict()  #: dict of context-based total sales by calendar year
     context_size_class_info_by_nrmc = dict()  #: dict of dicts: information about which context size classes are in which non-responsive market categories as well as what share of the size class is within the non-responsive category.  Populated by vehicles.py in Vehicle.init_vehicles_from_file()
     base_year_context_size_class_sales = dict()  #: dict: sales totals for each context size class represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in Vehicle.init_vehicles_from_file()
     base_year_other_sales = dict()  #: dict: sales totals by other categories represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in Vehicle.init_vehicles_from_file()
@@ -172,6 +172,7 @@ class NewVehicleMarket(OMEGABase):
             max_year = 0
             df = pd.read_csv(filename, index_col=0, dtype=str)
             # wanted to do: cls._new_vehicle_generalized_costs = df['new_vehicle_price_dollars'].to_dict()
+            
             # OK, this is really weird and you shouldn't have to do this, but for whatever reason, when pandas
             # converts the strings to floats... they have different values than what's in the file
             # This is the workaround: let python do the conversion
@@ -353,7 +354,7 @@ class NewVehicleMarket(OMEGABase):
             context_size_class (str): e.g. 'Large Pickup', etc
 
         Returns:
-            ''True'' if the given context size class name is valid, ''False'' otherwise
+            ``True`` if the given context size class name is valid, ``False`` otherwise
 
         """
         return context_size_class in NewVehicleMarket.context_size_classes
@@ -367,7 +368,7 @@ class NewVehicleMarket(OMEGABase):
             context_id (str): e.g. 'Reference case', etc
 
         Returns:
-            ''True'' if the given context ID name is valid, ''False'' otherwise
+            ``True`` if the given context ID name is valid, ``False`` otherwise
 
         """
         return context_id in NewVehicleMarket.context_ids
@@ -381,7 +382,7 @@ class NewVehicleMarket(OMEGABase):
             case_id (str): e.g. 'AEO2021', etc
 
         Returns:
-            ''True'' if the given case ID name is valid, ''False'' otherwise
+            ``True`` if the given case ID name is valid, ``False`` otherwise
 
         """
         return case_id in NewVehicleMarket.context_case_ids

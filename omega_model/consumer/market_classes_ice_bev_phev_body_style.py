@@ -163,7 +163,7 @@ class MarketClass(OMEGABase, MarketClassBase):
         Returns the non-responsive market category of the given market class ID
 
         Args:
-            market_class_id (str): market class ID, e.g. 'hauling.ICE'
+            market_class_id (str): market class ID, e.g. 'sedan_wagon.ICE'
 
         Returns:
             The non-responsive market category of the given market class ID
@@ -184,7 +184,7 @@ class MarketClass(OMEGABase, MarketClassBase):
         Validate market class ID
 
         Args:
-            market_class_id (str): market class ID, e.g. 'hauling.ICE'
+            market_class_id (str): market class ID, e.g. 'sedan_wagon.ICE'
 
         Returns:
             Error message in a list if market_class_id is not valid
@@ -287,10 +287,10 @@ if __name__ == '__main__':
             from common.omega_functions import print_dict
 
             market_class_list = [
-                'hauling.ICE',
-                'hauling.BEV',
-                'non_hauling.ICE',
-                'non_hauling.BEV',
+                'pickup.ICE',
+                'pickup.BEV',
+                'sedan_wagon.ICE',
+                'sedan_wagon.BEV',
             ]
 
             market_class_dict = MarketClass.parse_market_classes(market_class_list)
@@ -299,20 +299,20 @@ if __name__ == '__main__':
             market_class_dict_rc = MarketClass.parse_market_classes(market_class_list, by_reg_class=True)
             print_dict(market_class_dict_rc)
 
-            MarketClass.populate_market_classes(market_class_dict, 'hauling.ICE.ALT', 'F150')
-            MarketClass.populate_market_classes(market_class_dict, 'hauling.ICE.NO_ALT', 'Silverado')
-            MarketClass.populate_market_classes(market_class_dict, 'hauling.BEV.ALT', 'Cybertruck')
-            MarketClass.populate_market_classes(market_class_dict, 'non_hauling.ICE.NO_ALT', '240Z')
-            MarketClass.populate_market_classes(market_class_dict, 'non_hauling.BEV.ALT', 'Tesla3')
-            MarketClass.populate_market_classes(market_class_dict, 'non_hauling.BEV.NO_ALT', 'TeslaS')
+            MarketClass.populate_market_classes(market_class_dict, 'pickup.ICE.ALT', 'F150')
+            MarketClass.populate_market_classes(market_class_dict, 'pickup.ICE.NO_ALT', 'Silverado')
+            MarketClass.populate_market_classes(market_class_dict, 'pickup.BEV.ALT', 'Cybertruck')
+            MarketClass.populate_market_classes(market_class_dict, 'sedan_wagon.ICE.NO_ALT', '240Z')
+            MarketClass.populate_market_classes(market_class_dict, 'sedan_wagon.BEV.ALT', 'Tesla3')
+            MarketClass.populate_market_classes(market_class_dict, 'sedan_wagon.BEV.NO_ALT', 'TeslaS')
             print_dict(market_class_dict)
 
-            MarketClass.populate_market_classes(market_class_dict_rc, 'hauling.ICE.truck.ALT', 'F150')
-            MarketClass.populate_market_classes(market_class_dict_rc, 'hauling.ICE.truck.NO_ALT', 'Silverado')
-            MarketClass.populate_market_classes(market_class_dict_rc, 'hauling.BEV.truck.ALT', 'Cybertruck')
-            MarketClass.populate_market_classes(market_class_dict_rc, 'non_hauling.ICE.car.NO_ALT', '240Z')
-            MarketClass.populate_market_classes(market_class_dict_rc, 'non_hauling.ICE.car.ALT', 'Sentra')
-            MarketClass.populate_market_classes(market_class_dict_rc, 'non_hauling.BEV.car.NO_ALT', 'Tesla3')
+            MarketClass.populate_market_classes(market_class_dict_rc, 'pickup.ICE.truck.ALT', 'F150')
+            MarketClass.populate_market_classes(market_class_dict_rc, 'pickup.ICE.truck.NO_ALT', 'Silverado')
+            MarketClass.populate_market_classes(market_class_dict_rc, 'pickup.BEV.truck.ALT', 'Cybertruck')
+            MarketClass.populate_market_classes(market_class_dict_rc, 'sedan_wagon.ICE.car.NO_ALT', '240Z')
+            MarketClass.populate_market_classes(market_class_dict_rc, 'sedan_wagon.ICE.car.ALT', 'Sentra')
+            MarketClass.populate_market_classes(market_class_dict_rc, 'sedan_wagon.BEV.car.NO_ALT', 'Tesla3')
             print_dict(market_class_dict_rc)
 
         else:

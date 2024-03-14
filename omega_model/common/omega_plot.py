@@ -148,8 +148,6 @@ def fplotyyhg(x, y, ylinespec, y2, y2linespec):
     ax1.plot(x, y, ylinespec)
     ax2.plot(x, y2, y2linespec)
     ax1.grid(True)
-    # ax2.grid(True)
-    # fig.show()
     return fig, ax1, ax2
 
 

@@ -115,7 +115,7 @@ if __name__ == "__main__":
                 if f == 'omega_batch.py':
                     batch_patch = os.path.abspath('../omega_model/test_inputs/test_batch.csv')
                     bundle_path = os.path.abspath(test_omega2_output_folder + os.sep + 'bundle')
-                    cmd_opts = '--batch_file %s --bundle_path %s --verbose --session_num 0 --analysis_final_year 2020'\
+                    cmd_opts = '--batch_file %s --bundle_path %s --verbose --session_num 0 --analysis_final_year 2023'\
                                % (batch_patch, bundle_path)
 
                 cmd_str = cmd_str + ' %s > %s' % (cmd_opts, console_file_pathname)
