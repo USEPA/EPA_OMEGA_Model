@@ -217,7 +217,7 @@ class UtilityFactorMethods(OMEGABase):
         try:
             return method(miles, norm_dist)
         except:
-            # extreme cases may blow up, return 0 for now
+            # extreme cases may blow up, return 0
             return 0
 
     @staticmethod
