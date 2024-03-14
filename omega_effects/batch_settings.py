@@ -1,6 +1,245 @@
 """
 
-**OMEGA effects batch settings.**
+**OMEGA effects session settings.**
+
+----
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row header followed by subsequent data rows.
+
+The data represents OMEGA effects batch settings.
+
+File Type
+    comma-separated values (CSV)
+
+Sample Header
+    .. csv-table::
+
+       parameter,session_policy,value,full_path,notes
+
+Sample Data Rows
+    .. csv-table::
+        :widths: auto
+
+        RUNTIME OPTIONS,,,,
+        Run ID,all,,,enter a run identifier (in value column) for your output folder name or blank for default (default is omega_effects)
+        Run Description,,,,
+        Save Path,all,,C:\omega\effects\outputs,"enter full path, including drive id but do not include unique run identifiers"
+        Save Input Files,all,FALSE,,enter True to copy over input files or False to save space and not do so
+        Save Context Fuel Cost per Mile File,all,FALSE,,enter True or False and note that these files can be large especially in CSV format
+        Save Vehicle-Level Safety Effects Files,all,FALSE,,enter True or False and note that these files can be large especially in CSV format
+        Save Vehicle-Level Physical Effects Files,all,FALSE,,enter True or False - these files can be large especially in CSV format
+        Save Vehicle-Level Cost Effects Files,all,FALSE,,enter True or False - these files can be large especially in CSV format
+        Format for Vehicle-Level Output Files,all,csv,,enter 'csv' for large Excel-readable files 'parquet' for compressed files usable in Pandas
+        Powertrain Costs FEV,all,TRUE,,enter TRUE or FALSE (must be consistent with the compliance run)
+        BATCH SETTINGS,,,,
+        batch_folder,all,,C:\omega\compliance\<batch folder>,
+        Vehicles File Base Year,all,2022,,this should be consistent with the OMEGA compliance run
+        Analysis Final Year,all,2055,,this should be <= the value used in the OMEGA compliance run
+        Cost Accrual,all,end-of-year,,
+        Discount Values to Year,all,2027,,
+        Analysis Dollar Basis,all,2022,,
+        Context Name Liquid Fuel,all,AEO2023,,
+        Context Case Liquid Fuel,all,Reference case,,
+        Electricity Prices,all,IPM,,enter 'IPM' or 'AEO'
+        VMT Rebound Rate ICE,all,-0.1,,
+        VMT Rebound Rate BEV,all,0,,
+        SC-GHG in Net Benefits,all,global,,"enter 'global' or 'domestic' or 'both' (note that both global and domesitc benefits are calculated, this only impacts net benefits)"
+        Maintenance Costs File,all,,C:\omega\effects\inputs\maintenance_costs.csv,
+        Repair Costs File,all,,C:\omega\effects\inputs\repair_costs.csv,
+        Refueling Costs File,all,,C:\omega\effects\inputs\refueling_costs.csv,
+        General Inputs for Effects File,all,,C:\omega\effects\inputs\general_inputs_for_effects.csv,
+        Criteria Cost Factors File,all,,C:\omega\effects\inputs\criteria_cost_factors.csv,
+        SCGHG Cost Factors File,all,,C:\omega\effects\inputs\scghg_cost_factors.csv,
+        Energy Security Cost Factors File,all,,C:\omega\effects\inputs\energy_security_cost_factors.csv,
+        Congestion-Noise Cost Factors File,all,,C:\omega\effects\inputs\congestion_and_noise_cost_factors.csv,
+        Insurance and Taxes Cost Factors File,all,,C:\omega\effects\inputs\insurance_and_taxes_cost_factors.csv,
+        Legacy Fleet File,all,,C:\omega\effects\inputs\legacy_fleet.csv,
+        CPI Price Deflators File,all,,C:\omega\effects\inputs\cpi_deflators_file.csv,
+        EGU Data File,all,,C:\omega\effects\inputs\egu_data.csv,
+        Refinery Data File,all,,C:\omega\effects\inputs\refinery_data.csv,
+        Safety Values File,all,,C:\omega\effects\inputs\safety_values.csv,
+        Fatality Rates File,all,,C:\omega\effects\inputs\fatality_rates.csv,
+        SESSION SETTINGS,,,,
+        Session Name,context,<context session name>,,
+        Context Stock and VMT File,context,,C:\omega\effects\inputs\context_stock_vmt.csv,
+        Context Electricity Prices,context,,C:\omega\effects\inputs\electricity_prices_aeo.csv,
+        blank0,,,,
+        Session Name,no_action,<no action session name>,,
+        Session Vehicle Emission Rates File,no_action,,C:\omega\effects\inputs\vehicle_emission_rates_no_gpf.csv,
+        Session Electricity Prices,no_action,,C:\omega\effects\inputs\electricity_prices_ipm_no_action.csv,
+        blank1,,,,
+        Session Name,action_1,<action session name>,,
+        Session Vehicle Emission Rates File,action_1,,C:\omega\effects\inputsvehicle_emission_rates_with_gpf.csv,
+        Session Electricity Prices,action_1,,C:\omega\effects\inputs\electricity_prices_ipm_action.csv,
+
+Data Row Name and Description
+
+**RUNTIME OPTIONS**
+
+:Run ID:
+    A user defined run ID (optional; default='omega_effects')
+
+:Run Description:
+    A user defined run description
+
+:Save Path:
+    A full system path designation to which to save results
+
+:Save Input Files:
+    True/False entry for whether to save the input files to the results folder
+
+:Save Context Fuel Cost per Mile File:
+    True/False entry for whether to save the context fuel cost per mile file
+
+:Save Vehicle-Level Safety Effects Files:
+    True/False entry for whether to save the vehicle-level safety effects file
+
+:Save Vehicle-Level Physical Effects Files:
+    True/False entry for whether to save the vehicle-level physical effects file
+
+:Save Vehicle-Level Cost Effects Files:
+    True/False entry for whether to save the vehicle-level cost effects file
+
+:Format for Vehicle-Level Output Files:
+    'csv' or 'parquet'; this entry must be 'csv' when running from the executable
+
+:Powertrain Costs FEV:
+    True/False entry for whether to save the FEV developed powertrain costs
+
+**BATCH SETTINGS**
+
+:batch_folder:
+    Pathname of the OMEGA compliance batch folder on which to run effects
+
+:Vehicles File Base Year:
+    The intended model year of the base year vehicles file, should be consistent with the OMEGA compliance run
+
+:Analysis Final Year:
+    The final effects year, should be <= the value used in the OMEGA compliance run
+
+:Cost Accrual:
+    The time of year when costs are assumed to accrue, ``end-of-year`` or ``beginning-of-year``
+
+:Discount Values to Year:
+    The year to which all monetized values in the cost effects outputs will be discounted
+
+:Analysis Dollar Basis:
+    The dollar valuation for all monetized values in the cost effects outputs, i.e., costs are expressed in "Dollar Basis" dollars
+
+:Context Name Liquid Fuel:
+    Context name, e.g. ``AEO2021``
+
+:Context Case Liquid Fuel:
+    Context case, e.g., ``Reference case``
+
+:Electricity Prices:
+    'IPM' or 'AEO'; note that the context uses AEO since the context stock and VMT are from AEO
+
+:VMT Rebound Rate ICE:
+    VMT rebound rate for internal combustion engines
+
+:VMT Rebound Rate BEV:
+    VMT rebound rate for battery-electric vehicles
+
+:SC-GHG in Net Benefits *(str)*:
+    'global' or 'domestic' or 'both' (note that both global and domesitc benefits are calculated, if available, this only impacts net benefits)
+
+:Maintenance Costs File *(str)*:
+    The absolute path to the maintenance cost inputs file,
+    loaded by ``context.maintenance_cost.MaintenanceCost``
+
+:Repair Costs File *(str)*:
+    The absolute path to the repair cost inputs file,
+    loaded by ``context.repair_cost.RepairCost``
+
+:Refueling Costs File *(str)*:
+    The absolute path to the refueling cost inputs file,
+    loaded by ``context.refueling_cost.RefuelingCost``
+
+:General Inputs for Effects File *(str)*:
+    The absolute path to the general inputs used for effects calculations,
+    loaded by ``general.general_inputs_for_effects.GeneralInputsForEffects``
+
+:Criteria Cost Factors File *(str)*:
+    The absolute path to the criteria pollutant costs file,
+    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
+
+:SCGHG Cost Factors File *(str)*:
+    The absolute path to the social cost of carbon and carbon-equivalent pollutants file,
+    loaded by ``effects.cost_factors_scghg.CostFactorsSCGHG``
+
+:Energy Security Cost Factors File *(str)*:
+    The absolute path to the energy security cost factors file,
+    loaded by ``effects.cost_factors_energysecurity.CostFactorsEnergySecurity``
+
+:Congestion-Noise Cost Factors File *(str)*:
+    The absolute path to the congestion and noise cost factors file,
+    loaded by ``effects.cost_factors_congestion_noise.CostFactorsCongestionNoise``
+
+:Insurance and Taxes Cost Factors File *(str)*:
+    The relative or absolute path to the insurance and taxes file,
+    loaded by ``consumer.cost_factors_insurance_and_taxes.InsuranceAndTaxes``
+
+:Legacy Fleet File *(str)*:
+    The absolute path to the legacy fleet file,
+    loaded by ``effects.legacy_fleet.LegacyFleet``
+
+:CPI Price Deflators File *(str)*:
+    The absolute path to the CPI price deflators file,
+    loaded by ``context.cpi_price_deflators.CPIPriceDeflators``
+
+:EGU Data File *(str)*:
+    The absolute path to the EGU data file,
+    loaded by ``effects.egu_data.EGUdata``
+
+:Refinery Data File *(str)*:
+    The absolute path to the Refinery data file,
+    loaded by ``effects.refinery_data.RefineryData``
+
+:Context Safety Values File *(str)*:
+    The absolute path to the safety values file,
+    loaded by ``effects.safety_values.SafetyValues``
+
+:Context Fatality Rates File *(str)*:
+    The absolute path to the fatality rates file,
+    loaded by ``effects.fatality_rates.FatalityRates``
+
+**SESSION SETTINGS**
+
+:Session Name, context *(str)*:
+    Context session name used in the OMEGA compliance run
+
+:Context Stock and VMT File, context *(str)*:
+    The absolute path to the context stock and VMT file,
+    loaded by ``context.context_stock_vmt.ContextStockVMT``
+
+:Context Electricity Prices, context *(str)*:
+    The absolute path to the context electricity prices file,
+    loaded by ``context.electricity_prices.ElectricityPrices``
+
+:Session Name, no_action *(str)*:
+    No Action session name used in the OMEGA compliance run
+
+:Session Vehicle Emission Rates File, no_action *(str)*:
+    The absolute path to the vehicle emission rates file,
+    loaded by ``effects.emission_rates_vehicles.EmissionRatesVehicles``
+
+:Session Electricity Prices, no_action *(str)*:
+    The absolute path to the session electricity prices file,
+    loaded by ``context.electricity_prices.ElectricityPrices``
+
+:Session Name, action_1 *(str)*:
+    An action session name used in the OMEGA compliance run
+
+:Session Vehicle Emission Rates File, action_1 *(str)*:
+    The absolute path to the vehicle emission rates file,
+    loaded by ``effects.emission_rates_vehicles.EmissionRatesVehicles``
+
+:Session Electricity Prices, action_1 *(str)*:
+    The absolute path to the session electricity prices file,
+    loaded by ``context.electricity_prices.ElectricityPrices``
 
 ----
 

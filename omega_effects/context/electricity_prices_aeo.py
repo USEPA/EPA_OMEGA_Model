@@ -4,6 +4,8 @@
 
 AEO electricity price data include retail and pre-tax costs in dollars per unit (e.g. $/kWh)
 
+NOTE: This module is not active - electricity_prices.py is used
+
 ----
 
 **INPUT FILE FORMAT**

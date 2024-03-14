@@ -639,7 +639,7 @@ def calc_annual_physical_effects(batch_settings, input_df):
 
     Args:
         batch_settings: an instance of the BatchSettings class.
-        input_df: DataFrame of physical effects by vehicle.
+        input_df (DataFrame): DataFrame of physical effects by vehicle.
 
     Returns:
         A DataFrame of physical effects by calendar year.
@@ -698,7 +698,7 @@ def calc_period_consumer_physical_view(input_df, periods):
     """
 
     Args:
-        input_df: DataFrame of physical effects by vehicle in each analysis year.
+        input_df (DataFrame): DataFrame of physical effects by vehicle in each analysis year.
         periods (int): the number of periods (years) to include in the consumer view, set via the
         general_inputs_for_effects_file.
 

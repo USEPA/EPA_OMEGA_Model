@@ -33,7 +33,7 @@ def get_egu_emission_rate(batch_settings, v, calendar_year, kwh_consumption, kwh
     return batch_settings.egu_data.get_emission_rate(v, calendar_year, kwh_consumption, kwh_generation, rate_names)
 
 
-def calc_egu_inventory(batch_settings, annual_physical_df):  #, physical_effects_dict):
+def calc_egu_inventory(batch_settings, annual_physical_df):
     """
 
     Args:

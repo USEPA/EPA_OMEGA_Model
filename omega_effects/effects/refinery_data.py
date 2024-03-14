@@ -289,11 +289,8 @@ class RefineryData:
 
         return return_data
 
-    def interpolate_input_data(self):  #, session_settings):
+    def interpolate_input_data(self):
         """
-
-        Parameters:
-            session_settings: an instance of the SessionSettings class.
 
         Returns:
              Nothing, but it builds the data dictionary of interpolated inputs based on the limited years of input data.

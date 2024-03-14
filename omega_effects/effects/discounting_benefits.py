@@ -13,8 +13,8 @@ import pandas as pd
 class DiscountingBenefits:
     """
 
-    The Discounting class discounts annual values, sums those to calculate present values and annualizes those present
-    values for equivalent annualized values.
+    The DiscountingBenefits class discounts annual values, sums those to calculate present values and annualizes those
+    present values for equivalent annualized values.
 
     """
     def __init__(self):
@@ -33,12 +33,12 @@ class DiscountingBenefits:
 
     def discount_annual_values(self, batch_settings, annual_values_df, effects_log):
         """
-        The discount function determines attributes appropriate for discounting and does the discounting calculation to
-        a given year and point within that year.
+        The discount_annual_values function determines attributes appropriate for discounting and does the discounting
+        calculation to a given year and point within that year.
 
         Parameters:
             batch_settings: an instance of the omega effects batch settings class.
-            annual_values_df: A DataFrame of values to be discounted.
+            annual_values_df (DataFrame): including values to be discounted.
             effects_log: an instance of the EffectsLog class.
 
         Returns:
@@ -57,9 +57,9 @@ class DiscountingBenefits:
             Criteria health benefits are generated using $/ton inputs for criteria cost factors. Annual discounted values
             calculated here are valid only for those social discount rates that match the discount rate used in
             generating the $/ton benefit values. In other words, annual discounted values using a 2 percent social
-            discount rate are not value if calculated using a 3 or 7 percent discount rate in generating the $/ton
-            values. That said, this does calculate those values for use in generating present and annualized values of
-            the 3 percent health benefits using a 2 percent discount rate.
+            discount rate are not valid if calculated using a 3 or 7 percent discount rate in generating the $/ton
+            values. That said, this does calculate those values for use in generating present and annualized values of,
+            for example, the 3 percent health benefits using a 2 percent discount rate.
 
         """
         dict_of_values = annual_values_df.to_dict(orient='index')

@@ -13,7 +13,7 @@ import pandas as pd
 class DiscountingCosts:
     """
 
-    The Discounting class discounts annual values, sums those to calculate present values and annualizes those present
+    The DiscountingCosts class discounts annual values, sums those to calculate present values and annualizes those present
     values for equivalent annualized values.
 
     """
@@ -32,12 +32,12 @@ class DiscountingCosts:
 
     def discount_annual_values(self, batch_settings, annual_values_df):
         """
-        The discount function determines attributes appropriate for discounting and does the discounting calculation to
-        a given year and point within that year.
+        The discount_annual_values function determines attributes appropriate for discounting and does the discounting
+        calculation to a given year and point within that year.
 
         Parameters:
             batch_settings: an instance of the omega effects batch settings class.
-            annual_values_df: A DataFrame of values to be discounted.
+            annual_values_df (DataFrame):  including values to be discounted.
 
         Returns:
             A dictionary providing discounted annual values where monetized values are discounted at their internally
@@ -191,7 +191,7 @@ def discount_model_year_values(model_year_df):
     the first year of any given model year.
 
     Parameters:
-        model_year_df: A DataFrame of values to be discounted.
+        model_year_df (DataFrame): including values to be discounted.
 
     Returns:
         A DataFrame providing discounted model year values where monetized values are discounted to the first year

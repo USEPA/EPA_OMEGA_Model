@@ -15,14 +15,14 @@ def save_file(session_settings, df, save_folder, file_id, effects_log, extension
 
     Args:
         session_settings: an instance of the SessionSettings class.
-        df: the DataFrame to be saved.
+        df (DataFrame): the DataFrame to be saved.
         save_folder: a Path instance for the save folder.
         file_id (str): file identifier to be included in the saved filename.
         effects_log: an instance of the EffectsLog class.
         extension (str): entered in batch settings file (either 'csv' or 'parquet' with 'parquet' the default)
 
     Returns:
-        The passed dict_to_save as a DataFrame while also saving that DataFrame to the save_folder.
+        Nothing but saves the passed DataFrame to the save_folder.
 
     Note:
         If saving files as parquet files, they are readable only by Pandas and cannot be read directly by Excel. To

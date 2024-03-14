@@ -347,7 +347,7 @@ def calc_annual_avg_safety_effects(input_df):
     """
 
     Args:
-        input_df: DataFrame of physical effects by vehicle.
+        input_df (DataFrame): DataFrame of physical effects by vehicle.
 
     Returns:
         A DataFrame of physical effects by calendar year, regclass, fueling class, etc.
@@ -401,7 +401,7 @@ def calc_annual_avg_safety_effects_by_body_style(input_df):
     """
 
     Args:
-        input_df: DataFrame of physical effects by vehicle.
+        input_df (DataFrame): DataFrame of physical effects by vehicle.
 
     Returns:
         A DataFrame of physical effects by calendar year and body style.

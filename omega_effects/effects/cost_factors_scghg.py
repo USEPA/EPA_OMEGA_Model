@@ -9,6 +9,11 @@ The data represent the social costs per ton associated with emissions of GHGs.
 File Type
     comma-separated values (CSV)
 
+Sample Header
+    .. csv-table::
+
+       input_template_name:,cost_factors_scghg,input_template_version:,0.4
+
 Sample Data Columns
     .. csv-table::
         :widths: auto

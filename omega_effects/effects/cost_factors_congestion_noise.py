@@ -104,7 +104,7 @@ class CostFactorsCongestionNoise:
         Get cost factors by legacy reg class id
 
         Args:
-            reg_class_id: reg class to get cost factors for
+            reg_class_id (str): reg class to get cost factors for
             cost_factors: name of cost factor or list of cost factor attributes to get
 
         Returns:

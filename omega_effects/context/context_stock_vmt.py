@@ -128,6 +128,7 @@ class ContextStockVMT:
 
         Args:
             calendar_year (int): the calendar year for which stock and vmt are sought
+            args (str or strs): the attribute(s) for which to calculate growth
 
         Returns:
             The stock and vmt values for the passed calendar year when/if that year is beyond the input max; growth is

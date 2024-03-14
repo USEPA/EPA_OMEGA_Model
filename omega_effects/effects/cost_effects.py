@@ -1,7 +1,7 @@
 """
 
 A series of functions to calculate costs associated with the policy. The calc_cost_effects function is called by the
-omega_effects module and other functions here are called from within the calc_cost_effects function.
+omega_effects_main module and other functions here are called from within the calc_cost_effects function.
 
 ----
 
@@ -19,7 +19,7 @@ def get_congestion_noise_cf(batch_settings, reg_class_id):
 
     Args:
         batch_settings: an instance of the BatchSettings class.
-        reg_class_id: The (legacy) regulatory class ID for which congestion and noise cost factors are needed.
+        reg_class_id (str): The (legacy) regulatory class ID for which congestion and noise cost factors are needed.
 
     Returns:
         A list of cost factors as specified in the cost_factors list for the given calendar year.
@@ -311,7 +311,7 @@ def calc_annual_cost_effects(input_df):
     """
 
     Args:
-        input_df: DataFrame of cost effects by vehicle in each analysis year.
+        input_df (DataFrame): cost effects by vehicle in each analysis year.
 
     Returns:
         A DataFrame of cost effects by calendar year, reg class and fuel type.
@@ -343,7 +343,7 @@ def calc_period_consumer_view(batch_settings, input_df, periods):
 
     Args:
         batch_settings: an instance of the BatchSettings class.
-        input_df: DataFrame of cost effects by vehicle in each analysis year.
+        input_df (DataFrame): cost effects by vehicle in each analysis year.
         periods (int): the number of periods (years) to include in the consumer view, set via the
         general_inputs_for_effects_file.
 

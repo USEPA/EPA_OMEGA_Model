@@ -1,8 +1,8 @@
 """
 
-**Routines to load and access fuel prices from the analysis context**
+**Routines to load and access liquid fuel prices from the analysis context**
 
-Context fuel price data includes retail and pre-tax costs in dollars per unit (e.g. $/gallon, $/kWh)
+Context fuel price data includes retail and pre-tax costs in dollars per unit (e.g. $/gallon)
 
 ----
 
@@ -137,7 +137,7 @@ class FuelPrice:
         Args:
             calendar_year (numeric): calendar year for which to get fuel prices.
             fuel_id (str): fuel ID
-            price_types (str): ContextFuelPrices attributes to get
+            price_types (str or strs): ContextFuelPrices attributes to get
 
         Returns:
             Fuel price or list of fuel prices if multiple attributes were requested

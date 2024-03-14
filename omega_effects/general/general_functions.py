@@ -119,7 +119,7 @@ def save_dict(settings, dict_to_save, save_path, row_header=None, stamp=None, in
 
     Parameters:
         settings: object; an object of the SetInputs class.
-        dict_to_save: Dictionary; the dictionary to be saved to CSV.\n
+        dict_to_save (dict): the dictionary to be saved to CSV.\n
         save_path: Path object; the path for saving the passed dict_to_save.\n
         row_header: List; the column names to use as the row header for the preferred structure of the output file.\n
         stamp: str; an identifier for inclusion in the filename, e.g., datetime stamp.\n
@@ -144,7 +144,7 @@ def save_dict_return_df(dict_to_save, save_path, row_header=None, stamp=None, in
     """
 
     Parameters:
-        dict_to_save: Dictionary; the dictionary to be saved to CSV.\n
+        dict_to_save (dict): the dictionary to be saved to CSV.\n
         save_path: Path object; the path for saving the passed dict_to_save.\n
         row_header: List; the column names to use as the row header for the preferred structure of the output file.\n
         stamp: str; an identifier for inclusion in the filename, e.g., datetime stamp.\n

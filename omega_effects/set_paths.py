@@ -14,7 +14,7 @@ import shutil
 class SetPaths:
     """
 
-    The SetPaths class sets the paths and run_id info used by the tool.
+    The SetPaths class sets the paths and run_id info used by the omega effects package.
 
     """
     def __init__(self):
@@ -47,15 +47,12 @@ class SetPaths:
     def copy_code_to_destination(self):
         """
 
-        Parameters:
-            destination (path): the destination folder path; destination folder must exist prior to method call.
-
         Returns:
             Nothing, but copies contents of code folder to the destination.
 
         Note:
-           This is just a generator that allows for copy/paste of tool code into a bundle of folders and files saved to
-           the outputs folder.
+           This is just a generator that allows for copy/paste of omega effects package code into a bundle of folders
+           and files saved to the outputs folder.
 
         """
         # first copy files in the path_code folder

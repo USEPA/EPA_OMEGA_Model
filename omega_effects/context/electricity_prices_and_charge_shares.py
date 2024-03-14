@@ -2,6 +2,8 @@
 
 **Routines to load and access electricity prices from the analysis context**
 
+NOTE: This module is not active - electricity_prices.py is used
+
 **INPUT FILE FORMAT**
 
 The file format consists of a one-row data header and subsequent data rows.

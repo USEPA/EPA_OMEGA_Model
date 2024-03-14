@@ -136,8 +136,7 @@ class MaintenanceCost:
         """
 
         Args:
-            input_df: DataFrame reflecting the maintenance_cost_inputs.csv file
-                with costs updated to analysis_basis_dollars.
+            input_df (DataFrame): the maintenance_cost_inputs.csv file with costs updated to analysis_basis_dollars.
 
         Returns:
             A dictionary of maintenance cost curve coefficients (slope with intercept=0)

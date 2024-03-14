@@ -1,12 +1,12 @@
 """
 
-**Routines to load and access electricity prices from the analysis context**
+**Routines to load and access electricity prices from the analysis context and the sessions**
 
 **INPUT FILE FORMAT**
 
 The file format consists of a one-row data header and subsequent data rows.
 
-The data represent electricity charging costs per kWh and the share of charging at the given rate(s).
+The data represent electricity charging costs per kWh.
 
 File Type
     comma-separated values (CSV)
@@ -21,14 +21,15 @@ Sample Data Columns
 
 Data Column Name and Description
     :context_id:
-        The name of the context source, e.g. 'AEO2020', 'AEO2021', etc
+        The name of the context source, e.g. 'AEO2020', 'AEO2021', 'IPM', etc
 
     :dollar_basis:
-        The dollar basis of the fuel prices in the given AEO version. Note that this dollar basis is
-        converted in-code to 'analysis_dollar_basis' using the implicit_price_deflators input file.
+        The dollar basis of the fuel prices. Note that this dollar basis is converted in-code to 'analysis_dollar_basis'
+         using the implicit_price_deflators input file.
 
     :case_id:
-        The name of the case within the context, e.g. 'Reference Case', 'High oil price', etc
+        The name of the case within the context, e.g. 'Reference Case', 'High oil price', for AEO; 'action' or
+        'no_action' for IPM
 
     :fuel_id:
         The name of the vehicle in-use fuel, must be in the table loaded by ``class fuels.Fuel`` and consistent with
@@ -180,7 +181,7 @@ class ElectricityPrices:
 
         Args:
             calendar_year (numeric): calendar year for which to get fuel prices.
-            price_types (str): the price types sought (e.g., retail, pretax)
+            price_types (str or strs): the price types sought (e.g., retail, pretax)
 
         Returns:
             Fuel price or list of fuel prices if multiple attributes were requested

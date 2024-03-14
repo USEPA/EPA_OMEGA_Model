@@ -11,7 +11,7 @@ File Type
 Sample Header
     .. csv-table::
 
-       input_template_name:,cost_factors_insurance_and_taxes,input_template_version:,0.1
+       input_template_name:,cost_factors_insurance_and_taxes,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
@@ -21,8 +21,8 @@ Sample Data Columns
         all,all,averge_state_taxes,0.0502,
         all,sedan,average_insurance_cost,(vehicle_value * 0.009 + 220) * 1.19,2019
         all,cuv_suv,average_insurance_cost,(vehicle_value * 0.005 + 240) * 1.19,2019,
-        ICE,all,average_depreciation_rate,0.113,
-        HEV,all,average_depreciation_rate,0.121,
+        ICE,all,average_depreciation_rate,0.149,
+        HEV,all,average_depreciation_rate,0.149,
 
 
 Data Column Name and Description

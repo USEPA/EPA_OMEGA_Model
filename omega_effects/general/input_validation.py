@@ -16,7 +16,7 @@ def validate_template_version_info(df, input_template_version, input_template_na
     """
 
     Args:
-        df: the DataFrame to validate.
+        df (DataFrame): the DataFrame to validate.
         input_template_version: the input template version.
         input_template_name: the input template name.
         effects_log: an instance of the EffectsLog class.
@@ -42,7 +42,7 @@ def validate_template_column_names(filepath, df, column_names, effects_log=None)
     """
     Args:
         filepath: the Path object to the file.
-        df: the DataFrame to validate.
+        df (DataFrame): the DataFrame to validate.
         column_names (list or set): the column names that are necessary.
         effects_log: an instance of the EffectsLog class.
 

@@ -5,7 +5,8 @@
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
-The data represents $/gallon cost estimates associated with energy security.
+The data represents $/gallon cost estimates associated with energy security and the share of oil imports reduced as oil
+demand is reduced.
 
 File Type
     comma-separated values (CSV)

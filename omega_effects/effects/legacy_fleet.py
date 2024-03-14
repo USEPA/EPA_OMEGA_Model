@@ -23,11 +23,12 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        model_year,age,calendar_year,reg_class_id,body_style,market_class_id,in_use_fuel_id,registered_count,miles_per_gallon,horsepower,curbweight_lbs,fuel_capacity_gallons,kwh_per_mile,range_miles,transaction_price_dollars
-        1981,39,2020,car,sedan,sedan_wagon.ICE,{'pump gasoline':1.0},7819790.332,21.41631,99,3076,15,,,24254.44782
-        1982,38,2020,car,sedan,sedan_wagon.ICE,{'pump gasoline':1.0},7091909.547,22.21184,99,3053,16.1,,,25583.94377
-        1983,37,2020,car,sedan,sedan_wagon.ICE,{'pump gasoline':1.0},7370905.119,22.09123,104,3112,15.9,,,26839.95207
-        1984,36,2020,car,sedan,sedan_wagon.ICE,{'pump gasoline':1.0},10108067.31,22.4419,106,3101,15.2,,,26615.77742
+        model_year,age,calendar_year,reg_class_id,body_style,market_class_id,in_use_fuel_id,registered_count,miles_per_gallon,kwh_per_mile,curbweight_lbs,transaction_price_dollars
+        1981,41,2022,car,sedan,sedan_wagon.ICE,{'pump gasoline':1.0},7819790.332,21.41631,,3076,22653.68813
+        1982,40,2022,car,sedan,sedan_wagon.ICE,{'pump gasoline':1.0},7091909.547,22.21184,,3053,23890.97149
+        1983,39,2022,car,sedan,sedan_wagon.ICE,{'pump gasoline':1.0},7370905.119,22.09123,,3112,24881.29373
+        1984,38,2022,car,sedan,sedan_wagon.ICE,{'pump gasoline':1.0},10108067.31,22.4419,,3101,24854.47564
+        1985,37,2022,car,sedan,sedan_wagon.ICE,{'pump gasoline':1.0},10279557.36,23.01593,,3096,25883.12766
 
 Data Column Name and Description
     :model_year:
@@ -49,7 +50,7 @@ Data Column Name and Description
         The OMEGA market class id (e.g., 'sedan_wagon.BEV', 'pickup.ICE')
 
     :in_use_fuel_id:
-        The OMEGA in use fuel id (e.g., 'pump gasoline', 'US electricity')
+        The OMEGA in use fuel id and share (e.g., {'pump gasoline':1.0}, {'US electricity':1.0})
 
     :registered_count:
         The number of vehicles of the indicated model year sold as new (this is not the number of vehicles in the fleet
@@ -58,20 +59,11 @@ Data Column Name and Description
     :miles_per_gallon:
         The average 2-cycle fuel economy of the vehicles when sold as new
 
-    :horsepower:
-        The average horsepower of the vehicles when sold as new
-
-    :curbweight_lbs:
-        The average curb weight of the vehicles when sold as new
-
-    :fuel_capacity_gallons:
-        The average fuel capacity in gallons of the vehicles when sold as new
-
     :kwh_per_mile:
         The energy consumption in kilowatt hours of the vehicles when sold as new (electric-only)
 
-    :range_miles:
-        The range in miles of the vehicles when sold as new (electric only)
+    :curbweight_lbs:
+        The curb weight in pounds
 
     :transaction_price_dollars:
         The average transaction price of the vehicles when sold as new
@@ -172,7 +164,7 @@ class LegacyFleet:
         Parameters:
             vehicle_id (int): the vehicle_id.
             calendar_year (int): the calendar year.
-            update_dict: Dictionary; represents the attribute-value pairs to be updated.
+            update_dict (dict): represents the attribute-value pairs to be updated.
 
         Returns:
             Nothing, but updates the object dictionary with update_dict
