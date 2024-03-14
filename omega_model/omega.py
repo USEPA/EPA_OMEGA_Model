@@ -309,9 +309,6 @@ def run_compliance_id(compliance_id, pass_num, cumulative_battery_GWh, credit_ba
                                                             strategic_target_offset_Mg,
                                                             prior_producer_decision_and_response)
 
-            # if producer_compliant is None:
-            #     omega_log.logwrite('%%%%%% Production Constraints Violated ... %%%%%%')
-
             # composite vehicles have been updated from producer_decision at this point
             producer_market_classes = \
                 calc_market_class_data_from_composite_vehicles(candidate_mfr_composite_vehicles, producer_decision)
@@ -539,10 +536,7 @@ def calc_cross_subsidy_metrics(mcat, cross_subsidy_group, producer_decision, cro
         abs(1 - _cross_subsidy_options_and_response['average_ALT_cross_subsidized_price_%s' % mcat] /
             _cross_subsidy_options_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat])
 
-    # for development
-    # _cross_subsidy_options_and_response['pricing_price_ratio_%s' % mcat] = \
-    #     _cross_subsidy_options_and_response['average_ALT_cross_subsidized_price_%s' % mcat] / \
-    #     _cross_subsidy_options_and_response['average_ALT_new_vehicle_mfr_cost_%s' % mcat]
+    # CU RV
 
     _cross_subsidy_options_and_response['pricing_price_ratio_delta_%s_raw' % mcat] = \
         (1 - _cross_subsidy_options_and_response['average_ALT_cross_subsidized_price_%s' % mcat] /
@@ -1794,7 +1788,6 @@ def run_omega(session_runtime_options, standalone_run=False):
                         num_processes = \
                             max(1, int(num_processes / omega_globals.options.non_context_session_process_scaler))
 
-                    # start_time = time.time()
                     omega_globals.pool = Pool(processes=num_processes,
                                               initializer=omega.init_omega, initargs=[omega_globals.options])
 
@@ -1805,8 +1798,6 @@ def run_omega(session_runtime_options, standalone_run=False):
                                                                       error_callback=omega.error_callback))
 
                     [r.get() for r in results]
-
-                    # print('Elapsed init time = %f' % (time.time() - start_time))
 
                 omega_log.logwrite("Running %s:" % omega_globals.options.session_unique_name)
 

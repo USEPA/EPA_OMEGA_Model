@@ -34,28 +34,29 @@ Sample Data Columns
         Parameter,Type,Value,
         Batch Settings,,,
         Batch Name,String,test_batch,
-        Analysis Final Year,#,2021,
-        Analysis Dollar Basis,#,2020,
+        Analysis Final Year,#,2024,
+        Analysis Dollar Basis,#,2022,
         ,,,
         Batch Analysis Context Settings,,,
-        Context Name,String,AEO2021,
+        Context Name,String,AEO2023,
         Context Case,String,Reference case,
         Credit Market Efficiency,#,1,
         Context Fuel Prices File,String,context_fuel_prices.csv,
+        Context Electricity Prices File,String,context_electricity_prices_aeo.csv,
         Context New Vehicle Market File,String,context_new_vehicle_market-body_style.csv,
         Manufacturers File,String,manufacturers.csv,
-        Market Classes File,String,market_classes-body_style.csv,
+        Market Classes File,String,market_classes_ice_bev_phev-body_style.csv,
         New Vehicle Price Elasticity of Demand,#,-0.4,
         Onroad Fuels File,String,onroad_fuels.csv,
         Onroad Vehicle Calculations File,String,onroad_vehicle_calculations.csv,
-        Onroad VMT File,String,annual_vmt_fixed_by_age-body_style.csv,
+        Onroad VMT File,String,annual_vmt_fixed_by_age_ice_bev_phev-body_style.csv,
         Producer Cross Subsidy Multiplier Max,#,1.1,
         Producer Cross Subsidy Multiplier Min,#,0.9,
         Producer Generalized Cost File,String,producer_generalized_cost-body_style.csv,
         Production Constraints File,String,production_constraints-body_style.csv,
-        Sales Share File,String,sales_share_params_ice_bev_body_style.csv,
+        Sales Share File,String,sales_share_params_ice_bev_phev_body_style.csv,
         Vehicle Price Modifications File,String,vehicle_price_modifications-body_style.csv,
-        Vehicle Reregistration File,String,reregistration_fixed_by_age-body_style.csv,
+        Vehicle Reregistration File,String,reregistration_fixed_by_age_ice_bev_phev-body_style.csv,
         ICE Vehicle Simulation Results File,String,simulated_vehicles_rse_ice.csv,
         BEV Vehicle Simulation Results File,String,simulated_vehicles_rse_bev.csv,
         PHEV Vehicle Simulation Results File,String,simulated_vehicles_rse_phev.csv,
@@ -71,21 +72,19 @@ Sample Data Columns
         Session Name,String,NoActionPolicy,ActionAlternative
         ,,,
         Session Policy Alternatives Settings,,,
-        Drive Cycle Weights File,String,drive_cycle_weights_5545.csv,drive_cycle_weights_5545.csv
+        Drive Cycle Weights File,String,drive_cycle_weights.csv,drive_cycle_weights.csv
         Drive Cycle Ballast File,String,drive_cycle_ballast.csv,drive_cycle_ballast.csv
         Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
         GHG Credit Params File,String,ghg_credit_params.csv,ghg_credit_params.csv
         GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
-        GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-alternative.csv
+        GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-0.csv
         Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
         Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv,policy_fuel_upstream_methods.csv
-        Policy Utility Factor Methods File,String,policy_utility_factor_methods.csv,policy_utility_factor_methods.csv
         Policy Fuels File,String,policy_fuels.csv,policy_fuels.csv
         Production Multipliers File,String,production_multipliers.csv,production_multipliers.csv
         Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
         Required Sales Share File,String,required_sales_share-body_style.csv,required_sales_share-body_style.csv
-        ,,,
-        Session Postproc Settings,,,
+        Policy Utility Factor Methods File,String,policy_utility_factor_methods.csv,policy_utility_factor_methods.csv
         Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implicit_price_deflators.csv
 
 The first column defines the parameter name, the second column is a type-hint and does not get evaluated.  Subsequent
@@ -126,6 +125,11 @@ Data Row Name and Description
     The relative or absolute path to the context fuel prices file,
     loaded by ``context.fuel_prices.FuelPrice``
 
+:Context Electricity Prices File *(str)*):
+    The relative or absolute path to the context electricity prices file,
+    loaded by user-definable ``ElectricityPrices`` class defined in the module specified by the file header,
+    e.g. ``context.electricity_prices_aeo``
+
 :Context New Vehicle Market File *(str)*:
     The relative or absolute path to the context new vehicle market file,
     loaded by ``context.new_vehicle_market.NewVehicleMarket``
@@ -136,7 +140,8 @@ Data Row Name and Description
 
 :Market Classes File *(str)*:
     The relative or absolute path to the market classes file,
-    loaded by ``consumer.market_classes.MarketClass``
+    loaded by user-definable ``MarketClass`` class defined in the module specified by the file header,
+    e.g. ``consumer.market_classes_ice_bev_body_style``
 
 :New Vehicle Price Elasticity of Demand *(float, ...)*:
     Numeric value of the new vehicle price elasticity of demand, typically <= 0, e.g. ``-0.5``
@@ -175,7 +180,7 @@ Data Row Name and Description
 :Sales Share File *(str)*:
     The relative or absolute path to the sales share (consumer sales response) file,
     loaded dynamically by the ``SalesShare`` class defined in the module specified by the file header,
-    e.g. ``consumer.sales_share_gcam``
+    e.g. ``consumer.sales_share_ice_bev_phev_body_style``
 
 :Vehicle Price Modifications File *(str)*:
     The relative or absolute path to the vehicle price modifications file,
@@ -188,15 +193,18 @@ Data Row Name and Description
 
 :ICE Vehicle Simulation Results File *(str)*:
     The relative or absolute path to the ICE vehicle simulation results file,
-    loaded by user-definable CostCloud class
+    loaded by user-definable ``CostCloud`` class defined in the module specified by the file header,
+    e.g. ``context.rse_cost_clouds``
 
 :BEV Vehicle Simulation Results File *(str)*:
     The relative or absolute path to the BEV vehicle simulation results file,
-    loaded by user-definable CostCloud class
+    loaded by user-definable ``CostCloud`` class defined in the module specified by the file header,
+    e.g. ``context.rse_cost_clouds``
 
 :PHEV Vehicle Simulation Results File *(str)*:
     The relative or absolute path to the PHEV vehicle simulation results file,
-    loaded by user-definable CostCloud class
+    loaded by user-definable ``CostCloud`` class defined in the module specified by the file header,
+    e.g. ``context.rse_cost_clouds``
 
 :Vehicles File *(str)*:
     The relative or absolute path to the vehicles (base year fleet) file,
@@ -204,7 +212,8 @@ Data Row Name and Description
 
 :Powertrain Cost File *(str)*:
     The relative or absolute path to the powertrain cost file,
-    loaded by ``context.powertrain_cost``
+    loaded by user-definable ``PowertrainCost`` class defined in the module specified by the file header,
+    e.g. ``context.powertrain_cost_frm``
 
 :Glider Cost File *(str)*:
     The relative or absolute path to the vehicle glider cost file,
@@ -260,12 +269,13 @@ Data Row Name and Description
 
 :GHG Standards File *(str)*:
     The relative or absolute path to the GHG Standards / policy targets file,
-    loaded dynamically by the VehicleTargets class defined in the module specified by the file header,
+    loaded dynamically by the ``VehicleTargets`` class defined in the module specified by the file header,
     e.g. ``policy.targets_footprint``
 
 :Off-Cycle Credits File *(str)*:
     The relative or absolute path to the off-cycle credits file,
-    loaded by ``policy.offcycle_credits.OffCycleCredits``
+    loaded by user-definable ``OffcycleCredits`` class defined in the module specified by the file header,
+    e.g. ``policy.offcycle_credits``
 
 :Policy Fuel Upstream Methods File *(str)*:
     The relative or absolute path to the policy fuel upstream methods file,
@@ -291,11 +301,6 @@ Data Row Name and Description
 :Required Sales Share File *(str)*:
     The relative or absolute path to the required sales share file,
     loaded by ``policy.required_sales_share.RequiredSalesShare``
-
-----
-
-:Session Postproc Settings:
-    Decorator, not evaluated
 
 :Context Implicit Price Deflators File *(str)*:
     The relative or absolute path to the implicit price deflators file,
