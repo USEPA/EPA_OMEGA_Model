@@ -240,7 +240,6 @@ class CostCloud(OMEGABase, CostCloudBase):
                                   'cert_fuel_id', 'trx10', 'trx11', 'trx12', 'trx21', 'trx22',
                                   'ecvt', 'ice', 'fcv', 'phev', 'drive_system', 'application_id'}
 
-        # input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
         if not template_errors:
@@ -338,7 +337,6 @@ class CostCloud(OMEGABase, CostCloudBase):
                                   }
         powertrain_type = 'BEV'
 
-        # input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
         if not template_errors:
@@ -469,9 +467,6 @@ class CostCloud(OMEGABase, CostCloudBase):
             Copy of the requested cost cloud data.
 
         """
-
-        # print(vehicle.name)
-
         sweep_precision = 10
 
         vehicle_rlhp20 = \
@@ -842,8 +837,7 @@ class CostCloud(OMEGABase, CostCloudBase):
             powertrain_type = 'HEV'
         elif 'phev' in tech_flags and tech_flags['phev']:
             powertrain_type = 'PHEV'
-        # elif 'fcv' in tech_flags and tech_flags['fcv']:
-        #     powertrain_type = 'FCV'
+        # CU FCV
         else:
             powertrain_type = 'ICE'
 
