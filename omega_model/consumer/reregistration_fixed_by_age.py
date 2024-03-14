@@ -137,8 +137,6 @@ class Reregistration(OMEGABase, ReregistrationBase):
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
-            # Reregistration._data = df.set_index(['market_class_id', 'age']).sort_index().to_dict(orient='index')
-
             # convert dataframe to dict keyed by market class ID, age, and start year
             Reregistration._data = df.set_index(['market_class_id', 'age', 'start_model_year']).\
                 sort_index().to_dict(orient='index')

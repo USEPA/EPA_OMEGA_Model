@@ -151,7 +151,7 @@ class SalesShare(OMEGABase, SalesShareBase):
                 where MC = market class ID
 
         Returns:
-            Consumer cost in $/mi
+            Consumer generalized cost in $/passenger-mile
 
         """
         fuel_cost = producer_decision['average_ALT_retail_fuel_price_dollars_per_unit_%s' % market_class_id]
@@ -183,7 +183,6 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         fuel_cost_per_VMT += fuel_cost * average_co2e_gpmi / carbon_intensity_gasoline / refuel_efficiency
 
-        # consumer_generalized_cost_dollars = total_capital_costs
         annualized_capital_costs = annualization_factor * total_capital_costs
         annual_VMT = float(gcam_data_cy['annual_vmt'])
         total_non_fuel_costs_per_VMT = (annualized_capital_costs + annual_o_m_costs) / annual_VMT
@@ -265,16 +264,6 @@ class SalesShare(OMEGABase, SalesShareBase):
                     market_class_data['consumer_share_frac_%s' % market_class_id] = demanded_share
                     market_class_data['consumer_abs_share_frac_%s' % market_class_id] = demanded_absolute_share
 
-                    # # distribute absolute shares to ALT / NO_ALT, NO_ALT first:
-                    # for alt in ['NO_ALT', 'ALT']:
-                    #     share_id = 'consumer_abs_share_frac_%s.%s' % (market_class_id, alt)
-                    #     if alt == 'NO_ALT':
-                    #         market_class_data[share_id] = \
-                    #             min_constraints[share_id.replace('consumer', 'producer')] * parent_share
-                    #         demanded_absolute_share -= market_class_data[share_id]
-                    #     else:
-                    #         market_class_data[share_id] = demanded_absolute_share
-
         reconciliation_df = pd.DataFrame()
         abs_share_columns = []
         share_columns = []
@@ -296,7 +285,6 @@ class SalesShare(OMEGABase, SalesShareBase):
                 reconciliation_df[share_col] = reconciliation_df.apply(SalesShare.calc_attempted_share, args=(share_col, min_constraints[share_name], max_constraints[share_name], N), axis=1)
 
             reconciliation_df['sum'] = reconciliation_df[share_columns].sum(axis=1)
-            # reconciliation_df.to_csv('rdf_%s.csv' % N)
 
             if all(reconciliation_df['sum'] == 1):
                 break
@@ -742,10 +730,6 @@ if __name__ == '__main__':
             for mcat in omega_globals.options.MarketClass.market_categories:
                 mcd['average_new_vehicle_mfr_cost_%s' % mcat] = [35000, 25000]
                 mcd['average_footprint_ft2_%s' % mcat] = [45, 45]
-
-            # share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, 'Ford',
-            #                                       mcd.loc[0, :], mcd, 'sedan_wagon',
-            #                                       ['sedan_wagon.ICE', 'sedan_wagon.BEV'])
 
         else:
             print(init_fail)

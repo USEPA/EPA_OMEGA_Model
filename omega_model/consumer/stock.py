@@ -24,8 +24,6 @@ def get_vehicle_info(vehicle_id):
         Vehicle market_class_id, model_year, initial_registered_count
 
     """
-    # from producer.vehicles import Vehicle
-
     if vehicle_id not in vehicles_cache:
         try:
             vehicles_cache[vehicle_id] = [(v.market_class_id, v.model_year, v.initial_registered_count, v.reg_class_id)

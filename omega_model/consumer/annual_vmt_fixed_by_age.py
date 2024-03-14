@@ -160,8 +160,6 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
                 template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
             if not template_errors:
-                # OnroadVMT._data = df.set_index(['market_class_id','age']).sort_index().to_dict(orient='index')
-
                 # convert dataframe to dict keyed by market class ID, age, and start year
                 OnroadVMT._data = df.set_index(['market_class_id', 'age', 'start_year']).sort_index().to_dict(
                     orient='index')
