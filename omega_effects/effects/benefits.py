@@ -519,7 +519,6 @@ def build_dicts(
             'fuel_consumption_kwh': - oper_attrs_dict['fuel_consumption_kwh'],
             'fuel_consumption_gallons': - oper_attrs_dict['fuel_consumption_gallons'],
             'petroleum_consumption_gallons': - oper_attrs_dict['petroleum_consumption_gallons'],
-            # 'domestic_refined_gallons': - oper_attrs_dict['domestic_refined_gallons'],
             'barrels_of_oil': - oil_barrels,
             'change_in_barrels_of_oil_imports': - imported_oil_bbl,
             'change_in_barrels_of_oil_imports_per_day': - imported_oil_bbl_per_day,

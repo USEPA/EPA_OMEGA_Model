@@ -223,8 +223,6 @@ class EGUdata:
                 rate = ((kwh_generation_us_session - kwh_generation_us_low) * (rate_high - rate_low)
                         / (kwh_generation_us_high - kwh_generation_us_low)
                         + rate_low)
-                # if not rate_low <= rate <= rate_high or not rate_high <= rate <= rate_low:
-                #     rate = (rate_low + rate_high) / 2
 
             rates.append(rate)
             if rate <= 0:

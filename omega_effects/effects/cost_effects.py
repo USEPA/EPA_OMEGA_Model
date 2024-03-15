@@ -147,7 +147,7 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
                 cost_per_vehicle_no45x_dict[v['vehicle_id']] = vehicle_cost_dollars_no45x / v['registered_count']
 
             # fuel costs _______________________________________________________________________________________________
-            if v['fuel_consumption_kwh'] > 0:  # this is consumption at the wall so includes charging losses
+            if v['fuel_consumption_kwh'] > 0:
                 retail_price, pretax_price = session_settings.electricity_prices.get_fuel_price(
                     v['calendar_year'], 'retail_dollars_per_unit', 'pretax_dollars_per_unit'
                 )

@@ -55,7 +55,7 @@ class FatalityRates:
 
     """
     def __init__(self):
-        self._data = dict()  # private dict
+        self._data = dict()
         self.model_year_max = None
 
     def init_from_file(self, filepath, effects_log):

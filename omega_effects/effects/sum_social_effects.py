@@ -75,14 +75,12 @@ def calc_social_effects(batch_settings, costs_df, benefits_df, ghg_scope, calc_h
     )), inplace=True)
 
     net_benefit_cost_attributes = [
-        # 'fuel_pretax_cost_dollars',
         'vehicle_cost_dollars_no45X',
         'insurance_cost_dollars',
         'congestion_cost_dollars',
         'noise_cost_dollars',
         'maintenance_cost_dollars',
         'repair_cost_dollars',
-        # 'refueling_cost_dollars',
     ]
     net_benefit_fuel_attributes = [
         'fuel_pretax_cost_dollars'
@@ -91,7 +89,6 @@ def calc_social_effects(batch_settings, costs_df, benefits_df, ghg_scope, calc_h
         'fuel_retail_cost_dollars'
     ]
     non_net_benefit_cost_transfers = [
-        # 'fuel_retail_cost_dollars',
         'fuel_taxes_cost_dollars',
         'sales_taxes_cost_dollars',
         'battery_credit_dollars',

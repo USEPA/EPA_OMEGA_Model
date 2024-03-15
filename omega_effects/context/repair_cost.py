@@ -41,8 +41,6 @@ Data Column Name and Description
 **CODE**
 
 """
-# reactivate these imports for QA/QC of this module
-# from matplotlib import pyplot
 from math import e
 
 from omega_effects.general.general_functions import read_input_file

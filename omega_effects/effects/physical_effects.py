@@ -157,7 +157,6 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                     'age': int(v['age']),
                     'name': name,
                     'registered_count': v['registered_count'],
-                    # 'context_stock_adjustment': v['context_stock_adjustment'],
                     'base_year_reg_class_id': base_year_reg_class_id,
                     'reg_class_id': reg_class_id,
                     'manufacturer_id': manufacturer_id,

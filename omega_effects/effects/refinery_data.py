@@ -191,8 +191,6 @@ class RefineryData:
 
         df_rates.set_index(df_rates['calendar_year'], inplace=True)
 
-        # df_rates.insert(0, 'session_name', '')
-
         self.data = df_rates.to_dict('index')
 
         self.interpolate_input_data()

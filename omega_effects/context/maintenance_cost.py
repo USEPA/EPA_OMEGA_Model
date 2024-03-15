@@ -55,9 +55,6 @@ Data Column Name and Description
 **CODE**
 
 """
-# reactivate these imports for QA/QC of this module
-# from scipy.optimize import curve_fit
-# from matplotlib import pyplot
 import pandas as pd
 
 from omega_effects.general.general_functions import read_input_file
@@ -192,22 +189,6 @@ class MaintenanceCost:
 
             maint_cost_curve_dict[veh_type] = {'slope': cost_per_mile_slope,
                                                'intercept': 0}
-
-            # plot the curve (uncomment lines to see plots for QA/QC of rollup_cumulative)
-            # x, y = df['miles'], df['rollup_cumulative']
-            #
-            # def objective1(x, a, b):
-            #     return a * x + b * x ** 2
-            #
-            # popt, _ = curve_fit(objective1, x, y)
-            # miles_factor, miles_squared_factor = popt
-
-            # pyplot.scatter(x, y)
-            # x_line = x
-            # y_line = objective(x, a, b)
-            # pyplot.title(veh_type)
-            # pyplot.plot(x_line, y_line, '--', color='red')
-            # pyplot.show()
 
         return maint_cost_curve_dict
 
