@@ -649,7 +649,7 @@ Vehicle use is estimated as the vehicle miles traveled for each vehicle in the s
 
 Iteration and Convergence Algorithms
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-OMEGA finds a solution in each analysis year using iterative search algorithms. As shown in the process flow diagram in :numref:`al_label_overallprocessflow`, the model uses two iterative loops; a Producer-Policy loop and a Producer-Consumer loop. For both loops, convergence criteria must be achieved within a specified tolerance for the simulation to proceed. This section describes those loops in more detail, with additional information from the demo example.
+OMEGA finds a solution in each analysis year using iterative search algorithms. As shown in the process flow diagram in :numref:`al_label_overallprocessflow`, the model uses two iterative loops; a Producer-Policy loop and a Producer-Consumer loop. For both loops, convergence criteria must be achieved within a specified tolerance for the simulation to proceed. This section describes those loops in more detail, with additional information from an example.
 
 **'Producer-Policy' Iteration: Compliance Search**
 
