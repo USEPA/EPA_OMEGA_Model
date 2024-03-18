@@ -271,7 +271,7 @@ vehicle emission rates in the event that the policy impacts vehicle emission rat
 
 Running the OMEGA Effects Executable
 ------------------------------------
-1)	The OMEGA Effects code, input files and output files can be found on the OMEGA webpage at this link https://www3.epa.gov/otaq/ld/lmdv-nprm-effects-docket.zip
+1)	The OMEGA Effects code, input files and output files can be found on the OMEGA webpage at this link https://www.epa.gov/regulations-emissions-vehicles-and-engines/optimization-model-reducing-emissions-greenhouse-gases
 
 2)	The OMEGA Effects are not part of the OMEGA Model executable file. The OMEGA Effects can be run using the Python code included in the OMEGA repository at https://github.com/USEPA/EPA_OMEGA_Model or the Python code included in the zip file linked above.
 
