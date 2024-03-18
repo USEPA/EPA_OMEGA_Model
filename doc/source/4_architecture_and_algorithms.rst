@@ -5,7 +5,7 @@ Model Architecture and Algorithms
 =================================
 OMEGA is structured around four main modules which represent the distinct and interrelated decision-making agents and system elements that are most important for modeling how policy influences the environmental and other effects of the light duty sector. This chapter begins with a description of the simulation process, including the overall flow of an OMEGA run, and fundamental data structures and model inputs. That section is followed by descriptions of the algorithms and internal logic of the `Policy Module`_, `Producer Module`_, and `Consumer Module`_, and then by a section on the approach for `Iteration and Convergence Algorithms`_ between these three modules. Finally, the accounting method is described for the physical and monetary effects in the `Effects Module`_.
 
-Throughout this chapter, references to a demo analysis are included to provide additional specificity to the explanations in the main text. These examples, highlighted in shaded boxes, are also included with the model code. Please refer to  :numref:`ug_run_the_model` for more information on how to view and rerun the demo analysis.
+Throughout this chapter, references to an example analysis are included to provide additional specificity to the explanations in the main text. These examples are highlighted in shaded boxes. Please refer to  :numref:`ug_run_the_model` for more information on how to run the model to recreate an existing analysis or generate a new one.
 
 Overall Simulation Process
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -23,9 +23,9 @@ The model boundary of OMEGA as illustrated in :numref:`al_label_modelboundary` d
 
     OMEGA model boundary
 
-.. admonition:: Demo example: Analysis timeframe
+.. admonition:: Example: Analysis timeframe
 
-    For the demo analysis, the base year is defined as calendar year 2019. The year immediately following the base year is automatically used as the analysis start year. The analysis final year in this example is set to 2050 in the ‘demo_batch-context-X.csv’ input file. Therefore, the analysis timeframe is a 31-year span, inclusive of 2020 and 2050. The selection of 2019 as the base year is automatically derived from the last year of historical data contained in the ‘vehicles.csv’ and ‘ghg_credits.csv’ input files. These inputs describe the key attributes and counts for registered vehicles, and producers’ banked Mg CO2e credits as they actually existed. Note that for this example, base year vehicle inputs are limited to MY2019 new vehicles and their attributes. For an analysis which is intended to project the impacts of various policy alternatives on the reregistration and use of earlier model years, the base year inputs would describe the entire stock of registered vehicles, including MY2018, MY2017, etc.
+    For this example, the base year is defined as calendar year 2019. The year immediately following the base year is automatically used as the analysis start year. The analysis final year in this example is set to 2050 in the input batch file. Therefore, the analysis timeframe is a 31-year span, inclusive of 2020 and 2050. The selection of 2019 as the base year is automatically derived from the last year of historical data contained in the ‘vehicles.csv’ and ‘ghg_credits.csv’ input files. These inputs describe the key attributes and counts for registered vehicles, and producers’ banked Mg CO2e credits as they actually existed. Note that for this example, base year vehicle inputs are limited to MY2019 new vehicles and their attributes. For an analysis which is intended to project the impacts of various policy alternatives on the reregistration and use of earlier model years, the base year inputs would describe the entire stock of registered vehicles, including MY2018, MY2017, etc.
 
 .. sidebar:: Analysis start year and the base year
 
@@ -33,7 +33,7 @@ The model boundary of OMEGA as illustrated in :numref:`al_label_modelboundary` d
 
 Typically, the analysis start year will already be in the past at the time the model is run. Having the most up-to-date base year data can reduce the number of historical years that need to be modeled, although as noted in the sidebar, there are usually limits to data availability. Some overlap between the modeled and historical years may be beneficial, as it gives the user an opportunity to validate key model outputs against actual data and adjust modeling assumptions if needed.
 
-Model inputs for the policy alternatives and analysis context projections must be available for every year throughout the analysis timeframe. Many of the input files for OMEGA, utilize a ‘start_year’ field, which allows the user to skip years with repetitive inputs if desired. In general, OMEGA will carry over input assumptions from the most recent prior value whenever the user has not specified a unique value for the given analysis year. Similarly, in cases where the user-provided input projections do not extend to the analysis end year, the value in the last specified year is assumed to hold constant in subsequent years. For example, in the demo analysis, 2045 is the last year for which input values are specified in ‘cost_factors-criteria.csv’, so OMEGA will apply the same 2045 values for 2046 through 2050.
+Model inputs for the policy alternatives and analysis context projections must be available for every year throughout the analysis timeframe. Many of the input files for OMEGA, utilize a ‘start_year’ field, which allows the user to skip years with repetitive inputs if desired. In general, OMEGA will carry over input assumptions from the most recent prior value whenever the user has not specified a unique value for the given analysis year. Similarly, in cases where the user-provided input projections do not extend to the analysis end year, the value in the last specified year is assumed to hold constant in subsequent years. In this example analysis, 2045 is the last year for which input values are specified in ‘cost_factors-criteria.csv’, so OMEGA will apply the same 2045 values for 2046 through 2050.
 
 An OMEGA analysis can be conducted at various levels of resolution depending on the user’s choice of inputs and run settings. The key modeling elements where resolution is an important consideration include vehicles, technologies, market classes, producers, and consumers.
 
@@ -49,7 +49,7 @@ An OMEGA analysis can be conducted at various levels of resolution depending on 
 
 **Market class resolution:** The level of detail, and type of information used within the Producer and Consumer modules is different. For example, we assume that consumers are not aware of the compliance implications and detailed design choices made by the producer, unless those factors are evident in the price, availability, or key attributes of a vehicle. Therefore, consumer decisions regarding the demanded shares of vehicles are modeled based on vehicle characteristics aggregated at the market class level. The user's determination of the appropriate resolution for the market classes will depend on the chosen specification for share response modeling within the Consumer Module. Note that within the Consumer Module, while share response is modeled at the market class level, other consumer decisions (like reregistration and use) can be based on more detailed vehicle-level information.
 
-**Producer resolution:** The producers in OMEGA are the regulated entities subject to the policy alternatives being analyzed and are responsible (together with the consumers and policy) for the decisions about the quantities and characteristics of the vehicles produced. The user can choose to model the producers either as an aggregate entity with the assumption that compliance credits are available in an unrestricted market (i.e. 'perfect trading'), or as individual entities with no trading between firms.
+**Producer resolution:** The producers in OMEGA are the regulated entities subject to the policy alternatives being analyzed and are responsible (together with the consumers and policy) for the decisions about the quantities and characteristics of the vehicles produced. The user can choose to model the producers either as an aggregate entity with the assumption that compliance credits are available in an unrestricted market (i.e. 'perfect trading'), or as individual entities with a level of potential trading between firms that is specified by the user (i.e. between 'no trading' and 'perfect trading', the level of 'imperfect trading' that is considered by the model).
 
 **Consumer resolution:** The approach to account for heterogeneity in consumers is an important consideration when modeling the interaction between producer decisions and the demand for vehicles. By taking advantage of user-definable submodules, a developer can set-up the Consumer Module to account for different responses between consumer segments.
 
@@ -61,7 +61,7 @@ Whatever the level of resolution, the detail provided in the inputs 1) must meet
 
 * Within the Consumer Module, the modeling of consumer decisions requires sufficient detail to distinguish between market classes for representing both the purchase choices among different classes, and the reregistration and use of vehicles within a given class.
 
-.. admonition:: Demo example: Modeling resolution
+.. admonition:: Example: Modeling resolution
 
     .. csv-table:: How modeling resolution is defined in an OMEGA run
         :widths: auto
@@ -96,15 +96,15 @@ As described in the :numref:`inputs_and_outputs_label` overview, OMEGA model inp
 
 **Policy Alternatives Inputs**
 
-An OMEGA run requires a full description of the GHG standards themselves so that the modeled producer compliance considerations are consistent with how an EPA rule would be defined in the Federal Register and Code of Federal Regulations. As described in :numref:`Policy Module`, OMEGA is intended primarily for the analysis of fleet averaging standards, and the demo example has been set up to illustrate how accounting rules for GHG credits in a fleet averaging program can be defined. This includes the coefficients for calculating emissions rate targets (gram CO2e per mile) based on vehicle attributes, the methods for determining emissions rate certification values (e.g. drive cycle and fuel definitions, off-cycle credits), and the rules for calculating and accounting for Mg CO2e credits over time (e.g. banking and trading rules, and lifetime VMT assumptions.) See :numref:`al_label_table_policy_alternative_inputs` for a complete list of the policy alternative inputs used in the demo example.
+An OMEGA run requires a full description of the GHG standards themselves so that the modeled producer compliance considerations are consistent with how an EPA rule would be defined in the Federal Register and Code of Federal Regulations. As described in :numref:`Policy Module`, OMEGA is intended primarily for the analysis of fleet averaging standards, and the example provided here has been set up to illustrate how accounting rules for GHG credits in a fleet averaging program can be defined. This includes the coefficients for calculating emissions rate targets (gram CO2e per mile) based on vehicle attributes, the methods for determining emissions rate certification values (e.g. drive cycle and fuel definitions, off-cycle credits), and the rules for calculating and accounting for Mg CO2e credits over time (e.g. banking and trading rules, and lifetime VMT assumptions.) See :numref:`al_label_table_policy_alternative_inputs` for a complete list of the policy alternative inputs used in this example.
 
 **Analysis Context Inputs**
 
 The analysis context defines the inputs and assumptions that the user assumes are independent of the policy alternatives. This clear delineation of exogenous factors is what enables the apples-to-apples comparison of policy alternatives within a given analysis context. This is the primary purpose for which OMEGA was designed – to quantify the incremental effects of a policy for informing policy decisions. At the same time, considering how the incremental effects of a policy might vary depending on the analysis context assumptions is a useful approach for understanding the sensitivity of the projected results to differences in assumptions.
 
-.. admonition:: Demo example: Analysis Context inputs for 'Context A'
+.. admonition:: Example: Analysis Context inputs for 'Context A'
 
-    The demo example includes two policy alternatives ('alt0' and 'alt1') and two sets of analysis context assumptions ('A' and 'B'.) :numref:`al_label_table_policy_context_a_inputs` shows the complete set of input files and settings for Context A as defined in the 'demo_batch-context_a.csv' file.
+    This example includes two policy alternatives ('alt0' and 'alt1') and two sets of analysis context assumptions ('A' and 'B'.) :numref:`al_label_table_policy_context_a_inputs` shows the complete set of input files and settings for Context A that would be defined in an input batch file for Context A.
 
     .. _al_label_table_policy_context_a_inputs:
     .. csv-table:: Input files and settings for 'Context A'
@@ -142,9 +142,9 @@ The analysis context defines the inputs and assumptions that the user assumes ar
         Context Implicit Price Deflators File,implicit_price_deflators.csv,Factors for converting costs to a common dollar basis.
         Context Consumer Price Index File,cpi_price_deflators.csv,Factors for converting costs to a common dollar basis.
 
-.. admonition:: Demo example: Unique Analysis Context inputs for 'Context B'
+.. admonition:: Example: Unique Analysis Context inputs for 'Context B'
 
-    While most of the example input files are common for contexts ‘A’ and ‘B’, in cases where context assumptions vary, input files are differentiated using ‘context_a’ and ‘context_b’ in the file names. :numref:`al_label_table_policy_context_b_unique_inputs` shows the input files and settings that are unique for Context B as defined in the in the ‘demo_batch-context_b.csv’ file.
+    While most of the example input files are common for contexts ‘A’ and ‘B’, in cases where context assumptions vary, input files are differentiated using ‘context_a’ and ‘context_b’ in the file names. :numref:`al_label_table_policy_context_b_unique_inputs` shows the input files and settings that are unique for Context B that would be defined in an input batch file.
 
     .. _al_label_table_policy_context_b_unique_inputs:
     .. csv-table:: Input files and setting differences between contexts 'A' and 'B'
@@ -177,7 +177,7 @@ Input projections for items that are assumed to be not influenced at all by the 
 
 Both the consumer and producer decisions will influence the modeled new vehicle sales and attributes; for example, new vehicle prices, overall sales, sales mix, technology applications, emissions rates and fuel consumption rates. While some of these elements might not be within the scope of the input projections, when a projected element is also modeled as being responsive to policy, OMEGA uses a calibration approach to maintain consistency. Specifically, after calibration, the results of a model run using the context policy will produce results that match the projections in the analysis context. If that were not the case, results for any other policy alternatives could deviate in unrealistic ways from the underlying projections.
 
-.. admonition:: Demo example: Overall sales projections and the context policy
+.. admonition:: Example: Overall sales projections and the context policy
 
     The overall sales level is an item that is both specified as a projection in the context inputs, and is also modeled internally as responsive to changes in vehicle prices, fuel operating costs, etc. In each batch run (each batch contains two or more policy alternatives), OMEGA automatically calibrates the overall average new vehicle prices in the first session, which represents the context policy. This calibration process ensures that overall sales match the context projected sales by generating calibrated new vehicle prices (P) which are associated with the context. In subsequent sessions of the batch run for the other policy alternatives, these calibrated prices are used as the basis to which any price changes are applied (the P in equation :eq:`al_label_eqn_demand_elasticity`.)
 
@@ -185,9 +185,9 @@ Both the consumer and producer decisions will influence the modeled new vehicle 
 
 Some elements related to vehicle attributes and sales mix may be neither part of the projection inputs nor modeled internally, yet still be important to consider in the future projections. In these cases, base year vehicle fleet attributes and relative mix characteristics are assumed to hold constant into the future.
 
-.. admonition:: Demo example: Projections for new vehicle size class mix
+.. admonition:: Example: Projections for new vehicle size class mix
 
-    In the demo example, overall new vehicle sales projections are taken as purely exogenous. The ‘context_new_vehicle_market.csv’ file specifies the sales mix projections from AEO though 2050 by size class. As shown in :numref:`al_label_fig_context_projections_size_class_share`, the projected sales mix of size classes varies by year, and between Context A and Context B.
+    In this example, overall new vehicle sales projections are taken as purely exogenous. The ‘context_new_vehicle_market.csv’ file specifies the sales mix projections from AEO though 2050 by size class. As shown in :numref:`al_label_fig_context_projections_size_class_share`, the projected sales mix of size classes varies by year, and between Context A and Context B.
 
     .. _al_label_fig_context_projections_size_class_share:
     .. figure:: _static/al_figures/context_projections_size_class_share_by_context_a_b.png
@@ -237,7 +237,7 @@ Emissions standards are defined in OMEGA using a range of policy elements, inclu
 * definition of attribute-based target function
 * definition of the vehicles’ assumed lifetime miles
 
-.. admonition:: Demo example: Input files for no-action and action policy definitions
+.. admonition:: Example: Input files for no-action and action policy definitions
 
     .. _al_label_table_policy_alternative_inputs:
     .. csv-table:: Description of Policy Alternative input files
@@ -316,7 +316,7 @@ In reality, there are limits to the ability of producers to adjust vehicle price
 
 **Credit management strategy**
 
-With a policy that allows credit banking, the efficient management of compliance credits from year-to-year involves a degree of look-ahead, both in terms of expected changes in regulatory stringency and other policies, and expected changes in generalized costs over time. At this time, OMEGA assumes that producers aim to meet the GHG target in each year, with any banked credits used only to make up differences between the certification and target values. The producer logic associated with the process box labeled “Determine Strategic Target Offset” in the process flow diagram (:numref:`al_label_overallprocessflow`) therefore simply applies the offset, if any, to the policy GHG target. In a future revision, we plan to consider incorporating producer decisions that are intentionally under- or over-target based on the assumption that producers make strategic decisions looking beyond the immediate present to minimize generalized costs over a longer time horizon.
+With a policy that allows credit banking, the efficient management of compliance credits from year-to-year involves a degree of look-ahead, both in terms of expected changes in regulatory stringency and other policies, and expected changes in generalized costs over time. At this time, OMEGA assumes that producers aim to meet the GHG target in each year, with any banked credits used only to make up differences between the certification and target values. The producer logic associated with the process box labeled “Determine Strategic Target Offset” in the process flow diagram (:numref:`al_label_overallprocessflow`) therefore simply applies the offset, if any, to the policy GHG target.
 
 Vehicle Definitions
 -------------------
@@ -324,7 +324,7 @@ The vehicle is the fundamental unit of analysis within the Producer Module, and 
 
 Along with a definition of resolution, the base year vehicles inputs also define the key exogenous attributes that are necessary for 1) generating future projections, 2) assigning the policy emissions targets, 3) estimating consumer demanded quantities, 4) determining appropriate emissions rates and costs from the applied technology packages.
 
-.. admonition:: Demo example: Vehicle definitions in base year fleet
+.. admonition:: Example: Vehicle definitions in base year fleet
 
     .. _al_label_table_key_base_year_attributes_and_uses:
     .. csv-table:: Key base year vehicle attributes and their uses from 'vehicles.csv'
@@ -366,7 +366,7 @@ Vehicle Simulation and Cost Inputs
 ------------------------------------------
 One of the most important sets of inputs to the Producer Module is the simulated vehicles file. It contains the vehicle parameters used by OMEGA to generate all possible vehicle technology (and cost) options available to the producers – these production options represent distinct points in what might be considered a point 'cloud'. The use of these vehicle clouds by OMEGA is described in :numref:`veh clouds section`.
 
-The simulated vehicle file contains the various vehicles of different core attributes (such as vehicle size, weight, powertrain, etc), the CO2-reducing technologies that are applied to each, and their predicted energy consumption, CO2 performance, and cost. While not required by all users, EPA uses its own simulation tool (ALPHA) to predict the energy consumption and CO2 emissions for each vehicle and technology combination. For the demo, these vehicle and technology options (and associated CO2 performance) are consolidated into the 'simulated_vehicles.csv' file. The simulated vehicles file contains the following fields for use in the Producer Module:
+The simulated vehicle file contains the various vehicles of different core attributes (such as vehicle size, weight, powertrain, etc), the CO2-reducing technologies that are applied to each, and their predicted energy consumption, CO2 performance, and cost. While not required by all users, EPA uses its own simulation tool (ALPHA) to predict the energy consumption and CO2 emissions for each vehicle and technology combination. For this example, these vehicle and technology options (and associated CO2 performance) are consolidated into the 'simulated_vehicles.csv' file. The simulated vehicles file contains the following fields for use in the Producer Module:
 
 * the associated **cost curve class** (defined by powertrain family and described below)
 * vehicle properties such as curb weight, type of base powertrain (ICE/HEV/PHEV/BEV, etc)
@@ -375,7 +375,7 @@ The simulated vehicle file contains the various vehicles of different core attri
 * vehicle attributes, such as included technologies, costs
 
 **Significance of the cost curve class:**
-Each cost curve class includes multiple vehicles and represents the design space for all vehicle options in each class. In the demo, multiple vehicles are grouped within a single cost curve class to reduce the number of simulations required to represent the design space. OMEGA producer decisions are made based on discrete vehicle options within each vehicle cost curve class. For possible future consideration, EPA recommends the generation of RSEs (response surface equations) to derive particular cost clouds unique to each vehicle. This would allow for more unique cost and vehicle clouds without excessive simulation calculation burden.
+Each cost curve class includes multiple vehicles and represents the design space for all vehicle options in each class. In this example, multiple vehicles are grouped within a single cost curve class to reduce the number of simulations required to represent the design space. OMEGA producer decisions are made based on discrete vehicle options within each vehicle cost curve class. For possible future consideration, EPA recommends the generation of RSEs (response surface equations) to derive particular cost clouds unique to each vehicle. This would allow for more unique cost and vehicle clouds without excessive simulation calculation burden.
 
 .. _veh clouds section:
 
@@ -390,7 +390,7 @@ The Producer Module uses an approach of aggregating the discrete, vehicle-level 
 
 In oder to minimize cost, a producer would need to select the minimum cost package available at a given compliance emissions rate (i.e. g CO2/mi.) This subset of cost-minimizing vehicle technology packages is referred to as the *cost curve*, while the broader set of points is the *cost cloud*. Note that ‘cost’ here is referring to the producer generalized cost, as explained in :numref:`producer_compliance_strategy_section`.
 
-.. admonition:: Demo example: Vehicle cost clouds
+.. admonition:: Example: Vehicle cost clouds
 
     An example cost cloud for a single vehicle in MY2025 (vehicle #62, a 4WD minivan) for the no-action policy in Context A is shown in :numref:`al_label_pm_vehicle_cloud`. The costs for the blue points are production costs. The orange point costs are producer generalized costs, and include 5 years of fuel costs at 15,000 miles per year that the producer assumes are valued by consumers at the time of purchase (as defined in the analysis context input file ‘producer_generalized_costs.csv’.) Note that the producer generalized costs are higher than the production costs, and also form a cloud with a different shape than the blue production cost cloud. Essentially, the orange cloud is shifted up and rotated counterclockwise relative to the blue cloud because the technology packages with higher emissions rates also have relatively higher fuel costs that are assumed to factor into consumer purchases.
 
@@ -406,9 +406,9 @@ In oder to minimize cost, a producer would need to select the minimum cost packa
 
 Because a producer can offer a range of different vehicles, each with distinct costs associated with applying technology packages, it is not likely that the lowest cost compliance solution will be a uniform application of technology to all vehicles. Nor will selecting the lowest cost option for each vehicle likely result in producer compliance, except in cases where a policy is non-binding. In order to consider design options for multiple vehicles simultaneously, the Producer Module aggregates individual vehicles into composites, with one composite vehicle for each market class and reg class combination. It is important that the resultant cost curves (producer generalized cost vs. g CO2/mi emissions rates) are not aggregated further since 1) aggregating emissions rates across market classes would no longer be valid after iteration when the Consumer Module changes the relative shares of market classes, and 2) aggregating emissions rates across regulatory classes would, under some policy definitions, make it impossible to calculate the Mg CO2 compliance credits (e.g. in policy cases where there are limits to the transfer of credits between regulatory classes.)
 
-.. admonition:: Demo example: Vehicle aggregation into market class - reg class cost curves
+.. admonition:: Example: Vehicle aggregation into market class - reg class cost curves
 
-    :numref:`al_label_pm_composite_vehicle` shows the black cost curve of veh #62 as presented in :numref:`al_label_pm_vehicle_cloud`, along with the other vehicles that are in the same combination of market class (ICE non-hauling) and reg class (‘a’.) Note that the simulated_vehicles.csv file for this demo example does not contain distinct costs and emissions rates for every vehicle. As a result, even though there are 12 vehicles are represented here, they overlay into only three distinct cost curves. If a user provided simulated_vehicles.csv inputs defined with greater resolution, every vehicle could be associated with its own distinct cost curve.
+    :numref:`al_label_pm_composite_vehicle` shows the black cost curve of veh #62 as presented in :numref:`al_label_pm_vehicle_cloud`, along with the other vehicles that are in the same combination of market class (ICE non-hauling) and reg class (‘a’.) Note that the simulated_vehicles.csv file for this example does not contain distinct costs and emissions rates for every vehicle. As a result, even though there are 12 vehicles are represented here, they overlay into only three distinct cost curves. If a user provided simulated_vehicles.csv inputs defined with greater resolution, every vehicle could be associated with its own distinct cost curve.
 
     The bold orange line in :numref:`al_label_pm_composite_vehicle` is the MY2025 cost minimizing frontier for a composite vehicle made by aggregating the individual vehicle cost curves in the same market class and reg class combination. The relative shares of vehicles within a market class and reg class remain fixed in the Producer-Consumer iteration process. Therefore the composite vehicle cost curve does not change as a result of the consumer response. This curve, along with the composite vehicle cost curves from the other market class and reg class combinations, is used to generate the producer compliance options.
 
@@ -424,7 +424,7 @@ Once composite vehicle cost curves are generated for each market class and reg c
 
 Once a compliance option is selected through the iteration and convergence process, a user will likely want to know how specific vehicle design decisions contributed to that solution.
 
-.. admonition:: Demo example: Decomposition of composite vehicle
+.. admonition:: Example: Decomposition of composite vehicle
 
     Because the composite vehicle is made up of individual vehicles of fixed sales shares (at least relative to the other vehicles in the same market class, reg class combination), there is one-and-only-one solution for individual vehicle costs and emissions rates that will result in the selected option for the composite vehicle’s cost and emissions rate.  :numref:`al_label_pm_composite_vehicle_decomposition` shows the same orange composite vehicle curve from :numref:`al_label_pm_composite_vehicle`, along with star symbols to indicate the selected option for the composite vehicle and associated points for the individual vehicles.
 
@@ -470,11 +470,11 @@ The Consumer Module’s purpose is to estimate how light duty vehicle ownership 
 
     Throughout this chapter, 'shares' refers to the portion of all new vehicle sales that are classified into each of the different user-definable vehicle market classes.
 
-Each of these five elements represents a user-definable submodule within the Consumer Module code. The code within each submodule may be updated by a user, or the submodule may be replaced with an alternative submodule. When a modifies a submodule, they must ensure that the submodule retains consistency with the other submodules within the Consumer Module, as well as with the rest of OMEGA. For example, if the market class submodule is changed from the demo analysis version, the sales share submodule must be updated as well since sales shares are determined by market class.
+Each of these five elements represents a user-definable submodule within the Consumer Module code. The code within each submodule may be updated by a user, or the submodule may be replaced with an alternative submodule. When a modifies a submodule, they must ensure that the submodule retains consistency with the other submodules within the Consumer Module, as well as with the rest of OMEGA. For example, if the market class submodule is changed, the sales share submodule must be updated as well since sales shares are determined by market class.
 
-.. admonition:: Demo example: Consumer Module user-definable submodules
+.. admonition:: Example: Consumer Module user-definable submodules
 
-    The user-definable submodules in the demo analysis version of the Consumer Module are listed in the table below.
+    The user-definable submodules of the Consumer Module in this example are listed in the table below.
 
     .. csv-table::
         :widths: auto
@@ -509,21 +509,21 @@ The designation of market classes can be used to reflect market heterogeneity in
 
 Before the Consumer Module can estimate new vehicle sales or market shares responses, all vehicles must be categorized into their market classes. This categorization is defined as a series of nested market category levels. The user can define any number of market classes, or levels, as well as the hierarchy of the levels. In defining the hierarchy, it is important to note that OMEGA assumes that the sales share estimates within a parent category are independent of sales share estimates outside the parent category. This means that changing the available market classes outside the parent category will not change the sales share estimates within the parent category.
 
-.. admonition:: Demo example: Market class structure
+.. admonition:: Example: Market class structure
 
-    :numref:`mo_label_mktree` below illustrates an example of a nested market class hierarchy using the demo analysis market classes as an example. Hauling/non-hauling market classes are the highest, parent, level. Vehicles are separated into the appropriate hauling and non-hauling class using their attributes. Nested within the hauling and non-hauling categories, there are BEV/ICE market classes. The candidate vehicle inputs from the Producer Module, for example, vehicle prices, fuel cost and VMT, are used to determine the share of vehicles in the BEV/ICE market classes, as described in the examples below. During the iterative first phase, if the share of BEVs that consumers will accept given the candidate vehicle attributes does not converge within a tolerance with the share that the Producer Module estimates, the iterative process continues. The demanded BEV share is passed back to the Producer Module, which will return a new set of candidate vehicles and their attributes, including prices. Given the updated candidate vehicle inputs, the Consumer Module will redistribute vehicles into the BEV and ICE classes, with the BEV/ICE share estimates in the hauling category being independent from those in the non-hauling category. This possible redistribution between market class categories is represented by the dashed lines between each set of BEV/ICE classes. Note that the dashed lines travel within the hauling class and within the non-hauling class, but do not travel across them.
+    :numref:`mo_label_mktree` below illustrates the nested market class hierarchy used in this example. Hauling/non-hauling market classes are the highest, parent, level. Vehicles are separated into the appropriate hauling and non-hauling class using their attributes. Nested within the hauling and non-hauling categories, there are BEV/ICE market classes. The candidate vehicle inputs from the Producer Module, for example, vehicle prices, fuel cost and VMT, are used to determine the share of vehicles in the BEV/ICE market classes, as described in the examples below. During the iterative first phase, if the share of BEVs that consumers will accept given the candidate vehicle attributes does not converge within a tolerance with the share that the Producer Module estimates, the iterative process continues. The demanded BEV share is passed back to the Producer Module, which will return a new set of candidate vehicles and their attributes, including prices. Given the updated candidate vehicle inputs, the Consumer Module will redistribute vehicles into the BEV and ICE classes, with the BEV/ICE share estimates in the hauling category being independent from those in the non-hauling category. This possible redistribution between market class categories is represented by the dashed lines between each set of BEV/ICE classes. Note that the dashed lines travel within the hauling class and within the non-hauling class, but do not travel across them.
 
         .. _mo_label_mktree:
         .. figure:: _static/al_figures/market_class_tree.png
             :align: center
 
-            Illustration of the Market Class Structure in the Demo Analysis
+            Illustration of the Market Class Structure in the Example Analysis
 
 Within a given analysis context, the shares of vehicles allocated to nonresponsive market class categories do not shift between those nonresponsive market categories, even under different policy alternatives or during iteration with the Producer Module. Shares of vehicles allocated to responsive market class categories may shift between the responsive market categories.
 
-.. admonition:: Demo example: Nonresponsive and responsive market classes
+.. admonition:: Example: Nonresponsive and responsive market classes
 
-    Within the demo analysis, vehicles are separated into four market classes depending on whether they are categorized as hauling (primarily meant for transporting goods or towing, as a body-on-frame vehicle would be expected to do) or non-hauling (primarily meant for passenger transportation, as a unibody vehicle might do), and their fuel type (battery electric vehicle (BEV) or internal combustion engine vehicles (ICE)). The hauling/non-hauling market classes are defined as nonresponsive market class categories. The share of vehicles defined as hauling or non-hauling, regardless of the fuel type, depends on analysis context inputs, and is unaffected by model results. The BEV/ICE market classes are defined as responsive market class categories, the share of vehicles in that market class is estimated within the Consumer Module and is responsive to vehicle cost and fuel consumption rate of the set of candidate vehicles input from the Producer Module.
+    Within the example analysis, vehicles are separated into four market classes depending on whether they are categorized as hauling (primarily meant for transporting goods or towing, as a body-on-frame vehicle would be expected to do) or non-hauling (primarily meant for passenger transportation, as a unibody vehicle might do), and their fuel type (battery electric vehicle (BEV) or internal combustion engine vehicles (ICE)). The hauling/non-hauling market classes are defined as nonresponsive market class categories. The share of vehicles defined as hauling or non-hauling, regardless of the fuel type, depends on analysis context inputs, and is unaffected by model results. The BEV/ICE market classes are defined as responsive market class categories, the share of vehicles in that market class is estimated within the Consumer Module and is responsive to vehicle cost and fuel consumption rate of the set of candidate vehicles input from the Producer Module.
 
 .. _phase1:
 
@@ -536,9 +536,9 @@ During the iterative first phase of the Consumer Module, the Producer Module and
 
 The Consumer Module estimates the total new vehicles sold at the aggregated market class level with the user-definable submodule for new vehicle sales. The estimate for the change in new vehicle sales starts with an assumption of sales volumes in the Context Policy (the "no-action alternative"). These estimates can be an exogenous input from the analysis context, or estimated within the Consumer Module. Sales volumes under a defined policy (an "action alternative") can be responsive to policy if the estimation is defined as relying, at least in part, on inputs from the Producer Module, or may be unresponsive to policy if the estimation is defined to rely solely on inputs from the analysis context. In defining how the Consumer Module estimates sales volumes, the user must ensure consistency between the inputs available from both the Producer Module and the analysis context, as well as with the other user-definable submodules within the Consumer Module. For example, if a user defines sales volumes as responsive to a specific vehicle attribute, that attribute must be included in the set of candidate vehicles and their attributes input from the Producer Module.
 
-.. admonition:: Demo example: New vehicle sales estimates
+.. admonition:: Example: New vehicle sales estimates
 
-    In the demo analysis, sales volumes under the no-action policy alternative, which is also the Context Policy, are an exogenous input from the analysis context. An elasticity of demand, defined by the user, is used in conjunction with the change in price between a no-action alternative and an action alternative to estimate the change in sales from the no-action alternative level. Demand elasticity is defined as the percent change in the quantity of a good demanded for a 1%  change in the price of that good, where the good demanded in the Consumer Module is new light duty vehicles. They are almost always negative: as the price of a good increases (a positive denominator), the amount of that good purchased falls (a negative numerator). Larger (in absolute value) negative values are associated with more "elastic", or larger, changes in demand for a given change in price. This value represents how responsive consumers are to a change in price. The general elasticity equation is:
+    In the example analysis, sales volumes under the no-action policy alternative, which is also the Context Policy, are an exogenous input from the analysis context. An elasticity of demand, defined by the user, is used in conjunction with the change in price between a no-action alternative and an action alternative to estimate the change in sales from the no-action alternative level. Demand elasticity is defined as the percent change in the quantity of a good demanded for a 1%  change in the price of that good, where the good demanded in the Consumer Module is new light duty vehicles. They are almost always negative: as the price of a good increases (a positive denominator), the amount of that good purchased falls (a negative numerator). Larger (in absolute value) negative values are associated with more "elastic", or larger, changes in demand for a given change in price. This value represents how responsive consumers are to a change in price. The general elasticity equation is:
 
     .. Math::
       :label: al_label_eqn_demand_elasticity
@@ -553,7 +553,7 @@ The Consumer Module estimates the total new vehicles sold at the aggregated mark
     * :math:`\Delta P` is the change in the good's price
     * :math:`P` is the good's price before the change
 
-    In the demo analysis, the default elasticity of demand is set to -1. This means, for a 1% change in the consumer generalized price (described below), the vehicles demanded by consumers will fall by 1%.
+    In the example analysis, the default elasticity of demand is set to -1. This means, for a 1% change in the consumer generalized price (described below), the vehicles demanded by consumers will fall by 1%.
     In order to estimate the change in sales expected as function of the estimated change in price, this equation is rearranged:
 
     .. Math::
@@ -563,27 +563,27 @@ The Consumer Module estimates the total new vehicles sold at the aggregated mark
 
     At an aggregate level, the average expected change in the price of new vehicles is multiplied by the defined demand elasticity to get the estimated change in vehicles demanded. This change is combined with projected new vehicle sales under the no-action alternative to get the total new vehicle sales under the action alternative outlined in the Policy Module.
 
-If a user adopts the demo analysis method of estimating sales volumes using an elasticity of demand, they must ensure that net vehicle price, *P*, is defined. This net price is estimated under the no-action and the action alternatives, and the no-action alternative net price is subtracted from the action alternative net price to get an estimated change in net price, :math:`\Delta P`, that can be used with the user-specified elasticity. The net price should include factors the user assumes consumers consider in their purchase decision. Some factors that might be included are the share of total costs the producers pass onto the consumers, and the amount of future fuel costs consumers consider in their purchase decision.
+If a user adopts the example analysis method of estimating sales volumes using an elasticity of demand, they must ensure that net vehicle price, *P*, is defined. This net price is estimated under the no-action and the action alternatives, and the no-action alternative net price is subtracted from the action alternative net price to get an estimated change in net price, :math:`\Delta P`, that can be used with the user-specified elasticity. The net price should include factors the user assumes consumers consider in their purchase decision. Some factors that might be included are the share of total costs the producers pass onto the consumers, and the amount of future fuel costs consumers consider in their purchase decision.
 
-.. admonition:: Demo example: Net price
+.. admonition:: Example: Net price
 
-    In the demo analysis, the net price value in the sales volume estimate includes assumptions about the share of the total cost that producers pass onto the consumer and the amount of fuel consumption considered in the purchase decision. With respect to the share of total cost that producers pass onto consumers, the demo analysis assumes "full cost pass-through." This means that the full increase in cost that producers are subject to in achieving emission reduction targets is passed on to the consumers. However, due to cross-subsidization, those costs may be spread across multiple market classes.
+    In the example analysis, the net price value in the sales volume estimate includes assumptions about the share of the total cost that producers pass onto the consumer and the amount of fuel consumption considered in the purchase decision. With respect to the share of total cost that producers pass onto consumers, this example assumes "full cost pass-through." This means that the full increase in cost that producers are subject to in achieving emission reduction targets is passed on to the consumers. However, due to cross-subsidization, those costs may be spread across multiple market classes.
 
-    The role of fuel consumption in the purchase decision is represented by the number of years of fuel consumption consumers consider when purchasing a new vehicle, and can range from 0 through the full lifetime of the vehicle. Fuel costs are estimated using vehicle fuel consumption rates from the Producer Module, projections of fuel prices from the analysis context, the user-specified VMT schedules, and the user-specified vehicle reregistration schedules. The resulting portion of fuel costs considered by consumers is added to the candidate vehicle prices from the Producer Module to produce a net vehicle price, which is then used in conjunction with the elasticity of demand to estimate the change in vehicle sales. The demo analysis assumes that consumers consider 5 years of fuel costs in the vehicle purchase decision.
+    The role of fuel consumption in the purchase decision is represented by the number of years of fuel consumption consumers consider when purchasing a new vehicle, and can range from 0 through the full lifetime of the vehicle. Fuel costs are estimated using vehicle fuel consumption rates from the Producer Module, projections of fuel prices from the analysis context, the user-specified VMT schedules, and the user-specified vehicle reregistration schedules. The resulting portion of fuel costs considered by consumers is added to the candidate vehicle prices from the Producer Module to produce a net vehicle price, which is then used in conjunction with the elasticity of demand to estimate the change in vehicle sales. This example analysis assumes that consumers consider 5 years of fuel costs in the vehicle purchase decision.
 
 **Sales shares**
 
 The new vehicles sold are categorized into the user-definable market classes using estimates of sales shares. As mentioned above, those market classes can be nonresponsive or responsive to the policy being analyzed. Nonresponsive vehicle shares do not change with updated candidate vehicle sets or across policy alternatives. Though not responsive to endogenous inputs, the nonresponsive sales shares do not have to be constant. For example, they may be provided as a set of values for different points in time if the shares are expected to change exogenously over time. In addition, users can define sales shares to explicitly consider consumer heterogeneity by defining separate sales share estimates for different consumer groups. For example, sales share responses can differ between rural and urban consumers. If users identify heterogenous consumer groups with separate sales share responses, the analysis context must include the appropriate inputs. For example, the proportion of the vehicle buying population in urban and rural areas for each year being analyzed within the model.
 
-.. admonition:: Demo example: Nonresponsive market share estimates
+.. admonition:: Example: Nonresponsive market share estimates
 
-    Within the demo analysis, the hauling/non-hauling market classes are nonresponsive. The sales shares for these classes are defined using exogenous inputs from the analysis context. The shares change over time as relative projections of hauling and non-hauling vehicles change over time. However, within a given analysis context, the shares do not change across the no-action and action alternatives defined in the Batch Input File.
+    Within the example analysis, the hauling/non-hauling market classes are nonresponsive. The sales shares for these classes are defined using exogenous inputs from the analysis context. The shares change over time as relative projections of hauling and non-hauling vehicles change over time. However, within a given analysis context, the shares do not change across the no-action and action alternatives defined in the Batch Input File.
 
 For responsive market classes, users can define how market shares are responsive to attributes of candidate vehicle sets fed in from the Producer Module, for example vehicle price. In addition, the inputs used to estimate shares must be available within the set of candidate vehicles and their attributes, or as part of the analysis context.
 
-.. admonition:: Demo example: Responsive market share estimates
+.. admonition:: Example: Responsive market share estimates
 
-    The demo analysis defines BEV and ICE market classes as responsive to the action alternatives being analyzed. The method used to estimate BEV shares is based on an S-shaped curve, estimated using the logit curve functional form. Logit curves have been used to estimate technology adoption over time in peer reviewed literature as far back as 1957, and are still widely used today, including in estimating adoption of electric vehicle technologies. Technology adoption in a logit curve is modeled as a period of low adoption, followed by a period of rapid adoption, and then a period where the rate of adoption slows. This can be thought of as analogous to the "early adopter", "mainstream adopter" and "laggard" framework in technology adoption literature. The logit curve equation in the demo analysis estimates the share of BEVs demanded by consumers, accounting for how quickly (or slowly) new technology is phased into public acceptance, as well as how responsive consumers are to the candidate vehicle prices input from the Producer Module. The basic logit equation is:
+    The example analysis defines BEV and ICE market classes as responsive to the action alternatives being analyzed. The method used to estimate BEV shares is based on an S-shaped curve, estimated using the logit curve functional form. Logit curves have been used to estimate technology adoption over time in peer reviewed literature as far back as 1957, and are still widely used today, including in estimating adoption of electric vehicle technologies. Technology adoption in a logit curve is modeled as a period of low adoption, followed by a period of rapid adoption, and then a period where the rate of adoption slows. This can be thought of as analogous to the "early adopter", "mainstream adopter" and "laggard" framework in technology adoption literature. The logit curve equation in this example analysis estimates the share of BEVs demanded by consumers, accounting for how quickly (or slowly) new technology is phased into public acceptance, as well as how responsive consumers are to the candidate vehicle prices input from the Producer Module. The basic logit equation is:
 
     .. Math::
        :label: logit_curve
@@ -597,7 +597,7 @@ For responsive market classes, users can define how market shares are responsive
     * :math:`p_{i}` is the generalized cost of each vehicle in market class *i*
     * :math:`\gamma` represents how sensitive the model is to price.
 
-   The table below shows a subset of input parameters used to estimate sales shares in the demo analysis for Context A. Context B uses the same parameters with slightly different values. The full list of parameter values used in the demo analysis for each context can be found in the demo inputs for the contexts in the file 'sales_share_params-cntxt_*.csv', where * is either a or b.
+   The table below shows a subset of input parameters used to estimate sales shares in this example analysis for Context A. Context B uses the same parameters with slightly different values.
 
     .. _al_label_table_sales_share_parameter_inputs:
     .. csv-table:: Example of Sales Share Parameters in 'sales_share_params.csv'
@@ -615,13 +615,13 @@ For responsive market classes, users can define how market shares are responsive
         non_hauling.BEV,2031,12000,5,5,0.55,0.1,1600,1.58,-8
 
 
-If the user retains the demo analysis method of determining responsive BEV shares (using a logit curve as described above), the parameters representing the speed of acceptance, :math:`\alpha_{i}`, and price responsiveness, :math:`\gamma`, are factors the user can modify in the sales share submodule inputs (see :any:`sales share inputs <omega_model.consumer.sales_share_ice_bev_phev_body_style>`)
+If the user retains the method of determining responsive BEV shares (using a logit curve as described above), the parameters representing the speed of acceptance, :math:`\alpha_{i}`, and price responsiveness, :math:`\gamma`, are factors the user can modify in the sales share submodule inputs (see :any:`sales share inputs <omega_model.consumer.sales_share_ice_bev_phev_body_style>`)
 
 In addition, the user must specify the price used in the logit equation. This price should include factors the user estimates are significant in determining relative market shares; cost factors can be monetary, such as capital and maintenance costs, or non-monetary, such as time. In addition, price estimation needs to be consistent with the speed of acceptance and price responsiveness parameters.
 
-.. admonition:: Demo example: BEV share parameters
+.. admonition:: Example: BEV share parameters
 
-    The share weight and price sensitivity parameters in the demo analysis are currently informed by the inputs and assumptions used in the market share logit equation in the passenger transportation section of GCAM-USA (documentation and information on how to download GCAM-ISA can be found at https://jgcri.github.io/gcam-doc/gcam-usa.html ) In addition, the price used in estimating BEV shares is the consumer generalized cost used by the GCAM-USA share weight estimation method. The consumer generalized cost estimation from GCAM includes capital costs (including candidate vehicle prices fed in from the Producer Module, and the cost of a home charger), fuel costs, maintenance costs, and parameter values for amortization period and discount rate. The amortization period and discount rate, like most of the user-definable submodule, can be defined by a user. In the demo analysis, they are set at 10 years and 10%. These parameters are used to estimate an annualized vehicle cost. That annualized cost is then divided by a user defined annual vehicle mileage to convert the value to dollars per mile. Note that fuel costs are also included in GCAM’s generalized costs as $/mi, and are not discounted.
+    The share weight and price sensitivity parameters in this example analysis are currently informed by the inputs and assumptions used in the market share logit equation in the passenger transportation section of GCAM-USA (documentation and information on how to download GCAM-ISA can be found at https://jgcri.github.io/gcam-doc/gcam-usa.html ) In addition, the price used in estimating BEV shares is the consumer generalized cost used by the GCAM-USA share weight estimation method. The consumer generalized cost estimation from GCAM includes capital costs (including candidate vehicle prices fed in from the Producer Module, and the cost of a home charger), fuel costs, maintenance costs, and parameter values for amortization period and discount rate. The amortization period and discount rate, like most of the user-definable submodule, can be defined by a user. In this example, they are set at 10 years and 10%. These parameters are used to estimate an annualized vehicle cost. That annualized cost is then divided by a user defined annual vehicle mileage to convert the value to dollars per mile. Note that fuel costs are also included in GCAM’s generalized costs as $/mi, and are not discounted.
 
 
 Phase 2: Vehicle Stock and Use
@@ -640,17 +640,17 @@ If convergence with respect to the sales and shares of new vehicles is achieved,
 
 The method of estimating the reregistered fleet is in a user-definable used vehicle reregistration submodule. This method can make use of a static schedule, for example, where a vehicle's age is the only determinant of the proportion of vehicles remaining in the fleet over time, or depend on other vehicle attributes, like cumulative VMT. If users modify the reregistration submodule to follow a different prescribed static rate, or to allow interdependencies between the rate of reregistration and other vehicle attributes, they need to retain consistency between the reregistration submodule and other submodules, for example the submodules estimating new vehicle sales and total VMT.
 
-.. admonition:: Demo example: Vehicle stock estimates
+.. admonition:: Example: Vehicle stock estimates
 
-    In the demo analysis, the analysis start year stock of vehicles comes from the analysis context, and reregistration is estimated using fixed schedules based on vehicle age. For every calendar year, a specified proportion of vehicles in each model year is assumed to be reregistered for use in the following calendar year. In this fixed schedule, the proportion of vehicles of a given model year remaining in the registered stock (i.e. the survival rate) falls as the vehicles age. For example, in 2030, the proportion of the original MY 2025 vehicles remaining is larger than the proportion of MY 2015 vehicles remaining.
+    In this example analysis, the analysis start year stock of vehicles comes from the analysis context, and reregistration is estimated using fixed schedules based on vehicle age. For every calendar year, a specified proportion of vehicles in each model year is assumed to be reregistered for use in the following calendar year. In this fixed schedule, the proportion of vehicles of a given model year remaining in the registered stock (i.e. the survival rate) falls as the vehicles age. For example, in 2030, the proportion of the original MY 2025 vehicles remaining is larger than the proportion of MY 2015 vehicles remaining.
 
 **Vehicle use**
 
 Vehicle use is estimated as the vehicle miles traveled for each vehicle in the stock for the analysis year. This can be thought of as a measure of consumer demand for mobility. The method of estimating total VMT for the stock of vehicles is in a user-definable new and used vehicle use submodule. VMT can be estimated simply as a function of vehicle age, or may be a function of age, market class, analysis context inputs or more. Use could also include estimates of rebound driving. Rebound driving is estimated as the additional VMT consumers might drive as a function of reduced cost of driving.
 
-.. admonition:: Demo example: VMT estimates
+.. admonition:: Example: VMT estimates
 
-    In the demo analysis, total VMT demanded is an input from the analysis context and is constant across policy alternatives. Total VMT demanded is combined with the initial stock of vehicles and their attributes from the analysis context to determine the proportion of VMT attributed to cohorts of vehicles separated by age and market class. For each calendar year, the total VMT projected in the analysis context is allocated across the internally estimated stock of vehicles using this fixed relationship. This method allows VMT per vehicle to change with the total stock of vehicles, while assuming that consumer demand for mobility is not affected by the action alternatives under consideration. The demo analysis does not currently implement VMT rebound estimations.
+    In this example analysis, total VMT demanded is an input from the analysis context and is constant across policy alternatives. Total VMT demanded is combined with the initial stock of vehicles and their attributes from the analysis context to determine the proportion of VMT attributed to cohorts of vehicles separated by age and market class. For each calendar year, the total VMT projected in the analysis context is allocated across the internally estimated stock of vehicles using this fixed relationship. This method allows VMT per vehicle to change with the total stock of vehicles, while assuming that consumer demand for mobility is not affected by the action alternatives under consideration.
 
 
 .. _Iteration and Convergence Algorithms:
@@ -663,9 +663,9 @@ OMEGA finds a solution in each analysis year using iterative search algorithms. 
 
 The iteration process begins with a search for the vehicle design options and market class shares that minimize producer generalized costs and achieve the desired compliance outcome, independent of any feedback from the Consumer Module regarding vehicle demand. In this step, individual compliance options are built up, with each option fully defining the shares of each market class, and the technology package applications on each of the producer’s vehicles. From all these compliance options, up to a pair of points is selected which are closest, above and below, to the strategic GHG target (i.e. Mg CO2e.). If all points are under- or over-target then the point nearest to the target is chosen. The market shares and technologies of the selected point(s) become seed values for the next sub-iteration.  In each successive sub-iteration, the search area becomes narrower while also covering the options with greater resolution. Finally, when a point falls below the convergence tolerance for Mg CO2 credits or the search range has fallen below a minimum tolerance, the closest point is selected as the compliance option for the initial compliance search.
 
-.. admonition:: Demo example: Initial compliance search
+.. admonition:: Example: Initial compliance search
 
-    :numref:`al_label_figure_2025_0_compliance_search` shows the various sub-iterations for the initial compliance search in the demo example for 2025. The left figure shows a number of blue points for the 0th sub-iteration. The two low cost points nearest to 0 Mg CO2e credits form the basis for the search in the next sub-iteration. The right figure show all 15 sub-iterations (0th to 14th), including the points selected in the 0th sub-iteration (blue stars.) Note that the sub-iterations shown by the colored gradient scale have progressively lower costs, and more closely focused around 0 Mg CO2e. The selected compliance option from the initial Producer-Policy compliance search is shown by a single red star.
+    :numref:`al_label_figure_2025_0_compliance_search` shows the various sub-iterations for the initial compliance search in this example for 2025. The left figure shows a number of blue points for the 0th sub-iteration. The two low cost points nearest to 0 Mg CO2e credits form the basis for the search in the next sub-iteration. The right figure show all 15 sub-iterations (0th to 14th), including the points selected in the 0th sub-iteration (blue stars.) Note that the sub-iterations shown by the colored gradient scale have progressively lower costs, and more closely focused around 0 Mg CO2e. The selected compliance option from the initial Producer-Policy compliance search is shown by a single red star.
 
     .. |fig_al_ic_1_a| image:: _static/al_figures/2025_0_producer_compliance_search.png
         :scale: 50%
@@ -695,9 +695,9 @@ The iteration process begins with a search for the vehicle design options and ma
 
 After a purely cost-minimizing option is selected in the initial compliance search, the Producer Module provides the vehicle attributes and prices, at the market class level, for consideration by the Consumer Module. Within a given Producer-Consumer iteration loop, the vehicle design options are fixed. The search for a solution is based on consideration of various market class share and pricing options. Criteria for convergence include 1) the percent change in average total price, and 2) the difference in the producer and consumer market shares. To achieve convergence, both of these metrics must be close to zero, within the specified tolerance.
 
-.. admonition:: Demo example: Consumer-Producer iteration
+.. admonition:: Example: Consumer-Producer iteration
 
-    Within a single Producer-Consumer iteration loop, vehicle designs are fixed, but pricing and market class shares vary. :numref:`al_label_figure_2025_0_initial_producer_consumer_iteration` shows the various components of the first Producer-Consumer iteration loop for 2025 in the demo example (Context A, no action policy alternative.)
+    Within a single Producer-Consumer iteration loop, vehicle designs are fixed, but pricing and market class shares vary. :numref:`al_label_figure_2025_0_initial_producer_consumer_iteration` shows the various components of the first Producer-Consumer iteration loop for 2025 in this example (Context A, no action policy alternative.)
 
     The upper left panel shows the range of producer cross-subsidy price multiplier options.  The full range of multipliers in the 0th sub-iteration are dark blue points, which then narrow in range over eight sub-iterations. The final range of multipliers is shown by the red points.
 
@@ -732,7 +732,7 @@ If the prior round of iterations is unable to find a converged solution, the pro
 
 These iterations are repeated until the market class share and average total price convergence criteria are met, and the compliance search is complete. Alternatively, if the number of Producer-Consumer iterations exceeds the set limit, then the sales and market shares from the last iteration are used. In this case, any deviation from the Producer’s strategic compliance target in that analysis year must be made up for through the use of banked credits. Finally, the produced vehicles are logged for consideration in the Consumer Module’s vehicle stock and use submodules, and in the Effects Module.
 
-.. admonition:: Demo example: First iteration beyond initial Producer-Policy and Producer-Consumer iterations
+.. admonition:: Example: First iteration beyond initial Producer-Policy and Producer-Consumer iterations
 
     :numref:`al_label_figure_2025_1_compliance_search` shows the points considered in the compliance search in the first iteration (2025_1) following the initial iteration(2025_0). Similar to the initial iteration, each point represents a compliance option that is the result of a unique combination of candidate vehicle design choices and market class shares. Note that compared to :numref:`al_label_figure_2025_0_compliance_search`, the points in :numref:`al_label_figure_2025_1_compliance_search` are more sparse since the market shares in this iteration have been constrained to the shares selected in the prior Producer-Consumer iteration.
 
