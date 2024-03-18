@@ -44,7 +44,7 @@ The inputs and assumptions are categorized according to whether they define the 
 
 A list of the input files with links to full descriptions can be found in :any:`Chapter 5<5_user_guide>`.
 
-The primary outputs are the environmental effects, societal costs and benefits, and producer compliance status for a set of policy alternatives within a given analysis context. These outputs are expressed in absolute values, so that incremental effects, costs, and benefits can be evaluated by comparing two policy alternatives for a given analysis context. For example, comparing a No Action scenario to an Action (or Policy) Alternative. Those same policy alternatives can also be compared using other analysis context inputs to evaluate the sensitivity of results to uncertainty in particular assumptions. For example, comparing the incremental effects of a new policy in high fuel price and low fuel price analysis contexts.
+The primary outputs are producer compliance status, vehicles produced, and the costs and physical effects for a set of policy alternatives within a given analysis context. These outputs are expressed in absolute values, so that incremental effects, costs, and benefits can be evaluated by comparing two policy alternatives for a given analysis context. For example, comparing a No Action scenario to an Action (or Policy) Alternative. Those same policy alternatives can also be compared using other analysis context inputs to evaluate the sensitivity of results to uncertainty in particular assumptions. For example, comparing the incremental effects of a new policy in high fuel price and low fuel price analysis contexts.
 
 Model Structure and Key Modules
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
