@@ -283,7 +283,7 @@ Running the OMEGA Effects Executable
 
 6)	Place the associated “effects_inputs” folder and its contents in your preferred location on your local machine. This folder is available on request to omega_support@epa.gov.
 
-7)	In the effects_inputs folder, find 2 batch settings files: one for light-duty (batch_settings_effects_ld.csv) and one for medium-duty (batch_settings_effects_md.csv).
+7)	In the effects_inputs folder, find the batch settings files.
 
 8)	In cell C3 of the batch settings file, enter a run ID if desired (e.g., NPRM, test, etc.). This run ID will be included as part of the output folder name. The default value is omega_effects.
 
