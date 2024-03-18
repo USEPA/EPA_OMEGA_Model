@@ -35,7 +35,7 @@ After downloading the source code (via ``.zip`` file or cloning the repository),
 
     Earlier versions will work, but 3.11+ has a faster Cython engine for all platforms, and runs natively on Mx ARM macs as well.  Newer versions may also work but have not been tested at the time of this writing.
 
-    To use parallel processing via dispy (4.15.2) with 3.11+ a `patch <https://github.com/pgiri/dispy/commit/5e136eec3fc1625b7239cc15f67f6a642f906a1f>`_ is required in the dispy ``__init__.py``, otherwise stick with Python 3.10.
+    To use parallel processing via ``dispy (4.15.2)`` with 3.11+ a `patch <https://github.com/pgiri/dispy/commit/5e136eec3fc1625b7239cc15f67f6a642f906a1f>`_ is required in the dispy ``__init__.py``, otherwise stick with Python 3.10.  Subsequent versions of ``dispy`` should not require the patch when they become available.
 
 Python
 ++++++
@@ -70,7 +70,7 @@ There are at least four common ways to run OMEGA:
     1) from the executable GUI (see :any:`2_getting_started` and :any:`3_running_and_understanding_the_demo`)
     2) from source at the command line as a single (default) session via :any:`omega_model.omega`
     3) from source at the command line as a GUI via :any:`omega_gui.omega_gui`
-    4) from source at the command line as a batch via :any:`omega_model.omega_batch` (See also `Omega Batch Command Line Interface <5_user_guide.html#omega-batch-cli>`__)
+    4) from source at the command line as a batch via :any:`omega_model.omega_batch` (See also `OMEGA Batch Command Line Interface <index.html#omega-batch-cli>`__)
 
 ----
 
@@ -123,4 +123,4 @@ The primary use case for running ``omega.py`` directly is just to confirm the in
 
 ----
 
-**For all other development use cases it is recommended to run** ``omega_batch.py`` **as shown in the** :any:`User Guide <5_user_guide>` **under** `Omega Batch Command Line Interface <5_user_guide.html#omega-batch-cli>`__
+**For all other development use cases it is recommended to run** ``omega_batch.py`` **as shown in the** :any:`User Guide <5_user_guide>` **under** `OMEGA Batch Command Line Interface <index.html#omega-batch-cli>`__
