@@ -10,7 +10,7 @@ The OMEGA model is written in the open source Python programming language. The m
 
 Downloading OMEGA
 ^^^^^^^^^^^^^^^^^
-Releases of the OMEGA model executable will be available as single ``.zip`` files at:
+Releases of the OMEGA model executable are be available at:
 
   *  https://www.epa.gov/regulations-emissions-vehicles-and-engines/optimization-model-reducing-emissions-greenhouse-gases
 
