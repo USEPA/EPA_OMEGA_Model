@@ -14,5 +14,4 @@ OMEGA Documentation
     5_user_guide
     6_developer_guide
     7_code_details
-    8_glossary
-    9_distribution_and_support_policy
+    8_distribution_and_support_policy
