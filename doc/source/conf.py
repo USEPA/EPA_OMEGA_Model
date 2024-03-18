@@ -39,7 +39,8 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.autosummary',
     'sphinx.ext.viewcode',
-    'sphinx.ext.todo'
+    'sphinx.ext.todo',
+    'sphinx.ext.imgmath'
 ]
 
 autodoc_default_options = {
