@@ -63,8 +63,8 @@ Simulation Context
     The context inputs apply to all sessions within a batch.  Multiple batch files must be defined to run multiple contexts.
 
 Simulation Sessions
-    The Reference Session
-        The batch file must define at least one simulation session, known as the reference session, which is the left-most session in the batch definition file.  The reference session should align with the provided context inputs.  For example, if the context fuel price and new vehicle market data are from AEO, then the policy inputs of the reference session must be consistent with the assumptions used by AEO to generate the projections.  For example, the sales projections take into account ghg and fuel economy policies in force or projected at the time and the policy inputs used for the reference session should be consistent with those.  It would be inconsistent to assume the same sales for a different ghg/fuel economy policy.
+    The Context Session
+        The batch file must define at least one simulation session, known as the context session, which is the left-most session in the batch definition file.  The context session should align with the provided context inputs.  For example, if the context fuel price and new vehicle market data are from AEO, then the policy inputs of the reference session must be consistent with the assumptions used by AEO to generate the projections.  For example, the sales projections take into account ghg and fuel economy policies in force or projected at the time and the policy inputs used for the context session should be consistent with those.  It would be inconsistent to assume the same sales for a different ghg/fuel economy policy.
     Policy Alternative Sessions
         Optionally, one or more alternative policy sessions may be defined in subsequent columns. Typically these would be various policies under evaluation via OMEGA or perhaps a single policy with various alternative inputs or assumptions.
 
