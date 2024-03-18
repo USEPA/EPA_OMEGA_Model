@@ -27,5 +27,5 @@ Please refer to the :ref:`graphical_user_interface_label` documentation for a st
 
 Viewing the Results
 ^^^^^^^^^^^^^^^^^^^
-After OMEGA model runs have completed, the results generated for each session are available in the associated ``out`` folder in .csv and .png file formats.
+After OMEGA model runs have completed, the results generated for each session are available in the associated ``out`` folder in ``.csv`` and ``.png`` file formats.
 
