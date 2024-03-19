@@ -375,3 +375,7 @@ The session log file contains console output and may provide useful information 
 .. attention::
 
     A two-pass session will have results similar to the above example, but on a per-manufacturer basis with a commensurately larger number of outputs.
+
+.. attention::
+
+    Running OMEGA from the GUI executable is by far the slowest way to run the model since it runs single-threaded.  For large or complex runs, it's recommended to run from the source code to take advantage of multiprocessing. See :any:`Chapter 6<6_developer_guide>` for more details.
