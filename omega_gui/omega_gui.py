@@ -560,7 +560,7 @@ class Form(QObject):
         :return:
         """
 
-        doc_link = 'https://omega2.readthedocs.io/en/2.3.0'
+        doc_link = 'https://omega2.readthedocs.io/en/2.5.0'
 
         if sys.platform.startswith('win'):
             os.system("start \"\" %s" % doc_link)

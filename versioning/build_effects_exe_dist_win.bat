@@ -5,7 +5,7 @@ cd ..
 REM build executable
 
 pyinstaller omega_effects/omega_effects_main.py ^
-  --name OMEGA-effects-2.3.0-win.exe ^
+  --name OMEGA-effects-2.5.0-win.exe ^
   --paths omega_effects ^
   --add-data "./*.txt;./" ^
   --add-data "./omega_effects/*.py;./omega_effects/" ^

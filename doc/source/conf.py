@@ -27,7 +27,7 @@ copyright = '%s, US EPA' % datetime.datetime.now().strftime('%Y')
 author = 'US EPA'
 
 # The full version, including alpha/beta/rc tags
-release = '2.3.0'
+release = '2.5.0'
 
 
 # -- General configuration ---------------------------------------------------
