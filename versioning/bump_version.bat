@@ -1,4 +1,4 @@
-REM bump_version [major|minor|patch]
+REM bump_version [major|minor|patch] or bump_version --new-version VERSION
 
 REM auto-commit any changes otherwise bumpversion will fail if there are outstanding commits:
 REM git commit -m "commit before version bump" --all
