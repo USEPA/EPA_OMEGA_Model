@@ -1,0 +1,5 @@
+input_template_name:,onroad-fuels,input_template_version:,0.1,,
+fuel_id,start_year,unit,direct_co2e_grams_per_unit,refuel_efficiency,transmission_efficiency
+pump gasoline,2020,gallon,8887,1,1
+pump diesel,2020,gallon,10180,1,1
+US electricity,2020,kWh,0,0.9,0.935

@@ -1,0 +1,342 @@
+input_template_name:,context.powertrain_cost_frm,input_template_version:,0.21,description:,"20231127 new gpf cost; 20231101 includes ANL battery cost curves, battery learning for 2036+ set to 1.5pct; and adds EPA-NHTSA agreed NMC_share",,,,,
+powertrain_type,powertrain_subtype,system,subsystem,drive_system,engine_configuration,body_style,value,dollar_basis,Formula Notes,Notes
+BEV,-,Drive_Unit,E_Motor,FWD,-,-,(1.1097*KW_DU + 323.22) * MARKUP_BEV,2022,,FEV motor_single for RDU or DU; induction_motor_dual for FDU
+BEV,-,Drive_Unit,E_Motor,RWD,-,-,(1.1097*KW_DU + 323.22) * MARKUP_BEV,2022,,FEV motor_single for RDU or DU; induction_motor_dual for FDU
+BEV,-,Drive_Unit,E_Motor,AWD,-,-,((0.77*KW_FDU+225.33) + (1.1097*KW_RDU + 323.22)) * MARKUP_BEV,2022,,FEV motor_single for RDU or DU; induction_motor_dual for FDU
+BEV,-,KW_RDU_share,E_Motor,-,-,-,(0.65) * 1,,,EPA; share to rear drive motor vs front drive motor in AWD
+BEV,-,Drive_Unit,Inverter,FWD,-,-,(1.26 * KW_DU + 559) * MARKUP_BEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+BEV,-,Drive_Unit,Inverter,RWD,-,-,(1.26 * KW_DU + 559) * MARKUP_BEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+BEV,-,Drive_Unit,Inverter,AWD,-,-,((1.26 * KW_FDU + 559) + (1.26 * KW_RDU + 559)) * MARKUP_BEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+BEV,-,Drive_Unit,Gearbox,FWD,-,pickup,544.28 * MARKUP_BEV,2022,,FEV single_speed_gearbox_dual
+BEV,-,Drive_Unit,Gearbox,FWD,-,sedan,281.00 * MARKUP_BEV,2022,,FEV single_speed_gearbox_dual
+BEV,-,Drive_Unit,Gearbox,FWD,-,cuv_suv,339.37 * MARKUP_BEV,2022,,FEV single_speed_gearbox_dual
+BEV,-,Drive_Unit,Gearbox,RWD,-,pickup,544.28 * MARKUP_BEV,2022,,FEV single_speed_gearbox_dual
+BEV,-,Drive_Unit,Gearbox,RWD,-,sedan,281.00 * MARKUP_BEV,2022,,FEV single_speed_gearbox_dual
+BEV,-,Drive_Unit,Gearbox,RWD,-,cuv_suv,339.37 * MARKUP_BEV,2022,,FEV single_speed_gearbox_dual
+BEV,-,Drive_Unit,Gearbox,AWD,-,pickup,2 * 544.28 * MARKUP_BEV,2022,,FEV single_speed_gearbox_dual; 2 for AWD
+BEV,-,Drive_Unit,Gearbox,AWD,-,sedan,2 * 281.00 * MARKUP_BEV,2022,,FEV single_speed_gearbox_dual; 2 for AWD
+BEV,-,Drive_Unit,Gearbox,AWD,-,cuv_suv,2 * 339.37 * MARKUP_BEV,2022,,FEV single_speed_gearbox_dual; 2 for AWD
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,FWD,-,pickup,274.32 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,FWD,-,sedan,248.87 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,FWD,-,cuv_suv,244.87 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,RWD,-,pickup,274.32 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,RWD,-,sedan,248.87 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,RWD,-,cuv_suv,244.87 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,AWD,-,pickup,363.16 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,AWD,-,sedan,337.21 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,AWD,-,cuv_suv,333.71 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,FWD,-,pickup,110.42 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,FWD,-,sedan,101.62 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,FWD,-,cuv_suv,100.44 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,RWD,-,pickup,110.42 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,RWD,-,sedan,101.62 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,RWD,-,cuv_suv,100.44 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,AWD,-,pickup,157.75 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,AWD,-,sedan,143.48 * MARKUP_BEV,2022,,FEV
+BEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,AWD,-,cuv_suv,145.17 * MARKUP_BEV,2022,,FEV
+BEV,-,Electrical_Power_Supply,DC_DC_Converter + OBC,-,-,-,57 * KW_OBC * MARKUP_BEV,2022,,FEV
+BEV,-,Electrical_Power_Supply,External_Battery_Charge_Device,-,-,-,111 * MARKUP_BEV,2022,,FEV
+BEV,-,Driveline,LV_Battery_Less_Than_Equalto_48V,-,-,-,60 * MARKUP_ICE,2022,,FEV
+BEV,-,Thermal,Coolant_Circuit_Cooling_Heating,FWD,-,pickup,632.33 * MARKUP_BEV,2022,,FEV
+BEV,-,Thermal,Coolant_Circuit_Cooling_Heating,FWD,-,sedan,383.54 * MARKUP_BEV,2022,,FEV
+BEV,-,Thermal,Coolant_Circuit_Cooling_Heating,FWD,-,cuv_suv,413.13 * MARKUP_BEV,2022,,FEV
+BEV,-,Thermal,Coolant_Circuit_Cooling_Heating,RWD,-,pickup,632.33 * MARKUP_BEV,2022,,FEV
+BEV,-,Thermal,Coolant_Circuit_Cooling_Heating,RWD,-,sedan,383.54 * MARKUP_BEV,2022,,FEV
+BEV,-,Thermal,Coolant_Circuit_Cooling_Heating,RWD,-,cuv_suv,413.13 * MARKUP_BEV,2022,,FEV
+BEV,-,Thermal,Coolant_Circuit_Cooling_Heating,AWD,-,pickup,709.81 * MARKUP_BEV,2022,,FEV
+BEV,-,Thermal,Coolant_Circuit_Cooling_Heating,AWD,-,sedan,456.71 * MARKUP_BEV,2022,,FEV
+BEV,-,Thermal,Coolant_Circuit_Cooling_Heating,AWD,-,cuv_suv,602.00 * MARKUP_BEV,2022,,FEV
+BEV,-,Thermal,HVAC,-,-,-,551.79 * MARKUP_BEV,2022,,Glider structural and non-structual
+HEV,P2,Drive_Unit,Inverter,FWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,P2,Drive_Unit,Inverter,RWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,P2,Drive_Unit,Inverter,AWD,-,-,((1.26 * KW_P2 + 559) + (1.26 * KW_P4 + 559)) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal; 1 inverter per motor
+HEV,PS,Drive_Unit,Inverter,FWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,PS,Drive_Unit,Inverter,RWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,PS,Drive_Unit,Inverter,AWD,-,-,((1.26 * KW_P2 + 559) + (1.26 * KW_P4 + 559)) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal; 1 inverter per motor
+HEV,P2,Drive_Unit,Gearbox,AWD,-,sedan,281 * MARKUP_HEV,2022,,FEV single_speed_gearbox_dual
+HEV,P2,Drive_Unit,Gearbox,AWD,-,cuv_suv,339.37 * MARKUP_HEV,2022,,FEV single_speed_gearbox_dual
+HEV,P2,Drive_Unit,Gearbox,AWD,-,pickup,544.28 * MARKUP_HEV,2022,,FEV single_speed_gearbox_dual
+HEV,PS,Drive_Unit,Gearbox,AWD,-,sedan,281 * MARKUP_HEV,2022,,FEV single_speed_gearbox_dual
+HEV,PS,Drive_Unit,Gearbox,AWD,-,cuv_suv,339.37 * MARKUP_HEV,2022,,FEV single_speed_gearbox_dual
+HEV,PS,Drive_Unit,Gearbox,AWD,-,pickup,544.28 * MARKUP_HEV,2022,,FEV single_speed_gearbox_dual
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,FWD,-,pickup,81.09 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,FWD,-,sedan,67.58 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,FWD,-,cuv_suv,67.58 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,RWD,-,pickup,81.09 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,RWD,-,sedan,67.58 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,RWD,-,cuv_suv,67.58 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,AWD,-,pickup,81.09 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,AWD,-,sedan,67.58 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,AWD,-,cuv_suv,67.58 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,FWD,-,pickup,60.31 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,FWD,-,sedan,50.26 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,FWD,-,cuv_suv,50.26 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,RWD,-,pickup,60.31 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,RWD,-,sedan,50.26 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,RWD,-,cuv_suv,50.26 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,AWD,-,pickup,60.31 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,AWD,-,sedan,50.26 * MARKUP_HEV,2022,,FEV
+HEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,AWD,-,cuv_suv,50.26 * MARKUP_HEV,2022,,FEV
+HEV,-,Electrical_Power_Supply,DC_DC_Converter,-,-,-,250 * MARKUP_HEV,2022,,FEV
+HEV,-,Driveline,LV_Battery_Less_Than_Equalto_48V,-,-,-,60 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,deac_fc,-,I,pickup,169 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,deac_fc,-,V,pickup,221 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,deac_fc,-,I,sedan,169 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,deac_fc,-,V,sedan,221 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,deac_fc,-,I,cuv_suv,169 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,deac_fc,-,V,cuv_suv,221 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,DI,-,I,pickup,212 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,DI,-,V,pickup,319 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,DI,-,I,sedan,212 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,DI,-,V,sedan,319 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,DI,-,I,cuv_suv,212 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,DI,-,V,cuv_suv,319 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,EGR,-,-,pickup,100 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,EGR,-,-,sedan,100 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,EGR,-,-,cuv_suv,100 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,ALL,-,I,pickup,(324.71*LITERS + 632.34) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+HEV,-,Engine,ALL,-,I,sedan,(324.71*LITERS + 632.34) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+HEV,-,Engine,ALL,-,I,cuv_suv,(324.71*LITERS + 632.34) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+HEV,-,Engine,Turbo Charger,-,I,pickup,429 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,Turbo Charger,-,V,pickup,756 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,Turbo Charger,-,I,sedan,429 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,Turbo Charger,-,V,sedan,756 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,Turbo Charger,-,I,cuv_suv,429 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,Turbo Charger,-,V,cuv_suv,756 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,ALL,-,V,pickup,(246.87*LITERS + 1125.2) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+HEV,-,Engine,ALL,-,V,sedan,(246.87*LITERS + 1125.2) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+HEV,-,Engine,ALL,-,V,cuv_suv,(246.87*LITERS + 1125.2) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+HEV,-,Engine,VVT,-,I,pickup,100 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,VVT,-,V,pickup,200 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,VVT,-,I,sedan,100 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,VVT,-,V,sedan,200 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,VVT,-,I,cuv_suv,100 * MARKUP_ICE,2022,,FEV
+HEV,-,Engine,VVT,-,V,cuv_suv,200 * MARKUP_ICE,2022,,FEV
+HEV,-,Exhaust,Non-EAS,-,I,pickup,250 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+HEV,-,Exhaust,Non-EAS,-,V,pickup,350 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+HEV,-,Exhaust,Non-EAS,-,I,sedan,250 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+HEV,-,Exhaust,Non-EAS,-,V,sedan,350 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+HEV,-,Exhaust,Non-EAS,-,I,cuv_suv,250 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+HEV,-,Exhaust,Non-EAS,-,V,cuv_suv,350 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+HEV,-,Fuel,Storage,-,-,pickup,571.45 * MARKUP_ICE,2022,,FEV
+HEV,-,Fuel,Storage,-,-,sedan,467.55 * MARKUP_ICE,2022,,FEV
+HEV,-,Fuel,Storage,-,-,cuv_suv,519.5 * MARKUP_ICE,2022,,FEV
+HEV,-,Thermal,Coolant_Circuit_Cooling_Heating,-,I,pickup,519.13 * MARKUP_HEV,2022,,FEV
+HEV,-,Thermal,Coolant_Circuit_Cooling_Heating,-,I,sedan,493.78 * MARKUP_HEV,2022,,FEV
+HEV,-,Thermal,Coolant_Circuit_Cooling_Heating,-,I,cuv_suv,493.78 * MARKUP_HEV,2022,,FEV
+HEV,-,Thermal,Coolant_Circuit_Cooling_Heating,-,V,pickup,559.63 * MARKUP_HEV,2022,,FEV
+HEV,-,Thermal,Coolant_Circuit_Cooling_Heating,-,V,sedan,531.19 * MARKUP_HEV,2022,,FEV
+HEV,-,Thermal,Coolant_Circuit_Cooling_Heating,-,V,cuv_suv,531.19 * MARKUP_HEV,2022,,FEV
+HEV,-,Thermal,HVAC,-,-,-,472.76 * MARKUP_HEV,2022,,Glider structural and non-structual
+HEV,P2,Transmission,AT,FWD,-,-,(140.11 * GEARS + 1.73 * KW_P2 + 178) * MARKUP_HEV,2022,,FEV HAT cost
+HEV,P2,Transmission,AT,RWD,-,-,(140.11 * GEARS + 1.73 * KW_P2 + 178) * MARKUP_HEV,2022,,FEV HAT cost
+HEV,P2,Transmission,AT,AWD,-,-,(140.11 * GEARS + 1.73 * KW_P2 + 178 + 1.1097 * KW_P4 + 323) * MARKUP_HEV,2022,,FEV HAT cost plus FEV BEV DU e-motor cost for P4
+HEV,PS,Transmission,eCVT,FWD,-,-,1587.77 * MARKUP_HEV,2022,,"FEV E-CVT includes geartrain, e-motor"
+HEV,PS,Transmission,eCVT,RWD,-,-,1587.77 * MARKUP_HEV,2022,,"FEV E-CVT includes geartrain, e-motor"
+HEV,PS,Transmission,eCVT,AWD,-,-,(1587.77 + 1.1097 * KW_P4 + 323) * MARKUP_HEV,2022,,"FEV E-CVT includes geartrain, e-motor plus FEV BEV DU e-motor cost for P4 on AWD"
+HEV,-,KW_P2_share,E_Motor,-,-,-,(0.5) * 1,,,EPA; share to P2 motor vs P4 motor in AWD
+ICE,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,FWD,-,pickup,60.31 * MARKUP_ICE,2022,,FEV
+ICE,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,FWD,-,sedan,50.26 * MARKUP_ICE,2022,,FEV
+ICE,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,FWD,-,cuv_suv,50.26 * MARKUP_ICE,2022,,FEV
+ICE,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,RWD,-,pickup,60.31 * MARKUP_ICE,2022,,FEV
+ICE,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,RWD,-,sedan,50.26 * MARKUP_ICE,2022,,FEV
+ICE,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,RWD,-,cuv_suv,50.26 * MARKUP_ICE,2022,,FEV
+ICE,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,AWD,-,pickup,60.31 * MARKUP_ICE,2022,,FEV
+ICE,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,AWD,-,sedan,50.26 * MARKUP_ICE,2022,,FEV
+ICE,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,AWD,-,cuv_suv,50.26 * MARKUP_ICE,2022,,FEV
+ICE,-,Driveline,LV_Battery_Less_Than_Equalto_48V,-,-,-,60 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,deac_fc,-,I,pickup,169 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,deac_fc,-,V,pickup,221 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,deac_fc,-,I,sedan,169 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,deac_fc,-,V,sedan,221 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,deac_fc,-,I,cuv_suv,169 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,deac_fc,-,V,cuv_suv,221 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,DI,-,I,pickup,212 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,DI,-,V,pickup,319 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,DI,-,I,sedan,212 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,DI,-,V,sedan,319 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,DI,-,I,cuv_suv,212 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,DI,-,V,cuv_suv,319 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,EGR,-,-,pickup,100 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,EGR,-,-,sedan,100 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,EGR,-,-,cuv_suv,100 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,ALL,-,I,pickup,(324.71*LITERS + 680) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+ICE,-,Engine,ALL,-,I,sedan,(324.71*LITERS + 680) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+ICE,-,Engine,ALL,-,I,cuv_suv,(324.71*LITERS + 680) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+ICE,-,Engine,Turbo Charger,-,I,pickup,429 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,Turbo Charger,-,V,pickup,756 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,Turbo Charger,-,I,sedan,429 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,Turbo Charger,-,V,sedan,756 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,Turbo Charger,-,I,cuv_suv,429 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,Turbo Charger,-,V,cuv_suv,756 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,ALL,-,V,pickup,(246.87*LITERS + 1215) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+ICE,-,Engine,ALL,-,V,sedan,(246.87*LITERS + 1215) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+ICE,-,Engine,ALL,-,V,cuv_suv,(246.87*LITERS + 1215) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+ICE,-,Engine,VVT,-,I,pickup,100 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,VVT,-,V,pickup,200 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,VVT,-,I,sedan,100 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,VVT,-,V,sedan,200 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,VVT,-,I,cuv_suv,100 * MARKUP_ICE,2022,,FEV
+ICE,-,Engine,VVT,-,V,cuv_suv,200 * MARKUP_ICE,2022,,FEV
+ICE,-,Exhaust,Non-EAS,-,I,pickup,250 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+ICE,-,Exhaust,Non-EAS,-,V,pickup,350 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+ICE,-,Exhaust,Non-EAS,-,I,sedan,250 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+ICE,-,Exhaust,Non-EAS,-,V,sedan,350 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+ICE,-,Exhaust,Non-EAS,-,I,cuv_suv,250 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+ICE,-,Exhaust,Non-EAS,-,V,cuv_suv,350 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+ICE,-,Fuel,Storage,-,-,pickup,571.45 * MARKUP_ICE,2022,,FEV
+ICE,-,Fuel,Storage,-,-,sedan,467.55 * MARKUP_ICE,2022,,FEV
+ICE,-,Fuel,Storage,-,-,cuv_suv,519.5 * MARKUP_ICE,2022,,FEV
+ICE,-,Thermal,Coolant_Circuit_Cooling_Heating,-,I,pickup,334.04 * MARKUP_ICE,2022,,FEV
+ICE,-,Thermal,Coolant_Circuit_Cooling_Heating,-,V,pickup,374.53 * MARKUP_ICE,2022,,FEV
+ICE,-,Thermal,Coolant_Circuit_Cooling_Heating,-,I,sedan,308.68 * MARKUP_ICE,2022,,FEV
+ICE,-,Thermal,Coolant_Circuit_Cooling_Heating,-,V,sedan,346.09 * MARKUP_ICE,2022,,FEV
+ICE,-,Thermal,Coolant_Circuit_Cooling_Heating,-,I,cuv_suv,308.68 * MARKUP_ICE,2022,,FEV
+ICE,-,Thermal,Coolant_Circuit_Cooling_Heating,-,V,cuv_suv,346.09 * MARKUP_ICE,2022,,FEV
+ICE,-,Thermal,HVAC,-,-,-,472.76 * MARKUP_ICE,2022,,Glider structural and non-structual
+HEV,P0,Drive_Unit,Inverter,FWD,-,-,(1.26 * KW_P0 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,P0,Drive_Unit,Inverter,RWD,-,-,(1.26 * KW_P0 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,P0,Drive_Unit,Inverter,AWD,-,-,(1.26 * KW_P0 + 559) * MARKUP_HEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+HEV,P0,Drive_Unit,Gearbox,AWD,-,sedan,281 * MARKUP_HEV,2022,,FEV single_speed_gearbox_dual
+HEV,P0,Drive_Unit,Gearbox,AWD,-,cuv_suv,339.37 * MARKUP_HEV,2022,,FEV single_speed_gearbox_dual
+HEV,P0,Drive_Unit,Gearbox,AWD,-,pickup,544.28 * MARKUP_HEV,2022,,FEV single_speed_gearbox_dual
+HEV,P0,Transmission,AT,FWD,-,-,(140.11 * GEARS + 1.73 * KW_P0 + 178) * MARKUP_HEV,2022,,FEV HAT cost
+HEV,P0,Transmission,AT,RWD,-,-,(140.11 * GEARS + 1.73 * KW_P0 + 178) * MARKUP_HEV,2022,,FEV HAT cost
+HEV,P0,Transmission,AT,AWD,-,-,(140.11 * GEARS + 1.73 * KW_P0 + 178) * MARKUP_HEV,2022,,FEV HAT cost
+HEV,-,KW_P0_share,E_Motor,-,-,-,(1.0) * 1,,,EPA; share to P0 motor for all P0 (there is no second motor)
+PHEV,P2,Drive_Unit,Inverter,FWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_PHEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+PHEV,P2,Drive_Unit,Inverter,RWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_PHEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+PHEV,P2,Drive_Unit,Inverter,AWD,-,-,((1.26 * KW_P2 + 559) + (1.26 * KW_P4 + 559)) * MARKUP_PHEV,2022,,FEV inverter_dual and induction_inverter_dual are equal; 1 inverter per motor
+PHEV,PS,Drive_Unit,Inverter,FWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_PHEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+PHEV,PS,Drive_Unit,Inverter,RWD,-,-,(1.26 * KW_P2 + 559) * MARKUP_PHEV,2022,,FEV inverter_dual and induction_inverter_dual are equal
+PHEV,PS,Drive_Unit,Inverter,AWD,-,-,((1.26 * KW_P2 + 559) + (1.26 * KW_P4 + 559)) * MARKUP_PHEV,2022,,FEV inverter_dual and induction_inverter_dual are equal; 1 inverter per motor
+PHEV,P2,Drive_Unit,Gearbox,AWD,-,sedan,281 * MARKUP_PHEV,2022,,FEV single_speed_gearbox_dual
+PHEV,P2,Drive_Unit,Gearbox,AWD,-,cuv_suv,339.37 * MARKUP_PHEV,2022,,FEV single_speed_gearbox_dual
+PHEV,P2,Drive_Unit,Gearbox,AWD,-,pickup,544.28 * MARKUP_PHEV,2022,,FEV single_speed_gearbox_dual
+PHEV,PS,Drive_Unit,Gearbox,AWD,-,sedan,281 * MARKUP_PHEV,2022,,FEV single_speed_gearbox_dual
+PHEV,PS,Drive_Unit,Gearbox,AWD,-,cuv_suv,339.37 * MARKUP_PHEV,2022,,FEV single_speed_gearbox_dual
+PHEV,PS,Drive_Unit,Gearbox,AWD,-,pickup,544.28 * MARKUP_PHEV,2022,,FEV single_speed_gearbox_dual
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,FWD,-,pickup,246.09 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,FWD,-,sedan,205.07 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,FWD,-,cuv_suv,205.07 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,RWD,-,pickup,246.09 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,RWD,-,sedan,205.07 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,RWD,-,cuv_suv,205.07 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,AWD,-,pickup,246.09 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,AWD,-,sedan,205.07 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_High_Voltage_HV,AWD,-,cuv_suv,205.07 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,FWD,-,pickup,172.31 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,FWD,-,sedan,143.59 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,FWD,-,cuv_suv,143.59 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,RWD,-,pickup,172.31 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,RWD,-,sedan,143.59 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,RWD,-,cuv_suv,143.59 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,AWD,-,pickup,172.31 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,AWD,-,sedan,143.59 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Elect._Distribution_and_Electronic_Controls,Harness_Low_Voltage_LV,AWD,-,cuv_suv,143.59 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Electrical_Power_Supply,DC_DC_Converter + OBC,-,-,-,57 * KW_OBC * MARKUP_PHEV,2022,,FEV
+PHEV,-,Electrical_Power_Supply,External_Battery_Charge_Device,-,-,-,111 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Driveline,LV_Battery_Less_Than_Equalto_48V,-,-,-,60 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,deac_fc,-,I,pickup,169 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,deac_fc,-,V,pickup,221 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,deac_fc,-,I,sedan,169 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,deac_fc,-,V,sedan,221 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,deac_fc,-,I,cuv_suv,169 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,deac_fc,-,V,cuv_suv,221 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,DI,-,I,pickup,212 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,DI,-,V,pickup,319 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,DI,-,I,sedan,212 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,DI,-,V,sedan,319 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,DI,-,I,cuv_suv,212 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,DI,-,V,cuv_suv,319 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,EGR,-,-,pickup,100 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,EGR,-,-,sedan,100 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,EGR,-,-,cuv_suv,100 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,ALL,-,I,pickup,(324.71*LITERS + 632.34) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+PHEV,-,Engine,ALL,-,I,sedan,(324.71*LITERS + 632.34) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+PHEV,-,Engine,ALL,-,I,cuv_suv,(324.71*LITERS + 632.34) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+PHEV,-,Engine,Turbo Charger,-,I,pickup,429 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,Turbo Charger,-,V,pickup,756 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,Turbo Charger,-,I,sedan,429 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,Turbo Charger,-,V,sedan,756 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,Turbo Charger,-,I,cuv_suv,429 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,Turbo Charger,-,V,cuv_suv,756 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,ALL,-,V,pickup,(246.87*LITERS + 1125.2) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+PHEV,-,Engine,ALL,-,V,sedan,(246.87*LITERS + 1125.2) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+PHEV,-,Engine,ALL,-,V,cuv_suv,(246.87*LITERS + 1125.2) * MARKUP_ICE,2022,"Base engine includes cost of Cylinder Head Subsystem, PFI Valvetrain Subsystem, Cylinder Block Subsystem, Naturally Aspirated Induction Air Charging Subsystem, Crank Drive Subsystem Accessory Subsystem (Start Motor, Generator, etc.) Engine Management, Engine Electronic, Electrical Subsystem, DI Fuel Induction Subsystem, Lubrication Subsystem Timing Drive Subsystem Air Intake Subsystem, Accessory Drive Subsystem, Breather Subsystem.",FEV
+PHEV,-,Engine,VVT,-,I,pickup,100 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,VVT,-,V,pickup,200 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,VVT,-,I,sedan,100 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,VVT,-,V,sedan,200 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,VVT,-,I,cuv_suv,100 * MARKUP_ICE,2022,,FEV
+PHEV,-,Engine,VVT,-,V,cuv_suv,200 * MARKUP_ICE,2022,,FEV
+PHEV,-,Exhaust,Non-EAS,-,I,pickup,250 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+PHEV,-,Exhaust,Non-EAS,-,V,pickup,350 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+PHEV,-,Exhaust,Non-EAS,-,I,sedan,250 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+PHEV,-,Exhaust,Non-EAS,-,V,sedan,350 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+PHEV,-,Exhaust,Non-EAS,-,I,cuv_suv,250 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+PHEV,-,Exhaust,Non-EAS,-,V,cuv_suv,350 * MARKUP_ICE,2022,email 20230726 from VK at FEV,FEV
+PHEV,-,Fuel,Storage,-,-,pickup,571.45 * MARKUP_ICE,2022,,FEV
+PHEV,-,Fuel,Storage,-,-,sedan,467.55 * MARKUP_ICE,2022,,FEV
+PHEV,-,Fuel,Storage,-,-,cuv_suv,519.5 * MARKUP_ICE,2022,,FEV
+PHEV,-,Thermal,Coolant_Circuit_Cooling_Heating,-,I,pickup,538.5 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Thermal,Coolant_Circuit_Cooling_Heating,-,I,sedan,513.21 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Thermal,Coolant_Circuit_Cooling_Heating,-,I,cuv_suv,513.21 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Thermal,Coolant_Circuit_Cooling_Heating,-,V,pickup,579.07 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Thermal,Coolant_Circuit_Cooling_Heating,-,V,sedan,550.63 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Thermal,Coolant_Circuit_Cooling_Heating,-,V,cuv_suv,550.63 * MARKUP_PHEV,2022,,FEV
+PHEV,-,Thermal,HVAC,-,-,-,(77.6 + 474.19) * MARKUP_PHEV,2022,,Glider structural and non-structual
+PHEV,P2,Transmission,AT,FWD,-,-,(140.11 * GEARS + 1.73 * KW_P2 + 178) * MARKUP_PHEV,2022,,FEV HAT cost
+PHEV,P2,Transmission,AT,RWD,-,-,(140.11 * GEARS + 1.73 * KW_P2 + 178) * MARKUP_PHEV,2022,,FEV HAT cost
+PHEV,P2,Transmission,AT,AWD,-,-,(140.11 * GEARS + 1.73 * KW_P2 + 178 + 1.1097 * KW_P4 + 323) * MARKUP_PHEV,2022,,FEV HAT cost plus FEV BEV DU e-motor cost for P4
+PHEV,PS,Transmission,eCVT,FWD,-,-,1587.77 * MARKUP_PHEV,2022,,"FEV E-CVT includes geartrain, e-motor"
+PHEV,PS,Transmission,eCVT,RWD,-,-,1587.77 * MARKUP_PHEV,2022,,"FEV E-CVT includes geartrain, e-motor"
+PHEV,PS,Transmission,eCVT,AWD,-,-,(1587.77 + 1.1097 * KW_P4 + 323) * MARKUP_PHEV,2022,,"FEV E-CVT includes geartrain, e-motor plus FEV BEV DU e-motor cost for P4 on AWD"
+PHEV,-,KW_P2_share,E_Motor,-,-,-,(0.5) * 1,,,EPA; share to P2 motor vs P4 motor in AWD
+ICE,-,Driveline,start_stop,-,-,-,200 * MARKUP_ICE,2022,,FEV AT+BSG cost less the AT portion; used for ICE with start-stop
+ICE,-,Transmission,AT,FWD,-,-,(140.11 * GEARS + 52.674) * MARKUP_ICE,2022,,FEV AT
+ICE,-,Transmission,AT,RWD,-,-,(140.11 * GEARS + 52.674) * MARKUP_ICE,2022,,FEV AT
+ICE,-,Transmission,AT,AWD,-,pickup,(140.11 * GEARS + 52.674 + 544.28) * MARKUP_ICE,2022,,FEV AT + FEV Gearbox to account for AWD
+ICE,-,Transmission,AT,AWD,-,sedan,(140.11 * GEARS + 52.674 + 281) * MARKUP_ICE,2022,,FEV AT + FEV Gearbox to account for AWD
+ICE,-,Transmission,AT,AWD,-,cuv_suv,(140.11 * GEARS + 52.674 + 339.37) * MARKUP_ICE,2022,,FEV AT + FEV Gearbox to account for AWD
+ALL,-,Engine,deac_pd,-,-,-,(-1.0603 * CYL ** 2 + 28.92 * CYL - 8.6935) * MARKUP_ICE,2006,,NPRM
+ALL,-,Engine,atk2,-,-,-,(4.907 * CYL ** 2 - 29.957 * CYL + 130.18) * MARKUP_ICE,2010,,NPRM
+ICE,-,Driveline,high_eff_alternator,-,-,-,(150) * MARKUP_ICE,2015,,NPRM
+ALL,-,Exhaust,twc_substrate,-,-,-,(6.108 * LITERS * TWC_SWEPT_VOLUME + 1.95456) * MARKUP_ICE,2012,SAE 2013-01-0534,NPRM
+ALL,-,Exhaust,twc_washcoat,-,-,-,(5.09 * LITERS * TWC_SWEPT_VOLUME) * MARKUP_ICE,2012,ibid,NPRM
+ALL,-,Exhaust,twc_canning,-,-,-,(2.4432 * LITERS * TWC_SWEPT_VOLUME) * MARKUP_ICE,2012,ibid,NPRM
+ALL,-,Exhaust,twc_swept_volume,-,-,-,(1.2) * 1,,Tier3,NPRM
+ALL,-,Exhaust,twc_pt_grams_per_liter,-,-,-,(0) * 1,,,NPRM
+ALL,-,Exhaust,twc_pd_grams_per_liter,-,-,-,(2) * 1,,,NPRM
+ALL,-,Exhaust,twc_rh_grams_per_liter,-,-,-,(0.11) * 1,,,NPRM
+ALL,-,Exhaust,gpf,-,-,-,(42.269 * LITERS + 22.213) * MARKUP_ICE,2022,from SB on 20231128,SME
+ALL,-,Exhaust,twc_pgm,-,-,-,(PT_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * PT_USD_PER_OZ * OZ_PER_GRAM + PD_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * PD_USD_PER_OZ * OZ_PER_GRAM  + RH_GRAMS_PER_LITER_TWC * LITERS * TWC_SWEPT_VOLUME * RH_USD_PER_OZ * OZ_PER_GRAM) * MARKUP_ICE,,,NPRM
+ALL,-,Exhaust,troy_oz_per_gram,-,-,-,(0.0322) * 1,,,NPRM
+ALL,-,Exhaust,pt_dollars_per_oz,-,-,-,(1030) * 1,,C:\Users\TSHERWOO\OneDrive - Environmental Protection Agency (EPA)\Documents\LMDV\CostAnalysis\Copy of PGM 5-year 08-31-2022.xlsx from JMc,NPRM
+ALL,-,Exhaust,pd_dollars_per_oz,-,-,-,(2331) * 1,,ibid,NPRM
+ALL,-,Exhaust,rh_dollars_per_oz,-,-,-,(17981) * 1,,ibid,NPRM
+ALL,-,Driveline,ac_efficiency,-,-,-,(40) * MARKUP_ICE,2010,,NPRM
+ALL,-,Driveline,ac_leakage,-,-,-,(63) * MARKUP_ICE,2010,,NPRM
+ALL,-,Exhaust,diesel_aftertreatment_system,-,-,-,(700) * LITERS * MARKUP_ICE,2020,HD2027 NPRM,NPRM
+ALL,-,Engine,diesel_engine_cost_scaler,-,-,-,(1.5) * 1,,"diesel engine cost = (engine_cylinder_cost + engine_displacement_cost) * diesel_engine_cost_scaler; i.e., 1.5 times the gasoline engine cost of equivalent size",NPRM
+BEV,-,Electrical_Power_Supply,HV_Battery_NMC,-,-,-,(128.9 + 1480 / (KWH ** 1.164) - 5.278 * (MODEL_YEAR - 2023) * e ** (-0.0129 * (MODEL_YEAR - 2023))) * KWH * MARKUP_BEV,2022,KWH denotes gross kWh,ANL 20231030
+BEV,-,Electrical_Power_Supply,HV_Battery_LFP,-,-,-,(120.6 + 1535 / (KWH ** 1.148) - 10.04 * (MODEL_YEAR - 2023) * e ** (-0.08346 * (MODEL_YEAR - 2023))) * KWH * MARKUP_BEV,2022,KWH denotes gross kWh,ANL 20231030
+BEV,-,learning,HV_Battery,-,-,-,"(1 - 0.015) ** (max(CALENDAR_YEAR, 2035) - 2035)",,,calendar year entry is set to 2035 in-code for model years 2023 thru 2035 and then equals model year thereafter
+PHEV,-,Electrical_Power_Supply,HV_Battery_NMC,-,-,-,(128.9 + 1480 / (KWH ** 1.164) - 5.278 * (MODEL_YEAR - 2023) * e ** (-0.0129 * (MODEL_YEAR - 2023))) * KWH * MARKUP_PHEV,2022,KWH denotes gross kWh,ANL 20231030
+PHEV,-,Electrical_Power_Supply,HV_Battery_LFP,-,-,-,(120.6 + 1535 / (KWH ** 1.148) - 10.04 * (MODEL_YEAR - 2023) * e ** (-0.08346 * (MODEL_YEAR - 2023))) * KWH * MARKUP_PHEV,2022,KWH denotes gross kWh,ANL 20231030
+PHEV,-,learning,HV_Battery,-,-,-,"(1 - 0.015) ** (max(CALENDAR_YEAR, 2035) - 2035)",,,calendar year entry is set to 2023 in-code for model years 2023 thru 2035 and then equals model year thereafter
+HEV,-,Electrical_Power_Supply,HV_Battery_NMC,-,-,-,(122.9 + 509.6 / (KWH ** 0.7649) - 4.443 * (MODEL_YEAR - 2023) * e ** (0.01018 * (MODEL_YEAR - 2023))) * KWH * MARKUP_HEV,2022,KWH denotes gross kWh,ANL 20231030
+HEV,-,Electrical_Power_Supply,HV_Battery_LFP,-,-,-,(0) * KWH * MARKUP_HEV,2022,KWH denotes gross kWh,ANL 20231030
+HEV,-,learning,HV_Battery,-,-,-,"(1 - 0.015) ** (max(CALENDAR_YEAR, 2035) - 2035)",,,calendar year entry is set to 2023 in-code for model years 2023 thru 2035 and then equals model year thereafter
+BEV,-,battery_offset,-,-,-,-,"{""dollars_per_kwh"": {2023: -27, 2024: -31.5, 2025: -36, 2026: -40.5, 2027: -45, 2028: -45, 2029: -45, 2030: -33.75, 2031: -22.50, 2032: -11.25, 2033: -0}}",,,NPRM
+PHEV,-,battery_offset,-,-,-,-,"{""dollars_per_kwh"": {2023: -27, 2024: -31.5, 2025: -36, 2026: -40.5, 2027: -45, 2028: -45, 2029: -45, 2030: -33.75, 2031: -22.50, 2032: -11.25, 2033: -0}}",,,NPRM
+ALL,-,learning_rate,-,-,-,-,(-0.245) * 1,,,NPRM
+ALL,-,learning_start,-,-,-,-,(2022) * 1,,,NPRM
+ICE,-,legacy_sales_learning_scaler,-,-,-,-,(100) * 1,,,NPRM
+PEV,-,legacy_sales_learning_scaler,-,-,-,-,(8) * 1,,,NPRM
+ICE,-,sales_scaler,-,-,-,-,(1.5) * 1,,,NPRM
+PEV,-,sales_scaler,-,-,-,-,(6.6) * 1,,,NPRM
+BEV,-,markup,-,-,-,-,(1.5) * 1,,,NPRM
+HEV,-,markup,-,-,-,-,(1.5) * 1,,,NPRM
+PHEV,-,markup,-,-,-,-,(1.5) * 1,,,NPRM
+ICE,-,markup,-,-,-,-,(1.5) * 1,,,NPRM

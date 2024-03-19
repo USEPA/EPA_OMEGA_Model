@@ -1,0 +1,11 @@
+input_template_name:,consumer.market_classes_ice_bev_phev_body_style,input_template_version:,0.1
+market_class_id,fueling_class,ownership_class,
+sedan_wagon.BEV,BEV,private,
+cuv_suv_van.BEV,BEV,private,
+pickup.BEV,BEV,private,
+sedan_wagon.ICE,ICE,private,
+cuv_suv_van.ICE,ICE,private,
+pickup.ICE,ICE,private,
+sedan_wagon.PHEV,ICE,private,
+cuv_suv_van.PHEV,ICE,private,
+pickup.PHEV,ICE,private,

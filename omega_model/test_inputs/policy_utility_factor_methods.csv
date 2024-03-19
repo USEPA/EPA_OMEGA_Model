@@ -1,0 +1,5 @@
+input_template_name:,utility_factor_methods,input_template_version:,0.1,
+start_year,city_method,city_norm_dist,highway_method,highway_norm_dist
+0,FUF,583,FUF,583
+2012,cityFUF,399,highwayFUF,399
+2027,FUF,583,FUF,583

@@ -1,0 +1,4 @@
+input_template_name:,workfactor_definition,input_template_version:,0.1
+start_year,drive_system,xwd,workfactor
+2014,RWD,0,(0.75) * (gvwr_lbs - curbweight_lbs + xwd) + 0.25 * (gcwr_lbs - gvwr_lbs)
+2014,AWD,500,(0.75) * (gvwr_lbs - curbweight_lbs + xwd) + 0.25 * (gcwr_lbs - gvwr_lbs)

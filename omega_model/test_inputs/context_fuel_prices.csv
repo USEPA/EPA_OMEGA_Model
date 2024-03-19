@@ -1,0 +1,974 @@
+input_template_name:,context_fuel_prices,input_template_version:,0.2,description:,20230602-130256_run,
+context_id,dollar_basis,case_id,fuel_id,calendar_year,retail_dollars_per_unit,pretax_dollars_per_unit
+AEO2020,2019,Reference case,pump gasoline,2019,2.665601,2.10838
+AEO2020,2019,Reference case,pump gasoline,2020,2.639979,2.086804
+AEO2020,2019,Reference case,pump gasoline,2021,2.64319,2.094743
+AEO2020,2019,Reference case,pump gasoline,2022,2.64413,2.100513
+AEO2020,2019,Reference case,pump gasoline,2023,2.633867,2.09524
+AEO2020,2019,Reference case,pump gasoline,2024,2.599251,2.065917
+AEO2020,2019,Reference case,pump gasoline,2025,2.628672,2.100097
+AEO2020,2019,Reference case,pump gasoline,2026,2.650331,2.126037
+AEO2020,2019,Reference case,pump gasoline,2027,2.682016,2.161779
+AEO2020,2019,Reference case,pump gasoline,2028,2.694953,2.178818
+AEO2020,2019,Reference case,pump gasoline,2029,2.729894,2.217607
+AEO2020,2019,Reference case,pump gasoline,2030,2.813741,2.264958
+AEO2020,2019,Reference case,pump gasoline,2031,2.832745,2.288131
+AEO2020,2019,Reference case,pump gasoline,2032,2.85718,2.316642
+AEO2020,2019,Reference case,pump gasoline,2033,2.907378,2.365156
+AEO2020,2019,Reference case,pump gasoline,2034,2.953295,2.414751
+AEO2020,2019,Reference case,pump gasoline,2035,2.983456,2.448793
+AEO2020,2019,Reference case,pump gasoline,2036,3.018609,2.486603
+AEO2020,2019,Reference case,pump gasoline,2037,3.027417,2.49834
+AEO2020,2019,Reference case,pump gasoline,2038,3.060073,2.533639
+AEO2020,2019,Reference case,pump gasoline,2039,3.100547,2.576556
+AEO2020,2019,Reference case,pump gasoline,2040,3.11111,2.589809
+AEO2020,2019,Reference case,pump gasoline,2041,3.132885,2.614152
+AEO2020,2019,Reference case,pump gasoline,2042,3.180762,2.664272
+AEO2020,2019,Reference case,pump gasoline,2043,3.206139,2.692087
+AEO2020,2019,Reference case,pump gasoline,2044,3.230979,2.71927
+AEO2020,2019,Reference case,pump gasoline,2045,3.272165,2.762639
+AEO2020,2019,Reference case,pump gasoline,2046,3.281969,2.774897
+AEO2020,2019,Reference case,pump gasoline,2047,3.338524,2.83338
+AEO2020,2019,Reference case,pump gasoline,2048,3.376594,2.873584
+AEO2020,2019,Reference case,pump gasoline,2049,3.405497,2.90462
+AEO2020,2019,Reference case,pump gasoline,2050,3.430088,2.931466
+AEO2020,2019,Reference case,pump gasoline,2051,3.454856571,2.958587026
+AEO2020,2019,Reference case,pump gasoline,2052,3.479803995,2.985985887
+AEO2020,2019,Reference case,pump gasoline,2053,3.504931564,3.013665421
+AEO2020,2019,Reference case,pump gasoline,2054,3.530240578,3.041628495
+AEO2020,2019,Reference case,pump gasoline,2055,3.555732348,3.069878006
+AEO2020,2019,Reference case,pump gasoline,2056,3.581408193,3.098416879
+AEO2020,2019,Reference case,pump gasoline,2057,3.607269443,3.127248071
+AEO2020,2019,Reference case,pump gasoline,2058,3.633317436,3.156374567
+AEO2020,2019,Reference case,pump gasoline,2059,3.659553522,3.185799384
+AEO2020,2019,Reference case,pump gasoline,2060,3.685979057,3.215525569
+AEO2020,2019,Reference case,pump diesel,2019,3.039967,2.438176
+AEO2020,2019,Reference case,pump diesel,2020,2.934405,2.337878
+AEO2020,2019,Reference case,pump diesel,2021,2.949336,2.354987
+AEO2020,2019,Reference case,pump diesel,2022,2.994948,2.403835
+AEO2020,2019,Reference case,pump diesel,2023,3.012119,2.427298
+AEO2020,2019,Reference case,pump diesel,2024,3.066387,2.486785
+AEO2020,2019,Reference case,pump diesel,2025,3.084577,2.509921
+AEO2020,2019,Reference case,pump diesel,2026,3.14129,2.571285
+AEO2020,2019,Reference case,pump diesel,2027,3.149336,2.584042
+AEO2020,2019,Reference case,pump diesel,2028,3.197453,2.636623
+AEO2020,2019,Reference case,pump diesel,2029,3.226995,2.670809
+AEO2020,2019,Reference case,pump diesel,2030,3.293856,2.700866
+AEO2020,2019,Reference case,pump diesel,2031,3.331057,2.742148
+AEO2020,2019,Reference case,pump diesel,2032,3.355069,2.770205
+AEO2020,2019,Reference case,pump diesel,2033,3.409146,2.822407
+AEO2020,2019,Reference case,pump diesel,2034,3.436545,2.853612
+AEO2020,2019,Reference case,pump diesel,2035,3.467449,2.888092
+AEO2020,2019,Reference case,pump diesel,2036,3.502465,2.926338
+AEO2020,2019,Reference case,pump diesel,2037,3.527104,2.954288
+AEO2020,2019,Reference case,pump diesel,2038,3.556153,2.986736
+AEO2020,2019,Reference case,pump diesel,2039,3.587273,3.021029
+AEO2020,2019,Reference case,pump diesel,2040,3.586661,3.023818
+AEO2020,2019,Reference case,pump diesel,2041,3.609762,3.050152
+AEO2020,2019,Reference case,pump diesel,2042,3.662671,3.106049
+AEO2020,2019,Reference case,pump diesel,2043,3.686148,3.132348
+AEO2020,2019,Reference case,pump diesel,2044,3.713715,3.163037
+AEO2020,2019,Reference case,pump diesel,2045,3.764581,3.216807
+AEO2020,2019,Reference case,pump diesel,2046,3.766665,3.221758
+AEO2020,2019,Reference case,pump diesel,2047,3.803043,3.260621
+AEO2020,2019,Reference case,pump diesel,2048,3.835901,3.296107
+AEO2020,2019,Reference case,pump diesel,2049,3.859468,3.32234
+AEO2020,2019,Reference case,pump diesel,2050,3.880604,3.346115
+AEO2020,2019,Reference case,pump diesel,2051,3.901855749,3.370087252
+AEO2020,2019,Reference case,pump diesel,2052,3.923223882,3.394258395
+AEO2020,2019,Reference case,pump diesel,2053,3.944709034,3.418630081
+AEO2020,2019,Reference case,pump diesel,2054,3.966311849,3.443203976
+AEO2020,2019,Reference case,pump diesel,2055,3.988032969,3.46798176
+AEO2020,2019,Reference case,pump diesel,2056,4.009873042,3.492965128
+AEO2020,2019,Reference case,pump diesel,2057,4.031832721,3.518155786
+AEO2020,2019,Reference case,pump diesel,2058,4.053912659,3.543555458
+AEO2020,2019,Reference case,pump diesel,2059,4.076113516,3.56916588
+AEO2020,2019,Reference case,pump diesel,2060,4.098435954,3.594988802
+AEO2020,2019,High oil price,pump gasoline,2019,2.665599,2.108376
+AEO2020,2019,High oil price,pump gasoline,2020,3.236049,2.677195
+AEO2020,2019,High oil price,pump gasoline,2021,3.351047,2.796643
+AEO2020,2019,High oil price,pump gasoline,2022,3.505075,2.955343
+AEO2020,2019,High oil price,pump gasoline,2023,3.727231,3.182042
+AEO2020,2019,High oil price,pump gasoline,2024,3.827311,3.288308
+AEO2020,2019,High oil price,pump gasoline,2025,3.876024,3.344136
+AEO2020,2019,High oil price,pump gasoline,2026,3.939892,3.414506
+AEO2020,2019,High oil price,pump gasoline,2027,3.950555,3.431717
+AEO2020,2019,High oil price,pump gasoline,2028,3.998198,3.485319
+AEO2020,2019,High oil price,pump gasoline,2029,4.147246,3.598679
+AEO2020,2019,High oil price,pump gasoline,2030,4.185226,3.642617
+AEO2020,2019,High oil price,pump gasoline,2031,4.250091,3.713089
+AEO2020,2019,High oil price,pump gasoline,2032,4.364346,3.826795
+AEO2020,2019,High oil price,pump gasoline,2033,4.447692,3.915383
+AEO2020,2019,High oil price,pump gasoline,2034,4.479072,3.952371
+AEO2020,2019,High oil price,pump gasoline,2035,4.535181,4.014091
+AEO2020,2019,High oil price,pump gasoline,2036,4.585422,4.068335
+AEO2020,2019,High oil price,pump gasoline,2037,4.62264,4.10928
+AEO2020,2019,High oil price,pump gasoline,2038,4.670875,4.160807
+AEO2020,2019,High oil price,pump gasoline,2039,4.700146,4.193014
+AEO2020,2019,High oil price,pump gasoline,2040,4.749998,4.24518
+AEO2020,2019,High oil price,pump gasoline,2041,4.788712,4.28623
+AEO2020,2019,High oil price,pump gasoline,2042,4.810071,4.309533
+AEO2020,2019,High oil price,pump gasoline,2043,4.846516,4.347817
+AEO2020,2019,High oil price,pump gasoline,2044,4.831707,4.33492
+AEO2020,2019,High oil price,pump gasoline,2045,4.852967,4.357623
+AEO2020,2019,High oil price,pump gasoline,2046,4.879765,4.385518
+AEO2020,2019,High oil price,pump gasoline,2047,4.921601,4.428263
+AEO2020,2019,High oil price,pump gasoline,2048,4.974297,4.481649
+AEO2020,2019,High oil price,pump gasoline,2049,4.980424,4.488777
+AEO2020,2019,High oil price,pump gasoline,2050,5.01036,4.519616
+AEO2020,2019,High oil price,pump gasoline,2051,5.040475937,4.550681741
+AEO2020,2019,High oil price,pump gasoline,2052,5.070772893,4.581975885
+AEO2020,2019,High oil price,pump gasoline,2053,5.101251957,4.613500105
+AEO2020,2019,High oil price,pump gasoline,2054,5.131914221,4.645256087
+AEO2020,2019,High oil price,pump gasoline,2055,5.162760788,4.67724553
+AEO2020,2019,High oil price,pump gasoline,2056,5.193792766,4.709470145
+AEO2020,2019,High oil price,pump gasoline,2057,5.225011269,4.741931655
+AEO2020,2019,High oil price,pump gasoline,2058,5.256417418,4.774631796
+AEO2020,2019,High oil price,pump gasoline,2059,5.288012341,4.807572317
+AEO2020,2019,High oil price,pump gasoline,2060,5.319797172,4.840754979
+AEO2020,2019,High oil price,pump diesel,2019,3.039224,2.437579
+AEO2020,2019,High oil price,pump diesel,2020,3.515036,2.918958
+AEO2020,2019,High oil price,pump diesel,2021,3.674832,3.083061
+AEO2020,2019,High oil price,pump diesel,2022,3.903325,3.316562
+AEO2020,2019,High oil price,pump diesel,2023,4.208385,3.630239
+AEO2020,2019,High oil price,pump diesel,2024,4.357755,3.787749
+AEO2020,2019,High oil price,pump diesel,2025,4.459592,3.897861
+AEO2020,2019,High oil price,pump diesel,2026,4.547097,3.993479
+AEO2020,2019,High oil price,pump diesel,2027,4.546696,4.000844
+AEO2020,2019,High oil price,pump diesel,2028,4.610694,4.072373
+AEO2020,2019,High oil price,pump diesel,2029,4.815342,4.245011
+AEO2020,2019,High oil price,pump diesel,2030,4.848112,4.284767
+AEO2020,2019,High oil price,pump diesel,2031,4.934414,4.377516
+AEO2020,2019,High oil price,pump diesel,2032,5.102164,4.546749
+AEO2020,2019,High oil price,pump diesel,2033,5.12492,4.575539
+AEO2020,2019,High oil price,pump diesel,2034,5.131924,4.588053
+AEO2020,2019,High oil price,pump diesel,2035,5.181689,4.643017
+AEO2020,2019,High oil price,pump diesel,2036,5.24006,4.706325
+AEO2020,2019,High oil price,pump diesel,2037,5.286218,4.756896
+AEO2020,2019,High oil price,pump diesel,2038,5.338629,4.813259
+AEO2020,2019,High oil price,pump diesel,2039,5.396006,4.874496
+AEO2020,2019,High oil price,pump diesel,2040,5.446475,4.928201
+AEO2020,2019,High oil price,pump diesel,2041,5.496632,4.981636
+AEO2020,2019,High oil price,pump diesel,2042,5.512011,4.999652
+AEO2020,2019,High oil price,pump diesel,2043,5.578421,5.068302
+AEO2020,2019,High oil price,pump diesel,2044,5.610651,5.10243
+AEO2020,2019,High oil price,pump diesel,2045,5.679237,5.172501
+AEO2020,2019,High oil price,pump diesel,2046,5.67341,5.168239
+AEO2020,2019,High oil price,pump diesel,2047,5.710749,5.206684
+AEO2020,2019,High oil price,pump diesel,2048,5.745685,5.24285
+AEO2020,2019,High oil price,pump diesel,2049,5.781971,5.280138
+AEO2020,2019,High oil price,pump diesel,2050,5.779764,5.278833
+AEO2020,2019,High oil price,pump diesel,2051,5.777557842,5.277528499
+AEO2020,2019,High oil price,pump diesel,2052,5.775352527,5.276224498
+AEO2020,2019,High oil price,pump diesel,2053,5.773148053,5.274920996
+AEO2020,2019,High oil price,pump diesel,2054,5.770944421,5.273617994
+AEO2020,2019,High oil price,pump diesel,2055,5.76874163,5.27231549
+AEO2020,2019,High oil price,pump diesel,2056,5.76653968,5.271013485
+AEO2020,2019,High oil price,pump diesel,2057,5.76433857,5.269711979
+AEO2020,2019,High oil price,pump diesel,2058,5.7621383,5.268410971
+AEO2020,2019,High oil price,pump diesel,2059,5.75993887,5.267110463
+AEO2020,2019,High oil price,pump diesel,2060,5.75774028,5.265810452
+AEO2020,2019,Low oil price,pump gasoline,2019,2.665607,2.108375
+AEO2020,2019,Low oil price,pump gasoline,2020,2.132831,1.58404
+AEO2020,2019,Low oil price,pump gasoline,2021,2.07392,1.529976
+AEO2020,2019,Low oil price,pump gasoline,2022,2.062188,1.522555
+AEO2020,2019,Low oil price,pump gasoline,2023,2.046474,1.511174
+AEO2020,2019,Low oil price,pump gasoline,2024,2.02598,1.495213
+AEO2020,2019,Low oil price,pump gasoline,2025,2.012504,1.486296
+AEO2020,2019,Low oil price,pump gasoline,2026,2.017238,1.494763
+AEO2020,2019,Low oil price,pump gasoline,2027,2.024563,1.505711
+AEO2020,2019,Low oil price,pump gasoline,2028,2.029525,1.514225
+AEO2020,2019,Low oil price,pump gasoline,2029,2.032771,1.521007
+AEO2020,2019,Low oil price,pump gasoline,2030,2.091231,1.54275
+AEO2020,2019,Low oil price,pump gasoline,2031,2.091129,1.546403
+AEO2020,2019,Low oil price,pump gasoline,2032,2.102348,1.561179
+AEO2020,2019,Low oil price,pump gasoline,2033,2.120073,1.57684
+AEO2020,2019,Low oil price,pump gasoline,2034,2.117917,1.578163
+AEO2020,2019,Low oil price,pump gasoline,2035,2.127607,1.591241
+AEO2020,2019,Low oil price,pump gasoline,2036,2.136572,1.602591
+AEO2020,2019,Low oil price,pump gasoline,2037,2.154523,1.622853
+AEO2020,2019,Low oil price,pump gasoline,2038,2.153512,1.624377
+AEO2020,2019,Low oil price,pump gasoline,2039,2.164286,1.63758
+AEO2020,2019,Low oil price,pump gasoline,2040,2.178289,1.654003
+AEO2020,2019,Low oil price,pump gasoline,2041,2.183931,1.662215
+AEO2020,2019,Low oil price,pump gasoline,2042,2.188392,1.669191
+AEO2020,2019,Low oil price,pump gasoline,2043,2.187343,1.67074
+AEO2020,2019,Low oil price,pump gasoline,2044,2.193764,1.679673
+AEO2020,2019,Low oil price,pump gasoline,2045,2.204482,1.692885
+AEO2020,2019,Low oil price,pump gasoline,2046,2.196002,1.687072
+AEO2020,2019,Low oil price,pump gasoline,2047,2.199528,1.693301
+AEO2020,2019,Low oil price,pump gasoline,2048,2.206261,1.702673
+AEO2020,2019,Low oil price,pump gasoline,2049,2.204586,1.703788
+AEO2020,2019,Low oil price,pump gasoline,2050,2.202825,1.704869
+AEO2020,2019,Low oil price,pump gasoline,2051,2.201065407,1.705950998
+AEO2020,2019,Low oil price,pump gasoline,2052,2.199307219,1.707033993
+AEO2020,2019,Low oil price,pump gasoline,2053,2.197550436,1.708117988
+AEO2020,2019,Low oil price,pump gasoline,2054,2.195795055,1.709202983
+AEO2020,2019,Low oil price,pump gasoline,2055,2.194041078,1.710288979
+AEO2020,2019,Low oil price,pump gasoline,2056,2.192288501,1.711375976
+AEO2020,2019,Low oil price,pump gasoline,2057,2.190537324,1.712463975
+AEO2020,2019,Low oil price,pump gasoline,2058,2.188787546,1.713552977
+AEO2020,2019,Low oil price,pump gasoline,2059,2.187039165,1.714642983
+AEO2020,2019,Low oil price,pump gasoline,2060,2.185292182,1.715733994
+AEO2020,2019,Low oil price,pump diesel,2019,3.040576,2.438663
+AEO2020,2019,Low oil price,pump diesel,2020,2.335027,1.737658
+AEO2020,2019,Low oil price,pump diesel,2021,2.277384,1.681387
+AEO2020,2019,Low oil price,pump diesel,2022,2.322767,1.729365
+AEO2020,2019,Low oil price,pump diesel,2023,2.327793,1.739384
+AEO2020,2019,Low oil price,pump diesel,2024,2.351287,1.7675
+AEO2020,2019,Low oil price,pump diesel,2025,2.372608,1.793099
+AEO2020,2019,Low oil price,pump diesel,2026,2.392987,1.817338
+AEO2020,2019,Low oil price,pump diesel,2027,2.404782,1.833102
+AEO2020,2019,Low oil price,pump diesel,2028,2.404166,1.836394
+AEO2020,2019,Low oil price,pump diesel,2029,2.410063,1.846148
+AEO2020,2019,Low oil price,pump diesel,2030,2.476408,1.874347
+AEO2020,2019,Low oil price,pump diesel,2031,2.479984,1.881181
+AEO2020,2019,Low oil price,pump diesel,2032,2.492725,1.897173
+AEO2020,2019,Low oil price,pump diesel,2033,2.504681,1.906484
+AEO2020,2019,Low oil price,pump diesel,2034,2.493676,1.898421
+AEO2020,2019,Low oil price,pump diesel,2035,2.502078,1.909522
+AEO2020,2019,Low oil price,pump diesel,2036,2.503509,1.91387
+AEO2020,2019,Low oil price,pump diesel,2037,2.519411,1.932331
+AEO2020,2019,Low oil price,pump diesel,2038,2.516195,1.931968
+AEO2020,2019,Low oil price,pump diesel,2039,2.527627,1.946409
+AEO2020,2019,Low oil price,pump diesel,2040,2.536063,1.957671
+AEO2020,2019,Low oil price,pump diesel,2041,2.53811,1.96253
+AEO2020,2019,Low oil price,pump diesel,2042,2.538426,1.965733
+AEO2020,2019,Low oil price,pump diesel,2043,2.536194,1.966333
+AEO2020,2019,Low oil price,pump diesel,2044,2.543162,1.976165
+AEO2020,2019,Low oil price,pump diesel,2045,2.550459,1.986318
+AEO2020,2019,Low oil price,pump diesel,2046,2.551141,1.989733
+AEO2020,2019,Low oil price,pump diesel,2047,2.548575,1.990444
+AEO2020,2019,Low oil price,pump diesel,2048,2.550257,1.9947
+AEO2020,2019,Low oil price,pump diesel,2049,2.553265,2.000677
+AEO2020,2019,Low oil price,pump diesel,2050,2.565366,2.015858
+AEO2020,2019,Low oil price,pump diesel,2051,2.577524352,2.031188741
+AEO2020,2019,Low oil price,pump diesel,2052,2.589740327,2.046670701
+AEO2020,2019,Low oil price,pump diesel,2053,2.602014199,2.062305372
+AEO2020,2019,Low oil price,pump diesel,2054,2.614346242,2.078094262
+AEO2020,2019,Low oil price,pump diesel,2055,2.626736732,2.094038891
+AEO2020,2019,Low oil price,pump diesel,2056,2.639185945,2.110140797
+AEO2020,2019,Low oil price,pump diesel,2057,2.651694161,2.126401533
+AEO2020,2019,Low oil price,pump diesel,2058,2.664261658,2.142822664
+AEO2020,2019,Low oil price,pump diesel,2059,2.676888718,2.159405775
+AEO2020,2019,Low oil price,pump diesel,2060,2.689575623,2.176152463
+AEO2021,2020,Reference case,pump gasoline,2020,2.254854,1.683764
+AEO2021,2020,Reference case,pump gasoline,2021,2.354823,1.782645
+AEO2021,2020,Reference case,pump gasoline,2022,2.399469,1.828079
+AEO2021,2020,Reference case,pump gasoline,2023,2.461965,1.892717
+AEO2021,2020,Reference case,pump gasoline,2024,2.468871,1.902636
+AEO2021,2020,Reference case,pump gasoline,2025,2.511604,1.948789
+AEO2021,2020,Reference case,pump gasoline,2026,2.533375,1.974734
+AEO2021,2020,Reference case,pump gasoline,2027,2.561896,2.007506
+AEO2021,2020,Reference case,pump gasoline,2028,2.625924,2.075205
+AEO2021,2020,Reference case,pump gasoline,2029,2.669297,2.122566
+AEO2021,2020,Reference case,pump gasoline,2030,2.797148,2.206889
+AEO2021,2020,Reference case,pump gasoline,2031,2.808867,2.222628
+AEO2021,2020,Reference case,pump gasoline,2032,2.865813,2.276317
+AEO2021,2020,Reference case,pump gasoline,2033,2.887016,2.301076
+AEO2021,2020,Reference case,pump gasoline,2034,2.92502,2.342296
+AEO2021,2020,Reference case,pump gasoline,2035,2.946772,2.367291
+AEO2021,2020,Reference case,pump gasoline,2036,2.983997,2.407506
+AEO2021,2020,Reference case,pump gasoline,2037,3.015052,2.441399
+AEO2021,2020,Reference case,pump gasoline,2038,3.054285,2.483322
+AEO2021,2020,Reference case,pump gasoline,2039,3.058701,2.490729
+AEO2021,2020,Reference case,pump gasoline,2040,3.110869,2.545406
+AEO2021,2020,Reference case,pump gasoline,2041,3.139569,2.576809
+AEO2021,2020,Reference case,pump gasoline,2042,3.158735,2.598792
+AEO2021,2020,Reference case,pump gasoline,2043,3.177755,2.620718
+AEO2021,2020,Reference case,pump gasoline,2044,3.188731,2.634725
+AEO2021,2020,Reference case,pump gasoline,2045,3.168612,2.617817
+AEO2021,2020,Reference case,pump gasoline,2046,3.211146,2.663128
+AEO2021,2020,Reference case,pump gasoline,2047,3.224338,2.679476
+AEO2021,2020,Reference case,pump gasoline,2048,3.236133,2.694331
+AEO2021,2020,Reference case,pump gasoline,2049,3.229862,2.691332
+AEO2021,2020,Reference case,pump gasoline,2050,3.232289,2.696991
+AEO2021,2020,Reference case,pump gasoline,2051,3.234717824,2.702664007
+AEO2021,2020,Reference case,pump gasoline,2052,3.237148472,2.708351055
+AEO2021,2020,Reference case,pump gasoline,2053,3.239580948,2.714052178
+AEO2021,2020,Reference case,pump gasoline,2054,3.242015251,2.719767408
+AEO2021,2020,Reference case,pump gasoline,2055,3.244451383,2.72549678
+AEO2021,2020,Reference case,pump gasoline,2056,3.246889346,2.731240327
+AEO2021,2020,Reference case,pump gasoline,2057,3.249329141,2.736998084
+AEO2021,2020,Reference case,pump gasoline,2058,3.251770769,2.742770083
+AEO2021,2020,Reference case,pump gasoline,2059,3.254214232,2.74855636
+AEO2021,2020,Reference case,pump gasoline,2060,3.25665953,2.754356948
+AEO2021,2020,Reference case,pump diesel,2020,2.519058,1.914699
+AEO2021,2020,Reference case,pump diesel,2021,2.510598,1.907501
+AEO2021,2020,Reference case,pump diesel,2022,2.61632,2.015507
+AEO2021,2020,Reference case,pump diesel,2023,2.833065,2.235068
+AEO2021,2020,Reference case,pump diesel,2024,2.925872,2.331534
+AEO2021,2020,Reference case,pump diesel,2025,2.992841,2.40283
+AEO2021,2020,Reference case,pump diesel,2026,3.051365,2.466504
+AEO2021,2020,Reference case,pump diesel,2027,3.104251,2.524544
+AEO2021,2020,Reference case,pump diesel,2028,3.155711,2.581547
+AEO2021,2020,Reference case,pump diesel,2029,3.186768,2.617914
+AEO2021,2020,Reference case,pump diesel,2030,3.289715,2.684773
+AEO2021,2020,Reference case,pump diesel,2031,3.324433,2.723944
+AEO2021,2020,Reference case,pump diesel,2032,3.364744,2.762778
+AEO2021,2020,Reference case,pump diesel,2033,3.383182,2.785283
+AEO2021,2020,Reference case,pump diesel,2034,3.397004,2.802995
+AEO2021,2020,Reference case,pump diesel,2035,3.414968,2.824641
+AEO2021,2020,Reference case,pump diesel,2036,3.42257,2.835676
+AEO2021,2020,Reference case,pump diesel,2037,3.458736,2.875158
+AEO2021,2020,Reference case,pump diesel,2038,3.48517,2.904915
+AEO2021,2020,Reference case,pump diesel,2039,3.484768,2.907647
+AEO2021,2020,Reference case,pump diesel,2040,3.537822,2.964132
+AEO2021,2020,Reference case,pump diesel,2041,3.569398,2.999123
+AEO2021,2020,Reference case,pump diesel,2042,3.58846,3.021398
+AEO2021,2020,Reference case,pump diesel,2043,3.621851,3.058151
+AEO2021,2020,Reference case,pump diesel,2044,3.629381,3.069069
+AEO2021,2020,Reference case,pump diesel,2045,3.623236,3.066367
+AEO2021,2020,Reference case,pump diesel,2046,3.66545,3.11196
+AEO2021,2020,Reference case,pump diesel,2047,3.679899,3.130047
+AEO2021,2020,Reference case,pump diesel,2048,3.681523,3.135283
+AEO2021,2020,Reference case,pump diesel,2049,3.698285,3.155747
+AEO2021,2020,Reference case,pump diesel,2050,3.694213,3.155465
+AEO2021,2020,Reference case,pump diesel,2051,3.690145483,3.155183025
+AEO2021,2020,Reference case,pump diesel,2052,3.686082446,3.154901076
+AEO2021,2020,Reference case,pump diesel,2053,3.682023881,3.154619152
+AEO2021,2020,Reference case,pump diesel,2054,3.677969785,3.154337254
+AEO2021,2020,Reference case,pump diesel,2055,3.673920154,3.15405538
+AEO2021,2020,Reference case,pump diesel,2056,3.66987498,3.153773533
+AEO2021,2020,Reference case,pump diesel,2057,3.665834261,3.15349171
+AEO2021,2020,Reference case,pump diesel,2058,3.661797991,3.153209913
+AEO2021,2020,Reference case,pump diesel,2059,3.657766165,3.152928141
+AEO2021,2020,Reference case,pump diesel,2060,3.653738779,3.152646395
+AEO2021,2020,High oil price,pump gasoline,2020,2.254853,1.679478
+AEO2021,2020,High oil price,pump gasoline,2021,2.979453,2.400635
+AEO2021,2020,High oil price,pump gasoline,2022,3.237412,2.659058
+AEO2021,2020,High oil price,pump gasoline,2023,3.459914,2.883351
+AEO2021,2020,High oil price,pump gasoline,2024,3.583037,3.009233
+AEO2021,2020,High oil price,pump gasoline,2025,3.690663,3.120466
+AEO2021,2020,High oil price,pump gasoline,2026,3.730874,3.165522
+AEO2021,2020,High oil price,pump gasoline,2027,3.802338,3.241712
+AEO2021,2020,High oil price,pump gasoline,2028,3.909153,3.353162
+AEO2021,2020,High oil price,pump gasoline,2029,3.972094,3.420903
+AEO2021,2020,High oil price,pump gasoline,2030,4.120898,3.527497
+AEO2021,2020,High oil price,pump gasoline,2031,4.106604,3.518683
+AEO2021,2020,High oil price,pump gasoline,2032,4.166346,3.576451
+AEO2021,2020,High oil price,pump gasoline,2033,4.181954,3.596807
+AEO2021,2020,High oil price,pump gasoline,2034,4.215391,3.634711
+AEO2021,2020,High oil price,pump gasoline,2035,4.283442,3.706585
+AEO2021,2020,High oil price,pump gasoline,2036,4.311099,3.738237
+AEO2021,2020,High oil price,pump gasoline,2037,4.344756,3.775624
+AEO2021,2020,High oil price,pump gasoline,2038,4.341742,3.776533
+AEO2021,2020,High oil price,pump gasoline,2039,4.351453,3.78999
+AEO2021,2020,High oil price,pump gasoline,2040,4.383275,3.825106
+AEO2021,2020,High oil price,pump gasoline,2041,4.390029,3.835233
+AEO2021,2020,High oil price,pump gasoline,2042,4.41859,3.866798
+AEO2021,2020,High oil price,pump gasoline,2043,4.43468,3.885979
+AEO2021,2020,High oil price,pump gasoline,2044,4.46626,3.920499
+AEO2021,2020,High oil price,pump gasoline,2045,4.502784,3.95975
+AEO2021,2020,High oil price,pump gasoline,2046,4.535209,3.994914
+AEO2021,2020,High oil price,pump gasoline,2047,4.568638,4.030995
+AEO2021,2020,High oil price,pump gasoline,2048,4.623489,4.088192
+AEO2021,2020,High oil price,pump gasoline,2049,4.639452,4.106896
+AEO2021,2020,High oil price,pump gasoline,2050,4.682961,4.152825
+AEO2021,2020,High oil price,pump gasoline,2051,4.726878029,4.199308908
+AEO2021,2020,High oil price,pump gasoline,2052,4.771206915,4.246354401
+AEO2021,2020,High oil price,pump gasoline,2053,4.815951519,4.293968235
+AEO2021,2020,High oil price,pump gasoline,2054,4.86111574,4.342157249
+AEO2021,2020,High oil price,pump gasoline,2055,4.906703513,4.390928363
+AEO2021,2020,High oil price,pump gasoline,2056,4.95271881,4.440288581
+AEO2021,2020,High oil price,pump gasoline,2057,4.999165641,4.490244991
+AEO2021,2020,High oil price,pump gasoline,2058,5.046048052,4.540804765
+AEO2021,2020,High oil price,pump gasoline,2059,5.093370129,4.591975165
+AEO2021,2020,High oil price,pump gasoline,2060,5.141135995,4.643763536
+AEO2021,2020,High oil price,pump diesel,2020,2.519848,1.915298
+AEO2021,2020,High oil price,pump diesel,2021,3.188004,2.585657
+AEO2021,2020,High oil price,pump diesel,2022,3.550278,2.95085
+AEO2021,2020,High oil price,pump diesel,2023,3.913598,3.318987
+AEO2021,2020,High oil price,pump diesel,2024,4.113328,3.523702
+AEO2021,2020,High oil price,pump diesel,2025,4.260759,3.677
+AEO2021,2020,High oil price,pump diesel,2026,4.338907,3.761694
+AEO2021,2020,High oil price,pump diesel,2027,4.4565,3.886113
+AEO2021,2020,High oil price,pump diesel,2028,4.544815,3.981527
+AEO2021,2020,High oil price,pump diesel,2029,4.631717,4.075511
+AEO2021,2020,High oil price,pump diesel,2030,4.732375,4.143933
+AEO2021,2020,High oil price,pump diesel,2031,4.746992,4.165113
+AEO2021,2020,High oil price,pump diesel,2032,4.83266,4.251461
+AEO2021,2020,High oil price,pump diesel,2033,4.898602,4.323653
+AEO2021,2020,High oil price,pump diesel,2034,4.938239,4.368961
+AEO2021,2020,High oil price,pump diesel,2035,4.993177,4.429289
+AEO2021,2020,High oil price,pump diesel,2036,5.054876,4.496154
+AEO2021,2020,High oil price,pump diesel,2037,5.102575,4.549026
+AEO2021,2020,High oil price,pump diesel,2038,5.160533,4.611721
+AEO2021,2020,High oil price,pump diesel,2039,5.192387,4.648517
+AEO2021,2020,High oil price,pump diesel,2040,5.24613,4.706405
+AEO2021,2020,High oil price,pump diesel,2041,5.245736,4.709986
+AEO2021,2020,High oil price,pump diesel,2042,5.283206,4.75234
+AEO2021,2020,High oil price,pump diesel,2043,5.305206,4.778296
+AEO2021,2020,High oil price,pump diesel,2044,5.338653,4.81585
+AEO2021,2020,High oil price,pump diesel,2045,5.38776,4.868703
+AEO2021,2020,High oil price,pump diesel,2046,5.428175,4.913124
+AEO2021,2020,High oil price,pump diesel,2047,5.460484,4.948859
+AEO2021,2020,High oil price,pump diesel,2048,5.522949,5.014467
+AEO2021,2020,High oil price,pump diesel,2049,5.552018,5.046557
+AEO2021,2020,High oil price,pump diesel,2050,5.585064,5.082657
+AEO2021,2020,High oil price,pump diesel,2051,5.618306692,5.119041202
+AEO2021,2020,High oil price,pump diesel,2052,5.651747247,5.155711845
+AEO2021,2020,High oil price,pump diesel,2053,5.685386843,5.192671184
+AEO2021,2020,High oil price,pump diesel,2054,5.719226663,5.229921495
+AEO2021,2020,High oil price,pump diesel,2055,5.753267901,5.267465068
+AEO2021,2020,High oil price,pump diesel,2056,5.787511754,5.305304215
+AEO2021,2020,High oil price,pump diesel,2057,5.82195943,5.343441264
+AEO2021,2020,High oil price,pump diesel,2058,5.85661214,5.38187856
+AEO2021,2020,High oil price,pump diesel,2059,5.891471106,5.42061847
+AEO2021,2020,High oil price,pump diesel,2060,5.926537554,5.459663377
+AEO2021,2020,Low oil price,pump gasoline,2020,2.254854,1.683262
+AEO2021,2020,Low oil price,pump gasoline,2021,2.032305,1.462094
+AEO2021,2020,Low oil price,pump gasoline,2022,1.982661,1.414964
+AEO2021,2020,Low oil price,pump gasoline,2023,1.99281,1.427413
+AEO2021,2020,Low oil price,pump gasoline,2024,2.000101,1.437653
+AEO2021,2020,Low oil price,pump gasoline,2025,1.997359,1.438765
+AEO2021,2020,Low oil price,pump gasoline,2026,1.985263,1.431106
+AEO2021,2020,Low oil price,pump gasoline,2027,1.990597,1.440858
+AEO2021,2020,Low oil price,pump gasoline,2028,1.990883,1.445462
+AEO2021,2020,Low oil price,pump gasoline,2029,1.986455,1.445318
+AEO2021,2020,Low oil price,pump gasoline,2030,2.060832,1.476627
+AEO2021,2020,Low oil price,pump gasoline,2031,2.061881,1.481634
+AEO2021,2020,Low oil price,pump gasoline,2032,2.101629,1.518236
+AEO2021,2020,Low oil price,pump gasoline,2033,2.117851,1.537913
+AEO2021,2020,Low oil price,pump gasoline,2034,2.122205,1.54563
+AEO2021,2020,Low oil price,pump gasoline,2035,2.140392,1.567012
+AEO2021,2020,Low oil price,pump gasoline,2036,2.146112,1.575876
+AEO2021,2020,Low oil price,pump gasoline,2037,2.168893,1.601534
+AEO2021,2020,Low oil price,pump gasoline,2038,2.172349,1.608016
+AEO2021,2020,Low oil price,pump gasoline,2039,2.185912,1.624462
+AEO2021,2020,Low oil price,pump gasoline,2040,2.180214,1.621854
+AEO2021,2020,Low oil price,pump gasoline,2041,2.175493,1.620192
+AEO2021,2020,Low oil price,pump gasoline,2042,2.182893,1.630554
+AEO2021,2020,Low oil price,pump gasoline,2043,2.185968,1.6367
+AEO2021,2020,Low oil price,pump gasoline,2044,2.192602,1.646415
+AEO2021,2020,Low oil price,pump gasoline,2045,2.194757,1.651687
+AEO2021,2020,Low oil price,pump gasoline,2046,2.203054,1.663065
+AEO2021,2020,Low oil price,pump gasoline,2047,2.212985,1.676052
+AEO2021,2020,Low oil price,pump gasoline,2048,2.225744,1.691836
+AEO2021,2020,Low oil price,pump gasoline,2049,2.222335,1.691565
+AEO2021,2020,Low oil price,pump gasoline,2050,2.238527,1.710728
+AEO2021,2020,Low oil price,pump gasoline,2051,2.254836975,1.730154439
+AEO2021,2020,Low oil price,pump gasoline,2052,2.271265786,1.749847908
+AEO2021,2020,Low oil price,pump gasoline,2053,2.287814297,1.769812051
+AEO2021,2020,Low oil price,pump gasoline,2054,2.304483381,1.790050558
+AEO2021,2020,Low oil price,pump gasoline,2055,2.321273917,1.81056717
+AEO2021,2020,Low oil price,pump gasoline,2056,2.338186789,1.831365682
+AEO2021,2020,Low oil price,pump gasoline,2057,2.355222888,1.852449937
+AEO2021,2020,Low oil price,pump gasoline,2058,2.372383113,1.873823832
+AEO2021,2020,Low oil price,pump gasoline,2059,2.389668369,1.895491317
+AEO2021,2020,Low oil price,pump gasoline,2060,2.407079565,1.917456396
+AEO2021,2020,Low oil price,pump diesel,2020,2.519027,1.914673
+AEO2021,2020,Low oil price,pump diesel,2021,2.131976,1.528922
+AEO2021,2020,Low oil price,pump diesel,2022,2.099797,1.498198
+AEO2021,2020,Low oil price,pump diesel,2023,2.233062,1.633324
+AEO2021,2020,Low oil price,pump diesel,2024,2.280345,1.684392
+AEO2021,2020,Low oil price,pump diesel,2025,2.31734,1.726132
+AEO2021,2020,Low oil price,pump diesel,2026,2.339204,1.753184
+AEO2021,2020,Low oil price,pump diesel,2027,2.356597,1.775921
+AEO2021,2020,Low oil price,pump diesel,2028,2.352677,1.777298
+AEO2021,2020,Low oil price,pump diesel,2029,2.362712,1.792475
+AEO2021,2020,Low oil price,pump diesel,2030,2.412833,1.805644
+AEO2021,2020,Low oil price,pump diesel,2031,2.424775,1.822147
+AEO2021,2020,Low oil price,pump diesel,2032,2.46042,1.856001
+AEO2021,2020,Low oil price,pump diesel,2033,2.465409,1.864851
+AEO2021,2020,Low oil price,pump diesel,2034,2.457345,1.860422
+AEO2021,2020,Low oil price,pump diesel,2035,2.473784,1.880309
+AEO2021,2020,Low oil price,pump diesel,2036,2.47491,1.884961
+AEO2021,2020,Low oil price,pump diesel,2037,2.486598,1.899961
+AEO2021,2020,Low oil price,pump diesel,2038,2.478862,1.895525
+AEO2021,2020,Low oil price,pump diesel,2039,2.489734,1.909502
+AEO2021,2020,Low oil price,pump diesel,2040,2.486219,1.909083
+AEO2021,2020,Low oil price,pump diesel,2041,2.482043,1.908015
+AEO2021,2020,Low oil price,pump diesel,2042,2.475175,1.904462
+AEO2021,2020,Low oil price,pump diesel,2043,2.476809,1.909406
+AEO2021,2020,Low oil price,pump diesel,2044,2.476286,1.912776
+AEO2021,2020,Low oil price,pump diesel,2045,2.484653,1.923734
+AEO2021,2020,Low oil price,pump diesel,2046,2.495137,1.937582
+AEO2021,2020,Low oil price,pump diesel,2047,2.481277,1.927874
+AEO2021,2020,Low oil price,pump diesel,2048,2.50024,1.949748
+AEO2021,2020,Low oil price,pump diesel,2049,2.507994,1.960946
+AEO2021,2020,Low oil price,pump diesel,2050,2.526944,1.983296
+AEO2021,2020,Low oil price,pump diesel,2051,2.546037183,2.00597945
+AEO2021,2020,Low oil price,pump diesel,2052,2.565274631,2.029001332
+AEO2021,2020,Low oil price,pump diesel,2053,2.584657435,2.052366702
+AEO2021,2020,Low oil price,pump diesel,2054,2.604186691,2.076080693
+AEO2021,2020,Low oil price,pump diesel,2055,2.623863508,2.100148514
+AEO2021,2020,Low oil price,pump diesel,2056,2.643688999,2.124575451
+AEO2021,2020,Low oil price,pump diesel,2057,2.663664289,2.14936687
+AEO2021,2020,Low oil price,pump diesel,2058,2.683790508,2.174528217
+AEO2021,2020,Low oil price,pump diesel,2059,2.704068799,2.200065019
+AEO2021,2020,Low oil price,pump diesel,2060,2.724500308,2.225982886
+AEO2022,2021,Reference case,pump gasoline,2021,3.108103,2.54556
+AEO2022,2021,Reference case,pump gasoline,2022,2.980707,2.420085
+AEO2022,2021,Reference case,pump gasoline,2023,2.670641,2.113663
+AEO2022,2021,Reference case,pump gasoline,2024,2.654305,2.101585
+AEO2022,2021,Reference case,pump gasoline,2025,2.626717,2.078554
+AEO2022,2021,Reference case,pump gasoline,2026,2.652568,2.108489
+AEO2022,2021,Reference case,pump gasoline,2027,2.681886,2.141865
+AEO2022,2021,Reference case,pump gasoline,2028,2.71029,2.174199
+AEO2022,2021,Reference case,pump gasoline,2029,2.730041,2.19772
+AEO2022,2021,Reference case,pump gasoline,2030,2.796866,2.26773
+AEO2022,2021,Reference case,pump gasoline,2031,2.885489,2.311565
+AEO2022,2021,Reference case,pump gasoline,2032,2.914136,2.343494
+AEO2022,2021,Reference case,pump gasoline,2033,2.937602,2.36353
+AEO2022,2021,Reference case,pump gasoline,2034,2.959726,2.388925
+AEO2022,2021,Reference case,pump gasoline,2035,2.970234,2.402784
+AEO2022,2021,Reference case,pump gasoline,2036,2.99084,2.426508
+AEO2022,2021,Reference case,pump gasoline,2037,3.009079,2.447831
+AEO2022,2021,Reference case,pump gasoline,2038,3.041573,2.483224
+AEO2022,2021,Reference case,pump gasoline,2039,3.042685,2.48748
+AEO2022,2021,Reference case,pump gasoline,2040,3.066071,2.513788
+AEO2022,2021,Reference case,pump gasoline,2041,3.085062,2.535692
+AEO2022,2021,Reference case,pump gasoline,2042,3.089547,2.543158
+AEO2022,2021,Reference case,pump gasoline,2043,3.119768,2.576096
+AEO2022,2021,Reference case,pump gasoline,2044,3.148813,2.607769
+AEO2022,2021,Reference case,pump gasoline,2045,3.158468,2.620187
+AEO2022,2021,Reference case,pump gasoline,2046,3.183302,2.647612
+AEO2022,2021,Reference case,pump gasoline,2047,3.192658,2.659708
+AEO2022,2021,Reference case,pump gasoline,2048,3.183633,2.65346
+AEO2022,2021,Reference case,pump gasoline,2049,3.185066,2.65757
+AEO2022,2021,Reference case,pump gasoline,2050,3.184005,2.659177
+AEO2022,2021,Reference case,pump gasoline,2051,3.182944353,2.660785391
+AEO2022,2021,Reference case,pump gasoline,2052,3.18188406,2.662395174
+AEO2022,2021,Reference case,pump gasoline,2053,3.18082412,2.66400635
+AEO2022,2021,Reference case,pump gasoline,2054,3.179764533,2.66561892
+AEO2022,2021,Reference case,pump gasoline,2055,3.178705299,2.667232885
+AEO2022,2021,Reference case,pump gasoline,2056,3.177646418,2.668848245
+AEO2022,2021,Reference case,pump gasoline,2057,3.17658789,2.670465002
+AEO2022,2021,Reference case,pump gasoline,2058,3.175529714,2.672083157
+AEO2022,2021,Reference case,pump gasoline,2059,3.174471891,2.67370271
+AEO2022,2021,Reference case,pump gasoline,2060,3.17341442,2.675323662
+AEO2022,2021,Reference case,pump diesel,2021,3.256649,2.671415
+AEO2022,2021,Reference case,pump diesel,2022,3.130803,2.552615
+AEO2022,2021,Reference case,pump diesel,2023,3.020017,2.445145
+AEO2022,2021,Reference case,pump diesel,2024,3.12771,2.557743
+AEO2022,2021,Reference case,pump diesel,2025,3.12511,2.560339
+AEO2022,2021,Reference case,pump diesel,2026,3.121328,2.562002
+AEO2022,2021,Reference case,pump diesel,2027,3.130156,2.576048
+AEO2022,2021,Reference case,pump diesel,2028,3.154742,2.605781
+AEO2022,2021,Reference case,pump diesel,2029,3.173117,2.629022
+AEO2022,2021,Reference case,pump diesel,2030,3.16836,2.628736
+AEO2022,2021,Reference case,pump diesel,2031,3.252505,2.676024
+AEO2022,2021,Reference case,pump diesel,2032,3.265755,2.69333
+AEO2022,2021,Reference case,pump diesel,2033,3.283756,2.709308
+AEO2022,2021,Reference case,pump diesel,2034,3.289173,2.718456
+AEO2022,2021,Reference case,pump diesel,2035,3.302703,2.73586
+AEO2022,2021,Reference case,pump diesel,2036,3.327733,2.764384
+AEO2022,2021,Reference case,pump diesel,2037,3.355228,2.795532
+AEO2022,2021,Reference case,pump diesel,2038,3.373341,2.817646
+AEO2022,2021,Reference case,pump diesel,2039,3.385497,2.833134
+AEO2022,2021,Reference case,pump diesel,2040,3.413533,2.864778
+AEO2022,2021,Reference case,pump diesel,2041,3.428996,2.88394
+AEO2022,2021,Reference case,pump diesel,2042,3.43063,2.889095
+AEO2022,2021,Reference case,pump diesel,2043,3.466384,2.928584
+AEO2022,2021,Reference case,pump diesel,2044,3.505864,2.971561
+AEO2022,2021,Reference case,pump diesel,2045,3.519958,2.988805
+AEO2022,2021,Reference case,pump diesel,2046,3.544848,3.016938
+AEO2022,2021,Reference case,pump diesel,2047,3.552985,3.028105
+AEO2022,2021,Reference case,pump diesel,2048,3.545932,3.024058
+AEO2022,2021,Reference case,pump diesel,2049,3.542737,3.023925
+AEO2022,2021,Reference case,pump diesel,2050,3.534176,3.018371
+AEO2022,2021,Reference case,pump diesel,2051,3.525635688,3.012828943
+AEO2022,2021,Reference case,pump diesel,2052,3.517116013,3.007298802
+AEO2022,2021,Reference case,pump diesel,2053,3.508616926,3.001780553
+AEO2022,2021,Reference case,pump diesel,2054,3.500138377,2.996274169
+AEO2022,2021,Reference case,pump diesel,2055,3.491680316,2.990779624
+AEO2022,2021,Reference case,pump diesel,2056,3.483242694,2.985296893
+AEO2022,2021,Reference case,pump diesel,2057,3.474825462,2.979825951
+AEO2022,2021,Reference case,pump diesel,2058,3.466428569,2.974366771
+AEO2022,2021,Reference case,pump diesel,2059,3.458051968,2.968919329
+AEO2022,2021,Reference case,pump diesel,2060,3.449695609,2.963483598
+AEO2022,2021,High oil price,pump gasoline,2021,3.108103,2.540089
+AEO2022,2021,High oil price,pump gasoline,2022,3.986021,3.413546
+AEO2022,2021,High oil price,pump gasoline,2023,4.023636,3.454476
+AEO2022,2021,High oil price,pump gasoline,2024,4.050073,3.486173
+AEO2022,2021,High oil price,pump gasoline,2025,4.039636,3.481359
+AEO2022,2021,High oil price,pump gasoline,2026,4.129195,3.575539
+AEO2022,2021,High oil price,pump gasoline,2027,4.174231,3.625741
+AEO2022,2021,High oil price,pump gasoline,2028,4.207189,3.663822
+AEO2022,2021,High oil price,pump gasoline,2029,4.234839,3.696796
+AEO2022,2021,High oil price,pump gasoline,2030,4.230105,3.697333
+AEO2022,2021,High oil price,pump gasoline,2031,4.264245,3.68882
+AEO2022,2021,High oil price,pump gasoline,2032,4.293585,3.716242
+AEO2022,2021,High oil price,pump gasoline,2033,4.26067,3.68867
+AEO2022,2021,High oil price,pump gasoline,2034,4.297558,3.730155
+AEO2022,2021,High oil price,pump gasoline,2035,4.337427,3.774519
+AEO2022,2021,High oil price,pump gasoline,2036,4.343325,3.78514
+AEO2022,2021,High oil price,pump gasoline,2037,4.362134,3.80835
+AEO2022,2021,High oil price,pump gasoline,2038,4.357157,3.807794
+AEO2022,2021,High oil price,pump gasoline,2039,4.386668,3.841149
+AEO2022,2021,High oil price,pump gasoline,2040,4.38976,3.848174
+AEO2022,2021,High oil price,pump gasoline,2041,4.365178,3.827589
+AEO2022,2021,High oil price,pump gasoline,2042,4.397264,3.862895
+AEO2022,2021,High oil price,pump gasoline,2043,4.414745,3.883541
+AEO2022,2021,High oil price,pump gasoline,2044,4.408355,3.880266
+AEO2022,2021,High oil price,pump gasoline,2045,4.472436,3.946616
+AEO2022,2021,High oil price,pump gasoline,2046,4.485714,3.962534
+AEO2022,2021,High oil price,pump gasoline,2047,4.531804,4.010819
+AEO2022,2021,High oil price,pump gasoline,2048,4.575715,4.056766
+AEO2022,2021,High oil price,pump gasoline,2049,4.617884,4.100845
+AEO2022,2021,High oil price,pump gasoline,2050,4.678257,4.162901
+AEO2022,2021,High oil price,pump gasoline,2051,4.739419301,4.225972133
+AEO2022,2021,High oil price,pump gasoline,2052,4.801381221,4.290074959
+AEO2022,2021,High oil price,pump gasoline,2053,4.864153216,4.355226311
+AEO2022,2021,High oil price,pump gasoline,2054,4.927745875,4.421443292
+AEO2022,2021,High oil price,pump gasoline,2055,4.992169927,4.488743289
+AEO2022,2021,High oil price,pump gasoline,2056,5.057436243,4.557143969
+AEO2022,2021,High oil price,pump gasoline,2057,5.123555833,4.626663289
+AEO2022,2021,High oil price,pump gasoline,2058,5.190539854,4.697319499
+AEO2022,2021,High oil price,pump gasoline,2059,5.258399606,4.769131146
+AEO2022,2021,High oil price,pump gasoline,2060,5.327146538,4.84211708
+AEO2022,2021,High oil price,pump diesel,2021,3.256176,2.671052
+AEO2022,2021,High oil price,pump diesel,2022,4.278635,3.701767
+AEO2022,2021,High oil price,pump diesel,2023,4.487306,3.915219
+AEO2022,2021,High oil price,pump diesel,2024,4.636775,4.071961
+AEO2022,2021,High oil price,pump diesel,2025,4.677221,4.119391
+AEO2022,2021,High oil price,pump diesel,2026,4.743307,4.192294
+AEO2022,2021,High oil price,pump diesel,2027,4.771352,4.227758
+AEO2022,2021,High oil price,pump diesel,2028,4.799779,4.263319
+AEO2022,2021,High oil price,pump diesel,2029,4.84679,4.317005
+AEO2022,2021,High oil price,pump diesel,2030,4.842371,4.318899
+AEO2022,2021,High oil price,pump diesel,2031,4.838721,4.285355
+AEO2022,2021,High oil price,pump diesel,2032,4.860217,4.307992
+AEO2022,2021,High oil price,pump diesel,2033,4.870652,4.324359
+AEO2022,2021,High oil price,pump diesel,2034,4.92131,4.380897
+AEO2022,2021,High oil price,pump diesel,2035,4.969253,4.43481
+AEO2022,2021,High oil price,pump diesel,2036,5.046187,4.517543
+AEO2022,2021,High oil price,pump diesel,2037,5.104257,4.581188
+AEO2022,2021,High oil price,pump diesel,2038,5.084864,4.567671
+AEO2022,2021,High oil price,pump diesel,2039,5.136969,4.624686
+AEO2022,2021,High oil price,pump diesel,2040,5.151136,4.643487
+AEO2022,2021,High oil price,pump diesel,2041,5.149637,4.646584
+AEO2022,2021,High oil price,pump diesel,2042,5.194273,4.696014
+AEO2022,2021,High oil price,pump diesel,2043,5.22647,4.733282
+AEO2022,2021,High oil price,pump diesel,2044,5.240697,4.750923
+AEO2022,2021,High oil price,pump diesel,2045,5.288114,4.801546
+AEO2022,2021,High oil price,pump diesel,2046,5.315661,4.832078
+AEO2022,2021,High oil price,pump diesel,2047,5.36629,4.88555
+AEO2022,2021,High oil price,pump diesel,2048,5.418056,4.940032
+AEO2022,2021,High oil price,pump diesel,2049,5.458607,4.983147
+AEO2022,2021,High oil price,pump diesel,2050,5.506412,5.033486
+AEO2022,2021,High oil price,pump diesel,2051,5.554635663,5.084387717
+AEO2022,2021,High oil price,pump diesel,2052,5.603281656,5.135858442
+AEO2022,2021,High oil price,pump diesel,2053,5.652353678,5.187904535
+AEO2022,2021,High oil price,pump diesel,2054,5.701855459,5.240532427
+AEO2022,2021,High oil price,pump diesel,2055,5.751790763,5.293748623
+AEO2022,2021,High oil price,pump diesel,2056,5.802163386,5.347559697
+AEO2022,2021,High oil price,pump diesel,2057,5.85297716,5.4019723
+AEO2022,2021,High oil price,pump diesel,2058,5.904235947,5.456993155
+AEO2022,2021,High oil price,pump diesel,2059,5.955943645,5.512629062
+AEO2022,2021,High oil price,pump diesel,2060,6.008104184,5.568886896
+AEO2022,2021,Low oil price,pump gasoline,2021,3.108104,2.547972
+AEO2022,2021,Low oil price,pump gasoline,2022,2.287425,1.730828
+AEO2022,2021,Low oil price,pump gasoline,2023,2.12634,1.573965
+AEO2022,2021,Low oil price,pump gasoline,2024,2.066026,1.518004
+AEO2022,2021,Low oil price,pump gasoline,2025,2.044626,1.500871
+AEO2022,2021,Low oil price,pump gasoline,2026,2.04304,1.503512
+AEO2022,2021,Low oil price,pump gasoline,2027,2.021039,1.485792
+AEO2022,2021,Low oil price,pump gasoline,2028,2.044524,1.513048
+AEO2022,2021,Low oil price,pump gasoline,2029,2.054094,1.526311
+AEO2022,2021,Low oil price,pump gasoline,2030,2.068767,1.544367
+AEO2022,2021,Low oil price,pump gasoline,2031,2.157287,1.587792
+AEO2022,2021,Low oil price,pump gasoline,2032,2.174567,1.608173
+AEO2022,2021,Low oil price,pump gasoline,2033,2.19874,1.628544
+AEO2022,2021,Low oil price,pump gasoline,2034,2.209954,1.642745
+AEO2022,2021,Low oil price,pump gasoline,2035,2.235742,1.671395
+AEO2022,2021,Low oil price,pump gasoline,2036,2.246259,1.684833
+AEO2022,2021,Low oil price,pump gasoline,2037,2.258811,1.700289
+AEO2022,2021,Low oil price,pump gasoline,2038,2.26752,1.711872
+AEO2022,2021,Low oil price,pump gasoline,2039,2.25654,1.703742
+AEO2022,2021,Low oil price,pump gasoline,2040,2.248301,1.698472
+AEO2022,2021,Low oil price,pump gasoline,2041,2.240239,1.693158
+AEO2022,2021,Low oil price,pump gasoline,2042,2.241032,1.696629
+AEO2022,2021,Low oil price,pump gasoline,2043,2.240911,1.699149
+AEO2022,2021,Low oil price,pump gasoline,2044,2.253163,1.713881
+AEO2022,2021,Low oil price,pump gasoline,2045,2.253333,1.716658
+AEO2022,2021,Low oil price,pump gasoline,2046,2.256355,1.722365
+AEO2022,2021,Low oil price,pump gasoline,2047,2.255193,1.723898
+AEO2022,2021,Low oil price,pump gasoline,2048,2.258887,1.730202
+AEO2022,2021,Low oil price,pump gasoline,2049,2.265865,1.739679
+AEO2022,2021,Low oil price,pump gasoline,2050,2.266827,1.744118
+AEO2022,2021,Low oil price,pump gasoline,2051,2.267789408,1.748575022
+AEO2022,2021,Low oil price,pump gasoline,2052,2.268752225,1.753050122
+AEO2022,2021,Low oil price,pump gasoline,2053,2.269715451,1.757543357
+AEO2022,2021,Low oil price,pump gasoline,2054,2.270679086,1.762054783
+AEO2022,2021,Low oil price,pump gasoline,2055,2.27164313,1.76658446
+AEO2022,2021,Low oil price,pump gasoline,2056,2.272607583,1.771132442
+AEO2022,2021,Low oil price,pump gasoline,2057,2.273572446,1.775698789
+AEO2022,2021,Low oil price,pump gasoline,2058,2.274537718,1.780283558
+AEO2022,2021,Low oil price,pump gasoline,2059,2.2755034,1.784886806
+AEO2022,2021,Low oil price,pump gasoline,2060,2.276469492,1.789508593
+AEO2022,2021,Low oil price,pump diesel,2021,3.256372,2.671189
+AEO2022,2021,Low oil price,pump diesel,2022,2.309491,1.72987
+AEO2022,2021,Low oil price,pump diesel,2023,2.318459,1.74278
+AEO2022,2021,Low oil price,pump diesel,2024,2.329209,1.757614
+AEO2022,2021,Low oil price,pump diesel,2025,2.330295,1.763776
+AEO2022,2021,Low oil price,pump diesel,2026,2.312203,1.750877
+AEO2022,2021,Low oil price,pump diesel,2027,2.274773,1.718411
+AEO2022,2021,Low oil price,pump diesel,2028,2.300732,1.749308
+AEO2022,2021,Low oil price,pump diesel,2029,2.301899,1.755072
+AEO2022,2021,Low oil price,pump diesel,2030,2.318325,1.775703
+AEO2022,2021,Low oil price,pump diesel,2031,2.374387,1.793786
+AEO2022,2021,Low oil price,pump diesel,2032,2.382227,1.805259
+AEO2022,2021,Low oil price,pump diesel,2033,2.406506,1.826859
+AEO2022,2021,Low oil price,pump diesel,2034,2.403668,1.827219
+AEO2022,2021,Low oil price,pump diesel,2035,2.436568,1.863393
+AEO2022,2021,Low oil price,pump diesel,2036,2.430542,1.86058
+AEO2022,2021,Low oil price,pump diesel,2037,2.432682,1.865909
+AEO2022,2021,Low oil price,pump diesel,2038,2.409017,1.845345
+AEO2022,2021,Low oil price,pump diesel,2039,2.403234,1.842637
+AEO2022,2021,Low oil price,pump diesel,2040,2.395258,1.837736
+AEO2022,2021,Low oil price,pump diesel,2041,2.389592,1.835296
+AEO2022,2021,Low oil price,pump diesel,2042,2.377803,1.826689
+AEO2022,2021,Low oil price,pump diesel,2043,2.369852,1.821943
+AEO2022,2021,Low oil price,pump diesel,2044,2.37927,1.834518
+AEO2022,2021,Low oil price,pump diesel,2045,2.375665,1.833873
+AEO2022,2021,Low oil price,pump diesel,2046,2.376232,1.837398
+AEO2022,2021,Low oil price,pump diesel,2047,2.374143,1.838213
+AEO2022,2021,Low oil price,pump diesel,2048,2.37792,1.844887
+AEO2022,2021,Low oil price,pump diesel,2049,2.3703,1.840072
+AEO2022,2021,Low oil price,pump diesel,2050,2.386673,1.859229
+AEO2022,2021,Low oil price,pump diesel,2051,2.403159098,1.878655361
+AEO2022,2021,Low oil price,pump diesel,2052,2.419759074,1.898354877
+AEO2022,2021,Low oil price,pump diesel,2053,2.436473716,1.918331393
+AEO2022,2021,Low oil price,pump diesel,2054,2.453303815,1.938588812
+AEO2022,2021,Low oil price,pump diesel,2055,2.470250169,1.959131089
+AEO2022,2021,Low oil price,pump diesel,2056,2.487313581,1.979962235
+AEO2022,2021,Low oil price,pump diesel,2057,2.50449486,2.001086318
+AEO2022,2021,Low oil price,pump diesel,2058,2.52179482,2.022507464
+AEO2022,2021,Low oil price,pump diesel,2059,2.53921428,2.044229856
+AEO2022,2021,Low oil price,pump diesel,2060,2.556754066,2.066257737
+AEO2023,2022,Reference case,pump gasoline,2022,4.18362,3.630191
+AEO2023,2022,Reference case,pump gasoline,2023,3.661955,3.118264
+AEO2023,2022,Reference case,pump gasoline,2024,3.324864,2.786285
+AEO2023,2022,Reference case,pump gasoline,2025,3.105705,2.573572
+AEO2023,2022,Reference case,pump gasoline,2026,3.072808,2.545253
+AEO2023,2022,Reference case,pump gasoline,2027,3.053247,2.530096
+AEO2023,2022,Reference case,pump gasoline,2028,3.052871,2.533875
+AEO2023,2022,Reference case,pump gasoline,2029,3.057626,2.542762
+AEO2023,2022,Reference case,pump gasoline,2030,3.067657,2.556915
+AEO2023,2022,Reference case,pump gasoline,2031,3.062736,2.55617
+AEO2023,2022,Reference case,pump gasoline,2032,3.078265,2.575692
+AEO2023,2022,Reference case,pump gasoline,2033,3.085217,2.58673
+AEO2023,2022,Reference case,pump gasoline,2034,3.095258,2.600774
+AEO2023,2022,Reference case,pump gasoline,2035,3.101557,2.611039
+AEO2023,2022,Reference case,pump gasoline,2036,3.134493,2.647436
+AEO2023,2022,Reference case,pump gasoline,2037,3.138698,2.655259
+AEO2023,2022,Reference case,pump gasoline,2038,3.147909,2.667901
+AEO2023,2022,Reference case,pump gasoline,2039,3.161265,2.684505
+AEO2023,2022,Reference case,pump gasoline,2040,3.165112,2.691646
+AEO2023,2022,Reference case,pump gasoline,2041,3.164898,2.694711
+AEO2023,2022,Reference case,pump gasoline,2042,3.172778,2.705702
+AEO2023,2022,Reference case,pump gasoline,2043,3.159735,2.695939
+AEO2023,2022,Reference case,pump gasoline,2044,3.180168,2.719227
+AEO2023,2022,Reference case,pump gasoline,2045,3.181143,2.721342
+AEO2023,2022,Reference case,pump gasoline,2046,3.269686,2.777465
+AEO2023,2022,Reference case,pump gasoline,2047,3.269069,2.780017
+AEO2023,2022,Reference case,pump gasoline,2048,3.295266,2.808998
+AEO2023,2022,Reference case,pump gasoline,2049,3.303456,2.820143
+AEO2023,2022,Reference case,pump gasoline,2050,3.331972,2.85132
+AEO2023,2022,Reference case,pump gasoline,2051,3.360734155,2.882889635
+AEO2023,2022,Reference case,pump gasoline,2052,3.38974459,2.914856798
+AEO2023,2022,Reference case,pump gasoline,2053,3.419005448,2.947226443
+AEO2023,2022,Reference case,pump gasoline,2054,3.448518891,2.980003588
+AEO2023,2022,Reference case,pump gasoline,2055,3.478287098,3.013193311
+AEO2023,2022,Reference case,pump gasoline,2056,3.50831227,3.046800754
+AEO2023,2022,Reference case,pump gasoline,2057,3.538596625,3.080831123
+AEO2023,2022,Reference case,pump gasoline,2058,3.569142399,3.11528969
+AEO2023,2022,Reference case,pump gasoline,2059,3.59995185,3.150181793
+AEO2023,2022,Reference case,pump gasoline,2060,3.631027253,3.185512834
+AEO2023,2022,Reference case,pump diesel,2022,5.105059,4.534457
+AEO2023,2022,Reference case,pump diesel,2023,4.518414,3.95697
+AEO2023,2022,Reference case,pump diesel,2024,4.286637,3.73079
+AEO2023,2022,Reference case,pump diesel,2025,3.996505,3.445461
+AEO2023,2022,Reference case,pump diesel,2026,3.869371,3.32293
+AEO2023,2022,Reference case,pump diesel,2027,3.741054,3.199108
+AEO2023,2022,Reference case,pump diesel,2028,3.634589,3.096978
+AEO2023,2022,Reference case,pump diesel,2029,3.647751,3.114693
+AEO2023,2022,Reference case,pump diesel,2030,3.651149,3.122572
+AEO2023,2022,Reference case,pump diesel,2031,3.672718,3.148627
+AEO2023,2022,Reference case,pump diesel,2032,3.689976,3.170337
+AEO2023,2022,Reference case,pump diesel,2033,3.706393,3.191192
+AEO2023,2022,Reference case,pump diesel,2034,3.712827,3.202062
+AEO2023,2022,Reference case,pump diesel,2035,3.741309,3.23476
+AEO2023,2022,Reference case,pump diesel,2036,3.742129,3.239661
+AEO2023,2022,Reference case,pump diesel,2037,3.761191,3.262592
+AEO2023,2022,Reference case,pump diesel,2038,3.775079,3.28023
+AEO2023,2022,Reference case,pump diesel,2039,3.780975,3.289756
+AEO2023,2022,Reference case,pump diesel,2040,3.787541,3.299955
+AEO2023,2022,Reference case,pump diesel,2041,3.810997,3.326997
+AEO2023,2022,Reference case,pump diesel,2042,3.812437,3.331949
+AEO2023,2022,Reference case,pump diesel,2043,3.828923,3.351907
+AEO2023,2022,Reference case,pump diesel,2044,3.815942,3.342346
+AEO2023,2022,Reference case,pump diesel,2045,3.82362,3.351127
+AEO2023,2022,Reference case,pump diesel,2046,3.90424,3.39162
+AEO2023,2022,Reference case,pump diesel,2047,3.907707,3.398527
+AEO2023,2022,Reference case,pump diesel,2048,3.914353,3.408837
+AEO2023,2022,Reference case,pump diesel,2049,3.923101,3.421015
+AEO2023,2022,Reference case,pump diesel,2050,3.924145,3.425328
+AEO2023,2022,Reference case,pump diesel,2051,3.925189278,3.429647669
+AEO2023,2022,Reference case,pump diesel,2052,3.926233834,3.433974017
+AEO2023,2022,Reference case,pump diesel,2053,3.927278667,3.438307054
+AEO2023,2022,Reference case,pump diesel,2054,3.928323779,3.442646791
+AEO2023,2022,Reference case,pump diesel,2055,3.929369169,3.446993236
+AEO2023,2022,Reference case,pump diesel,2056,3.930414837,3.451346402
+AEO2023,2022,Reference case,pump diesel,2057,3.931460783,3.455706297
+AEO2023,2022,Reference case,pump diesel,2058,3.932507008,3.460072932
+AEO2023,2022,Reference case,pump diesel,2059,3.933553511,3.464446316
+AEO2023,2022,Reference case,pump diesel,2060,3.934600293,3.468826462
+AEO2023,2022,High oil price,pump gasoline,2022,4.183618,3.626497
+AEO2023,2022,High oil price,pump gasoline,2023,5.240892,4.679955
+AEO2023,2022,High oil price,pump gasoline,2024,5.009673,4.456634
+AEO2023,2022,High oil price,pump gasoline,2025,4.95791,4.411159
+AEO2023,2022,High oil price,pump gasoline,2026,4.889524,4.349092
+AEO2023,2022,High oil price,pump gasoline,2027,4.818536,4.284111
+AEO2023,2022,High oil price,pump gasoline,2028,4.752012,4.223602
+AEO2023,2022,High oil price,pump gasoline,2029,4.765383,4.2421
+AEO2023,2022,High oil price,pump gasoline,2030,4.754299,4.236072
+AEO2023,2022,High oil price,pump gasoline,2031,4.745644,4.232526
+AEO2023,2022,High oil price,pump gasoline,2032,4.697002,4.188972
+AEO2023,2022,High oil price,pump gasoline,2033,4.696925,4.193559
+AEO2023,2022,High oil price,pump gasoline,2034,4.7232,4.224138
+AEO2023,2022,High oil price,pump gasoline,2035,4.732477,4.237741
+AEO2023,2022,High oil price,pump gasoline,2036,4.699714,4.209386
+AEO2023,2022,High oil price,pump gasoline,2037,4.742592,4.255727
+AEO2023,2022,High oil price,pump gasoline,2038,4.680834,4.198206
+AEO2023,2022,High oil price,pump gasoline,2039,4.662844,4.183864
+AEO2023,2022,High oil price,pump gasoline,2040,4.67693,4.197426
+AEO2023,2022,High oil price,pump gasoline,2041,4.715171,4.210969
+AEO2023,2022,High oil price,pump gasoline,2042,4.677471,4.177349
+AEO2023,2022,High oil price,pump gasoline,2043,4.666968,4.170128
+AEO2023,2022,High oil price,pump gasoline,2044,4.692246,4.198697
+AEO2023,2022,High oil price,pump gasoline,2045,4.663033,4.172349
+AEO2023,2022,High oil price,pump gasoline,2046,4.674571,4.186799
+AEO2023,2022,High oil price,pump gasoline,2047,4.706324,4.221067
+AEO2023,2022,High oil price,pump gasoline,2048,4.830201,4.346273
+AEO2023,2022,High oil price,pump gasoline,2049,4.812518,4.330749
+AEO2023,2022,High oil price,pump gasoline,2050,4.853505,4.373469
+AEO2023,2022,High oil price,pump gasoline,2051,4.894841076,4.416647653
+AEO2023,2022,High oil price,pump gasoline,2052,4.936529201,4.460289843
+AEO2023,2022,High oil price,pump gasoline,2053,4.978572373,4.504400502
+AEO2023,2022,High oil price,pump gasoline,2054,5.020973616,4.548984618
+AEO2023,2022,High oil price,pump gasoline,2055,5.06373598,4.594047232
+AEO2023,2022,High oil price,pump gasoline,2056,5.10686254,4.639593436
+AEO2023,2022,High oil price,pump gasoline,2057,5.150356398,4.685628379
+AEO2023,2022,High oil price,pump gasoline,2058,5.194220682,4.732157265
+AEO2023,2022,High oil price,pump gasoline,2059,5.238458548,4.77918535
+AEO2023,2022,High oil price,pump gasoline,2060,5.283073176,4.82671795
+AEO2023,2022,High oil price,pump diesel,2022,5.105308,4.534677
+AEO2023,2022,High oil price,pump diesel,2023,5.909949,5.350881
+AEO2023,2022,High oil price,pump diesel,2024,5.782188,5.230391
+AEO2023,2022,High oil price,pump diesel,2025,5.803475,5.258274
+AEO2023,2022,High oil price,pump diesel,2026,5.752724,5.213681
+AEO2023,2022,High oil price,pump diesel,2027,5.71117,5.178028
+AEO2023,2022,High oil price,pump diesel,2028,5.615468,5.087565
+AEO2023,2022,High oil price,pump diesel,2029,5.641919,5.119433
+AEO2023,2022,High oil price,pump diesel,2030,5.676197,5.158624
+AEO2023,2022,High oil price,pump diesel,2031,5.730224,5.217827
+AEO2023,2022,High oil price,pump diesel,2032,5.725389,5.217507
+AEO2023,2022,High oil price,pump diesel,2033,5.768436,5.265171
+AEO2023,2022,High oil price,pump diesel,2034,5.834577,5.335842
+AEO2023,2022,High oil price,pump diesel,2035,5.838967,5.344439
+AEO2023,2022,High oil price,pump diesel,2036,5.836132,5.345483
+AEO2023,2022,High oil price,pump diesel,2037,5.898245,5.411508
+AEO2023,2022,High oil price,pump diesel,2038,5.867742,5.384698
+AEO2023,2022,High oil price,pump diesel,2039,5.888883,5.40916
+AEO2023,2022,High oil price,pump diesel,2040,5.929533,5.44878
+AEO2023,2022,High oil price,pump diesel,2041,6.039544,5.529065
+AEO2023,2022,High oil price,pump diesel,2042,6.120258,5.613039
+AEO2023,2022,High oil price,pump diesel,2043,6.172343,5.668029
+AEO2023,2022,High oil price,pump diesel,2044,6.22396,5.722398
+AEO2023,2022,High oil price,pump diesel,2045,6.202194,5.703252
+AEO2023,2022,High oil price,pump diesel,2046,6.198706,5.702299
+AEO2023,2022,High oil price,pump diesel,2047,6.21555,5.721616
+AEO2023,2022,High oil price,pump diesel,2048,6.242464,5.750695
+AEO2023,2022,High oil price,pump diesel,2049,6.213806,5.724496
+AEO2023,2022,High oil price,pump diesel,2050,6.212902,5.725734
+AEO2023,2022,High oil price,pump diesel,2051,6.211998132,5.726972306
+AEO2023,2022,High oil price,pump diesel,2052,6.211094395,5.728210918
+AEO2023,2022,High oil price,pump diesel,2053,6.210190789,5.729449836
+AEO2023,2022,High oil price,pump diesel,2054,6.209287315,5.73068906
+AEO2023,2022,High oil price,pump diesel,2055,6.208383972,5.73192859
+AEO2023,2022,High oil price,pump diesel,2056,6.207480761,5.733168426
+AEO2023,2022,High oil price,pump diesel,2057,6.206577681,5.734408569
+AEO2023,2022,High oil price,pump diesel,2058,6.205674733,5.735649018
+AEO2023,2022,High oil price,pump diesel,2059,6.204771916,5.736889773
+AEO2023,2022,High oil price,pump diesel,2060,6.20386923,5.738130835
+AEO2023,2022,Low oil price,pump gasoline,2022,4.183618,3.631685
+AEO2023,2022,Low oil price,pump gasoline,2023,2.545594,2.009788
+AEO2023,2022,Low oil price,pump gasoline,2024,2.37752,1.8469
+AEO2023,2022,Low oil price,pump gasoline,2025,2.278583,1.752629
+AEO2023,2022,Low oil price,pump gasoline,2026,2.230226,1.708468
+AEO2023,2022,Low oil price,pump gasoline,2027,2.194605,1.676897
+AEO2023,2022,Low oil price,pump gasoline,2028,2.200456,1.686278
+AEO2023,2022,Low oil price,pump gasoline,2029,2.204155,1.693525
+AEO2023,2022,Low oil price,pump gasoline,2030,2.213358,1.706222
+AEO2023,2022,Low oil price,pump gasoline,2031,2.223932,1.720235
+AEO2023,2022,Low oil price,pump gasoline,2032,2.23776,1.737456
+AEO2023,2022,Low oil price,pump gasoline,2033,2.249078,1.75226
+AEO2023,2022,Low oil price,pump gasoline,2034,2.246899,1.753639
+AEO2023,2022,Low oil price,pump gasoline,2035,2.261724,1.771759
+AEO2023,2022,Low oil price,pump gasoline,2036,2.269348,1.782581
+AEO2023,2022,Low oil price,pump gasoline,2037,2.275483,1.791781
+AEO2023,2022,Low oil price,pump gasoline,2038,2.268339,1.7877
+AEO2023,2022,Low oil price,pump gasoline,2039,2.283086,1.805219
+AEO2023,2022,Low oil price,pump gasoline,2040,2.255893,1.781153
+AEO2023,2022,Low oil price,pump gasoline,2041,2.245162,1.773281
+AEO2023,2022,Low oil price,pump gasoline,2042,2.245786,1.776544
+AEO2023,2022,Low oil price,pump gasoline,2043,2.248189,1.781522
+AEO2023,2022,Low oil price,pump gasoline,2044,2.311599,1.807012
+AEO2023,2022,Low oil price,pump gasoline,2045,2.322505,1.82047
+AEO2023,2022,Low oil price,pump gasoline,2046,2.33333,1.833859
+AEO2023,2022,Low oil price,pump gasoline,2047,2.32091,1.823955
+AEO2023,2022,Low oil price,pump gasoline,2048,2.338596,1.843946
+AEO2023,2022,Low oil price,pump gasoline,2049,2.366859,1.868597
+AEO2023,2022,Low oil price,pump gasoline,2050,2.381358,1.884926
+AEO2023,2022,Low oil price,pump gasoline,2051,2.395945819,1.901425393
+AEO2023,2022,Low oil price,pump gasoline,2052,2.410623,1.918096956
+AEO2023,2022,Low oil price,pump gasoline,2053,2.425390091,1.934942483
+AEO2023,2022,Low oil price,pump gasoline,2054,2.440247643,1.951963786
+AEO2023,2022,Low oil price,pump gasoline,2055,2.45519621,1.9691627
+AEO2023,2022,Low oil price,pump gasoline,2056,2.47023635,1.986541074
+AEO2023,2022,Low oil price,pump gasoline,2057,2.485368623,2.004100779
+AEO2023,2022,Low oil price,pump gasoline,2058,2.500593594,2.021843706
+AEO2023,2022,Low oil price,pump gasoline,2059,2.515911831,2.039771764
+AEO2023,2022,Low oil price,pump gasoline,2060,2.531323905,2.057886883
+AEO2023,2022,Low oil price,pump diesel,2022,5.10296,4.532587
+AEO2023,2022,Low oil price,pump diesel,2023,2.777626,2.21533
+AEO2023,2022,Low oil price,pump diesel,2024,2.731781,2.173851
+AEO2023,2022,Low oil price,pump diesel,2025,2.688615,2.134597
+AEO2023,2022,Low oil price,pump diesel,2026,2.646331,2.096435
+AEO2023,2022,Low oil price,pump diesel,2027,2.596217,2.050321
+AEO2023,2022,Low oil price,pump diesel,2028,2.603714,2.061718
+AEO2023,2022,Low oil price,pump diesel,2029,2.604649,2.066448
+AEO2023,2022,Low oil price,pump diesel,2030,2.622558,2.088106
+AEO2023,2022,Low oil price,pump diesel,2031,2.634599,2.104025
+AEO2023,2022,Low oil price,pump diesel,2032,2.636212,2.109482
+AEO2023,2022,Low oil price,pump diesel,2033,2.646798,2.123936
+AEO2023,2022,Low oil price,pump diesel,2034,2.631223,2.112185
+AEO2023,2022,Low oil price,pump diesel,2035,2.638885,2.123542
+AEO2023,2022,Low oil price,pump diesel,2036,2.649937,2.138147
+AEO2023,2022,Low oil price,pump diesel,2037,2.652752,2.144358
+AEO2023,2022,Low oil price,pump diesel,2038,2.644155,2.139026
+AEO2023,2022,Low oil price,pump diesel,2039,2.652517,2.150589
+AEO2023,2022,Low oil price,pump diesel,2040,2.639812,2.141048
+AEO2023,2022,Low oil price,pump diesel,2041,2.622663,2.126967
+AEO2023,2022,Low oil price,pump diesel,2042,2.618952,2.126232
+AEO2023,2022,Low oil price,pump diesel,2043,2.61039,2.120573
+AEO2023,2022,Low oil price,pump diesel,2044,2.679433,2.144346
+AEO2023,2022,Low oil price,pump diesel,2045,2.679338,2.146794
+AEO2023,2022,Low oil price,pump diesel,2046,2.697257,2.167115
+AEO2023,2022,Low oil price,pump diesel,2047,2.669903,2.142147
+AEO2023,2022,Low oil price,pump diesel,2048,2.667041,2.14175
+AEO2023,2022,Low oil price,pump diesel,2049,2.67677,2.146756
+AEO2023,2022,Low oil price,pump diesel,2050,2.688537,2.160882
+AEO2023,2022,Low oil price,pump diesel,2051,2.700355727,2.17513143
+AEO2023,2022,Low oil price,pump diesel,2052,2.71222641,2.189505365
+AEO2023,2022,Low oil price,pump diesel,2053,2.724149275,2.20400489
+AEO2023,2022,Low oil price,pump diesel,2054,2.736124553,2.2186311
+AEO2023,2022,Low oil price,pump diesel,2055,2.748152474,2.233385098
+AEO2023,2022,Low oil price,pump diesel,2056,2.760233269,2.248267998
+AEO2023,2022,Low oil price,pump diesel,2057,2.772367171,2.263280924
+AEO2023,2022,Low oil price,pump diesel,2058,2.784554413,2.278425008
+AEO2023,2022,Low oil price,pump diesel,2059,2.79679523,2.293701393
+AEO2023,2022,Low oil price,pump diesel,2060,2.809089857,2.309111232
