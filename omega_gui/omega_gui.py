@@ -771,9 +771,14 @@ class Form(QObject):
             batch_definition_df = pandas.read_csv(input_batch_file, index_col=0)
         # Create timestamp for batch filename
         batch_time_stamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+
         # Create path to batch log file
-        output_batch_subdirectory = output_batch_directory + os.sep + batch_time_stamp + '_' + \
-            batch_definition_df.loc['Batch Name', 'Value']
+        if 'Value' in batch_definition_df.columns:
+            batch_name = batch_definition_df.loc['Batch Name', 'Value']
+        else:
+            batch_name = batch_definition_df.loc['Batch Name'].iloc[0]
+
+        output_batch_subdirectory = output_batch_directory + os.sep + batch_time_stamp + '_' + batch_name
 
         # Play a model start sound
         # sound1 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_start], close_fds=True)
