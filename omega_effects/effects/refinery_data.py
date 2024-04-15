@@ -258,7 +258,7 @@ class RefineryData:
 
         return df_rates
 
-    def get_data(self, calendar_year, reg_class_id, fuel, *args):
+    def get_data(self, calendar_year, reg_class_id=None, fuel=None, *args):
         """
 
         Get emission rates by calendar year
@@ -285,7 +285,8 @@ class RefineryData:
         for arg in args:
             return_data.append(self.data[calendar_year][arg])
 
-        self.cache[calendar_year, reg_class_id, fuel] = return_data
+        if reg_class_id:
+            self.cache[calendar_year, reg_class_id, fuel] = return_data
 
         return return_data
 

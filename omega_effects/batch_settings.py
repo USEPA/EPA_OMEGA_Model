@@ -256,6 +256,7 @@ from pathlib import Path
 from omega_effects.general.general_functions import read_input_file
 from omega_effects.context.ip_deflators import ImplicitPriceDeflators
 from omega_effects.context.cpi_price_deflators import CPIPriceDeflators
+from omega_effects.context.legacy_fleet_fuel_consumption_adjustment import LegacyFleetFuelConsumptionAdjustment
 from omega_effects.effects.cost_factors_criteria import CostFactorsCriteria
 from omega_effects.effects.cost_factors_scghg import CostFactorsSCGHG
 from omega_effects.effects.cost_factors_energysecurity import CostFactorsEnergySecurity
@@ -367,6 +368,7 @@ class BatchSettings:
         self.onroad_fuels = None
         self.context_fuel_cost_per_mile = None
         self.legacy_fleet = None
+        self.legacy_fleet_fc_adjustment = None
         self.ip_deflators = None
         self.cpi_deflators = None
 
@@ -678,6 +680,8 @@ class BatchSettings:
             self.context_stock_and_vmt = ContextStockVMT()
             self.context_stock_and_vmt.init_from_file(self.context_stock_and_vmt_file, self, effects_log)
             self.inputs_filelist.append(self.context_stock_and_vmt_file)
+
+            self.legacy_fleet_fc_adjustment = LegacyFleetFuelConsumptionAdjustment()
 
             self.insurance_and_taxes_cost_factors = InsuranceAndTaxes()
             self.insurance_and_taxes_cost_factors.init_from_file(
