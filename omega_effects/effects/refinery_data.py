@@ -174,6 +174,8 @@ class RefineryData:
         df_rates = pd.concat([
             df_rates,
             df['fuel_reduction_leading_to_reduced_domestic_refining'],
+            df['retail_gasoline_million_barrels_per_day'],
+            df['diesel_million_barrels_per_day'],
             df['context_scaler_lmdv_car_gasoline'],
             df['context_scaler_lmdv_truck_gasoline'],
             df['context_scaler_lmdv_mediumduty_gasoline'],
