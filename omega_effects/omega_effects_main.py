@@ -111,6 +111,8 @@ def main():
 
         effects_log.logwrite(f'\nAdjusting legacy fleet VMT and stock for Context')
         batch_settings.legacy_fleet.adjust_legacy_fleet_stock_and_vmt(batch_settings, vmt_adjustments_context)
+
+        effects_log.logwrite(f'\nAdjusting legacy fleet fuel consumption rates for consistency with Context')
         batch_settings.legacy_fleet_fc_adjustment.calc_analysis_start_year_fuel_consumption(batch_settings, session_settings)
         batch_settings.legacy_fleet_fc_adjustment.calc_adjustments(batch_settings)
 

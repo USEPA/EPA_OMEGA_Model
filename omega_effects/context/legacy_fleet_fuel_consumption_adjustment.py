@@ -67,14 +67,8 @@ class LegacyFleetFuelConsumptionAdjustment:
                 fuel = [item for item in fuel_dict][0]
 
                 onroad_miles_per_gallon = v['miles_per_gallon'] * 0.8
-                try:
-                    # onroad_direct_co2e_grams_per_mile = 8887 / onroad_miles_per_gallon
-                    onroad_gallons_per_mile = 1 / onroad_miles_per_gallon
-                except ZeroDivisionError:
-                    # onroad_direct_co2e_grams_per_mile = 0
-                    onroad_gallons_per_mile = 0
 
-                fuel_consumption_gallons = v['vmt'] * onroad_gallons_per_mile
+                fuel_consumption_gallons = v['vmt'] / onroad_miles_per_gallon
 
                 if ('legacy', fuel) in self.data:
                     self.data['legacy', fuel] = self.data['legacy', fuel] + fuel_consumption_gallons

@@ -443,20 +443,13 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'kwh_per_mile': v['kwh_per_mile'],
         })
 
-        onroad_miles_per_gallon_data = v['miles_per_gallon'] * 0.8
+        onroad_gallons_per_mile = onroad_miles_per_gallon = 0
+        onroad_direct_co2e_grams_per_mile = 0
+        onroad_miles_per_gallon_data = v['miles_per_gallon'] * 0.8  # legacy fleet data with gap applied
         if fuel in fc_adjustment_factors:
-        # try:
             onroad_gallons_per_mile = fc_adjustment_factors[fuel] / onroad_miles_per_gallon_data
             onroad_direct_co2e_grams_per_mile = 8887 * onroad_gallons_per_mile
             onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
-            # onroad_direct_co2e_grams_per_mile = 8887 / onroad_miles_per_gallon
-            # onroad_gallons_per_mile = 1 / onroad_miles_per_gallon
-        # except ZeroDivisionError:
-        else:
-            onroad_gallons_per_mile = 0
-            onroad_direct_co2e_grams_per_mile = 0
-            onroad_miles_per_gallon = 0
-            # onroad_gallons_per_mile = 0
         onroad_direct_kwh_per_mile = v['kwh_per_mile']  # / 0.7
         vehicle_data.update_value({
             'onroad_miles_per_gallon': onroad_miles_per_gallon,
@@ -527,7 +520,6 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
 
         if onroad_direct_co2e_grams_per_mile:
             fuel_consumption_gallons = v['vmt'] * onroad_gallons_per_mile
-            # onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
 
             vehicle_data.update_value({
                 'fuel_consumption_gallons': fuel_consumption_gallons,
