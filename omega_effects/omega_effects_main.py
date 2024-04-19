@@ -16,8 +16,9 @@ from omega_effects.session_settings import SessionSettings
 from omega_effects.general.general_functions import copy_files
 from omega_effects.general.file_id_and_save import add_id_to_csv, save_file
 
+from omega_effects.context.context_fuel_cost_per_mile import calc_context_fuel_cost_per_mile
+
 from omega_effects.effects.vmt_adjustments import AdjustmentsVMT
-from omega_effects.effects.context_fuel_cost_per_mile import calc_context_fuel_cost_per_mile
 from omega_effects.effects.safety_effects import \
     (calc_safety_effects, calc_legacy_fleet_safety_effects,
      calc_annual_avg_safety_effects, calc_annual_avg_safety_effects_by_body_style)
@@ -74,6 +75,13 @@ def main(set_paths, batch_settings, fleet, effects_log):
                 session_settings, context_fuel_cpm_df, set_paths.path_of_run_folder, f'context_fuel_cost_per_mile_{fleet}',
                 effects_log, extension=batch_settings.file_format
             )
+
+        effects_log.logwrite(f'\nAdjusting legacy fleet VMT and stock for Context')
+        batch_settings.legacy_fleet.adjust_legacy_fleet_stock_and_vmt(batch_settings, vmt_adjustments_context)
+
+        effects_log.logwrite(f'\nAdjusting legacy fleet fuel consumption rates for consistency with Context')
+        batch_settings.legacy_fleet_fc_adjustment.calc_analysis_start_year_fuel_consumption(batch_settings, session_settings)
+        batch_settings.legacy_fleet_fc_adjustment.calc_adjustments(batch_settings)
 
         # loop thru sessions to calc safety effects, physical effects, cost effects for each ___________________________
         annual_safety_df = annual_safety_by_body_style_df = pd.DataFrame()
