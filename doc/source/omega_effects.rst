@@ -28,6 +28,14 @@ omega\_effects.batch\_settings module
    :undoc-members:
    :show-inheritance:
 
+omega\_effects.effects\_controller module
+-----------------------------------------
+
+.. automodule:: omega_effects.effects_controller
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_effects.omega\_effects\_main module
 ------------------------------------------
 

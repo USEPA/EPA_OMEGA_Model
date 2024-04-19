@@ -63,7 +63,7 @@ def read_input_file(path, effects_log=None, usecols=None, index_col=None, skipro
         A DataFrame of the desired data from the passed input file.
 
     """
-    if path.is_file():
+    if path and path.is_file():
         file_datetime = get_file_datetime(path)
         if effects_log:
             effects_log.logwrite(message=f'File {path}...found. Version {file_datetime}.')

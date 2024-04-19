@@ -43,13 +43,14 @@ class SessionSettings:
         self.vehicle_annual_data = None
         self.electricity_prices = None
 
-    def get_context_session_settings(self, batch_settings, effects_log):
+    def get_context_session_settings(self, batch_settings, fleet, effects_log):
         """
 
         This method is used to establish context session settings as specified in the BatchSettings class
 
         Args:
             batch_settings: an instance of the BatchSettings class.
+            fleet (str): e.g., 'ld', 'md'.
             effects_log: an instance of the EffectsLog class.
 
         Returns:
@@ -62,23 +63,24 @@ class SessionSettings:
         path_session_out = path_session / 'out'
 
         self.vehicles_file = batch_settings.find_file(
-            path_session_out, f'{batch_settings.context_session_name}_vehicles.csv'
+            path_session_out, f'{batch_settings.context_session_name}_vehicles.csv', effects_log
         )
         self.vehicle_annual_data_file = batch_settings.find_file(
-            path_session_out, f'{batch_settings.context_session_name}_vehicle_annual_data.csv'
+            path_session_out, f'{batch_settings.context_session_name}_vehicle_annual_data.csv', effects_log
         )
         self.electricity_prices_file = batch_settings.get_attribute_value(
-            ('Context Electricity Prices', 'context'), 'full_path')
-
+            (fleet, 'Context Electricity Prices', 'context'), 'full_path'
+        )
         self.init_context_classes(batch_settings, effects_log)
 
-    def get_session_settings(self, batch_settings, session_num, effects_log):
+    def get_session_settings(self, batch_settings, fleet, session_num, effects_log):
         """
 
         This method is used to establish no action and action session settings as specified in the BatchSettings class
 
         Args:
             batch_settings: an instance of the BatchSettings class.
+            fleet (str): e.g., 'ld', 'md'.
             session_num (int): the session number.
             effects_log: an instance of the EffectsLog class.
 
@@ -96,24 +98,24 @@ class SessionSettings:
 
         # Get vehicles_file and vehicle_annual_data_file from the batch/session/out folder.
         self.vehicles_file = batch_settings.find_file(
-            path_session_out, f'{self.session_name}_vehicles.csv'
+            path_session_out, f'{self.session_name}_vehicles.csv', effects_log
         )
         self.vehicle_annual_data_file = batch_settings.find_file(
-            path_session_out, f'{self.session_name}_vehicle_annual_data.csv'
+            path_session_out, f'{self.session_name}_vehicle_annual_data.csv', effects_log
         )
         self.electricity_prices_file = batch_settings.get_attribute_value(
-            ('Session Electricity Prices', f'{self.session_policy}'), 'full_path'
+            (fleet, 'Session Electricity Prices', f'{self.session_policy}'), 'full_path'
         )
         self.vehicle_emission_rates_file = batch_settings.get_attribute_value(
-            ('Session Vehicle Emission Rates File', f'{self.session_policy}'), 'full_path'
+            (fleet, 'Session Vehicle Emission Rates File', f'{self.session_policy}'), 'full_path'
         )
 
         find_string = None
         try:
             find_string = 'powertrain_cost'
-            self.powertrain_cost_file = batch_settings.find_file(path_session_in, find_string)
+            self.powertrain_cost_file = batch_settings.find_file(path_session_in, find_string, effects_log)
         except FileNotFoundError:
-            effects_log.logwrite(f'{path_session_in} does not contain a {find_string} file.')
+            effects_log.logwrite(f'{path_session_in} not found or {path_session_in} does not contain a {find_string} file.')
             sys.exit()
 
         self.init_session_classes(batch_settings, self.session_name, effects_log)
