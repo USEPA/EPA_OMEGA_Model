@@ -6,6 +6,8 @@ class LegacyFleetFuelConsumptionAdjustment:
         self.data = {}
         self.adjustment_factors = {}
         self.fuels = []
+        self.gasoline_name = None
+        self.diesel_name = None
 
     def calc_analysis_start_year_fuel_consumption(self, batch_settings, session_settings):
 
@@ -24,7 +26,6 @@ class LegacyFleetFuelConsumptionAdjustment:
         # new vehicles in the analysis initial year
         vads = session_settings.vehicle_annual_data.get_vehicle_annual_data_by_calendar_year(model_year)
 
-        fuel_consumption_gallons = 0
         vehicle_info_dict = {}
         for v in vads:
 
@@ -42,6 +43,11 @@ class LegacyFleetFuelConsumptionAdjustment:
 
                 fuel_dict = eval(in_use_fuel_id)
                 fuel = [item for item in fuel_dict][0]
+
+                if not self.gasoline_name and 'gasoline' in fuel:
+                    self.gasoline_name = fuel
+                if not self.diesel_name and 'diesel' in fuel:
+                    self.diesel_name = fuel
 
                 co2_emissions_grams_per_unit = \
                     batch_settings.onroad_fuels.get_fuel_attribute(
@@ -75,8 +81,17 @@ class LegacyFleetFuelConsumptionAdjustment:
                 else:
                     self.data['legacy', fuel] = fuel_consumption_gallons
 
-    def calc_adjustments(self, batch_settings):
+    def calc_adjustments(self, batch_settings, fleet):
+        """
 
+        Args:
+            batch_settings: An instance of the BatchSettings class.
+            fleet (str): e.g., 'ld', 'md'
+
+        Returns:
+            Nothing, but it builds the fuel consumption adjustment factors Class dictionary.
+
+        """
         calendar_year = batch_settings.analysis_initial_year
 
         args_gasoline = [
@@ -103,10 +118,7 @@ class LegacyFleetFuelConsumptionAdjustment:
         context_gasoline_gallons = context_gasoline * 42 * 365 * pow(10, 6)
         context_diesel_gallons = context_diesel * 42 * 365 * pow(10, 6)
 
-        # TODO provide a control of whether LD or MD
-        # fleet_type = 'light_duty'
-        fleet_type = 'mediumduty'
-        if fleet_type == 'light_duty':
+        if fleet == 'ld':
             context_gasoline_consumption = (
                     context_gasoline_gallons * gasoline_lmdv_scaler * (gasoline_car_scaler + gasoline_truck_scaler)
             )
@@ -122,13 +134,14 @@ class LegacyFleetFuelConsumptionAdjustment:
             )
 
         gasoline_adjustment = (
-                (context_gasoline_consumption - self.data['new', 'pump gasoline']) / self.data['legacy', 'pump gasoline']
+                (context_gasoline_consumption - self.data['new', self.gasoline_name]
+                 ) / self.data['legacy', self.gasoline_name]
         )
         diesel_adjustment = (
-                (context_diesel_consumption - self.data['new', 'pump diesel']) / self.data['legacy', 'pump diesel']
+                (context_diesel_consumption - self.data['new', self.diesel_name]) / self.data['legacy', self.diesel_name]
         )
 
         self.adjustment_factors = {
-            'pump gasoline': gasoline_adjustment,
-            'pump diesel': diesel_adjustment,
+            self.gasoline_name: gasoline_adjustment,
+            self.diesel_name: diesel_adjustment,
         }

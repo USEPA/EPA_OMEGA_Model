@@ -393,9 +393,10 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
     sourcetype_name = None
 
     # get fuel consumption adjustment factors
-    fc_adjustment_factors = {}
-    for fuel in ['pump gasoline', 'pump diesel']:
-        fc_adjustment_factors[fuel] = batch_settings.legacy_fleet_fc_adjustment.adjustment_factors[fuel]
+    fc_adjustment_factors = batch_settings.legacy_fleet_fc_adjustment.adjustment_factors.copy()
+    # fc_adjustment_factors = {}
+    # for fuel in ['pump gasoline', 'pump diesel']:
+    #     fc_adjustment_factors[fuel] = batch_settings.legacy_fleet_fc_adjustment.adjustment_factors[fuel]
 
     physical_effects = {}
     for v in batch_settings.legacy_fleet.adjusted_legacy_fleet.values():
@@ -450,7 +451,7 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             onroad_gallons_per_mile = fc_adjustment_factors[fuel] / onroad_miles_per_gallon_data
             onroad_direct_co2e_grams_per_mile = 8887 * onroad_gallons_per_mile
             onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
-        onroad_direct_kwh_per_mile = v['kwh_per_mile']  # / 0.7
+        onroad_direct_kwh_per_mile = v['kwh_per_mile'] / 0.8  # is this correct
         vehicle_data.update_value({
             'onroad_miles_per_gallon': onroad_miles_per_gallon,
             'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,

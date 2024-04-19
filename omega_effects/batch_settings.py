@@ -318,6 +318,7 @@ from pathlib import Path
 from omega_effects.general.general_functions import read_input_file
 from omega_effects.context.ip_deflators import ImplicitPriceDeflators
 from omega_effects.context.cpi_price_deflators import CPIPriceDeflators
+from omega_effects.context.legacy_fleet_fuel_consumption_adjustment import LegacyFleetFuelConsumptionAdjustment
 from omega_effects.effects.cost_factors_criteria import CostFactorsCriteria
 from omega_effects.effects.cost_factors_scghg import CostFactorsSCGHG
 from omega_effects.effects.cost_factors_energysecurity import CostFactorsEnergySecurity
@@ -350,7 +351,7 @@ class BatchSettings:
 
     """
     def __init__(self):
-        self.effects_package_version = '2024.3.0' + '_effects_one_step'
+        self.effects_package_version = '2024.3.0' + '_effects_240419'
         self.start_time_readable = None
         self.runtime_info = None
         self.batch_df = pd.DataFrame()
@@ -432,6 +433,7 @@ class BatchSettings:
         self.onroad_fuels = None
         self.context_fuel_cost_per_mile = None
         self.legacy_fleet = None
+        self.legacy_fleet_fc_adjustment = None
         self.ip_deflators = None
         self.cpi_deflators = None
 
@@ -657,6 +659,8 @@ class BatchSettings:
         """
         self.legacy_fleet_file = self.get_attribute_value((fleet, 'Legacy Fleet File', 'all'), 'full_path')
 
+        self.legacy_fleet_fc_adjustment = LegacyFleetFuelConsumptionAdjustment()
+
         self.context_session_name = self.get_attribute_value((fleet, 'Session Name', 'context'), 'value')
         path_context_in = self.batch_folder / f'_{self.context_session_name}' / 'in'
 
@@ -831,7 +835,7 @@ class BatchSettings:
             self.inputs_filelist.append(self.onroad_fuels_file)
 
             self.legacy_fleet = LegacyFleet()
-            self.legacy_fleet.init_from_file(self.legacy_fleet_file, self.vehicles_base_year, effects_log)
+            self.legacy_fleet.init_from_file(self.legacy_fleet_file, self.analysis_initial_year, effects_log)
             self.inputs_filelist.append(self.legacy_fleet_file)
 
             self.context_stock_and_vmt = ContextStockVMT()

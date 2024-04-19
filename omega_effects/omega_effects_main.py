@@ -81,7 +81,7 @@ def main(set_paths, batch_settings, fleet, effects_log):
 
         effects_log.logwrite(f'\nAdjusting legacy fleet fuel consumption rates for consistency with Context')
         batch_settings.legacy_fleet_fc_adjustment.calc_analysis_start_year_fuel_consumption(batch_settings, session_settings)
-        batch_settings.legacy_fleet_fc_adjustment.calc_adjustments(batch_settings)
+        batch_settings.legacy_fleet_fc_adjustment.calc_adjustments(batch_settings, fleet)
 
         # loop thru sessions to calc safety effects, physical effects, cost effects for each ___________________________
         annual_safety_df = annual_safety_by_body_style_df = pd.DataFrame()

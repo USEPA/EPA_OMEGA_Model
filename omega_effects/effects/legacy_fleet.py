@@ -96,14 +96,15 @@ class LegacyFleet:
         self.legacy_fleet_vehicle_id_start = pow(10, 6)
         self.legacy_fleet_vehicle_numbers = []
 
-    def init_from_file(self, filepath, vehicles_base_year, effects_log):
+    def init_from_file(self, filepath, analysis_initial_year, effects_log):
         """
 
         Initialize class data from input file.
 
         Args:
             filepath: the Path object to the file.
-            vehicles_base_year (int): the model year of the input fleet - the legacy fleet calendar year will be
+            analysis_initial_year (int): the analysis start year used as the calendar year of the legacy fleet - note
+            that the legacy fleet input file includes vehicles aged 1 and older - the legacy fleet model years will be
             adjusted if necessary for consistency with the analysis.
             effects_log: an instance of the EffectsLog class.
 
@@ -144,7 +145,7 @@ class LegacyFleet:
         calendar_year_df = df['calendar_year'].unique()
         if len(calendar_year_df) > 1:
             effects_log.logwrite('\nLegacy fleet input file should have just one calendar year of data.')
-        df['calendar_year'] = vehicles_base_year
+        df['calendar_year'] = analysis_initial_year
         df['model_year'] = df['calendar_year'] - df['age']
 
         # add attributes that are populated in build_legacy_fleet_for_analysis
