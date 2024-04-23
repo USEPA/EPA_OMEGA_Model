@@ -373,7 +373,8 @@ class BatchSettings:
 
         self._dict = {}
         self.batch_sessions = {}  # all sessions, ld and md
-        self.session_dict = {}  # fleet-specific sessions, ld or md
+        # self.session_dict = {}  # fleet-specific sessions, ld or md
+        self.join_dict = {}
         self.vehicles_base_year = 0
         self.analysis_initial_year = 0
         self.analysis_final_year = 0
@@ -447,6 +448,8 @@ class BatchSettings:
 
         self.fleets = None
         self.sessions_to_run = None
+        self.sessions_completed = []
+        self.joins_max = 0
         self.fleet_dict = {
             'LD': 'ld',
             'Light-duty': 'ld',
@@ -667,63 +670,78 @@ class BatchSettings:
         self.context_stock_and_vmt_file = \
             self.get_attribute_value((fleet, 'Context Stock and VMT File', 'context'), 'full_path')
 
-        self.session_dict[0] = {
+        self.batch_sessions[fleet] = {}
+        self.batch_sessions[fleet][0] = {
             'session_policy': 'no_action',
             'session_name': self.get_attribute_value((fleet, 'Session Name', 'no_action'), 'value'),
         }
         for session_num in range(1, 8):
             session_name = self.get_attribute_value((fleet, 'Session Name', f'action_{session_num}'), 'value')
             if session_name:
-                self.session_dict[session_num] = {
+                self.batch_sessions[fleet][session_num] = {
                     'session_policy': f'action_{session_num}',
                     'session_name': self.get_attribute_value((fleet, 'Session Name', f'action_{session_num}'), 'value')
                 }
-        self.batch_sessions[fleet] = self.session_dict.copy()
-
-        if self.session_dict[0]['session_name']:
+        if self.batch_sessions[fleet][0]['session_name']:
             pass
         else:
-            effects_log.logwrite('\n *** Must have a no_action session name ***')
+            effects_log.logwrite(f'\n *** Must have a no_action session name  for {fleet} ***')
             sys.exit()
-        if len(self.session_dict) < 2:
-            effects_log.logwrite('\n *** Must have an action_1 session name ***')
+        if not self.batch_sessions[fleet][1]['session_name']:
+            effects_log.logwrite(f'\n *** Must have an action_1 session name for {fleet} ***')
             sys.exit()
 
-        find_string = None
+        find_string = 'context_fuel_prices'
         try:
-            find_string = 'context_fuel_prices'
             self.context_fuel_prices_file = self.find_file(path_context_in, find_string, effects_log)
         except FileNotFoundError:
             effects_log.logwrite(f'{path_context_in} not found or {path_context_in} does not contain a {find_string} file.')
             sys.exit()
 
+        find_string = 'onroad_fuels'
         try:
-            find_string = 'onroad_fuels'
             self.onroad_fuels_file = self.find_file(path_context_in, find_string, effects_log)
         except FileNotFoundError:
             effects_log.logwrite(f'{path_context_in} not found or {path_context_in} does not contain a {find_string} file.')
             sys.exit()
 
+        find_string = 'onroad_vehicle_calculations'
         try:
-            find_string = 'onroad_vehicle_calculations'
             self.onroad_vehicle_calculations_file = self.find_file(path_context_in, find_string, effects_log)
         except FileNotFoundError:
             effects_log.logwrite(f'{path_context_in} not found or {path_context_in} does not contain a {find_string} file.')
             sys.exit()
 
+        find_string = 'annual_vmt'
         try:
-            find_string = 'annual_vmt'
             self.onroad_vmt_file = self.find_file(path_context_in, find_string, effects_log)
         except FileNotFoundError:
             effects_log.logwrite(f'{path_context_in} not found or {path_context_in} does not contain a {find_string} file.')
             sys.exit()
 
+        find_string = 'reregistration'
         try:
-            find_string = 'reregistration'
             self.vehicle_reregistration_file = self.find_file(path_context_in, find_string, effects_log)
         except FileNotFoundError:
             effects_log.logwrite(f'{path_context_in} not found or {path_context_in} does not contain a {find_string} file.')
             sys.exit()
+
+    def get_join_settings(self):
+        """
+
+        Returns:
+            Nothing, but it builds the class join_dict for use in joining ld and md sessions into lmdv results.
+
+        """
+        for fleet in self.fleets:
+            self.joins_max = max(self.joins_max, len(self.batch_sessions[fleet]))
+        for join_num in range(1, self.joins_max):
+            for fleet in self.fleets:
+                session_name = self.get_attribute_value((fleet, f'join_{join_num}', f'action_{join_num}'), 'value')
+                self.join_dict[fleet, join_num] = {
+                    'session_policy': f'action_{join_num}',
+                    'session_name': session_name,
+                }
 
     def init_batch_classes(self, effects_log):
         """
@@ -845,21 +863,6 @@ class BatchSettings:
         except Exception as e:
             effects_log.logwrite(e)
             sys.exit()
-
-    def return_session_policy(self, session_name):
-        """
-
-        Args:
-            session_name (str): the name of a given session.
-
-        Returns:
-            The session_policy (e.g., 'no_action', 'action_1') for the given session_name.
-
-        """
-        session_policy = \
-            [v['session_policy'] for k, v in self.session_dict.items() if v['session_name'] == session_name]
-
-        return session_policy[0]
 
     @staticmethod
     def find_file(folder, file_id_string, effects_log, identifier=None):

@@ -62,6 +62,7 @@ def effects_controller():
 
     if batch_settings.sessions_to_run == 'lmdv':
 
+        batch_settings.get_join_settings()
         join_controller(set_paths, batch_settings, effects_log)
 
     elapsed_runtime = round(time() - start_time, 2)

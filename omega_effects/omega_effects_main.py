@@ -94,11 +94,12 @@ def main(set_paths, batch_settings, fleet, effects_log):
         periods_1 = periods_2 = 0
 
         effects_log.logwrite(f'\nStarting work on {fleet} sessions')
-        for session_num in batch_settings.session_dict:
+        for session_num in batch_settings.batch_sessions[fleet]:
 
             session_settings = SessionSettings()
             session_settings.get_session_settings(batch_settings, fleet, session_num, effects_log)
             session_name = session_settings.session_name
+
             if batch_settings.save_input_files:
                 copy_files(session_settings.inputs_filelist, set_paths.path_of_run_folder / f'{session_name}_inputs_{fleet}')
 
@@ -238,6 +239,8 @@ def main(set_paths, batch_settings, fleet, effects_log):
                 f'{batch_settings.start_time_readable}_electricity_prices_{session_name}_{fleet}.csv',
                 index=False
             )
+            batch_settings.sessions_completed.append(f'{fleet}_{session_name}')
+            effects_log.logwrite(f'\n{fleet} session {session_name} complete')
 
         # discount annual costs ________________________________________________________________________________________
         effects_log.logwrite(f'\nCalculating discounted annual costs, PVs and AVs for the {fleet} sessions')

@@ -89,7 +89,7 @@ class SessionSettings:
             the session.
 
         """
-        session_deets = batch_settings.session_dict[session_num]
+        session_deets = batch_settings.batch_sessions[fleet][session_num]
         self.session_policy, self.session_name = session_deets['session_policy'], session_deets['session_name']
         
         path_session = batch_settings.batch_folder / f'_{self.session_name}'

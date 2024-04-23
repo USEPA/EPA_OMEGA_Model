@@ -41,10 +41,17 @@ def join_results(set_paths, batch_settings, file_id_string, effects_log):
     df_join = pd.concat([no_action_ld, no_action_md], axis=0, ignore_index=True)
 
     # join action sessions
-    action_sessions = df_ld.loc[df_ld['session_policy'] != 'no_action', 'session_policy'].unique()
-    for action_session in action_sessions:
-        action_ld = df_ld.loc[df_ld['session_policy'] == action_session, :]
-        action_md = df_md.loc[df_md['session_policy'] == action_session, :]
+    joins = batch_settings.joins_max
+    for join in range(1, joins):
+
+        ld_session_name = batch_settings.join_dict['ld', join]['session_name']
+        md_session_name = batch_settings.join_dict['md', join]['session_name']
+
+        action_ld = df_ld.loc[df_ld['session_name'] == ld_session_name, :]
+        action_md = df_md.loc[df_md['session_name'] == md_session_name, :]
+
+        action_ld['session_policy'] = f'action_{join}'
+        action_md['session_policy'] = f'action_{join}'
 
         df_join = pd.concat([df_join, action_ld, action_md], axis=0, ignore_index=True)
 
