@@ -47,7 +47,6 @@ Sample Data Rows
         Analysis Dollar Basis,lmdv,all,2022,,
         Context Name Liquid Fuel,lmdv,all,AEO2023,,
         Context Case Liquid Fuel,lmdv,all,Reference case,,
-        Electricity Prices,lmdv,all,IPM,,enter 'IPM' or 'AEO'
         VMT Rebound Rate ICE,lmdv,all,-0.1,,
         VMT Rebound Rate BEV,lmdv,all,0,,
         SC-GHG in Net Benefits,lmdv,all,global,,"enter 'global' or 'domestic' or 'both' (note that both global and domesitc benefits are calculated, this only impacts net benefits)"
@@ -157,9 +156,6 @@ Data Row Name and Description
 :Context Case Liquid Fuel:
     Context case, e.g., ``Reference case``
 
-:Electricity Prices:
-    'IPM' or 'AEO'; note that the context uses AEO since the context stock and VMT are from AEO
-
 :VMT Rebound Rate ICE:
     VMT rebound rate for internal combustion engines
 
@@ -244,7 +240,7 @@ Data Row Name and Description
 
 :Context Electricity Prices, context *(str)*:
     The absolute path to the context electricity prices file,
-    loaded by :any:`omega_effects.context.electricity_prices.py<omega_effects.context.electricity_prices>`
+    loaded by :any:`omega_effects.context.electricity_prices_ipm.py<omega_effects.context.electricity_prices>`
 
 :Session Name, no_action *(str)*:
     No Action session name used in the OMEGA compliance run
@@ -255,7 +251,7 @@ Data Row Name and Description
 
 :Session Electricity Prices, no_action *(str)*:
     The absolute path to the session electricity prices file,
-    loaded by :any:`omega_effects.context.electricity_prices.py<omega_effects.context.electricity_prices>`
+    loaded by :any:`omega_effects.context.electricity_prices_ipm.py<omega_effects.context.electricity_prices>`
 
 :Session Name, action_1 *(str)*:
     An action session name used in the OMEGA compliance run
@@ -266,7 +262,7 @@ Data Row Name and Description
 
 :Session Electricity Prices, action_1 *(str)*:
     The absolute path to the session electricity prices file,
-    loaded by :any:`omega_effects.context.electricity_prices.py<omega_effects.context.electricity_prices>`
+    loaded by :any:`omega_effects.context.electricity_prices_ipm.py<omega_effects.context.electricity_prices>`
 
 **SESSION SETTINGS - MD**
 
@@ -279,7 +275,7 @@ Data Row Name and Description
 
 :Context Electricity Prices, context *(str)*:
     The absolute path to the context electricity prices file,
-    loaded by :any:`omega_effects.context.electricity_prices.py<omega_effects.context.electricity_prices>`
+    loaded by :any:`omega_effects.context.electricity_prices_aeo.py<omega_effects.context.electricity_prices_aeo>`
 
 :Session Name, no_action *(str)*:
     No Action session name used in the OMEGA compliance run
@@ -290,7 +286,7 @@ Data Row Name and Description
 
 :Session Electricity Prices, no_action *(str)*:
     The absolute path to the session electricity prices file,
-    loaded by :any:`omega_effects.context.electricity_prices.py<omega_effects.context.electricity_prices>`
+    loaded by :any:`omega_effects.context.electricity_prices_ipm.py<omega_effects.context.electricity_prices_ipm>`
 
 :Session Name, action_1 *(str)*:
     An action session name used in the OMEGA compliance run
@@ -301,7 +297,7 @@ Data Row Name and Description
 
 :Session Electricity Prices, action_1 *(str)*:
     The absolute path to the session electricity prices file,
-    loaded by :any:`omega_effects.context.electricity_prices.py<omega_effects.context.electricity_prices>`
+    loaded by :any:`omega_effects.context.electricity_prices_ipm.py<omega_effects.context.electricity_prices_ipm>`
 
 ----
 
@@ -341,7 +337,7 @@ from omega_effects.context.repair_cost import RepairCost
 from omega_effects.context.refueling_cost import RefuelingCost
 
 from omega_effects.general.general_inputs_for_effects import GeneralInputsForEffects
-from omega_effects.general.input_validation import validate_template_column_names  #, get_module_name
+from omega_effects.general.input_validation import validate_template_column_names
 
 
 class BatchSettings:
@@ -373,7 +369,6 @@ class BatchSettings:
 
         self._dict = {}
         self.batch_sessions = {}  # all sessions, ld and md
-        # self.session_dict = {}  # fleet-specific sessions, ld or md
         self.join_dict = {}
         self.vehicles_base_year = 0
         self.analysis_initial_year = 0
@@ -427,7 +422,6 @@ class BatchSettings:
         self.insurance_and_taxes_cost_factors = None
 
         self.context_fuel_prices = None
-        self.electricity_prices_source = None
         self.onroad_vmt = None
         self.reregistration = None
         self.context_stock_and_vmt = None
@@ -617,7 +611,6 @@ class BatchSettings:
 
         self.context_name_liquid_fuel = self.get_attribute_value((fleet, 'Context Name Liquid Fuel', 'all'), 'value')
         self.context_case_liquid_fuel = self.get_attribute_value((fleet, 'Context Case Liquid Fuel', 'all'), 'value')
-        self.electricity_prices_source = self.get_attribute_value((fleet, 'Electricity Prices', 'all'), 'value')
 
         self.net_benefit_ghg_scope = self.get_attribute_value((fleet, 'SC-GHG in Net Benefits', 'all'), 'value')
 
@@ -972,6 +965,8 @@ class BatchSettings:
         if self.run_employment_analysis_costs in self.true_false_dict:
             self.run_employment_analysis_costs = self.true_false_dict[self.run_employment_analysis_costs]
             effects_log.logwrite(f'{string_id} is {self.run_employment_analysis_costs}')
+            if self.sessions_to_run != 'lmdv':
+                effects_log.logwrite(f'\nSessions to Run must be "lmdv" to {string_id} so Employment Analysis Costs will not be run.')
 
     @staticmethod
     def path_of_effects_batch_settings_csv():

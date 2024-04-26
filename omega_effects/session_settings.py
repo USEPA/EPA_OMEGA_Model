@@ -14,7 +14,7 @@ from pathlib import Path
 from omega_effects.effects.vehicles import Vehicles
 from omega_effects.effects.vehicle_annual_data import VehicleAnnualData
 from omega_effects.general.input_validation import get_module_name
-from omega_effects.context.electricity_prices import ElectricityPrices
+from omega_effects.context.electricity_prices_ipm import ElectricityPrices
 from omega_effects.context.powertrain_cost import PowertrainCost
 
 
@@ -142,10 +142,10 @@ class SessionSettings:
             self.vehicle_annual_data.init_from_file(self.vehicle_annual_data_file, effects_log)
             self.inputs_filelist.append(self.vehicle_annual_data_file)
 
-            self.electricity_prices = ElectricityPrices()
-            self.electricity_prices.init_from_file(
-                self.electricity_prices_file, batch_settings, effects_log, context=True
-            )
+            # determine what module to use for electricity prices
+            module_name = get_module_name(self.electricity_prices_file, effects_log)
+            self.electricity_prices = importlib.import_module(module_name, package=None).ElectricityPrices()
+            self.electricity_prices.init_from_file(self.electricity_prices_file, batch_settings, effects_log)
             self.inputs_filelist.append(self.electricity_prices_file)
 
         except Exception as e:
@@ -175,10 +175,10 @@ class SessionSettings:
             self.vehicle_annual_data.init_from_file(self.vehicle_annual_data_file, effects_log)
             self.inputs_filelist.append(self.vehicle_annual_data_file)
 
-            self.electricity_prices = ElectricityPrices()
-            self.electricity_prices.init_from_file(
-                self.electricity_prices_file, batch_settings, effects_log, self, context=False
-            )
+            # determine what module to use for electricity prices
+            module_name = get_module_name(self.electricity_prices_file, effects_log)
+            self.electricity_prices = importlib.import_module(module_name, package=None).ElectricityPrices()
+            self.electricity_prices.init_from_file(self.electricity_prices_file, batch_settings, effects_log)
             self.inputs_filelist.append(self.electricity_prices_file)
 
             # determine what module to use for vehicle rates
