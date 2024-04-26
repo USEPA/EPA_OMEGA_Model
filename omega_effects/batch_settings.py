@@ -347,7 +347,7 @@ class BatchSettings:
 
     """
     def __init__(self):
-        self.effects_package_version = '2024.3.0' + '_effects_240419'
+        self.effects_package_version = '2024.4.0' + '_effects_240419'
         self.start_time_readable = None
         self.runtime_info = None
         self.batch_df = pd.DataFrame()
