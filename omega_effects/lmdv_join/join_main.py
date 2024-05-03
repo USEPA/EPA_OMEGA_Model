@@ -50,9 +50,6 @@ def join_results(set_paths, batch_settings, file_id_string, effects_log):
         action_ld = df_ld.loc[df_ld['session_name'] == ld_session_name, :]
         action_md = df_md.loc[df_md['session_name'] == md_session_name, :]
 
-        action_ld['session_policy'] = f'action_{join}'
-        action_md['session_policy'] = f'action_{join}'
-
         df_join = pd.concat([df_join, action_ld, action_md], axis=0, ignore_index=True)
 
     if file_id_string == 'safety_effects_by_body_style_summary':

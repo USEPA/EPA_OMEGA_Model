@@ -7,6 +7,7 @@
 **CODE**
 
 """
+import shutil
 import sys
 import traceback
 import pandas as pd
@@ -46,6 +47,9 @@ def main(set_paths, batch_settings, fleet, effects_log):
         batch_settings.set_calendar_year_range('lmdv')
         batch_settings.get_fleet_batch_settings(fleet, effects_log)
         batch_settings.init_fleet_batch_classes(effects_log)
+
+        if batch_settings.save_input_files:
+            copy_files(batch_settings.inputs_filelist_fleet, set_paths.path_of_run_folder / f'batch_inputs_{fleet}')
 
         # build legacy fleet which is used for all fleet sessions_______________________________________________________
         effects_log.logwrite(f'\nBuilding the {fleet} legacy fleet for the batch')

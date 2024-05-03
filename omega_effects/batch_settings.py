@@ -305,6 +305,7 @@ Data Row Name and Description
 
 """
 import sys
+import importlib
 import tkinter as tk
 from tkinter import filedialog
 import numpy as np
@@ -338,6 +339,7 @@ from omega_effects.context.refueling_cost import RefuelingCost
 
 from omega_effects.general.general_inputs_for_effects import GeneralInputsForEffects
 from omega_effects.general.input_validation import validate_template_column_names
+from omega_effects.general.input_validation import get_module_name
 
 
 class BatchSettings:
@@ -347,7 +349,7 @@ class BatchSettings:
 
     """
     def __init__(self):
-        self.effects_package_version = '2024.4.0' + '_effects_240419'
+        self.effects_package_version = '2024.4.0' + '_adjust_context_kwh_too'
         self.start_time_readable = None
         self.runtime_info = None
         self.batch_df = pd.DataFrame()
@@ -384,6 +386,7 @@ class BatchSettings:
         self.net_benefit_ghg_scope = 'global'  # default value; change via batch file ('domestic' and 'both' are options)
 
         self.inputs_filelist = []
+        self.inputs_filelist_fleet = []
         self.maintenance_costs_file = None
         self.repair_costs_file = None
         self.refueling_costs_file = None
@@ -397,6 +400,7 @@ class BatchSettings:
 
         self.context_fuel_prices_file = None
         self.context_stock_and_vmt_file = None
+        self.context_electricity_consumption_file = None
         self.onroad_fuels_file = None
         self.onroad_vehicle_calculations_file = None
         self.onroad_vmt_file = None
@@ -422,6 +426,7 @@ class BatchSettings:
         self.insurance_and_taxes_cost_factors = None
 
         self.context_fuel_prices = None
+        self.context_electricity_consumption = None
         self.onroad_vmt = None
         self.reregistration = None
         self.context_stock_and_vmt = None
@@ -631,6 +636,9 @@ class BatchSettings:
             = self.get_attribute_value((fleet, 'Insurance and Taxes Cost Factors File', 'all'), 'full_path')
         self.ip_deflators_file = self.get_attribute_value((fleet, 'Implicit Price Deflators File', 'all'), 'full_path')
         self.cpi_deflators_file = self.get_attribute_value((fleet, 'CPI Price Deflators File', 'all'), 'full_path')
+        self.context_electricity_consumption_file = self.get_attribute_value(
+            (fleet, 'Context Electricity Consumption File', 'all'), 'full_path'
+        )
 
         # Get effects-specific files from appropriate folder as specified in batch_settings.csv.
         self.egu_data_file \
@@ -812,6 +820,16 @@ class BatchSettings:
             self.fatality_rates.init_from_file(self.fatality_rates_file, effects_log)
             self.inputs_filelist.append(self.fatality_rates_file)
 
+            # determine what module to use for context electricity consumption
+            module_name = get_module_name(self.context_electricity_consumption_file, effects_log)
+            self.context_electricity_consumption = importlib.import_module(
+                module_name, package=None
+            ).ContextElectricityConsumption()
+            self.context_electricity_consumption.init_from_file(
+                self.context_electricity_consumption_file, self, effects_log
+            )
+            self.inputs_filelist.append(self.context_electricity_consumption_file)
+
         except Exception as e:
             effects_log.logwrite(e)
             sys.exit()
@@ -831,27 +849,27 @@ class BatchSettings:
         try:
             self.context_fuel_prices = FuelPrice()
             self.context_fuel_prices.init_from_file(self.context_fuel_prices_file, self, effects_log)
-            self.inputs_filelist.append(self.context_fuel_prices_file)
+            self.inputs_filelist_fleet.append(self.context_fuel_prices_file)
 
             self.reregistration = Reregistration()
             self.reregistration.init_from_file(self.vehicle_reregistration_file, effects_log)
-            self.inputs_filelist.append(self.vehicle_reregistration_file)
+            self.inputs_filelist_fleet.append(self.vehicle_reregistration_file)
 
             self.onroad_vmt = OnroadVMT()
             self.onroad_vmt.init_from_file(self.onroad_vmt_file, effects_log)
-            self.inputs_filelist.append(self.onroad_vmt_file)
+            self.inputs_filelist_fleet.append(self.onroad_vmt_file)
 
             self.onroad_fuels = OnroadFuel()
             self.onroad_fuels.init_from_file(self.onroad_fuels_file, effects_log)
-            self.inputs_filelist.append(self.onroad_fuels_file)
+            self.inputs_filelist_fleet.append(self.onroad_fuels_file)
 
             self.legacy_fleet = LegacyFleet()
             self.legacy_fleet.init_from_file(self.legacy_fleet_file, self.analysis_initial_year, effects_log)
-            self.inputs_filelist.append(self.legacy_fleet_file)
+            self.inputs_filelist_fleet.append(self.legacy_fleet_file)
 
             self.context_stock_and_vmt = ContextStockVMT()
             self.context_stock_and_vmt.init_from_file(self.context_stock_and_vmt_file, self, effects_log)
-            self.inputs_filelist.append(self.context_stock_and_vmt_file)
+            self.inputs_filelist_fleet.append(self.context_stock_and_vmt_file)
 
         except Exception as e:
             effects_log.logwrite(e)

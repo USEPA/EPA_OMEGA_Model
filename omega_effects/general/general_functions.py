@@ -225,3 +225,28 @@ def calc_fuel_cost_per_mile(
         fuel_cost_per_mile += onroad_gallons_per_mile * retail_price_per_gallon
 
     return fuel_cost_per_mile
+
+
+def calc_electricity_consumption(batch_settings, v, onroad_direct_kwh_per_mile):
+    """
+
+    Args:
+        batch_settings: an instance of the BatchSettings class.
+        v: a vehicle object (i.e., a Vehicle Annual Data object or a legacy fleet object)
+        onroad_direct_kwh_per_mile (float): the energy consumption rate
+
+    Returns:
+        The electricity consumption and associated generation to deliver it.
+
+    """
+    refuel_efficiency = batch_settings.onroad_fuels.get_fuel_attribute(
+        v['calendar_year'], 'US electricity', 'refuel_efficiency'
+    )
+    evse_kwh_per_mile = onroad_direct_kwh_per_mile / refuel_efficiency
+    fuel_consumption_kwh = v['vmt'] * evse_kwh_per_mile
+    transmission_efficiency = batch_settings.onroad_fuels.get_fuel_attribute(
+        v['calendar_year'], 'US electricity', 'transmission_efficiency'
+        )
+    fuel_generation_kwh = fuel_consumption_kwh / transmission_efficiency
+
+    return fuel_consumption_kwh, fuel_generation_kwh, evse_kwh_per_mile
