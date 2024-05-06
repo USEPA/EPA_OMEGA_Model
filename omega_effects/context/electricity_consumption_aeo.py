@@ -65,6 +65,7 @@ class ContextElectricityConsumption:
         self.df = pd.DataFrame()
         self.year_min = None
         self.year_max = None
+        self.attribute_to_use = 'electricity_consumption_kwh'
 
     def init_from_file(self, filepath, batch_settings, effects_log):
         """
@@ -116,7 +117,7 @@ class ContextElectricityConsumption:
             also returned.
 
         """
-        return_list = [self._data[calendar_year]['bev_electricity_consumption_kwh']]
+        return_list = [self._data[calendar_year][self.attribute_to_use]]
 
         if fleet:
             return_list.append(self._data[calendar_year][f'{fleet}_share'])
