@@ -325,6 +325,7 @@ from omega_effects.effects.egu_data import EGUdata
 from omega_effects.effects.refinery_data import RefineryData
 from omega_effects.effects.safety_values import SafetyValues
 from omega_effects.effects.fatality_rates import FatalityRates
+from omega_effects.effects.legacy_vs_analysis_fleet import LegacyVsAnalysisFleet
 
 from omega_effects.consumer.annual_vmt_fixed_by_age import OnroadVMT
 from omega_effects.consumer.reregistration_fixed_by_age import Reregistration
@@ -349,7 +350,7 @@ class BatchSettings:
 
     """
     def __init__(self):
-        self.effects_package_version = '2024.4.0' + '_effects_240419_0506'
+        self.effects_package_version = '2024.4.0' + '_effects_240419_0507'
         self.start_time_readable = None
         self.runtime_info = None
         self.batch_df = pd.DataFrame()
@@ -441,6 +442,8 @@ class BatchSettings:
         self.refinery_data = None
         self.safety_values = None
         self.fatality_rates = None
+
+        self.legacy_vs_analysis = None
 
         self.gwp_ch4 = None
         self.gwp_n2o = None
@@ -819,6 +822,8 @@ class BatchSettings:
             self.fatality_rates = FatalityRates()
             self.fatality_rates.init_from_file(self.fatality_rates_file, effects_log)
             self.inputs_filelist.append(self.fatality_rates_file)
+
+            self.legacy_vs_analysis = LegacyVsAnalysisFleet()
 
             # determine what module to use for context electricity consumption
             module_name = get_module_name(self.context_electricity_consumption_file, effects_log)

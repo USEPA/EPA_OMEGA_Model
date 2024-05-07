@@ -131,6 +131,8 @@ def main(set_paths, batch_settings, fleet, effects_log):
             session_fleet_safety_df = \
                 pd.DataFrame.from_dict(session_fleet_safety, orient='index').reset_index(drop=True)
 
+            batch_settings.legacy_vs_analysis.create_safety_pivot(session_settings, session_fleet_safety_df, fleet)
+
             if batch_settings.save_vehicle_safety_effects_files:
                 effects_log.logwrite(f'Saving safety effects file for {fleet} session {session_name}')
                 save_file(
@@ -166,6 +168,8 @@ def main(set_paths, batch_settings, fleet, effects_log):
 
             session_fleet_physical_df = \
                 pd.DataFrame.from_dict(session_fleet_physical, orient='index').reset_index(drop=True)
+
+            batch_settings.legacy_vs_analysis.create_physical_pivot(session_settings, session_fleet_physical_df, fleet)
 
             if batch_settings.save_vehicle_physical_effects_files:
                 effects_log.logwrite(f'\nSaving physical effects file for {fleet} session {session_name}')
@@ -360,6 +364,12 @@ def main(set_paths, batch_settings, fleet, effects_log):
             set_paths.path_of_run_folder / f'{time_stamp}_physical_effects_annual_action_minus_no_action_{fleet}.csv',
             index=False
         )
+        batch_settings.legacy_vs_analysis.safety_pivot.to_csv(
+            set_paths.path_of_run_folder / f'{time_stamp}_safety_effects_legacy_vs_analysis.csv'
+        )
+        batch_settings.legacy_vs_analysis.physical_pivot.to_csv(
+            set_paths.path_of_run_folder / f'{time_stamp}_physical_effects_legacy_vs_analysis.csv'
+        )
         discounted_costs_df.to_csv(
             set_paths.path_of_run_folder / f'{time_stamp}_cost_effects_annual_{fleet}.csv', index=False
         )
@@ -411,6 +421,14 @@ def main(set_paths, batch_settings, fleet, effects_log):
         add_id_to_csv(
             set_paths.path_of_run_folder / f'{time_stamp}_physical_effects_annual_action_minus_no_action_{fleet}.csv',
             output_file_id_info
+        )
+        add_id_to_csv(
+            set_paths.path_of_run_folder / f'{time_stamp}_safety_effects_legacy_vs_analysis.csv',
+            output_file_id_info,
+        )
+        add_id_to_csv(
+            set_paths.path_of_run_folder / f'{time_stamp}_physical_effects_legacy_vs_analysis.csv',
+            output_file_id_info,
         )
         add_id_to_csv(set_paths.path_of_run_folder / f'{time_stamp}_cost_effects_annual_{fleet}.csv',
                       output_file_id_info
