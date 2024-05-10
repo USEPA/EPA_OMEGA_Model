@@ -9,12 +9,10 @@
 """
 import sys
 import importlib
-from pathlib import Path
 
 from omega_effects.effects.vehicles import Vehicles
 from omega_effects.effects.vehicle_annual_data import VehicleAnnualData
 from omega_effects.general.input_validation import get_module_name
-from omega_effects.context.electricity_prices_ipm import ElectricityPrices
 from omega_effects.context.powertrain_cost import PowertrainCost
 
 
@@ -71,7 +69,7 @@ class SessionSettings:
         self.electricity_prices_file = batch_settings.get_attribute_value(
             (fleet, 'Context Electricity Prices', 'context'), 'full_path'
         )
-        self.init_context_classes(batch_settings, effects_log)
+        self.init_context_classes(batch_settings, fleet, effects_log)
 
     def get_session_settings(self, batch_settings, fleet, session_num, effects_log):
         """
@@ -118,20 +116,21 @@ class SessionSettings:
             effects_log.logwrite(f'{path_session_in} not found or {path_session_in} does not contain a {find_string} file.')
             sys.exit()
 
-        self.init_session_classes(batch_settings, self.session_name, effects_log)
+        self.init_session_classes(batch_settings, self.session_name, fleet, effects_log)
 
-    def init_context_classes(self, batch_settings, effects_log):
+    def init_context_classes(self, batch_settings, fleet, effects_log):
         """
 
         Args:
             batch_settings: an instance of the BatchSettings class.
+            fleet (str): e.g., 'ld' or 'md'
             effects_log: an instance of the EffectsLog class.
 
         Returns:
             Nothing, but it creates instances of needed classes for the context.
 
         """
-        effects_log.logwrite('\nInitializing context')
+        effects_log.logwrite(f'\nInitializing {fleet} context')
 
         try:
             self.vehicles = Vehicles()
@@ -152,19 +151,20 @@ class SessionSettings:
             effects_log.logwrite(e)
             sys.exit()
 
-    def init_session_classes(self, batch_settings, session_name, effects_log):
+    def init_session_classes(self, batch_settings, session_name, fleet, effects_log):
         """
 
         Args:
             batch_settings: an instance of the BatchSettings class.
             session_name (str): the session name.
+            fleet (str): e.g., 'ld' or 'md'
             effects_log: an instance of the EffectsLog class.
 
         Returns:
             Nothing, but it creates instances of needed classes for the session.
 
         """
-        effects_log.logwrite(f'\nInitializing session {session_name}')
+        effects_log.logwrite(f'\nInitializing {fleet} session {session_name}')
 
         try:
             self.vehicles = Vehicles()

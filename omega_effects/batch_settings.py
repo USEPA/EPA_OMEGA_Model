@@ -354,7 +354,7 @@ class BatchSettings:
 
     """
     def __init__(self):
-        self.effects_package_version = '2024.4.0' + '_effects_240419_marginal_egu'
+        self.effects_package_version = '2024.4.0' + '_effects_240419_0510'
         self.start_time_readable = None
         self.runtime_info = None
         self.batch_df = pd.DataFrame()
@@ -844,17 +844,18 @@ class BatchSettings:
             effects_log.logwrite(e)
             sys.exit()
 
-    def init_fleet_batch_classes(self, effects_log):
+    def init_fleet_batch_classes(self, fleet, effects_log):
         """
 
         Args:
+            fleet (str): e.g., 'ld' or 'md'
             effects_log: an instance of the EffectsLog class.
 
         Returns:
              Nothing, but it creates instances of classes needed for the batch.
 
         """
-        effects_log.logwrite('\nInitializing fleet-specific batch classes')
+        effects_log.logwrite(f'\nInitializing {fleet}-specific batch classes')
 
         try:
             self.context_fuel_prices = FuelPrice()

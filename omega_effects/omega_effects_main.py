@@ -46,7 +46,7 @@ def main(set_paths, batch_settings, fleet, effects_log):
         batch_settings.get_compliance_results_batch_deets(fleet)
         batch_settings.set_calendar_year_range('lmdv')
         batch_settings.get_fleet_batch_settings(fleet, effects_log)
-        batch_settings.init_fleet_batch_classes(effects_log)
+        batch_settings.init_fleet_batch_classes(fleet, effects_log)
 
         if batch_settings.save_input_files:
             copy_files(batch_settings.inputs_filelist_fleet, set_paths.path_of_run_folder / f'batch_inputs_{fleet}')
@@ -80,11 +80,13 @@ def main(set_paths, batch_settings, fleet, effects_log):
                 effects_log, extension=batch_settings.file_format
             )
 
-        effects_log.logwrite(f'\nAdjusting legacy fleet VMT and stock for Context')
+        effects_log.logwrite(f'\nAdjusting {fleet} legacy fleet VMT and stock for Context')
         batch_settings.legacy_fleet.adjust_legacy_fleet_stock_and_vmt(batch_settings, vmt_adjustments_context)
 
-        effects_log.logwrite(f'\nAdjusting legacy fleet fuel consumption rates for consistency with Context')
-        batch_settings.legacy_fleet_fc_adjustment.calc_analysis_start_year_fuel_consumption(batch_settings, session_settings)
+        effects_log.logwrite(f'\nAdjusting {fleet} legacy fleet fuel consumption rates for consistency with Context')
+        batch_settings.legacy_fleet_fc_adjustment.calc_analysis_start_year_fuel_consumption(
+            batch_settings, session_settings
+        )
         batch_settings.legacy_fleet_fc_adjustment.calc_adjustments(batch_settings, fleet)
 
         # loop thru sessions to calc safety effects, physical effects, cost effects for each ___________________________
@@ -108,7 +110,7 @@ def main(set_paths, batch_settings, fleet, effects_log):
                 copy_files(session_settings.inputs_filelist, set_paths.path_of_run_folder / f'{session_name}_inputs_{fleet}')
 
             # vmt adjustments to vehicle annual data ___________________________________________________________________
-            effects_log.logwrite(f'\nCalculating {fleet} vmt adjustments for session {session_name}')
+            effects_log.logwrite(f'\nCalculating vmt adjustments for {fleet} session {session_name}')
             vmt_adjustments_session = AdjustmentsVMT()
             vmt_adjustments_session.calc_vmt_adjustments(batch_settings, session_settings)
 
