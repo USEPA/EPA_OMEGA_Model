@@ -35,6 +35,7 @@ Sample Data Rows
         Format for Vehicle-Level Output Files,lmdv,all,csv,,enter 'csv' for large Excel-readable files 'parquet' for compressed files usable in Pandas
         Powertrain Costs FEV,lmdv,all,TRUE,,enter TRUE or FALSE (must be consistent with the compliance run)
         Run Employment Analysis Costs,lmdv,all,TRUE,,enter TRUE or FALSE
+        Use Marginal EGU Rates,lmdv,all,FALSE,,enter TRUE for marginal rates and FALSE for average rates
         BATCH SETTINGS - COMPLIANCE,,,,,
         batch_folder,ld,all,,C:/omega/compliance/<batch folder>,
         batch_folder,md,all,,C:/omega/compliance/<batch folder>,
@@ -127,6 +128,9 @@ Data Row Name and Description
 
 :Run Employment Analysis Costs:
     True/False entry for whether to run a cost summary for use in the employment analysis
+
+:Use Marginal EGU Rates:
+    True/False entry for whether to use marginal or average EGU rates
 
 **BATCH SETTINGS - COMPLIANCE**
 
@@ -350,7 +354,7 @@ class BatchSettings:
 
     """
     def __init__(self):
-        self.effects_package_version = '2024.4.0' + '_effects_240419_0507'
+        self.effects_package_version = '2024.4.0' + '_effects_240419_marginal_egu'
         self.start_time_readable = None
         self.runtime_info = None
         self.batch_df = pd.DataFrame()
@@ -369,6 +373,7 @@ class BatchSettings:
         self.save_input_files = False
         self.powertrain_costs_fev = True
         self.run_employment_analysis_costs = None
+        self.marginal_egu_rates = False  # lmdv frm used average
 
         self._dict = {}
         self.batch_sessions = {}  # all sessions, ld and md
@@ -990,6 +995,12 @@ class BatchSettings:
             effects_log.logwrite(f'{string_id} is {self.run_employment_analysis_costs}')
             if self.sessions_to_run != 'lmdv':
                 effects_log.logwrite(f'\nSessions to Run must be "lmdv" to {string_id} so Employment Analysis Costs will not be run.')
+
+        string_id = 'Use Marginal EGU Rates'
+        self.marginal_egu_rates = self._dict[(fleet, string_id, 'all')]['value']
+        if self.marginal_egu_rates in self.true_false_dict:
+            self.marginal_egu_rates = self.true_false_dict[self.marginal_egu_rates]
+            effects_log.logwrite(f'{string_id} is {self.marginal_egu_rates}')
 
     @staticmethod
     def path_of_effects_batch_settings_csv():
