@@ -367,10 +367,10 @@ def main(set_paths, batch_settings, fleet, effects_log):
             index=False
         )
         batch_settings.legacy_vs_analysis.safety_pivot.to_csv(
-            set_paths.path_of_run_folder / f'{time_stamp}_safety_effects_legacy_vs_analysis.csv'
+            set_paths.path_of_run_folder / f'{time_stamp}_safety_effects_legacy_vs_analysis_{fleet}.csv'
         )
         batch_settings.legacy_vs_analysis.physical_pivot.to_csv(
-            set_paths.path_of_run_folder / f'{time_stamp}_physical_effects_legacy_vs_analysis.csv'
+            set_paths.path_of_run_folder / f'{time_stamp}_physical_effects_legacy_vs_analysis_{fleet}.csv'
         )
         discounted_costs_df.to_csv(
             set_paths.path_of_run_folder / f'{time_stamp}_cost_effects_annual_{fleet}.csv', index=False
@@ -425,11 +425,11 @@ def main(set_paths, batch_settings, fleet, effects_log):
             output_file_id_info
         )
         add_id_to_csv(
-            set_paths.path_of_run_folder / f'{time_stamp}_safety_effects_legacy_vs_analysis.csv',
+            set_paths.path_of_run_folder / f'{time_stamp}_safety_effects_legacy_vs_analysis_{fleet}.csv',
             output_file_id_info,
         )
         add_id_to_csv(
-            set_paths.path_of_run_folder / f'{time_stamp}_physical_effects_legacy_vs_analysis.csv',
+            set_paths.path_of_run_folder / f'{time_stamp}_physical_effects_legacy_vs_analysis_{fleet}.csv',
             output_file_id_info,
         )
         add_id_to_csv(set_paths.path_of_run_folder / f'{time_stamp}_cost_effects_annual_{fleet}.csv',

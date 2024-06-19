@@ -32,6 +32,8 @@ def join_controller(set_paths, batch_settings, effects_log):
     join_results(set_paths, batch_settings, 'physical_effects_annual_action_minus_no_action', effects_log)
     join_results(set_paths, batch_settings, 'cost_effects_annual', effects_log)
     join_results(set_paths, batch_settings, 'benefits_annual', effects_log)
+    join_results(set_paths, batch_settings, 'safety_effects_legacy_vs_analysis', effects_log)
+    join_results(set_paths, batch_settings, 'physical_effects_legacy_vs_analysis', effects_log)
     if batch_settings.net_benefit_ghg_scope in ['global', 'both']:
         join_results(set_paths, batch_settings, 'social_effects_global_ghg_annual', effects_log)
     if batch_settings.net_benefit_ghg_scope in ['domestic', 'both']:

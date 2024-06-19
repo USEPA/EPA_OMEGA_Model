@@ -354,7 +354,7 @@ class BatchSettings:
 
     """
     def __init__(self):
-        self.effects_package_version = '2024.4.0' + '_effects_240419_0522'
+        self.effects_package_version = '2024.6.0' + '_effects_240419_0618'
         self.start_time_readable = None
         self.runtime_info = None
         self.batch_df = pd.DataFrame()
@@ -828,8 +828,6 @@ class BatchSettings:
             self.fatality_rates.init_from_file(self.fatality_rates_file, effects_log)
             self.inputs_filelist.append(self.fatality_rates_file)
 
-            self.legacy_vs_analysis = LegacyVsAnalysisFleet()
-
             # determine what module to use for context electricity consumption
             module_name = get_module_name(self.context_electricity_consumption_file, effects_log)
             self.context_electricity_consumption = importlib.import_module(
@@ -881,6 +879,8 @@ class BatchSettings:
             self.context_stock_and_vmt = ContextStockVMT()
             self.context_stock_and_vmt.init_from_file(self.context_stock_and_vmt_file, self, effects_log)
             self.inputs_filelist_fleet.append(self.context_stock_and_vmt_file)
+
+            self.legacy_vs_analysis = LegacyVsAnalysisFleet()
 
         except Exception as e:
             effects_log.logwrite(e)
