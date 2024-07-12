@@ -87,7 +87,6 @@ class LegacyFleetFuelConsumptionAdjustment:
 
             if v['miles_per_gallon'] != 0:
 
-                # onroad_miles_per_gallon = v['miles_per_gallon'] * 0.8
                 onroad_miles_per_gallon = v['miles_per_gallon']
 
                 fuel_consumption_gallons = v['vmt'] / onroad_miles_per_gallon
@@ -99,8 +98,7 @@ class LegacyFleetFuelConsumptionAdjustment:
 
             if v['kwh_per_mile'] != 0:
 
-                # onroad_direct_kwh_per_mile = v['kwh_per_mile'] / 0.8  # is this correct
-                onroad_direct_kwh_per_mile = v['kwh_per_mile']  # is this correct
+                onroad_direct_kwh_per_mile = v['kwh_per_mile']
 
                 fuel_consumption_kwh, fuel_generation_kwh, evse_kwh_per_mile = calc_electricity_consumption(
                     batch_settings, v, onroad_direct_kwh_per_mile
@@ -123,6 +121,7 @@ class LegacyFleetFuelConsumptionAdjustment:
 
         """
         calendar_year = batch_settings.analysis_initial_year
+        gal_per_bbl = batch_settings.general_inputs_for_effects.get_value('gal_per_bbl')
 
         args_gasoline = [
             'retail_gasoline_million_barrels_per_day',
@@ -148,8 +147,8 @@ class LegacyFleetFuelConsumptionAdjustment:
             calendar_year, fleet
         )
 
-        context_gasoline_gallons = context_gasoline * 42 * 365 * pow(10, 6)
-        context_diesel_gallons = context_diesel * 42 * 365 * pow(10, 6)
+        context_gasoline_gallons = context_gasoline * gal_per_bbl * 365 * pow(10, 6)
+        context_diesel_gallons = context_diesel * gal_per_bbl * 365 * pow(10, 6)
 
         if fleet == 'ld':
             context_gasoline_consumption = (

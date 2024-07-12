@@ -214,14 +214,6 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
                     fuel_consumption_kwh, fuel_generation_kwh, evse_kwh_per_mile = calc_electricity_consumption(
                         batch_settings, v, onroad_direct_kwh_per_mile
                     )
-                    # refuel_efficiency = batch_settings.onroad_fuels.get_fuel_attribute(
-                    #     calendar_year, 'US electricity', 'refuel_efficiency'
-                    # )
-                    # fuel_consumption_kwh = v['vmt'] * onroad_direct_kwh_per_mile / refuel_efficiency
-                    # transmission_efficiency = batch_settings.onroad_fuels.get_fuel_attribute(
-                    #         calendar_year, 'US electricity', 'transmission_efficiency'
-                    #     )
-                    # fuel_generation_kwh = fuel_consumption_kwh / transmission_efficiency
 
                     vehicle_data.update_value({
                         'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
@@ -448,19 +440,12 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
 
         onroad_gallons_per_mile = onroad_miles_per_gallon = 0
         onroad_direct_co2e_grams_per_mile = 0
-        # onroad_miles_per_gallon_data = v['miles_per_gallon'] * 0.8  # legacy fleet data with gap applied
         onroad_miles_per_gallon_data = v['miles_per_gallon']
         if onroad_miles_per_gallon_data != 0:
             onroad_gallons_per_mile = fc_adjustment_factors[fuel] / v['miles_per_gallon']
             onroad_direct_co2e_grams_per_mile = 8887 * onroad_gallons_per_mile
             onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
-        onroad_direct_kwh_per_mile = fc_adjustment_factors[fuel] * v['kwh_per_mile']  # the gap is in fc_adjustment_factors
-        # onroad_direct_kwh_per_mile = fc_adjustment_factors[fuel] * v['kwh_per_mile'] / 0.8  # is this correct
-        # if fuel in fc_adjustment_factors:
-        #     onroad_gallons_per_mile = fc_adjustment_factors[fuel] / onroad_miles_per_gallon_data
-        #     onroad_direct_co2e_grams_per_mile = 8887 * onroad_gallons_per_mile
-        #     onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
-        # onroad_direct_kwh_per_mile = fc_adjustment_factors[fuel] * v['kwh_per_mile'] / 0.8  # is this correct
+        onroad_direct_kwh_per_mile = fc_adjustment_factors[fuel] * v['kwh_per_mile']
         vehicle_data.update_value({
             'onroad_miles_per_gallon': onroad_miles_per_gallon,
             'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,
