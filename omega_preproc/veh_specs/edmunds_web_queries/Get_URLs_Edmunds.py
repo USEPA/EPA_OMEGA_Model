@@ -115,6 +115,7 @@ def Get_URLs_Edmunds(model_year):
     working_directory = str(Path.home()) + '/Documents/Python/Edmunds_web_vehicle_specs/'
     base_url = 'https://www.edmunds.com/car-reviews/'
     chromedriver = 'chromedriver.exe'
+    # options.binary_location = r"ADD_YOUR_PATH\chrome.exe"
     os.environ["webdriver.chrome.driver"] = chromedriver
     chromeOptions = Options()
     service = Service();
@@ -137,7 +138,9 @@ def Get_URLs_Edmunds(model_year):
     xpath_year = "//select[@name = 'select-year']"
     # xpath_go_button = "//button[@class = 'w-100 btn btn-success']"
     # xpath_go_button = "//button[@class = 'mb-0_5 w-100 px-0 px-md-1_5 btn btn-success']"
-    xpath_go_button = "//button[@class = 'mb-0_5 w-100 px-0 px-md-1_5 font-weight-medium btn btn-primary-b']"
+    # xpath_go_button = "//button[@class = 'mb-0_5 w-100 px-0 px-md-1_5 font-weight-medium btn btn-primary-b']"
+    # Updated a "GO" button link by removing the "disabled" at the end on January 26, 2023
+    xpath_go_button = "//button[@class='inventory-button p-0_5 make-model-zip-dropdown-form-submit w-100 px-0 px-md-1_5 font-weight-medium text-transform-none ml-md-1 size-16 btn btn-blue-50']"
 
     time.sleep(sleep_short)
     element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, xpath_make)))
