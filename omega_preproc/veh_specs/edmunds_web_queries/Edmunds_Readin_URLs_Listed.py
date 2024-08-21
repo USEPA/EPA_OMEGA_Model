@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import Edmunds_Interact as Edmunds_Interact
 import os
+import sys
 import time
 import math
 from datetime import datetime
@@ -26,12 +27,14 @@ def movecol(df, cols_to_move=[], ref_cols='', place='After'):
     seg3 = [i for i in cols if i not in seg1 + seg2]
 
     return (df[seg1 + seg2 + seg3])
-
+#
+#
+#
 start_time = datetime.now()
 working_directory = str(Path.home()) + '/Documents/Python/Edmunds_web_vehicle_specs/'
-run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2016.csv')
+run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2024.csv')
 start_count = 0 #Set to 0 when time permits
-final_table_to_csv_inc = 20 # print final_table csv file at the final_table_to_csv_inc increments
+final_table_to_csv_inc = 30 # print final_table csv file at the final_table_to_csv_inc increments
 # cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
 #                 "DUAL FRONT AND DUAL REAR SIDE-MOUNTED AIRBAGS",
 #                 "DUAL FRONT AND DUAL REAR WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
@@ -46,7 +49,8 @@ for run_count in range (0,len(run_controller)):
     output_name = str(run_controller['Output Filename'][run_count])
     url_column_name = str(run_controller['URL Column Name'][run_count])
     model_year = str(run_controller['Model Year'][run_count])
-    weberror = pd.Series(np.zeros(1), name = 'Website Errors').replace(0,'')
+    # weberror = pd.Series(np.zeros(1), name = 'Website Errors').replace(0,'')
+    weberror = pd.DataFrame(columns=['Website', 'Errors'])
     edmunds_info = pd.read_csv(working_directory+input_name, encoding = "ISO-8859-1")
     edmunds_info.dropna(subset=[url_column_name], inplace=True)
     edmunds_makes = edmunds_info['Make']
@@ -71,10 +75,16 @@ for run_count in range (0,len(run_controller)):
             model = edmunds_models[url_count]
             make = edmunds_makes[url_count]
             [original_output_table, readin_check, trim_text] = Edmunds_Interact.Edmunds_Interact(url)
-            if type(original_output_table) == str:
-                weberror[len(weberror)] = url
+            if (type(original_output_table) == str):
+                iloc_weberror = len(weberror)
+                weberror.loc[iloc_weberror, 'Website'] = url
+                weberror.loc[iloc_weberror, 'Errors'] = trim_text
                 weberror.to_csv(working_directory + 'Non-Functioning Websites_MY'+str(model_year)+'.csv',index=False)
                 continue
+            # if (trim_text == 'WebDriverException') or (trim_text == 'TimeoutException'):
+            #     final_table.to_csv(working_directory + output_name.split('.')[0] + '_' + str(url_count) + '.csv', index=False)
+            #     sys.exit(0)  # sys.exit('WebDriverE
+
             category_name = original_output_table['Category']
             specification_name = original_output_table['Specifications']
             output_table = original_output_table.drop(['Category', 'Specifications'], axis=1)
@@ -126,12 +136,13 @@ for run_count in range (0,len(run_controller)):
                 reformatted_table.to_csv(working_directory + 'Merge Error Table' + '.csv', index=False)
         # raise SystemExit
             final_table = final_table.dropna(how='all')
-            if url_count in final_table_to_csv_list:
+            if (url_count in final_table_to_csv_list):
                 final_table.to_csv(working_directory + output_name.split('.')[0] + '_' + str(url_count) + '.csv', index=False)
                 if len(Edmunds_Interact.super_trim_url_list) > 0:
                     timestr = time.strftime("%Y%m%d-%H%M%S")
                     df_super_trim_url_list = pd.DataFrame(Edmunds_Interact.super_trim_url_list, columns=['URL'])
                     df_super_trim_url_list.to_csv(working_directory + output_name.split('.')[0] + '_high_options_url_' + timestr + '.csv' , index=False)
+
             # if url_count == 0:
             #     final_table_category_specs = pd.DataFrame([category_name, specification_name], columns=['Category', 'Specifications'])
             #     timestr = time.strftime("%Y%m%d-%H%M%S")

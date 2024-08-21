@@ -472,7 +472,7 @@ def est_max_towing_capacity(df):
 
 def Edmunds_Interact(url):
 
-    max_attempts = 10
+    max_attempts = 5 # 10
     max_time = 30
     sleep_3sec = 3
     sleep_sec = 1
@@ -508,20 +508,42 @@ def Edmunds_Interact(url):
         try:
             driver.set_page_load_timeout(wait_sec)
             driver.implicitly_wait(5)
-            time.sleep(sleep_sec)
-            driver.get(url)
+            time.sleep(2)
+            try:
+                driver.get(url)
+            except (WebDriverException, TimeoutException):
+                print("page down")
+                _soup = BeautifulSoup(driver.page_source, "lxml")
+                if ('page not found' in _soup.text) or ('Page Not Found' in _soup.text):
+                    return ('N', 'READIN_ERROR', 'PageNotFound')
+                else:
+                    return ('N', 'READIN_ERROR', 'WebDriverException')
+            if (geturl_attempt > 0):
+                _page_not_found = 0
+                if (geturl_attempt == 1):
+                    _soup = BeautifulSoup(driver.page_source, "lxml")
+                    if ('page not found' in _soup.text) or ('Page Not Found' in _soup.text):
+                        _page_not_found = 1
+                        print("Page Not Found")
+                if (_page_not_found == 1) or (geturl_attempt == max_attempts-1):
+                    driver.close()
+                    if (_page_not_found == 1):
+                        return ('N', 'READIN_ERROR', 'PageNotFound')
+                    else:
+                        return ('N', 'READIN_ERROR', 'MaxAttempted')
+
             # find and click main button to reveal drop-down menu
             # menus = driver.find_elements_by_xpath(trim_dropdown_buttons_xpath);
-            menus = driver.find_elements(By.XPATH, trim_dropdown_buttons_xpath);
-
-            WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_dropdown_buttons_xpath)))
+            # menus = driver.find_elements(By.XPATH, trim_dropdown_buttons_xpath);
+            #
+            # WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_dropdown_buttons_xpath)))
             time.sleep(sleep_sec)
             # find trim buttons in drop-down menu
             # trim_buttons = driver.find_elements_by_xpath(trim_select_buttons_xpath)
-            trim_buttons = driver.find_elements(By.XPATH, trim_select_buttons_xpath)
+            menus = trim_buttons = driver.find_elements(By.XPATH, trim_select_buttons_xpath)
             WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_select_buttons_xpath)))
 
-            menus = trim_buttons
+            # menus = trim_buttons
             menus[0].click() # click the first dropdown menu button. Assumes all menus contain the same trim list.
 
             _trim_start = 0
@@ -541,7 +563,7 @@ def Edmunds_Interact(url):
         total_trims = len(trim_buttons)
     except UnboundLocalError:
         if geturl_attempt + 1 == max_attempts:
-            return ('N', 'READIN_ERROR')
+            return ('N', 'READIN_ERROR', 'MaxAttempted')
     # trim_group_length = 1
     #
     # if total_trims >= 2:
@@ -593,9 +615,13 @@ def Edmunds_Interact(url):
 
             try:
                 for i in range(_num_trims_page):
-                    time.sleep(sleep_sec)
-                    # element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_dropdown_buttons_xpath)))
                     time.sleep(sleep_3sec)
+                    try:
+                        element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_dropdown_buttons_xpath)))
+                    except:
+                        return ('N', 'StaleElementReferenceException', 'StaleElementNotFound')
+                    time.sleep(sleep_sec)
+
                     try:
                         # if _num_menu_columns == 1:
                         #     Select(element).select_by_index(0)
@@ -604,8 +630,14 @@ def Edmunds_Interact(url):
                         menus[i].click()
                     except (NoSuchElementException, TimeoutException, UnboundLocalError):
                         driver.quit()
+                        time.sleep(sleep_3sec)
                         driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
-                        driver.get(url)
+
+                        try:
+                            driver.get(url)
+                        except:
+                            print('element click Timeout')
+
                         time.sleep(sleep_sec)
                         try:
                             element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_dropdown_buttons_xpath)))
@@ -623,9 +655,9 @@ def Edmunds_Interact(url):
                     trims_text.append(trim_options[_index * _num_menu_columns + i])
                     # element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_select_buttons_xpath)))
                     # dropdown_item = driver.find_elements(By.XPATH, trim_select_buttons_xpath)[_index * _num_menu_columns + i]
-                    actions = ActionChains(driver)
+                    # actions = ActionChains(driver) # Commented out @ July 18, 2024
                     # actions.move_to_element(dropdown_item).click().perform()
-                    actions.reset_actions()
+                    # actions.reset_actions() # Commented out @ July 18, 2024
 
                     if table_list_count == 0:
                         time.sleep(sleep_sec)
