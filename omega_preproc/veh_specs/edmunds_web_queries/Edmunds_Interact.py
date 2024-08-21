@@ -474,8 +474,9 @@ def Edmunds_Interact(url):
 
     max_attempts = 5 # 10
     max_time = 30
+    sleep_5sec = 5
     sleep_3sec = 3
-    sleep_sec = 1
+    sleep_sec = 2
     wait_sec = 30
     _max_trim_groups_count = 75 # for 4K resolution monitor, set 10 for low resolution monitors like 1080K
     _max_trim_buttons =  100     # for 4K resolution monitor, set 33 (10 x 3 menu columns) for 1080K monitor
@@ -504,11 +505,16 @@ def Edmunds_Interact(url):
         service = Service();
         options = webdriver.ChromeOptions()
         options.add_argument("--start-maximized")
-        driver = webdriver.Chrome(service=service, options=options)
+        time.sleep(sleep_5sec)
+        try:
+            driver = webdriver.Chrome(service=service, options=options)
+        except TimeoutException:
+            print("TimeoutException")
+
         try:
             driver.set_page_load_timeout(wait_sec)
             driver.implicitly_wait(5)
-            time.sleep(2)
+            time.sleep(sleep_sec)
             try:
                 driver.get(url)
             except (WebDriverException, TimeoutException):
