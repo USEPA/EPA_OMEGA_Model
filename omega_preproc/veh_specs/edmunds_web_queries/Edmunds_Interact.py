@@ -510,6 +510,8 @@ def Edmunds_Interact(url):
             driver = webdriver.Chrome(service=service, options=options)
         except TimeoutException:
             print("TimeoutException")
+            time.sleep(sleep_5sec)
+            driver = webdriver.Chrome(service=service, options=options)
 
         try:
             driver.set_page_load_timeout(wait_sec)
@@ -523,7 +525,15 @@ def Edmunds_Interact(url):
                 if ('page not found' in _soup.text) or ('Page Not Found' in _soup.text):
                     return ('N', 'READIN_ERROR', 'PageNotFound')
                 else:
-                    return ('N', 'READIN_ERROR', 'WebDriverException')
+                    driver.quit()
+                    time.sleep(sleep_5sec)
+                    driver = webdriver.Chrome(service=service, options=options)
+                    time.sleep(sleep_5sec)
+                    try:
+                        driver.get(url)
+                    except:
+                        print("page down second times")
+                        return ('N', 'READIN_ERROR', 'WebDriverException')
             if (geturl_attempt > 0):
                 _page_not_found = 0
                 if (geturl_attempt == 1):

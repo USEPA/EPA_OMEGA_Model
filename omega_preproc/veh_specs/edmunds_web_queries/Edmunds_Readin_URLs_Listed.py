@@ -32,7 +32,7 @@ def movecol(df, cols_to_move=[], ref_cols='', place='After'):
 #
 start_time = datetime.now()
 working_directory = str(Path.home()) + '/Documents/Python/Edmunds_web_vehicle_specs/'
-run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2023.csv')
+run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2022.csv')
 start_count = 0 #Set to 0 when time permits
 final_table_to_csv_inc = 30 # print final_table csv file at the final_table_to_csv_inc increments
 # cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
@@ -78,7 +78,7 @@ for run_count in range (0,len(run_controller)):
             if (type(original_output_table) == str):
                 iloc_weberror = len(weberror)
                 weberror.loc[iloc_weberror, 'Website'] = url
-                weberror.loc[iloc_weberror, 'Errors'] = trim_text
+                weberror.loc[iloc_weberror, 'Errors'] = trim_text + ', ' + str(url_count)
                 weberror.to_csv(working_directory + 'Non-Functioning Websites_MY'+str(model_year)+'.csv',index=False)
                 continue
             # if (trim_text == 'WebDriverException') or (trim_text == 'TimeoutException'):
