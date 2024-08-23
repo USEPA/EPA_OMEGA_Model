@@ -17,14 +17,15 @@ from omega_effects.session_settings import SessionSettings
 from omega_effects.general.general_functions import copy_files
 from omega_effects.general.file_id_and_save import add_id_to_csv, save_file
 
-from omega_effects.context.context_fuel_cost_per_mile import calc_context_fuel_cost_per_mile
+from omega_effects.context.context_fuel_cost_per_mile import (calc_context_fuel_cost_per_mile,
+                                                              calc_context_fuel_cost_per_mile_post_frm)
 
 from omega_effects.effects.vmt_adjustments import AdjustmentsVMT
-from omega_effects.effects.safety_effects import \
-    (calc_safety_effects, calc_legacy_fleet_safety_effects,
-     calc_annual_avg_safety_effects, calc_annual_avg_safety_effects_by_body_style)
-from omega_effects.effects.physical_effects import calc_physical_effects, calc_legacy_fleet_physical_effects, \
-    calc_annual_physical_effects, calc_period_consumer_physical_view
+from omega_effects.effects.safety_effects import (calc_safety_effects, calc_legacy_fleet_safety_effects,
+                                                  calc_annual_avg_safety_effects,
+                                                  calc_annual_avg_safety_effects_by_body_style)
+from omega_effects.effects.physical_effects import (calc_physical_effects, calc_legacy_fleet_physical_effects,
+                                                    calc_annual_physical_effects, calc_period_consumer_physical_view)
 from omega_effects.effects.refinery_inventory_and_oil_imports import calc_refinery_inventory_and_oil_imports
 from omega_effects.effects.egu_inventory import calc_egu_inventory
 from omega_effects.effects.total_inventory import calc_total_inventory
@@ -71,7 +72,10 @@ def main(set_paths, batch_settings, fleet, effects_log):
         vmt_adjustments_context = AdjustmentsVMT()
         vmt_adjustments_context.calc_vmt_adjustments(batch_settings, session_settings)
 
-        context_fuel_cpm_dict = calc_context_fuel_cost_per_mile(batch_settings, session_settings)
+        if batch_settings.vmt_rebound_post_frm:
+            context_fuel_cpm_dict = calc_context_fuel_cost_per_mile_post_frm(batch_settings, session_settings)
+        else:
+            context_fuel_cpm_dict = calc_context_fuel_cost_per_mile(batch_settings, session_settings)
         if batch_settings.save_context_fuel_cost_per_mile_file:
             effects_log.logwrite(f'Saving {fleet} context fuel cost per mile file')
             context_fuel_cpm_df = pd.DataFrame.from_dict(context_fuel_cpm_dict, orient='index').reset_index(drop=True)

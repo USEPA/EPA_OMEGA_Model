@@ -389,6 +389,7 @@ class BatchSettings:
         self.context_case_liquid_fuel = None
         self.vmt_rebound_rate_ice = None
         self.vmt_rebound_rate_bev = None
+        self.vmt_rebound_post_frm = False
         self.net_benefit_ghg_scope = 'global'  # default value; change via batch file ('domestic' and 'both' are options)
 
         self.inputs_filelist = []
@@ -613,14 +614,21 @@ class BatchSettings:
 
         """
         self.cost_accrual = self.get_attribute_value((fleet, 'Cost Accrual', 'all'), 'value')
-        self.discount_values_to_year \
-            = pd.to_numeric(self.get_attribute_value((fleet, 'Discount Values to Year', 'all'), 'value'))
-        self.analysis_dollar_basis \
-            = pd.to_numeric(self.get_attribute_value((fleet, 'Analysis Dollar Basis', 'all'), 'value'))
-        self.vmt_rebound_rate_ice \
-            = pd.to_numeric(self.get_attribute_value((fleet, 'VMT Rebound Rate ICE', 'all'), 'value'))
-        self.vmt_rebound_rate_bev \
-            = pd.to_numeric(self.get_attribute_value((fleet, 'VMT Rebound Rate BEV', 'all'), 'value'))
+        self.discount_values_to_year = (
+            pd.to_numeric(self.get_attribute_value((fleet, 'Discount Values to Year', 'all'), 'value'))
+        )
+        self.analysis_dollar_basis = (
+            pd.to_numeric(self.get_attribute_value((fleet, 'Analysis Dollar Basis', 'all'), 'value'))
+        )
+        self.vmt_rebound_rate_ice = (
+            pd.to_numeric(self.get_attribute_value((fleet, 'VMT Rebound Rate ICE', 'all'), 'value'))
+        )
+        self.vmt_rebound_rate_bev = (
+            pd.to_numeric(self.get_attribute_value((fleet, 'VMT Rebound Rate BEV', 'all'), 'value'))
+        )
+        self.vmt_rebound_post_frm = (
+            self.get_attribute_value((fleet, 'VMT Rebound post-FRM', 'all'), 'value')
+        )
 
         self.context_name_liquid_fuel = self.get_attribute_value((fleet, 'Context Name Liquid Fuel', 'all'), 'value')
         self.context_case_liquid_fuel = self.get_attribute_value((fleet, 'Context Case Liquid Fuel', 'all'), 'value')
