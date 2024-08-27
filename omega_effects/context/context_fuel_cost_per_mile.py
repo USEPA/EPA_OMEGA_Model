@@ -189,7 +189,10 @@ def calc_context_fuel_cost_per_mile_post_frm(batch_settings, session_settings):
                     'base_year_vehicle_id': base_year_vehicle_id,
                     'base_year_powertrain_type': base_year_powertrain_type,
                     'base_year_product': base_year_product,
+                    'in_use_fuel_id': in_use_fuel_id,
                     'fueling_class': fueling_class,
+                    'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,
+                    'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
                     'fuel_cost_per_mile': fuel_cost_per_mile,
                 }
                 calendar_year_fuel_cpm_dict[key] = update_dict
