@@ -8,7 +8,8 @@ import math
 from datetime import datetime
 from pathlib import *
 
-# pip install pandas numpy selenium beautifulsoup4 html5lib lxml
+# pip install pandas numpy scipy sympy pytest seaborn matplotlib scikit-learn
+# conda install selenium beautifulsoup4 html5lib lxml xlsxwriter virtualenv
 
 # def movecol(df, cols_to_move=[], ref_cols='', place='After'):
 #     cols = df.columns.tolist()
