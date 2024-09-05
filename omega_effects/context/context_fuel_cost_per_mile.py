@@ -21,6 +21,14 @@ def calc_context_fuel_cost_per_mile(batch_settings, session_settings):
     Returns:
         A dictionary of fuel costs per mile by vehicle_id and age.
 
+    Notes:
+        This function calculates a sales weighted context fuel cost per mile for two powertrain groups (BEV and nonBEV)
+        and for each context size class within those two powertrain groups and for each model year and age for every
+        calendar year in the analysis. In subsequent policy sessions, whether no-action or action, an individual
+        vehicle's fuel cost per mile is compared to the appropriate context fuel cost per mile (considering its model year,
+        age, context size class and BEV vs. nonBEV powertrain) in calculating rebound VMT.
+
+        Rebound VMT is calculated in VehicleAnnualData.adjust_vad.
     """
     vehicle_attribute_list = [
         'base_year_vehicle_id',
@@ -134,6 +142,17 @@ def calc_context_fuel_cost_per_mile_post_frm(batch_settings, session_settings):
     Returns:
         A dictionary of fuel costs per mile by base_year_vehicle_id and age.
 
+    Notes:
+        This function calculates a context fuel cost per mile for every base year vehicle that is also a base product--
+        where a base product is a vehicle that was in production in the base year as designated in the vehicles input
+        file--and for each model year and age for every calendar year in the analysis. In subsequent policy sessions,
+        whether no-action or action, an individual vehicle's fuel cost per mile is compared to the appropriate context
+        fuel cost per mile (considering its model year, age, and base year vehicle ID) in calculating rebound VMT. This
+        way, for example, a BEV, PHEV or HEV that was not a base product would be compared to the ICE vehicle having the
+        same base year vehicle ID in the rebound VMT calculation.
+
+        Rebound VMT is calculated in VehicleAnnualData.adjust_vad.
+
     """
     vehicle_attribute_list = [
         'base_year_vehicle_id',
@@ -173,29 +192,30 @@ def calc_context_fuel_cost_per_mile_post_frm(batch_settings, session_settings):
              base_year_product, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile) = (
                 vehicle_info_dict)[vehicle_id]
 
-            key = (base_year_vehicle_id, fueling_class, int(model_year), int(age))
-            if key not in calendar_year_fuel_cpm_dict:
-                fuel_cost_per_mile = calc_fuel_cost_per_mile(
-                    batch_settings, session_settings, calendar_year,
-                    onroad_direct_kwh_per_mile, onroad_direct_co2e_grams_per_mile, in_use_fuel_id
-                )
-                update_dict = {
-                    'session_policy': session_settings.session_policy,
-                    'session_name': session_settings.session_name,
-                    'calendar_year': int(calendar_year),
-                    'model_year': int(model_year),
-                    'age': int(age),
-                    'vehicle_id': vehicle_id,
-                    'base_year_vehicle_id': base_year_vehicle_id,
-                    'base_year_powertrain_type': base_year_powertrain_type,
-                    'base_year_product': base_year_product,
-                    'in_use_fuel_id': in_use_fuel_id,
-                    'fueling_class': fueling_class,
-                    'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,
-                    'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
-                    'fuel_cost_per_mile': fuel_cost_per_mile,
-                }
-                calendar_year_fuel_cpm_dict[key] = update_dict
+            if base_year_product == 1:
+                key = (base_year_vehicle_id, int(model_year), int(age))
+                if key not in calendar_year_fuel_cpm_dict:
+                    fuel_cost_per_mile = calc_fuel_cost_per_mile(
+                        batch_settings, session_settings, calendar_year,
+                        onroad_direct_kwh_per_mile, onroad_direct_co2e_grams_per_mile, in_use_fuel_id
+                    )
+                    update_dict = {
+                        'session_policy': session_settings.session_policy,
+                        'session_name': session_settings.session_name,
+                        'calendar_year': int(calendar_year),
+                        'model_year': int(model_year),
+                        'age': int(age),
+                        'vehicle_id': vehicle_id,
+                        'base_year_vehicle_id': base_year_vehicle_id,
+                        'base_year_powertrain_type': base_year_powertrain_type,
+                        'base_year_product': base_year_product,
+                        'in_use_fuel_id': in_use_fuel_id,
+                        'fueling_class': fueling_class,
+                        'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,
+                        'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
+                        'fuel_cost_per_mile': fuel_cost_per_mile,
+                    }
+                    calendar_year_fuel_cpm_dict[key] = update_dict
 
         context_fuel_cpm_dict.update(calendar_year_fuel_cpm_dict)
 

@@ -160,13 +160,8 @@ class VehicleAnnualData:
 
                     # get context fuel cost per mile
                     if batch_settings.vmt_rebound_post_frm:
-                        context_fuel_cpm_dict_key = (base_year_vehicle_id, fueling_class, int(model_year), int(age))
-                        base_year_product = context_fuel_cpm_dict[context_fuel_cpm_dict_key]['base_year_product']
-                        if base_year_product == 1:
-                            context_fuel_cpm = context_fuel_cpm_dict[context_fuel_cpm_dict_key]['fuel_cost_per_mile']
-                        else:
-                            base_year_key = (base_year_vehicle_id, 'ICE', int(model_year), int(age))
-                            context_fuel_cpm = context_fuel_cpm_dict[base_year_key]['fuel_cost_per_mile']
+                        context_fuel_cpm_dict_key = (base_year_vehicle_id, int(model_year), int(age))
+                        context_fuel_cpm = context_fuel_cpm_dict[context_fuel_cpm_dict_key]['fuel_cost_per_mile']
                     else:
                         cost_per_mile_group = 'nonBEV'
                         if fueling_class == 'BEV':
