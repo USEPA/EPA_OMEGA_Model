@@ -310,6 +310,7 @@ Data Row Name and Description
 """
 import sys
 import importlib
+import subprocess
 import tkinter as tk
 from tkinter import filedialog
 import numpy as np
@@ -354,8 +355,9 @@ class BatchSettings:
 
     """
     def __init__(self):
-        self.effects_package_version = '2024.11.0' + '_effects_240419_1108'
+        self.effects_package_version = '2024.11.1' + '_effects_240419_1120'
         self.start_time_readable = None
+        self.branch_name = None
         self.runtime_info = None
         self.batch_df = pd.DataFrame()
         self.batch_program = None
@@ -502,6 +504,7 @@ class BatchSettings:
             filepath: the Path object to the file.
 
         """
+        self.branch_name = self.get_git_branch_name()
         self.set_runtime_info()
 
         input_template_columns = [
@@ -1041,10 +1044,27 @@ class BatchSettings:
             log file to indicate whether the run used the executable (PyInstaller bundle) or a normal Python process.
 
         """
-
         if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
             self.runtime_info = \
                 f'Running in a PyInstaller bundle, OMEGA effects package {self.effects_package_version}'
         else:
-            self.runtime_info = \
-                f'Running in a normal Python process, OMEGA effects package {self.effects_package_version}'
+            if self.branch_name:
+                self.runtime_info = \
+                    f'Running in a normal Python process, OMEGA effects package {self.effects_package_version}, Current branch {self.branch_name}'
+            else:
+                self.runtime_info = \
+                    f'Running in a normal Python process, OMEGA effects package {self.effects_package_version}'
+
+    @staticmethod
+    def get_git_branch_name():
+        """
+
+        Returns:
+            Name of current Git branch if running code maintained in a Git repository, else None.
+
+        """
+        try:
+            branch_name = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode('utf-8').strip()
+            return branch_name
+        except subprocess.CalledProcessError:
+            return None
