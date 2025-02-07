@@ -17,6 +17,8 @@ import math
 from bs4 import BeautifulSoup
 import numpy as np
 
+from io import StringIO
+
 # import signal
 
 global super_trim_url_list
@@ -677,7 +679,9 @@ def Edmunds_Interact(url):
 
                     if table_list_count == 0:
                         time.sleep(sleep_sec)
-                        table_list = pd.read_html(driver.page_source, header=0)
+                        # table_list = pd.read_html(driver.page_source, header=0)
+                        table_list = pd.read_html(StringIO(str(driver.page_source)), header=0)
+
                     else:
                         soup = BeautifulSoup(driver.page_source, "lxml")
                         hp = HTMLTableParser()
