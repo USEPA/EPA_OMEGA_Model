@@ -92,26 +92,26 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
                 output_columns = pd.Series(FE_readin_final_output.columns.values)
                 for k in range (0,len(output_columns)):
                     if (sheet_columns == output_columns[k]).sum() == 0:
-                        FE_readin_final_output[output_columns[k]][concat_start:] = ''
+                        FE_readin_final_output.loc[concat_start:, output_columns[k]] = ''
             for k in range (0,readin_sheet.shape[1]):
                 #print(k)
                 try:
                     FE_readin_final_output[sheet_columns[k]] #Find new columns
                 except KeyError: #Add new columns in
                     FE_readin_final_output.insert(FE_readin_final_output.shape[1],sheet_columns[k],readin_sheet[sheet_columns[k]])
-                    FE_readin_final_output[sheet_columns[k]].loc[0:concat_start] = ''
-                FE_readin_final_output[sheet_columns[k]].loc[concat_start:] \
-                    = pd.Series(readin_sheet[sheet_columns[k]]).tolist()
+                    FE_readin_final_output.loc[concat_start:, sheet_columns[k]] = ''
+                FE_readin_final_output.loc[concat_start:, sheet_columns[k]] = pd.Series(readin_sheet[sheet_columns[k]]).tolist()
+                #     FE_readin_final_output[sheet_columns[k]].loc[0:concat_start] = ''
+                # FE_readin_final_output[sheet_columns[k]].loc[concat_start:] = pd.Series(readin_sheet[sheet_columns[k]]).tolist()
     #Create separate list items for "/" carlines
     extra_carline_array = FE_readin_final_output[FE_readin_final_output['Carline'].str.contains('/')].reset_index(drop=True)
     for i in range (0,len(extra_carline_array)):
-        dash_output_index = FE_readin_final_output['Carline']\
-            [FE_readin_final_output['Carline'] == extra_carline_array['Carline'][i]].index[0]
+        dash_output_index = FE_readin_final_output['Carline'][FE_readin_final_output['Carline'] == extra_carline_array['Carline'][i]].index[0]
         postdash_trim = extra_carline_array['Carline'][i][extra_carline_array['Carline'][i].find('/')+1:]
-        FE_readin_final_output['Carline'][dash_output_index] = FE_readin_final_output['Carline'][dash_output_index][0:FE_readin_final_output['Carline'][dash_output_index].find('/')]
+        FE_readin_final_output.loc[dash_output_index, 'Carline'] = FE_readin_final_output['Carline'][dash_output_index][0:FE_readin_final_output['Carline'][dash_output_index].find('/')]
         if (' ' not in FE_readin_final_output['Carline'][dash_output_index]): continue
         last_space_index = [m.start() for m in re.finditer(' ', FE_readin_final_output['Carline'][dash_output_index])][-1]
-        extra_carline_array['Carline'][i] = FE_readin_final_output['Carline'][dash_output_index].replace(FE_readin_final_output['Carline'][dash_output_index][1+last_space_index:],postdash_trim).strip()
+        extra_carline_array.loc[i, 'Carline'] = FE_readin_final_output['Carline'][dash_output_index].replace(FE_readin_final_output['Carline'][dash_output_index][1+last_space_index:],postdash_trim).strip()
     FE_readin_final_output = pd.concat([FE_readin_final_output, extra_carline_array])\
         .sort_values(['Mfr Name','Division', 'Carline', 'Index (Model Type Index)']).reset_index(drop=True)
     # FE_readin_final_output['Model Year'] = FE_readin_final_output['Model Year'].replace('.0', '')
@@ -181,8 +181,7 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
         footprint_lineageid_in_vehghgid['LineageID'] = footprint_lineageid_in_vehghgid['LineageID'].astype(int)
         footprint_lineageid_in_vehghgid['Index (Model Type Index)'] = footprint_lineageid_in_vehghgid['Index (Model Type Index)'].astype(int)
         footprint_lineageid_in_vehghgid = footprint_lineageid_in_vehghgid.drop_duplicates().reset_index(drop=True)
-        footprint_lineageid_in_vehghgid_my = footprint_lineageid_in_vehghgid.loc[
-                                             footprint_lineageid_in_vehghgid['Model Year'] == year, :].reset_index(drop=True)
+        footprint_lineageid_in_vehghgid_my = footprint_lineageid_in_vehghgid.loc[footprint_lineageid_in_vehghgid['Model Year'] == year, :].reset_index(drop=True)
         for i in range(len(footprint_lineageid_in_vehghgid_my)):
             _make = footprint_lineageid_in_vehghgid_my.loc[i, 'Division']
             _model = footprint_lineageid_in_vehghgid_my.loc[i, 'Carline']

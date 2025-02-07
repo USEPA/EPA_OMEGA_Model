@@ -140,7 +140,8 @@ def Get_URLs_Edmunds(model_year):
     # xpath_go_button = "//button[@class = 'mb-0_5 w-100 px-0 px-md-1_5 btn btn-success']"
     # xpath_go_button = "//button[@class = 'mb-0_5 w-100 px-0 px-md-1_5 font-weight-medium btn btn-primary-b']"
     # Updated a "GO" button link by removing the "disabled" at the end on January 26, 2023
-    xpath_go_button = "//button[@class='inventory-button p-0_5 make-model-zip-dropdown-form-submit w-100 px-0 px-md-1_5 font-weight-medium text-transform-none ml-md-1 size-16 btn btn-blue-50']"
+    # xpath_go_button = "//button[@class='inventory-button p-0_5 make-model-zip-dropdown-form-submit w-100 px-0 px-md-1_5 font-weight-medium text-transform-none ml-md-1 size-16 btn btn-blue-50']"
+    xpath_go_button = "//button[@class='inventory-button p-0_5 make-model-zip-dropdown-form-submit w-100 px-0 px-md-1_5 fw-medium text-transform-none ms-md-1 size-16 btn btn-blue-50']"
 
     time.sleep(sleep_short)
     element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, xpath_make)))

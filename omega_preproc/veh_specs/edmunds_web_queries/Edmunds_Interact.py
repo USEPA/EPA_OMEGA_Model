@@ -16,7 +16,7 @@ import pandas as pd
 import math
 from bs4 import BeautifulSoup
 import numpy as np
-from io import StringIO
+
 # import signal
 
 global super_trim_url_list
@@ -119,6 +119,9 @@ def merge_trim_options(tmp_raw_table0, _num_menu_columns, df_options, _trim_str)
                 elif ioption.lower() == 'no' and tmp_raw_table[trim_col][_trim_str_row] == 'no':
                     tmp_raw_table[trim_col][_trim_str_row] = np.nan
                 if k > _row_drop_start: tmp_raw_table[trim_col][_row] = np.nan
+            # if k > _row_drop_start:
+            #     # tmp_raw_table =[trim_col][_row] = ''
+            #     tmp_raw_table = tmp_raw_table.drop(index=_row)
 
     return tmp_raw_table
 
@@ -470,12 +473,11 @@ def est_max_towing_capacity(df):
 def Edmunds_Interact(url):
 
     max_attempts = 5 # 10
-    # max_time = 30
-    # sleep_5sec = 5
-    sleep_4sec = 3
+    max_time = 30
+    sleep_5sec = 5
     sleep_3sec = 3
-    sleep_sec = 1
-    wait_sec = 5 # 30
+    sleep_sec = 2
+    wait_sec = 30
     _max_trim_groups_count = 75 # for 4K resolution monitor, set 10 for low resolution monitors like 1080K
     _max_trim_buttons =  100     # for 4K resolution monitor, set 33 (10 x 3 menu columns) for 1080K monitor
     _num_menu_columns = 1 # 3 trims were displayed in 2020, and changed the trim column to 1 in 2021
@@ -494,40 +496,43 @@ def Edmunds_Interact(url):
         chromedriver = 'chromedriver.exe'
         os.environ["webdriver.chrome.driver"] = chromedriver
         chromeOptions = Options()
+        # caps = DesiredCapabilities().CHROME
+        # caps["pageLoadStrategy"] = "none"
+        # chromeOptions.add_argument("--kiosk")  # for Mac/Linux OS
+        # chromeOptions.add_argument("--start-maximized")
+        # driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions, desired_capabilities=caps)
+        # driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
         service = Service();
         options = webdriver.ChromeOptions()
         options.add_argument("--start-maximized")
-        time.sleep(sleep_4sec)
+        time.sleep(sleep_5sec)
         try:
             driver = webdriver.Chrome(service=service, options=options)
-        except (NoSuchElementException, TimeoutException, UnboundLocalError):
-            print("TimeoutException, NoSuchElementException, UnboundLocalError")
-            time.sleep(sleep_4sec)
+        except TimeoutException:
+            print("TimeoutException")
+            time.sleep(sleep_5sec)
             driver = webdriver.Chrome(service=service, options=options)
+
         try:
             driver.set_page_load_timeout(wait_sec)
-            driver.implicitly_wait(sleep_4sec)
-            time.sleep(sleep_3sec)
+            driver.implicitly_wait(5)
+            time.sleep(sleep_sec)
             try:
                 driver.get(url)
             except (WebDriverException, TimeoutException):
+                print("page down")
                 _soup = BeautifulSoup(driver.page_source, "lxml")
                 if ('page not found' in _soup.text) or ('Page Not Found' in _soup.text):
-                    print("page down")
                     return ('N', 'READIN_ERROR', 'PageNotFound')
-                elif (geturl_attempt > 2):
+                else:
                     driver.quit()
-                    time.sleep(sleep_4sec)
+                    time.sleep(sleep_5sec)
                     driver = webdriver.Chrome(service=service, options=options)
-                    driver.set_page_load_timeout(wait_sec)
-                    driver.implicitly_wait(sleep_4sec)
-                    time.sleep(sleep_4sec)
+                    time.sleep(sleep_5sec)
                     try:
-                        wait = WebDriverWait(driver, 10)
                         driver.get(url)
-                        # print(driver.current_url)
                     except:
-                        print("get url attempted = ", geturl_attempt+1)
+                        print("page down second times")
                         return ('N', 'READIN_ERROR', 'WebDriverException')
             if (geturl_attempt > 0):
                 _page_not_found = 0
@@ -537,7 +542,7 @@ def Edmunds_Interact(url):
                         _page_not_found = 1
                         print("Page Not Found")
                 if (_page_not_found == 1) or (geturl_attempt == max_attempts-1):
-                    driver.quit()
+                    driver.close()
                     if (_page_not_found == 1):
                         return ('N', 'READIN_ERROR', 'PageNotFound')
                     else:
@@ -569,11 +574,22 @@ def Edmunds_Interact(url):
         except (NoSuchElementException, TimeoutException, UnboundLocalError):
             driver.quit()
             pass
+
     try:
         total_trims = len(trim_buttons)
     except UnboundLocalError:
         if geturl_attempt + 1 == max_attempts:
             return ('N', 'READIN_ERROR', 'MaxAttempted')
+    # trim_group_length = 1
+    #
+    # if total_trims >= 2:
+    #     #menu2 = driver.find_elements_by_xpath(trim_dropdown_buttons_xpath)[1]
+    #     # dropdown2 = Select(menu2)
+    #     trim_group_length = 2
+    # if total_trims >= 3:
+    #     #menu3 = driver.find_elements_by_xpath(trim_dropdown_buttons_xpath)[2]
+    #     # dropdown3 = Select(menu3)
+    #     trim_group_length = 3
 
     trim_groups_count = math.ceil(total_trims / _num_menu_columns)  # Number of trim groups (in groups of 3, add one if only 1-
     if _num_menu_columns == 1: trim_groups_count = 1
@@ -623,6 +639,10 @@ def Edmunds_Interact(url):
                     time.sleep(sleep_sec)
 
                     try:
+                        # if _num_menu_columns == 1:
+                        #     Select(element).select_by_index(0)
+                        #     # element.click()
+                        # else:
                         menus[i].click()
                     except (NoSuchElementException, TimeoutException, UnboundLocalError):
                         driver.quit()
@@ -640,18 +660,24 @@ def Edmunds_Interact(url):
                             time.sleep(sleep_3sec)
                             if _num_menu_columns == 1:
                                 Select(element).select_by_index(0)
+                                # element.click()
                             else:
+                                # menus = driver.find_elements_by_xpath(trim_dropdown_buttons_xpath)
                                 menus = Select(driver.find_elements(By.XPATH, trim_dropdown_buttons_xpath))
                                 menus.select_by_index(i)
                         except (NoSuchElementException, TimeoutException, UnboundLocalError):
                             print('element click Timeout')
                             continue
                     trims_text.append(trim_options[_index * _num_menu_columns + i])
+                    # element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_select_buttons_xpath)))
+                    # dropdown_item = driver.find_elements(By.XPATH, trim_select_buttons_xpath)[_index * _num_menu_columns + i]
+                    # actions = ActionChains(driver) # Commented out @ July 18, 2024
+                    # actions.move_to_element(dropdown_item).click().perform()
+                    # actions.reset_actions() # Commented out @ July 18, 2024
 
                     if table_list_count == 0:
                         time.sleep(sleep_sec)
-                        # table_list = pd.read_html(driver.page_source, header=0)
-                        table_list = pd.read_html(StringIO(driver.page_source), header=0)
+                        table_list = pd.read_html(driver.page_source, header=0)
                     else:
                         soup = BeautifulSoup(driver.page_source, "lxml")
                         hp = HTMLTableParser()
@@ -676,10 +702,17 @@ def Edmunds_Interact(url):
                 # df.drop(_model_name, axis=1, inplace=True)
         df.reset_index(drop=True, inplace=True)
     # df = est_max_towing_capacity(df)
-    driver.quit()
+    driver.close()
     return (df, readin_check, trims_text)
 
 def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_text, i_trims_page, trim_group, num_column_shift, df):
+
+    # if len(df_tmp) == 0: del df_tmp
+    # if _num_menu_columns == 1:
+    # try:
+    #     del df_tmp  # important_tables
+    # except NameError:
+    #     pass
 
     num_table_list = len(table_list)
     if len(table_list[num_table_list-1]) < 1:
@@ -701,6 +734,8 @@ def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_t
         if table_check == 0: continue
 
         name_category = table_list[table_count].columns[0]
+        # if (table_count > 0) and ((name_category == 'Front Seat Dimensions') or (name_category == 'Rear Seat Dimensions') or (name_category == 'In-Car Entertainment') or (name_category == 'Colors')): continue
+        # if (table_count > 0) and ((name_category == 'Interior Options') or (name_category == 'Exterior Options') or (name_category == 'Power Feature')): continue
 
         # table_tag = raw_table.columns[0]
         if len(raw_table) > 0 and isinstance(raw_table, pd.DataFrame): # and (not ("Highlights" in table_tag)) and (table_tag != 'OVERVIEW'):
@@ -711,6 +746,8 @@ def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_t
                     del_colname = table_list[table_count].columns[i]
                     table_list[table_count].drop(del_colname, axis=1, inplace=True)
             try:
+                # important_tables = important_tables.loc[:, ~important_tables.columns.duplicated()]
+                # important_tables = pd.concat([important_tables, raw_table])
                 if ('Overview' in name_category):
                     for j in range(len(table_list[table_count])):
                         if ('EPA Combined MPGe'.lower() in table_list[table_count][name_category][j].lower()):
@@ -722,39 +759,43 @@ def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_t
                             df_tmp = pd.concat([df_tmp, raw_table])
                     except NameError:
                         pass
+                # df = pd.merge(df, df_tmp, on=['Category', 'Specifications'], how='inner')
+                # df = df.drop_duplicates(subset=['Specifications'])
 
                 raw_table = raw_table.loc[:, ~raw_table.columns.duplicated()]
+                # name_category = table_list[table_count].columns[0]
                 for i in range(_num_menu_columns):
+                    # if ('Overview' in name_category): table_list[table_count] = table_list[table_count].rename(columns={table_list[table_count].columns[0 + i]: 'Overview'})
                     table_list[table_count] = table_list[table_count].rename(columns={table_list[table_count].columns[1 + i]: trims_text[i_trims_page]})
                 tmp_raw_table = table_list[table_count]
                 if (name_category == 'Battery & Range') or (name_category == 'Fuel & MPG'):
                     for j in range(len(tmp_raw_table)):
-                        if ('EPA Combined MPGe'.lower() in tmp_raw_table.loc[j, name_category].lower()):
-                            tmp_raw_table.loc[j, name_category] = 'EPA Combined MPGe'
-                        elif ('EPA Electricity Range'.lower() in tmp_raw_table.loc[j, name_category].lower()):
-                            tmp_raw_table.loc[j, name_category] = 'EPA Electricity Range'
-                        elif ('EPA Time To Charge Battery (At 240V)'.lower() in tmp_raw_table.loc[j, name_category].lower()):
-                            tmp_raw_table.loc[j, name_category] = 'EPA Time To Charge Battery (At 240V)'
-                        elif ('EPA KWh/100 Mi'.lower() in tmp_raw_table.loc[j, name_category].lower()):
-                            tmp_raw_table.loc[j, name_category] = 'EPA KWh/100 Mi'
+                        if ('EPA Combined MPGe'.lower() in tmp_raw_table[name_category][j].lower()):
+                            tmp_raw_table[name_category][j] = 'EPA Combined MPGe'
+                        elif ('EPA Electricity Range'.lower() in tmp_raw_table[name_category][j].lower()):
+                            tmp_raw_table[name_category][j] = 'EPA Electricity Range'
+                        elif ('EPA Time To Charge Battery (At 240V)'.lower() in tmp_raw_table[name_category][j].lower()):
+                            tmp_raw_table[name_category][j] = 'EPA Time To Charge Battery (At 240V)'
+                        elif ('EPA KWh/100 Mi'.lower() in tmp_raw_table[name_category][j].lower()):
+                            tmp_raw_table[name_category][j] = 'EPA KWh/100 Mi'
                 if (name_category == 'Tires & Wheels'):
                     for j in range(len(tmp_raw_table)):
-                        tmp_val = tmp_raw_table.loc[j, name_category]
-                        if ('In. Wheels'.lower() in tmp_raw_table.loc[j, name_category].lower()):
-                            tmp_raw_table.loc[j, name_category] = 'Wheels'
-                            tmp_raw_table.loc[j, tmp_raw_table.columns[1]] = tmp_val
-                        elif ('All Season Tires'.lower() in tmp_raw_table.loc[j, name_category].lower()) or ('PERFORMANCE TIRES'.lower() in tmp_raw_table.loc[j, name_category].lower()) or \
-                             ('RUN FLAT TIRES'.lower() in tmp_raw_table.loc[j, name_category].lower()) or ('ALL-SEASON RUN FLAT TIRES'.lower() in tmp_raw_table.loc[j, name_category].lower()) or \
-                             ('All terrain tires'.lower() in tmp_raw_table.loc[j, name_category].lower()) or ('Null Tires'.lower() in tmp_raw_table.loc[j, name_category].lower()) or \
-                             ('Puncture-Sealing Tires'.lower() in tmp_raw_table.loc[j, name_category].lower()) :
-                            tmp_raw_table.loc[j, name_category] = 'Tire Types'
-                            tmp_raw_table.loc[j, tmp_raw_table.columns[1]] = tmp_val
-                        elif (' Tires'.lower() in tmp_raw_table.loc[j, name_category].lower()) and (tmp_val.split(' ')[0].replace('/', '').isalnum()):
-                            tmp_raw_table.loc[j, name_category] = 'Tires'
-                            tmp_raw_table.loc[j, tmp_raw_table.columns[1]] = tmp_val
-                        elif (' Tires'.lower() in tmp_raw_table.loc[j, name_category].lower()) and ('Spare' not in tmp_val):
-                            tmp_raw_table.loc[j, name_category] = 'Tire Types'
-                            tmp_raw_table.loc[j, tmp_raw_table.columns[1]] = tmp_val
+                        tmp_val = tmp_raw_table[name_category][j]
+                        if ('In. Wheels'.lower() in tmp_raw_table[name_category][j].lower()):
+                            tmp_raw_table[name_category][j] = 'Wheels'
+                            tmp_raw_table[tmp_raw_table.columns[1]][j] = tmp_val
+                        elif ('All Season Tires'.lower() in tmp_raw_table[name_category][j].lower()) or ('PERFORMANCE TIRES'.lower() in tmp_raw_table[name_category][j].lower()) or \
+                             ('RUN FLAT TIRES'.lower() in tmp_raw_table[name_category][j].lower()) or ('ALL-SEASON RUN FLAT TIRES'.lower() in tmp_raw_table[name_category][j].lower()) or \
+                             ('All terrain tires'.lower() in tmp_raw_table[name_category][j].lower()) or ('Null Tires'.lower() in tmp_raw_table[name_category][j].lower()) or \
+                             ('Puncture-Sealing Tires'.lower() in tmp_raw_table[name_category][j].lower()) :
+                            tmp_raw_table[name_category][j] = 'Tire Types'
+                            tmp_raw_table[tmp_raw_table.columns[1]][j] = tmp_val
+                        elif (' Tires'.lower() in tmp_raw_table[name_category][j].lower()) and (tmp_val.split(' ')[0].replace('/', '').isalnum()):
+                            tmp_raw_table[name_category][j] = 'Tires'
+                            tmp_raw_table[tmp_raw_table.columns[1]][j] = tmp_val
+                        elif (' Tires'.lower() in tmp_raw_table[name_category][j].lower()) and ('Spare' not in tmp_val):
+                            tmp_raw_table[name_category][j] = 'Tire Types'
+                            tmp_raw_table[tmp_raw_table.columns[1]][j] = tmp_val
 
                 if tmp_raw_table.columns[0] != 'Category':
                     if ('Overview' in name_category): # and (len(name_category) > 8):
@@ -763,6 +804,7 @@ def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_t
                     else:
                         tmp_raw_table.insert(0, 'Category', name_category)
 
+                # tmp_raw_table['Category'] = name_category
                 tmp_raw_table = tmp_raw_table.rename(columns={tmp_raw_table.columns[1]: 'Specifications', tmp_raw_table.columns[2]: 'Trim_' + str(i_trims_page+1)})
                 try:
                     df_tmp = pd.concat([df_tmp, tmp_raw_table], ignore_index=True);
@@ -775,13 +817,19 @@ def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_t
                     if (trim_group == 0 and _num_menu_columns > 1) or (i_trims_page == 0):
                         df = df_tmp
                     else:
+                        # df_tmp = df_tmp.rename(columns={df_tmp.columns[2]: 'Trim_' + str(i_trims_page+1)})  # , df_tmp.columns[2]: 'Spec Values'})
                         df =  pd.merge(df, df_tmp, on=['Category', 'Specifications'], how='outer')
                         df = df.drop_duplicates(subset=['Specifications'])
             except NameError:
                 df_tmp = table_list[table_count]
                 name_category = table_list[table_count].columns[0]
+                # if df_tmp.columns[0] != 'Category': df_tmp.insert(0, 'Category', '')
+                # if df_tmp.columns[1] != 'Specifications':
                 if 'Category' not in df_tmp.columns:
                     df_tmp.insert(0, 'Category', name_category)
                 df_tmp = df_tmp.rename(columns={df_tmp.columns[1]: 'Specifications', df_tmp.columns[2]: 'Trim'}) #, df_tmp.columns[2]: 'Spec Values'})
-
+                # df_tmp.insert(3, 'Trim', trims_text[i_trims_page])
+                # for i in range(_num_menu_columns): df_tmp = df_tmp.rename(columns={df_tmp.columns[num_column_shift + i]: trims_text[i_trims_page]})
+                # df_tmp = update_raw_tables(df_tmp, _num_menu_columns)
+                # df_tmp = drop_merged_option(df_tmp, _num_menu_columns)
     return df
