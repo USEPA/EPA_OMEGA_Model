@@ -93,11 +93,11 @@ def url_list_to_csv(url_list, make_idx, working_directory):
             last_rows = i+1
             break
         str_make_model = url_str.replace('//', '/').split('/')
-        url_list['Make'][i] = str_make_model[2].capitalize()
-        url_list['Model'][i] = str_make_model[3].upper()
+        url_list.loc[i, 'Make'] = str_make_model[2].capitalize()
+        url_list.loc[i, 'Model'] = str_make_model[3].upper()
         if str_make_model[4].isnumeric() == False: url_str = url_str + str(model_year) + '/'
         if 'features-specs' not in str_make_model: url_str = url_str + 'features-specs/'
-        url_list[url_column_name][i] = url_str
+        url_list.loc[i, url_column_name] = url_str
 
     num_csv_files = math.ceil(last_rows/max_URLs)
     timestr = time.strftime("%Y%m%d-%H%M%S")

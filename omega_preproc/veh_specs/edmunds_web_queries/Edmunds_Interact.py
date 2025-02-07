@@ -103,7 +103,7 @@ def merge_trim_options(tmp_raw_table0, _num_menu_columns, df_options, _trim_str)
             continue
         else:
             if k == 0 or _row_trim_str_init == 0:
-                tmp_raw_table['Specifications'][_row] = _trim_str
+                tmp_raw_table.loc[_row, 'Specifications'] = _trim_str
                 _trim_str_row = _row
                 if k>0 and _row_trim_str_init == 0:
                     _row_drop_start = k
@@ -115,10 +115,10 @@ def merge_trim_options(tmp_raw_table0, _num_menu_columns, df_options, _trim_str)
                 trim_col = tmp_raw_table.columns[_index_col+2]
                 ioption = str(tmp_raw_table[trim_col][_row])
                 if ioption.lower() == 'yes':
-                    tmp_raw_table[trim_col][_trim_str_row] = _option_spec
+                    tmp_raw_table.loc[_trim_str_row, trim_col] = _option_spec
                 elif ioption.lower() == 'no' and tmp_raw_table[trim_col][_trim_str_row] == 'no':
-                    tmp_raw_table[trim_col][_trim_str_row] = np.nan
-                if k > _row_drop_start: tmp_raw_table[trim_col][_row] = np.nan
+                    tmp_raw_table.loc[_trim_str_row, trim_col] = np.nan
+                if k > _row_drop_start: tmp_raw_table.loc[_row, trim_col] = np.nan
             # if k > _row_drop_start:
             #     # tmp_raw_table =[trim_col][_row] = ''
             #     tmp_raw_table = tmp_raw_table.drop(index=_row)
@@ -140,22 +140,22 @@ def trim_tires_wheels(tmp_raw_table, _num_menu_columns):
             break
     for _index in range(len(tmp_raw_table)):
         if str(tmp_raw_table['Specifications'][_index]).lower() == 'all season tires' or \
-                tmp_raw_table['Specifications'][_index] == 'All season tires':
+                tmp_raw_table.loc[_index, 'Specifications'] == 'All season tires':
             all_season_tires_index = _index
             break
     for _index in range(len(tmp_raw_table)):
         if str(tmp_raw_table['Specifications'][_index]).lower() == 'performance tires' or \
-                tmp_raw_table['Specifications'][_index] == 'Performance tires':
+                tmp_raw_table.loc[_index, 'Specifications'] == 'Performance tires':
             performance_tires_index = _index
             break
     for _index in range(len(tmp_raw_table)):
         if str(tmp_raw_table['Specifications'][_index]).lower() == 'run flat tires' or \
-                tmp_raw_table['Specifications'][_index] == 'Run flat tires':
+                tmp_raw_table.loc[_index, 'Specifications'] == 'Run flat tires':
             run_flat_tires_index = _index
             break
     for _index in range(len(tmp_raw_table)):
         if str(tmp_raw_table['Specifications'][_index]).lower() == 'all terrain tires' or \
-                tmp_raw_table['Specifications'][_index] == 'All terrain tires':
+                tmp_raw_table.loc[_index, 'Specifications'] == 'All terrain tires':
             all_terrain_tires_index = _index
             break
 
@@ -275,8 +275,8 @@ def update_raw_tables(tmp_raw_table0, _num_menu_columns):
             _new_specs_pos.append('no')
         else:
             df1 = pd.DataFrame([[''] * len(tmp_raw_table.columns)], columns=tmp_raw_table.columns)
-            df1["Category"][0] = _category
-            df1['Specifications'][0] = _new_spec
+            df1.loc[0, "Category"] = _category
+            df1.loc[0, 'Specifications'] = _new_spec
             if i == 0:
                 tmp_raw_table = pd.concat([df1, tmp_raw_table], ignore_index=True)
             else:
@@ -301,11 +301,11 @@ def update_raw_tables(tmp_raw_table0, _num_menu_columns):
             _specs = tmp_raw_table0[tmp_raw_table0.columns[1]][ispec_no]
         if _new_specs_pos[i] == 'yes' and ispec_no < 0:
             _new_specs_text = _new_specs_list[i]
-            tmp_raw_table[tmp_raw_table.columns[1]][i] = _new_specs_text
+            tmp_raw_table.loc[i, tmp_raw_table.columns[1]] = _new_specs_text
             _num_new_specs_inserted = _num_new_specs_inserted + 1
             _irow = ispec_no + _num_new_specs_inserted
             for j in range (_num_menu_columns):
-                tmp_raw_table[tmp_raw_table.columns[j+2]][i] = ''
+                tmp_raw_table.loc[i, tmp_raw_table.columns[j+2]] = ''
                 _new_spec_inserted = True
         elif _specs_skipped_pos[i] == 'yes':
             _num_specs_skipped = _num_specs_skipped + 1
@@ -316,12 +316,12 @@ def update_raw_tables(tmp_raw_table0, _num_menu_columns):
         if ispec_no >= 0:
             _new_specs_text = tmp_raw_table0[tmp_raw_table0.columns[1]][ispec_no]
             if _new_specs_text == 'Maximum towing capacity': _index_towing_capacity = _irow
-            tmp_raw_table[tmp_raw_table.columns[1]][_irow_adjusted] = _new_specs_text
+            tmp_raw_table.loc[_irow_adjusted, tmp_raw_table.columns[1]] = _new_specs_text
             for j in range (_num_menu_columns):
                 _item = tmp_raw_table0[tmp_raw_table0.columns[j + 2]][ispec_no]
                 if _item == 'no' or _item == '' or  _item == np.nan:
                     if _specs in _no_to_nan_list: _item = ''
-                tmp_raw_table[tmp_raw_table.columns[j+2]][_irow_adjusted] = _item
+                tmp_raw_table.loc[_irow_adjusted, tmp_raw_table.columns[j+2]] = _item
 
     return tmp_raw_table
 
@@ -771,31 +771,31 @@ def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_t
                 if (name_category == 'Battery & Range') or (name_category == 'Fuel & MPG'):
                     for j in range(len(tmp_raw_table)):
                         if ('EPA Combined MPGe'.lower() in tmp_raw_table[name_category][j].lower()):
-                            tmp_raw_table[name_category][j] = 'EPA Combined MPGe'
+                            tmp_raw_table.loc[j, name_category] = 'EPA Combined MPGe'
                         elif ('EPA Electricity Range'.lower() in tmp_raw_table[name_category][j].lower()):
-                            tmp_raw_table[name_category][j] = 'EPA Electricity Range'
+                            tmp_raw_table.loc[j, name_category] = 'EPA Electricity Range'
                         elif ('EPA Time To Charge Battery (At 240V)'.lower() in tmp_raw_table[name_category][j].lower()):
-                            tmp_raw_table[name_category][j] = 'EPA Time To Charge Battery (At 240V)'
+                            tmp_raw_table.loc[j, name_category] = 'EPA Time To Charge Battery (At 240V)'
                         elif ('EPA KWh/100 Mi'.lower() in tmp_raw_table[name_category][j].lower()):
-                            tmp_raw_table[name_category][j] = 'EPA KWh/100 Mi'
+                            tmp_raw_table.loc[j, name_category] = 'EPA KWh/100 Mi'
                 if (name_category == 'Tires & Wheels'):
                     for j in range(len(tmp_raw_table)):
                         tmp_val = tmp_raw_table[name_category][j]
                         if ('In. Wheels'.lower() in tmp_raw_table[name_category][j].lower()):
-                            tmp_raw_table[name_category][j] = 'Wheels'
+                            tmp_raw_table.loc[j, name_category] = 'Wheels'
                             tmp_raw_table[tmp_raw_table.columns[1]][j] = tmp_val
                         elif ('All Season Tires'.lower() in tmp_raw_table[name_category][j].lower()) or ('PERFORMANCE TIRES'.lower() in tmp_raw_table[name_category][j].lower()) or \
                              ('RUN FLAT TIRES'.lower() in tmp_raw_table[name_category][j].lower()) or ('ALL-SEASON RUN FLAT TIRES'.lower() in tmp_raw_table[name_category][j].lower()) or \
                              ('All terrain tires'.lower() in tmp_raw_table[name_category][j].lower()) or ('Null Tires'.lower() in tmp_raw_table[name_category][j].lower()) or \
                              ('Puncture-Sealing Tires'.lower() in tmp_raw_table[name_category][j].lower()) :
-                            tmp_raw_table[name_category][j] = 'Tire Types'
-                            tmp_raw_table[tmp_raw_table.columns[1]][j] = tmp_val
+                            tmp_raw_table.loc[j, name_category] = 'Tire Types'
+                            tmp_raw_table.loc[j, tmp_raw_table.columns[1]] = tmp_val
                         elif (' Tires'.lower() in tmp_raw_table[name_category][j].lower()) and (tmp_val.split(' ')[0].replace('/', '').isalnum()):
-                            tmp_raw_table[name_category][j] = 'Tires'
-                            tmp_raw_table[tmp_raw_table.columns[1]][j] = tmp_val
+                            tmp_raw_table.loc[j, name_category] = 'Tires'
+                            tmp_raw_table.loc[j, tmp_raw_table.columns[1]] = tmp_val
                         elif (' Tires'.lower() in tmp_raw_table[name_category][j].lower()) and ('Spare' not in tmp_val):
-                            tmp_raw_table[name_category][j] = 'Tire Types'
-                            tmp_raw_table[tmp_raw_table.columns[1]][j] = tmp_val
+                            tmp_raw_table.loc[j, name_category] = 'Tire Types'
+                            tmp_raw_table.loc[j, tmp_raw_table.columns[1]] = tmp_val
 
                 if tmp_raw_table.columns[0] != 'Category':
                     if ('Overview' in name_category): # and (len(name_category) > 8):
