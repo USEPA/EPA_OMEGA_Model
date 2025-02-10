@@ -73,12 +73,11 @@ class SetPaths:
         shutil.copy2(self.path_project / 'requirements.txt', self.path_of_run_folder / 'requirements.txt')
         self.path_code = self.path_of_code_folder
 
-    def create_output_paths(self, path_name, batch_name, start_time_readable, run_id):
+    def create_output_paths(self, path_name, start_time_readable, run_id):
         """
 
         Parameters:
             path_name: save path set via batch settings file.
-            batch_name (str): the batch name set via the runtime options input file.
             start_time_readable (str): the start time of the run, in text readable format.\n
             run_id (str): the run ID entered by the user or the default value if the user does not provide an ID.
 
@@ -87,7 +86,8 @@ class SetPaths:
 
         """
         path_name.mkdir(exist_ok=True)
-        path_of_output_batch_folder = path_name / batch_name
+        path_of_output_batch_folder = path_name / run_id
+        # path_of_output_batch_folder = path_name / batch_name
         path_of_output_batch_folder.mkdir(exist_ok=True)
         self.path_of_run_folder = path_of_output_batch_folder / f'{start_time_readable}_{run_id}'
         self.path_of_run_folder.mkdir(exist_ok=False)

@@ -407,6 +407,7 @@ def calc_period_consumer_view(batch_settings, input_df, periods):
             'purchase_credit_dollars',
             'modified_xsub_price_dollars',
             'sales_taxes_cost_dollars',
+            'battery_credit_dollars',
         ]:
             s = pd.Series(return_df[attribute] / return_df['sales'], name=f'{attribute}_per_period')
             return_df = pd.concat([return_df, s], axis=1)

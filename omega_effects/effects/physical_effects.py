@@ -12,6 +12,7 @@ calculate from them the pollutant inventories, including fuel consumed, for each
 """
 import pandas as pd
 from omega_effects.effects.vehicle_inventory import VehiclePhysicalData, calc_vehicle_inventory
+from omega_effects.general.general_functions import calc_electricity_consumption
 
 
 def get_inputs_for_effects(batch_settings, arg=None):
@@ -209,18 +210,14 @@ def calc_physical_effects(batch_settings, session_settings, analysis_fleet_safet
 
                 # calc fuel consumption and update emission rates
                 if onroad_direct_kwh_per_mile:
-                    refuel_efficiency = batch_settings.onroad_fuels.get_fuel_attribute(
-                        calendar_year, 'US electricity', 'refuel_efficiency'
+
+                    fuel_consumption_kwh, fuel_generation_kwh, evse_kwh_per_mile = calc_electricity_consumption(
+                        batch_settings, v, onroad_direct_kwh_per_mile
                     )
-                    fuel_consumption_kwh = v['vmt'] * onroad_direct_kwh_per_mile / refuel_efficiency
-                    transmission_efficiency = batch_settings.onroad_fuels.get_fuel_attribute(
-                            calendar_year, 'US electricity', 'transmission_efficiency'
-                        )
-                    fuel_generation_kwh = fuel_consumption_kwh / transmission_efficiency
 
                     vehicle_data.update_value({
                         'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
-                        'evse_kwh_per_mile': onroad_direct_kwh_per_mile / refuel_efficiency,
+                        'evse_kwh_per_mile': evse_kwh_per_mile,
                         'fuel_consumption_kwh': fuel_consumption_kwh,
                         'fuel_generation_kwh': fuel_generation_kwh,
                     })
@@ -392,12 +389,18 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
 
     sourcetype_name = None
 
+    # get fuel consumption adjustment factors
+    fc_adjustment_factors = batch_settings.legacy_fleet_fc_adjustment.adjustment_factors.copy()
+
     physical_effects = {}
     for v in batch_settings.legacy_fleet.adjusted_legacy_fleet.values():
 
         vehicle_data = VehiclePhysicalData()
 
         model_year = v['calendar_year'] - v['age']
+
+        fuel_dict = eval(v['in_use_fuel_id'])
+        fuel = [item for item in fuel_dict][0]
 
         # establish VMT shares
         vmt_liquid_fuel = v['vmt']
@@ -435,14 +438,14 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
             'kwh_per_mile': v['kwh_per_mile'],
         })
 
-        onroad_miles_per_gallon = v['miles_per_gallon'] * 0.8
-        try:
-            onroad_direct_co2e_grams_per_mile = 8887 / onroad_miles_per_gallon
-            onroad_gallons_per_mile = 1 / onroad_miles_per_gallon
-        except ZeroDivisionError:
-            onroad_direct_co2e_grams_per_mile = 0
-            onroad_gallons_per_mile = 0
-        onroad_direct_kwh_per_mile = v['kwh_per_mile'] / 0.7
+        onroad_gallons_per_mile = onroad_miles_per_gallon = 0
+        onroad_direct_co2e_grams_per_mile = 0
+        onroad_miles_per_gallon_data = v['miles_per_gallon']
+        if onroad_miles_per_gallon_data != 0:
+            onroad_gallons_per_mile = fc_adjustment_factors[fuel] / v['miles_per_gallon']
+            onroad_direct_co2e_grams_per_mile = 8887 * onroad_gallons_per_mile
+            onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
+        onroad_direct_kwh_per_mile = fc_adjustment_factors[fuel] * v['kwh_per_mile']
         vehicle_data.update_value({
             'onroad_miles_per_gallon': onroad_miles_per_gallon,
             'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,
@@ -480,22 +483,13 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
         if veh_rates_by == 'odometer':
             ind_var_value = pd.to_numeric(v['odometer'])
 
-        fuel_dict = eval(v['in_use_fuel_id'])
-        fuel = [item for item in fuel_dict.keys()][0]
         if onroad_direct_kwh_per_mile:
-            refuel_efficiency = \
-                batch_settings.onroad_fuels.get_fuel_attribute(v['calendar_year'], 'US electricity',
-                                                               'refuel_efficiency')
-            fuel_consumption_kwh = v['vmt'] * onroad_direct_kwh_per_mile / refuel_efficiency
-            transmission_efficiency = \
-                batch_settings.onroad_fuels.get_fuel_attribute(
-                    v['calendar_year'], 'US electricity', 'transmission_efficiency'
-                )
-            fuel_generation_kwh = fuel_consumption_kwh / transmission_efficiency
 
+            fuel_consumption_kwh, fuel_generation_kwh, evse_kwh_per_mile = calc_electricity_consumption(
+                batch_settings, v, onroad_direct_kwh_per_mile
+            )
             vehicle_data.update_value({
-                'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
-                'evse_kwh_per_mile': onroad_direct_kwh_per_mile / refuel_efficiency,
+                'evse_kwh_per_mile': evse_kwh_per_mile,
                 'fuel_consumption_kwh': fuel_consumption_kwh,
                 'fuel_generation_kwh': fuel_generation_kwh,
             })
@@ -514,7 +508,6 @@ def calc_legacy_fleet_physical_effects(batch_settings, session_settings, legacy_
 
         if onroad_direct_co2e_grams_per_mile:
             fuel_consumption_gallons = v['vmt'] * onroad_gallons_per_mile
-            onroad_miles_per_gallon = 1 / onroad_gallons_per_mile
 
             vehicle_data.update_value({
                 'fuel_consumption_gallons': fuel_consumption_gallons,

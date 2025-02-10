@@ -69,7 +69,9 @@ class EGUdata:
         self.years = None
         self.calendar_year_min = None
         self.calendar_year_max = None
-        self.rate_names = None
+        self.kwh_names = []
+        self.rate_names = []
+        self.pollutant_inventories = []
         self.deets = {}  # all the calc details; this dictionary will not include the legacy fleet
         self.pollutant_ids = [
             'pm25',
@@ -109,6 +111,8 @@ class EGUdata:
         suffixes = 'metrictons'
         for pollutant_id in self.pollutant_ids:
             input_template_columns.append(f'{pollutant_id}_{suffixes}')
+            self.rate_names.append(f'{pollutant_id}_grams_per_kwh')
+            self.pollutant_inventories.append(f'{pollutant_id}_{suffixes}')
 
         df = read_input_file(filepath, effects_log)
         validate_template_version_info(
@@ -121,21 +125,20 @@ class EGUdata:
 
         df_rates = self.calc_rates(df)
 
-        self.rate_names = [
-            rate_name for rate_name in df_rates.columns if 'year' not in rate_name and 'case' not in rate_name
-        ]
-        self.years = df_rates['calendar_year'].unique()
-        self.calendar_year_min = int(min(df_rates['calendar_year']))
-        self.calendar_year_max = int(max(df_rates['calendar_year']))
-        self.cases = df_rates['case'].unique()
+        df = pd.concat([df, df_rates], axis=1)
+        self.kwh_names = [item for item in df.columns if 'kwh' in item]
+        self.years = df['calendar_year'].unique()
+        self.calendar_year_min = int(min(df['calendar_year']))
+        self.calendar_year_max = int(max(df['calendar_year']))
+        self.cases = df['case'].unique()
 
         rate_keys = zip(
-            df_rates['calendar_year'],
-            df_rates['case'],
+            df['calendar_year'],
+            df['case'],
         )
-        df_rates.set_index(rate_keys, inplace=True)
+        df.set_index(rate_keys, inplace=True)
 
-        self._data = df_rates.to_dict('index')
+        self._data = df.to_dict('index')
 
         self.interpolate_input_data()
 
@@ -149,7 +152,7 @@ class EGUdata:
             A DataFrame of egu emission rates based on the input data.
 
         """
-        df_rates = df[['calendar_year', 'case', 'kwh_demand', 'kwh_generation_us']]
+        df_rates = pd.DataFrame()
         for pollutant_id in self.pollutant_ids:
             rates = pd.Series(
                 df[f'{pollutant_id}_metrictons'] * pow(10, 6) / df['kwh_generation_us'],
@@ -159,12 +162,13 @@ class EGUdata:
 
         return df_rates
 
-    def get_emission_rate(self, v, cyear, session_kwh_consumption, session_kwh_generation, rate_names):
+    def get_emission_rate(self, batch_settings, v, cyear, session_kwh_consumption, session_kwh_generation, rate_names):
         """
 
         Get emission rates by calendar year
 
         Args:
+            batch_settings: an instance of the BatchSettings class
             v (dict): a dictionary of annual physical effects values
             cyear (int): calendar year for which to get emission rates
             session_kwh_consumption (numeric): the session kwh to use (e.g., kwh_consumption or kwh_generation; this is omega-only)
@@ -216,25 +220,50 @@ class EGUdata:
             rate_low = self._data[(calendar_year, 'low_demand')][rate_name]
             rate_high = self._data[(calendar_year, 'high_demand')][rate_name]
 
-            # interpolate the rate for kwh_demand
-            if calendar_year <= self.calendar_year_min:
-                rate = rate_low
+            if not batch_settings.marginal_egu_rates:
+                # interpolate the rate for kwh_demand
+                if calendar_year <= self.calendar_year_min:
+                    rate = rate_low
+                else:
+                    rate = ((kwh_generation_us_session - kwh_generation_us_low) * (rate_high - rate_low)
+                            / (kwh_generation_us_high - kwh_generation_us_low)
+                            + rate_low)
+
+                if rate <= 0:
+                    rate = (rate_low + rate_high) / 2
+                rates.append(rate)
+
+                us_inventory_grams = rate * kwh_generation_us_session
+                analysis_fleet_inventory_grams = rate * session_kwh_generation
+                self.deets[v['session_policy'], cyear, rate_name].update({
+                    'rate_low': rate_low,
+                    'rate_high': rate_high,
+                    'rate': rate,
+                    'US_inventory_grams': us_inventory_grams,
+                    'analysis_fleet_inventory_grams': analysis_fleet_inventory_grams,
+                })
             else:
-                rate = ((kwh_generation_us_session - kwh_generation_us_low) * (rate_high - rate_low)
-                        / (kwh_generation_us_high - kwh_generation_us_low)
-                        + rate_low)
+                pollutant = [item for item in rate_name.split('_')][0]
+                inventory_low_demand_grams = (
+                        self._data[calendar_year, 'low_demand'][f'{pollutant}_metrictons'] * pow(10, 6))
+                inventory_high_demand_grams = (
+                        self._data[calendar_year, 'high_demand'][f'{pollutant}_metrictons'] * pow(10, 6))
+                rate = ((inventory_high_demand_grams - inventory_low_demand_grams) /
+                        (kwh_generation_us_high - kwh_generation_us_low))
 
-            rates.append(rate)
-            if rate <= 0:
-                rate = (rate_low + rate_high) / 2
+                if rate <= 0:
+                    rate = (rate_low + rate_high) / 2
+                rates.append(rate)
 
-            self.deets[v['session_policy'], cyear, rate_name].update({
-                'rate_low': rate_low,
-                'rate_high': rate_high,
-                'rate': rate,
-                'US_inventory_grams': rate * kwh_generation_us_session,
-                'analysis_fleet_inventory_grams': rate * session_kwh_generation,
-            })
+                us_inventory_grams = inventory_low_demand_grams + rate * session_kwh_generation
+                analysis_fleet_inventory_grams = rate * session_kwh_generation
+                self.deets[v['session_policy'], cyear, rate_name].update({
+                    'rate_low': rate_low,
+                    'rate_high': rate_high,
+                    'rate': rate,
+                    'US_inventory_grams': us_inventory_grams,
+                    'analysis_fleet_inventory_grams': analysis_fleet_inventory_grams,
+                })
 
         self._cache[v['session_policy'], cyear] = rates
 
@@ -258,11 +287,34 @@ class EGUdata:
                             'case': case,
                         }})
 
-                        for rate_name in self.rate_names:
-                            value_1 = self._data[(year_1, case)][rate_name]
-                            value_2 = self._data[(year_2, case)][rate_name]
+                        for name in self.kwh_names:
+                            value_new = self.interpolate_arg(year_1, year_2, yr, case, name)
+                            self._data[(yr, case)][name] = value_new
 
-                            m = (value_2 - value_1) / (year_2 - year_1)
+                        for name in self.rate_names:
+                            value_new = self.interpolate_arg(year_1, year_2, yr, case, name)
+                            self._data[(yr, case)][name] = value_new
 
-                            value_new = m * (yr - year_1) + value_1
-                            self._data[(yr, case)][rate_name] = value_new
+                        for name in self.pollutant_inventories:
+                            value_new = self.interpolate_arg(year_1, year_2, yr, case, name)
+                            self._data[(yr, case)][name] = value_new
+
+    def interpolate_arg(self, year_1, year_2, year_to_interpolate, case, arg):
+        """
+
+        Args:
+            year_1 (int): the lesser year of data between which to interpolate
+            year_2 (int): the greater year of data between which to interpolate
+            year_to_interpolate (int): the year for which interpolated value is sought
+            case (str): e.g.,'low demand' or 'high demand'
+            arg (str): the attribute name for which an interpolated value is sought
+
+        Returns:
+
+        """
+        value_1 = self._data[(year_1, case)][arg]
+        value_2 = self._data[(year_2, case)][arg]
+        m = (value_2 - value_1) / (year_2 - year_1)
+        value = m * (year_to_interpolate - year_1) + value_1
+
+        return value

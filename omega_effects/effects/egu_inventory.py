@@ -30,7 +30,9 @@ def get_egu_emission_rate(batch_settings, v, calendar_year, kwh_consumption, kwh
         'hg_grams_per_kwh',
     )
 
-    return batch_settings.egu_data.get_emission_rate(v, calendar_year, kwh_consumption, kwh_generation, rate_names)
+    return batch_settings.egu_data.get_emission_rate(
+        batch_settings, v, calendar_year, kwh_consumption, kwh_generation, rate_names
+    )
 
 
 def calc_egu_inventory(batch_settings, annual_physical_df):

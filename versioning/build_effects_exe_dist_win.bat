@@ -4,7 +4,7 @@ cd ..
 
 REM build executable
 
-pyinstaller omega_effects/omega_effects_main.py ^
+pyinstaller omega_effects/effects_controller.py ^
   --name OMEGA-effects-2.5.0-win.exe ^
   --paths omega_effects ^
   --add-data "./*.txt;./" ^
@@ -13,6 +13,7 @@ pyinstaller omega_effects/omega_effects_main.py ^
   --add-data "./omega_effects/context/*.py;./omega_effects/context/" ^
   --add-data "./omega_effects/effects/*.py;./omega_effects/effects/" ^
   --add-data "./omega_effects/general/*.py;./omega_effects/general/" ^
+  --add-data "./omega_effects/lmdv_join/*.py;./omega_effects/lmdv_join/" ^
   --add-data "./omega_effects/test_inputs/*.csv;./omega_effects/test_inputs/" ^
   --noconfirm ^
   --onefile

@@ -84,11 +84,12 @@ def calc_delta(dict_na, dict_a, arg):
         return 0
 
 
-def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effects_df, calc_health_effects=False):
+def calc_benefits(batch_settings, fleet, annual_physical_effects_df, annual_cost_effects_df, calc_health_effects=False):
     """
 
     Args:
         batch_settings: an instance of the BatchSettings class.
+        fleet (str): e.g., 'ld', 'md'
         annual_physical_effects_df (DataFrame): a DataFrame of physical effects by calendar year, reg class, fuel type.
         annual_cost_effects_df (DataFrame): a DataFrame of cost effects by calendar year, reg class, fuel type.
         calc_health_effects (bool): pass True to use $/ton values to calculate health effects. If cost_factors_criteria.csv
@@ -149,7 +150,7 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
                 physical_na = cost_na = None
 
             benefits_dict[key_a], delta_physical_effects_dict[key_a] = build_dicts(
-                batch_settings, calc_health_effects, physical_a, physical_na, cost_a, cost_na, key_a=key_a
+                batch_settings, fleet, calc_health_effects, physical_a, physical_na, cost_a, cost_na, key_a=key_a
             )
     for action in action_policies:
         for key_na in stranded_no_action_keys[action]:
@@ -158,19 +159,20 @@ def calc_benefits(batch_settings, annual_physical_effects_df, annual_cost_effect
             physical_na = physical_effects_dict[key_na]
             cost_na = cost_effects_dict[key_na]
             benefits_dict[key_a], delta_physical_effects_dict[key_a] = build_dicts(
-                batch_settings, calc_health_effects, physical_na=physical_na, cost_na=cost_na, key_a=key_a
+                batch_settings, fleet, calc_health_effects, physical_na=physical_na, cost_na=cost_na, key_a=key_a
             )
 
     return benefits_dict, delta_physical_effects_dict
 
 
 def build_dicts(
-        batch_settings, calc_health_effects, physical_a=None, physical_na=None, cost_a=None, cost_na=None, key_a=None
+        batch_settings, fleet, calc_health_effects, physical_a=None, physical_na=None, cost_a=None, cost_na=None, key_a=None
 ):
     """
 
     Args:
         batch_settings: an instance of the BatchSettings class.
+        fleet (str): e.g., 'ld', 'md'
         calc_health_effects (bool): if True the criteria air pollutant health effects will be calculated.
         physical_a (dict): the physical effects for the action session for a given "vehicle."
         physical_na (dict): the physical effects for the no_action session for a given "vehicle."
@@ -185,7 +187,7 @@ def build_dicts(
     benefits_dict_for_key = {}
     physical_effects_dict_for_key = {}
     session_policy, calendar_year, reg_class_id, in_use_fuel_id, fueling_class = key_a
-    session_name = batch_settings.get_attribute_value(('Session Name', f'{session_policy}'), 'value')
+    session_name = batch_settings.get_attribute_value((fleet, 'Session Name', f'{session_policy}'), 'value')
     fuel_dict = eval(in_use_fuel_id)
     fuel = [item for item in fuel_dict.keys()][0]
 

@@ -46,6 +46,7 @@ Data Column Name and Description
 **CODE**
 
 """
+import sys
 import pandas as pd
 
 from omega_effects.general.general_functions import read_input_file
@@ -109,6 +110,19 @@ class CostFactorsSCGHG:
             self.scghg_rates.append(n)
         self.scghg_rates = list(set(self.scghg_rates))
         self.scopes = df['scope'].unique()
+
+        # scopes will be either ['global'], ['domestic'], or ['global', 'domestic']
+        # batch_settings.net_benefit_ghg_scope will be one of 'global', 'domestic', 'both'
+        if batch_settings.net_benefit_ghg_scope == 'both':
+            for s in ['global', 'domestic']:
+                if s not in self.scopes:
+                    effects_log.logwrite(f'\n"SC-GHG in Net Benefits" is "both" but {s} values not found in {filepath}')
+                    sys.exit()
+        if batch_settings.net_benefit_ghg_scope != 'both':
+            if batch_settings.net_benefit_ghg_scope not in self.scopes:
+                effects_log.logwrite(f'\n"SC-GHG in Net Benefits" is {batch_settings.net_benefit_ghg_scope} but '
+                                     f'{batch_settings.net_benefit_ghg_scope} values not found in {filepath}')
+                sys.exit()
 
         df = batch_settings.ip_deflators.adjust_dollars(batch_settings, df, effects_log, *self.gases)
 
