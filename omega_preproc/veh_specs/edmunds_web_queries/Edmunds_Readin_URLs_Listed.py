@@ -122,7 +122,7 @@ for run_count in range (0,len(run_controller)):
                 reformatted_table = reformatted_table.dropna(how='all', axis=1)
                 final_table = final_table.loc[:, ~final_table.columns.duplicated()]
                 if len(final_table) > 0:
-                    final_table = final_table.merge(reformatted_table, how='outer') # .sort_values('URL')
+                    final_table = final_table.merge(reformatted_table, how='outer').sort_values('URL')
                 else:
                     final_table = reformatted_table
             except NameError:
@@ -151,7 +151,7 @@ for run_count in range (0,len(run_controller)):
     # print (type(my_list))
 
     final_table['URL'] = final_table['URL'].str.upper()
-    # final_table = final_table.sort_values('URL')
+    final_table = final_table.sort_values('URL')
     final_table = final_table.dropna(how='all', subset=['Make', 'Model'])
     final_table = final_table.fillna('')
     final_table = final_table.reset_index(drop=True)
