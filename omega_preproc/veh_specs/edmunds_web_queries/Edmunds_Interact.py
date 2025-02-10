@@ -759,9 +759,9 @@ def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_t
             else:
                 name_category = 'Fuel & MPG'
         if ('EPA electricity range' in _raw_table_tag): name_category = 'Battery & Range'
-        if ('Base engine type' in _raw_table_tag) or ('Base engine size' in _raw_table_tag): name_category = 'Engine'
+        if ('Base engine' in _raw_table_tag) or ('Base engine size' in _raw_table_tag): name_category = 'Engine'
 
-        if (_raw_table_tag == 'Max Towing Capacity') and (name_category != 'Towing & Hauling'): name_category = 'Towing & Hauling'
+        if ('Max Towing Capacity' in _raw_table_tag): name_category = 'Towing & Hauling'
         if ('Transmission' in _raw_table_tag): name_category = 'Drivetrain'
         if ('Four-wheel independent suspension' in _raw_table_tag): name_category = 'Suspension'
         if ('Length' in _raw_table_tag) or ('Height' in _raw_table_tag) or ('Wheelbase' in _raw_table_tag): name_category = 'Dimensions'
