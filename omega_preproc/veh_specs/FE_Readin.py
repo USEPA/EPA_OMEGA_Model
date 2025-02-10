@@ -20,6 +20,10 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
     #     skiprows_vec = [0, 7, 8, 7]
     # elif year == 2022:
     #     skiprows_vec = [0, 4, 7, 3]
+    # elif year == 2023:
+    #     skiprows_vec = [0, 6, 6, -1]
+    # elif year == 2024:
+    #     skiprows_vec = [0, 6, 9, -1]
 
     with pd.ExcelFile(input_path+'\\'+input_filename) as xlsx:
         sheetname_vec = [sheet for sheet in xlsx.sheet_names]
@@ -60,7 +64,7 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
                 #     readin_sheet = readin_sheet[readin_sheet["Carline"] != ''].reset_index(drop=True)
                 #     readin_sheet = readin_sheet.rename(columns={"Model Yr  (gold fill means release date is after today's date)": 'Model Year',
                 #              'Trans Lockup': 'Lockup Torque Converter', "Release Date (gold fill means release date is after today's date)": "Release Date"})
-                elif (year == 2021) or (year == 2022):
+                elif (year >= 2021): #  or (year == 2022):
                     readin_sheet = readin_sheet[readin_sheet["Model Yr  (gold fill means release date is after today's date)"] != ''].reset_index(drop=True)
                     readin_sheet = readin_sheet[readin_sheet["Carline"] != ''].reset_index(drop=True)
                     readin_sheet = readin_sheet.rename(columns={"Model Yr  (gold fill means release date is after today's date)": 'Model Year',
@@ -336,4 +340,12 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
     # #                        matching_trns_numgears, matching_trns_category, matching_boost_category, matching_mfr_category, \
     # #                        matching_fuel_category],axis=0)
     # date_and_time = str(datetime.datetime.now())[:19].replace(':', '').replace('-', '')
+    _sheet_types = ['FEguide', 'PHEVs', 'EVs', 'FCVs']
+    FE_output['Sheet_Type_index'] = FE_output['Sheet Type'].copy()
+    for i in range(len(_sheet_types)):
+        FE_output.loc[FE_output['Sheet Type'] == _sheet_types[i], 'Sheet_Type_index'] = i
+        
+    FE_output = FE_output.sort_values(['Sheet_Type_index', 'Mfr Name']).reset_index(drop=True)
+    FE_output = FE_output.drop('Sheet_Type_index', axis=1)
+
     FE_output.to_csv(output_path + '\\' + save_name + '_MY' + str(year) + '-' + date_and_time + '.csv', index=False)  # Output final FE data
