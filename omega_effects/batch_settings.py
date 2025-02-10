@@ -23,7 +23,7 @@ Sample Data Rows
         :widths: auto
 
         RUNTIME OPTIONS,,,,
-        Sessions to Run,lmdv,,,,enter ld for ld only or md for md only or lmdv for both
+        Sessions to Run,,,lmdv,,enter ld for ld only or md for md only or lmdv for both
         Run ID,lmdv,all,,,enter a run identifier (in value column) for your output folder name or blank for default (default is omega_effects)
         Run Description,lmdv,,,,
         Save Path,lmdv,all,,C:/omega/effects/outputs,"enter full path, including drive id but do not include unique run identifiers",
@@ -50,6 +50,7 @@ Sample Data Rows
         Context Case Liquid Fuel,lmdv,all,Reference case,,
         VMT Rebound Rate ICE,lmdv,all,-0.1,,
         VMT Rebound Rate BEV,lmdv,all,0,,
+        VMT Rebound post-FRM,lmdv,all,TRUE,,
         SC-GHG in Net Benefits,lmdv,all,global,,"enter 'global' or 'domestic' or 'both' (note that both global and domesitc benefits are calculated, this only impacts net benefits)"
         Maintenance Costs File,lmdv,all,,C:/omega/effects/inputs/maintenance_costs.csv,
         Repair Costs File,lmdv,all,,C:/omega/effects/inputs/repair_costs.csv,
@@ -165,6 +166,10 @@ Data Row Name and Description
 
 :VMT Rebound Rate BEV:
     VMT rebound rate for battery-electric vehicles
+
+:VMT Rebound post-FRM:
+    if TRUE - non-context session vehicles are compared back to their context session starting point via
+    base_year_vehicle_id and base_year_powertrain_type to be more consistent with the historical approach to calculating rebound
 
 :SC-GHG in Net Benefits *(str)*:
     'global' or 'domestic' or 'both' (note that both global and domesitc benefits are calculated, if available, this only impacts net benefits)
