@@ -360,7 +360,7 @@ class BatchSettings:
 
     """
     def __init__(self):
-        self.effects_package_version = '2024.11.1' + '_effects_240419_1120'
+        self.effects_package_version = '2024.11.1'
         self.start_time_readable = None
         self.branch_name = None
         self.runtime_info = None
@@ -615,7 +615,6 @@ class BatchSettings:
 
         Args:
             fleet (str): e.g., 'lmdv' or other entry set in batch input file.
-            effects_log: an instance of the EffectsLog class.
 
         Returns:
              Nothing, but it sets the class attributes included in the class init.
