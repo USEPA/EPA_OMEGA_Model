@@ -1,0 +1,88 @@
+parameter,fleet,session_policy,value,full_path,notes
+RUNTIME OPTIONS,,,,,
+Sessions to Run,,,lmdv,,enter ld for ld only or md for md only or lmdv for both
+Run ID,lmdv,all,,,enter a run identifier (in value column) for your output folder name or blank for default (default is omega_effects)
+Run Description,lmdv,,2025.2.0,,
+Save Path,lmdv,all,,D:\omega\effects\outputs,"enter full path, including drive id but do not include unique run identifiers"
+Save Input Files,lmdv,all,TRUE,,enter True to copy over input files or False to save space and not do so
+Save Context Fuel Cost per Mile File,lmdv,all,TRUE,,enter True or False and note that these files can be large especially in CSV format
+Save Vehicle-Level Safety Effects Files,lmdv,all,FALSE,,enter True or False and note that these files can be large especially in CSV format
+Save Vehicle-Level Physical Effects Files,lmdv,all,FALSE,,enter True or False - these files can be large especially in CSV format
+Save Vehicle-Level Cost Effects Files,lmdv,all,FALSE,,enter True or False - these files can be large especially in CSV format
+Format for Vehicle-Level Output Files,lmdv,all,csv,,"enter 'csv' for large Excel-readable files 'parquet' for compressed files usable in Pandas (parquet works only when running from code, not from a bundle)"
+Powertrain Costs FEV,lmdv,all,TRUE,,enter TRUE or FALSE (must be consistent with the compliance run)
+Run Employment Analysis Costs,lmdv,all,FALSE,,enter TRUE or FALSE
+Use Marginal EGU Rates,lmdv,all,TRUE,,enter TRUE for marginal rates and FALSE for average rates
+BATCH SETTINGS - COMPLIANCE,,,,,
+batch_folder,ld,all,,D:\omega\compliance\frm\2024_02_27_16_06_31_LDV_central_to2055_20240227,
+batch_folder,md,all,,D:\omega\compliance\frm\2024_03_01_15_51_40_MD_FRM_central_to2055_20240301b,
+Vehicles File Base Year,ld,all,2022,,this should be consistent with the OMEGA compliance run
+Vehicles File Base Year,md,all,2022,,this should be consistent with the OMEGA compliance run
+BATCH SETTINGS - EFFECTS,,,,,
+Analysis Final Year,lmdv,all,2055,,this should be <= the value used in the OMEGA compliance run
+Cost Accrual,lmdv,all,end-of-year,,
+Discount Values to Year,lmdv,all,2027,,
+Analysis Dollar Basis,lmdv,all,2022,,
+Context Name Liquid Fuel,lmdv,all,AEO2023,,
+Context Case Liquid Fuel,lmdv,all,Reference case,,
+VMT Rebound Rate ICE,lmdv,all,-0.1,,
+VMT Rebound Rate BEV,lmdv,all,0,,
+VMT Rebound post-FRM,lmdv,all,TRUE,,if TRUE - non-context session vehicles are compared back to their context session starting point via base_year_vehicle_id and base_year_powertrain_type to be more consistent with the historical approach to calculating rebound
+SC-GHG in Net Benefits,lmdv,all,global,,enter 'global' or 'domestic' or 'both'
+Maintenance Costs File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm\maintenance_cost.csv,
+Repair Costs File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm\repair_cost.csv,
+Refueling Costs File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm\refueling_cost.csv,
+General Inputs for Effects File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm\general_inputs_for_effects.csv,
+Criteria Cost Factors File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm\cost_factors_criteria.csv,
+SCGHG Cost Factors File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm\cost_factors_scghg_2020.csv,
+Energy Security Cost Factors File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm\cost_factors_energysecurity.csv,
+Congestion-Noise Cost Factors File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm\cost_factors_congestion_noise.csv,
+Insurance and Taxes Cost Factors File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm\cost_factors_insurance_and_taxes_20240218.csv,
+Implicit Price Deflators File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm\implicit_price_deflators_20230602.csv,this should be consistent with the OMEGA compliance run
+CPI Price Deflators File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm\cpi_price_deflators.csv,
+EGU Data File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm_post\egu_data.csv,
+Refinery Data File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm\refinery_data.csv,
+Context Electricity Consumption File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm_post\context_electricity_consumption.csv,
+Safety Values File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm\safety_values_nhtsa_nprm.csv,
+Fatality Rates File,lmdv,all,,D:\omega\effects\inputs\lmdv_frm\fatality_rates.csv,
+Legacy Fleet File,ld,all,,D:\omega\effects\inputs\lmdv_frm_post\legacy_fleet_ld.csv,
+Legacy Fleet File,md,all,,D:\omega\effects\inputs\lmdv_frm\legacy_fleet_md.csv,
+SESSION SETTINGS - LD,,,,,
+Session Name,ld,context,NTR-noIRA,,
+Context Stock and VMT File,ld,context,,D:\omega\effects\inputs\lmdv_frm\context_stock_vmt_ld.csv,
+Context Electricity Prices,ld,context,,D:\omega\effects\inputs\lmdv_frm_post\electricity_prices_aeo.csv,
+Session Name,ld,no_action,NTR,,
+Session Vehicle Emission Rates File,ld,no_action,,D:\omega\effects\inputs\lmdv_frm\emission_rates_vehicles_no_gpf.csv,
+Session Electricity Prices,ld,no_action,,D:\omega\effects\inputs\lmdv_frm_post\electricity_prices_ipm_no_action.csv,
+Session Name,ld,action_1,Final,,
+Session Vehicle Emission Rates File,ld,action_1,,D:\omega\effects\inputs\lmdv_frm\emission_rates_vehicles_with_gpf.csv,
+Session Electricity Prices,ld,action_1,,D:\omega\effects\inputs\lmdv_frm_post\electricity_prices_ipm_action.csv,
+Session Name,ld,action_2,None,,
+Session Vehicle Emission Rates File,ld,action_2,,,
+Session Electricity Prices,ld,action_2,,,
+Session Name,ld,action_3,None,,
+Session Vehicle Emission Rates File,ld,action_3,,,
+Session Electricity Prices,ld,action_3,,,
+SESSION SETTINGS - MD,,,,,
+Session Name,md,context,HDP2-noIRA,,
+Context Stock and VMT File,md,context,,D:\omega\effects\inputs\lmdv_frm\context_stock_vmt_md.csv,
+Context Electricity Prices,md,context,,D:\omega\effects\inputs\lmdv_frm_post\electricity_prices_aeo.csv,
+Session Name,md,no_action,HDP2+ACT,,
+Session Vehicle Emission Rates File,md,no_action,,D:\omega\effects\inputs\lmdv_frm\emission_rates_vehicles_no_gpf.csv,
+Session Electricity Prices,md,no_action,,D:\omega\effects\inputs\lmdv_frm_post\electricity_prices_ipm_no_action.csv,
+Session Name,md,action_1,Final,,
+Session Vehicle Emission Rates File,md,action_1,,D:\omega\effects\inputs\lmdv_frm\emission_rates_vehicles_with_gpf.csv,
+Session Electricity Prices,md,action_1,,D:\omega\effects\inputs\lmdv_frm_post\electricity_prices_ipm_action.csv,
+Session Name,md,action_2,None,,
+Session Vehicle Emission Rates File,md,action_2,,,
+Session Electricity Prices,md,action_2,,,
+Session Name,md,action_3,None,,
+Session Vehicle Emission Rates File,md,action_3,,,
+Session Electricity Prices,md,action_3,,,
+JOIN SETTINGS - LMDV,,,,,
+join_1,ld,action_1,Final,,
+join_1,md,action_1,Final,,
+join_2,ld,action_2,,,
+join_2,md,action_2,,,
+join_3,ld,action_3,,,
+join_3,md,action_3,,,
