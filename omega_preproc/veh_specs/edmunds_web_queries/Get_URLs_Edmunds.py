@@ -93,11 +93,11 @@ def url_list_to_csv(url_list, make_idx, working_directory):
             last_rows = i+1
             break
         str_make_model = url_str.replace('//', '/').split('/')
-        url_list['Make'][i] = str_make_model[2].capitalize()
-        url_list['Model'][i] = str_make_model[3].upper()
+        url_list.loc[i, 'Make'] = str_make_model[2].capitalize()
+        url_list.loc[i, 'Model'] = str_make_model[3].upper()
         if str_make_model[4].isnumeric() == False: url_str = url_str + str(model_year) + '/'
         if 'features-specs' not in str_make_model: url_str = url_str + 'features-specs/'
-        url_list[url_column_name][i] = url_str
+        url_list.loc[i, url_column_name] = url_str
 
     num_csv_files = math.ceil(last_rows/max_URLs)
     timestr = time.strftime("%Y%m%d-%H%M%S")
@@ -140,7 +140,8 @@ def Get_URLs_Edmunds(model_year):
     # xpath_go_button = "//button[@class = 'mb-0_5 w-100 px-0 px-md-1_5 btn btn-success']"
     # xpath_go_button = "//button[@class = 'mb-0_5 w-100 px-0 px-md-1_5 font-weight-medium btn btn-primary-b']"
     # Updated a "GO" button link by removing the "disabled" at the end on January 26, 2023
-    xpath_go_button = "//button[@class='inventory-button p-0_5 make-model-zip-dropdown-form-submit w-100 px-0 px-md-1_5 font-weight-medium text-transform-none ml-md-1 size-16 btn btn-blue-50']"
+    # xpath_go_button = "//button[@class='inventory-button p-0_5 make-model-zip-dropdown-form-submit w-100 px-0 px-md-1_5 font-weight-medium text-transform-none ml-md-1 size-16 btn btn-blue-50']"
+    xpath_go_button = "//button[@class='inventory-button p-0_5 make-model-zip-dropdown-form-submit w-100 px-0 px-md-1_5 fw-medium text-transform-none ms-md-1 size-16 btn btn-blue-50']"
 
     time.sleep(sleep_short)
     element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, xpath_make)))

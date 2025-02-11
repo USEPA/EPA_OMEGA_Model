@@ -8,33 +8,31 @@ import math
 from datetime import datetime
 from pathlib import *
 
-# pip install pandas numpy scipy sympy pytest seaborn matplotlib scikit-learn
-# conda install selenium beautifulsoup4 html5lib lxml xlsxwriter virtualenv
+# pip install pandas numpy selenium beautifulsoup4 html5lib lxml
+def movecol(df, cols_to_move=[], ref_cols='', place='After'):
+    cols = df.columns.tolist()
+    if ref_cols[0] in cols:
+        ref_col = ref_cols[0]
+    elif len(ref_cols) > 0:
+        ref_col = ref_cols[1]
 
-# def movecol(df, cols_to_move=[], ref_cols='', place='After'):
-#     cols = df.columns.tolist()
-#     if ref_cols[0] in cols:
-#         ref_col = ref_cols[0]
-#     elif len(ref_cols) > 0:
-#         ref_col = ref_cols[1]
-#
-#     if place == 'After':
-#         seg1 = cols[:list(cols).index(ref_col) + 1]
-#         seg2 = cols_to_move
-#     if place == 'Before':
-#         seg1 = cols[:list(cols).index(ref_col)]
-#         seg2 = cols_to_move + [ref_col]
-#
-#     seg1 = [i for i in seg1 if i not in seg2]
-#     seg3 = [i for i in cols if i not in seg1 + seg2]
-#
-#     return (df[seg1 + seg2 + seg3])
+    if place == 'After':
+        seg1 = cols[:list(cols).index(ref_col) + 1]
+        seg2 = cols_to_move
+    if place == 'Before':
+        seg1 = cols[:list(cols).index(ref_col)]
+        seg2 = cols_to_move + [ref_col]
+
+    seg1 = [i for i in seg1 if i not in seg2]
+    seg3 = [i for i in cols if i not in seg1 + seg2]
+
+    return (df[seg1 + seg2 + seg3])
 #
 #
 #
 start_time = datetime.now()
 working_directory = str(Path.home()) + '/Documents/Python/Edmunds_web_vehicle_specs/'
-run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2018.csv')
+run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2024.csv')
 start_count = 0 #Set to 0 when time permits
 final_table_to_csv_inc = 30 # print final_table csv file at the final_table_to_csv_inc increments
 # cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
@@ -83,9 +81,7 @@ for run_count in range (0,len(run_controller)):
                 weberror.loc[iloc_weberror, 'Errors'] = trim_text + ', ' + str(url_count)
                 weberror.to_csv(working_directory + 'Non-Functioning Websites_MY'+str(model_year)+'.csv',index=False)
                 continue
-            # if (trim_text == 'WebDriverException') or (trim_text == 'TimeoutException'):
-            #     final_table.to_csv(working_directory + output_name.split('.')[0] + '_' + str(url_count) + '.csv', index=False)
-            #     sys.exit(0)  # sys.exit('WebDriverE
+            if 'Category' not in original_output_table: print(model, ' Category not found, url: ', url)
 
             category_name = original_output_table['Category']
             specification_name = original_output_table['Specifications']
@@ -129,8 +125,6 @@ for run_count in range (0,len(run_controller)):
                     final_table = final_table.merge(reformatted_table, how='outer').sort_values('URL')
                 else:
                     final_table = reformatted_table
-                # final_table = final_table.merge(reformatted_table, how='outer', on=specification_name).sort_values('URL')
-                # final_table = final_table.dropna(how='all', axis=1)
             except NameError:
                 reformatted_table = reformatted_table.dropna(how='all', axis=1)
                 final_table = reformatted_table

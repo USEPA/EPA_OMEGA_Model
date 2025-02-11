@@ -292,7 +292,7 @@ for model_year in model_years:
 
     master_category_check_df = master_category_check_file.set_index(master_category_check_file['Readin Sources'].values)
 
-    field_mapping_df['UserFriendlyName'].fillna('', inplace=True)
+    field_mapping_df['UserFriendlyName'] = field_mapping_df['UserFriendlyName'].fillna('') # , inplace=True)
     aggregating_columns = pd.Series(np.zeros(len(aggregating_fields))).replace(0, '')
     master_schema = data_sources_df['SourceSchema'][data_sources_df['SourceSchema'][(data_sources_df['SourceName']==master_index_source) & \
         (data_sources_df['MY']==model_year)].index[0]]
@@ -351,7 +351,7 @@ for model_year in model_years:
     del (all_schemas, all_column_names, all_query_types, all_weighting_fields, all_bounding_fields, all_desired_fields)
     all_array['Output Column'] = pd.Series(all_array['FieldName']+'_'+all_array['QueryType'])\
         .replace(['_top1', '_avg', '_sum'],'', regex=True)
-    all_array['Output Column'][~pd.isnull(all_array['BoundingField'])] = \
+    all_array.loc[~pd.isnull(all_array['BoundingField']), 'Output Column'] = \
         all_array['FieldName'][~pd.isnull(all_array['BoundingField'])]+'_at'+all_array['QueryType'][~pd.isnull(\
         all_array['BoundingField'])] + all_array['BoundingField'][~pd.isnull(all_array['BoundingField'])]
     all_array['Output Column Name'] = all_array['Output Column'] + '_' + all_array['SourceName']
@@ -360,8 +360,7 @@ for model_year in model_years:
     for aggregating_field in aggregating_fields:
         all_array = all_array[all_array['Desired Field'] != aggregating_field].reset_index(drop=True)
     #Get Master Index File
-    master_index_filepath = data_sources_df['SourceDirectory'][data_sources_df['SourceDirectory'][ \
-        (data_sources_df['SourceName'] == master_index_source) & \
+    master_index_filepath = data_sources_df['SourceDirectory'][data_sources_df['SourceDirectory'][(data_sources_df['SourceName'] == master_index_source) & \
         (data_sources_df['MY'] == model_year)].index[0]]
     master_index_filename = data_sources_df['SourceFile'][data_sources_df['SourceFile'][ \
         (data_sources_df['SourceName'] == master_index_source) & \
@@ -383,7 +382,7 @@ for model_year in model_years:
     except (KeyError, ValueError):
         pass
     try:
-        master_index_file['Number of Cylinders Category'][(master_index_file['Number of Cylinders Category'].astype(str) != 'ELE') & (master_index_file['Number of Cylinders Category'] != str(np.nan))] = \
+        master_index_file.loc[(master_index_file['Number of Cylinders Category'].astype(str) != 'ELE') & (master_index_file['Number of Cylinders Category'] != str(np.nan)), 'Number of Cylinders Category'] = \
             master_index_file['Number of Cylinders Category'][(master_index_file['Number of Cylinders Category'].astype(str) != 'ELE') & (master_index_file['Number of Cylinders Category'] != str(np.nan))].astype(float).astype(int).astype(str)
     except KeyError:
         pass
@@ -397,12 +396,12 @@ for model_year in model_years:
     except KeyError:
         pass
     try:
-        master_index_file['CALC_ID'][~pd.isnull(master_index_file['CALC_ID'])] = \
+        master_index_file.loc[~pd.isnull(master_index_file['CALC_ID']), 'CALC_ID'] = \
             master_index_file['CALC_ID'][~pd.isnull(master_index_file['CALC_ID'])].astype(float).astype(str)
     except KeyError:
         pass
 
-    print("master_index_file['LineageID'][0] = ", master_index_file['LineageID'][0])
+    # print("master_index_file['LineageID'][0] = ", master_index_file['LineageID'][0])
     unique_source_info = all_array[['SourceName', 'SourceFile', 'SourceDirectory']].drop_duplicates()
     unique_source_info = unique_source_info[~pd.isnull(unique_source_info['SourceName'])]
     source_matching_categories_source = master_category_check_df.loc[master_index_source]
@@ -473,7 +472,7 @@ for model_year in model_years:
                     source_file['WHEELS-raw'] = pd.Series(np.zeros(len(source_file['WHEELS'])), name='WHEELS-raw')
                     source_file['WHEELS-raw'] = source_file['WHEELS']
                     for i in range(len(source_file['WHEELS-raw'])):
-                        source_file['WHEELS'][i] = float(source_file['WHEELS-raw'][i].split(' ')[0])
+                        source_file.loc[i, 'WHEELS'] = float(source_file['WHEELS-raw'][i].split(' ')[0])
                     source_file['WHEELS'] = source_file['WHEELS'].astype(float).round(1)
                 except KeyError:
                     pass
@@ -484,7 +483,7 @@ for model_year in model_years:
             except KeyError:
                 pass
             try:
-                source_file['Number of Cylinders Category'][(source_file['Number of Cylinders Category'].astype(str) != 'ELE') & (source_file['Number of Cylinders Category'] != str(np.nan))] = \
+                source_file.loc[(source_file['Number of Cylinders Category'].astype(str) != 'ELE') & (source_file['Number of Cylinders Category'] != str(np.nan)), 'Number of Cylinders Category'] = \
                     source_file['Number of Cylinders Category'][(source_file['Number of Cylinders Category'].astype(str) != 'ELE') & (source_file['Number of Cylinders Category'] != str(np.nan))].astype(float).astype(int).astype(str)
             except KeyError:
                 pass
@@ -506,7 +505,7 @@ for model_year in model_years:
                 except UnicodeDecodeError:
                     vehghg_file = pd.read_csv(vehghg_filepath+'\\'+vehghg_filename, converters={'LineageID': int, 'BodyID': int}, encoding = "ISO-8859-1").astype(str)
                 try:
-                    vehghg_file['Number of Cylinders Category'][(vehghg_file['Number of Cylinders Category'].astype(str) != 'ELE') & (vehghg_file['Number of Cylinders Category'] != str(np.nan))] = \
+                    vehghg_file.loc[(vehghg_file['Number of Cylinders Category'].astype(str) != 'ELE') & (vehghg_file['Number of Cylinders Category'] != str(np.nan)), 'Number of Cylinders Category'] = \
                         vehghg_file['Number of Cylinders Category'][(vehghg_file['Number of Cylinders Category'].astype(str) != 'ELE') & (vehghg_file['Number of Cylinders Category'] != str(np.nan))].astype(float).astype(int).astype(str)
                 except KeyError:
                     pass
@@ -516,7 +515,7 @@ for model_year in model_years:
                     master_index_file = pd.merge_ordered(\
                         master_index_file, vehghg_file[list(vehghg_matching_categories) + list(missing_matching_categories)], how='left', on=list(vehghg_matching_categories))
                 try:
-                    master_index_file['CALC_ID'][~pd.isnull(master_index_file['CALC_ID'])] = \
+                    master_index_file.loc[~pd.isnull(master_index_file['CALC_ID']), 'CALC_ID'] = \
                         master_index_file['CALC_ID'][~pd.isnull(master_index_file['CALC_ID'])].astype(float).astype(int).astype(str)
                 except KeyError:
                     pass
@@ -626,8 +625,7 @@ for model_year in model_years:
                             how='left', \
                             left_on=list(aggregating_columns) + [bounding_field + '_max'],
                             right_on=list(aggregating_columns) + [bounding_field]) \
-                            .groupby(list(aggregating_columns) + [bounding_field + '_max']).median().reset_index() \
-                            .drop([bounding_field + '_max'], axis=1)
+                            .groupby(list(aggregating_columns) + [bounding_field + '_max']).median().reset_index().drop([bounding_field + '_max'], axis=1)
                         del master_index_with_boundingfield_max
                 elif query_type == 'min':
                     if bounding_field == str(np.nan) or  pd.isnull(bounding_field):
@@ -636,43 +634,36 @@ for model_year in model_years:
                     else:
                         master_index_with_boundingfield_min = master_index_file_with_desired_field_all_merges[ \
                             list(aggregating_columns) + [bounding_field]] \
-                            .groupby(list(aggregating_columns)).min().reset_index() \
-                            .rename(columns={bounding_field: bounding_field + '_min'})
+                            .groupby(list(aggregating_columns)).min().reset_index().rename(columns={bounding_field: bounding_field + '_min'})
                         query_output_source = master_index_with_boundingfield_min.merge( \
                             master_index_file_with_desired_field_all_merges[ \
-                                list(aggregating_columns) + [bounding_field] + [information_toget_source_column_name]],
-                            how='left', \
+                                list(aggregating_columns) + [bounding_field] + [information_toget_source_column_name]], how='left', \
                             left_on=list(aggregating_columns) + [bounding_field + '_min'],
                             right_on=list(aggregating_columns) + [bounding_field]) \
-                            .groupby(list(aggregating_columns) + [bounding_field + '_min']).median().reset_index() \
-                            .drop([bounding_field + '_min'], axis=1)
+                            .groupby(list(aggregating_columns) + [bounding_field + '_min']).median().reset_index().drop([bounding_field + '_min'], axis=1)
                         del master_index_with_boundingfield_min
                 elif query_type == 'top1':
                     query_output_source = mode(master_index_file_with_desired_field_all_merges[ \
-                        list(aggregating_columns) + [information_toget_source_column_name]], list(aggregating_columns), \
-                        information_toget_source_column_name, 'count')
+                        list(aggregating_columns) + [information_toget_source_column_name]], list(aggregating_columns), information_toget_source_column_name, 'count')
                 elif query_type == 'sum':
                     query_output_source = master_index_file_with_desired_field_all_merges[ \
-                        list(aggregating_columns) + [information_toget_source_column_name]].groupby(
-                        list(aggregating_columns)) \
-                        .sum().reset_index()
+                        list(aggregating_columns) + [information_toget_source_column_name]].groupby(list(aggregating_columns)).sum().reset_index()
                 elif query_type == 'all':
                     query_output_source = master_index_file_with_desired_field_all_merges[ \
                         list(aggregating_columns) + [information_toget_source_column_name]].groupby(\
                         list(aggregating_columns))[information_toget_source_column_name].apply(lambda x: '|'.join(map(str, x))).reset_index()
                     for all_count in range(0, len(query_output_source)):
-                        query_output_source[information_toget_source_column_name][all_count] = \
+                        query_output_source.loc[all_count, information_toget_source_column_name] = \
                             '|'.join(list(pd.Series(query_output_source[information_toget_source_column_name][all_count].split('|')).unique()))
                 elif query_type == 'avg':
                     master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
                         pd.to_numeric(master_index_file_with_desired_field_all_merges[information_toget_source_column_name], errors='coerce')
                     if weighting_field == str(np.nan) or pd.isnull(weighting_field):
                         query_output_source = master_index_file_with_desired_field_all_merges[ \
-                            list(aggregating_columns) + [information_toget_source_column_name]].groupby(
-                            list(aggregating_columns)).mean().reset_index()
+                            list(aggregating_columns) + [information_toget_source_column_name]].groupby(list(aggregating_columns)).mean().reset_index()
                     else:
                         query_output_source = master_index_file_with_desired_field_all_merges[ \
-                         list(aggregating_columns) + [weighting_field] + [information_toget_source_column_name]].groupby(list(aggregating_columns)).apply(weighted_average)
+                         list(aggregating_columns) + [weighting_field] + [information_toget_source_column_name]].groupby(list(aggregating_columns)).apply(weighted_average, include_groups=False)
                         query_output_source = query_output_source.drop(weighting_field, axis=1).replace(0, np.nan) # drop weighting_field column
                         # query_output_source.dropna(subset=list(aggregating_columns), inplace=True)
                         # query_output_source = query_output_source.drop_duplicates(list(aggregating_columns)).reset_index() # don't drop np.nan and '' for many empty max. towing capacity

@@ -18,8 +18,18 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
 
     # if year == 2016:
     #     skiprows_vec = [0, 7, 8, 7]
+    # elif year == 2019:
+    #     skiprows_vec = [0, 6, 4, 3]
+    # elif year == 2020:
+    #     skiprows_vec = [0, 6, 3, 5]
+    # elif year == 2021:
+    #     skiprows_vec = [0, 5, 4, 4]
     # elif year == 2022:
     #     skiprows_vec = [0, 4, 7, 3]
+    # elif year == 2023:
+    #     skiprows_vec = [0, 6, 6, -1]
+    # elif year == 2024:
+    #     skiprows_vec = [0, 6, 9, -1]
 
     with pd.ExcelFile(input_path+'\\'+input_filename) as xlsx:
         sheetname_vec = [sheet for sheet in xlsx.sheet_names]
@@ -60,7 +70,7 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
                 #     readin_sheet = readin_sheet[readin_sheet["Carline"] != ''].reset_index(drop=True)
                 #     readin_sheet = readin_sheet.rename(columns={"Model Yr  (gold fill means release date is after today's date)": 'Model Year',
                 #              'Trans Lockup': 'Lockup Torque Converter', "Release Date (gold fill means release date is after today's date)": "Release Date"})
-                elif (year == 2021) or (year == 2022):
+                elif (year >= 2021): #  or (year == 2022):
                     readin_sheet = readin_sheet[readin_sheet["Model Yr  (gold fill means release date is after today's date)"] != ''].reset_index(drop=True)
                     readin_sheet = readin_sheet[readin_sheet["Carline"] != ''].reset_index(drop=True)
                     readin_sheet = readin_sheet.rename(columns={"Model Yr  (gold fill means release date is after today's date)": 'Model Year',
@@ -92,26 +102,26 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
                 output_columns = pd.Series(FE_readin_final_output.columns.values)
                 for k in range (0,len(output_columns)):
                     if (sheet_columns == output_columns[k]).sum() == 0:
-                        FE_readin_final_output[output_columns[k]][concat_start:] = ''
+                        FE_readin_final_output.loc[concat_start:, output_columns[k]] = ''
             for k in range (0,readin_sheet.shape[1]):
                 #print(k)
                 try:
                     FE_readin_final_output[sheet_columns[k]] #Find new columns
                 except KeyError: #Add new columns in
                     FE_readin_final_output.insert(FE_readin_final_output.shape[1],sheet_columns[k],readin_sheet[sheet_columns[k]])
-                    FE_readin_final_output[sheet_columns[k]].loc[0:concat_start] = ''
-                FE_readin_final_output[sheet_columns[k]].loc[concat_start:] \
-                    = pd.Series(readin_sheet[sheet_columns[k]]).tolist()
+                    FE_readin_final_output.loc[concat_start:, sheet_columns[k]] = ''
+                FE_readin_final_output.loc[concat_start:, sheet_columns[k]] = pd.Series(readin_sheet[sheet_columns[k]]).tolist()
+                #     FE_readin_final_output[sheet_columns[k]].loc[0:concat_start] = ''
+                # FE_readin_final_output[sheet_columns[k]].loc[concat_start:] = pd.Series(readin_sheet[sheet_columns[k]]).tolist()
     #Create separate list items for "/" carlines
     extra_carline_array = FE_readin_final_output[FE_readin_final_output['Carline'].str.contains('/')].reset_index(drop=True)
     for i in range (0,len(extra_carline_array)):
-        dash_output_index = FE_readin_final_output['Carline']\
-            [FE_readin_final_output['Carline'] == extra_carline_array['Carline'][i]].index[0]
+        dash_output_index = FE_readin_final_output['Carline'][FE_readin_final_output['Carline'] == extra_carline_array['Carline'][i]].index[0]
         postdash_trim = extra_carline_array['Carline'][i][extra_carline_array['Carline'][i].find('/')+1:]
-        FE_readin_final_output['Carline'][dash_output_index] = FE_readin_final_output['Carline'][dash_output_index][0:FE_readin_final_output['Carline'][dash_output_index].find('/')]
+        FE_readin_final_output.loc[dash_output_index, 'Carline'] = FE_readin_final_output['Carline'][dash_output_index][0:FE_readin_final_output['Carline'][dash_output_index].find('/')]
         if (' ' not in FE_readin_final_output['Carline'][dash_output_index]): continue
         last_space_index = [m.start() for m in re.finditer(' ', FE_readin_final_output['Carline'][dash_output_index])][-1]
-        extra_carline_array['Carline'][i] = FE_readin_final_output['Carline'][dash_output_index].replace(FE_readin_final_output['Carline'][dash_output_index][1+last_space_index:],postdash_trim).strip()
+        extra_carline_array.loc[i, 'Carline'] = FE_readin_final_output['Carline'][dash_output_index].replace(FE_readin_final_output['Carline'][dash_output_index][1+last_space_index:],postdash_trim).strip()
     FE_readin_final_output = pd.concat([FE_readin_final_output, extra_carline_array])\
         .sort_values(['Mfr Name','Division', 'Carline', 'Index (Model Type Index)']).reset_index(drop=True)
     # FE_readin_final_output['Model Year'] = FE_readin_final_output['Model Year'].replace('.0', '')
@@ -181,8 +191,7 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
         footprint_lineageid_in_vehghgid['LineageID'] = footprint_lineageid_in_vehghgid['LineageID'].astype(int)
         footprint_lineageid_in_vehghgid['Index (Model Type Index)'] = footprint_lineageid_in_vehghgid['Index (Model Type Index)'].astype(int)
         footprint_lineageid_in_vehghgid = footprint_lineageid_in_vehghgid.drop_duplicates().reset_index(drop=True)
-        footprint_lineageid_in_vehghgid_my = footprint_lineageid_in_vehghgid.loc[
-                                             footprint_lineageid_in_vehghgid['Model Year'] == year, :].reset_index(drop=True)
+        footprint_lineageid_in_vehghgid_my = footprint_lineageid_in_vehghgid.loc[footprint_lineageid_in_vehghgid['Model Year'] == year, :].reset_index(drop=True)
         for i in range(len(footprint_lineageid_in_vehghgid_my)):
             _make = footprint_lineageid_in_vehghgid_my.loc[i, 'Division']
             _model = footprint_lineageid_in_vehghgid_my.loc[i, 'Carline']
@@ -337,4 +346,12 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
     # #                        matching_trns_numgears, matching_trns_category, matching_boost_category, matching_mfr_category, \
     # #                        matching_fuel_category],axis=0)
     # date_and_time = str(datetime.datetime.now())[:19].replace(':', '').replace('-', '')
+    _sheet_types = ['FEguide', 'PHEVs', 'EVs', 'FCVs']
+    FE_output['Sheet_Type_index'] = FE_output['Sheet Type'].copy()
+    for i in range(len(_sheet_types)):
+        FE_output.loc[FE_output['Sheet Type'] == _sheet_types[i], 'Sheet_Type_index'] = i
+        
+    FE_output = FE_output.sort_values(['Sheet_Type_index', 'Mfr Name']).reset_index(drop=True)
+    FE_output = FE_output.drop('Sheet_Type_index', axis=1)
+
     FE_output.to_csv(output_path + '\\' + save_name + '_MY' + str(year) + '-' + date_and_time + '.csv', index=False)  # Output final FE data

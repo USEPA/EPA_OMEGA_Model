@@ -850,7 +850,7 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     # matching_trns_numgears = pd.to_numeric(matching_trns_numgears, errors='coerce').astype(int)
 
     # matching_trns_numgears = pd.Series(Edmunds_data_cleaned['TRANSMISSION'].str[0], name='Number of Transmission Gears Category').replace('C',1).replace('E',1).astype(int)
-    Edmunds_data_cleaned['TRANSMISSION'].fillna(' ', inplace=True)
+    Edmunds_data_cleaned['TRANSMISSION'] = Edmunds_data_cleaned['TRANSMISSION'].fillna(' ') # , inplace=True)
     # print(Edmunds_data_cleaned.loc[Edmunds_data_cleaned['TRANSMISSION'] == 'N/A', 'TRANSMISSION'])
     matching_trns_category = pd.Series(np.zeros(len(Edmunds_data_cleaned)), name = 'Transmission Type Category').replace(0,'A')
     matching_trns_category[matching_trns_numgears == 1] = '1ST'
@@ -868,8 +868,8 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     matching_mfr_category = pd.Series(Edmunds_data_cleaned['Make'], name='Make Category').astype(str).replace('ROLLS ROYCE', 'ROLLS-ROYCE')
 
     matching_fuel_category = pd.Series(np.zeros(len(Edmunds_data_cleaned)), name = 'Fuel Type Category').replace(0,'G')
-    Edmunds_data_cleaned['FUEL TYPE'][matching_cyl_layout == 'ELE'] = 'Electric fuel'
-    Edmunds_data_cleaned['FUEL TYPE'][pd.isnull(Edmunds_data_cleaned['FUEL TYPE'])] = 'gas'
+    Edmunds_data_cleaned.loc[matching_cyl_layout == 'ELE', 'FUEL TYPE'] = 'Electric fuel'
+    Edmunds_data_cleaned.loc[pd.isnull(Edmunds_data_cleaned['FUEL TYPE']), 'FUEL TYPE'] = 'gas'
     matching_fuel_category[Edmunds_data_cleaned['FUEL TYPE'].str.contains('Flex')] = 'FFV'
     matching_fuel_category[Edmunds_data_cleaned['FUEL TYPE'].str.contains('Diesel')] = 'D'
     matching_fuel_category[matching_cyl_layout == 'ELE'] = 'E'
@@ -887,12 +887,12 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     electrification_category[Edmunds_data_cleaned['Trims'].str.contains('fuel cell')] = 'FCV'
 
     Edmunds_data_cleaned['CAM TYPE SHORT NAME'] = pd.Series(np.zeros(len(Edmunds_data_cleaned))).replace(0,'')
-    Edmunds_data_cleaned['CAM TYPE SHORT NAME'][Edmunds_data_cleaned['CAM TYPE'].astype(str).str.contains('DOHC')] = 'DOHC'
-    Edmunds_data_cleaned['CAM TYPE SHORT NAME'][Edmunds_data_cleaned['CAM TYPE'].astype(str).str.contains('OHV')] = 'OHV'
-    Edmunds_data_cleaned['CAM TYPE SHORT NAME'][Edmunds_data_cleaned['CAM TYPE'].astype(str).str.contains('SOHC')] = 'SOHC'
-    Edmunds_data_cleaned['CAM TYPE SHORT NAME'][Edmunds_data_cleaned['CAM TYPE'].astype(str).str.contains('dohc')] = 'DOHC'
-    Edmunds_data_cleaned['CAM TYPE SHORT NAME'][Edmunds_data_cleaned['CAM TYPE'].astype(str).str.contains('ohv')] = 'OHV'
-    Edmunds_data_cleaned['CAM TYPE SHORT NAME'][Edmunds_data_cleaned['CAM TYPE'].astype(str).str.contains('sohc')] = 'SOHC'
+    Edmunds_data_cleaned.loc[Edmunds_data_cleaned['CAM TYPE'].astype(str).str.contains('DOHC'), 'CAM TYPE SHORT NAME'] = 'DOHC'
+    Edmunds_data_cleaned.loc[Edmunds_data_cleaned['CAM TYPE'].astype(str).str.contains('OHV'), 'CAM TYPE SHORT NAME'] = 'OHV'
+    Edmunds_data_cleaned.loc[Edmunds_data_cleaned['CAM TYPE'].astype(str).str.contains('SOHC'), 'CAM TYPE SHORT NAME'] = 'SOHC'
+    Edmunds_data_cleaned.loc[Edmunds_data_cleaned['CAM TYPE'].astype(str).str.contains('dohc'), 'CAM TYPE SHORT NAME'] = 'DOHC'
+    Edmunds_data_cleaned.loc[Edmunds_data_cleaned['CAM TYPE'].astype(str).str.contains('ohv'), 'CAM TYPE SHORT NAME'] = 'OHV'
+    Edmunds_data_cleaned.loc[Edmunds_data_cleaned['CAM TYPE'].astype(str).str.contains('sohc'), 'CAM TYPE SHORT NAME'] = 'SOHC'
 
     tire_codes = pd.Series(np.zeros(len(Edmunds_data_cleaned)), name = 'Tire Code').replace(0,'')
     initial_columns = pd.Series(Edmunds_data_cleaned.columns)
@@ -957,7 +957,7 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
             _model = _models[j]
             # _bodyid = Edmunds_Final_Output.loc[(Edmunds_Final_Output['Model'] == _model) & (Edmunds_Final_Output['BodyID'] != -9), :]
             df_bodyids = Edmunds_Final_Output.loc[(Edmunds_Final_Output['Model'] == _model) & (Edmunds_Final_Output['BodyID'] != 0) & (Edmunds_Final_Output['BodyID'] != -9), :]
-            if len(df_lineageids) > 0:
+            if len(df_bodyids) > 0:
                 _bodyid = df_bodyids.loc[df_bodyids.index[0], 'BodyID']
                 _idx = df_tmp.loc[df_tmp['Model'] == _model, :].index
                 Edmunds_Final_Output.loc[_idx, 'BodyID'] = _bodyid
