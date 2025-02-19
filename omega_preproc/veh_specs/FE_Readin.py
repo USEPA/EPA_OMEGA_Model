@@ -16,20 +16,20 @@ def FE_Readin(input_path, run_input_path, input_filename, output_path, exception
     sheettype_vec = [] # pd.Series(['FEguide', 'PHEVs', 'EVs', 'FCVs']) #Define Sheetnames
     skiprows_vec = ast.literal_eval(skiprows_vec)
 
-    # if year == 2016:
-    #     skiprows_vec = [0, 7, 8, 7]
-    # elif year == 2019:
-    #     skiprows_vec = [0, 6, 4, 3]
-    # elif year == 2020:
-    #     skiprows_vec = [0, 6, 3, 5]
-    # elif year == 2021:
-    #     skiprows_vec = [0, 5, 4, 4]
-    # elif year == 2022:
-    #     skiprows_vec = [0, 4, 7, 3]
-    # elif year == 2023:
-    #     skiprows_vec = [0, 6, 6, -1]
-    # elif year == 2024:
-    #     skiprows_vec = [0, 6, 9, -1]
+    if year == 2016:
+        skiprows_vec = [0, 7, 8, 7]
+    elif year == 2019:
+        skiprows_vec = [0, 6, 4, 3]
+    elif year == 2020:
+        skiprows_vec = [0, 6, 3, 5]
+    elif year == 2021:
+        skiprows_vec = [0, 5, 4, 4]
+    elif year == 2022:
+        skiprows_vec = [0, 4, 7, 3]
+    elif year == 2023:
+        skiprows_vec = [0, 6, 6, -1]
+    elif year == 2024:
+        skiprows_vec = [0, 6, 9, -1]
 
     with pd.ExcelFile(input_path+'\\'+input_filename) as xlsx:
         sheetname_vec = [sheet for sheet in xlsx.sheet_names]
