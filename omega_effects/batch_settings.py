@@ -360,7 +360,7 @@ class BatchSettings:
 
     """
     def __init__(self):
-        self.effects_package_version = '2024.11.1'
+        self.effects_package_version = '2025.2.0'
         self.start_time_readable = None
         self.branch_name = None
         self.runtime_info = None
@@ -368,7 +368,7 @@ class BatchSettings:
         self.batch_program = None
         self.batch_folder = None
         self.batch_name = None
-        self.run_id = 'omega_effects'
+        self.run_id = None
 
         # runtime options set via batch settings file
         self.file_format = None
@@ -606,9 +606,9 @@ class BatchSettings:
             Nothing, but sets the run_id to the user entry, if provided, otherwise use default value.
 
         """
-        run_id = self.get_attribute_value((fleet, 'Run ID', 'all'), 'value')
-        if run_id != '':
-            self.run_id = run_id
+        self.run_id = self.get_attribute_value((fleet, 'Run ID', 'all'), 'value')
+        if self.run_id is None:
+            self.run_id = 'omega_effects'
 
     def get_lmdv_batch_settings(self, fleet):
         """
