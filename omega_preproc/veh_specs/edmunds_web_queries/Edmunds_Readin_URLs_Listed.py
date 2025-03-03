@@ -32,7 +32,7 @@ def movecol(df, cols_to_move=[], ref_cols='', place='After'):
 #
 start_time = datetime.now()
 working_directory = str(Path.home()) + '/Documents/Python/Edmunds_web_vehicle_specs/'
-run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2024.csv')
+run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2025.csv')
 start_count = 0 #Set to 0 when time permits
 final_table_to_csv_inc = 30 # print final_table csv file at the final_table_to_csv_inc increments
 # cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
@@ -93,10 +93,22 @@ for run_count in range (0,len(run_controller)):
             #     tmp_str = original_output_table['Trim_x'].str.rsplit('$').str[1].str.strip()[0].split(' ')[0]
             # except AttributeError:
             #     msrp = pd.Series(np.zeros(len(trims_msrp)), name = 'MSRP').astype(str)
+            # if url_count == 97:
+            #     print(url)
             trims = []; msrp = []
             for i in range(len(trim_text)):
                 trims.append((trim_text[i].rsplit(' - ')[0].strip()))
-                msrp.append((trim_text[i].rsplit('$')[1].strip()))
+                if ('$' not in trim_text[i]):
+                    if i > 0:
+                        if ('Most Popular' in msrp[-1]):
+                            msrp_tmp = msrp[-1].split('Most')[0]
+                        else:
+                            msrp_tmp = msrp[-1]
+                        msrp.append(msrp_tmp + ' (Estimated)')
+                    else:
+                        msrp.append('0')
+                else:
+                    msrp.append((trim_text[i].rsplit('$')[1].strip()))
 
             trims = pd.Series(trims, name='Trims'); msrp = pd.Series(msrp, name='MSRP')
             # trims = pd.Series(trims.str.rsplit(' - ').str[0].str.strip(), name='Trims')
