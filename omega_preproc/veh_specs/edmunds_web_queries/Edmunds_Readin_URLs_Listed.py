@@ -104,7 +104,7 @@ for run_count in range (0,len(run_controller)):
                             msrp_tmp = msrp[-1].split('Most')[0]
                         else:
                             msrp_tmp = msrp[-1]
-                        msrp.append(msrp_tmp + ' (Estimated)')
+                        msrp.append(msrp_tmp + ' (Est.)')
                     else:
                         msrp.append('0')
                 else:
