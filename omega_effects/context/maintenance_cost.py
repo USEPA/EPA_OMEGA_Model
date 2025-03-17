@@ -107,9 +107,12 @@ class MaintenanceCost:
 
         df = df.loc[df['dollar_basis'] != 0, :]
 
-        cols_to_convert = [col for col in df.columns if 'dollars_per_event' in col]
+        cols_to_float = [col for col in df.columns if 'per_event' in col]
+        for col in cols_to_float:
+            df[col] = df[col].astype(float)
 
-        df = batch_settings.ip_deflators.adjust_dollars(batch_settings, df, effects_log, *cols_to_convert)
+        cols_to_dollar_convert = [col for col in df.columns if 'dollars_per_event' in col]
+        df = batch_settings.ip_deflators.adjust_dollars(batch_settings, df, effects_log, *cols_to_dollar_convert)
 
         maintenance_cost_curve_dict = self.calc_maintenance_cost_per_mile_curve(df)
 
@@ -167,7 +170,7 @@ class MaintenanceCost:
             for interval in intervals:
                 cost_at_interval = \
                     input_df.loc[input_df[f'miles_per_event_{veh_type}'] == interval, 'dollars_per_event'].sum()
-                df.insert(1, f'cost_for_{int(interval)}', 0)
+                df.insert(1, f'cost_for_{int(interval)}', 0.0)
 
                 # determine miles for all events in this interval series
                 # (%1=0 divides by 1 and looks for a remainder of 0)

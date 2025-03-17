@@ -124,6 +124,8 @@ class CostFactorsSCGHG:
                                      f'{batch_settings.net_benefit_ghg_scope} values not found in {filepath}')
                 sys.exit()
 
+        for gas in self.gases:
+            df[gas] = df[gas].astype(float)
         df = batch_settings.ip_deflators.adjust_dollars(batch_settings, df, effects_log, *self.gases)
 
         self.factors_in_analysis_dollars = df.copy()

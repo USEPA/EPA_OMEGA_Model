@@ -329,7 +329,7 @@ def calc_annual_cost_effects(input_df):
                     'in_use_fuel_id', 'fueling_class'
                     ]
     return_df = input_df[[*groupby_cols, *attributes]]
-    return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+    return_df = return_df.groupby(by=groupby_cols, as_index=False).sum()
 
     return_df.insert(return_df.columns.get_loc('calendar_year') + 1, 'series', 'AnnualValue')
 
@@ -385,7 +385,7 @@ def calc_period_consumer_view(batch_settings, input_df, periods):
 
     attributes.append('sales')
     return_df = df[[*groupby_cols, *attributes]]
-    return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+    return_df = return_df.groupby(by=groupby_cols, as_index=False).sum()
 
     return_df.insert(return_df.columns.get_loc('model_year') + 1, 'periods', 0)
     return_df.insert(return_df.columns.get_loc('model_year') + 1, 'series', 'PeriodValue')

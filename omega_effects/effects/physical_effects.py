@@ -656,7 +656,7 @@ def calc_annual_physical_effects(batch_settings, input_df):
         'session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'in_use_fuel_id', 'fueling_class'
     ]
     return_df = input_df[[*groupby_cols, *attributes]]
-    return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+    return_df = return_df.groupby(by=groupby_cols, as_index=False).sum()
 
     return_df.insert(return_df.columns.get_loc('fuel_generation_kwh') + 1,
                      'onroad_gallons_per_mile',
@@ -717,14 +717,14 @@ def calc_period_consumer_physical_view(input_df, periods):
     df.loc[df['age'] != 0, 'sales'] = 0
 
     # groupby model year, body_style and fuel
-    if 'medium' in [item for item in input_df['reg_class_id']]:
+    if ('car' or 'truck') not in [item for item in input_df['reg_class_id']]:
         groupby_cols = ['session_policy', 'session_name', 'model_year', 'body_style', 'in_use_fuel_id']
     else:
         groupby_cols = ['session_policy', 'session_name', 'model_year', 'body_style', 'fueling_class']
 
     attributes.append('sales')
     return_df = df[[*groupby_cols, *attributes]]
-    return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+    return_df = return_df.groupby(by=groupby_cols, as_index=False).sum()
 
     return_df.insert(return_df.columns.get_loc('model_year') + 1, 'periods', 0)
     return_df.insert(return_df.columns.get_loc('model_year') + 1, 'series', 'PeriodValue')

@@ -371,11 +371,8 @@ def calc_annual_avg_safety_effects(input_df):
         s = pd.Series(input_df['registered_count'] * input_df[attribute], name=f'wtd_avg_{attribute}')
         temp_df = pd.concat([temp_df, s], axis=1)
 
-    mediumduty = None
-    if 'medium' in [item for item in input_df['reg_class_id']]:  # TODO is this what is needed?
-        mediumduty = 1
-
-    cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'body_style', 'in_use_fuel_id', 'fueling_class',
+    # safety effects do not depend on fuel id
+    cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'body_style', 'fueling_class',
             'registered_count', 'base_fatalities', 'session_fatalities'
             ]
     for attribute in attributes:
@@ -383,13 +380,9 @@ def calc_annual_avg_safety_effects(input_df):
     df = input_df[cols]
     df = pd.concat([df, temp_df], axis=1)
 
-    # groupby calendar year, regclass, body style and fuel
-    if mediumduty:
-        groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'body_style', 'in_use_fuel_id']
-    else:
-        groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'body_style', 'fueling_class']
-
-    return_df = df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+    # safety effects do not depend on fuel id
+    groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'reg_class_id', 'body_style', 'fueling_class']
+    return_df = df.groupby(by=groupby_cols, as_index=False).sum()
 
     for attribute in wtd_attributes:
         return_df[attribute] = return_df[attribute] / return_df['registered_count']
@@ -435,7 +428,7 @@ def calc_annual_avg_safety_effects_by_body_style(input_df):
 
     # groupby calendar year, body style
     groupby_cols = ['session_policy', 'session_name', 'calendar_year', 'body_style']
-    return_df = df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+    return_df = df.groupby(by=groupby_cols, as_index=False).sum()
 
     for attribute in wtd_attributes:
         return_df[attribute] = return_df[attribute] / return_df['registered_count']
