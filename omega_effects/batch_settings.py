@@ -360,7 +360,7 @@ class BatchSettings:
 
     """
     def __init__(self):
-        self.effects_package_version = '2025.2.0'
+        self.effects_package_version = '2025.3.0'
         self.start_time_readable = None
         self.branch_name = None
         self.runtime_info = None
