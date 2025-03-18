@@ -667,7 +667,7 @@ def calc_annual_physical_effects(batch_settings, input_df):
                      return_df['fuel_consumption_kwh'] / return_df['vmt'])
 
     cyears = pd.DataFrame(return_df['calendar_year'])
-    cyears.insert(0, 'refuel_efficiency', 0)
+    cyears.insert(0, 'refuel_efficiency', 0.0)
     for cyear in cyears['calendar_year'].unique():
         refuel_efficiency = \
             batch_settings.onroad_fuels.get_fuel_attribute(cyear, 'US electricity', 'refuel_efficiency')

@@ -18,9 +18,9 @@ class VehiclePhysicalData:
         self.grams_per_us_ton = 0
         self.grams_per_metric_ton = 0
         self.gal_per_bbl = 0
-        self.e0_share = 0
-        self.e0_energy_density_ratio = 0
-        self.diesel_energy_density_ratio = 0
+        self.e0_share = 0.0
+        self.e0_energy_density_ratio = 0.0
+        self.diesel_energy_density_ratio = 0.0
 
         self.vehicle_id = None
         self.base_year_vehicle_id = None
@@ -43,73 +43,73 @@ class VehiclePhysicalData:
         self.registered_count = None
         self.context_stock_adjustment = None
         self.context_vmt_adjustment = None
-        self.annual_vmt = 0
-        self.odometer = 0
-        self.vmt = 0
-        self.annual_vmt_rebound = 0
-        self.vmt_rebound = 0
-        self.vmt_liquid_fuel = 0
-        self.battery_kwh = 0
-        self.battery_kwh_per_veh = 0
-        self.onroad_direct_co2e_grams_per_mile = 0
-        self.onroad_direct_kwh_per_mile = 0
-        self.evse_kwh_per_mile = 0
-        self.onroad_gallons_per_mile = 0
-        self.onroad_miles_per_gallon = 0
-        self.fuel_consumption_gallons = 0
-        self.petroleum_consumption_gallons = 0
-        self.fuel_consumption_kwh = 0
-        self.fuel_generation_kwh = 0
-        self.curbweight_lbs = 0
-        self.gvwr_lbs = 0
+        self.annual_vmt = 0.0
+        self.odometer = 0.0
+        self.vmt = 0.0
+        self.annual_vmt_rebound = 0.0
+        self.vmt_rebound = 0.0
+        self.vmt_liquid_fuel = 0.0
+        self.battery_kwh = 0.0
+        self.battery_kwh_per_veh = 0.0
+        self.onroad_direct_co2e_grams_per_mile = 0.0
+        self.onroad_direct_kwh_per_mile = 0.0
+        self.evse_kwh_per_mile = 0.0
+        self.onroad_gallons_per_mile = 0.0
+        self.onroad_miles_per_gallon = 0.0
+        self.fuel_consumption_gallons = 0.0
+        self.petroleum_consumption_gallons = 0.0
+        self.fuel_consumption_kwh = 0.0
+        self.fuel_generation_kwh = 0.0
+        self.curbweight_lbs = 0.0
+        self.gvwr_lbs = 0.0
         self.weight_class = 'na'
-        self.onroad_charge_depleting_range_mi = 0
+        self.onroad_charge_depleting_range_mi = 0.0
 
-        self.session_fatalities = 0
-        self.energy_density_ratio = 0
-        self.pure_share = 0
+        self.session_fatalities = 0.0
+        self.energy_density_ratio = 0.0
+        self.pure_share = 0.0
 
-        self.pm25_brakewear_rate_e = 0
-        self.pm25_tirewear_rate_e = 0
-        self.pm25_brakewear_rate_l = 0
-        self.pm25_tirewear_rate_l = 0
-        self.pm25_exh_rate = 0
+        self.pm25_brakewear_rate_e = 0.0
+        self.pm25_tirewear_rate_e = 0.0
+        self.pm25_brakewear_rate_l = 0.0
+        self.pm25_tirewear_rate_l = 0.0
+        self.pm25_exh_rate = 0.0
 
-        self.nmog_exh_rate = 0
-        self.nmog_permeation_rate = 0
-        self.nmog_venting_rate = 0
-        self.nmog_leaks_rate = 0
-        self.nmog_refuel_disp_rate = 0
-        self.nmog_refuel_spill_rate = 0
+        self.nmog_exh_rate = 0.0
+        self.nmog_permeation_rate = 0.0
+        self.nmog_venting_rate = 0.0
+        self.nmog_leaks_rate = 0.0
+        self.nmog_refuel_disp_rate = 0.0
+        self.nmog_refuel_spill_rate = 0.0
 
-        self.co_exh_rate = 0
-        self.nox_exh_rate = 0
-        self.sox_exh_rate = 0
-        self.ch4_exh_rate = 0
-        self.n2o_exh_rate = 0
+        self.co_exh_rate = 0.0
+        self.nox_exh_rate = 0.0
+        self.sox_exh_rate = 0.0
+        self.ch4_exh_rate = 0.0
+        self.n2o_exh_rate = 0.0
 
-        self.acetaldehyde_exh_rate = 0
-        self.acrolein_exh_rate = 0
+        self.acetaldehyde_exh_rate = 0.0
+        self.acrolein_exh_rate = 0.0
 
-        self.benzene_exh_rate = 0
-        self.benzene_permeation_rate = 0
-        self.benzene_venting_rate = 0
-        self.benzene_leaks_rate = 0
-        self.benzene_refuel_disp_rate = 0
-        self.benzene_refuel_spill_rate = 0
+        self.benzene_exh_rate = 0.0
+        self.benzene_permeation_rate = 0.0
+        self.benzene_venting_rate = 0.0
+        self.benzene_leaks_rate = 0.0
+        self.benzene_refuel_disp_rate = 0.0
+        self.benzene_refuel_spill_rate = 0.0
 
-        self.ethylbenzene_exh_rate = 0
-        self.ethylbenzene_permeation_rate = 0
-        self.ethylbenzene_venting_rate = 0
-        self.ethylbenzene_leaks_rate = 0
-        self.ethylbenzene_refuel_disp_rate = 0
-        self.ethylbenzene_refuel_spill_rate = 0
+        self.ethylbenzene_exh_rate = 0.0
+        self.ethylbenzene_permeation_rate = 0.0
+        self.ethylbenzene_venting_rate = 0.0
+        self.ethylbenzene_leaks_rate = 0.0
+        self.ethylbenzene_refuel_disp_rate = 0.0
+        self.ethylbenzene_refuel_spill_rate = 0.0
 
-        self.formaldehyde_exh_rate = 0
-        self.naphthalene_exh_rate = 0
-        self.naphthalene_refuel_spill_rate = 0
-        self.butadiene13_exh_rate = 0
-        self.pah15_exh_rate = 0
+        self.formaldehyde_exh_rate = 0.0
+        self.naphthalene_exh_rate = 0.0
+        self.naphthalene_refuel_spill_rate = 0.0
+        self.butadiene13_exh_rate = 0.0
+        self.pah15_exh_rate = 0.0
 
     def update_value(self, update_dict):
         """

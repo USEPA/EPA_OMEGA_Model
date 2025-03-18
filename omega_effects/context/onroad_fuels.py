@@ -113,6 +113,10 @@ class OnroadFuel:
 
         validate_template_column_names(filepath, df, input_template_columns, effects_log)
 
+        df['direct_co2e_grams_per_unit'] = df['direct_co2e_grams_per_unit'].astype(float)
+        df['refuel_efficiency'] = df['refuel_efficiency'].astype(float)
+        df['transmission_efficiency'] = df['transmission_efficiency'].astype(float)
+
         self._data = df.set_index(['fuel_id', 'start_year']).to_dict(orient='index')
         self._data.update(df[['start_year', 'fuel_id']].set_index('fuel_id').to_dict(orient='series'))
         self.fuel_ids = df['fuel_id'].unique()

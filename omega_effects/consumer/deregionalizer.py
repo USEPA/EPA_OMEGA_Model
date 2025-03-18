@@ -31,7 +31,7 @@ def remove_region_entries(df, attribute, attribute_values_to_remove, string_for_
         for suffix in ['BEV', 'ICE']:
             df_return = df_return.loc[df_return[attribute] != f'{arg}_{attribute_values_to_remove}.{suffix}']
 
-    df_return[attribute].replace({f'_{string_for_removal}': ''}, regex=True, inplace=True)
+    df_return[attribute] = df_return[attribute].replace({f'_{string_for_removal}': ''}, regex=True)
 
     return df_return
 
@@ -51,7 +51,7 @@ def deregionalize_entries(df, attribute, *args):
     df_return = df.copy()
 
     for arg in args:
-        df_return[attribute].replace({f'_{arg}': ''}, regex=True, inplace=True)
+        df_return[attribute] = df_return[attribute].replace({f'_{arg}': ''}, regex=True)
 
     return df_return
 
@@ -70,6 +70,6 @@ def clean_body_styles(df):
                        'cuv_suv_van': 'cuv_suv',
                        }
     for style in body_style_dict:
-        df['body_style'].replace({style: body_style_dict[style]}, inplace=True)
+        df['body_style'] = df['body_style'].replace({style: body_style_dict[style]})
 
     return df

@@ -109,7 +109,7 @@ def calc_annual_avg_safety_effects_by_body_style(input_df):
 
     # groupby calendar year, body style
     groupby_cols = ['session_policy', 'calendar_year', 'body_style']
-    return_df = df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+    return_df = df.groupby(by=groupby_cols, as_index=False).sum()
 
     for attribute in wtd_attributes:
         return_df[attribute] = return_df[attribute] / return_df['registered_count']
