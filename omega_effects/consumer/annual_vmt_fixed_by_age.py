@@ -133,7 +133,10 @@ class OnroadVMT:
 
             if len(start_years[start_years <= calendar_year]) > 0:
                 year = max(start_years[start_years <= calendar_year])
-                self._data[cache_key] = self._data[market_class_id, age, year]['annual_vmt']
+                try:
+                    self._data[cache_key] = self._data[market_class_id, age, year]['annual_vmt']
+                except:
+                    self._data[cache_key] = 0
             else:
                 raise Exception('Missing onroad VMT fixed by age parameters for %s, %d or prior' %
                                 (market_class_id, calendar_year))

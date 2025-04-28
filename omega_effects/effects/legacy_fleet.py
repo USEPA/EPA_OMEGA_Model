@@ -203,7 +203,9 @@ class LegacyFleet:
                 reregistered_proportion \
                     = batch_settings.reregistration.get_reregistered_proportion(model_year, market_class_id, new_age)
                 new_registered_count = v['registered_count'] * reregistered_proportion
-                if new_registered_count == 0 or new_age == 0:
+                # if new_registered_count == 0 or new_age == 0:
+                #     pass
+                if new_age == 0 or new_age > 39:
                     pass
 
                 else:
@@ -285,7 +287,10 @@ class LegacyFleet:
             context_stock_adj = vmt_adjustments_session.get_stock_adjustment(v['calendar_year'])
             adjusted_registered_count = v['registered_count'] * context_stock_adj
 
-            annual_vmt_adjusted = vmt_adjusted / adjusted_registered_count
+            try:
+                annual_vmt_adjusted = vmt_adjusted / adjusted_registered_count
+            except:
+                annual_vmt_adjusted = 0
 
             if v['calendar_year'] == batch_settings.analysis_initial_year:
                 annual_vmt = v['annual_vmt']
