@@ -87,6 +87,7 @@ if __name__ == "__main__":
             pythonpathstr = 'export PYTHONPATH=%s:%s/omega_model' % (path, path)
         else:
             pythonpathstr = 'set PYTHONPATH=.;..;..\\omega_model'
+
         pythoncommand = 'python -u'
 
         results = dict() # {'PASSED': [], 'FAILED': [], 'UNKNOWN': []}

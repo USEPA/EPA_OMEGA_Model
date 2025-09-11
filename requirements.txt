@@ -34,5 +34,4 @@ openpyxl
 
 PySide6
 multitimer
-playsound
 PyYAML

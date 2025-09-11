@@ -22,7 +22,6 @@ import multitimer
 
 from PySide6.QtGui import QIcon, QColor, QTextOption
 from PySide6.QtWidgets import QWidget, QMessageBox
-# from playsound import playsound
 
 # PyCharm indicates the next statement is not used but is needed for the compile process to satisfy PySide2.QtUiTools.
 import PySide6.QtXml
@@ -250,7 +249,6 @@ class Form(QObject):
         :return:
         """
 
-        # playsound(button_click_sound)
         global configuration_file, scenario, configuration_file_valid, input_batch_file_valid
         global output_batch_directory_valid, input_batch_file, output_batch_directory
         # self.window.statusBar().showMessage("Open File")
