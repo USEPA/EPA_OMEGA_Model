@@ -107,6 +107,9 @@ def main(set_paths, batch_settings, fleet, effects_log):
         for session_num in batch_settings.batch_sessions[fleet]:
 
             session_settings = SessionSettings()
+
+            session_settings.fuel_prices = batch_settings.context_fuel_prices  # by default, use batch context case id fuel prices
+
             session_settings.get_session_settings(batch_settings, fleet, session_num, effects_log)
             session_name = session_settings.session_name
 

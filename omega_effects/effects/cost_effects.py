@@ -157,10 +157,10 @@ def calc_cost_effects(batch_settings, session_settings, session_fleet_physical, 
         if v['fuel_consumption_gallons'] > 0:
             fuel_dict = eval(v['in_use_fuel_id'])
             fuel = [item for item in fuel_dict.keys()][0]
-            retail_price = batch_settings.context_fuel_prices.get_fuel_price(
+            retail_price = session_settings.fuel_prices.get_fuel_price(
                 v['calendar_year'], fuel, 'retail_dollars_per_unit'
             )
-            pretax_price = batch_settings.context_fuel_prices.get_fuel_price(
+            pretax_price = session_settings.fuel_prices.get_fuel_price(
                 v['calendar_year'], fuel, 'pretax_dollars_per_unit'
             )
             fuel_retail_cost_dollars += retail_price * v['fuel_consumption_gallons']

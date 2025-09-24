@@ -212,7 +212,7 @@ def calc_fuel_cost_per_mile(
         fuel_dict = eval(in_use_fuel_id)
         fuel = [fuel for fuel in fuel_dict.keys()][0]
         retail_price_per_gallon = \
-            batch_settings.context_fuel_prices.get_fuel_price(
+            session_settings.fuel_prices.get_fuel_price(
                 calendar_year, fuel, 'retail_dollars_per_unit'
             )
         refuel_efficiency_l = \
