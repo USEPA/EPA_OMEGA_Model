@@ -311,7 +311,7 @@ class SetInputs:
 
         # some run settings
         self.create_results_thru = 2060
-        self.aeo_cases = ['Reference case', 'High oil price', 'Low oil price']
+        self.aeo_cases = ['Reference case', 'High oil price', 'Low oil price', 'Alternative Transportation']
         self.gasoline_upstream = 2478  # 77 FR 63181
         self.electricity_upstream = 534  # 77 FR 63182
 
@@ -332,7 +332,7 @@ def main():
     settings = SetInputs()
     start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
 
-    deflators_table = read_table(settings.path_bea_tables, settings.deflators_table_file)
+    deflators_table = read_table(settings.path_bea_tables, settings.deflators_table_file, skiprows=3)
     cpi_table = pd.read_csv(settings.path_bea_tables / settings.cpiu_table_file, skiprows=11, usecols=[0, 1])
 
     fleet_context_df = pd.DataFrame()
@@ -352,6 +352,8 @@ def main():
         for aeo_case in settings.aeo_cases:
             # print(f'Working on context gasoline prices for the {aeo_version} {aeo_case}')
             case_df = return_df(aeo_petroleum_fuel_prices_table, 'full name', aeo_case, aeo_version)
+            if case_df.empty: # allows for aeo_case array to reference scenarios that are not in every aeo year (e.g. 'Alternative Transportation')
+                continue
             aeo_table_obj = GetContext(case_df)
 
             usd_basis = aeo_table_obj.aeo_dollars()
@@ -445,8 +447,13 @@ def main():
             attributes_df = return_df(aeo_class_attributes_table, 'full name', aeo_case, aeo_version)
             aeo_table_obj = GetContext(attributes_df)
 
-            attribute['HP'] = aeo_table_obj.select_table_rows('full name', 'Horsepower', settings.create_results_thru, replace='New Vehicle Attributes: Horsepower: Conventional ')
-            attribute['lb'] = aeo_table_obj.select_table_rows('full name', 'Weight', settings.create_results_thru, replace='New Vehicle Attributes: Weight: Conventional ')
+            if aeo_version == "AEO2025": # for AEO2025. If subsequent versions use the same format, add conditions here
+                attribute['HP'] = aeo_table_obj.select_table_rows('full name', 'Horsepower', settings.create_results_thru, replace='New Vehicle Attributes: Horsepower: ')
+                attribute['lb'] = aeo_table_obj.select_table_rows('full name', 'Weight', settings.create_results_thru, replace='New Vehicle Attributes: Weight: ')
+            else: # for prior to AEO2025
+                attribute['HP'] = aeo_table_obj.select_table_rows('full name', 'Horsepower', settings.create_results_thru, replace='New Vehicle Attributes: Horsepower: Conventional ')
+                attribute['lb'] = aeo_table_obj.select_table_rows('full name', 'Weight', settings.create_results_thru, replace='New Vehicle Attributes: Weight: Conventional ')
+
             attribute['percent'] = aeo_table_obj.select_table_rows('full name', 'Sales Shares', settings.create_results_thru, replace='New Vehicle Attributes: Sales Shares: ')
             attribute['mpg_conventional'] = aeo_table_obj.select_table_rows('full name', 'EPA Efficiency', settings.create_results_thru, replace='New Vehicle Attributes: EPA Efficiency: Conventional ')
             attribute['mpg_alternative'] = aeo_table_obj.select_table_rows('full name', 'Fuel Efficiency', settings.create_results_thru, replace='New Vehicle Attributes: Fuel Efficiency: Alternative-Fuel ')
